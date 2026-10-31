@@ -9,6 +9,44 @@ import tools.jackson.databind.JsonNode
 
 class InternalCollaborationMatrixKeyRepository(private val source: MatrixKeyDataSource) :
     CollaborationMatrixKeyRepository {
+    override fun deviceKeys(
+        request: CollaborationMatrixKeyQuery,
+        token: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixKeyQueryResult> = safeMatrixProviderCall {
+        if (request.devices.size !in 1..100) invalid()
+        for ((user, devices) in request.devices) {
+            if (
+                user.length !in 1..255 ||
+                    devices.size !in 1..5 ||
+                    devices.any { it.length !in 1..128 } ||
+                    devices.toSet().size != devices.size
+            )
+                invalid()
+        }
+        val captured = request.devices.mapValues { it.value.toList() }
+        val body = source.queryDevices(captured, token, deadline)
+        val failures = body.path("failures")
+        if (!failures.isMissingNode && (!failures.isObject || !failures.isEmpty)) invalid()
+        val users = body.path("device_keys")
+        if (!users.isObject || users.propertyNames().any { it !in captured }) invalid()
+        CollaborationMatrixKeyQueryResult(
+            captured.mapValues { (user, requested) ->
+                val devices = users.path(user)
+                if (devices.isMissingNode) emptyMap()
+                else {
+                    if (!devices.isObject || devices.propertyNames().any { it !in requested })
+                        invalid()
+                    devices.properties().associate { (device, value) ->
+                        val keys = readDevice(value)
+                        if (keys.userId != user || keys.deviceId != device) invalid()
+                        device to keys
+                    }
+                }
+            }
+        )
+    }
+
     override fun ownDeviceKeys(
         userId: String,
         deviceId: String,
@@ -25,6 +63,10 @@ class InternalCollaborationMatrixKeyRepository(private val source: MatrixKeyData
         if (!devices.isObject || devices.propertyNames().any { it != deviceId }) invalid()
         val value = devices.path(deviceId)
         if (value.isMissingNode) return@safeMatrixProviderCall null
+        readDevice(value)
+    }
+
+    private fun readDevice(value: JsonNode): CollaborationMatrixDeviceKeys {
         val required = setOf("user_id", "device_id", "algorithms", "keys", "signatures")
         if (
             !value.isObject ||
@@ -42,7 +84,7 @@ class InternalCollaborationMatrixKeyRepository(private val source: MatrixKeyData
         // Other users' signatures/unsigned labels do not enter this own-device projection.
         // The use case still verifies the self signature, expected identity and fingerprint.
         val ownSignatures = stringMap(signatures.path(user), 8, 136, 88)
-        CollaborationMatrixDeviceKeys(
+        return CollaborationMatrixDeviceKeys(
             user,
             device,
             algorithms.iterator().asSequence().map { text(it, 100) }.toList(),

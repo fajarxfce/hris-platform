@@ -38,7 +38,9 @@ per-account limits, exact Matrix user/device mapping, provider fingerprint check
 and pre/post-exchange admission remain the consuming key-query use case's work.
 An empty eligible list must not become a self-only message reported as delivered.
 
-The repository is not yet bound to a public endpoint. Group/resource-context
+The [native recipient-key query](device-key-query.md) now binds this repository
+and owns its per-account bounds, device-set completeness and pre/post-exchange
+checks. The view by itself grants no provider operation. Group/resource-context
 membership and browser-parent enrollment will extend their own eligibility
 contracts; this initial view authorizes only existing direct pairs and self.
 The schema adds no secret envelope; recovery's reviewed ceiling becomes 113 and

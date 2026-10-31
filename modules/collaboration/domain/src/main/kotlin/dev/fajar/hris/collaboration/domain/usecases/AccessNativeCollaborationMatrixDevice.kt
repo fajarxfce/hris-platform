@@ -22,6 +22,8 @@ class AccessNativeCollaborationMatrixDevice(
     private val matrix: CollaborationMatrixRepository,
     private val keys: CollaborationDeviceKeyRepository,
     private val providerKeys: CollaborationMatrixKeyRepository,
+    private val recipients: CollaborationRecipientRepository,
+    private val conversations: CollaborationDirectRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -34,6 +36,154 @@ class AccessNativeCollaborationMatrixDevice(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
+    fun queryKeys(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationMatrixKeyQuery,
+    ): Result<CollaborationMatrixKeyQueryResult> {
+        val captured = snapshotCollaborationKeyQuery(request)
+        if (captured is Result.Failed) return captured
+        val query = (captured as Result.Success).value
+        return admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ -> prepareQuery(initial, query) },
+            extraAccounts = { initial ->
+                collaborationKeyQueryAccounts(query, initial.companyId, provider.serverName).map {
+                    it.values.toSet()
+                }
+            },
+            revalidate = { initial, original ->
+                prepareQuery(initial, query).flatMap { current ->
+                    if (original != current) recipientsChanged() else Result.Success(Unit)
+                }
+            },
+        ) { exchange, prepared ->
+            val expanded = prepared.providerRequest()
+            if (expanded.devices.isEmpty()) {
+                exchange.confirm().map {
+                    CollaborationMatrixKeyQueryResult(prepared.accounts.mapValues { emptyMap() })
+                }
+            } else {
+                exchange.exchange { bearer, deadline ->
+                    providerKeys.deviceKeys(expanded, bearer, deadline).flatMap {
+                        verifyQuery(prepared, it)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun prepareQuery(
+        initial: CollaborationGatewaySession,
+        request: CollaborationMatrixKeyQuery,
+    ): Result<QueryPreparation> {
+        val resolved =
+            collaborationKeyQueryAccounts(request, initial.companyId, provider.serverName)
+        if (resolved is Result.Failed) return resolved
+        val accounts = (resolved as Result.Success).value
+        val admittedAccounts = mutableSetOf(initial.accountId)
+        for (account in accounts.values) {
+            if (account == initial.accountId) continue
+            val read = identities.access(account, initial.companyId)
+            if (read is Result.Failed) return read
+            val peer = (read as Result.Success).value
+            if (
+                peer == null ||
+                    peer.account.id != account ||
+                    !peer.account.active ||
+                    !peer.companyActive ||
+                    !peer.membershipActive ||
+                    COLLABORATION_CHAT_PERMISSION !in peer.permissions
+            )
+                continue
+            val pair = listOf(initial.accountId, account).sortedBy { it.toString() }
+            val conversation = conversations.findPair(initial.companyId, pair[0], pair[1])
+            if (conversation is Result.Failed) return conversation
+            val direct = (conversation as Result.Success).value
+            if (direct == null) continue
+            if (
+                direct.companyId != initial.companyId ||
+                    direct.firstAccountId != pair[0] ||
+                    direct.secondAccountId != pair[1]
+            )
+                return invalidProvider()
+            admittedAccounts.add(account)
+        }
+        // Matrix clients may batch a removed/unknown peer with current recipients.
+        // Empty entries reveal no key material and must not stall unrelated conversations.
+        val requestedAccounts = accounts.values.filter { it in admittedAccounts }.toSet()
+        if (requestedAccounts.isEmpty())
+            return Result.Success(QueryPreparation(accounts, emptyMap()))
+        val at = clock.instant()
+        val read = recipients.devices(initial.companyId, requestedAccounts, at)
+        if (read is Result.Failed) return read
+        val eligible = (read as Result.Success).value
+        if (
+            eligible.size > 500 ||
+                eligible.any {
+                    it.companyId != initial.companyId ||
+                        it.accountId !in requestedAccounts ||
+                        it.receiveUntil <= at
+                } ||
+                eligible.groupingBy { it.accountId }.eachCount().values.any { it > 5 } ||
+                eligible.map { it.deviceId }.toSet().size != eligible.size
+        )
+            return recipientsChanged()
+        val names = accounts.entries.associate { it.value to it.key }
+        val selected =
+            eligible
+                .filter { row ->
+                    val requested = request.devices.getValue(names.getValue(row.accountId))
+                    requested.isEmpty() || collaborationMatrixDeviceId(row.deviceId) in requested
+                }
+                .associateBy { it.deviceId }
+        return Result.Success(QueryPreparation(accounts, selected))
+    }
+
+    private fun verifyQuery(
+        prepared: QueryPreparation,
+        response: CollaborationMatrixKeyQueryResult,
+    ): Result<CollaborationMatrixKeyQueryResult> {
+        val expected = prepared.providerRequest().devices
+        if (response.deviceKeys.keys != expected.keys) return invalidProvider()
+        val output = linkedMapOf<String, Map<String, CollaborationMatrixDeviceKeys>>()
+        for ((user, account) in prepared.accounts) {
+            val rows = prepared.devices.values.filter { it.accountId == account }
+            val devices = response.deviceKeys[user] ?: emptyMap()
+            if (devices.keys != rows.map { collaborationMatrixDeviceId(it.deviceId) }.toSet())
+                return invalidProvider()
+            for (row in rows) {
+                val deviceId = collaborationMatrixDeviceId(row.deviceId)
+                val checked =
+                    validateCollaborationDeviceKeys(devices.getValue(deviceId), user, deviceId)
+                if (checked is Result.Failed) return invalidProvider()
+                if ((checked as Result.Success).value != row.fingerprint) return keysChanged()
+            }
+            output[user] = devices.toMap()
+        }
+        return Result.Success(CollaborationMatrixKeyQueryResult(output))
+    }
+
+    private data class QueryPreparation(
+        val accounts: Map<String, UUID>,
+        val devices: Map<UUID, CollaborationRecipientDevice>,
+    ) {
+        fun providerRequest() =
+            CollaborationMatrixKeyQuery(
+                accounts
+                    .mapValues { (_, account) ->
+                        devices.values
+                            .filter { it.accountId == account }
+                            .map { collaborationMatrixDeviceId(it.deviceId) }
+                    }
+                    .filterValues { it.isNotEmpty() }
+            )
+    }
+
+    private fun recipientsChanged() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_recipients_changed"))
+
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, { _, _ -> Result.Success(Unit) }) { exchange, _ ->
             exchange
@@ -169,12 +319,18 @@ class AccessNativeCollaborationMatrixDevice(
                 if (result.value == retained.fingerprint) Result.Success(Unit) else keysChanged()
         }
 
-    // Only the two fixed public operations above can use this private runner. Callers cannot
+    // Only the fixed public operations above can use this private runner. Callers cannot
     // supply provider paths or callbacks. Preparation, admission and publication remain here.
     private fun <S, T> admitted(
         token: String,
         correlationId: UUID,
         prepare: (CollaborationGatewaySession, Observation) -> Result<S>,
+        extraAccounts: (CollaborationGatewaySession) -> Result<Set<UUID>> = {
+            Result.Success(emptySet())
+        },
+        revalidate: (CollaborationGatewaySession, S) -> Result<Unit> = { _, _ ->
+            Result.Success(Unit)
+        },
         operation: (Exchange, S) -> Result<T>,
     ): Result<T> {
         if (!service.enabled || !provider.enabled)
@@ -187,10 +343,13 @@ class AccessNativeCollaborationMatrixDevice(
         val initial =
             (resolved as Result.Success).value
                 ?: return collaborationGatewayAuthenticationRequired()
+        val resolvedAccounts = extraAccounts(initial)
+        if (resolvedAccounts is Result.Failed) return resolvedAccounts
+        val relatedAccounts = (resolvedAccounts as Result.Success).value.toSet()
         val scope = lookup.copy(accountId = initial.accountId, companyId = initial.companyId)
         val captured =
             transactions.run(scope) {
-                observe(scope, initial).flatMap { observation ->
+                observe(scope, initial, relatedAccounts).flatMap { observation ->
                     prepare(initial, observation).flatMap { extra ->
                         validateObservation(observation.admission, observation.admission).map {
                             Preparation(observation, extra)
@@ -214,7 +373,9 @@ class AccessNativeCollaborationMatrixDevice(
             )
         if (clock.instant() >= deadline) return changed()
         return operation(
-            Exchange(scope, initial, observed.admission, active, deadline),
+            Exchange(scope, initial, observed.admission, active, deadline, relatedAccounts) {
+                revalidate(initial, prepared.extra)
+            },
             prepared.extra,
         )
     }
@@ -225,6 +386,8 @@ class AccessNativeCollaborationMatrixDevice(
         val admission: CollaborationAdmission,
         val credential: CollaborationProviderSession,
         val deadline: Instant,
+        val relatedAccounts: Set<UUID>,
+        val extraCheck: () -> Result<Unit>,
     ) {
         fun <T> exchange(request: (String, Instant) -> Result<T>): Result<T> {
             val before = check()
@@ -244,11 +407,15 @@ class AccessNativeCollaborationMatrixDevice(
             )
         }
 
+        fun confirm(): Result<Unit> = check()
+
         private fun check(): Result<Unit> =
             transactions.run(scope) {
-                observe(scope, initial).flatMap { current ->
+                observe(scope, initial, relatedAccounts).flatMap { current ->
                     validateObservation(admission, current.admission).flatMap {
-                        if (clock.instant() >= deadline) changed() else Result.Success(Unit)
+                        extraCheck().flatMap {
+                            if (clock.instant() >= deadline) changed() else Result.Success(Unit)
+                        }
                     }
                 }
             }
@@ -385,7 +552,11 @@ class AccessNativeCollaborationMatrixDevice(
     }
 
     /** The token lookup identifies locks only; this method reacquires every authority input. */
-    private fun observe(scope: Actor, initial: CollaborationGatewaySession): Result<Observation> {
+    private fun observe(
+        scope: Actor,
+        initial: CollaborationGatewaySession,
+        relatedAccounts: Set<UUID> = emptySet(),
+    ): Result<Observation> {
         val company = initial.companyId
         val pg = policies.lock(company, shared = true)
         if (pg is Result.Failed) return pg
@@ -393,8 +564,10 @@ class AccessNativeCollaborationMatrixDevice(
         if (cg is Result.Failed) return cg
         val mg = members.lock(company, shared = true)
         if (mg is Result.Failed) return mg
-        val ag = identities.lockAccount(initial.accountId, shared = true)
-        if (ag is Result.Failed) return ag
+        for (account in (relatedAccounts + initial.accountId).sorted()) {
+            val ag = identities.lockAccount(account, shared = true)
+            if (ag is Result.Failed) return ag
+        }
         val locked = sessions.lock(initial.nativeSessionId, initial.accountId)
         if (locked is Result.Failed) return locked
         val parent =

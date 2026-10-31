@@ -71,7 +71,9 @@
         "device-key-upload.md",
         "../measurements/collaboration-device-key-upload-2026-10-31.json",
         "recipient-devices.md",
-        "../measurements/collaboration-recipient-devices-2026-10-31.json"
+        "../measurements/collaboration-recipient-devices-2026-10-31.json",
+        "device-key-query.md",
+        "../measurements/collaboration-device-key-query-2026-10-31.json"
       ]
     },
     {
@@ -460,10 +462,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Prove native Android/web Matrix interoperability on the dedicated emulator.",
-    "Prove Apple bindings and retain the physical-device acceptance boundary.",
-    "Implement strict HRIS session/device admission before exposing provider logins.",
-    "Implement MatrixRTC participant/epoch/key rotation before accepting production encrypted calls.",
-    "Continue P1\u2013P8; browser provider proof does not accept a product feature or capacity."
+    "Implement signed one-time key claim and scoped to-device/classic sync/content on current native self/direct authority.",
+    "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
+    "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
+    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",
+    "Continue P1\u2013P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
   ]
 }

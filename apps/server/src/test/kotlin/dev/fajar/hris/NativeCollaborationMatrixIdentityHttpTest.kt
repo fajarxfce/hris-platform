@@ -6,13 +6,17 @@ import java.net.URI
 import java.net.http.*
 import java.nio.file.Path
 import java.time.Duration
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -31,6 +35,24 @@ import tools.jackson.databind.json.JsonMapper
         ]
 )
 class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture() {
+    private val ownedParents = mutableSetOf<UUID>()
+
+    @BeforeEach
+    fun alignProtocolClockWithCurrentDatabaseTime() {
+        // This live eligibility view uses database time. The broader People fixture
+        // intentionally uses October 1; that is not a live protocol parent today.
+        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+    }
+
+    @AfterEach
+    fun retireOwnedNativeParents() {
+        for (parent in ownedParents) database()
+            .update(
+                "update native_sessions set revoked_at=coalesce(revoked_at,now()),version=version+1 where id=?",
+                parent,
+            )
+    }
+
     companion object {
         private val provider = Provider()
 
@@ -57,6 +79,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     private fun enroll(n: Native): Pair<UUID, String> {
+        ownedParents.add(n.session)
         val registered = register(n)
         assertEquals(200, registered.statusCode(), registered.body())
         val device = UUID.fromString(json.readTree(registered.body())["id"].asString())
@@ -212,10 +235,11 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         duplicate: Boolean = false,
         contentType: String = "application/json",
         chunked: Boolean = false,
+        path: String = "upload",
     ): HttpResponse<String> {
         val builder =
             HttpRequest.newBuilder(
-                    URI("http://127.0.0.1:$port/_matrix/client/v3/keys/upload$suffix")
+                    URI("http://127.0.0.1:$port/_matrix/client/v3/keys/$path$suffix")
                 )
                 .timeout(Duration.ofSeconds(15))
                 .header("Content-Type", contentType)
@@ -237,6 +261,140 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test",
             "HRIS_${device.toString().replace("-", "")}",
         )
+
+    @Test
+    fun keyQueryUsesOpaqueAuthorityAndReturnsOnlyConfirmedExplicitDeviceKeys() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        val body =
+            json.writeValueAsString(
+                mapOf("device_keys" to mapOf(key.user to emptyList<String>()), "timeout" to 10000)
+            )
+        for (invalid in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+            401,
+            uploadKeys(n, invalid, body, path = "query").statusCode(),
+        )
+        val pending = uploadKeys(n, token, body, path = "query")
+        assertEquals(200, pending.statusCode(), pending.body())
+        assertTrue(json.readTree(pending.body()).path("device_keys").path(key.user).isEmpty)
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        val response = uploadKeys(n, token, body, chunked = true, path = "query")
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        val keys = json.readTree(response.body()).path("device_keys")
+        assertEquals(setOf(key.user), keys.propertyNames().toSet())
+        assertEquals(setOf(key.device), keys.path(key.user).propertyNames().toSet())
+        assertEquals(key.device, keys.path(key.user).path(key.device).path("device_id").asString())
+        assertFalse(keys.path(key.user).path(key.device).has("unsigned"))
+        val unknownUser =
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${UUID.randomUUID().toString().replace("-", "")}:matrix.example.test"
+        val batch =
+            uploadKeys(
+                n,
+                token,
+                json.writeValueAsString(
+                    mapOf(
+                        "device_keys" to
+                            mapOf(
+                                key.user to emptyList<String>(),
+                                unknownUser to emptyList<String>(),
+                            )
+                    )
+                ),
+                path = "query",
+            )
+        assertEquals(200, batch.statusCode(), batch.body())
+        assertTrue(json.readTree(batch.body()).path("device_keys").path(unknownUser).isEmpty)
+        assertEquals(1, json.readTree(batch.body()).path("device_keys").path(key.user).size())
+        val unknown =
+            json.writeValueAsString(
+                mapOf(
+                    "device_keys" to
+                        mapOf(
+                            key.user to
+                                listOf("HRIS_" + UUID.randomUUID().toString().replace("-", ""))
+                        )
+                )
+            )
+        val absent = uploadKeys(n, token, unknown, path = "query")
+        assertEquals(200, absent.statusCode(), absent.body())
+        assertTrue(json.readTree(absent.body()).path("device_keys").path(key.user).isEmpty)
+    }
+
+    @Test
+    fun keyQueryRejectsAmbiguousOrForeignRequestsWithoutCallingTheProvider() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        val body =
+            json.writeValueAsString(mapOf("device_keys" to mapOf(key.user to emptyList<String>())))
+        val before = provider.keyQueries.get()
+        for (invalid in
+            listOf(
+                "{}",
+                "{\"device_keys\":null}",
+                "{\"device_keys\":{},\"device_keys\":{}}",
+                body.dropLast(1) + ",\"timeout\":null}",
+                body.dropLast(1) + ",\"timeout\":-1}",
+                body.dropLast(1) + ",\"unknown\":true}",
+                body.replace("matrix.example.test", "foreign.example.test"),
+                body.replace("[]", "[\"*\"]"),
+            )) {
+            assertEquals(400, uploadKeys(n, token, invalid, path = "query").statusCode())
+        }
+        assertEquals(
+            400,
+            uploadKeys(n, token, body, suffix = "?access_token=fixture", path = "query")
+                .statusCode(),
+        )
+        assertEquals(401, uploadKeys(n, token, body, duplicate = true, path = "query").statusCode())
+        assertEquals(
+            413,
+            uploadKeys(n, token, " ".repeat(65537), chunked = true, path = "query").statusCode(),
+        )
+        assertEquals(before, provider.keyQueries.get())
+    }
+
+    @Test
+    fun keyQueryWithholdsAProviderResultAfterNativeRevocation() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        provider.onKeyQuery.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val response =
+                uploadKeys(
+                    n,
+                    token,
+                    json.writeValueAsString(
+                        mapOf("device_keys" to mapOf(key.user to emptyList<String>()))
+                    ),
+                    path = "query",
+                )
+            assertEquals(401, response.statusCode(), response.body())
+            assertFalse(json.readTree(response.body()).has("device_keys"))
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(
+                1,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_device_key_publications where device_id=? and version=1",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onKeyQuery.set(null)
+        }
+    }
 
     @Test
     fun keyUploadUsesOpaqueAuthorityPreservesSignedFieldsAndRetainsPublicationOnReplay() {
@@ -421,6 +579,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     private class Provider : AutoCloseable {
         val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
         val keyUploads = AtomicInteger()
+        val keyQueries = AtomicInteger()
+        val onKeyQuery = AtomicReference<(() -> Unit)?>(null)
         val onKeyUpload = AtomicReference<(() -> Unit)?>(null)
         private val keys =
             ConcurrentHashMap<Pair<String, String>, tools.jackson.databind.JsonNode>()
@@ -459,6 +619,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                 identity + mapOf("access_token" to token, "expires_in_ms" to 600000)
                             }
                             "/_matrix/client/v3/keys/query" -> {
+                                keyQueries.incrementAndGet()
                                 val identity =
                                     requireNotNull(
                                         credentials[
@@ -483,6 +644,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                         .map { it.asString() }
                                         .toList(),
                                 )
+                                onKeyQuery.getAndSet(null)?.invoke()
                                 mapOf(
                                     "device_keys" to
                                         mapOf(

@@ -102,6 +102,20 @@ Current provider/client evidence:
 
 Current backend implementation:
 
+- Native `POST /_matrix/client/v3/keys/query` now uses the recipient projection,
+  current caller/self/direct authority and immutable self-signed fingerprints.
+  Unknown/unavailable peers return empty entries without blocking current devices
+  in a batch; provider requests always contain explicit devices. Caller admission
+  and the selected set are fenced before/after I/O, with no SQL held across HTTP.
+  [Contract](collaboration/device-key-query.md) and
+  [evidence](measurements/collaboration-device-key-query-2026-10-31.json) retain
+  final 5m09s checks: 26 domain, 152 data, 151 API, 112 worker (one existing skip),
+  format/architecture and both DI contexts, plus corrected fixture failures.
+  Transport has a one-MiB bound for bulk keys, other responses stay 64 KiB.
+  Actual Synapse readback/restart and HTTP framing/auth denial pass; this is not
+  yet complete SDK content traffic. Next implement signed one-time key claim,
+  then scoped to-device/classic sync/content and durable product UI/outbox.
+
 - Schema **113** adds a read-only public recipient view owned by a restricted
   non-login role. Application-role private device/binding/key RLS stays unchanged.
   Only self/current direct peers with active company/account/membership/chat
@@ -109,15 +123,15 @@ Current backend implementation:
   preserve offline delivery eligibility; hard parent expiry/revocation, security
   changes, device revocation and offboarding remove it. Parent cleanup retains
   owned device/key facts. The view returns five fields and no labels/credentials;
-  its storage port has a 100-account/500-result bound and is not yet public/DI-bound.
+  its storage port has a 100-account/500-result bound and now serves typed key query.
   [Contract](collaboration/recipient-devices.md) and
   [evidence](measurements/collaboration-recipient-devices-2026-10-31.json) retain
   seven actual storage cases, 112-to-113 upgrade, pg_dump/restore ownership/RLS,
   final 6m43s checks (30 database, 140 collaboration data, 148 API, 112 worker with
   one existing skip), domain suites, format/architecture and 23 recovery checks.
   Initial 53s test corrected its expected Result.Failed mutation denial; final
-  focused 28s passes. Inspect the exact hosted control after push; next connect
-  this projection to typed peer key query/claim with current admission and
+  focused 28s passes. Exact `b3b9b9a1` hosted `41213850974` passed all jobs/steps;
+  evidence is retained. Typed key query now adds current admission and
   retained-fingerprint checks before/after every provider exchange.
 
 - The exact `f104f097` room-control workflow [41206499276](https://github.com/fajarxfce/hris-platform/actions/runs/41206499276) passed every job/step, including both runtime graphs and real storage/provider checks; retained in the room-provisioning measurement.
@@ -247,7 +261,7 @@ Current backend implementation:
   the corrected JsonNode mapping compilation error remains recorded. The shared DI
   graph was exercised in both runtimes. Exact `05685bf2` hosted control
   [41210683028](https://github.com/fajarxfce/hris-platform/actions/runs/41210683028)
-  passed every job and step; retained in the measurement. No product rollout. Public peer key/claim,
+  passed every job and step; retained in the measurement. No product rollout. Public key claim,
   to-device, room/history and classic/native sync remain closed.
 
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
@@ -296,7 +310,7 @@ Next implementation:
 2. Schema-111 storage `71ad7c81` passed all jobs/steps in [41205061024](https://github.com/fajarxfce/hris-platform/actions/runs/41205061024).
    Room setup/worker `f104f097` passed every job/step in `41206499276`. Own-device
    key gateway `05685bf2` passed every step in `41210683028`; schema 112 `966dee38` passed all hosted
-   steps in `41208833880`. Implement scoped eligible peer key/query/claim and
+   steps in `41208833880`. Scoped peer key query is implemented above; continue key claim and
    to-device traffic. Offline recipient eligibility must not require a fresh short
    access token; retain current device/company/security revocation checks. Continue
    native/classic sync and content integration using the

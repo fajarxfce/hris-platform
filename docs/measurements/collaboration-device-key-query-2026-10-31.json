@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-31",
+  "scope": "Native self/direct Matrix recipient keys/query; schema remains 113",
+  "baseCommit": "b3b9b9a10f68c35d85dcd914a7d1cfbec8b1f435",
+  "finalValidation": {
+    "command": "./gradlew formatCheck architectureCheck :modules:collaboration:domain:test :modules:collaboration:data:test :apps:server:test --tests *NativeCollaboration*Test --tests *ApiContractHttpTest --tests *ClientPolicy*Test --tests *ApprovalReadCompletionAssuranceTest --tests *PeopleReadCompletionTest :apps:worker:test",
+    "seconds": 309,
+    "result": "passed",
+    "tests": {
+      "domain": {
+        "suites": 6,
+        "tests": 26,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "data": {
+        "suites": 13,
+        "tests": 152,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "api": {
+        "suites": 13,
+        "tests": 151,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "worker": {
+        "suites": 22,
+        "tests": 112,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "format": "passed",
+    "architecture": "passed",
+    "sharedRuntimeGraphs": [
+      "API",
+      "worker"
+    ]
+  },
+  "earlierRuns": [
+    {
+      "seconds": 41,
+      "result": "passed",
+      "scope": "Three domain policy and 21 provider/transport cases; preceding use-case integration"
+    },
+    {
+      "seconds": 13,
+      "result": "compile_failed",
+      "reason": "Test-only missing imports; corrected"
+    },
+    {
+      "seconds": 33,
+      "result": "failed",
+      "reason": "Test override parameter warning and stale fixed HTTP fixture time/accumulating native parents; corrected"
+    },
+    {
+      "seconds": 61,
+      "result": "failed",
+      "reason": "Frozen nanosecond fixture clock disagreed with PostgreSQL microsecond rounding; fixed fixture to current microsecond precision"
+    },
+    {
+      "seconds": 51,
+      "result": "passed",
+      "scope": "26 domain, 24 selected data and nine HTTP cases after fixture corrections"
+    },
+    {
+      "seconds": 385,
+      "result": "passed",
+      "scope": "26 domain, 151 data, 151 API and 112 worker with one skip; before final unavailable-peer batch refinement"
+    }
+  ],
+  "verified": [
+    "Strict canonical company/server names and detached bounded inputs",
+    "No provider wildcards; at most 100 users and five selected devices each",
+    "Current self/direct account scope and schema-113 recipient eligibility",
+    "Expired short access and older MFA do not remove otherwise eligible offline peers",
+    "Missing/unrelated/inactive peers return empty entries without blocking eligible peers in a batch",
+    "Immutable self-signed public identity and retained fingerprint checks",
+    "Caller or recipient-set changes during I/O withhold keys, including after provider failure",
+    "Actual pinned Synapse key upload/query, missing explicit devices and restart retention",
+    "Chunked response above 64 KiB and bounded at 1 MiB; oversize rejection releases transport capacity",
+    "Both shared application DI contexts"
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "d04ceb7c9531b748735219ceb1ecc4a63d0a49f822c7ba4f00471f0d637eb320",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "fcc7031ba661472d02f506e03d497ed6681cf35bdea6024ef2a17b3e2bb88ad1",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/BoundedMatrixBodySubscriber.kt": "96de5aeb89e1fd915af34b6d755d8df4331704def2a15eaf6023b9f8c6938982",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "f736d5bdb1f6e4e15f314ad320cdececc6b5c8aab4ced46274b94da530598d07",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixKeyDataSource.kt": "23aae721ffdcafc4c0de1213ae1065a94ff5428022bad4e0a19c0bbcab0cafca",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixKeyRepository.kt": "40f4da690cb571cbf3e23e73882dee16c46a3769340c8a4bcb1c1bea7df9de9e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixKeyRepository.kt": "eb13afa7dca4079c9989373bcc7523bba45f064f7f71d993c130e6a5ddcbbcfd",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixKeyProviderInteropTest.kt": "b466c4880444673b637fc9a1ecb335736b528f7fb96763c2c6e7fc16da67ec66",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "1ec75fe4afad602c6e024b840a318da18c9a4d23863b6986c400ff21fdb38ae5",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "86599aad0c4dd6d10c63b087f19efe4073992ea7f4c269bf3ebd50fdfaea7107",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayKeyController.kt": "3512fa5e6ec99e0519297eae2a9868df6509cfc4996a856c7cbc0ec85ad1645c",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "a4062c4e155929ef1273cf96b850fc5c59d5e700d1a83d091da5f7c470afa783",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/MatrixKeyQueryRequest.kt": "172544998953a26d14e3e685062b73b5c77168c6ae502cb24ce9e4c3d526de3f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationMatrixKeyQuery.kt": "44ac3b12b1f425a0b203808c66f6150ce30af8910a706abcf0db31dc5d70b1d9",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationMatrixKeyQueryPolicy.kt": "f9a690e5a9f69ec3602523ffda2862e5e042a11ab401fa87187cb522572f9225",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixKeyRepository.kt": "e2b204786aa9cc546392edaffe5eb7022204ffcceb44273845f53a5ec68dd0d8",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "00926620161af9352c4769f4e1dab75862225468bc714a9441fa7e5b29b558b9",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationMatrixKeyQueryPolicyTest.kt": "ee2ab25c090517dee71adf8b81a83091bfa8bee934d32cc86855f4b82a117f7a"
+  },
+  "limitations": [
+    "Component HTTP/storage/provider evidence; complete SDK-through-HRIS acceptance remains pending",
+    "Native self/direct only; no browser parent, group/context, cross-signing or backup authority",
+    "Key claim, to-device, scoped sync/content and durable UI/outbox remain to implement",
+    "One existing opt-in elapsed-retention worker case remains skipped",
+    "No performance/capacity claim, live deployment, phone action or Starter port"
+  ],
+  "hosted": {
+    "status": "inspect exact commit after push"
+  }
+}

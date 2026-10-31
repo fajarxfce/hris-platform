@@ -10,6 +10,7 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirect
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRecipientDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
@@ -20,11 +21,13 @@ import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDeviceK
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRecipientRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
+import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDeviceKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomRepository
@@ -1780,7 +1783,324 @@ class NativeCollaborationRegistrationTest {
             assertEquals(1L, retained?.version)
             assertNotEquals(tokens.accessToken, g.f.credential(g.device)?.accessToken)
             assertEquals(0L, g.f.credential(g.device)?.generation)
+            val queried =
+                success(
+                    command.queryKeys(
+                        tokens.accessToken,
+                        UUID.randomUUID(),
+                        CollaborationMatrixKeyQuery(mapOf(keys.userId to emptyList())),
+                    )
+                )
+            assertEquals(
+                mapOf(keys.userId to mapOf(keys.deviceId to keys.device)),
+                queried.deviceKeys,
+            )
         }
+    }
+
+    @Test
+    fun peerKeyQueryExpandsOnlyCurrentConfirmedDevicesAndRetainsOfflineRecipients() {
+        val q = KeyQueryFixture()
+        sql.update(
+            "update native_sessions set access_expires_at=now()-interval '1 hour',mfa_verified_at=null where id=?",
+            q.peerParent,
+        )
+        val value = (q.read() as Result.Success).value.deviceKeys
+        assertEquals(setOf(q.upload.keys.userId, q.peerKeys.userId), value.keys)
+        assertEquals(
+            q.peerKeys.device,
+            value.getValue(q.peerKeys.userId).getValue(q.peerKeys.deviceId),
+        )
+        assertEquals(1, q.calls.get())
+        assertTrue(requireNotNull(q.request).devices.values.all { it.size == 1 })
+        assertEquals(1L, q.upload.publication()?.version)
+    }
+
+    @Test
+    fun peerWithNoConfirmedKeyReturnsEmptyWithoutQueryingUnconfirmedProviderKeys() {
+        val q = KeyQueryFixture(published = false)
+        val result = q.read(CollaborationMatrixKeyQuery(mapOf(q.peerKeys.userId to emptyList())))
+        assertEquals(
+            Result.Success(
+                CollaborationMatrixKeyQueryResult(mapOf(q.peerKeys.userId to emptyMap()))
+            ),
+            result,
+        )
+        assertEquals(0, q.calls.get())
+        assertEquals(
+            0L,
+            sql.queryForObject(
+                "select version from collaboration_device_key_publications where device_id=?",
+                Long::class.java,
+                q.peerDevice,
+            ),
+        )
+    }
+
+    @Test
+    fun keysOfUnrelatedOrForeignAccountsNeverReachTheProvider() {
+        val q = KeyQueryFixture(paired = false)
+        assertEquals(
+            Result.Success(
+                CollaborationMatrixKeyQueryResult(mapOf(q.peerKeys.userId to emptyMap()))
+            ),
+            q.read(CollaborationMatrixKeyQuery(mapOf(q.peerKeys.userId to emptyList()))),
+        )
+        val foreign = q.peerKeys.userId.replace(":proof.invalid", ":foreign.invalid")
+        assertEquals(
+            FailureKind.VALIDATION,
+            (q.read(CollaborationMatrixKeyQuery(mapOf(foreign to emptyList()))) as Result.Failed)
+                .failure
+                .kind,
+        )
+        assertEquals(0, q.calls.get())
+    }
+
+    @Test
+    fun removedAndUnknownAccountsInABatchDoNotBlockCurrentRecipientsOrRevealKeys() {
+        val q = KeyQueryFixture()
+        sql.update(
+            "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+            q.company,
+            q.peer,
+        )
+        val unknown = "@${collaborationMatrixLocalpart(q.company, UUID.randomUUID())}:proof.invalid"
+        val input =
+            CollaborationMatrixKeyQuery(
+                mapOf(
+                    q.upload.keys.userId to emptyList(),
+                    q.peerKeys.userId to emptyList(),
+                    unknown to emptyList(),
+                )
+            )
+        val result = (q.read(input) as Result.Success).value.deviceKeys
+        assertEquals(setOf(q.upload.keys.userId, q.peerKeys.userId, unknown), result.keys)
+        assertEquals(
+            q.upload.keys.device,
+            result.getValue(q.upload.keys.userId).getValue(q.upload.keys.deviceId),
+        )
+        assertTrue(result.getValue(q.peerKeys.userId).isEmpty())
+        assertTrue(result.getValue(unknown).isEmpty())
+        assertEquals(setOf(q.upload.keys.userId), requireNotNull(q.request).devices.keys)
+    }
+
+    @Test
+    fun peerKeyQueryRejectsProviderSubstitutionMissingKeysAndLateProviderErrors() {
+        val q = KeyQueryFixture()
+        q.keys[q.peerKeys.userId to q.peerKeys.deviceId] =
+            MatrixKeyFixture(q.peerKeys.userId, q.peerKeys.deviceId).device
+        assertEquals(
+            "collaboration_device_key_recovery_required",
+            (q.read() as Result.Failed).failure.code,
+        )
+        q.keys.remove(q.peerKeys.userId to q.peerKeys.deviceId)
+        assertEquals(
+            "collaboration_provider_invalid_response",
+            (q.read() as Result.Failed).failure.code,
+        )
+        q.keys[q.peerKeys.userId to q.peerKeys.deviceId] = q.peerKeys.device
+        q.onQuery = {
+            sql.update(
+                "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+                q.company,
+                q.peer,
+            )
+            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_outage"))
+        }
+        assertEquals("collaboration_recipients_changed", (q.read() as Result.Failed).failure.code)
+    }
+
+    @Test
+    fun peerDeviceRemovalAndNewEnrollmentDuringQueryInvalidateTheCapturedSet() {
+        for (adding in listOf(false, true)) {
+            val q = KeyQueryFixture()
+            q.onQuery = { result ->
+                if (adding) q.enrollPeer()
+                else
+                    sql.update(
+                        "update collaboration_devices set state='REVOKED',revoked_at=now(),updated_at=now(),version=version+1 where company_id=? and id=?",
+                        q.company,
+                        q.peerDevice,
+                    )
+                Result.Success(result)
+            }
+            assertEquals(
+                "collaboration_recipients_changed",
+                (q.read() as Result.Failed).failure.code,
+            )
+            q.onQuery = null
+            val admitted = (q.read() as Result.Success).value.deviceKeys.getValue(q.peerKeys.userId)
+            assertEquals(if (adding) 2 else 0, admitted.size)
+        }
+    }
+
+    @Test
+    fun peerSecurityChangeDuringQueryInvalidatesKeysButKeepsOwnedKeyHistory() {
+        val q = KeyQueryFixture()
+        q.onQuery = { result ->
+            sql.update(
+                "update accounts set security_version=security_version+1,version=version+1 where id=?",
+                q.peer,
+            )
+            Result.Success(result)
+        }
+        assertEquals("collaboration_recipients_changed", (q.read() as Result.Failed).failure.code)
+        assertEquals(
+            1,
+            sql.queryForObject(
+                "select count(*) from collaboration_device_key_publications where device_id=? and version=1",
+                Int::class.java,
+                q.peerDevice,
+            ),
+        )
+        q.onQuery = null
+        assertTrue(
+            (q.read() as Result.Success).value.deviceKeys.getValue(q.peerKeys.userId).isEmpty()
+        )
+    }
+
+    @Test
+    fun queryCrossingCallerRefreshOrItsDeadlineCannotPublishCapturedKeys() {
+        for (refresh in listOf(false, true)) {
+            val q = KeyQueryFixture()
+            q.onQuery = { result ->
+                if (refresh)
+                    sql.update(
+                        "update native_sessions set version=version+1 where id=?",
+                        q.upload.g.parent,
+                    )
+                else q.upload.g.f.clock.at = q.upload.g.f.clock.at.plusSeconds(61)
+                Result.Success(result)
+            }
+            assertEquals(
+                "collaboration_admission_changed",
+                (q.read() as Result.Failed).failure.code,
+            )
+        }
+    }
+
+    private class KeyQueryFixture(published: Boolean = true, paired: Boolean = true) {
+        val upload = KeyUploadFixture()
+        val company = requireNotNull(upload.g.f.actor.companyId)
+        val peer = upload.g.f.peer("Fictional key recipient")
+        val keys =
+            java.util.concurrent.ConcurrentHashMap<
+                Pair<String, String>,
+                CollaborationMatrixDeviceKeys,
+            >()
+        val calls = AtomicInteger()
+        var request: CollaborationMatrixKeyQuery? = null
+        var onQuery:
+            ((CollaborationMatrixKeyQueryResult) -> Result<CollaborationMatrixKeyQueryResult>)? =
+            null
+        val peerParent: UUID
+        val peerDevice: UUID
+        val peerKeys: MatrixKeyFixture
+        private val provider =
+            object : CollaborationMatrixKeyRepository by upload.provider {
+                override fun deviceKeys(
+                    request: CollaborationMatrixKeyQuery,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyQueryResult> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    calls.incrementAndGet()
+                    this@KeyQueryFixture.request = request
+                    val result =
+                        CollaborationMatrixKeyQueryResult(
+                            request.devices.mapValues { (user, ids) ->
+                                ids.mapNotNull { device ->
+                                        keys[user to device]?.let { device to it }
+                                    }
+                                    .toMap()
+                            }
+                        )
+                    return onQuery?.invoke(result) ?: Result.Success(result)
+                }
+            }
+        private val command = upload.g.f.matrixIdentity(upload.matrix, providerKeys = provider)
+
+        init {
+            assertInstanceOf(Result.Success::class.java, upload.upload())
+            keys[upload.keys.userId to upload.keys.deviceId] = upload.keys.device
+            val enrolled = enrollPeer(published)
+            peerParent = enrolled.first
+            peerKeys = enrolled.second
+            peerDevice =
+                UUID.fromString(
+                    peerKeys.deviceId.removePrefix("HRIS_").let {
+                        "${it.substring(0, 8)}-${it.substring(8, 12)}-${it.substring(12, 16)}-${it.substring(16, 20)}-${it.substring(20)}"
+                    }
+                )
+            if (paired) {
+                val pair = listOf(upload.g.f.account, peer).sortedBy { it.toString() }
+                sql.update(
+                    "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,now())",
+                    company,
+                    UUID.randomUUID(),
+                    pair[0],
+                    pair[1],
+                    upload.g.f.account,
+                )
+            }
+        }
+
+        fun enrollPeer(published: Boolean = true): Pair<UUID, MatrixKeyFixture> {
+            val parent = upload.g.f.parent(peer)
+            val device = UUID.randomUUID()
+            val key =
+                MatrixKeyFixture(
+                    "@${collaborationMatrixLocalpart(company, peer)}:proof.invalid",
+                    collaborationMatrixDeviceId(device),
+                )
+            val fingerprint =
+                (validateCollaborationDeviceKeys(key.device, key.userId, key.deviceId)
+                        as Result.Success)
+                    .value
+            sql.update(
+                "insert into collaboration_devices(company_id,id,account_id,platform,label,state,version,created_at,updated_at) values(?,?,?,'ANDROID','Fictional recipient device','PROVISIONING',0,now()-interval '1 minute',now()-interval '1 minute')",
+                company,
+                device,
+                peer,
+            )
+            sql.update(
+                "update collaboration_devices set state='ACTIVE',version=1 where company_id=? and id=?",
+                company,
+                device,
+            )
+            sql.update(
+                "insert into collaboration_device_sessions(company_id,device_id,account_id,native_session_id,bound_at) values(?,?,?,?,now())",
+                company,
+                device,
+                peer,
+                parent,
+            )
+            sql.update(
+                "insert into collaboration_device_key_publications(company_id,device_id,account_id,fingerprint,version,reserved_at) values(?,?,?,?,0,now())",
+                company,
+                device,
+                peer,
+                fingerprint,
+            )
+            if (published)
+                sql.update(
+                    "update collaboration_device_key_publications set version=1,published_at=now() where company_id=? and device_id=?",
+                    company,
+                    device,
+                )
+            keys[key.userId to key.deviceId] = key.device
+            return parent to key
+        }
+
+        fun read(
+            input: CollaborationMatrixKeyQuery =
+                CollaborationMatrixKeyQuery(
+                    mapOf(upload.keys.userId to emptyList(), peerKeys.userId to emptyList())
+                )
+        ) = command.queryKeys(upload.tokens.accessToken, UUID.randomUUID(), input)
     }
 
     private class KeyUploadFixture {
@@ -1812,6 +2132,12 @@ class NativeCollaborationRegistrationTest {
     }
 
     private class RecordingKeys : CollaborationMatrixKeyRepository {
+        override fun deviceKeys(
+            request: CollaborationMatrixKeyQuery,
+            token: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixKeyQueryResult> = error("Own-device publication fixture")
+
         val queries = AtomicInteger()
         val uploads = AtomicInteger()
         @Volatile var stored: CollaborationMatrixDeviceKeys? = null
@@ -3369,6 +3695,8 @@ class NativeCollaborationRegistrationTest {
         private val receipts = PostgresOperationReceiptDataSource(dsl)
         val deviceKeys =
             StoredCollaborationDeviceKeyRepository(PostgresCollaborationDeviceKeyDataSource(dsl))
+        val recipients =
+            StoredCollaborationRecipientRepository(PostgresCollaborationRecipientDataSource(dsl))
         val directRooms =
             StoredCollaborationDirectRoomRepository(PostgresCollaborationDirectRoomDataSource(dsl))
         val direct = StoredCollaborationDirectRepository(PostgresCollaborationDirectDataSource(dsl))
@@ -3772,6 +4100,8 @@ class NativeCollaborationRegistrationTest {
                 matrix,
                 keyStore,
                 providerKeys,
+                recipients,
+                direct,
                 sessions,
                 policies,
                 companies,

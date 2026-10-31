@@ -6,6 +6,12 @@ import dev.fajar.hris.core.domain.*
 import java.time.Instant
 
 class DisabledCollaborationMatrixKeyRepository : CollaborationMatrixKeyRepository {
+    override fun deviceKeys(
+        request: CollaborationMatrixKeyQuery,
+        token: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixKeyQueryResult> = unavailable()
+
     override fun ownDeviceKeys(
         userId: String,
         deviceId: String,

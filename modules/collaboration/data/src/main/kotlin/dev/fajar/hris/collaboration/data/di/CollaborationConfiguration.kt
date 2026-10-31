@@ -24,6 +24,15 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationRecipientSource(sql: DSLContext): CollaborationRecipientDataSource =
+        PostgresCollaborationRecipientDataSource(sql)
+
+    @Bean
+    fun collaborationRecipients(
+        source: CollaborationRecipientDataSource
+    ): CollaborationRecipientRepository = StoredCollaborationRecipientRepository(source)
+
+    @Bean
     fun collaborationDeviceKeySource(sql: DSLContext): CollaborationDeviceKeyDataSource =
         PostgresCollaborationDeviceKeyDataSource(sql)
 
@@ -389,6 +398,8 @@ class CollaborationConfiguration {
         matrix: CollaborationMatrixRepository,
         keys: CollaborationDeviceKeyRepository,
         providerKeys: CollaborationMatrixKeyRepository,
+        recipients: CollaborationRecipientRepository,
+        conversations: CollaborationDirectRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -408,6 +419,8 @@ class CollaborationConfiguration {
             matrix,
             keys,
             providerKeys,
+            recipients,
+            conversations,
             sessions,
             policies,
             companies,

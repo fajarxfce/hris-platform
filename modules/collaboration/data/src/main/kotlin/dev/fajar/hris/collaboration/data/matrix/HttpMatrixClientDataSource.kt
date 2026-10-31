@@ -106,6 +106,33 @@ class HttpMatrixClientDataSource(
         )
     }
 
+    override fun queryDevices(
+        devices: Map<String, List<String>>,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(devices.size in 1..100)
+        require(
+            devices.all { (user, ids) ->
+                user.length in 1..255 &&
+                    user.all { it.code in 33..126 } &&
+                    ids.size in 1..5 &&
+                    ids.all { id -> id.length in 1..128 && id.all { it.code in 33..126 } }
+            }
+        )
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/keys/query",
+                "POST",
+                mapOf("device_keys" to devices, "timeout" to 1000),
+                token,
+                deadline,
+                maximumResponseBytes = 1_048_576,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
     override fun queryDeviceKeys(
         userId: String,
         deviceId: String,
@@ -258,6 +285,7 @@ class HttpMatrixClientDataSource(
         body: Map<String, Any>?,
         token: String,
         deadline: Instant,
+        maximumResponseBytes: Int = 65536,
     ): HttpResponse<ByteArray> {
         require(token.length in 1..2048 && token.all { it.code in 33..126 })
         val remaining = Duration.between(clock.instant(), deadline)
@@ -283,6 +311,7 @@ class HttpMatrixClientDataSource(
                 )
                 .build(),
             timeout,
+            maximumResponseBytes,
         )
     }
 
@@ -303,13 +332,17 @@ class HttpMatrixClientDataSource(
         return exchange(builder.build(), timeout)
     }
 
-    private fun exchange(request: HttpRequest, timeout: Duration): HttpResponse<ByteArray> {
+    private fun exchange(
+        request: HttpRequest,
+        timeout: Duration,
+        maximumResponseBytes: Int = 65536,
+    ): HttpResponse<ByteArray> {
         if (!exchanges.tryAcquire()) throw MatrixCapacityException()
         return try {
             val pending =
                 client.sendAsync(
                     request,
-                    HttpResponse.BodyHandler { BoundedMatrixBodySubscriber() },
+                    HttpResponse.BodyHandler { BoundedMatrixBodySubscriber(maximumResponseBytes) },
                 )
             try {
                 pending.get(timeout.toNanos(), TimeUnit.NANOSECONDS)

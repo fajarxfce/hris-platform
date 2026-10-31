@@ -7,6 +7,7 @@ import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatri
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixDirectRoom
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyQuery
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyUpload
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomCreation
@@ -29,6 +30,148 @@ import org.junit.jupiter.api.Test
 import tools.jackson.databind.json.JsonMapper
 
 class MatrixProviderTransportTest {
+    @Test
+    fun explicitRecipientQueryHasItsOwnBoundAndNeverRequestsAllProviderDevices() {
+        Fixture().use { f ->
+            val keys =
+                (1..100).map {
+                    MatrixKeyFixture(
+                        "@${collaborationMatrixLocalpart(f.login.companyId, UUID.randomUUID())}:matrix.example.test",
+                        collaborationMatrixDeviceId(UUID.randomUUID()),
+                    )
+                }
+            val selected =
+                CollaborationMatrixKeyQuery(keys.associate { it.userId to listOf(it.deviceId) })
+            val body =
+                f.json.writeValueAsBytes(
+                    mapOf(
+                        "device_keys" to
+                            keys.associate { key ->
+                                key.userId to
+                                    mapOf(
+                                        key.deviceId to
+                                            (key.body() +
+                                                ("unsigned" to
+                                                    mapOf(
+                                                        "device_display_name" to "x".repeat(256)
+                                                    )))
+                                    )
+                            }
+                    )
+                )
+            assertTrue(body.size > 65536 && body.size < 1_048_576)
+            f.handler = { exchange ->
+                assertEquals("POST", exchange.requestMethod)
+                assertEquals("/_matrix/client/v3/keys/query", exchange.requestURI.path)
+                assertNull(exchange.requestURI.rawQuery)
+                assertEquals(
+                    "Bearer fictional-access-token",
+                    exchange.requestHeaders.getFirst("Authorization"),
+                )
+                val request = f.json.readTree(exchange.requestBody.readNBytes(65537))
+                assertEquals(100, request.path("device_keys").size())
+                assertTrue(
+                    request.path("device_keys").properties().all { (_, ids) ->
+                        ids.isArray && ids.size() == 1
+                    }
+                )
+                assertEquals(1000, request.path("timeout").asInt())
+                f.respond(exchange, body.toString(Charsets.UTF_8))
+            }
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            val result =
+                repo.deviceKeys(selected, "fictional-access-token", Instant.now().plusSeconds(10))
+            assertInstanceOf(Result.Success::class.java, result)
+            val actual = (result as Result.Success).value.deviceKeys
+            assertEquals(100, actual.size)
+            for (key in keys) assertEquals(
+                key.device,
+                actual.getValue(key.userId).getValue(key.deviceId),
+            )
+        }
+    }
+
+    @Test
+    fun recipientQueryRejectsForeignResultsAndOversizeBodiesThenReleasesTransport() {
+        Fixture().use { f ->
+            val key = MatrixKeyFixture(f.userId, collaborationMatrixDeviceId(f.login.deviceId))
+            val query = CollaborationMatrixKeyQuery(mapOf(key.userId to listOf(key.deviceId)))
+            val valid =
+                mapOf("device_keys" to mapOf(key.userId to mapOf(key.deviceId to key.body())))
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            fun read() =
+                repo.deviceKeys(query, "fictional-access-token", Instant.now().plusSeconds(10))
+            val responses =
+                listOf(
+                    mapOf(
+                        "device_keys" to
+                            mapOf("@foreign:example.test" to mapOf(key.deviceId to key.body()))
+                    ),
+                    mapOf(
+                        "device_keys" to mapOf(key.userId to mapOf("FOREIGN_DEVICE" to key.body()))
+                    ),
+                    mapOf(
+                        "device_keys" to
+                            mapOf(
+                                key.userId to
+                                    mapOf(
+                                        key.deviceId to
+                                            (key.body() + ("device_id" to "FOREIGN_DEVICE"))
+                                    )
+                            )
+                    ),
+                    valid + ("failures" to mapOf("foreign.example.test" to emptyMap<String, Any>())),
+                )
+            for (response in responses) {
+                f.handler = { f.respond(it, f.json.writeValueAsString(response)) }
+                assertInstanceOf(Result.Failed::class.java, read())
+            }
+            f.handler = { f.respond(it, " ".repeat(1_048_577)) }
+            assertInstanceOf(Result.Failed::class.java, read())
+            f.handler = { f.respond(it, f.json.writeValueAsString(valid)) }
+            assertInstanceOf(Result.Success::class.java, read())
+            f.handler = {
+                f.respond(
+                    it,
+                    f.json.writeValueAsString(mapOf("device_keys" to emptyMap<String, Any>())),
+                )
+            }
+            assertEquals(
+                emptyMap<String, Any>(),
+                (read() as Result.Success).value.deviceKeys.getValue(key.userId),
+            )
+        }
+    }
+
+    @Test
+    fun recipientQueryRefusesEmptyDeviceWildcardsBeforeTransport() {
+        Fixture().use { f ->
+            val calls = AtomicInteger()
+            f.handler = {
+                calls.incrementAndGet()
+                f.respond(it, f.success)
+            }
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            for (query in
+                listOf(
+                    emptyMap(),
+                    mapOf(f.userId to emptyList()),
+                    mapOf(f.userId to List(6) { collaborationMatrixDeviceId(UUID.randomUUID()) }),
+                    (1..101).associate { "@user$it:proof.invalid" to listOf("DEVICE") },
+                )) {
+                assertInstanceOf(
+                    Result.Failed::class.java,
+                    repo.deviceKeys(
+                        CollaborationMatrixKeyQuery(query),
+                        "fictional-access-token",
+                        Instant.now().plusSeconds(10),
+                    ),
+                )
+            }
+            assertEquals(0, calls.get())
+        }
+    }
+
     @Test
     fun fixedKeyUploadPreservesSignedFieldsAndOwnQueryUsesOnlyOneExactDevice() {
         Fixture().use { f ->

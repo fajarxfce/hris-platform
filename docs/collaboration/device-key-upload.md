@@ -81,8 +81,10 @@ provider transport and own-device publication are distinct from SDK/content
 acceptance. The actual HTTP fixture accepts chunked replay and rejects an upload
 result after native revocation, with its pending identity retained.
 
-Public peer query/claim, to-device messages, classic/native sync and room/content
-routes remain closed. Browser-parent admission, client crypto ownership/recovery
+Native self/direct [recipient query](device-key-query.md) now validates the
+retained fingerprint through a scoped public-device projection. Public claim,
+to-device messages, classic/native sync and room/content routes remain closed.
+Browser-parent admission, client crypto ownership/recovery
 and recipient delivery still need integration. Recipient key eligibility must
 allow an admitted employee's enrolled offline device; short access-token freshness
 is not device revocation or a reason to discard owned local history. A peer with

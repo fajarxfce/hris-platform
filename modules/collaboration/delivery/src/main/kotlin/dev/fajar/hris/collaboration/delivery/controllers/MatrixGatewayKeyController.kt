@@ -1,10 +1,12 @@
 package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
+import dev.fajar.hris.collaboration.delivery.requests.matrixKeyQueryRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
 import dev.fajar.hris.core.domain.Result
+import dev.fajar.hris.core.domain.map
 import dev.fajar.hris.core.http.*
 import jakarta.servlet.http.HttpServletRequest
 import java.time.Duration
@@ -16,10 +18,11 @@ import tools.jackson.core.StreamReadConstraints
 import tools.jackson.core.StreamReadFeature
 import tools.jackson.core.json.JsonFactory
 import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
 
 @RestController
-class MatrixGatewayKeyUploadController(private val device: AccessNativeCollaborationMatrixDevice) {
+class MatrixGatewayKeyController(private val device: AccessNativeCollaborationMatrixDevice) {
     private val parser =
         JsonMapper.builder(
                 JsonFactory.builder()
@@ -37,7 +40,40 @@ class MatrixGatewayKeyUploadController(private val device: AccessNativeCollabora
             .build()
 
     @PostMapping("/_matrix/client/v3/keys/upload")
-    fun upload(request: HttpServletRequest): ResponseEntity<Any> {
+    fun upload(request: HttpServletRequest): ResponseEntity<Any> =
+        keyRequest(request, ::matrixKeyUploadRequest) { token, correlation, upload ->
+            device.uploadKeys(token, correlation, upload).map {
+                mapOf("one_time_key_counts" to it.oneTimeKeyCounts)
+            }
+        }
+
+    @PostMapping("/_matrix/client/v3/keys/query")
+    fun query(request: HttpServletRequest): ResponseEntity<Any> =
+        keyRequest(request, ::matrixKeyQueryRequest) { token, correlation, query ->
+            device.queryKeys(token, correlation, query).map { result ->
+                mapOf(
+                    "failures" to emptyMap<String, Any>(),
+                    "device_keys" to
+                        result.deviceKeys.mapValues { (_, devices) ->
+                            devices.mapValues { (_, key) ->
+                                mapOf(
+                                    "user_id" to key.userId,
+                                    "device_id" to key.deviceId,
+                                    "algorithms" to key.algorithms,
+                                    "keys" to key.keys,
+                                    "signatures" to key.signatures,
+                                )
+                            }
+                        },
+                )
+            }
+        }
+
+    private fun <T> keyRequest(
+        request: HttpServletRequest,
+        decode: (JsonNode) -> T,
+        operation: (String, UUID, T) -> Result<Map<String, Any>>,
+    ): ResponseEntity<Any> {
         if (request.queryString != null) return problem(400, "M_INVALID_PARAM")
         val authorization = request.getHeaders("Authorization")
         val header = if (authorization.hasMoreElements()) authorization.nextElement() else ""
@@ -50,13 +86,13 @@ class MatrixGatewayKeyUploadController(private val device: AccessNativeCollabora
         )
             return problem(415, "M_NOT_JSON")
         if (request.contentLengthLong > 65536) return problem(413, "M_TOO_LARGE")
-        val upload =
+        val input =
             try {
                 val bytes =
                     BoundedRequestStream(request.inputStream, 65536, Duration.ofSeconds(2)).use {
                         it.readNBytes(65537)
                     }
-                matrixKeyUploadRequest(requireNotNull(parser.readTree(bytes)))
+                decode(requireNotNull(parser.readTree(bytes)))
             } catch (_: RequestBodyTooLargeException) {
                 return problem(413, "M_TOO_LARGE")
             } catch (_: RequestBodyTimeoutException) {
@@ -78,12 +114,10 @@ class MatrixGatewayKeyUploadController(private val device: AccessNativeCollabora
                 return problem(400, "M_BAD_JSON")
             }
         val correlation = request.getAttribute("hris.correlationId") as? UUID ?: UUID.randomUUID()
-        return when (val result = device.uploadKeys(header.substring(7), correlation, upload)) {
+        return when (val result = operation(header.substring(7), correlation, input)) {
             is Result.Failed -> matrixGatewayProblem(result.failure)
             is Result.Success ->
-                ResponseEntity.ok()
-                    .header("Cache-Control", "no-store")
-                    .body(mapOf("one_time_key_counts" to result.value.oneTimeKeyCounts))
+                ResponseEntity.ok().header("Cache-Control", "no-store").body(result.value)
         }
     }
 

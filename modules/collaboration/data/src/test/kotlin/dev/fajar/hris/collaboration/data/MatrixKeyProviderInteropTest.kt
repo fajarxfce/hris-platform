@@ -2,13 +2,76 @@ package dev.fajar.hris.collaboration.data
 
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyQuery
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyUpload
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.core.domain.Result
+import java.util.UUID
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class MatrixKeyProviderInteropTest {
+    @Test
+    fun actualProviderReturnsOnlyExplicitPeerDevicesAndRetainsTheirKeysAfterRestart() {
+        MatrixProviderFixture("10m").use { f ->
+            f.start()
+            val sender = f.login()
+            val at = f.clock.instant()
+            val peer =
+                (f.repository.login(
+                        f.request.copy(
+                            accountId = UUID.randomUUID(),
+                            deviceId = UUID.randomUUID(),
+                            issuedAt = at,
+                            expiresAt = at.plusSeconds(60),
+                        )
+                    ) as Result.Success)
+                    .value
+            val senderKeys = MatrixKeyFixture(sender.userId, sender.deviceId)
+            val peerKeys = MatrixKeyFixture(peer.userId, peer.deviceId)
+            fun repo() =
+                InternalCollaborationMatrixKeyRepository(
+                    HttpMatrixClientDataSource(f.client, f.config, f.clock)
+                )
+            fun deadline() = f.clock.instant().plusSeconds(20)
+            assertInstanceOf(
+                Result.Success::class.java,
+                repo()
+                    .upload(
+                        CollaborationMatrixKeyUpload(senderKeys.device),
+                        sender.accessToken,
+                        deadline(),
+                    ),
+            )
+            assertInstanceOf(
+                Result.Success::class.java,
+                repo()
+                    .upload(
+                        CollaborationMatrixKeyUpload(peerKeys.device),
+                        peer.accessToken,
+                        deadline(),
+                    ),
+            )
+            val query =
+                CollaborationMatrixKeyQuery(
+                    mapOf(
+                        sender.userId to listOf(sender.deviceId),
+                        peer.userId to
+                            listOf(peer.deviceId, collaborationMatrixDeviceId(UUID.randomUUID())),
+                    )
+                )
+            fun read() = repo().deviceKeys(query, sender.accessToken, deadline())
+            val expected =
+                mapOf(
+                    sender.userId to mapOf(sender.deviceId to senderKeys.device),
+                    peer.userId to mapOf(peer.deviceId to peerKeys.device),
+                )
+            assertEquals(expected, (read() as Result.Success).value.deviceKeys)
+            f.restart()
+            assertEquals(expected, (read() as Result.Success).value.deviceKeys)
+        }
+    }
+
     @Test
     fun actualProviderRetainsSignedKeysAcrossRetryPrivateBearerRotationAndRestart() {
         MatrixProviderFixture("10m").use { f ->

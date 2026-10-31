@@ -5,6 +5,8 @@ import tools.jackson.databind.JsonNode
 
 /** Fixed protocol exchanges. Scope, signature validation and publication belong to the use case. */
 interface MatrixKeyDataSource {
+    fun queryDevices(devices: Map<String, List<String>>, token: String, deadline: Instant): JsonNode
+
     fun queryDeviceKeys(
         userId: String,
         deviceId: String,

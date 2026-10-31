@@ -4,8 +4,15 @@ import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.domain.Result
 import java.time.Instant
 
-/** Fixed internal own-device operations; the use case owns scope and completion admission. */
+/** Fixed internal key operations; the use case owns scope and completion admission. */
 interface CollaborationMatrixKeyRepository {
+    /** Only explicit eligible devices; empty/all-provider-device lists are never forwarded. */
+    fun deviceKeys(
+        request: CollaborationMatrixKeyQuery,
+        token: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixKeyQueryResult>
+
     fun ownDeviceKeys(
         userId: String,
         deviceId: String,

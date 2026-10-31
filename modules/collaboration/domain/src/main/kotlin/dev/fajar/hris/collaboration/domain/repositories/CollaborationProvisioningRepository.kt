@@ -9,4 +9,6 @@ interface CollaborationProvisioningRepository {
     fun find(companyId: UUID, accountId: UUID, deviceId: UUID): Result<CollaborationProvisioning?>
 
     fun create(value: CollaborationProvisioning): Result<Unit>
+
+    fun replace(value: CollaborationProvisioning, expectedVersion: Long): Result<Unit>
 }

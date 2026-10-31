@@ -11,4 +11,6 @@ interface CollaborationProvisioningDataSource {
     ): CollaborationDeviceProvisioningRecord?
 
     fun insert(record: CollaborationDeviceProvisioningRecord)
+
+    fun replace(record: CollaborationDeviceProvisioningRecord, expectedVersion: Long): Boolean
 }

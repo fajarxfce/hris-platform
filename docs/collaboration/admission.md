@@ -237,7 +237,7 @@ post-write authorization rolls all new rows back. Duplicate operations and
 registration after ordinary native refresh reuse the same device/job. A retained
 pending device without a pointer can enqueue once under fresh authority without
 replacing its identity. Existing failed jobs are not silently reset by receipt
-replay; an explicit bounded retry use case remains to be implemented.
+replay; the explicit bounded retry command is described below.
 
 The device projection now retains its immutable platform. Registration and
 admission reject contradictory Android/iOS metadata before queueing or returning
@@ -279,8 +279,8 @@ observation returns a retryable observation failure; actual permission, MFA or
 module denial stays final under the existing eight-attempt worker policy.
 
 `AbortCollaborationProvisioning` stops only the owned lease, recording failure or
-cancellation without deleting the device or its E2EE identity. Explicit retry
-and permanent device revocation remain separate forthcoming commands.
+cancellation without deleting the device or its E2EE identity. Explicit retry is described below; permanent device revocation remains a
+separate forthcoming command.
 
 Nineteen data cases (18 registration/activation and one registry regression) and
 eleven admission cases passed in 49s. The later retry-observation refinement
@@ -335,5 +335,53 @@ parsing passes. [Worker evidence](../measurements/collaboration-provider-worker-
 retains the initially malformed fictional key and cancellation-fixture correction.
 The real provider tests prove actual queue/batch/provisioning behavior, not product
 chat or E2EE key exchange. Activation source `4600a294` independently passed
-complete hosted control run `41191206775`. Continue explicit status/retry and the
-protected gateway/SDK integration; the live stack remains unchanged.
+complete hosted control run `41191206775`. Continue the protected gateway/SDK integration after the status/retry increment
+described below; the live stack remains unchanged.
+
+## Native setup status and explicit retry
+
+`GET /api/v1/companies/{companyId}/collaboration/native-device` reads the verified
+native parent's setup state. Its response is `{device: null}` before enrollment,
+or an owned device projection with ID, device version, state, platform and
+optional provisioning metadata. Provisioning includes its separate version,
+job ID/status, attempts, safe failure code and `retryNotBefore` for a terminal
+pending setup. No Matrix bearer, refresh credential or private encryption key
+appears in this response. The route requires native transport and current
+company/permission/MFA/client admission, including at response completion.
+Ordinary local history ownership is independent of this network read.
+
+`POST /api/v1/companies/{companyId}/collaboration/native-device/retry` requires
+`Idempotency-Key` and a body containing `deviceId`, `expectedDeviceVersion` and
+`expectedProvisioningVersion`. A successful mutation receipt identifies the
+**new background job**, version zero. Read the status route for the current
+device/provisioning versions; the device ID and version are unchanged by retry.
+
+Only a currently bound pending device with a FAILED/CANCELLED job can retry.
+Queued, running, successful, revoked, foreign-parent/company and stale-version
+inputs cannot reset work. A new provisioning run is allowed at most once per
+60 seconds per device, with HTTP 429 and bounded `retryAfterSeconds` before that
+boundary. Each new job retains the existing eight-attempt bounded backoff and
+100-pending-job company queue admission. Pointer revisions are finite; the last
+revision can execute but cannot schedule another replacement. A fresh explicit
+request captures current parent assurance and optional client build.
+
+Operation receipt, company/account/native-parent/device guards precede the
+pointer read. Reading the old terminal job does not take a reverse job lock:
+workers lock job before account/device. Immutable terminal status plus the
+schema-108 replacement constraint guard the old job. New job, pointer version,
+receipt, audit and outbox commit atomically, with final authority revalidation.
+Concurrent commands produce one new job; a lost-response replay, including
+after normal native refresh, returns its original job receipt. Replay does not
+repeat the delay check or create another job, but it still requires live access.
+Registration replay never invokes this command implicitly.
+
+Twenty-four actual PostgreSQL data cases and three new HTTP cases pass in 51s,
+including concurrency, lost responses, queue capacity, post-write rollback and
+restored retry history/fences. Full API/worker contexts pass in 4m22s: 80 API,
+108 worker passes and its unchanged opt-in retention skip. Eleven unchanged
+admission cases, formatting and architecture also pass.
+[Retry evidence](../measurements/collaboration-native-retry-2026-10-31.json) retains
+the corrected fixture comparison of the existing `replayed` receipt flag.
+Provider-worker source `d387ab67` passed full hosted control `41192185771`.
+Continue gateway/session and product SDK/chat implementation; no deployment or
+product feature group is accepted by this increment.

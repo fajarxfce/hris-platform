@@ -198,6 +198,70 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun getNativeCollaborationDeviceStatus(
+        registry: CollaborationRegistryRepository,
+        provisioning: CollaborationProvisioningRepository,
+        jobs: JobRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        service: CollaborationServicePolicy,
+    ) =
+        GetNativeCollaborationDeviceStatus(
+            registry,
+            provisioning,
+            jobs,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+            service,
+        )
+
+    @Bean
+    fun retryNativeCollaborationProvisioning(
+        registry: CollaborationRegistryRepository,
+        provisioning: CollaborationProvisioningRepository,
+        jobs: JobRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        service: CollaborationServicePolicy,
+    ) =
+        RetryNativeCollaborationProvisioning(
+            registry,
+            provisioning,
+            jobs,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+            service,
+        )
+
+    @Bean
     fun acquireNativeCollaborationAdmission(
         registry: CollaborationRegistryRepository,
         sessions: NativeSessionRepository,

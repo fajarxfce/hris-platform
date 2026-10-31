@@ -20,4 +20,20 @@ class PostgresCollaborationProvisioningDataSource(private val sql: DSLContext) :
     override fun insert(record: CollaborationDeviceProvisioningRecord) {
         sql.insertInto(P).set(record).execute()
     }
+
+    override fun replace(
+        record: CollaborationDeviceProvisioningRecord,
+        expectedVersion: Long,
+    ): Boolean =
+        sql.update(P)
+            .set(P.JOB_ID, record.jobId)
+            .set(P.VERSION, record.version)
+            .set(P.UPDATED_AT, record.updatedAt)
+            .where(
+                P.COMPANY_ID.eq(record.companyId),
+                P.ACCOUNT_ID.eq(record.accountId),
+                P.DEVICE_ID.eq(record.deviceId),
+                P.VERSION.eq(expectedVersion),
+            )
+            .execute() == 1
 }

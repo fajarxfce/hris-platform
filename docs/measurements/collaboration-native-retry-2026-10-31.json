@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "native_collaboration_status_and_explicit_retry",
+  "schema": 108,
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "phoneModified": false,
+  "checks": {
+    "modules": {
+      "modules/collaboration/data": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 80,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 109,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "correctedDataAndNewHttpElapsedSeconds": 51,
+    "fullApiAndWorkerElapsedSeconds": 262,
+    "format": true,
+    "architecture": true,
+    "postgresDumpRestore": true
+  },
+  "verifiedBehaviors": [
+    "Native status reads only the bound parent/company device and safe setup metadata under live authority. Cookie, invalid token, revoked permission, mismatched platform and revoked native parent are denied.",
+    "Only failed/cancelled pending provisioning may retry, using observed device and pointer versions, fresh authority and a one-minute per-device enqueue bound.",
+    "Four concurrent retries create exactly one new job; the other stale requests cannot replace it.",
+    "Lost-response replay returns the original new-job receipt, also after ordinary native refresh; device identity/version is retained.",
+    "Queued/running/succeeded work, foreign parent/company, missing idempotency, forged parent fields and invalid revisions cannot reset provisioning.",
+    "A full 100-job queue or post-write authority expiry leaves the old pointer, jobs, receipts, audit and outbox unchanged.",
+    "Actual PostgreSQL dump/restore retains old failed job, new queued job, pointer revision one, owner/company row isolation and pointer after parent purge; unfinished replacement/deletion remain rejected."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "Initial 23-case registration/status/retry selection",
+      "elapsedSeconds": 45,
+      "result": "22 data cases passed; replay comparison failed because the existing operation repository correctly sets replayed=true. The fixture now checks that flag explicitly. All 11 unchanged admission cases and delivery compilation passed in the same selection."
+    }
+  ],
+  "limits": [
+    "The HTTP fixture seeds terminal job status and advances its controlled clock; actual provider/batch execution is proved independently by the worker increment.",
+    "No protected Matrix SDK gateway, product chat, private-call/meeting integration or live deployment is implied by setup metadata and retry.",
+    "Schema/recovery ceiling remains 108; the final shared-context selection includes the same pre-existing opt-in elapsed export-retention skip."
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationStatusHttpTest.kt": "9e0dcea262cac2792a052404b5b72d42f382817310c7f81fb5535080b5d7acba",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationProvisioningDataSource.kt": "e0d315e34a4f93464bd6f429c2b05ec959f19577bfbe5af7811267237d5b5a30",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationProvisioningDataSource.kt": "540f233d23e7f9b15ee44644b35f31d66268c7e9581e640fab7ab095cbdf1a39",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "d5e7ef945053b055edc6e821447af6ec0b030a38391aceef6ef4a5016df69ea0",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationProvisioningRepository.kt": "6f41a76291c971fca69fb703e572f835a6e213f13f70a4f5a52e34b8003dff34",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "5368b1bf5da5d05cc42e84685fce428ee8d0e6b2a59920e4534024091ccf3aaf",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDeviceController.kt": "0fd79b5d63f1a153561a2ff4c208badea5f6f2500390fbd829d20f8cb7ce3923",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/RetryCollaborationProvisioningRequest.kt": "3c142f35b5d84544c50f2dd1131ac5865d37c1cdf4e8733d86f16ed346359bfd",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationDeviceResponse.kt": "74a4835ca743cd4bcdc753e654d730068edfe44d0670371f38e21e554aaccb15",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDeviceStatus.kt": "b98c5a206a04f58e7abccd5d218e7ff15fdef6ff602b02a3620d6de66794f195",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationProvisioningStatusPolicy.kt": "3ed788e3a3bfd69d89c837303c06ef36a247ae4b890e70fe77d1e01a6176d6c3",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationProvisioningRepository.kt": "2e020491c0a5dccb360004937a828d2f480a808a02e4fa006b38b2356749d3fa",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/GetNativeCollaborationDeviceStatus.kt": "d34df9ebd8d98782bf929b0589c87a4b3ed45aaf4ccc905a32899ee68ad9a3c2",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/RetryNativeCollaborationProvisioning.kt": "f7214e4b20747c09e70cec586643c48d1318d595407bc736cb5a184821a4407f"
+  }
+}

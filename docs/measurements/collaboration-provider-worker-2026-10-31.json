@@ -111,5 +111,21 @@
     "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixHttpClientOwner.kt": "6f0fde5bc7f255096079a869bbaab626a80496107f1472802d1f9fe6c95483a5",
     "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixRepository.kt": "1cb7995ed1353df45c764edc0edb4854e3e249aa73c8b341eed1a22a358838cb",
     "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderSettingsTest.kt": "b3bcf4c3cb7168b00937ccffb4f1358ada772f74f0db07d70bc28eb399f9175a"
+  },
+  "hostedControl": {
+    "runId": 41192185771,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41192185771",
+    "headSha": "d387ab67da5d528736739c15b0aa827997052b30",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "authority-and-storage",
+        "conclusion": "success"
+      },
+      {
+        "name": "company-settings",
+        "conclusion": "success"
+      }
+    ]
   }
 }

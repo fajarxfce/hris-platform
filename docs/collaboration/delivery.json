@@ -33,7 +33,8 @@
         "../measurements/collaboration-provider-expiry-2026-10-31.json",
         "../measurements/collaboration-provisioning-registration-2026-10-31.json",
         "../measurements/collaboration-provisioning-activation-2026-10-31.json",
-        "../measurements/collaboration-provider-worker-2026-10-31.json"
+        "../measurements/collaboration-provider-worker-2026-10-31.json",
+        "../measurements/collaboration-native-retry-2026-10-31.json"
       ]
     },
     {

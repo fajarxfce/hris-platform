@@ -367,6 +367,29 @@ class NativeCollaborationRegistrationTest {
         val f = Fixture()
         val parent = f.parent()
         val device = success(f.register(parent)).id
+        val first = f.claim(device)
+        success(
+            f.abort()
+                .execute(
+                    first,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable"),
+                )
+        )
+        f.clock.at = f.clock.at.plusSeconds(61)
+        val retried =
+            success(
+                f.retry()
+                    .execute(
+                        f.actor,
+                        parent,
+                        0,
+                        UUID.randomUUID(),
+                        device,
+                        0,
+                        0,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                    )
+            )
         val company = requireNotNull(f.actor.companyId)
         val pointer =
             requireNotNull(
@@ -385,7 +408,9 @@ class NativeCollaborationRegistrationTest {
         assertEquals("1", job.request.values["clientBuild"])
         assertEquals(0, job.attempts)
         assertEquals(JobStatus.QUEUED, job.status)
-        assertEquals(0, pointer.version)
+        assertEquals(1L, pointer.version)
+        assertEquals(retried.id, pointer.jobId)
+        assertNotEquals(first.job.request.id, pointer.jobId)
 
         val restored = "provisioning_" + UUID.randomUUID().toString().replace("-", "")
         fun command(vararg args: String) {
@@ -452,11 +477,19 @@ class NativeCollaborationRegistrationTest {
         }
         assertThrows(org.springframework.dao.DataAccessException::class.java) {
             restoredSql.update(
-                "update collaboration_device_provisioning set version=1,job_id=? where device_id=?",
+                "update collaboration_device_provisioning set version=2,job_id=? where device_id=?",
                 UUID.randomUUID(),
                 device,
             )
         }
+        assertEquals(
+            "FAILED",
+            restoredSql.queryForObject(
+                "select status from background_jobs where id=?",
+                String::class.java,
+                first.job.request.id,
+            ),
+        )
         restoredSql.update("delete from native_sessions where id=?", parent)
         assertEquals(
             pointer,
@@ -772,6 +805,265 @@ class NativeCollaborationRegistrationTest {
         }
     }
 
+    @Test
+    fun nativeStatusIsOwnedLiveMetadataAndExplicitRetryKeepsIdentityAfterResponseLoss() {
+        val f = Fixture()
+        val parent = f.parent()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        assertNull(success(f.status().execute(f.actor, parent, 0, client)))
+        val device = success(f.register(parent)).id
+        val queued = requireNotNull(success(f.status().execute(f.actor, parent, 0, client)))
+        assertEquals(device, queued.id)
+        assertEquals(JobStatus.QUEUED, queued.provisioning?.status)
+        val old = f.claim(device)
+        success(
+            f.abort()
+                .execute(
+                    old,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable"),
+                )
+        )
+        val stopped = requireNotNull(success(f.status().execute(f.actor, parent, 0, client)))
+        assertEquals(JobStatus.FAILED, stopped.provisioning?.status)
+        assertNotNull(stopped.provisioning?.retryNotBefore)
+        val operation = UUID.randomUUID()
+        assertEquals(
+            "collaboration_provisioning_retry_too_soon",
+            failed(f.retry().execute(f.actor, parent, 0, operation, device, 0, 0, client)),
+        )
+        f.clock.at = requireNotNull(stopped.provisioning?.retryNotBefore)
+        val receipt =
+            success(f.retry().execute(f.actor, parent, 0, operation, device, 0, 0, client))
+        assertNotEquals(old.job.request.id, receipt.id)
+        assertEquals(
+            receipt.copy(replayed = true),
+            success(f.retry().execute(f.actor, parent, 0, operation, device, 0, 0, client)),
+        )
+        // A normal native refresh changes authority version, not the command's identity.
+        sql.update("update native_sessions set version=version+1 where id=?", parent)
+        assertEquals(
+            receipt.copy(replayed = true),
+            success(f.retry().execute(f.actor, parent, 1, operation, device, 0, 0, client)),
+        )
+        val current = requireNotNull(success(f.status().execute(f.actor, parent, 1, client)))
+        assertEquals(1L, current.provisioning?.version)
+        assertEquals(receipt.id, current.provisioning?.jobId)
+        assertEquals(0L, current.version)
+        assertEquals(1, f.rows("collaboration_devices"))
+        assertEquals(2, f.rows("background_jobs"))
+        assertNull(f.credential(device))
+        assertEquals("job_lease_lost", failed(f.advance(RecordingMatrix(f.clock)).execute(old)))
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=?",
+            f.actor.companyId,
+            f.actor.accountId,
+        )
+        assertEquals("access_denied", failed(f.status().execute(f.actor, parent, 1, client)))
+        assertEquals(
+            "access_denied",
+            failed(f.retry().execute(f.actor, parent, 1, operation, device, 0, 0, client)),
+        )
+    }
+
+    @Test
+    fun competingExplicitRetriesCreateExactlyOneJobAndProtectCompanyAndParentScope() {
+        val f = Fixture()
+        val parent = f.parent()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val device = success(f.register(parent)).id
+        success(
+            f.abort()
+                .execute(
+                    f.claim(device),
+                    Failure(FailureKind.CONFLICT, "job_cancellation_requested"),
+                )
+        )
+        f.clock.at = f.clock.at.plusSeconds(61)
+        val results =
+            race(
+                List(4) {
+                    {
+                        f.retry()
+                            .execute(f.actor, parent, 0, UUID.randomUUID(), device, 0, 0, client)
+                    }
+                }
+            )
+        assertEquals(1, results.count { it is Result.Success })
+        assertEquals(
+            3,
+            results.count {
+                it is Result.Failed && it.failure.code == "collaboration_provisioning_changed"
+            },
+        )
+        assertEquals(2, f.rows("background_jobs"))
+        val another = f.parent()
+        assertNull(success(f.status().execute(f.actor, another, 0, client)))
+        assertEquals(
+            "collaboration_access_denied",
+            failed(f.retry().execute(f.actor, another, 0, UUID.randomUUID(), device, 0, 1, client)),
+        )
+        val secondCompany = f.company()
+        val otherActor = f.actor.copy(companyId = secondCompany)
+        assertNull(success(f.status().execute(otherActor, parent, 0, client)))
+        assertEquals(
+            "collaboration_access_denied",
+            failed(
+                f.retry().execute(otherActor, parent, 0, UUID.randomUUID(), device, 0, 1, client)
+            ),
+        )
+        assertEquals(
+            "invalid_collaboration_device",
+            failed(f.status().execute(f.actor, parent, 0, ClientVersion(ClientPlatform.IOS, 1))),
+        )
+    }
+
+    @Test
+    fun unfinishedOrActiveProvisioningCannotBeResetAndStaleVersionDoesNotEnqueue() {
+        val f = Fixture()
+        val parent = f.parent()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val device = success(f.register(parent)).id
+        f.clock.at = f.clock.at.plusSeconds(61)
+        assertEquals(
+            "collaboration_provisioning_changed",
+            failed(f.retry().execute(f.actor, parent, 0, UUID.randomUUID(), device, 0, 0, client)),
+        )
+        val leased = f.claim(device)
+        assertEquals(
+            "collaboration_provisioning_changed",
+            failed(f.retry().execute(f.actor, parent, 0, UUID.randomUUID(), device, 0, 0, client)),
+        )
+        success(f.advance(RecordingMatrix(f.clock)).execute(leased))
+        val active = requireNotNull(success(f.status().execute(f.actor, parent, 0, client)))
+        assertEquals(CollaborationDeviceState.ACTIVE, active.state)
+        assertNull(active.provisioning?.retryNotBefore)
+        assertEquals(
+            "collaboration_provisioning_changed",
+            failed(f.retry().execute(f.actor, parent, 0, UUID.randomUUID(), device, 1, 0, client)),
+        )
+        assertEquals(1, f.rows("background_jobs"))
+    }
+
+    @Test
+    fun retryPostWriteExpiryRollsBackNewJobPointerReceiptAuditAndOutbox() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val old = f.claim(device)
+        success(
+            f.abort()
+                .execute(
+                    old,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable"),
+                )
+        )
+        f.clock.at = f.clock.at.plusSeconds(61)
+        val before =
+            listOf("background_jobs", "operation_receipts", "audit_entries", "outbox_events")
+                .associateWith(f::rows)
+        val journal =
+            object : ChangeJournalRepository by f.journal {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> {
+                    val result = f.journal.record(actor, change)
+                    f.clock.at = f.clock.at.plusSeconds(3600)
+                    return result
+                }
+            }
+        assertTrue(
+            f.retry(journal)
+                .execute(
+                    f.actor,
+                    parent,
+                    0,
+                    UUID.randomUUID(),
+                    device,
+                    0,
+                    0,
+                    ClientVersion(ClientPlatform.ANDROID, 1),
+                ) is Result.Failed
+        )
+        assertEquals(before, before.keys.associateWith(f::rows))
+        val pointer =
+            success(
+                f.transactions.run(f.actor) {
+                    f.provisioning.find(
+                        requireNotNull(f.actor.companyId),
+                        f.actor.accountId,
+                        device,
+                    )
+                }
+            )
+        assertEquals(old.job.request.id, pointer?.jobId)
+        assertEquals(0L, pointer?.version)
+    }
+
+    @Test
+    fun fullCompanyQueueLeavesFailedPointerAndOperationUnchanged() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val old = f.claim(device)
+        success(
+            f.abort()
+                .execute(
+                    old,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable"),
+                )
+        )
+        f.clock.at = f.clock.at.plusSeconds(61)
+        success(
+            f.transactions.run(f.actor) {
+                repeat(100) {
+                    val request =
+                        JobRequest(
+                            UUID.randomUUID(),
+                            requireNotNull(f.actor.companyId),
+                            f.account,
+                            JobKind.REPORT_EXPORT,
+                            UUID.randomUUID(),
+                            emptyMap(),
+                            f.actor.authenticatedAt,
+                            0,
+                            f.actor.correlationId,
+                            f.clock.at,
+                            1,
+                        )
+                    val created = f.jobs.create(request)
+                    if (created is Result.Failed) return@run created
+                }
+                Result.Success(Unit)
+            }
+        )
+        val tables =
+            listOf("background_jobs", "operation_receipts", "audit_entries", "outbox_events")
+        val before = tables.associateWith(f::rows)
+        assertEquals(
+            "job_queue_full",
+            failed(
+                f.retry()
+                    .execute(
+                        f.actor,
+                        parent,
+                        0,
+                        UUID.randomUUID(),
+                        device,
+                        0,
+                        0,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                    )
+            ),
+        )
+        assertEquals(before, tables.associateWith(f::rows))
+        val pointer =
+            success(
+                f.transactions.run(f.actor) {
+                    f.provisioning.find(requireNotNull(f.actor.companyId), f.account, device)
+                }
+            )
+        assertEquals(old.job.request.id, pointer?.jobId)
+        assertEquals(0L, pointer?.version)
+    }
+
     private class RecordingMatrix(private val clock: Clock) : CollaborationMatrixRepository {
         val logins = AtomicInteger()
         val logouts = AtomicInteger()
@@ -933,6 +1225,40 @@ class NativeCollaborationRegistrationTest {
                 IdentitySecurityPolicy(),
                 clock,
                 service,
+            )
+
+        fun status() =
+            GetNativeCollaborationDeviceStatus(
+                registry,
+                provisioning,
+                jobs,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                clock,
+                CollaborationServicePolicy(true),
+            )
+
+        fun retry(journal: ChangeJournalRepository = this.journal) =
+            RetryNativeCollaborationProvisioning(
+                registry,
+                provisioning,
+                jobs,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                operations,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                clock,
+                CollaborationServicePolicy(true),
             )
 
         fun advance(

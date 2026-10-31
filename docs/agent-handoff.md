@@ -50,7 +50,21 @@ Current implementation:
   4m28s: four settings cases, 77 API cases and 109 worker cases (108 pass, one
   unchanged opt-in retention skip), formatting and architecture. Compose syntax
   also passes. [Worker evidence](measurements/collaboration-provider-worker-2026-10-31.json)
-  retains both corrected fixture failures and precise scope.
+  retains both corrected fixture failures and precise scope. Exact `d387ab67`
+  passed complete hosted control [41192185771](https://github.com/fajarxfce/hris-platform/actions/runs/41192185771).
+- Native setup status and explicit retry are implemented on the registration route
+  (GET and POST `/retry`). Status exposes only owned safe metadata. Retry checks
+  native/company/permission/MFA/client authority, observed device/pointer versions,
+  terminal failed/cancelled job, a one-minute enqueue bound and queue capacity.
+  It creates one new job and increments the pointer atomically with receipt/audit/
+  outbox; the device identity/version does not change. Receipt ID is the new job,
+  not a new device. Replay after native refresh returns the same job. Twenty-four
+  PostgreSQL data cases and three new HTTP cases pass (51s), including raced retry,
+  rollback and actual restore of the old failed/new queued job with pointer v1.
+  Full contexts pass in 4m22s: 80 API and 108 worker passes plus the one existing
+  opt-in retention skip; eleven unchanged admission cases, formatting/architecture
+  also pass. [Retry evidence](measurements/collaboration-native-retry-2026-10-31.json)
+  retains the corrected replay-flag fixture assertion.
 
 Critical provider behavior: Synapse logout deletes the **whole device**, every
 bearer and its E2EE keys, even when called with an expired bearer. Never use it
@@ -63,16 +77,13 @@ allow public login/admin/federation bypass.
 
 Next implementation:
 
-1. Inspect this worker increment's exact hosted control result after push; local
-   checks are complete. Do not rerun accepted broad checks without a new change.
-2. Native status and explicit idempotent, versioned/rate-bounded retry for a failed
-   or cancelled provisioning job, preserving the device identity. Registration
-   replay must not silently reset terminal jobs.
-3. Protected HRIS Matrix bootstrap/gateway and standard access/refresh protocol,
+1. Inspect the status/retry increment's exact hosted control result after push;
+   its local checks are complete. Prior provider-worker CI is accepted above.
+2. Protected HRIS Matrix bootstrap/gateway and standard access/refresh protocol,
    browser-parent admission, native/web SDK adapters and durable chat UI. Restore
    an authenticated Matrix SDK client only once; rotate tokens through its
    standard refresh callback. Keep owned offline data after ordinary expiry.
-4. All remaining P0 native protocol gates and P1–P8 product groups, including
+3. All remaining P0 native protocol gates and P1–P8 product groups, including
    rich messaging/context, backup, native voice/video, web/mobile meetings, AI,
    recovery and measured capacity. Do not substitute procedure documents for
    executed evidence or mark all features done after a foundation commit.

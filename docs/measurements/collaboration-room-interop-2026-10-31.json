@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-31",
+  "scope": "Actual pinned Synapse v1.164.1 room-version-12 creation, canonical-alias replay and partial-state repair",
+  "productAcceptance": false,
+  "providerImage": "ghcr.io/element-hq/synapse:v1.164.1@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+  "tests": {
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "15.885"
+  },
+  "gradleElapsedSeconds": 36,
+  "formatCheck": "passed",
+  "architectureCheck": "passed",
+  "cases": [
+    "failedInitialStateLeavesAnAliasThatMustBeVerifiedAndRepairedBeforePublication()",
+    "canonicalAliasAndImmutableMarkerRecoverCreationBeforePeerFirstLogin()"
+  ],
+  "observations": [
+    "Creating a private, non-federated room can invite a deterministic local HRIS Matrix user before its first provider login; later JWT login and repeated join succeed. No placeholder peer device or private key is required.",
+    "Repeating createRoom with the same canonical alias returns HTTP 400 M_ROOM_IN_USE; resolving the alias returns the same room before and after provider restart.",
+    "Immutable creation marker and room version, encryption algorithm, joined history visibility, invite-only join policy and forbidden guest access are readable and match expected state.",
+    "An ordinary peer cannot invite additional users or replace the encryption state at power level zero. Room-version-12 creator authority remains privileged; HRIS gateway must mediate creator state/membership controls too.",
+    "Deliberately invalid initial power levels fail createRoom with HTTP 400 after reserving its alias and persisting creation/member events. Encryption state is absent. Repeating createRoom cannot finish it because the alias already exists.",
+    "The correct creator can verify the retained immutable marker and repair the partial room by setting bounded expected power/encryption/join/history/guest state. Each final state matches its expected content."
+  ],
+  "limits": [
+    "Provider control semantics, not cryptographic message/media acceptance; no SDK encrypted payload or HRIS room-publication worker is exercised here.",
+    "Alias lookup alone is not admission or proof of complete creation. Production must verify immutable creator/marker, reject alien/mismatching state, reconcile exact membership and recheck HRIS authority before publishing its room binding.",
+    "No generic Matrix proxy, new public route, deployment, phone action, real employee message or Starter port. Fixtures own and close their provider process/network and HTTP client."
+  ]
+}

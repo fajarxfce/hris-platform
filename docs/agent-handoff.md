@@ -39,6 +39,14 @@ Current provider/client evidence:
   durable encrypted logical IDs, scoped recipient coalescing, event aliases and
   tombstones. Never assume unlimited provider deduplication.
 
+- Actual pinned Synapse room-version-12 provisioning checks now pass: unknown local
+  peer invitation survives first login, alias replay/restart resolves one room, and
+  peer state/invite escalation is denied. An invalid initial power state leaves a
+  partial room/alias without encryption; verified creator/marker plus state repair
+  completes it. [Evidence](measurements/collaboration-room-interop-2026-10-31.json)
+  records two cases (36s Gradle), format/architecture and owned cleanup. No HRIS
+  binding/publication or SDK E2EE is implied by this control proof.
+
 Current backend implementation:
 
 - Schemas 104–108 retain company/account/device/native-parent identity, independent
@@ -121,11 +129,13 @@ Provider ports remain private; raw provider credentials never reach clients.
 
 Next implementation:
 
-1. Inspect the direct-conversation increment's exact hosted control after push.
+1. Inspect direct-conversation `031c3714` hosted control [41201832706](https://github.com/fajarxfce/hris-platform/actions/runs/41201832706)
+   and the subsequent room-proof commit's control after push.
    Participant `d50bb0ad` passed every hosted job/step in
    [41200742892](https://github.com/fajarxfce/hris-platform/actions/runs/41200742892).
    Identity `b0bf1326` passed every hosted job/step in [41199490597](https://github.com/fajarxfce/hris-platform/actions/runs/41199490597).
-2. Prove and implement durable provider-room reconciliation for retained DM intent;
+2. Implement durable provider-room reconciliation for retained DM intent using the
+   [actual room-control proof](collaboration/provider-room-provisioning.md);
    Synapse createRoom/alias reservation is not atomic. Verify immutable creation
    marker, creator and complete encryption/membership state before publication,
    including partial creation, peer first login and response loss. Then group and

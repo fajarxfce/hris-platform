@@ -6871,3 +6871,21 @@ serial 68s reruns passed unchanged source. Combined: 36 domain, 201 data, 160 AP
 41227795949 at fabaa9a5 passed both jobs/all 23 steps with 24 verified hashes.
 No schema/live/phone change. Continue actual HRIS SDK integration, durable outbox,
 UI and every remaining collaboration phase; this does not accept product chat.
+
+
+## Actual Android SDK through HRIS — 31 October 2026
+
+Two fictional Android clients now exchange and decrypt Megolm messages through
+real HRIS native admission, with separate encrypted stores and preserved encrypted
+logical IDs. Server gateway reads verify ciphertext in both directions. The pinned
+SDK sends unprefixed `use_state_after`; bounded boolean parsing now permits the
+standard v1.12 state-before fallback. Four failed diagnostic runs are retained.
+
+[Evidence](measurements/collaboration-native-hris-sdk-2026-10-31.json): final 83s
+run passes 19 API cases and quality; 27 Python guard/cleanup cases pass. Mobile
+root/debug/lint passes in 69s. Ten Platform/twelve Mobile hashes and APK `3b10b319`
+bind the result. Activation/publication are fixture SQL; provider creation and
+HTTP/crypto are real. Cleanup passed; no live/phone/Starter update. Prior send
+CI 41229637604 passed both jobs/all 23 steps with 18 verified hashes. Continue
+product SDK ownership, durable outbox reconciliation, UI and all remaining P0–P8;
+no product feature is accepted by this protocol integration.

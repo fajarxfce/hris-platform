@@ -383,10 +383,11 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     fun syncReturnsOnlyEncryptedPositionAndWithholdsProviderSuccessAfterRevocation() {
         val n = native()
         val (_, token) = enroll(n)
-        val response = sync(n, token, "?timeout=0")
+        val response = sync(n, token, "?timeout=0&use_state_after=true")
         assertEquals(200, response.statusCode(), response.body())
         assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
         val cursor = json.readTree(response.body()).path("next_batch").asString()
+        assertEquals(200, sync(n, token, "?use_state_after=false").statusCode())
         assertFalse(cursor.contains("fixture-private-since"))
         val repeated =
             sync(
@@ -428,6 +429,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 "?timeout=30001",
                 "?full_state=yes",
                 "?filter=foreign-filter",
+                "?use_state_after=1",
+                "?use_state_after=true&use_state_after=false",
                 "?set_presence=unknown",
             )) {
             val result = sync(n, token, suffix)

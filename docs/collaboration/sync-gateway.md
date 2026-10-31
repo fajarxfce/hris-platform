@@ -32,7 +32,11 @@ requires explicit initial-position recovery; restoration acceptance is pending.
 ## Admitted classic endpoint
 
 `GET /_matrix/client/v3/sync` now accepts one opaque gateway bearer and bounded
-`since`, `timeout` (0–30,000 ms), `full_state` and `set_presence` parameters. Unknown
+`since`, `timeout` (0–30,000 ms), `full_state`, `set_presence` and one boolean
+`use_state_after` preference. The pinned SDK sends that preference even to the
+advertised v1.12 endpoint; responses retain standard `state` and do not advertise
+state-after support. [Actual SDK interoperability](native-hris-sdk.md) verifies
+this fallback. Unknown
 or duplicate parameters, URL credentials and GET bodies are rejected. Client
 filters are not exposed yet. Presence is not published by this first transport.
 The response is `no-store`; only the encrypted HRIS cursor becomes `next_batch`.
@@ -77,9 +81,10 @@ Device-list changes are intersected with those users; bounded own key/fallback
 counts are retained. Provider account data/presence are excluded, and `m.direct`
 is derived from HRIS bindings. Ephemeral receipts/typing and further account-data,
 verification, deletion and backup flows still require their own implementation.
-The limited room-history `prev_batch` remains an opaque provider pagination value;
-no public history endpoint accepts it yet. That future endpoint must authorize
-the exact room independently and bind its pagination to the owner/room.
+The limited room-history `prev_batch` is now independently sealed to the
+company/account/device/server/room and accepted only by the exact admitted
+[room-history endpoints](room-history.md). Sync/member and history positions
+remain different purposes; a raw provider position is never a public cursor.
 
 Long polling has a separate 64-slot pool, with at most one active operation per
 Matrix user/device; it does not consume the 32 short control slots. Acquisition

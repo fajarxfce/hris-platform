@@ -31,8 +31,9 @@ class MatrixGatewaySyncController(private val device: AccessNativeCollaborationM
             return matrixGatewayProblem(collaborationGatewayAuthenticationRequired().failure)
         val query = request.parameterMap
         if (
-            query.keys.any { it !in setOf("since", "timeout", "full_state", "set_presence") } ||
-                query.values.any { it.size != 1 }
+            query.keys.any {
+                it !in setOf("since", "timeout", "full_state", "set_presence", "use_state_after")
+            } || query.values.any { it.size != 1 }
         )
             return invalid()
         val timeoutText = request.getParameter("timeout")
@@ -41,6 +42,10 @@ class MatrixGatewaySyncController(private val device: AccessNativeCollaborationM
         if (timeout !in 0..30_000) return invalid()
         val full = request.getParameter("full_state")
         if (full != null && full !in setOf("true", "false")) return invalid()
+        // The pinned SDK always sends this optional preference. We do not advertise
+        // state-after support and retain our advertised v1.12 state-before response.
+        val stateAfter = request.getParameter("use_state_after")
+        if (stateAfter != null && stateAfter !in setOf("true", "false")) return invalid()
         val presence = request.getParameter("set_presence")
         if (presence != null && presence !in setOf("online", "offline", "unavailable"))
             return invalid()

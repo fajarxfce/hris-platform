@@ -12,6 +12,10 @@ on:
       - modules/identity/data/src/main/kotlin/dev/fajar/hris/identity/data/repositories/StoredMembershipRepository.kt
       - apps/server/src/test/kotlin/dev/fajar/hris/ClientPolicy*
       - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
+      - apps/server/src/test/kotlin/dev/fajar/hris/NativeSdk*
+      - apps/server/src/test/kotlin/dev/fajar/hris/NativeGatewaySdkFixture.kt
+      - tool/collaboration_hris_native.py
+      - tool/test_collaboration_hris_native.py
       - apps/server/src/test/resources/matrix-signing.fixture
       - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
       - apps/server/build.gradle.kts
@@ -42,6 +46,10 @@ on:
       - modules/identity/data/src/main/kotlin/dev/fajar/hris/identity/data/repositories/StoredMembershipRepository.kt
       - apps/server/src/test/kotlin/dev/fajar/hris/ClientPolicy*
       - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
+      - apps/server/src/test/kotlin/dev/fajar/hris/NativeSdk*
+      - apps/server/src/test/kotlin/dev/fajar/hris/NativeGatewaySdkFixture.kt
+      - tool/collaboration_hris_native.py
+      - tool/test_collaboration_hris_native.py
       - apps/server/src/test/resources/matrix-signing.fixture
       - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
       - apps/server/build.gradle.kts
@@ -81,6 +89,7 @@ jobs:
       - name: Check boundaries and recovery schema gate
         run: |
           python3 tool/check_architecture.py
+          python3 -m unittest discover -s tool -p 'test_collaboration*.py'
           python3 -m unittest discover -s tool -p 'test_recovery*.py'
       - name: Verify policies, actual PostgreSQL isolation and backup recovery
         run: ./gradlew formatCheck :core:database:test :core:jobs:domain:test :modules:identity:domain:test :modules:administration:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon

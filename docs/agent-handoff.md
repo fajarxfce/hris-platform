@@ -17,6 +17,24 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Actual Android SDK through HRIS passes**: two fictional employees, separate
+  encrypted stores, keys/claim/to-device, bidirectional Megolm messages and classic
+  sync all use the real gateway. Server event reads verify ciphertext; decrypted
+  client content retains logical IDs. [Contract](collaboration/native-hris-sdk.md)
+  and [measurement](measurements/collaboration-native-hris-sdk-2026-10-31.json)
+  retain 10 Platform/12 Mobile source hashes and APK `3b10b319`. Final 83s run:
+  19 API cases, format/architecture passed; all 27 Python driver cases passed.
+  Mobile root/debug/lint passed in 69s. Four earlier timeout failures exposed
+  the pinned SDK's unprefixed `use_state_after`; strict boolean preference now
+  permits the advertised v1.12 state-before response, verified by the SDK.
+  Device activation/binding publication remain explicit SQL fixtures; provider
+  room creation and HTTP/crypto are real. Cleanup passed. No live/phone/Starter
+  change. Send commit c3b0955d CI 41229637604 passed both jobs/all 23 steps and
+  all 18 source hashes were verified. **Continue product session/store ownership,
+  durable SDK queue restart/logical reconciliation, UI and the full P0–P8 plan.**
+  Commit/push the matching Mobile proof and its pinned HRIS CI fixture next;
+  this infrastructure checkpoint accepts no product feature.
+
 - Native DIRECT encrypted sends now use exact owned-room scope, confirmed sender
   publication and current eligible peer devices, preserving offline short-token
   expiry behavior. Key preflight and send each revalidate room/recipient/admission;

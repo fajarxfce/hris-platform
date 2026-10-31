@@ -28,7 +28,9 @@
         "sdk-protocol-surface.md",
         "../measurements/collaboration-sdk-protocol-surface-2026-10-31.json",
         "sync-mode.md",
-        "../measurements/collaboration-dual-sync-2026-10-31.json"
+        "../measurements/collaboration-dual-sync-2026-10-31.json",
+        "native-hris-sdk.md",
+        "../measurements/collaboration-native-hris-sdk-2026-10-31.json"
       ]
     },
     {
@@ -88,7 +90,9 @@
         "room-history.md",
         "../measurements/collaboration-room-history-2026-10-31.json",
         "room-messages.md",
-        "../measurements/collaboration-room-messages-2026-10-31.json"
+        "../measurements/collaboration-room-messages-2026-10-31.json",
+        "native-hris-sdk.md",
+        "../measurements/collaboration-native-hris-sdk-2026-10-31.json"
       ]
     },
     {

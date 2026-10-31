@@ -88,7 +88,7 @@ class MatrixRoomAccessInteropTest {
                             )
                                 as Result.Success)
                             .value
-                    (InternalCollaborationMatrixSyncRepository(sync)
+                    (InternalCollaborationMatrixSyncRepository(sync, collaborationCursorFixture())
                             .sync(owner, scope, null, 0, false, creator.accessToken, deadline())
                             as Result.Success)
                         .value

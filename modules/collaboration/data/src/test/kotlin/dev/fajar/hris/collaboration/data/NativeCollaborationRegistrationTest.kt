@@ -15,12 +15,14 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegist
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRoomScopeDataSource
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomHistoryRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationSyncCursorRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomHistoryRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDeviceKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
@@ -40,6 +42,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomR
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomHistoryRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixToDeviceRepository
@@ -2609,7 +2612,10 @@ class NativeCollaborationRegistrationTest {
                     serverName = "matrix.example.test",
                     providerSync =
                         dev.fajar.hris.collaboration.data.repositories
-                            .InternalCollaborationMatrixSyncRepository(syncSource),
+                            .InternalCollaborationMatrixSyncRepository(
+                                syncSource,
+                                collaborationCursorFixture(),
+                            ),
                 )
             val identity = success(request.identity(tokens.accessToken, UUID.randomUUID()))
             assertEquals(
@@ -4021,10 +4027,18 @@ class NativeCollaborationRegistrationTest {
                             serverName = provider.config.serverName,
                             providerSync =
                                 dev.fajar.hris.collaboration.data.repositories
-                                    .InternalCollaborationMatrixSyncRepository(sync),
+                                    .InternalCollaborationMatrixSyncRepository(
+                                        sync,
+                                        collaborationCursorFixture(),
+                                    ),
                             providerRoomAccess =
                                 dev.fajar.hris.collaboration.data.repositories
                                     .InternalCollaborationMatrixRoomAccessRepository(source),
+                            providerRoomHistory =
+                                InternalCollaborationMatrixRoomHistoryRepository(
+                                    source,
+                                    collaborationCursorFixture(),
+                                ),
                         )
                     assertEquals(
                         binding.matrixRoomId,
@@ -4064,6 +4078,72 @@ class NativeCollaborationRegistrationTest {
                         )
                     assertEquals(2, members.events.size)
                     assertTrue(members.events.all { it["room_id"] == binding.matrixRoomId })
+                    val target = state.events.first()["event_id"] as String
+                    val history =
+                        success(
+                            request.roomMessages(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                binding.matrixRoomId,
+                                CollaborationRoomPageRequest(null, null, "b", 20),
+                            )
+                        )
+                    assertTrue((history.payload["chunk"] as List<*>).isNotEmpty())
+                    assertEquals(
+                        target,
+                        success(
+                                request.roomEvent(
+                                    tokens.accessToken,
+                                    UUID.randomUUID(),
+                                    binding.matrixRoomId,
+                                    target,
+                                )
+                            )
+                            .payload["event_id"],
+                    )
+                    success(
+                        request.roomContext(
+                            tokens.accessToken,
+                            UUID.randomUUID(),
+                            binding.matrixRoomId,
+                            target,
+                            10,
+                        )
+                    )
+                    assertEquals(
+                        "collaboration_room_not_found",
+                        failed(
+                            request.roomMessages(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                "!unknown",
+                                CollaborationRoomPageRequest(null, null, "b", 20),
+                            )
+                        ),
+                    )
+                    assertEquals(
+                        "invalid_collaboration_history_request",
+                        failed(
+                            request.roomContext(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                binding.matrixRoomId,
+                                target,
+                                101,
+                            )
+                        ),
+                    )
+                    assertEquals(
+                        "invalid_collaboration_history_cursor",
+                        failed(
+                            request.roomMessages(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                binding.matrixRoomId,
+                                CollaborationRoomPageRequest(batch.nextBatch, null, "b", 20),
+                            )
+                        ),
+                    )
                 }
         }
     }
@@ -5051,6 +5131,8 @@ class NativeCollaborationRegistrationTest {
                 dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomAccessRepository =
                 dev.fajar.hris.collaboration.data.repositories
                     .DisabledCollaborationMatrixRoomAccessRepository(),
+            providerRoomHistory: CollaborationMatrixRoomHistoryRepository =
+                DisabledCollaborationMatrixRoomHistoryRepository(),
         ) =
             AccessNativeCollaborationMatrixDevice(
                 gateway,
@@ -5073,6 +5155,7 @@ class NativeCollaborationRegistrationTest {
                 ),
                 providerSync,
                 providerRoomAccess,
+                providerRoomHistory,
                 sessions,
                 policies,
                 companies,

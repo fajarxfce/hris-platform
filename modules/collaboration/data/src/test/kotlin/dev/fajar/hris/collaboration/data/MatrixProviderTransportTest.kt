@@ -1065,6 +1065,82 @@ class MatrixProviderTransportTest {
         }
     }
 
+    @Test
+    fun historyEscapesAllPathAndPositionValuesAndBoundsStreamingWithoutLosingPermits() {
+        Fixture(maximumConcurrent = 1).use { f ->
+            val deadline = f.clock.now.plusSeconds(20)
+            f.handler = {
+                assertEquals("GET", it.requestMethod)
+                assertEquals(
+                    "/_matrix/client/v3/rooms/%21room%2F..%2F%3Froom/messages",
+                    it.requestURI.rawPath,
+                )
+                assertEquals("dir=b&limit=5&from=t%26x%3D1&to=t%23end", it.requestURI.rawQuery)
+                f.respond(it, "{}")
+            }
+            f.source.messages("!room/../?room", "t&x=1", "t#end", "b", 5, "fixture", deadline)
+            f.handler = {
+                assertEquals(
+                    "/_matrix/client/v3/rooms/%21room/context/%24event%2F..%3Fother%23fragment",
+                    it.requestURI.rawPath,
+                )
+                assertEquals("limit=0", it.requestURI.rawQuery)
+                f.respond(it, "{}")
+            }
+            f.source.context("!room", "\$event/..?other#fragment", 0, "fixture", deadline)
+            f.handler = {
+                f.respond(
+                    it,
+                    "{\"padding\":[" +
+                        List(2048) { "\"" + "a".repeat(1024) + "\"" }.joinToString(",") +
+                        "]}",
+                )
+            }
+            assertEquals(
+                2048,
+                f.source
+                    .messages("!room", null, null, "b", 5, "fixture", deadline)
+                    .path("padding")
+                    .size(),
+            )
+            for (body in
+                listOf(
+                    "{} {}",
+                    "{\"x\":1,\"x\":2}",
+                    "{\"x\":" + "[".repeat(65) + "0" + "]".repeat(65) + "}",
+                    "{\"x\":\"" + "a".repeat(1_048_577) + "\"}",
+                    "{\"padding\":[" +
+                        List(8192) { "\"" + "a".repeat(1024) + "\"" }.joinToString(",") +
+                        "]}",
+                )) {
+                f.handler = { f.respond(it, body) }
+                assertInstanceOf(
+                    Result.Failed::class.java,
+                    safeMatrixProviderCall {
+                        f.source.messages("!room", null, null, "b", 5, "fixture", deadline)
+                    },
+                )
+                f.handler = { f.respond(it, "{}") }
+                assertTrue(f.source.event("!room", "\$event", "fixture", deadline).isObject)
+            }
+            f.handler = { f.respond(it, "{}", status = 404) }
+            assertEquals(
+                "collaboration_room_event_not_found",
+                (safeMatrixProviderCall {
+                        f.source.event("!room", "\$missing", "fixture", deadline)
+                    }
+                        as Result.Failed)
+                    .failure
+                    .code,
+            )
+            val count = f.requests.get()
+            assertThrows(MatrixDeadlineException::class.java) {
+                f.source.messages("!room", null, null, "b", 5, "fixture", f.clock.now)
+            }
+            assertEquals(count, f.requests.get())
+        }
+    }
+
     private class Fixture(timeout: Duration = Duration.ofSeconds(5), maximumConcurrent: Int = 32) :
         AutoCloseable {
         val json = JsonMapper.builder().build()

@@ -61,7 +61,8 @@ class MatrixSyncGatewayInteropTest {
             val first = create()
             val second = create()
             HttpMatrixSyncDataSource(f.client, f.config, f.clock).use { source ->
-                val repository = InternalCollaborationMatrixSyncRepository(source)
+                val repository =
+                    InternalCollaborationMatrixSyncRepository(source, collaborationCursorFixture())
                 for ((account, device, bearer, bucket) in
                     listOf(
                         listOf(f.request.accountId, f.request.deviceId, own.accessToken, "join"),

@@ -303,6 +303,66 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         assertEquals(before, provider.roomCalls.get())
     }
 
+    @Test
+    fun historyRoutesScopePositionsValidateQueriesAndWithholdLateResults() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val room = publishedRoom(n, device)
+        fun read(path: String, bearer: String = token) =
+            matrixRoom(n, bearer, "v3/rooms/$room/$path")
+        val page = read("messages?dir=b&limit=10")
+        assertEquals(200, page.statusCode(), page.body())
+        assertEquals("no-store", page.headers().firstValue("Cache-Control").orElse(""))
+        val body = json.readTree(page.body())
+        assertFalse(page.body().contains("private-history"))
+        val cursor =
+            java.net.URLEncoder.encode(
+                body.path("end").asString(),
+                java.nio.charset.StandardCharsets.UTF_8,
+            )
+        assertEquals(200, read("messages?dir=b&from=$cursor&limit=10").statusCode())
+        assertTrue(provider.lastHistoryQuery.get().contains("from=private-history-1"))
+        val eventId = body.path("chunk").first().path("event_id").asString()
+        assertEquals(200, read("event/$eventId").statusCode())
+        val context = read("context/$eventId?limit=0")
+        assertEquals(200, context.statusCode(), context.body())
+        val before = provider.roomCalls.get()
+        for (invalid in
+            listOf(
+                "messages",
+                "messages?dir=b&limit=0",
+                "messages?dir=b&limit=101",
+                "messages?dir=b&limit=+1",
+                "messages?dir=b&limit=1&limit=2",
+                "messages?dir=b&filter=%7B%7D",
+                "messages?dir=b&from=raw-position",
+                "context/$eventId?limit=101",
+                "event/$eventId?access_token=foreign",
+            )) {
+            assertEquals(400, read(invalid).statusCode(), invalid)
+        }
+        assertEquals(401, read("messages?dir=b", n.access).statusCode())
+        val other = native()
+        val (_, otherToken) = enroll(other)
+        assertEquals(
+            404,
+            matrixRoom(other, otherToken, "v3/rooms/$room/messages?dir=b&from=$cursor").statusCode(),
+        )
+        assertEquals(before, provider.roomCalls.get())
+        provider.onRoomHistory.set {
+            database()
+                .update(
+                    "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                    n.fixture.company,
+                    n.fixture.account,
+                )
+        }
+        val denied = read("messages?dir=b")
+        assertTrue(denied.statusCode() in listOf(401, 403, 409), denied.body())
+        assertFalse(denied.body().contains(eventId))
+        assertEquals(before + 1, provider.roomCalls.get())
+    }
+
     private fun sync(
         n: Native,
         token: String? = null,
@@ -1038,6 +1098,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val roomStates = ConcurrentHashMap<String, List<Map<String, Any>>>()
         val roomCalls = AtomicInteger()
         val lastMemberQuery = AtomicReference<String>()
+        val lastHistoryQuery = AtomicReference<String>()
+        val onRoomHistory = AtomicReference<(() -> Unit)?>(null)
         val onQuery = AtomicReference<(() -> Unit)?>(null)
         private val credentials = ConcurrentHashMap<String, Map<String, Any>>()
         private val executor = Executors.newFixedThreadPool(2)
@@ -1237,7 +1299,47 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                                     events.filter { it["type"] == "m.room.member" }
                                             )
                                         }
-                                        else -> error("Unexpected room fixture route")
+                                        else -> {
+                                            val operation = relative.substringAfter('/')
+                                            onRoomHistory.getAndSet(null)?.invoke()
+                                            when {
+                                                operation == "messages" -> {
+                                                    lastHistoryQuery.set(request.requestURI.query)
+                                                    if (request.requestURI.query.contains("from="))
+                                                        mapOf(
+                                                            "start" to "private-history-1",
+                                                            "chunk" to emptyList<Any>(),
+                                                        )
+                                                    else
+                                                        mapOf(
+                                                            "start" to "private-history-2",
+                                                            "end" to "private-history-1",
+                                                            "chunk" to events,
+                                                        )
+                                                }
+                                                operation.startsWith("event/") ->
+                                                    events.single {
+                                                        it["event_id"] ==
+                                                            operation.removePrefix("event/")
+                                                    }
+                                                operation.startsWith("context/") ->
+                                                    mapOf(
+                                                        "event" to
+                                                            events.single {
+                                                                it["event_id"] ==
+                                                                    operation.removePrefix(
+                                                                        "context/"
+                                                                    )
+                                                            },
+                                                        "events_before" to emptyList<Any>(),
+                                                        "events_after" to emptyList<Any>(),
+                                                        "state" to events,
+                                                        "start" to "private-history-1",
+                                                        "end" to "private-history-2",
+                                                    )
+                                                else -> error("Unexpected room fixture route")
+                                            }
+                                        }
                                     }
                                 } else if (
                                     request.requestURI.path.startsWith(

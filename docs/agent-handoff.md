@@ -17,6 +17,21 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Native DIRECT history now exposes fixed messages/context/event reads with exact
+  retained room ownership and current admission before/after I/O. Sync prev_batch
+  and page/context positions are AES-GCM bound to company/account/device/server/
+  room, separate from sync/member positions. Actual Synapse 25-event pagination
+  terminates without duplicates; context works both directions. Full checks pass
+  in 426s: 34 domain, 194 data, 159 selected API, 112 worker (one opt-in skip),
+  format/architecture and both DI graphs. [Contract](collaboration/room-history.md)
+  and [measurement](measurements/collaboration-room-history-2026-10-31.json) retain
+  the initial fixture burst-429 failure, corrected 59s checks and 24 source hashes.
+  **Next implement encrypted room sends, then actual pinned SDK through HRIS,
+  durable outbox and product UI. Continue the full P0–P8 plan.** No migration,
+  live service, phone, Mobile or Starter change occurred. The prior room-access
+  commit b82888b6 hosted 41225780266 passed both jobs/all 23 steps; all 23 matching
+  source hashes and terminal metadata are retained in its measurement.
+
 - Native Matrix discovery and DIRECT join/state/member reads now use exact owned
   room lookup through existing RLS. `members?at=` opens only the calling device's
   sealed sync position; actual Synapse preserves historical invite state after a
@@ -28,9 +43,9 @@ Current provider/client evidence:
   routes, strict framing, foreign/unpublished room denial and late revocation are
   covered. [Contract](collaboration/room-access.md) and
   [evidence](measurements/collaboration-room-access-2026-10-31.json) retain source
-  hashes and the corrected duplicate-helper compilation failure. **Next implement
-  owner/room-bound pagination, context/event reads and encrypted room sends, then
-  the actual pinned SDK through HRIS, durable outbox and UI.** Client filters,
+  hashes and the corrected duplicate-helper compilation failure. Pagination and
+  context/event reads are implemented above. Continue encrypted sends, the actual
+  pinned SDK through HRIS, durable outbox and UI. Client filters,
   additional fixed discovery, browser admission, group/context scope and the rest
   of the full plan remain. No schema migration, live update or phone action.
   Sync `43391884` hosted `41223350867` passed all jobs/steps; its 18 exact source

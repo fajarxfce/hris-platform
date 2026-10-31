@@ -84,7 +84,9 @@
         "../measurements/collaboration-sync-foundation-2026-10-31.json",
         "../measurements/collaboration-sync-gateway-2026-10-31.json",
         "room-access.md",
-        "../measurements/collaboration-room-access-2026-10-31.json"
+        "../measurements/collaboration-room-access-2026-10-31.json",
+        "room-history.md",
+        "../measurements/collaboration-room-history-2026-10-31.json"
       ]
     },
     {
@@ -473,7 +475,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement scoped classic sync/cursor state reacquisition and room content on current native self/direct authority; fixed key and encrypted to-device endpoints are implemented.",
+    "Implement encrypted room sends, then actual pinned SDK through native HRIS admission; scoped classic sync, room joins, state/member reads and owner-bound pagination/context/event reads are implemented.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

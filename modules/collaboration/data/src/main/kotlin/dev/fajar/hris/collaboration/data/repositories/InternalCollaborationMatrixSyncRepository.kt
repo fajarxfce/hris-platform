@@ -5,6 +5,7 @@ import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixSyncRepository
 import dev.fajar.hris.core.domain.Result
+import dev.fajar.hris.identity.data.datasources.IdentityTokenDataSource
 import java.time.Instant
 import java.util.UUID
 import tools.jackson.core.type.TypeReference
@@ -14,8 +15,10 @@ import tools.jackson.databind.json.JsonMapper
 /**
  * Maps only the fixed DIRECT protocol surface. Provider filters are an optimization, never ACLs.
  */
-class InternalCollaborationMatrixSyncRepository(private val source: MatrixSyncDataSource) :
-    CollaborationMatrixSyncRepository {
+class InternalCollaborationMatrixSyncRepository(
+    private val source: MatrixSyncDataSource,
+    private val crypto: IdentityTokenDataSource,
+) : CollaborationMatrixSyncRepository {
     private val json = JsonMapper.builder().build()
 
     override fun sync(
@@ -122,7 +125,13 @@ class InternalCollaborationMatrixSyncRepository(private val source: MatrixSyncDa
                         val timelineOut = linkedMapOf<String, Any>("events" to timeline)
                         val previous = timelineNode.path("prev_batch")
                         if (!previous.isMissingNode)
-                            timelineOut["prev_batch"] = text(timelineNode, "prev_batch", 1024)
+                            timelineOut["prev_batch"] =
+                                sealMatrixRoomCursor(
+                                    crypto,
+                                    owner,
+                                    id,
+                                    text(timelineNode, "prev_batch", 1024),
+                                )
                         val limited = timelineNode.path("limited")
                         if (!limited.isMissingNode) {
                             if (!limited.isBoolean) throw MatrixResponseException()

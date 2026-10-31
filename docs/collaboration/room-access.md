@@ -74,8 +74,8 @@ late lookup expiry and revocation after provider acceptance. An actual HRIS job
 publishes a real Synapse room before the gateway joins/reads/syncs it and resolves
 member history through its sealed cursor.
 
-Continue with owner/room-bound pagination, encrypted room sends and the remaining
-fixed SDK discovery surface, then the actual pinned Android/web client through
-HRIS. Durable outbox, logical-message reconciliation, UI and the rest of chat,
+[Owner/room-bound pagination and context/event reads](room-history.md) now extend
+this surface. Continue encrypted room sends and the actual pinned Android/web
+client through HRIS, adding fixed discovery only as required by that client. Durable outbox, logical-message reconciliation, UI and the rest of chat,
 calls and meetings are not accepted by these transport tests. The live schema-103
 runtime and phone remain unchanged.

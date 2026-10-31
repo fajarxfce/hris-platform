@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixPolicy
+import dev.fajar.hris.collaboration.domain.entities.CollaborationRoomPageRequest
 import dev.fajar.hris.collaboration.domain.entities.CollaborationServicePolicy
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
@@ -107,6 +108,60 @@ class MatrixGatewayReadController(
                 mapOf("chunk" to it.events)
             }
         }
+
+    @GetMapping("/_matrix/client/v3/rooms/{roomId}/messages")
+    fun messages(@PathVariable roomId: String, request: HttpServletRequest): ResponseEntity<Any> =
+        read(request, setOf("from", "to", "dir", "limit")) { token, correlation ->
+            val limit =
+                limit(request, 10)
+                    ?: return@read Result.Failed(
+                        Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request")
+                    )
+            device
+                .roomMessages(
+                    token,
+                    correlation,
+                    roomId,
+                    CollaborationRoomPageRequest(
+                        request.getParameter("from"),
+                        request.getParameter("to"),
+                        request.getParameter("dir") ?: "",
+                        limit,
+                    ),
+                )
+                .map { it.payload }
+        }
+
+    @GetMapping("/_matrix/client/v3/rooms/{roomId}/context/{eventId}")
+    fun context(
+        @PathVariable roomId: String,
+        @PathVariable eventId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        read(request, setOf("limit")) { token, correlation ->
+            val limit =
+                limit(request, 10)
+                    ?: return@read Result.Failed(
+                        Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request")
+                    )
+            device.roomContext(token, correlation, roomId, eventId, limit).map { it.payload }
+        }
+
+    @GetMapping("/_matrix/client/v3/rooms/{roomId}/event/{eventId}")
+    fun event(
+        @PathVariable roomId: String,
+        @PathVariable eventId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        read(request) { token, correlation ->
+            device.roomEvent(token, correlation, roomId, eventId).map { it.payload }
+        }
+
+    private fun limit(request: HttpServletRequest, default: Int): Int? {
+        val value = request.getParameter("limit") ?: return default
+        if (value.length !in 1..3 || value.any { it !in '0'..'9' }) return null
+        return value.toIntOrNull()
+    }
 
     private fun read(
         request: HttpServletRequest,

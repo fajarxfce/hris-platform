@@ -29,6 +29,7 @@ class AccessNativeCollaborationMatrixDevice(
     private val syncCursors: CollaborationSyncCursorRepository,
     private val providerSync: CollaborationMatrixSyncRepository,
     private val providerRoomAccess: CollaborationMatrixRoomAccessRepository,
+    private val providerRoomHistory: CollaborationMatrixRoomHistoryRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -81,6 +82,75 @@ class AccessNativeCollaborationMatrixDevice(
                 )
             }
         }
+
+    fun roomMessages(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        request: CollaborationRoomPageRequest,
+    ): Result<CollaborationRoomHistory> {
+        if (
+            request.direction !in setOf("b", "f") ||
+                request.limit !in 1..100 ||
+                listOfNotNull(request.from, request.to).any {
+                    it.length !in 1..4096 || it.any { char -> char.code !in 33..126 }
+                }
+        )
+            return invalidHistory()
+        return roomOperation(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomHistory.messages(
+                    prepared.owner,
+                    prepared.room,
+                    request,
+                    bearer,
+                    deadline,
+                )
+            }
+        }
+    }
+
+    fun roomContext(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        eventId: String,
+        limit: Int,
+    ): Result<CollaborationRoomHistory> {
+        if (!validEventId(eventId) || limit !in 0..100) return invalidHistory()
+        return roomOperation(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomHistory.context(
+                    prepared.owner,
+                    prepared.room,
+                    eventId,
+                    limit,
+                    bearer,
+                    deadline,
+                )
+            }
+        }
+    }
+
+    fun roomEvent(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        eventId: String,
+    ): Result<CollaborationRoomHistory> {
+        if (!validEventId(eventId)) return invalidHistory()
+        return roomOperation(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomHistory.event(prepared.owner, prepared.room, eventId, bearer, deadline)
+            }
+        }
+    }
+
+    private fun validEventId(value: String) =
+        value.length in 2..255 && value.startsWith('$') && value.all { it.code in 33..126 }
+
+    private fun invalidHistory() =
+        Result.Failed(Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request"))
 
     private fun <T> roomOperation(
         token: String,

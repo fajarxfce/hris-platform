@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-31",
+  "scope": "Native DIRECT history pagination, context/event reads and owner-room-bound encrypted positions",
+  "schema": 113,
+  "validation": [
+    {
+      "durationSeconds": 77,
+      "result": "failed",
+      "note": "One of 14 data cases hit actual Synapse default message burst 429 while seeding 25 ciphertext fixtures; 17 HTTP and 34 domain cases and quality checks passed. The isolated history fixture now opts into a 64-message burst; default fixtures and live configuration stay unchanged."
+    },
+    {
+      "durationSeconds": 59,
+      "result": "passed",
+      "counts": {
+        "data": 8,
+        "api": 17
+      },
+      "note": "Actual 25-event Synapse paging/termination/context; HRIS worker publication through native history access; cursor crypto, malformed projection and bounded HTTP stream/URI escaping; quality checks."
+    },
+    {
+      "durationSeconds": 426,
+      "result": "passed",
+      "counts": {
+        "modules/collaboration/domain": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 194,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 159,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/worker": {
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        }
+      },
+      "note": "Full collaboration domain/data, selected native/API/client-policy/approval/people API tests, complete worker, format/architecture and both DI contexts."
+    }
+  ],
+  "verified": [
+    "Existing retained room ownership with current native access before and after acquisition; late revoked permission withholds successful history responses",
+    "Sync prev_batch, messages start/end and context positions use AES-GCM bound to account/company/device/server/room; sync and room purposes cannot cross",
+    "Malformed/foreign cursors rejected before provider history I/O, retained-key rotation succeeds and retired keys require reanchoring without deleting owned stores",
+    "Raw position progress checked before randomized sealing; stalled empty pages stop, advancing empty pages continue, repeated nonempty positions fail",
+    "Actual Synapse 25 ciphertext events: sync prev_batch loads older events, bounded pagination reaches termination without duplicates, context cursors work in both directions and missing event returns not-found",
+    "Shared DIRECT event projection checks exact event target/room/pair, no duplicate IDs/state keys or plaintext messages, fixed fields only",
+    "Fixed encoded control paths, separate control capacity from long polling, eight-MiB streamed response and strict JSON limits; malformed/oversized responses release slots",
+    "Actual HRIS published Synapse room and native gateway history/state/sync/member interoperability, no generic proxy",
+    "Strict public GET/query/auth bounds, no-store, native-token/cross-company denial and current-permission completion checks"
+  ],
+  "limits": {
+    "responseBytes": 8388608,
+    "controlPermits": 32,
+    "configuredTimeoutSeconds": 5,
+    "pageLimit": 100,
+    "contextEventLimit": 100,
+    "stateEvents": 256,
+    "cursorCharacters": 4096,
+    "providerPositionCharacters": 1024,
+    "jsonDepth": 64,
+    "jsonStringCharacters": 1048576,
+    "jsonNumberCharacters": 32
+  },
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "82fa92f0462527d4aab7c70b530356b6f8579fc7955db7fe2b5b45c2bd28a698",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "ae46dc43579e0996a6587dd5cef2c8487e9d36a3b6e588ebf6f11958300c4831",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "1abff7739aa8d3157b2638dbeec4ab25bdedfaae075442cf3c03d0bee5b813a6",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixRoomCursor.kt": "ebdd2789967c19bdf8c28d6606a08fb37c67bb7eda92d9e12693a776177d9b7f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixRoomHistoryDataSource.kt": "d024fa402310fb6851150e7fe88c86340910152b65960b75a56c1cfcb2b33c4a",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/SafeMatrixProviderCall.kt": "1bbfbf00b4d1448caa2d1bb69d2381649b1ef71ffa438537d6c1f34c0ea10f87",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixRoomHistoryRepository.kt": "26e11db39f62d51be5c71b93d1bdc9d143ef3141b4819ddd588f3c1201d9e084",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixRoomHistoryRepository.kt": "42927d7355898bf3544830cea04f1b311ad0f91de9baf56914b677386cea2e19",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixSyncRepository.kt": "b5eebb4d8ffd8990584f0a6d79b4ffc0992537ec2f3f0b6b7b92e55a267007b2",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationCursorFixture.kt": "432dfb94387721364fd39eaff2184d068d1029490e98a7e575cd4cd701b20c10",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderFixture.kt": "a47e4cfb976e6b5091a7f07495a05cc5ff6da00acd0a16bb51d72bf6bae6f1d8",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "a543187e52723f207c271a27caa5be8f16e47df9629bec5037395d330298fdec",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomAccessInteropTest.kt": "6aba16075d17ac62fd89ef91d1a476b363408985c103972c7b19a48b2f0136cf",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomCursorTest.kt": "d71568958cd10b2adaf4c33a4c662d3272fe325f00ad8000c9e882bd40c15242",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomHistoryInteropTest.kt": "6ba6bd1929b6d1fbaa7ce15b3f7dd8166fe0aa4376c069ab71efe8342c705086",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomHistoryMappingTest.kt": "0fe0fadb51523fdd8f06a505d99a75e278fd2093cc66e63a9844433514563ab9",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSyncGatewayInteropTest.kt": "1420f6e549e6771093646bca40e39c90da59fe3251034511549ff2ad533e2c0b",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSyncProjectionTest.kt": "85653c5f0945d60368cab2145aef21f5e5f13cffae8c0b6534ff859f15687bc1",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "3a79332642dae15095dfbca6fdc04c80a72cd90276a0de01a145274fec231975",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayReadController.kt": "da5e066871b70a9c971d0754a73596f14ea653df2eb227f78ec19a3611d8119b",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "2f4e34627f4ca8a4ebee15163f177a7433e0f541cbe9ddbb0f5d253f425eebd2",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRoomHistory.kt": "91d974b64ab9ffc83dd39b686626232bfa3bcb8c9bfe216539fb95d0eded60a3",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixRoomHistoryRepository.kt": "a3cdb5be23a95ab07eb38d91f42077c50f4f6c31faf97493426d886e29761946",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "47b9f0671d98b39e362b94ac0295a3e205e6704ad32ad0f2f162920086a2f127"
+  },
+  "remaining": [
+    "Encrypted room sends and actual pinned Android/web SDK through HRIS; fixed client filters only when explicitly mapped",
+    "Durable outbox, encrypted logical IDs, recipient coalescing, edits/redactions and product UI",
+    "SDK cursor reset ingestion and provider rollback recovery; immediate servlet-disconnect observation and capacity",
+    "Browser admission, groups/context rooms, Apple provider/native media, all remaining P0-P8 work; no feature acceptance or live/mobile/starter update"
+  ]
+}

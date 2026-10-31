@@ -16,6 +16,8 @@ class MatrixStatusException(val status: Int) : IOException("Matrix request rejec
 
 class MatrixCapacityException : RuntimeException("Matrix exchange capacity exhausted")
 
+class MatrixHistoryNotFoundException : RuntimeException("Matrix history was not found")
+
 /** Maps acquisition and parsing together; never logs provider messages, bodies or bearers. */
 fun <T> safeMatrixProviderCall(operation: () -> T): Result<T> =
     try {
@@ -35,6 +37,20 @@ fun <T> safeMatrixProviderCall(operation: () -> T): Result<T> =
         if (Thread.currentThread().isInterrupted) throw InterruptedException()
         Result.Failed(
             when (cause) {
+                is MatrixHistoryNotFoundException ->
+                    Failure(FailureKind.NOT_FOUND, "collaboration_room_event_not_found")
+                is MatrixRoomCursorException ->
+                    when (cause.reason) {
+                        MatrixRoomCursorFailure.INVALID ->
+                            Failure(FailureKind.VALIDATION, "invalid_collaboration_history_cursor")
+                        MatrixRoomCursorFailure.RESET_REQUIRED ->
+                            Failure(FailureKind.CONFLICT, "collaboration_history_reset_required")
+                        MatrixRoomCursorFailure.UNAVAILABLE ->
+                            Failure(
+                                FailureKind.UNAVAILABLE,
+                                "collaboration_history_cursor_unavailable",
+                            )
+                    }
                 is MatrixCapacityException ->
                     Failure(
                         FailureKind.RATE_LIMITED,

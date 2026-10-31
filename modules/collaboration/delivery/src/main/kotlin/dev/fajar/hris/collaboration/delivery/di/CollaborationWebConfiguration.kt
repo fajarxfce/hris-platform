@@ -42,6 +42,9 @@ class CollaborationWebConfiguration {
                     "/_matrix/client/v3/rooms/*/state/*",
                     "/_matrix/client/v3/rooms/*/state/*/",
                     "/_matrix/client/v3/rooms/*/members",
+                    "/_matrix/client/v3/rooms/*/messages",
+                    "/_matrix/client/v3/rooms/*/context/*",
+                    "/_matrix/client/v3/rooms/*/event/*",
                 )
                 .permitAll()
             it.requestMatchers(

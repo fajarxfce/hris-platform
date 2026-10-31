@@ -96,9 +96,10 @@ The synchronous servlet cannot promise immediate detection of a disconnected
 mobile HTTP request. Provider work remains bounded by its deadline; direct
 interruption/shutdown cancellation is tested. Actual Android/web SDK owner
 cancellation, long-poll capacity, client scope-reset ingestion, durable outbox,
-provider rollback recovery and pagination remain acceptance gates. Discovery,
+provider rollback recovery remain acceptance gates. Discovery,
 [room join/state/member reads](room-access.md) are now implemented. History
-pagination, encrypted sends and product UI must be connected before accepting chat.
+[pagination and context/event reads](room-history.md) now seal per-room positions.
+Encrypted sends and product UI must be connected before accepting chat.
 
 [Validation](../measurements/collaboration-sync-foundation-2026-10-31.json):
 domain, affected PostgreSQL storage and cursor crypto tests, format and architecture

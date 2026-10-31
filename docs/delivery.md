@@ -6833,3 +6833,22 @@ post-approval overtime-fact amendment has no defined product contract and is not
 represented as implemented. Public domain/DNS/TLS, signed Apple/APNs deployment,
 further tax/bank packs and production operation retain their documented separate
 scope. No specified implementation, source CI or owned local test remains pending.
+
+
+## Native collaboration room history — 31 October 2026
+
+Fixed DIRECT messages/context/event reads now authorize the exact retained room
+and current native device. Sync prev_batch and page/context positions are sealed
+per company/account/device/server/room, with raw progress comparison before
+randomized encryption. Actual Synapse 25-event history terminates without
+duplicates and context positions work in both directions. HTTP/current-denial,
+wrong cursor/room, malformed projection and bounded stream/JSON tests pass.
+
+[Evidence](measurements/collaboration-room-history-2026-10-31.json) retains the
+initial isolated fixture burst-429 failure, corrected 59s checks, 24 source hashes
+and full 426s regression: 34 domain, 194 data, 159 selected API and 112 worker
+(one opt-in skip), format/architecture and both DI graphs. Prior b82888b6 CI
+41225780266 passed both jobs/all 23 steps with 23 exact matching source hashes,
+retained in the room-access measurement. Schema remains 113; no live or phone
+change. Continue encrypted sends, actual HRIS SDK integration, outbox/UI and all
+remaining collaboration phases; no product feature is accepted by this checkpoint.

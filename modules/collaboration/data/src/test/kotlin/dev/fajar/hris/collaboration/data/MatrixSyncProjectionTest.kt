@@ -240,7 +240,8 @@ class MatrixSyncProjectionTest {
                         bearer: String,
                         deadline: Instant,
                     ): MatrixSyncConnection = connection
-                }
+                },
+                collaborationCursorFixture(),
             )
             .sync(owner, scope, null, 0, false, "fixture", Instant.now().plusSeconds(30))
 

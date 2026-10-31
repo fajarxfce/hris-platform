@@ -18,10 +18,14 @@ import org.testcontainers.images.builder.Transferable
 import tools.jackson.databind.json.JsonMapper
 
 /** Owned pinned provider process; each test gets its own network, database and HTTP owner. */
-class MatrixProviderFixture(lifetime: String, val clock: Clock = Clock.systemUTC()) :
-    AutoCloseable {
+class MatrixProviderFixture(
+    lifetime: String,
+    val clock: Clock = Clock.systemUTC(),
+    messageBurst: Int? = null,
+) : AutoCloseable {
     init {
         require(lifetime in setOf("5s", "10m"))
+        require(messageBurst == null || messageBurst in 1..100)
     }
 
     val json = JsonMapper.builder().build()
@@ -80,7 +84,12 @@ class MatrixProviderFixture(lifetime: String, val clock: Clock = Clock.systemUTC
                             "suppress_key_server_warning" to true,
                             "url_preview_enabled" to false,
                             "enable_metrics" to false,
-                        )
+                        ) +
+                            (messageBurst?.let {
+                                mapOf(
+                                    "rc_message" to mapOf("per_second" to 0.2, "burst_count" to it)
+                                )
+                            } ?: emptyMap())
                     )
                 ),
                 "/data/homeserver.yaml",

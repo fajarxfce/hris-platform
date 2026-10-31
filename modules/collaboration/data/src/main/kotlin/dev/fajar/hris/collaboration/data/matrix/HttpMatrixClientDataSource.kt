@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets
 import java.time.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
+import tools.jackson.core.StreamReadConstraints
 import tools.jackson.core.StreamReadFeature
+import tools.jackson.core.json.JsonFactory
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
@@ -22,11 +24,22 @@ class HttpMatrixClientDataSource(
     MatrixRoomDataSource,
     MatrixKeyDataSource,
     MatrixToDeviceDataSource,
-    MatrixRoomAccessDataSource {
+    MatrixRoomAccessDataSource,
+    MatrixRoomHistoryDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
-        JsonMapper.builder()
-            .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+        JsonMapper.builder(
+                JsonFactory.builder()
+                    .streamReadConstraints(
+                        StreamReadConstraints.builder()
+                            .maxNestingDepth(64)
+                            .maxStringLength(1_048_576)
+                            .maxNumberLength(32)
+                            .build()
+                    )
+                    .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                    .build()
+            )
             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
             .build()
 
@@ -133,6 +146,62 @@ class HttpMatrixClientDataSource(
 
     override fun join(roomId: String, token: String, deadline: Instant): JsonNode {
         val response = roomRequest(roomPath(roomId) + "/join", "POST", emptyMap(), token, deadline)
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
+    override fun messages(
+        roomId: String,
+        from: String?,
+        to: String?,
+        direction: String,
+        limit: Int,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(direction in setOf("b", "f") && limit in 1..100)
+        for (position in listOfNotNull(from, to)) require(
+            position.length in 1..1024 && position.all { it.code in 33..126 }
+        )
+        val path =
+            roomPath(roomId) +
+                "/messages?dir=$direction&limit=$limit" +
+                (from?.let { "&from=${segment(it)}" } ?: "") +
+                (to?.let { "&to=${segment(it)}" } ?: "")
+        return history(path, token, deadline)
+    }
+
+    override fun context(
+        roomId: String,
+        eventId: String,
+        limit: Int,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(limit in 0..100)
+        return history(
+            roomPath(roomId) + "/context/${eventSegment(eventId)}?limit=$limit",
+            token,
+            deadline,
+        )
+    }
+
+    override fun event(
+        roomId: String,
+        eventId: String,
+        token: String,
+        deadline: Instant,
+    ): JsonNode = history(roomPath(roomId) + "/event/${eventSegment(eventId)}", token, deadline)
+
+    private fun eventSegment(eventId: String): String {
+        require(eventId.length in 2..255 && eventId.startsWith('$'))
+        return segment(eventId)
+    }
+
+    private fun history(path: String, token: String, deadline: Instant): JsonNode {
+        val response =
+            roomRequest(path, "GET", null, token, deadline, maximumResponseBytes = 8_388_608)
+        if (response.statusCode() == 404) throw MatrixHistoryNotFoundException()
         if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
         return parse(response)
     }

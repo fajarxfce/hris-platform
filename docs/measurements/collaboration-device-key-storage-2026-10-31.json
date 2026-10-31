@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-31",
+  "kind": "retained_device_public_key_identity_storage",
+  "complete": true,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "databaseSchema": 112,
+  "checks": {
+    "focusedCases": 5,
+    "focusedElapsedSeconds": 59,
+    "fullGradleElapsedSeconds": 465,
+    "fullSuiteResults": {
+      "core/database": {
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 119,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 145,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 112,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "format": true,
+    "architecture": true,
+    "pythonRecoveryCases": 23,
+    "actualUpgrade": "111 to 112, existing account snapshots unchanged",
+    "actualDumpRestore": true,
+    "failureExercises": [
+      "own-company/account RLS with broad table grants",
+      "immutable key identity and exactly one publication transition",
+      "wrong, inactive and revoked device rejection",
+      "concurrent first reservation guard",
+      "failed-result and interruption rollback",
+      "uncertain publication retains reservation",
+      "parent cleanup and revocation retain identity",
+      "restore pending and confirmed rows with RLS and triggers"
+    ]
+  },
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V112__collaboration_device_key_publications.sql": "b8886c0f05765af7cf38edc5d1967442d20e93d45617d5897961d34cbbb54795",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationDeviceKeyDataSource.kt": "5cfc81267ca7fcc237267f6de1b0b622c25712db74ea1eb8b931de94c2b94b73",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationDeviceKeyDataSource.kt": "5184019a178efdd6dcbdde9e4453fb0ce276a9c96c515455420ae118e5c92534",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationDeviceKeyRepository.kt": "1c9103108feb2cee5b71d05e333c9c67f789293db3e463f2e4bbde7207765ac5",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationDeviceKeyStorageTest.kt": "29cace0f380b25a3ab97f87ab7f3a1baf15de469a5694b6a09d52b4bc672beba",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDeviceKeyPublication.kt": "2b8a2b970238d48ae31f77e0017365a5101ce76af03172c8e01202b0c751dadb",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationDeviceKeyRepository.kt": "6f1ab11247a6299f1e94def3a4da97662c18ea140bc34aefb185ee5662aeedd4",
+    "tool/recovery_set.py": "20cc4fe7ecbb0f48587a399bede1d67fdb23200f37213f04efa758732efaaa5d",
+    "tool/test_recovery_set.py": "988fb7f854ed069011c2e4d87a9af12b1b1441f1704b7fd33b331fd6b01a90fc"
+  },
+  "limits": [
+    "Storage does not perform signature or provider readback validation; typed gateway integration follows.",
+    "No new public Matrix route, runtime DI change, deployment, phone action or Starter port.",
+    "The existing opt-in elapsed-retention worker case remains skipped.",
+    "Peer key projections, SDK content integration and E2EE trust/recovery are not accepted by this storage evidence."
+  ]
+}

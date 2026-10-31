@@ -63,7 +63,9 @@
         "direct-room-provisioning.md",
         "../measurements/collaboration-direct-room-provisioning-2026-10-31.json",
         "sdk-protocol-surface.md",
-        "../measurements/collaboration-sdk-protocol-surface-2026-10-31.json"
+        "../measurements/collaboration-sdk-protocol-surface-2026-10-31.json",
+        "device-key-storage.md",
+        "../measurements/collaboration-device-key-storage-2026-10-31.json"
       ]
     },
     {

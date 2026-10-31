@@ -79,10 +79,15 @@ Current provider/client evidence:
   Classic Kotlin syncV2 exists in the binding but is unproved. Do not open generic
   provider routes from these aggregate counts: negative/setup requests are included.
   Scope native lists/subscriptions/extensions and classic cursor/filter behavior;
-  withhold unverified rooms. Emulator is stopped and phone untouched. Pin Mobile CI
-  to this driver commit after push and inspect exact hosted results.
+  withhold unverified rooms. Emulator is stopped and phone untouched. Exact hosted
+  browser `41207148334` and Mobile `41207178159` passed every job/step, source hashes
+  match, and sanitized artifacts retain cleanup: 8.995s/32.972s browser,
+  33.604s/77.491s native combined (scenario/owned duration). Mobile head `7b57865b`
+  pins Platform `047897f9`; hosted APK hash is retained separately from the local build.
 
 Current backend implementation:
+
+- The exact `f104f097` room-control workflow [41206499276](https://github.com/fajarxfce/hris-platform/actions/runs/41206499276) passed every job/step, including both runtime graphs and real storage/provider checks; retained in the room-provisioning measurement.
 
 - Schemas 104–108 retain company/account/device/native-parent identity, independent
   COLLABORATION availability, authenticated encrypted internal provider credentials
@@ -167,11 +172,25 @@ Current backend implementation:
   retain twelve focused data cases, eight HTTP cases and six actual-worker cases,
   including first setup and paused-provider recovery. Full checks passed in 5m12s:
   18 domain, 114 data, 145 selected API and 112 worker cases (one existing skip),
-  formatting and architecture. Inspect this commit's hosted control after push.
+  formatting and architecture. Exact hosted control `41206499276` passed every job/step.
   Corrected receipt assertions and callback syntax remain recorded. The expanded
   worker fixture hit Synapse's per-address five-login bucket (0.003/s); its bounded
   address capacity is now 32 at 5/s, with account limits intact. Production capacity
   needs separate configuration/load proof. READY does not imply recipient keys.
+
+- Schema 112 now reserves an immutable own-device public-key fingerprint before
+  provider uploads; only version zero to one publication is allowed. RLS restricts
+  reads/writes to company/account and triggers retain identity even through owner
+  mutation attempts, ordinary parent cleanup and device revocation. The repository
+  owns an explicit guard after native/device/gateway guards, without provider I/O.
+  [Contract](collaboration/device-key-storage.md) and [evidence](measurements/collaboration-device-key-storage-2026-10-31.json)
+  retain five real PostgreSQL cases, 111-to-112 upgrade and actual dump/restore.
+  Focused checks passed in 59s; full checks passed in 7m45s: 30 database, 18 domain,
+  119 collaboration data, 145 selected API and 112 worker cases (one existing skip),
+  format/architecture and 23 Python recovery cases. No public route or DI change;
+  the gateway must still validate signed keys, reject replacement identities,
+  check current authority around provider I/O and confirm readback. Inspect exact
+  hosted control after push. No product acceptance, rollout or Starter port.
 
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
@@ -180,8 +199,8 @@ and architecture pass. The final successful selection took 3m39s, with the
 unchanged domain/data/worker results retained incrementally. Corrected failures
 include a fixture missing its explicit Synapse start and two legacy eight-module
 assertions; catalog tests now verify all nine names and run in collaboration CI.
-The identity increment added no migration; current repository recovery ceiling is
-110 at the direct-pair checkpoint; schema 111 storage is recorded above.
+The identity increment added no migration; its later direct-pair checkpoint used
+ceiling 110. The current key-publication storage below raises the ceiling to 112.
 
 [Participant evidence](measurements/collaboration-participants-2026-10-31.json)
 records 181 API, 81 collaboration data, 14 collaboration domain, 22 identity data,
@@ -217,8 +236,10 @@ Next implementation:
    room proof `6139604c` likewise passed [41201965622](https://github.com/fajarxfce/hris-platform/actions/runs/41201965622).
    Participant `d50bb0ad` and identity `b0bf1326` hosted controls also passed.
 2. Schema-111 storage `71ad7c81` passed all jobs/steps in [41205061024](https://github.com/fajarxfce/hris-platform/actions/runs/41205061024).
-   Inspect the new room setup/worker commit after push. Continue bounded SDK
-   key/sync/content integration using the
+   Room setup/worker `f104f097` passed every job/step in `41206499276`. Inspect the
+   schema-112 key storage commit after push. Implement bounded own-device signed
+   key upload with the retained reservation, then scoped peer key/query/claim and
+   to-device traffic. Continue native/classic sync and content integration using the
    [typed adapter and invited-history policy](collaboration/matrix-room-adapter.md);
    Synapse createRoom/alias reservation is not atomic. Verify immutable creation
    marker, creator and complete encryption/membership state before publication

@@ -2,13 +2,16 @@ package dev.fajar.hris.collaboration.data.di
 
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.collaboration.data.datasources.*
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationServicePolicy
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.Clock
 import org.jooq.DSLContext
@@ -34,8 +37,19 @@ class CollaborationConfiguration {
     ): CollaborationRegistryRepository = StoredCollaborationRegistryRepository(source)
 
     @Bean
+    fun collaborationProvisioningSource(sql: DSLContext): CollaborationProvisioningDataSource =
+        PostgresCollaborationProvisioningDataSource(sql)
+
+    @Bean
+    fun collaborationProvisioning(
+        source: CollaborationProvisioningDataSource
+    ): CollaborationProvisioningRepository = StoredCollaborationProvisioningRepository(source)
+
+    @Bean
     fun registerNativeCollaborationDevice(
         registry: CollaborationRegistryRepository,
+        provisioning: CollaborationProvisioningRepository,
+        jobs: JobRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -50,6 +64,8 @@ class CollaborationConfiguration {
     ) =
         RegisterNativeCollaborationDevice(
             registry,
+            provisioning,
+            jobs,
             sessions,
             policies,
             companies,

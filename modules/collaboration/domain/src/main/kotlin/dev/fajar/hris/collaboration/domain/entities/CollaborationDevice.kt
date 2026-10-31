@@ -13,6 +13,7 @@ data class CollaborationDevice(
     val version: Long,
     val createdAt: Instant,
     val revokedAt: Instant?,
+    val platform: CollaborationPlatform,
 )
 
 enum class CollaborationDeviceState {

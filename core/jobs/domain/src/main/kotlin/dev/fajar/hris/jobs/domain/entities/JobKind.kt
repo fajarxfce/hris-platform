@@ -1,6 +1,7 @@
 package dev.fajar.hris.jobs.domain.entities
 
 enum class JobKind {
+    COLLABORATION_PROVISION,
     ANNOUNCEMENT_PUBLISH,
     PEOPLE_OFFBOARD,
     PEOPLE_ONBOARD_START,

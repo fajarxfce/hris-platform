@@ -16,6 +16,8 @@ on:
       - apps/dashboard/src/features/administration/**
       - apps/dashboard/tests/client-policy*.ts
       - core/database/**
+      - core/jobs/domain/**
+      - apps/dashboard/src/features/jobs/**
       - tool/recovery_set.py
       - tool/test_recovery_set.py
       - .github/workflows/collaboration-control.yml
@@ -32,6 +34,8 @@ on:
       - apps/dashboard/src/features/administration/**
       - apps/dashboard/tests/client-policy*.ts
       - core/database/**
+      - core/jobs/domain/**
+      - apps/dashboard/src/features/jobs/**
       - tool/recovery_set.py
       - tool/test_recovery_set.py
       - .github/workflows/collaboration-control.yml
@@ -55,7 +59,7 @@ jobs:
           python3 tool/check_architecture.py
           python3 -m unittest discover -s tool -p 'test_recovery*.py'
       - name: Verify policies, actual PostgreSQL isolation and backup recovery
-        run: ./gradlew formatCheck :core:database:test :modules:identity:domain:test :modules:administration:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
+        run: ./gradlew formatCheck :core:database:test :core:jobs:domain:test :modules:identity:domain:test :modules:administration:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
       - name: Verify API contracts, native transport and shared worker context
         run: ./gradlew :apps:server:test --tests '*NativeCollaboration*Test' --tests '*ApiContractHttpTest' :apps:worker:test --no-daemon
       - uses: actions/upload-artifact@v4
@@ -84,6 +88,6 @@ jobs:
           cache-dependency-path: apps/dashboard/package-lock.json
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx tsc --noEmit
-      - run: npx vitest run src/features/administration
+      - run: npx vitest run src/features/administration src/features/jobs
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test tests/client-policy.spec.ts tests/client-policy-editor.spec.ts

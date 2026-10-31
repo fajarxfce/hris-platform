@@ -4,11 +4,14 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.*
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRegistryRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.nativeAuthenticationRequired
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.Clock
 import java.time.temporal.ChronoUnit
@@ -17,6 +20,8 @@ import java.util.UUID
 /** Native session identity/version come from authenticated transport, never the request body. */
 class RegisterNativeCollaborationDevice(
     private val registry: CollaborationRegistryRepository,
+    private val provisioning: CollaborationProvisioningRepository,
+    private val jobs: JobRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -126,6 +131,40 @@ class RegisterNativeCollaborationDevice(
                     Failure(FailureKind.FORBIDDEN, "collaboration_access_denied")
                 )
             val previous = (replay as Result.Success).value
+            if (device != null && device.platform != platform)
+                return@run Result.Failed(
+                    Failure(FailureKind.VALIDATION, "invalid_collaboration_device")
+                )
+            // A retained pre-provisioning device may first be resumed after this rollout.
+            // Fresh authority can enqueue it once, without replacing its identity or receipt.
+            if (device?.state == CollaborationDeviceState.PROVISIONING) {
+                val queued = provisioning.find(company, actor.accountId, device.id)
+                if (queued is Result.Failed) return@run queued
+                if ((queued as Result.Success).value == null) {
+                    val created =
+                        enqueue(
+                            actor,
+                            device.id,
+                            sessionId,
+                            platform,
+                            clientVersion,
+                            operationId,
+                            session.credentialVersion,
+                        )
+                    if (created is Result.Failed) return@run created
+                    val recorded =
+                        journal.record(
+                            actor,
+                            ChangeRecord(
+                                "collaboration_device",
+                                device.id,
+                                "collaboration.device_provisioning_queued",
+                                mapOf("version" to device.version.toString()),
+                            ),
+                        )
+                    if (recorded is Result.Failed) return@run recorded
+                }
+            }
             if (previous != null) {
                 if (device?.id != previous.id)
                     return@run Result.Failed(
@@ -167,6 +206,17 @@ class RegisterNativeCollaborationDevice(
             val receipt = MutationReceipt(registration.deviceId, 0)
             registry
                 .register(registration)
+                .flatMap {
+                    enqueue(
+                        actor,
+                        registration.deviceId,
+                        sessionId,
+                        platform,
+                        clientVersion,
+                        operationId,
+                        session.credentialVersion,
+                    )
+                }
                 .flatMap { operations.record(actor, key, receipt) }
                 .flatMap {
                     journal.record(
@@ -180,6 +230,49 @@ class RegisterNativeCollaborationDevice(
                     )
                 }
                 .flatMap { authorized().map { receipt } }
+        }
+    }
+
+    private fun enqueue(
+        actor: Actor,
+        deviceId: UUID,
+        parentId: UUID,
+        platform: CollaborationPlatform,
+        client: ClientVersion?,
+        operationId: UUID,
+        credentialVersion: Long,
+    ): Result<Unit> {
+        val company = requireNotNull(actor.companyId)
+        val guard = jobs.lockQueue(company)
+        if (guard is Result.Failed) return guard
+        val pending = jobs.pendingCount(company)
+        if (pending is Result.Failed) return pending
+        if ((pending as Result.Success).value >= 100)
+            return Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
+        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+        val request =
+            JobRequest(
+                UUID.randomUUID(),
+                company,
+                actor.accountId,
+                JobKind.COLLABORATION_PROVISION,
+                operationId,
+                buildMap {
+                    put("deviceId", deviceId.toString())
+                    put("nativeSessionId", parentId.toString())
+                    put("platform", platform.name)
+                    if (client != null) put("clientBuild", client.build.toString())
+                },
+                actor.authenticatedAt,
+                credentialVersion,
+                actor.correlationId,
+                at,
+                1,
+            )
+        return jobs.create(request).flatMap {
+            provisioning.create(
+                CollaborationProvisioning(company, actor.accountId, deviceId, request.id, 0, at, at)
+            )
         }
     }
 }

@@ -51,6 +51,7 @@ class CollaborationAdmissionPolicyTest {
             2,
             now.minusSeconds(30),
             null,
+            CollaborationPlatform.ANDROID,
         )
     private val security = IdentitySecurityPolicy()
 

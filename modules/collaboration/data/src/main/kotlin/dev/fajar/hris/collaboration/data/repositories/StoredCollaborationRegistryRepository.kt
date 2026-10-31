@@ -29,6 +29,7 @@ class StoredCollaborationRegistryRepository(private val store: CollaborationRegi
                 row.version,
                 row.createdAt.toInstant(),
                 row.revokedAt?.toInstant(),
+                CollaborationPlatform.valueOf(row.platform),
             )
         }
     }

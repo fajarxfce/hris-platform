@@ -212,6 +212,35 @@ and formatting pass locally (21s); the measurement retains the failed hosted run
 Check the corrected control CI after push. The schema-107 run `41188884369` at
 `3a0135d2` also predates this cleanup correction; retain its eventual outcome.
 
+Schema 108 now queues native device provisioning atomically with registration.
+`COLLABORATION_PROVISION` uses the existing bounded jobs infrastructure; a scoped
+monotonic pointer ties it to company/account/device/native parent. Duplicate
+registration and native refresh retain one device/job; old pending identities
+without a pointer enqueue once. Full 100-job company queues and post-write expiry
+roll back all seven row groups. Platform metadata now comes back with the device
+and contradictory Android/iOS registration/admission is rejected.
+
+Twelve registration scenarios plus the registry regression, eleven admission
+cases, 76 HTTP/contract cases and full worker context pass in 4m31s (104 worker
+passes, its unchanged opt-in retention skip). All 29 database and two jobs-domain
+cases passed the schema-108 selection; 22 recovery and 14 dashboard/type checks
+pass. Actual dump/restore retains the job request/pointer, owner/company isolation
+and pointer after parent purge. [Queue evidence](measurements/collaboration-provisioning-registration-2026-10-31.json)
+retains the initial policy-fixture constructor mistake and corrected result.
+
+The worker deliberately leases only registered task kinds; no provisioning task
+exists yet. Continue its prepare → private Matrix I/O → reauthorization/fenced
+activation transactions, then explicit bounded retry and protected SDK gateway.
+No provider credential is published by registration; the device remains pending.
+Use the existing lease token/DB deadlines; never call Matrix logout to compensate
+a losing candidate. Permanent revocation alone permits device logout. The API
+and worker DI graph has been exercised; live schema 103 and phone build 4 remain.
+
+Hosted schema-107 run `41188884369` passed at `3a0135d2`. The subsequent cleanup
+correction also passed full control CI `41189071278` at `b2bc286a`, including real
+provider transport, storage, API and worker contexts. The earlier failed provider
+fixture run remains in its evidence. Check the new queue commit's CI after push.
+
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's
 current handoff for its artifact/source and future versionCode >= 5.

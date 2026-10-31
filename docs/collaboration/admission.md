@@ -219,3 +219,42 @@ All eight credential scenarios, eleven admission cases, 29 core database cases,
 formatting and architecture passed in 2m27s. Twenty-two recovery-tool cases pass.
 [Expiry evidence](../measurements/collaboration-provider-expiry-2026-10-31.json)
 records the tested source and schema-107 restore. The live database remains 103.
+
+## Durable native provisioning queue
+
+Schema 108 links each device to its current `COLLABORATION_PROVISION` job. The
+immutable job request carries the account/company, parent session, device,
+platform and optional observed client build. The pointer has its own monotonic
+version. Its row policy admits only the selected company and owner; constraints
+reject foreign job/device/parent substitutions, deletion, and replacement of
+an unfinished or successful job. Parent-session purging removes its ordinary
+binding but retains this provisioning fence.
+
+Registration now creates device, parent binding, durable job, pointer, operation
+receipt, audit and outbox in one transaction. It takes the existing bounded
+company job-queue guard after device/account guards. A full 100-job queue or lost
+post-write authorization rolls all new rows back. Duplicate operations and
+registration after ordinary native refresh reuse the same device/job. A retained
+pending device without a pointer can enqueue once under fresh authority without
+replacing its identity. Existing failed jobs are not silently reset by receipt
+replay; an explicit bounded retry use case remains to be implemented.
+
+The device projection now retains its immutable platform. Registration and
+admission reject contradictory Android/iOS metadata before queueing or returning
+a grant. The dashboard translates the new job kind with its existing job UI.
+API and worker DI share the queue repository and registration dependencies.
+
+Actual tests cover concurrent enrollment/replay, queue capacity, seven-table
+rollback, legacy pending enrollment, platform mismatch and PostgreSQL dump/restore
+of the immutable request and pointer, including restored owner/company isolation
+and retained identity after parent purge. Worker execution, terminal activation,
+provider admission/gateway and product chat remain the next implementation. The
+current worker only leases its registered task kinds and does not yet execute the
+new provisioning kind. No provider or live runtime is enabled by this increment.
+
+Final admission/registration selection: 13 data cases, eleven domain cases, 76
+HTTP/contract cases, and the full worker context (104 pass, one existing opt-in
+elapsed-retention skip) pass in 4m31s. The unchanged schema-108 selection passed
+all 29 database and two jobs-domain cases earlier (2m35s); 22 recovery cases and
+14 dashboard cases/type checking also pass. [Queue evidence](../measurements/collaboration-provisioning-registration-2026-10-31.json)
+retains the corrected fixture constructor failure and tested sources.

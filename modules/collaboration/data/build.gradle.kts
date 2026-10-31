@@ -3,6 +3,8 @@ plugins { id("hris.spring") }
 dependencies {
     implementation(projects.modules.collaboration.domain)
     implementation(projects.core.database)
+    implementation(projects.core.jobs.domain)
+    testImplementation(projects.core.jobs.data)
     implementation(libs.jackson.kotlin)
     implementation(projects.modules.identity.domain)
     implementation(projects.modules.identity.data)

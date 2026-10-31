@@ -4,7 +4,9 @@ import dev.fajar.hris.administration.data.datasources.PostgresCompanyClientPolic
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -16,6 +18,9 @@ import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.jobs.data.datasources.PostgresJobDataSource
+import dev.fajar.hris.jobs.data.repositories.PostgresJobRepository
+import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.organization.data.datasources.PostgresCompanyDataSource
 import dev.fajar.hris.organization.data.repositories.StoredCompanyRepository
 import java.time.*
@@ -84,6 +89,8 @@ class NativeCollaborationRegistrationTest {
             outcomes.filterIsInstance<Result.Failed>().map { it.failure.code },
         )
         assertEquals(5, f.rows("collaboration_devices"))
+        assertEquals(5, f.rows("background_jobs"))
+        assertEquals(5, f.rows("collaboration_device_provisioning"))
         assertEquals(5, f.rows("operation_receipts"))
         assertEquals(5, f.rows("audit_entries"))
         assertEquals(5, f.rows("outbox_events"))
@@ -109,6 +116,8 @@ class NativeCollaborationRegistrationTest {
         assertEquals(1, f.rows("operation_receipts"))
         assertEquals(1, f.rows("audit_entries"))
         assertEquals(1, f.rows("outbox_events"))
+        assertEquals(1, f.rows("background_jobs"))
+        assertEquals(1, f.rows("collaboration_device_provisioning"))
         // Revocation is checked even when the exact successful receipt is present.
         sql.update(
             "update collaboration_devices set state='REVOKED',version=version+1,updated_at=now(),revoked_at=now() where id=?",
@@ -254,10 +263,198 @@ class NativeCollaborationRegistrationTest {
             listOf(
                 "collaboration_devices",
                 "collaboration_device_sessions",
+                "collaboration_device_provisioning",
+                "background_jobs",
                 "operation_receipts",
                 "audit_entries",
                 "outbox_events",
             )) assertEquals(0, f.rows(table), table)
+    }
+
+    @Test
+    fun queueCapacityRollsBackRegistrationAndLegacyPendingIdentityEnqueuesOnlyOnce() {
+        val full = Fixture()
+        assertEquals(
+            Result.Success(Unit),
+            full.transactions.run(full.actor) {
+                repeat(100) {
+                    val job =
+                        JobRequest(
+                            UUID.randomUUID(),
+                            requireNotNull(full.actor.companyId),
+                            full.account,
+                            JobKind.REPORT_EXPORT,
+                            UUID.randomUUID(),
+                            emptyMap(),
+                            full.actor.authenticatedAt,
+                            0,
+                            full.actor.correlationId,
+                            full.clock.at,
+                            1,
+                        )
+                    val created = full.jobs.create(job)
+                    if (created is Result.Failed) return@run created
+                }
+                Result.Success(Unit)
+            },
+        )
+        assertEquals("job_queue_full", failed(full.register(full.parent())))
+        assertEquals(100, full.rows("background_jobs"))
+        for (table in
+            listOf(
+                "collaboration_devices",
+                "collaboration_device_sessions",
+                "collaboration_device_provisioning",
+                "operation_receipts",
+                "audit_entries",
+                "outbox_events",
+            )) assertEquals(0, full.rows(table), table)
+
+        val legacy = Fixture()
+        val parent = legacy.parent()
+        val device = UUID.randomUUID()
+        assertEquals(
+            Result.Success(Unit),
+            legacy.transactions.run(legacy.actor) {
+                legacy.registry.register(
+                    CollaborationRegistration(
+                        device,
+                        requireNotNull(legacy.actor.companyId),
+                        legacy.account,
+                        parent,
+                        CollaborationPlatform.ANDROID,
+                        "Retained device",
+                        legacy.clock.at,
+                    )
+                )
+            },
+        )
+        val operation = UUID.randomUUID()
+        assertEquals(
+            "invalid_collaboration_device",
+            failed(
+                legacy.register(
+                    parent,
+                    platform = CollaborationPlatform.IOS,
+                    client = ClientVersion(ClientPlatform.IOS, 1),
+                )
+            ),
+        )
+        assertEquals(0, legacy.rows("background_jobs"))
+        val result = success(legacy.register(parent, operation))
+        assertEquals(device, result.id)
+        assertEquals(device, success(legacy.register(parent, operation)).id)
+        assertEquals(1, legacy.rows("collaboration_devices"))
+        assertEquals(1, legacy.rows("background_jobs"))
+        assertEquals(1, legacy.rows("collaboration_device_provisioning"))
+        assertEquals(1, legacy.rows("audit_entries"))
+        legacy.activate(device)
+        assertEquals(
+            "invalid_collaboration_device",
+            failed(legacy.acquire(parent, client = ClientVersion(ClientPlatform.IOS, 1))),
+        )
+    }
+
+    @Test
+    fun durableJobBindingSurvivesRestoreAndRejectsCrossScopeOrUnfinishedReplacement() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val company = requireNotNull(f.actor.companyId)
+        val pointer =
+            requireNotNull(
+                success(
+                    f.transactions.run(f.actor) { f.provisioning.find(company, f.account, device) }
+                )
+            )
+        val job =
+            requireNotNull(
+                success(f.transactions.run(f.actor) { f.jobs.find(company, pointer.jobId) })
+            )
+        assertEquals(JobKind.COLLABORATION_PROVISION, job.request.kind)
+        assertEquals(device.toString(), job.request.values["deviceId"])
+        assertEquals(parent.toString(), job.request.values["nativeSessionId"])
+        assertEquals("ANDROID", job.request.values["platform"])
+        assertEquals("1", job.request.values["clientBuild"])
+        assertEquals(0, job.attempts)
+        assertEquals(JobStatus.QUEUED, job.status)
+        assertEquals(0, pointer.version)
+
+        val restored = "provisioning_" + UUID.randomUUID().toString().replace("-", "")
+        fun command(vararg args: String) {
+            val result = postgres.execInContainer(*args)
+            assertEquals(0, result.exitCode, result.stderr)
+        }
+        command(
+            "pg_dump",
+            "-U",
+            postgres.username,
+            "-d",
+            postgres.databaseName,
+            "-Fc",
+            "-f",
+            "/tmp/provisioning.dump",
+        )
+        command("createdb", "-U", postgres.username, restored)
+        command(
+            "pg_restore",
+            "-U",
+            postgres.username,
+            "-d",
+            restored,
+            "--exit-on-error",
+            "/tmp/provisioning.dump",
+        )
+        val url = postgres.jdbcUrl.substringBeforeLast('/') + "/" + restored
+        val restoredSource =
+            DriverManagerDataSource(url, "collaboration_fixture", "collaboration-fixture-only")
+        val tx =
+            PostgresTransactionRunner(
+                JdbcTransactionManager(restoredSource),
+                JdbcTemplate(restoredSource),
+            )
+        val repository =
+            StoredCollaborationProvisioningRepository(
+                PostgresCollaborationProvisioningDataSource(
+                    DSL.using(TransactionAwareDataSourceProxy(restoredSource), SQLDialect.POSTGRES)
+                )
+            )
+        assertEquals(
+            pointer,
+            success(tx.run(f.actor) { repository.find(company, f.account, device) }),
+        )
+        assertEquals(
+            Result.Success(null),
+            tx.run(f.actor.copy(accountId = UUID.randomUUID())) {
+                repository.find(company, f.account, device)
+            },
+        )
+        assertEquals(
+            Result.Success(null),
+            tx.run(f.actor.copy(companyId = UUID.randomUUID())) {
+                repository.find(company, f.account, device)
+            },
+        )
+        val restoredSql =
+            JdbcTemplate(DriverManagerDataSource(url, postgres.username, postgres.password))
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            restoredSql.update(
+                "delete from collaboration_device_provisioning where device_id=?",
+                device,
+            )
+        }
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            restoredSql.update(
+                "update collaboration_device_provisioning set version=1,job_id=? where device_id=?",
+                UUID.randomUUID(),
+                device,
+            )
+        }
+        restoredSql.update("delete from native_sessions where id=?", parent)
+        assertEquals(
+            pointer,
+            success(tx.run(f.actor) { repository.find(company, f.account, device) }),
+        )
     }
 
     @Test
@@ -365,6 +562,11 @@ class NativeCollaborationRegistrationTest {
         private val companies =
             StoredCompanyRepository(PostgresCompanyDataSource(dsl), receipts, json)
         private val members = StoredMembershipRepository(PostgresMembershipDataSource(dsl))
+        val provisioning =
+            StoredCollaborationProvisioningRepository(
+                PostgresCollaborationProvisioningDataSource(dsl)
+            )
+        val jobs = PostgresJobRepository(PostgresJobDataSource(dsl), json)
         private val operations = PostgresOperationRepository(receipts, json)
         val journal = PostgresChangeJournalRepository(PostgresChangeJournalDataSource(dsl, json))
         val actor: Actor
@@ -426,6 +628,8 @@ class NativeCollaborationRegistrationTest {
         ) =
             RegisterNativeCollaborationDevice(
                 registry,
+                provisioning,
+                jobs,
                 sessions,
                 policies,
                 companies,
@@ -446,19 +650,15 @@ class NativeCollaborationRegistrationTest {
             label: String = "Fictional emulator",
             actor: Actor = this.actor,
             client: ClientVersion = ClientVersion(ClientPlatform.ANDROID, 1),
+            platform: CollaborationPlatform = CollaborationPlatform.ANDROID,
             command: RegisterNativeCollaborationDevice = command(),
-        ) =
-            command.execute(
-                actor,
-                parent,
-                version,
-                operation,
-                CollaborationPlatform.ANDROID,
-                label,
-                client,
-            )
+        ) = command.execute(actor, parent, version, operation, platform, label, client)
 
-        fun acquire(parent: UUID, policies: CompanyClientPolicyRepository = this.policies) =
+        fun acquire(
+            parent: UUID,
+            policies: CompanyClientPolicyRepository = this.policies,
+            client: ClientVersion = ClientVersion(ClientPlatform.ANDROID, 1),
+        ) =
             AcquireNativeCollaborationAdmission(
                     registry,
                     sessions,
@@ -471,7 +671,7 @@ class NativeCollaborationRegistrationTest {
                     clock,
                     CollaborationServicePolicy(enabled = true),
                 )
-                .execute(actor, parent, 0, ClientVersion(ClientPlatform.ANDROID, 1))
+                .execute(actor, parent, 0, client)
 
         fun activate(device: UUID) {
             sql.update(

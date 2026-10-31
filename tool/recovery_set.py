@@ -36,7 +36,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V106 binds internal Matrix token envelopes to company/account/device/generation.
 # Query selection preserves restoration of earlier schemas without the new table.
 # V107 authenticates known token deadlines; NULL retains the legacy V106 AAD.
-MAX_SCHEMA = 107
+# V108 retains company/account/device provisioning fences and durable job links.
+MAX_SCHEMA = 108
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

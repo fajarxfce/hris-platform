@@ -68,6 +68,15 @@ class AcquireNativeCollaborationAdmission(
             if (allowed is Result.Failed) return@run allowed
             val found = registry.findBound(company, actor.accountId, sessionId)
             if (found is Result.Failed) return@run found
+            val device = (found as Result.Success).value
+            if (
+                device != null &&
+                    clientVersion != null &&
+                    device.platform.name != clientVersion.platform.name
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.VALIDATION, "invalid_collaboration_device")
+                )
             val now = clock.instant()
             val effective = policies.effective(company, now)
             if (effective is Result.Failed) return@run effective
@@ -84,7 +93,7 @@ class AcquireNativeCollaborationAdmission(
                             access,
                             session,
                             sessionVersion,
-                            (found as Result.Success).value,
+                            device,
                             evaluatedAt,
                             security,
                         )

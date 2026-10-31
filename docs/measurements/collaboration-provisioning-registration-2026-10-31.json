@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "kind": "durable_native_provisioning_registration",
+  "schema": 108,
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "providerWorkerImplemented": false,
+  "checks": {
+    "core/database": {
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "core/jobs/domain": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/domain": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/data": {
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "apps/server": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "apps/worker": {
+      "tests": 105,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "dashboardUnitCases": 14,
+    "dashboardTypecheck": true,
+    "recoveryToolCases": 22,
+    "format": true,
+    "architecture": true,
+    "databaseAndInitialRegistrationBuildSeconds": 155,
+    "finalContextBuildSeconds": 271,
+    "actualPostgresDumpRestore": true
+  },
+  "existingSkip": "The worker one-hour elapsed export retention acceptance remains opt-in; no new skip was added.",
+  "initialFailure": "While adding immutable platform to the device projection, the policy fixture inserted it in the NativeSession constructor instead. Corrected the fixture argument; final domain/data/API/worker selection passed.",
+  "verifiedBehaviors": [
+    "Same transaction commits device, native binding, durable job, monotonic pointer, receipt, audit and outbox.",
+    "Concurrent quota/replay and legitimate parent refresh preserve one device/job identity.",
+    "Full company queue or post-write admission expiry rolls new rows back.",
+    "A retained pending device with no pointer enqueues once under fresh authority.",
+    "Platform substitution is rejected on registration and native admission.",
+    "Actual restore retains job request and pointer, owner/company row isolation, unfinished-job replacement rejection and retained pointer after parent purge."
+  ],
+  "sourceSha256": {
+    ".github/workflows/collaboration-control.yml": "bc258b4dbf4151681c1528ded4e24f4ee4486704f1155897728ea33f775d79f2",
+    "apps/dashboard/src/features/jobs/presentation/i18n/job-messages.ts": "3c5929ea0538ef77a73ba6f23701c3113042c82680f2fda69ab6ee9b95d3d4d7",
+    "core/database/src/main/resources/db/migration/V108__collaboration_provisioning_jobs.sql": "a1011655e0e3bb28d3c844b747780467bed9b03321c6d4b380fd659f3fac0733",
+    "core/jobs/domain/src/main/kotlin/dev/fajar/hris/jobs/domain/entities/JobKind.kt": "c04fd98735e5f8a62b1c656e2ada18c500a6e019a2f65a37d58d9888d304561f",
+    "modules/collaboration/data/build.gradle.kts": "abee7138bc02ad040eee8e09663615cb1d5c2c522fc633bb82b34ae3b3775798",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationProvisioningDataSource.kt": "bd832bd2a6a1bfbbbe37ce02b4444b4eae3fccd1a291fdab84c5e1607cfb5a92",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationProvisioningDataSource.kt": "262badb8b616be57e626f759048b9749c206faf09e3ee8507c5c8145efe07977",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "6ae5534c8dea2bfcf77e7e47d403a083151a233b228abc1a065447b406cb1ea4",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationProvisioningRepository.kt": "c70f884d93e5a2b7a7dd3883292b9ff6cd99ce8959db9a01376803ce045d2c1c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRegistryRepository.kt": "242d18606e02ea8b3722f258c5d486446467fc4b70ee98782cc239e47c4a651e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "3e68fd4fcf42c27762580a0d23ebcd762e09c8564c6de1568dce73f0f1c4f3e0",
+    "modules/collaboration/domain/build.gradle.kts": "0b34a141c88ae77bd01078eff3e4c1db57b76ca89852ff1395d5de376fd22f52",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDevice.kt": "b7f2af4159a4649ad271b07dc642fc3b5aa9f820e8a363b5460c366c77c37bf5",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationProvisioning.kt": "8b1ce9db63f39dce60cd7b4c4f8a71e1699b5d8fdd5dfcaba22992ef7ee33fb3",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationProvisioningRepository.kt": "d078d68b499b7e35e19318b19266043c23660165b9af5a5fc1280eadd9595254",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AcquireNativeCollaborationAdmission.kt": "567c252e12211455a7a24db3a0e23ce5e67237f23f7a1e8837f2004880d47f84",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/RegisterNativeCollaborationDevice.kt": "cb8c1b823152b701ac856bc87f2ce5bdcf486fe8f6d036f3a4ad97bce2c3ed7e",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationAdmissionPolicyTest.kt": "8f0217092c0d184a33c6511d488aa14eeb3c2718e2d509a332b57652bc2ce116",
+    "tool/recovery_set.py": "b98d55f8804d6480caae4e6e1d40333ac725d8917842f52984c9ba56bfdbf68d",
+    "tool/test_recovery_set.py": "1f0a38f572b76b2c3cbb8cc09a3d13b40cb1c88a58611460dd07f46355e7a790"
+  },
+  "remaining": [
+    "Provisioning worker, fenced activation and explicit bounded retry",
+    "Provider configuration and protected native/browser Matrix gateway",
+    "Product SDK adapters and chat screens"
+  ]
+}

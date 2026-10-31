@@ -42,12 +42,12 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("extract(epoch FROM token_expires_at)*1000000", expiring)
         self.assertIn(":expires:", expiring)
         with self.assertRaises(recovery.RecoveryError):
-            recovery.envelope_query(108)
+            recovery.envelope_query(109)
 
     def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 108, None, 'invalid'):
+        for schema in (58, 109, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

@@ -17,6 +17,7 @@ import java.util.UUID
 /** Reads only the authenticated native parent's setup state under current HRIS authority. */
 class GetNativeCollaborationDeviceStatus(
     private val registry: CollaborationRegistryRepository,
+    private val gateway: CollaborationGatewaySessionRepository,
     private val provisioning: CollaborationProvisioningRepository,
     private val jobs: JobRepository,
     private val sessions: NativeSessionRepository,
@@ -107,6 +108,13 @@ class GetNativeCollaborationDeviceStatus(
                 return@run Result.Failed(
                     Failure(FailureKind.UNEXPECTED, "invalid_collaboration_provisioning")
                 )
+            val gatewayHead =
+                if (device == null) null
+                else {
+                    val read = gateway.find(company, actor.accountId, device.id)
+                    if (read is Result.Failed) return@run read
+                    (read as Result.Success).value
+                }
             val effective = policies.effective(company, clock.instant())
             if (effective is Result.Failed) return@run effective
             val at = clock.instant()
@@ -135,6 +143,16 @@ class GetNativeCollaborationDeviceStatus(
                             if (pointer != null && job != null)
                                 collaborationProvisioningStatus(it, pointer, job)
                             else null,
+                            gatewayHead?.let { head ->
+                                CollaborationGatewayStatus(
+                                    head.id,
+                                    head.version,
+                                    head.clientBuild,
+                                    head.accessExpiresAt,
+                                    head.expiresAt,
+                                    head.revokedAt,
+                                )
+                            },
                         )
                     }
                 }

@@ -1602,6 +1602,7 @@ class NativeCollaborationRegistrationTest {
         fun status() =
             GetNativeCollaborationDeviceStatus(
                 registry,
+                gateway,
                 provisioning,
                 jobs,
                 sessions,

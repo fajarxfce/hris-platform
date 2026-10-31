@@ -87,8 +87,30 @@ Receipts contain no secrets; issuance/receipt/audit/outbox roll back on final
 admission failure. The initial selection passed 43 PostgreSQL and eleven domain
 cases in 79s. Final single-instant response validation passed 34 PostgreSQL and
 thirteen domain cases in 45s, formatting/architecture. [Admission evidence](measurements/collaboration-gateway-admission-2026-10-31.json)
-records scope. HTTP/DI, status metadata, cleanup worker and protected provider
-proxy remain next; these use cases are not exposed to clients yet.
+records scope. HTTP/DI/status/cache cleanup are now implemented as described below;
+protected provider requests and SDK integration remain next.
+
+The gateway HTTP/worker increment now exposes native POST `/bootstrap` and
+GET setup gateway metadata, plus POST `/_matrix/client/v3/refresh` with standard
+Matrix reply/errors. The separate stateless security chain keeps native/cookie
+authority out of Matrix refresh and denies every other Matrix/Synapse route.
+JSON bodies are bounded to 2 KiB with strict duplicate/trailing/depth checks.
+The worker clears one batch of at most 100 expired response caches every five
+seconds, with owned timer, cancellation, rollback and shutdown. It can drain
+caches after collaboration is disabled. [HTTP/worker evidence](measurements/collaboration-gateway-http-2026-10-31.json)
+records eight focused API/five worker passes (62s), then 84 API, 34 data, fourteen
+domain and 111 worker cases (110 pass, one unchanged retention skip), quality
+checks (4m34s) and Compose syntax. No provider content proxy is exposed yet.
+
+Exact storage `16ab4991` and admission `5a666758` passed every hosted control job/
+step in [41195040771](https://github.com/fajarxfce/hris-platform/actions/runs/41195040771)
+and [41195557470](https://github.com/fajarxfce/hris-platform/actions/runs/41195557470).
+The [transaction-retention gate](collaboration/provider-transaction-retention.md)
+records a pinned-source finding: Synapse deletes message transaction mappings
+older than 24 hours on a five-minute cleanup loop. Actual same-device bearer
+replacement/aged retry proof and durable uncertain-send reconciliation are still
+required before offline messaging acceptance. Do not assume unlimited provider
+deduplication or change a local transaction ID on refresh/restart.
 
 Critical provider behavior: Synapse logout deletes the **whole device**, every
 bearer and its E2EE keys, even when called with an expired bearer. Never use it
@@ -101,18 +123,19 @@ allow public login/admin/federation bypass.
 
 Next implementation:
 
-1. Inspect the schema-109 gateway storage increment's exact hosted control result
-   after push; prior status/retry CI is accepted above. Live-admission bootstrap/
-   refresh use cases are locally accepted; wire status, HTTP/DI, bounded cache
-   maintenance and the protected Matrix request path next.
-2. Protected HRIS Matrix bootstrap/gateway and standard access/refresh protocol,
-   browser-parent admission, native/web SDK adapters and durable chat UI. Restore
-   an authenticated Matrix SDK client only once; rotate tokens through its
-   standard refresh callback. Keep owned offline data after ordinary expiry.
-3. All remaining P0 native protocol gates and P1–P8 product groups, including
-   rich messaging/context, backup, native voice/video, web/mobile meetings, AI,
-   recovery and measured capacity. Do not substitute procedure documents for
-   executed evidence or mark all features done after a foundation commit.
+1. Inspect the HTTP/worker increment's exact hosted control after push. Its local
+   complete contexts pass; storage/admission hosted results are accepted above.
+2. Protected Matrix request path with current admission before/after provider I/O,
+   bounded/cancelled transport, internal credential renewal and room/context scope.
+   Prove same-device transaction IDs across bearer replacement and aged retry.
+3. Browser-parent admission, native/web SDK adapters, owned crypto stores and
+   durable chat UI/outbox reconciliation. Restore an authenticated Matrix SDK
+   client only once; rotate through standard refresh. Retain owned offline facts
+   after ordinary expiry. A public refresh endpoint alone is not a usable SDK
+   content gateway.
+4. All remaining P0 native protocol gates and P1–P8 groups: rich/context messaging,
+   backup, native calls, web/mobile meetings, AI, recovery and measured capacity.
+   Do not mark the full plan complete after infrastructure checkpoints.
 
 Keep the live stack at schema **103**, API/worker application **2c2a59e3**, dashboard
 **1e0522c0**, and phone release **build 4**. No deployment or phone action occurred

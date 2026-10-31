@@ -14,6 +14,7 @@ on:
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/**
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/tasks/Collaboration*
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/collaboration/**
       - apps/worker/src/test/kotlin/dev/fajar/hris/worker/*Collaboration*
       - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerMatrixFixture.kt
       - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationTest.kt
@@ -38,6 +39,7 @@ on:
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/**
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/tasks/Collaboration*
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/collaboration/**
       - apps/worker/src/test/kotlin/dev/fajar/hris/worker/*Collaboration*
       - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerMatrixFixture.kt
       - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationTest.kt

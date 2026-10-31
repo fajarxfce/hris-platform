@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-31",
+  "scope": "P1 native gateway HTTP/bootstrap/status, standard refresh, shared DI and bounded replay-cache maintenance",
+  "validation": {
+    "focusedApiCases": 8,
+    "focusedWorkerCases": 5,
+    "focusedFailures": 0,
+    "focusedElapsedSeconds": 62,
+    "finalSuites": {
+      "apps/server": {
+        "tests": 84,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "modules/collaboration/data": {
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "fullSelectionElapsedSeconds": 274,
+    "format": true,
+    "architecture": true,
+    "composeConfiguration": true
+  },
+  "behaviors": [
+    "Native-only bootstrap requires idempotency/observed versions/client build and returns only public Matrix identity plus opaque gateway credentials, no-store.",
+    "Status exposes safe gateway version/build/expiry metadata; token values, hashes and encrypted response never appear there.",
+    "POST Matrix v3 refresh uses only its JSON refresh token, with a separate stateless security chain. A native bearer/cookie cannot replace that authority.",
+    "Matrix response/error shapes, latest-response replay, rate bounds and permission removal are exercised through actual HTTP and PostgreSQL.",
+    "Known-length and chunked request bodies above 2 KiB, duplicate/trailing/deep/unknown/non-JSON shapes are rejected.",
+    "Every unimplemented Matrix/Synapse route stays denied, including login/logout/admin/federation/sync.",
+    "The actual worker graph provisions a fictional Matrix device, creates an expired encrypted gateway cache, interrupts cleanup after the SQL write, verifies rollback, terminates its timer/queue, then clears only the cache in a later pass.",
+    "Disabled worker creates no cleanup timer/task. Rejected scheduling leaves it stopped; invalid batch limits fail.",
+    "Generation exhaustion maps to reauthentication without deleting the retained device/history."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "Initial delivery compilation",
+      "elapsedSeconds": 46,
+      "result": "Jackson 3 JsonFactory package is tools.jackson.core.json; corrected the import. No production runtime was changed."
+    }
+  ],
+  "limits": [
+    "Final worker selection includes one unchanged opt-in elapsed retention skip; all other cases passed.",
+    "Native HTTP fixture controls activation to isolate transport/DI. Real provider activation and cleanup ownership are exercised separately by the actual worker fixture.",
+    "The parser checks a two-second elapsed budget between reads and inherits the five-second server socket timeout; it does not promise a hard two-second interrupt of a blocked servlet read.",
+    "The private provider is not proxied. Sync, content/media and SDK product ownership, browser admission and all chat/call/meeting acceptance remain required.",
+    "Pinned Synapse source inspection found a 24-hour transaction mapping retention boundary. The aged-retry runtime proof and durable offline reconciliation remain required; see provider-transaction-retention.md.",
+    "No live deployment or phone action occurred."
+  ],
+  "sourceSha256": {
+    ".env.example": "a34bb93e6ed7fff8d8b292454a1b3f6dfb50964572330049637439c303d9204b",
+    ".github/workflows/collaboration-control.yml": "29cef56f88d5163bedafd417995d387ccfc1fe272ee05a6921e9ec3d47197f9a",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixConfigurationTest.kt": "3a8cf5bbf52600096a1b1bac43d1e9de43ea065844ec87d4c36d6cf8d30e28ca",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationStatusHttpTest.kt": "e4a36c4a2b3dfa734ed6a39062f68558858e648af9deda5a2687af8877ae055c",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/collaboration/CollaborationGatewayCleanupWorker.kt": "aa4297693deeac0669f8f5f7e990a768af7708b186b8c8cc34322dc2676e48b9",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/WorkerConfiguration.kt": "a8c145ae64e81425e6be6f3e5d99cf1c1c156845d378f356299cd92b8475808d",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "f0bcafbcfdf2e86b6073f847f8ba4246aebcca32d603dfb757339475ecd550fb",
+    "compose.yml": "51c68cf440a3b08d3d295ebb6f5419ea228a81b728aae716644107c117effc15",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "d0226d1ea89106764223d68464ed17463d20f0ab3aa8dcad2a79c9e62e678e23",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "1fde8b473773274960f0eb5002844373184ee3fbe208660cdd771839113bea10",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayRefreshController.kt": "e12512157ea0393e013ecb3a568bb593259afe4c8272f59f197479c37de0b703",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDeviceController.kt": "7881723d4e80723bcfcbfe5a97975beb3476f2d70946796d491aece95283b2d2",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "98c33bd04d4eb5a7b39b0278b43be642e8d612b824ce0f4f18c50809f1aad1e3",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/matrix/MatrixGatewayProblem.kt": "9772c695cb3ccbcb0f47920d5984f022e119a1cb238d44ca4064970a69a81aca",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/BootstrapCollaborationGatewayRequest.kt": "56d4304ded7a3a55b9649f10b5a3adab9339b59fa91492754d556ea3d4cd449a",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationBootstrapResponse.kt": "3a9daaf2ccc8128d127b5ed7774718d6949cb4e3f6ea383e93054099e0419551",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDeviceStatus.kt": "f9176dc153a1333eb3fda8a922f44fecddeac05a499a53afa9dc095b237ef240",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationGatewayPolicy.kt": "b7755b755dc6b33280f4de82c06bebe475da5b6e81e78f9dfb48a5490de55548",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/GetNativeCollaborationDeviceStatus.kt": "745b9e9d8a7b15c1caa7c3014e1813d3df63052b5545e01f60b7b747e275e28b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/MaintainCollaborationGatewayReplays.kt": "3f57c81a7feb41e443bd82dce3b2c6ee383a3ab530b96de32f09f37933a6e5fd",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationGatewayPolicyTest.kt": "6402d6ea4af37e9d403ea342d071e076cb80ad4c7ebf7d9cb3075c1e3e4b3f61"
+  }
+}

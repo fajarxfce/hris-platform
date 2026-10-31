@@ -1,7 +1,9 @@
 package dev.fajar.hris.collaboration.domain
 
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayRotationAllowed
 import dev.fajar.hris.collaboration.domain.policies.validateCollaborationGatewayResponse
+import dev.fajar.hris.core.domain.FailureKind
 import dev.fajar.hris.core.domain.Result
 import java.time.Instant
 import java.util.UUID
@@ -116,5 +118,15 @@ class CollaborationGatewayPolicyTest {
             )
                 is Result.Failed
         )
+    }
+
+    @Test
+    fun exhaustedRotationRequiresReauthenticationWithoutRevokingTheDevice() {
+        val retained = session.copy(version = 999999)
+        val result = collaborationGatewayRotationAllowed(retained, at.plusSeconds(11))
+        assertTrue(result is Result.Failed)
+        assertEquals(FailureKind.UNAUTHENTICATED, (result as Result.Failed).failure.kind)
+        assertEquals("collaboration_gateway_renewal_required", result.failure.code)
+        assertNull(retained.revokedAt)
     }
 }

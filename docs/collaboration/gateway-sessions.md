@@ -86,7 +86,47 @@ Credential writes, bootstrap receipt and audit/outbox roll back together on fina
 authority failure. Refresh records a safe version-only journal entry; it does not
 create operation receipts or unbounded consumed-token history.
 
-These use cases remain unwired in this checkpoint. HTTP Matrix error mapping,
-protected provider gateway, status metadata, runtime DI, cache-maintenance worker,
-SDK ownership and browser admission are the next implementation work. They are
-not claimed as delivered by these transaction tests.
+The use cases were accepted separately before the HTTP/worker integration below.
+Those transaction tests do not imply SDK ownership, provider proxy or browser
+admission acceptance.
+
+## HTTP and worker integration
+
+The shared module configuration now composes the gateway store, native bootstrap,
+standard refresh and maintenance use cases. Native setup status includes only
+head ID/version, captured build and expiry/revocation metadata; neither token nor
+its hash/ciphertext is exposed in status. `POST` on the native-device route's
+`/bootstrap` suffix requires native transport, client build, idempotency key and
+observed device/gateway versions. Its no-store response contains public Matrix
+user/device identity plus the scoped opaque gateway pair. Clients use their known
+HRIS API origin; no untrusted Host header selects a homeserver URL.
+
+`POST /_matrix/client/v3/refresh` accepts only the standard `refresh_token` JSON
+property. The body is limited to 2 KiB including chunked requests; duplicate keys,
+trailing values, excessive nesting, unknown properties and non-JSON content are
+rejected. Stream reads check a two-second budget and inherit the server's five-
+second socket timeout; the check does not claim to interrupt an already blocked
+read at exactly two seconds. Replies use `access_token`, `refresh_token` and
+`expires_in_ms`; unknown/expired authorization uses Matrix `M_UNKNOWN_TOKEN`
+with `soft_logout`, permission failure uses `M_FORBIDDEN`, and rotation bounds use
+`M_LIMIT_EXCEEDED` with `retry_after_ms`. Responses and token DTO strings are safe
+for caching/diagnostics: no-store and explicit redacted representations.
+
+An ordered stateless Matrix security chain bypasses native-bearer/cookie parsing.
+Only POST refresh is currently permitted. All other `/_matrix/**` and
+`/_synapse/**` routes, including login, logout, admin, federation and sync, are
+denied. This is not yet a usable SDK sync/content gateway. The private provider
+is not proxied by these endpoints.
+
+The worker owns one fixed-delay cleanup task, one timer thread and at most one
+100-row transaction per pass. It defaults to five seconds and remains eligible
+when collaboration/provider flags are disabled, so old response caches can drain.
+`hris.worker.enabled=false` or `HRIS_COLLABORATION_GATEWAY_CLEANUP_ENABLED=false`
+disables allocation. `HRIS_COLLABORATION_GATEWAY_CLEANUP_INTERVAL_SECONDS` adjusts
+the interval within one second to one hour. Shutdown cancels the task, interrupts
+in-flight work, rolls back incomplete cleanup and terminates the timer; no
+per-session jobs or unbounded draining loop are created.
+
+The [provider transaction-retention gate](provider-transaction-retention.md) is
+required before offline send acceptance. Gateway credential replay and Matrix
+message deduplication are separate contracts.

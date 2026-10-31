@@ -89,6 +89,90 @@ class CollaborationConfiguration {
         } ?: DisabledCollaborationMatrixRepository()
 
     @Bean
+    fun collaborationGatewaySource(sql: DSLContext): CollaborationGatewaySessionDataSource =
+        PostgresCollaborationGatewaySessionDataSource(sql)
+
+    @Bean
+    fun collaborationGatewaySessions(
+        source: CollaborationGatewaySessionDataSource,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationGatewaySessionRepository =
+        EncryptedCollaborationGatewaySessionRepository(source, crypto)
+
+    @Bean
+    fun maintainCollaborationGatewayReplays(
+        gateway: CollaborationGatewaySessionRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = MaintainCollaborationGatewayReplays(gateway, transactions, clock)
+
+    @Bean
+    fun bootstrapNativeCollaborationGateway(
+        gateway: CollaborationGatewaySessionRepository,
+        registry: CollaborationRegistryRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        BootstrapNativeCollaborationGateway(
+            gateway,
+            registry,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun refreshNativeCollaborationGateway(
+        gateway: CollaborationGatewaySessionRepository,
+        registry: CollaborationRegistryRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        RefreshNativeCollaborationGateway(
+            gateway,
+            registry,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            journal,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun collaborationProviderSessionSource(
         sql: DSLContext
     ): CollaborationProviderSessionDataSource = PostgresCollaborationProviderSessionDataSource(sql)
@@ -200,6 +284,7 @@ class CollaborationConfiguration {
     @Bean
     fun getNativeCollaborationDeviceStatus(
         registry: CollaborationRegistryRepository,
+        gateway: CollaborationGatewaySessionRepository,
         provisioning: CollaborationProvisioningRepository,
         jobs: JobRepository,
         sessions: NativeSessionRepository,
@@ -214,6 +299,7 @@ class CollaborationConfiguration {
     ) =
         GetNativeCollaborationDeviceStatus(
             registry,
+            gateway,
             provisioning,
             jobs,
             sessions,

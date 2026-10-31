@@ -5,24 +5,32 @@ import dev.fajar.hris.administration.domain.entities.ClientVersion
 import dev.fajar.hris.collaboration.data.matrix.MatrixHttpClientOwner
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.*
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationProviderSessionRepository
+import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationGatewayReplays
 import dev.fajar.hris.collaboration.domain.usecases.RegisterNativeCollaborationDevice
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.usecases.LeaseJobs
+import dev.fajar.hris.worker.collaboration.CollaborationGatewayCleanupWorker
 import dev.fajar.hris.worker.runtime.*
 import dev.fajar.hris.worker.tasks.CollaborationProvisioningTask
 import java.net.URI
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.*
+import java.time.temporal.ChronoUnit
 import java.util.UUID
+import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicInteger
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.ApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.DriverManagerDataSource
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
@@ -80,6 +88,9 @@ class CollaborationProvisioningWorkerTest {
     @Autowired private lateinit var credentials: CollaborationProviderSessionRepository
     @Autowired private lateinit var transactions: TransactionRunner
     @Autowired private lateinit var http: MatrixHttpClientOwner
+    @Autowired private lateinit var gateway: CollaborationGatewaySessionRepository
+    @Autowired private lateinit var maintainGateway: MaintainCollaborationGatewayReplays
+    @Autowired private lateinit var context: ApplicationContext
 
     private fun database() =
         JdbcTemplate(
@@ -295,6 +306,142 @@ class CollaborationProvisioningWorkerTest {
             collaborationMatrixDeviceId(f.device),
             requireNotNull(stored(f)).matrixDeviceId,
         )
+    }
+
+    @Test
+    fun gatewayCacheWorkerInterruptRollsBackItsBatchAndTerminatesWithoutTouchingTheProviderDevice() {
+        val f = fixture()
+        runner.execute(RunningJob(claim(f)), task)
+        assertEquals("ACTIVE", deviceState(f))
+        val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        val head =
+            CollaborationGatewaySession(
+                UUID.randomUUID(),
+                requireNotNull(f.actor.companyId),
+                f.actor.accountId,
+                f.device,
+                f.parent,
+                CollaborationPlatform.ANDROID,
+                1,
+                0,
+                at,
+                at,
+                at.plusSeconds(3600),
+                at.plusSeconds(300),
+            )
+        val tokens =
+            success(
+                transactions.run(f.actor) {
+                    gateway.create(head, UUID.randomUUID(), at.plusNanos(1000))
+                }
+            )
+        val entered = CountDownLatch(1)
+        val released = CountDownLatch(1)
+        val exited = CountDownLatch(1)
+        val callback = CountDownLatch(1)
+        val calls = AtomicInteger()
+        val probe =
+            object : CollaborationGatewaySessionRepository by gateway {
+                override fun clearExpiredReplays(at: Instant, limit: Int): Result<Int> {
+                    assertEquals(100, limit)
+                    calls.incrementAndGet()
+                    try {
+                        val value = gateway.clearExpiredReplays(at, limit)
+                        assertEquals(1, success(value))
+                        entered.countDown()
+                        check(released.await(5, TimeUnit.SECONDS))
+                        return value
+                    } finally {
+                        exited.countDown()
+                    }
+                }
+            }
+        val timer =
+            ThreadPoolTaskScheduler().apply {
+                poolSize = 1
+                setThreadNamePrefix("owned-gateway-cache-fixture-")
+                setRemoveOnCancelPolicy(true)
+                setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+                setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+                setWaitForTasksToCompleteOnShutdown(false)
+                setAwaitTerminationSeconds(3)
+                initialize()
+            }
+        val worker =
+            CollaborationGatewayCleanupWorker(
+                MaintainCollaborationGatewayReplays(probe, transactions, Clock.systemUTC()),
+                timer,
+                Duration.ofSeconds(1),
+            )
+        try {
+            worker.start()
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            assertNotNull(
+                database()
+                    .queryForObject(
+                        "select replay_encrypted from collaboration_gateway_sessions where device_id=?",
+                        String::class.java,
+                        f.device,
+                    )
+            )
+            worker.stop(Runnable { callback.countDown() })
+            assertTrue(callback.await(3, TimeUnit.SECONDS))
+            assertTrue(exited.await(3, TimeUnit.SECONDS))
+            assertFalse(worker.isRunning)
+            assertTrue(timer.scheduledThreadPoolExecutor.awaitTermination(3, TimeUnit.SECONDS))
+            assertTrue(timer.scheduledThreadPoolExecutor.queue.isEmpty())
+            assertEquals(1, calls.get())
+            assertNotNull(
+                database()
+                    .queryForObject(
+                        "select replay_encrypted from collaboration_gateway_sessions where device_id=?",
+                        String::class.java,
+                        f.device,
+                    )
+            )
+            assertEquals(1, success(maintainGateway.execute()))
+            assertNull(
+                database()
+                    .queryForObject(
+                        "select replay_encrypted from collaboration_gateway_sessions where device_id=?",
+                        String::class.java,
+                        f.device,
+                    )
+            )
+            assertEquals(
+                0L,
+                success(transactions.run(f.actor) { gateway.findAccess(tokens.accessToken) })
+                    ?.version,
+            )
+            assertEquals("ACTIVE", deviceState(f))
+            assertNotNull(stored(f))
+            assertThrows(IllegalStateException::class.java) { worker.start() }
+        } finally {
+            released.countDown()
+            worker.stop()
+        }
+    }
+
+    @Test
+    fun disabledGatewayMaintenanceAllocatesNoTimerAndSchedulingRejectionStopsTheOwner() {
+        assertFalse(context.containsBean("collaborationGatewayCleanupTimer"))
+        assertFalse(context.containsBean("collaborationGatewayCleanupWorker"))
+        assertEquals(
+            "invalid_cleanup_limit",
+            (maintainGateway.execute(101) as Result.Failed).failure.code,
+        )
+        val timer =
+            ThreadPoolTaskScheduler().apply {
+                initialize()
+                shutdown()
+            }
+        val worker = CollaborationGatewayCleanupWorker(maintainGateway, timer)
+        try {
+            assertThrows(RuntimeException::class.java) { worker.start() }
+            assertFalse(worker.isRunning)
+        } finally {
+            worker.stop()
+        }
     }
 
     private fun <T> success(result: Result<T>): T {

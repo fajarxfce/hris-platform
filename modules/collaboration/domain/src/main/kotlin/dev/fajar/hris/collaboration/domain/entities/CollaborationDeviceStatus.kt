@@ -11,6 +11,16 @@ data class CollaborationDeviceStatus(
     val state: CollaborationDeviceState,
     val platform: CollaborationPlatform,
     val provisioning: CollaborationProvisioningStatus?,
+    val gateway: CollaborationGatewayStatus? = null,
+)
+
+data class CollaborationGatewayStatus(
+    val id: UUID,
+    val version: Long,
+    val clientBuild: Int,
+    val accessExpiresAt: Instant,
+    val expiresAt: Instant,
+    val revokedAt: Instant?,
 )
 
 data class CollaborationProvisioningStatus(

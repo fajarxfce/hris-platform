@@ -131,6 +131,44 @@ class WorkerConfiguration {
         )
 
     @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled", "hris.collaboration-gateway-cleanup.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun collaborationGatewayCleanupTimer() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-collaboration-cache-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled", "hris.collaboration-gateway-cleanup.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun collaborationGatewayCleanupWorker(
+        maintain: dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationGatewayReplays,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationGatewayCleanupTimer")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        @org.springframework.beans.factory.annotation.Value(
+            "\${hris.collaboration-gateway-cleanup.interval-seconds:5}"
+        )
+        intervalSeconds: Long,
+    ) =
+        dev.fajar.hris.worker.collaboration.CollaborationGatewayCleanupWorker(
+            maintain,
+            timer,
+            java.time.Duration.ofSeconds(intervalSeconds),
+        )
+
+    @Bean
     @Primary
     fun workerTransactions(
         manager: PlatformTransactionManager,

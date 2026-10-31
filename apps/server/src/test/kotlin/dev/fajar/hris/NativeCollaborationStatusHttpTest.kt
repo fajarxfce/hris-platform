@@ -73,7 +73,7 @@ class NativeCollaborationStatusHttpTest : NativeCollaborationApiFixture() {
         assertEquals("PROVISIONING", body["state"].asString())
         assertEquals("QUEUED", body["provisioning"]["status"].asString())
         assertEquals(
-            setOf("id", "version", "state", "platform", "provisioning"),
+            setOf("id", "version", "state", "platform", "provisioning", "gateway"),
             body.propertyNames().toSet(),
         )
         assertEquals(

@@ -76,7 +76,7 @@ fun collaborationGatewayRotationAllowed(
 ): Result<Unit> {
     if (session.version >= 999999)
         return Result.Failed(
-            Failure(FailureKind.CONFLICT, "collaboration_gateway_renewal_required")
+            Failure(FailureKind.UNAUTHENTICATED, "collaboration_gateway_renewal_required")
         )
     val earliest = session.rotatedAt.plusSeconds(COLLABORATION_GATEWAY_ROTATION_SECONDS)
     if (at < earliest)

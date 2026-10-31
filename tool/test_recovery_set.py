@@ -42,12 +42,24 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("extract(epoch FROM token_expires_at)*1000000", expiring)
         self.assertIn(":expires:", expiring)
         with self.assertRaises(recovery.RecoveryError):
-            recovery.envelope_query(109)
+            recovery.envelope_query(110)
+
+    def test_gateway_replay_projection_is_schema_gated_and_authenticates_its_metadata(self):
+        for schema in (59, 103, 106, 107, 108):
+            self.assertNotIn("collaboration_gateway_sessions", recovery.envelope_query(schema))
+        sql = recovery.envelope_query(109)
+        self.assertIn("hris:matrix-gateway:v1:", sql)
+        self.assertIn("encode(sha256(convert_to(", sql)
+        self.assertIn("native_session_id::text", sql)
+        self.assertIn("access_hash||':'||refresh_hash", sql)
+        self.assertIn("extract(epoch FROM replay_until)", sql)
+        self.assertIn("bootstrap_operation_id::text ELSE previous_refresh_hash", sql)
+        self.assertIn("FROM collaboration_gateway_sessions WHERE replay_encrypted IS NOT NULL", sql)
 
     def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 109, None, 'invalid'):
+        for schema in (58, 110, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

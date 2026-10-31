@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-31",
+  "scope": "P1 native Matrix gateway credential storage and recovery; no public gateway or admission wiring",
+  "validation": {
+    "gatewayRepositoryCases": 9,
+    "gatewayRepositoryFailures": 0,
+    "gatewayRepositoryCaseSeconds": 42.326,
+    "recoveryToolCases": 23,
+    "recoveryToolFailures": 0,
+    "databaseCases": 29,
+    "databaseFailures": 0,
+    "admissionPolicyCases": 11,
+    "admissionPolicyFailures": 0,
+    "finalSelectionElapsedSeconds": 155,
+    "format": true,
+    "architecture": true
+  },
+  "behaviors": [
+    "One retained company/account/native-parent/device head; hashes only, one AES-GCM response cache; public token values redact diagnostics.",
+    "Two concurrent refresh transactions produce one compare-and-set winner; lost-response replay returns that pair; a subsequent rotation rejects the older hash without revoking its device.",
+    "A new bootstrap updates the client build without replacing the device and invalidates earlier credentials and bootstrap replay.",
+    "Transaction-local lookup resolves only one opaque-token head and is absent on a reused connection after transaction completion; it does not itself grant HRIS admission.",
+    "Deadline tampering fails AEAD; a failed business Result rolls back a credential rotation.",
+    "Maintenance is bounded to 100 expired caches, skips a locked head, cannot alter active credentials or clear ahead of database time, and finishes after lock release.",
+    "SQL denies foreign parent/platform, excessive lifetimes, malformed replay, deletion, unrevoked retirement and generation resurrection.",
+    "Actual pg_dump/pg_restore preserves old/current key envelopes; the independent Python/SQL recovery projection decrypts both and matches Kotlin AAD."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "Initial test compilation",
+      "elapsedSeconds": 29,
+      "result": "Ambiguous wildcard JUnit assertions; corrected explicit lifecycle/test imports."
+    },
+    {
+      "stage": "First corrected selection",
+      "elapsedSeconds": 182,
+      "result": "Six of eight gateway cases passed; two cleanup cases failed. Database 29 and admission 11 cases passed."
+    },
+    {
+      "stage": "Focused SQL diagnostic",
+      "elapsedSeconds": 27,
+      "result": "Confirmed timestamp parameter inferred as varchar in raw SQL; added an explicit timestamptz cast. Temporary diagnostic wrapper removed."
+    },
+    {
+      "stage": "After SQL parameter correction",
+      "result": "Seven of nine gateway cases passed. Two cleanup cases exposed PostgreSQL RLS post-update visibility. Retain the expired nonsecret deadline while clearing response and replay identifiers; forbid other metadata changes.",
+      "elapsedSeconds": 70
+    }
+  ],
+  "limits": [
+    "Storage contracts require future use cases to check current native/company/chat/MFA/client authority and replay deadlines.",
+    "No public Matrix gateway, worker scheduling, SDK product integration, browser-parent binding, chat/calls/meetings or deployment is claimed.",
+    "Ordinary HRIS access expiry retains owned offline facts; token lookup and storage metadata are not provider grants.",
+    "Hard storage lifetime is at most 31 days and never beyond the bound native parent; native default session lifetime is 30 days."
+  ],
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V109__collaboration_gateway_sessions.sql": "d64567d55b61820266f4bfdee95e3f4e4d2ae6c6d8c4325e55618e2e75e15214",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/crypto/CollaborationGatewayPurpose.kt": "4c50bf3b04fe06b7bb6b8ea7d3978f9f213b3b52d2deada8064cfb572a8ed853",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationGatewaySessionDataSource.kt": "3f1a728b4ce93333496a7675873b620571002f13324d0351136f30834c5208bb",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationGatewaySessionDataSource.kt": "349f527d0753fc8a79356053fe5fc9e8d39850037d1e9ee0ec76126e15ebf40f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/mappers/CollaborationGatewaySessionMapper.kt": "28663e36b59699c36216230e1f9395e6bdda406cd059d93bcb5205ec007300a5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/EncryptedCollaborationGatewaySessionRepository.kt": "cd54717f601abd2ea17e3bb345d2ded22d7568135e923724a8d8b70c9dcdddd5",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationGatewaySessionTest.kt": "a3dde4900fd92d5af023f874212ae20477c3da4d0989c869490699ea48335098",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationGatewaySession.kt": "2a78d56bcb996d9f2b3bcfafeac9568956df1da0f0f7ccaba6b10741ef371d63",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationGatewayTokenPolicy.kt": "62776f4c5295ad59aa1237e8246dd28291b53558c02f2eafacde00815b3c5130",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationGatewaySessionRepository.kt": "6402df203084f7805ff652b929c0b0272f60436fd941adf9b34542249cd7dc42",
+    "tool/recovery_set.py": "fb6f76484a7b1e3fa9eda9eacbf8b80d0e56c87434cdd9ced64e24ba4921adaa",
+    "tool/test_recovery_set.py": "34216b969ebe990b8588a57002c1e0887115e01d6ea2c0f5718e3e6f4727f62f"
+  }
+}

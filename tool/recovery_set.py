@@ -37,7 +37,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # Query selection preserves restoration of earlier schemas without the new table.
 # V107 authenticates known token deadlines; NULL retains the legacy V106 AAD.
 # V108 retains company/account/device provisioning fences and durable job links.
-MAX_SCHEMA = 108
+# V109 retains one authenticated gateway token replay per native device.
+MAX_SCHEMA = 109
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -67,6 +68,20 @@ def envelope_query(schema):
             "||generation||CASE WHEN token_expires_at IS NULL THEN '' ELSE ':expires:'||"
             "((extract(epoch FROM token_expires_at)*1000000)::bigint)::text END, token_encrypted",
         )
+    if int(schema) >= 109:
+        fields = [
+            "company_id::text", "account_id::text", "device_id::text", "id::text",
+            "native_session_id::text", "platform", "client_build::text", "version::text",
+            *["((extract(epoch FROM " + name + ")*1000000)::bigint)::text"
+              for name in ("created_at", "rotated_at", "expires_at", "access_expires_at")],
+            "access_hash", "refresh_hash", "replay_kind",
+            "CASE WHEN replay_kind='BOOTSTRAP' THEN bootstrap_operation_id::text ELSE previous_refresh_hash END",
+            "((extract(epoch FROM replay_until)*1000000)::bigint)::text",
+        ]
+        canonical = "||':'||".join(fields)
+        collaboration += (" UNION ALL SELECT 'hris:matrix-gateway:v1:'||"
+                          "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),replay_encrypted"
+                          " FROM collaboration_gateway_sessions WHERE replay_encrypted IS NOT NULL\n")
     return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
             ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 

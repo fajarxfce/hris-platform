@@ -17,6 +17,18 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Mobile SDK synchronization now follows protected runtime ownership.**
+  Mobile `fbb2f3ae` replaces the HRIS fixture's separate sync producer
+  with lease-owned classic sync and verifies duplicate starts, cancellation/late
+  acquisition and explicit failed-cleanup retry. [Evidence](measurements/collaboration-owned-sync-2026-10-31.json)
+  records 15 Platform/94 Mobile hashes, APK `e5c07ded`, actual Android case `54ab8f5a`
+  passing in 35.750s, one API and 32 driver cases, cleanup complete. Root/Wasm/
+  Android/lint passes in 192s with 2,121 desktop cases; data browser has 45. One
+  provider-busy key upload is retained before successful SDK completion. Emulator
+  stopped, no live/schema/phone changes. Mobile `50964794` adds scoped conversation
+  control reads; durable mutations, product room/timeline ownership and chat UI
+  remain next. **Continue all P0–P8; no group is accepted.**
+
 - **Mobile application runtime ownership is pushed at `9f83dcdc`.**
   [Cross-repository checkpoint](collaboration/mobile-setup.md) links admitted
   install/restore, application DI and Android process lifecycle. Final root/Wasm/

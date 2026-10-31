@@ -1,5 +1,24 @@
 # Mobile native setup ownership
 
+## Owned synchronization and conversation control
+
+Mobile [fbb2f3ae](https://github.com/fajarxfce/hris-mobile/commit/fbb2f3aef2b62fa221ae12d0c5f5b71d3ee1b22f)
+owns classic sync through the protected SDK lease. Cancelled/late callers cannot
+abandon the native producer, and cleanup terminates sync before database draining
+and store unlock. Eight new common cases and actual Android process death pass;
+[measurement](../measurements/collaboration-owned-sync-2026-10-31.json) binds 15
+Platform/94 Mobile source hashes to proof APK `e5c07ded`. Actual case `54ab8f5a`
+passes in 35.750s, one API/32 driver cases, cleanup complete. Root/Wasm/Android/
+lint passes in 192s with 2,121 desktop and 45 data browser cases. One provider-busy
+key-upload response is retained; the SDK exchange subsequently completes.
+
+Mobile `50964794` also connects native participant, DM and room control adapters
+and admitted reads, with bounded responses and strict scope/cursor validation.
+Mutation ports preserve operation IDs and observed versions but still require
+durable preparation/replay before UI use. Product room/timeline ownership, chat UI,
+bootstrap recovery and offline logical-message reconciliation remain next. No
+feature group, live rollout or physical phone action is claimed.
+
 ## Application runtime checkpoint
 
 Mobile [9f83dcdc](https://github.com/fajarxfce/hris-mobile/commit/9f83dcdc2f42e69441569f050c5428746ef38f8a)

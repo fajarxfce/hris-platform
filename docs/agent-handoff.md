@@ -3,6 +3,9 @@
 Updated 31 October 2026 (UTC). The user requested verification and completion of
 all specified features, with every atomic commit pushed and handoffs retained in
 Git. The full audit is complete after implementing the discovered gaps and validating every reviewed area.
+New work on 31 October: the user requested a full Mobile layout/component review
+and fictional sample data for the existing linked employee. [Sample setup](mobile-sample-data-2026-10-31.md)
+is verified through normal employee APIs; Mobile's layout review remains active.
 Earlier distribution/native acceptance remains valid for its recorded scope. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.

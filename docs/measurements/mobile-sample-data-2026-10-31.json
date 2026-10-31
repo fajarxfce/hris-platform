@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-31",
+  "scope": "Requested fictional mobile review data for the existing linked employee in HRISDEMO",
+  "summary": {
+    "completedAt": "2026-10-31T03:51:39.096Z",
+    "colleagues": 4,
+    "leaveRequests": 3,
+    "expenseClaims": 3,
+    "overtimeRequests": 3,
+    "attendanceDays": 5,
+    "announcements": 3,
+    "documents": 2,
+    "commands": 42
+  },
+  "verification": {
+    "verifiedAt": "2026-10-31T03:52:28.711Z",
+    "statuses": {
+      "leave": [
+        "APPROVED",
+        "PENDING",
+        "CANCELLED"
+      ],
+      "expenses": [
+        "APPROVED",
+        "PENDING",
+        "DRAFT"
+      ],
+      "overtime": [
+        "APPROVED",
+        "PLANNED",
+        "WITHDRAWN"
+      ]
+    },
+    "attendanceDays": 5,
+    "inboxItems": 3,
+    "readAsOwnedEmployee": true
+  },
+  "successfulCommands": 40,
+  "setupSessionRevoked": true,
+  "rejectedSetupAttempts": [
+    {
+      "status": 400,
+      "code": "invalid_request",
+      "reason": "Expected version omitted because the ledger wrapper was read as a balance"
+    },
+    {
+      "status": 400,
+      "code": "invalid_request",
+      "reason": "Leave action uses version rather than expectedVersion"
+    }
+  ],
+  "documents": {
+    "newPublishedPdfs": 2,
+    "scannerStatus": "READY",
+    "downloadedAsOwnedEmployee": true,
+    "downloadBytesMatch": true
+  },
+  "preserved": [
+    "Existing account/person/Google binding",
+    "Existing employee grants",
+    "Existing phone sessions",
+    "Existing development server configuration"
+  ],
+  "noEmailSent": true,
+  "localManifest": ".work/ui-review-2026-10-31/sample-state.json",
+  "limits": [
+    "All employment, requests, attendance corrections and documents are explicitly fictional",
+    "No salary publication, payment execution or real GPS capture performed",
+    "No external recipient was added; announcement audience preview required exactly one requested employee"
+  ]
+}

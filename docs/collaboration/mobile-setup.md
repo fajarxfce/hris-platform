@@ -1,5 +1,33 @@
 # Mobile native setup ownership
 
+## Durable conversation commands
+
+Mobile [39217be2](https://github.com/fajarxfce/hris-mobile/commit/39217be2f63116dfe2752672a68f25b9479c514b)
+now persists per-peer/room control intent before submission, saves uncertainty
+before HTTP and preserves operation/action through lost responses and ordinary
+app upgrades. Exact-record removal requires an observed owned conversation or
+provisioning version. Known server denials survive failed transport retries in
+both setup and conversation replay. Preparation remains live-admitted native
+control; offline message composition and UI are separate pending work.
+
+[Evidence](https://github.com/fajarxfce/hris-mobile/blob/39217be2f63116dfe2752672a68f25b9479c514b/docs/measurements/collaboration-conversation-commands-2026-10-31.json)
+records 24 new cases, final root/browser/assembly/Android/lint passing in 4m:
+2,145 desktop, 70 domain browser and 49 data browser cases; zero lint errors.
+Initial moved-ciphertext fixture reused a unique sort key and was corrected before
+rechecking the cryptographic boundary. No device, live service or schema change.
+
+CI `767ed980` lets running control/HRIS proofs complete while replacing superseded
+pending work. Mobile `fbb2f3ae` provider run `41246770541` passes both modes/all
+steps: classic 83.930s/native 92.938s, two browser cases each, cleanup complete;
+all 14 Platform source hashes per mode match `e0dbb567`. The owned-sync measurement
+retains those provider-only results separately from its actual HRIS lifetime proof.
+Starter hosted AppAuth verify `41245287269` passed all 15 verify steps at `9740cb5`
+with matching source hashes; closure is committed at Starter `36116b2`.
+
+**Next:** product room/timeline ownership and chat UI, owned offline projections,
+bootstrap/cross-family recovery and logical-message reconciliation. Continue all
+P0–P8; no product group is accepted.
+
 ## Owned synchronization and conversation control
 
 Mobile [fbb2f3ae](https://github.com/fajarxfce/hris-mobile/commit/fbb2f3aef2b62fa221ae12d0c5f5b71d3ee1b22f)

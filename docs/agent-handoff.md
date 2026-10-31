@@ -17,6 +17,18 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Mobile durable conversation control is pushed at `39217be2`.**
+  [Cross-repository checkpoint](collaboration/mobile-setup.md) records encrypted
+  per-peer/room commands, uncertainty before HTTP, immutable retries and exact
+  receipt reconciliation. Both setup and conversation preserve known server denial
+  across failed transport retries. Final root/browser/Android/lint passes in 4m:
+  2,145 desktop cases, 70 domain/49 data browser, zero lint errors. Mobile CI now
+  lets running proofs finish; `fbb2f3ae` provider run `41246770541` passes both modes
+  with all steps and source hashes verified. Starter AppAuth hosted verification
+  also passes (`9740cb5`/`41245287269`), recorded at `36116b2`. No product group,
+  live/schema/phone change. **Continue room/timeline ownership, chat UI, offline
+  projections/recovery and all P0–P8.**
+
 - **Mobile SDK synchronization now follows protected runtime ownership.**
   Mobile `fbb2f3ae` replaces the HRIS fixture's separate sync producer
   with lease-owned classic sync and verifies duplicate starts, cancellation/late

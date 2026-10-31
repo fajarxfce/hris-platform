@@ -100,7 +100,8 @@
         "../measurements/collaboration-protected-native-store-2026-10-31.json",
         "../measurements/collaboration-sdk-process-death-2026-10-31.json",
         "https://github.com/fajarxfce/hris-mobile/blob/9f83dcdc2f42e69441569f050c5428746ef38f8a/docs/measurements/collaboration-application-runtime-2026-10-31.json",
-        "../measurements/collaboration-owned-sync-2026-10-31.json"
+        "../measurements/collaboration-owned-sync-2026-10-31.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/39217be2f63116dfe2752672a68f25b9479c514b/docs/measurements/collaboration-conversation-commands-2026-10-31.json"
       ]
     },
     {

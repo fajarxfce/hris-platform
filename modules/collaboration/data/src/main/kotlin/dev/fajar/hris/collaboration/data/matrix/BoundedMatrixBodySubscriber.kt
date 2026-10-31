@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.Flow
 
-/** Bounded control responses, including chunked bodies and failure responses. */
+/** Explicit per-operation bounds, including chunked bodies and failure responses. */
 class BoundedMatrixBodySubscriber(private val maximumBytes: Int = 65536) :
     HttpResponse.BodySubscriber<ByteArray> {
     private val result = CompletableFuture<ByteArray>()
@@ -15,7 +15,7 @@ class BoundedMatrixBodySubscriber(private val maximumBytes: Int = 65536) :
     @Volatile private var subscription: Flow.Subscription? = null
 
     init {
-        require(maximumBytes in 1..1_048_576)
+        require(maximumBytes in 1..8_388_608)
         result.whenComplete { _, error -> if (error != null) subscription?.cancel() }
     }
 

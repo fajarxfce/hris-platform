@@ -24,6 +24,38 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationRoomScopeSource(sql: DSLContext): CollaborationRoomScopeDataSource =
+        PostgresCollaborationRoomScopeDataSource(sql)
+
+    @Bean
+    fun collaborationRoomScopes(
+        source: CollaborationRoomScopeDataSource
+    ): CollaborationRoomScopeRepository = StoredCollaborationRoomScopeRepository(source)
+
+    @Bean
+    fun collaborationSyncCursors(
+        crypto: IdentityTokenDataSource
+    ): CollaborationSyncCursorRepository = EncryptedCollaborationSyncCursorRepository(crypto)
+
+    @Bean
+    fun collaborationMatrixSync(
+        source: ObjectProvider<MatrixSyncDataSource>
+    ): CollaborationMatrixSyncRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixSyncRepository)
+            ?: DisabledCollaborationMatrixSyncRepository()
+
+    @Bean(destroyMethod = "close")
+    @ConditionalOnProperty(
+        name = ["HRIS_COLLABORATION_ENABLED", "HRIS_MATRIX_ENABLED"],
+        havingValue = "true",
+    )
+    fun collaborationMatrixSyncSource(
+        owner: MatrixHttpClientOwner,
+        configuration: MatrixProviderConfiguration,
+        clock: Clock,
+    ): HttpMatrixSyncDataSource = HttpMatrixSyncDataSource(owner.client, configuration, clock)
+
+    @Bean
     fun collaborationRecipientSource(sql: DSLContext): CollaborationRecipientDataSource =
         PostgresCollaborationRecipientDataSource(sql)
 
@@ -408,6 +440,9 @@ class CollaborationConfiguration {
         providerToDevice: CollaborationMatrixToDeviceRepository,
         recipients: CollaborationRecipientRepository,
         conversations: CollaborationDirectRepository,
+        roomScopes: CollaborationRoomScopeRepository,
+        syncCursors: CollaborationSyncCursorRepository,
+        providerSync: CollaborationMatrixSyncRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -430,6 +465,9 @@ class CollaborationConfiguration {
             providerToDevice,
             recipients,
             conversations,
+            roomScopes,
+            syncCursors,
+            providerSync,
             sessions,
             policies,
             companies,

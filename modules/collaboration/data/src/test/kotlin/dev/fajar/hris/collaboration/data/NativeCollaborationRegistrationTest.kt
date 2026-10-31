@@ -12,11 +12,14 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvid
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRecipientDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRoomScopeDataSource
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
+import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationSyncCursorRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDeviceKeyRepository
@@ -25,6 +28,7 @@ import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectR
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRecipientRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRoomScopeRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
@@ -37,7 +41,9 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySess
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixToDeviceRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationRoomScopeRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
@@ -2591,8 +2597,20 @@ class NativeCollaborationRegistrationTest {
         MatrixProviderFixture("10m", g.f.clock).use { provider ->
             provider.start()
             val tokens = success(g.bootstrap())
+            val syncSource =
+                dev.fajar.hris.collaboration.data.matrix.HttpMatrixSyncDataSource(
+                    provider.client,
+                    provider.config,
+                    g.f.clock,
+                )
             val request =
-                g.f.matrixIdentity(provider.repository, serverName = "matrix.example.test")
+                g.f.matrixIdentity(
+                    provider.repository,
+                    serverName = "matrix.example.test",
+                    providerSync =
+                        dev.fajar.hris.collaboration.data.repositories
+                            .InternalCollaborationMatrixSyncRepository(syncSource),
+                )
             val identity = success(request.identity(tokens.accessToken, UUID.randomUUID()))
             assertEquals(
                 "@${collaborationMatrixLocalpart(requireNotNull(g.f.actor.companyId), g.f.account)}:matrix.example.test",
@@ -2605,6 +2623,207 @@ class NativeCollaborationRegistrationTest {
             assertEquals(0L, stored.generation)
             assertEquals(identity, success(request.identity(tokens.accessToken, UUID.randomUUID())))
             assertEquals(stored.accessToken, g.f.credential(g.device)?.accessToken)
+            try {
+                val initial =
+                    success(
+                        request.sync(
+                            tokens.accessToken,
+                            UUID.randomUUID(),
+                            CollaborationSyncRequest(null, 0),
+                        )
+                    )
+                success(
+                    request.sync(
+                        tokens.accessToken,
+                        UUID.randomUUID(),
+                        CollaborationSyncRequest(initial.nextBatch, 0),
+                    )
+                )
+                assertFalse(initial.payload.containsKey("next_batch"))
+            } finally {
+                syncSource.close()
+            }
+        }
+    }
+
+    @Test
+    fun syncPositionsResumeOnlyForTheSameOwnedRoomScopeAndResetWhenItGrows() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        val rooms = mutableListOf<CollaborationOwnedRoom>()
+        val scopes =
+            object : CollaborationRoomScopeRepository {
+                override fun owned(
+                    companyId: UUID,
+                    accountId: UUID,
+                    limit: Int,
+                ): Result<List<CollaborationOwnedRoom>> {
+                    assertEquals(g.f.actor.companyId, companyId)
+                    assertEquals(g.f.account, accountId)
+                    assertEquals(10_001, limit)
+                    return Result.Success(rooms.toList())
+                }
+            }
+        val provider = RecordingSync()
+        val request = g.f.matrixIdentity(matrix, roomScopes = scopes, providerSync = provider)
+        val first =
+            success(
+                request.sync(
+                    tokens.accessToken,
+                    UUID.randomUUID(),
+                    CollaborationSyncRequest(null, 0),
+                )
+            )
+        assertFalse(first.nextBatch.contains("private-position"))
+        assertNull(provider.positions.single())
+        success(
+            request.sync(
+                tokens.accessToken,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(first.nextBatch, 0),
+            )
+        )
+        assertEquals("private-position", provider.positions.last()?.providerSince)
+        rooms +=
+            CollaborationOwnedRoom(
+                requireNotNull(g.f.actor.companyId),
+                UUID.randomUUID(),
+                g.f.account,
+                UUID.randomUUID(),
+                g.f.account,
+                "proof.invalid",
+                "!fictional-grown-room",
+            )
+        success(
+            request.sync(
+                tokens.accessToken,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(first.nextBatch, 0),
+            )
+        )
+        assertNull(provider.positions.last())
+        val other = GatewayFixture()
+        val otherTokens = success(other.bootstrap())
+        val foreign =
+            other.f
+                .matrixIdentity(RecordingMatrix(other.f.clock), providerSync = provider)
+                .sync(
+                    otherTokens.accessToken,
+                    UUID.randomUUID(),
+                    CollaborationSyncRequest(first.nextBatch, 0),
+                )
+        assertEquals("invalid_collaboration_sync_cursor", (foreign as Result.Failed).failure.code)
+        assertEquals(3, provider.positions.size)
+    }
+
+    @Test
+    fun syncCannotReleaseCursorAfterRevocationScopeGrowthOrLateFailure() {
+        for (change in listOf("revoke", "growth", "expiry", "failure")) {
+            val g = GatewayFixture()
+            val tokens = success(g.bootstrap())
+            val rooms = mutableListOf<CollaborationOwnedRoom>()
+            val scopes =
+                object : CollaborationRoomScopeRepository {
+                    override fun owned(companyId: UUID, accountId: UUID, limit: Int) =
+                        Result.Success(rooms.toList())
+                }
+            val provider =
+                RecordingSync().apply {
+                    after = {
+                        when (change) {
+                            "growth" ->
+                                rooms.add(
+                                    CollaborationOwnedRoom(
+                                        requireNotNull(g.f.actor.companyId),
+                                        UUID.randomUUID(),
+                                        g.f.account,
+                                        UUID.randomUUID(),
+                                        g.f.account,
+                                        "proof.invalid",
+                                        "!late-room",
+                                    )
+                                )
+                            "expiry" -> g.f.clock.at = tokens.accessExpiresAt
+                            else ->
+                                sql.update(
+                                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                                    g.parent,
+                                )
+                        }
+                        if (change == "failure")
+                            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+                        else null
+                    }
+                }
+            val result =
+                g.f
+                    .matrixIdentity(
+                        RecordingMatrix(g.f.clock),
+                        roomScopes = scopes,
+                        providerSync = provider,
+                    )
+                    .sync(
+                        tokens.accessToken,
+                        UUID.randomUUID(),
+                        CollaborationSyncRequest(null, 30_000),
+                    )
+            assertInstanceOf(Result.Failed::class.java, result)
+            assertNotEquals("fixture_provider_down", (result as Result.Failed).failure.code)
+            assertEquals(1, provider.positions.size)
+        }
+    }
+
+    @Test
+    fun syncPositionSurvivesOrdinaryGatewayBearerRefreshForTheSameDevice() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val provider = RecordingSync()
+        val request = g.f.matrixIdentity(RecordingMatrix(g.f.clock), providerSync = provider)
+        val initial =
+            success(
+                request.sync(
+                    tokens.accessToken,
+                    UUID.randomUUID(),
+                    CollaborationSyncRequest(null, 0),
+                )
+            )
+        g.f.clock.at = g.f.clock.at.plusSeconds(11)
+        val refreshed = success(g.refresh(tokens.refreshToken))
+        assertNotEquals(tokens.accessToken, refreshed.accessToken)
+        success(
+            request.sync(
+                refreshed.accessToken,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(initial.nextBatch, 0),
+            )
+        )
+        assertEquals("private-position", provider.positions.last()?.providerSince)
+        assertEquals(2, provider.positions.size)
+    }
+
+    private class RecordingSync : CollaborationMatrixSyncRepository {
+        val positions = mutableListOf<CollaborationSyncPosition?>()
+        var after: (() -> Result<CollaborationMatrixSyncBatch>?)? = null
+
+        override fun sync(
+            owner: CollaborationSyncOwner,
+            scope: CollaborationRoomScope,
+            position: CollaborationSyncPosition?,
+            timeoutMillis: Int,
+            fullState: Boolean,
+            bearer: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixSyncBatch> {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            positions += position
+            return after?.invoke()
+                ?: Result.Success(
+                    CollaborationMatrixSyncBatch("private-position", "123", emptyMap())
+                )
         }
     }
 
@@ -4496,6 +4715,12 @@ class NativeCollaborationRegistrationTest {
             providerToDevice: CollaborationMatrixToDeviceRepository =
                 DisabledCollaborationMatrixToDeviceRepository(),
             keyStore: CollaborationDeviceKeyRepository = deviceKeys,
+            roomScopes: CollaborationRoomScopeRepository =
+                StoredCollaborationRoomScopeRepository(
+                    PostgresCollaborationRoomScopeDataSource(dsl)
+                ),
+            providerSync: CollaborationMatrixSyncRepository =
+                DisabledCollaborationMatrixSyncRepository(),
         ) =
             AccessNativeCollaborationMatrixDevice(
                 gateway,
@@ -4507,6 +4732,16 @@ class NativeCollaborationRegistrationTest {
                 providerToDevice,
                 recipients,
                 direct,
+                roomScopes,
+                EncryptedCollaborationSyncCursorRepository(
+                    JceIdentityTokenDataSource(
+                        dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(
+                            "fixture",
+                            "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 17 }),
+                        )
+                    )
+                ),
+                providerSync,
                 sessions,
                 policies,
                 companies,

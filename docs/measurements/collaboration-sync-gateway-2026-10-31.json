@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-31",
+  "scope": "Admitted native classic Matrix sync for immutable HRIS DIRECT bindings",
+  "schema": 113,
+  "validation": [
+    {
+      "durationSeconds": 10,
+      "result": "compile_failed",
+      "note": "JsonNode member map shadowed Kotlin collection mapping; converted to a list before mapping."
+    },
+    {
+      "durationSeconds": 41,
+      "result": "failed",
+      "counts": {
+        "modules/collaboration/domain": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 7,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 15,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "note": "Fixture used two instants for a maximum-60-second JWT; raw HTTP future wrapped cancellation; shared body subscriber still capped at one MiB."
+    },
+    {
+      "durationSeconds": 32,
+      "result": "failed",
+      "note": "Provider/HTTP tests reproduced the one-MiB subscriber constructor ceiling; safe category/frame-only diagnostics identified it. Explicit sync ceiling corrected to eight MiB; existing control operation sizes retained."
+    },
+    {
+      "durationSeconds": 31,
+      "result": "passed",
+      "counts": {
+        "modules/collaboration/data": {
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "note": "Seven data and two HTTP cases, formatting and architecture; includes two-MiB success, oversize/duplicate/trailing rejection, cancellation, shutdown, single-device and separate control capacity."
+    },
+    {
+      "durationSeconds": 352,
+      "result": "failed_two_obsolete_test_assumptions",
+      "results": {
+        "modules/collaboration/domain": {
+          "counts": {
+            "tests": 34,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "failedCases": []
+        },
+        "modules/collaboration/data": {
+          "counts": {
+            "tests": 179,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0
+          },
+          "failedCases": [
+            "actualSyncFiltersEveryRoomBucketHydratesCreationAndReusesOwnedProviderFilter()"
+          ]
+        },
+        "apps/server": {
+          "counts": {
+            "tests": 157,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0
+          },
+          "failedCases": [
+            "bootstrapRequiresNativeVersionsAndTheGatewayDeniesEveryUnimplementedProviderPath()"
+          ]
+        },
+        "apps/worker": {
+          "counts": {
+            "tests": 112,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 1
+          },
+          "failedCases": []
+        }
+      },
+      "note": "Full data/domain, selected API, complete worker and both DI graphs. New stable own-user filter avoids room-list retention; actual HRIS-to-Synapse initial/resume also exercised. One test expected create only in state; one still expected sync to be unimplemented."
+    },
+    {
+      "durationSeconds": 34,
+      "result": "passed",
+      "counts": {
+        "modules/collaboration/data": {
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "note": "Corrected both assertions; added gateway-refresh cursor survival and immutable-only state hydration with an older timeline. Format/architecture passed. No production or DI change after the full run."
+    }
+  ],
+  "combinedCoverage": {
+    "domain": 34,
+    "data": 181,
+    "selectedApi": 157,
+    "worker": 112,
+    "workerExistingOptInSkipped": 1,
+    "allRequiredCasesPassedAcrossFullAndCorrectionRuns": true
+  },
+  "verified": [
+    "Current native/company/account/CHAT/MFA/build/device/gateway admission before and after provider I/O and cursor sealing",
+    "No SQL transaction across waiting; current denial dominates late provider success/failure",
+    "Owner-bound encrypted cursor resume, ordinary bearer refresh, scope-growth initial reacquisition and foreign-owner rejection",
+    "Every room bucket scoped; presence/account data excluded; HRIS direct mapping; eligible historical to-device/device-list senders",
+    "Actual pinned Synapse stable own-user filter deduplication across scope changes, joined/invited filtering and initial/resume",
+    "Actual HRIS admission and private credential through PostgreSQL to Synapse sync",
+    "Creation state found in state or timeline; missing immutable creation hydrated alone without merging mutable current state",
+    "Separate 64-slot long-poll pool, one operation per user/device, no queue and one fixed in-flight request per connection",
+    "Control requests remain available while long poll waits; interruption/shutdown and malformed/oversize response release owned resources",
+    "Strict HTTP query/auth framing and no-store response; no public provider since in next_batch",
+    "Both shared DI runtime contexts and source quality checks"
+  ],
+  "limits": {
+    "longPollSlots": 64,
+    "perUserDevice": 1,
+    "requestedPollMillis": 30000,
+    "maximumNetworkSeconds": 35,
+    "syncResponseBytes": 8388608,
+    "stateResponseBytes": 1048576,
+    "filterRequestAndResponseBytes": 65536,
+    "roomScopeLimit": 10000
+  },
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixConfigurationTest.kt": "01471363c4c4b448db5313a5d319966f9dd0ffab90386936e68c4b16dbaa2fab",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "0c0aa85b102b607643bedfc7eb8b0d87db3758c9546a3492bb40b336ab586034",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "c4dae21b37509746476e1657371e8daf2ef8620f2446b065e176e8ad8b6c21c8",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/BoundedMatrixBodySubscriber.kt": "7fef92550130bc63b59d7dc43f3bad1f7dc83afdb12cf306e07c6e40ec2378fc",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/SafeMatrixProviderCall.kt": "1c36cc03f02e71cf1b570100547a7204fbc816cd954a540cf8765dcc56a435f8",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "69e72f5ab65fee64785409625a437e1f22a5e2493e29806cd43b10b5cbd0ebf3",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "5e7795833cdfd6c8b7d9fea8ef6331958f7307d648e835204e9b349e76da045a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "89b3e7a914bc15ce00f8c7d7a5c1960188ad47822f789cd22017e55bb3e7f5fd",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixSyncDataSource.kt": "77c077a1d0edede806ad1e36a27009056aee61201b45ede4a488636ff038ad60",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixSyncDataSource.kt": "837fa190047f1a4316195d3f3cd4a99af777c95e376c95f2da8e235c8f886f11",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixSyncRepository.kt": "6686d119fdf1e55df213538f6f8597662ab74aff1d27f34c040a18d4998a81f2",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixSyncRepository.kt": "87bacc0476ec40c80f04cd77e61490432c25d9b5665bdb60c9723640ce581188",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSyncGatewayInteropTest.kt": "1870d099d44fe5afac56a789d260f448249b67b6d303e9134e84742c6cabaa6d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSyncProjectionTest.kt": "223d77a6f5bb3cd7bc8f81fa276e821529e8bca62f40e3c7cd58422fc74f8a7c",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSyncTransportTest.kt": "4190ebc8fbba79c34f23ef1d38d398d94d07dc8d0acbed805d58d849ec9ae526",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewaySyncController.kt": "aa5073d717fd0e0103f39d43fe4062b3d6c00609eb9dc74939b846bbeb64c881",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSync.kt": "f7f0e6132af41a00ff55dfbe82c8a1287a7d94c84cab4f87ef67fa50192f5bd8",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixSyncRepository.kt": "0f2513545c12f77a0f34abdd99c05fa9add6509dec74d847ef5c64612ab59806"
+  },
+  "remaining": [
+    "Actual pinned Android/web SDK through HRIS; discovery, room join/history/encrypted send routes",
+    "Servlet disconnect observation is bounded by deadlines, not proven immediate cancellation",
+    "Large-scope/5000-user concurrency and provider restore recovery acceptance",
+    "Client scope-reset ingestion, pagination ownership and durable outbox/deduplication",
+    "Typing/receipts, backup/verification, deletions and remaining chat/call/meeting/UI scope"
+  ]
+}

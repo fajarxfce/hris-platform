@@ -645,7 +645,7 @@ class NativeCollaborationMatrixConfigurationTest : NativeCollaborationApiFixture
             listOf(
                 "/_matrix/client/v3/login",
                 "/_matrix/client/v3/logout",
-                "/_matrix/client/v3/sync",
+                "/_matrix/client/unstable/org.matrix.simplified_msc3575/sync",
                 "/_matrix/federation/v1/version",
                 "/_synapse/admin/v2/users",
                 "/_matrix/client/v3/refresh",

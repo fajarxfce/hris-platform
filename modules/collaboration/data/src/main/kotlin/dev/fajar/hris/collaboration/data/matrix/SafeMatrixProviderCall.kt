@@ -6,6 +6,7 @@ import java.util.concurrent.CancellationException
 import java.util.concurrent.CompletionException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeoutException
+import org.slf4j.LoggerFactory
 
 class MatrixDeadlineException : RuntimeException("Matrix login observation expired")
 
@@ -53,7 +54,19 @@ fun <T> safeMatrixProviderCall(operation: () -> T): Result<T> =
                 is IOException,
                 is TimeoutException ->
                     Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable")
-                else -> Failure(FailureKind.UNEXPECTED, "collaboration_provider_failed")
+                else -> {
+                    LoggerFactory.getLogger("dev.fajar.hris.collaboration.matrix")
+                        .warn(
+                            "Matrix operation failed category={} frames={}",
+                            cause.javaClass.name,
+                            cause.stackTrace
+                                .asSequence()
+                                .filter { it.className.startsWith("dev.fajar.hris.") }
+                                .take(8)
+                                .joinToString(" | "),
+                        )
+                    Failure(FailureKind.UNEXPECTED, "collaboration_provider_failed")
+                }
             }
         )
     }

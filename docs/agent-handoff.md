@@ -17,6 +17,28 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Native `GET /_matrix/client/v3/sync` now has current admission and immutable
+  DIRECT scope fences, owner-bound encrypted positions, initial reacquisition on
+  scope growth and fixed own-user provider filters. Every room bucket is filtered
+  in HRIS; actual immutable creation metadata is hydrated only when absent from
+  state/timeline. Separate finite long-poll slots do not consume control capacity.
+  [Contract](collaboration/sync-gateway.md) and
+  [evidence](measurements/collaboration-sync-gateway-2026-10-31.json) retain exact
+  bounds, failures/corrections and source hashes. Full 352s coverage plus the 34s
+  test-only correction passes 34 domain, 181 data, 157 selected API and 112 worker
+  cases (one existing opt-in skip), format/architecture and both DI contexts.
+  The full run's two obsolete assertions are retained honestly: sync is now an
+  authenticated route; actual creation may be in state or timeline. Cursor survival
+  after ordinary gateway refresh and immutable-only hydration were added.
+  Pinned Synapse and actual HRIS-to-provider sync pass; this is not native SDK/UI,
+  capacity or durable outbox acceptance. **Continue with fixed SDK discovery,
+  room join/history/encrypted send, then actual HRIS SDK integration and outbox.**
+  Browser/native client filters, immediate servlet-disconnect observation, scoped
+  pagination and provider rollback recovery remain explicit gates. No migration
+  or live/phone update occurred. Scope proof `54a3c974` CI `41220888684` and cursor
+  foundation `2c63c5bf` CI `41221573663` both passed all jobs/steps; exact source
+  hashes and terminal metadata are retained in their measurements.
+
 - Native DIRECT sync foundations now include one bounded forced-RLS room projection
   and an AES-GCM cursor bound to company/account/device/Matrix server. Peer
   offboarding does not delete retained history. Scope growth changes its digest;

@@ -134,6 +134,81 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
     }
 
+    private fun sync(
+        n: Native,
+        token: String? = null,
+        suffix: String = "",
+        duplicate: Boolean = false,
+        body: String? = null,
+    ): HttpResponse<String> {
+        val builder =
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/sync$suffix"))
+                .timeout(Duration.ofSeconds(15))
+        token?.let { builder.header("Authorization", "Bearer $it") }
+        if (duplicate) builder.header("Authorization", "Bearer duplicate")
+        if (body == null) builder.GET()
+        else builder.method("GET", HttpRequest.BodyPublishers.ofString(body))
+        return n.fixture.browser.send(builder.build(), HttpResponse.BodyHandlers.ofString())
+    }
+
+    @Test
+    fun syncReturnsOnlyEncryptedPositionAndWithholdsProviderSuccessAfterRevocation() {
+        val n = native()
+        val (_, token) = enroll(n)
+        val response = sync(n, token, "?timeout=0")
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        val cursor = json.readTree(response.body()).path("next_batch").asString()
+        assertFalse(cursor.contains("fixture-private-since"))
+        val repeated =
+            sync(
+                n,
+                token,
+                "?since=" +
+                    java.net.URLEncoder.encode(cursor, java.nio.charset.StandardCharsets.UTF_8),
+            )
+        assertEquals(200, repeated.statusCode(), repeated.body())
+        provider.onSync.set {
+            database()
+                .update(
+                    "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                    n.fixture.company,
+                    n.fixture.account,
+                )
+        }
+        val denied = sync(n, token)
+        assertEquals(403, denied.statusCode(), denied.body())
+        assertFalse(denied.body().contains("next_batch"))
+    }
+
+    @Test
+    fun syncRejectsAmbiguousQueryCookieNativeAndBodyCredentialsBeforeProviderAccess() {
+        val n = native()
+        val (_, token) = enroll(n)
+        val calls = provider.syncs.get()
+        for (result in
+            listOf(sync(n), sync(n, n.access), sync(n, token, duplicate = true))) assertEquals(
+            401,
+            result.statusCode(),
+            result.body(),
+        )
+        for (suffix in
+            listOf(
+                "?access_token=fixture",
+                "?since=a&since=b",
+                "?timeout=-1",
+                "?timeout=30001",
+                "?full_state=yes",
+                "?filter=foreign-filter",
+                "?set_presence=unknown",
+            )) {
+            val result = sync(n, token, suffix)
+            assertEquals(400, result.statusCode(), result.body())
+        }
+        assertEquals(400, sync(n, token, body = "{}").statusCode())
+        assertEquals(calls, provider.syncs.get())
+    }
+
     @Test
     fun identityUsesOnlyGatewayAuthorityAndReturnsValidatedPublicMetadata() {
         val n = native()
@@ -789,6 +864,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         private val keyIds = ConcurrentHashMap<Pair<String, String>, MutableSet<String>>()
         val logins = AtomicInteger()
         val queries = AtomicInteger()
+        val syncs = AtomicInteger()
+        val onSync = AtomicReference<(() -> Unit)?>(null)
         val onQuery = AtomicReference<(() -> Unit)?>(null)
         private val credentials = ConcurrentHashMap<String, Map<String, Any>>()
         private val executor = Executors.newFixedThreadPool(2)
@@ -947,7 +1024,43 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                             .removePrefix("Bearer ")]
                                 )
                             }
-                            else -> error("Unexpected fixed provider route")
+                            "/_matrix/client/v3/sync" -> {
+                                assertNotNull(
+                                    credentials[
+                                        request.requestHeaders
+                                            .getFirst("Authorization")
+                                            .removePrefix("Bearer ")]
+                                )
+                                syncs.incrementAndGet()
+                                onSync.getAndSet(null)?.invoke()
+                                mapOf(
+                                    "next_batch" to "fixture-private-since",
+                                    "rooms" to emptyMap<String, Any>(),
+                                )
+                            }
+                            else -> {
+                                if (
+                                    request.requestURI.path.startsWith(
+                                        "/_matrix/client/v3/user/"
+                                    ) && request.requestURI.path.endsWith("/filter")
+                                ) {
+                                    val identity =
+                                        requireNotNull(
+                                            credentials[
+                                                request.requestHeaders
+                                                    .getFirst("Authorization")
+                                                    .removePrefix("Bearer ")]
+                                        )
+                                    assertEquals(
+                                        "/_matrix/client/v3/user/${identity["user_id"]}/filter",
+                                        request.requestURI.path,
+                                    )
+                                    val filter =
+                                        parser.readTree(request.requestBody.readNBytes(65537))
+                                    assertFalse(filter.path("room").has("rooms"))
+                                    mapOf("filter_id" to "0")
+                                } else error("Unexpected fixed provider route")
+                            }
                         }
                     val bytes = parser.writeValueAsBytes(response)
                     request.responseHeaders.add("Content-Type", "application/json")

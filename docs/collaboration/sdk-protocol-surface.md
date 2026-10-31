@@ -18,8 +18,10 @@ SyncService. The combined run made eighteen POST requests to SlidingSyncRestServ
 the browser baseline made none. Pinned Synapse describes this as MSC4186 Simplified
 Sliding Sync, historically derived from MSC3575. Do not implement only classic
 GET sync and assume the existing native fixture will work through that gateway.
-The pinned Kotlin binding also exposes syncV2/syncOnceV2; those alternatives are
-not exercised by the current fixture and must not inherit its acceptance.
+The later [dual-mode experiment](sync-mode.md) separately exercised the pinned
+Kotlin syncV2 binding and selected classic sync for the first HRIS transport. The
+[admitted classic gateway](sync-gateway.md) now has provider/HTTP evidence; actual
+SDK integration through HRIS still needs the remaining fixed protocol routes.
 
 | Observed operations | Integration implication |
 | --- | --- |

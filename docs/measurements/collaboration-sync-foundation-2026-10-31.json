@@ -51,5 +51,221 @@
     "Admitted public sync, separately owned long polling and provider filtering/hydration",
     "Actual native SDK through HRIS and durable offline outbox",
     "Large-scope/capacity and provider restoration recovery acceptance"
-  ]
+  ],
+  "hosted": {
+    "runId": 41221573663,
+    "headSha": "2c63c5bf5a4058818914fbfb48f0bbe47ca1a43a",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41221573663",
+    "status": "completed",
+    "conclusion": "success",
+    "sourceHashesVerified": 11,
+    "jobs": [
+      {
+        "completedAt": "2026-10-31T17:03:34Z",
+        "conclusion": "success",
+        "databaseId": 124597045402,
+        "name": "authority-and-storage",
+        "startedAt": "2026-10-31T16:50:07Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-31T16:50:10Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-31T16:50:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:13Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-31T16:50:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:13Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-java@v4",
+            "number": 3,
+            "startedAt": "2026-10-31T16:50:13Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:16Z",
+            "conclusion": "success",
+            "name": "Run gradle/actions/setup-gradle@v4",
+            "number": 4,
+            "startedAt": "2026-10-31T16:50:13Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:19Z",
+            "conclusion": "success",
+            "name": "Check boundaries and recovery schema gate",
+            "number": 5,
+            "startedAt": "2026-10-31T16:50:16Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:58:05Z",
+            "conclusion": "success",
+            "name": "Verify policies, actual PostgreSQL isolation and backup recovery",
+            "number": 6,
+            "startedAt": "2026-10-31T16:50:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T17:03:30Z",
+            "conclusion": "success",
+            "name": "Verify API contracts, native transport and shared worker context",
+            "number": 7,
+            "startedAt": "2026-10-31T16:58:05Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T17:03:31Z",
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 8,
+            "startedAt": "2026-10-31T17:03:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T17:03:31Z",
+            "conclusion": "success",
+            "name": "Post Run gradle/actions/setup-gradle@v4",
+            "number": 14,
+            "startedAt": "2026-10-31T17:03:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T17:03:32Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-java@v4",
+            "number": 15,
+            "startedAt": "2026-10-31T17:03:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T17:03:32Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "startedAt": "2026-10-31T17:03:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T17:03:32Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "startedAt": "2026-10-31T17:03:32Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41221573663/job/124597045402"
+      },
+      {
+        "completedAt": "2026-10-31T16:51:12Z",
+        "conclusion": "success",
+        "databaseId": 124597045613,
+        "name": "company-settings",
+        "startedAt": "2026-10-31T16:50:07Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-31T16:50:08Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-31T16:50:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:10Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-31T16:50:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:12Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-node@v4",
+            "number": 3,
+            "startedAt": "2026-10-31T16:50:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:26Z",
+            "conclusion": "success",
+            "name": "Run npm ci --ignore-scripts --no-audit --no-fund",
+            "number": 4,
+            "startedAt": "2026-10-31T16:50:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:30Z",
+            "conclusion": "success",
+            "name": "Run npx tsc --noEmit",
+            "number": 5,
+            "startedAt": "2026-10-31T16:50:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:36Z",
+            "conclusion": "success",
+            "name": "Run npx vitest run src/features/administration src/features/jobs",
+            "number": 6,
+            "startedAt": "2026-10-31T16:50:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:50:52Z",
+            "conclusion": "success",
+            "name": "Run npx playwright install --with-deps chromium",
+            "number": 7,
+            "startedAt": "2026-10-31T16:50:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:51:10Z",
+            "conclusion": "success",
+            "name": "Run npx playwright test tests/client-policy.spec.ts tests/client-policy-editor.spec.ts",
+            "number": 8,
+            "startedAt": "2026-10-31T16:50:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:51:10Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@v4",
+            "number": 15,
+            "startedAt": "2026-10-31T16:51:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:51:10Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 16,
+            "startedAt": "2026-10-31T16:51:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-31T16:51:11Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "startedAt": "2026-10-31T16:51:10Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41221573663/job/124597045613"
+      }
+    ]
+  }
 }

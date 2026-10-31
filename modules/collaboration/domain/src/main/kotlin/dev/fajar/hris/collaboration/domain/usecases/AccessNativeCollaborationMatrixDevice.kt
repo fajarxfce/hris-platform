@@ -25,6 +25,9 @@ class AccessNativeCollaborationMatrixDevice(
     private val providerToDevice: CollaborationMatrixToDeviceRepository,
     private val recipients: CollaborationRecipientRepository,
     private val conversations: CollaborationDirectRepository,
+    private val roomScopes: CollaborationRoomScopeRepository,
+    private val syncCursors: CollaborationSyncCursorRepository,
+    private val providerSync: CollaborationMatrixSyncRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -37,6 +40,104 @@ class AccessNativeCollaborationMatrixDevice(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
+    fun sync(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationSyncRequest,
+    ): Result<CollaborationSyncResult> {
+        if (
+            request.timeoutMillis !in 0..30_000 ||
+                request.since?.let {
+                    it.length !in 1..4096 || it.any { char -> char.code !in 33..126 }
+                } == true
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_sync_request")
+            )
+        return admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ ->
+                readRoomScope(initial).flatMap { rooms ->
+                    val owner = syncOwner(initial)
+                    val opened =
+                        request.since?.let { syncCursors.open(owner, it) } ?: Result.Success(null)
+                    opened.map { position ->
+                        SyncPreparation(
+                            owner,
+                            rooms,
+                            position?.takeIf { it.scopeDigest == rooms.digest },
+                        )
+                    }
+                }
+            },
+            revalidate = { initial, prepared ->
+                readRoomScope(initial).flatMap { current ->
+                    if (current == prepared.rooms) Result.Success(Unit)
+                    else
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "collaboration_sync_scope_changed")
+                        )
+                }
+            },
+        ) { exchange, prepared ->
+            exchange
+                .exchange { bearer, deadline ->
+                    providerSync.sync(
+                        prepared.owner,
+                        prepared.rooms,
+                        prepared.position,
+                        request.timeoutMillis,
+                        request.fullState,
+                        bearer,
+                        deadline,
+                    )
+                }
+                .flatMap { batch ->
+                    val sealed =
+                        syncCursors.seal(
+                            prepared.owner,
+                            CollaborationSyncPosition(
+                                prepared.rooms.digest,
+                                batch.providerSince,
+                                batch.providerFilterId,
+                            ),
+                        )
+                    exchange.confirm().flatMap {
+                        sealed.map { CollaborationSyncResult(it, batch.payload) }
+                    }
+                }
+        }
+    }
+
+    private fun syncOwner(session: CollaborationGatewaySession) =
+        CollaborationSyncOwner(
+            session.companyId,
+            session.accountId,
+            session.deviceId,
+            provider.serverName,
+        )
+
+    private fun readRoomScope(
+        session: CollaborationGatewaySession
+    ): Result<CollaborationRoomScope> =
+        roomScopes
+            .owned(session.companyId, session.accountId, COLLABORATION_SYNC_ROOM_LIMIT + 1)
+            .flatMap {
+                snapshotCollaborationRoomScope(
+                    session.companyId,
+                    session.accountId,
+                    provider.serverName,
+                    it,
+                )
+            }
+
+    private data class SyncPreparation(
+        val owner: CollaborationSyncOwner,
+        val rooms: CollaborationRoomScope,
+        val position: CollaborationSyncPosition?,
+    )
+
     fun sendToDevice(
         token: String,
         correlationId: UUID,

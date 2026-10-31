@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "acceptedOn": "2026-10-31",
+  "status": "in_progress",
+  "complete": false,
+  "featureCatalog": "prd.md",
+  "architecture": "architecture.md",
+  "threatModel": "threat-model.md",
+  "phases": [
+    {
+      "id": "P0",
+      "name": "Provider, protocol and native feasibility",
+      "status": "in_progress",
+      "evidence": []
+    },
+    {
+      "id": "P1",
+      "name": "Durable encrypted chat",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P2",
+      "name": "Rich messaging and HRIS context",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P3",
+      "name": "Encrypted backup and recovery",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P4",
+      "name": "Native voice and video",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P5",
+      "name": "Core meetings and admission",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P6",
+      "name": "Meeting collaboration",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P7",
+      "name": "Recording, caption and AI",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "P8",
+      "name": "Capacity, recovery and rollout",
+      "status": "planned",
+      "evidence": []
+    }
+  ],
+  "features": [
+    {
+      "id": "CHAT-01",
+      "requiredBehavior": "Company-scoped employee DM from directory, profile, search and work context; active HRIS identity and admission.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-02",
+      "requiredBehavior": "Groups: name, avatar, description, members, admins, invitations, leave, invitation policy and membership history.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-03",
+      "requiredBehavior": "Multiline text, basic formatting, emoji, mentions, links, quoted replies and reactions; safe data rendering.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-04",
+      "requiredBehavior": "Owned offline history, drafts, durable message/attachment queue, cancel pending, bounded retry and recovery after process/device restart.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-05",
+      "requiredBehavior": "Pending, sending, server-accepted, device-delivered, read and failed; delivery acknowledgement follows recipient durable storage.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-06",
+      "requiredBehavior": "Edit with indicator, forward one/multiple messages, attachment captions and forwarded indicator; retry deduplication.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-07",
+      "requiredBehavior": "Delete for me across owned devices; delete for everyone through redaction, sync and restore reconciliation.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-08",
+      "requiredBehavior": "Multiple photos, videos and documents, quality selection, preview, captions, per-file progress/cancel/retry and network-specific downloads.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-09",
+      "requiredBehavior": "Voice-note record/lock/pause/resume/discard/preview, waveform, seek, 1/1.5/2x playback and audio focus.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-10",
+      "requiredBehavior": "Static/animated stickers, licensed bundled packs, import, favorites, recents and bounded decoding.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-11",
+      "requiredBehavior": "Local message/media search, unread filter, pin/archive/mute, draft indicators, jump to message, read-receipt/presence preferences.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-12",
+      "requiredBehavior": "Verified device list, QR/security-code verification, new-device notice, revoke, history/read-state sync and key recovery.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-13",
+      "requiredBehavior": "Per-conversation notifications, native inline reply, mark read/mute, locked-screen privacy and precise deep links.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-14",
+      "requiredBehavior": "Manual/scheduled encrypted backups, optional videos, progress/size, cloud account choice, recovery key, restore and device transfer.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "CHAT-15",
+      "requiredBehavior": "DM claim card and dedicated claim room, live resource authorization, approver replacement, selected E2EE history handover and extensible context types.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-01",
+      "requiredBehavior": "Start one-to-one calls from chat, profile, call history or callback notification.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-02",
+      "requiredBehavior": "Group calls, selected invitees, additional invites, join ongoing and rejoin after interruption.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-03",
+      "requiredBehavior": "Incoming calls in foreground/background/locked/system-terminated states, subject to OS admission.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-04",
+      "requiredBehavior": "Answer, decline, cancel, hang up, callback; distinct missed/busy/declined/unavailable/failed outcomes.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-05",
+      "requiredBehavior": "Ring admitted devices; exactly one winning acceptance for a recipient; stop other devices.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-06",
+      "requiredBehavior": "Mute, speaker/earpiece, wired/Bluetooth routing, route changes, proximity and system audio focus.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-07",
+      "requiredBehavior": "Waiting-call reject or end-and-answer, with Telecom/CallKit cellular interruption integration.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-08",
+      "requiredBehavior": "Cross-device history: direction, participants, times, connected duration and termination reason.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-09",
+      "requiredBehavior": "Wi-Fi/mobile handover, reconnect, network quality, adaptive bitrate and data-saving mode.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-10",
+      "requiredBehavior": "Persistent in-app call controls across HRIS navigation plus system mute/hang-up controls.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VOICE-11",
+      "requiredBehavior": "E2EE, participant identity/change visibility, key rotation, block/report and DND/Focus respect.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-01",
+      "requiredBehavior": "Start video or request upgrade from voice; recipient consent and camera permission.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-02",
+      "requiredBehavior": "Front/back and web camera selection, on/off, self preview/mirroring and orientation.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-03",
+      "requiredBehavior": "One-to-one/group grid, active speaker, pinning, movable self preview and camera-off states.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-04",
+      "requiredBehavior": "Native PiP and in-app minimized call without creating another media connection.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-05",
+      "requiredBehavior": "Screen capture and supported system audio; web screen/window/tab and native capture permission.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-06",
+      "requiredBehavior": "Adaptive resolution, simulcast, bandwidth degradation and retained audio when video stops.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-07",
+      "requiredBehavior": "Device-processed background/blur, framing and lightweight effects with capability limits.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "VIDEO-08",
+      "requiredBehavior": "E2EE, consistent media/capture indicators and OS-compliant background capture.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-01",
+      "requiredBehavior": "Instant/scheduled/recurring meetings, title/description/host, timezone, join code/link, reschedule/cancel/remind.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-02",
+      "requiredBehavior": "HRIS meeting calendar, ICS, opt-in Google/Outlook integration for app-created/linked events.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-03",
+      "requiredBehavior": "Pre-join camera/microphone/speaker selection/test, guest name, connectivity check and initial media selection.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-04",
+      "requiredBehavior": "Knock/waiting room, admit/reject, lock, invitation limits and removed-guest handling.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-05",
+      "requiredBehavior": "Host/co-host/presenter/participant/viewer, 500 interactive plus 500 viewer capacity, atomic seat/role admission.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-06",
+      "requiredBehavior": "Host mute, restrictions on unmute/camera/share/chat, removal, co-host/host transfer, leave/end for all; no forced microphone activation.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-07",
+      "requiredBehavior": "Grid, spotlight, active speaker, pin, fullscreen, speaker plus presentation, participant/chat sidebars and adaptive mobile layout.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-08",
+      "requiredBehavior": "Raised-hand queue, reactions, speaking indicators and speaking-while-muted notice.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-09",
+      "requiredBehavior": "Screen/window/tab and supported audio sharing, presenter changes, pointer, annotation and presentation permissions.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-10",
+      "requiredBehavior": "E2EE meeting chat/replies/mentions/files, moderation, post-meeting access; guests have no employee directory/company chat access.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-11",
+      "requiredBehavior": "Manual/automatic breakout assignment, transfers, timer, host broadcast/help request and return to main room.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-12",
+      "requiredBehavior": "Scheduled/live polls, anonymous option, votes, moderated Q&A, answered marker and results export.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-13",
+      "requiredBehavior": "Collaborative whiteboard shapes/text/sticky notes/pointer, undo/redo, snapshots and exports.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-14",
+      "requiredBehavior": "Authorized recording start/stop, visible consent/indicator, async processing/playback/download and partial/failed outcomes.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-15",
+      "requiredBehavior": "Indonesian/English captions/transcripts, speaker identity, timestamps, corrections, search and export.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-16",
+      "requiredBehavior": "ID/EN caption translation, grounded summaries/decisions/action items/catch-up/Q&A; timestamp sources and draft publishing.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-17",
+      "requiredBehavior": "Attendance join/leave/rejoin/duration/roles and authorized meeting artifacts/results page.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-18",
+      "requiredBehavior": "Companion device for chat/polls/presentation with audio disabled to prevent echo and capacity accounting.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-19",
+      "requiredBehavior": "Keyboard, screen readers, captions, labels/touch targets, themes, reduced motion and text scaling.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "MEET-20",
+      "requiredBehavior": "Reconnect/network change/host recovery, recorder/AI failures and full rooms without displacing existing attendees.",
+      "status": "planned",
+      "evidence": []
+    }
+  ],
+  "acceptanceBoundaries": {
+    "physicalIphoneTesting": "waived; actual PushKit/CallKit acceptance must remain unverified until exercised",
+    "largeMeetingCapacity": "requires separate provisioned load environment; no capacity claim from development host",
+    "providerProofIsProductAcceptance": false
+  },
+  "next": [
+    "Create a bounded isolated Matrix/LiveKit provider lab with fictional users and owned cleanup.",
+    "Prove client E2EE and recovery using actual service transports before product UI integration.",
+    "Add collaboration admission/device/control contracts and test their failure boundaries."
+  ]
+}

@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Active collaboration implementation — 31 October 2026
+
+The user approved [the full collaboration plan](collaboration/prd.md) and requested
+implementation. Branch `feat/communications` starts from `1363abee`. The new
+54-group scope is separate from the completed original HRIS audit below.
+[Delivery](collaboration/delivery.json) is authoritative for its phases and
+evidence; no chat/call/meeting group has been accepted yet. Read the
+[architecture](collaboration/architecture.md) and
+[threat model](collaboration/threat-model.md) before implementation.
+
+Continue through P0 provider/native protocol proof, then all P1–P8 gates. Use
+isolated fictional provider fixtures. Preserve the running schema-103 HRIS stack,
+real Firebase identity, and installed Mobile build 4. Public domains, Apple VoIP
+credentials and dedicated capacity/GPU resources are future deployment inputs,
+not blockers for local implementation. Keep any unperformed native/capacity
+acceptance explicitly unverified. Commit and push each atomic increment; update
+this handoff and the delivery ledger. Mobile proves generic code before Starter.
+
+The paragraphs below are retained prior-work history. Their old installed build
+2 reference is superseded by Mobile's validated release build 4; consult Mobile's
+current handoff for its artifact/source and future versionCode >= 5.
+
 Updated 31 October 2026 (UTC). The user requested verification and completion of
 all specified features, with every atomic commit pushed and handoffs retained in
 Git. The full audit is complete after implementing the discovered gaps and validating every reviewed area.

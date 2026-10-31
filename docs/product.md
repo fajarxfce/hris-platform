@@ -8,6 +8,7 @@ Support office schedules, rotating/overnight shifts, remote work, and field assi
 
 ## Modules
 
+- [Collaboration: encrypted chat, calls and meetings](collaboration/prd.md) — new accepted implementation scope; [delivery](collaboration/delivery.json).
 - [Identity and access](modules/identity.md)
 - [Organization and people](modules/people.md)
 - [Workforce](modules/workforce.md)

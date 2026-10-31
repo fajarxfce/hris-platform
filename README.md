@@ -25,6 +25,7 @@ The dashboard requires Node.js 24 or newer. From `apps/dashboard`, run `npm ci`,
 
 ## Documentation
 
+- [Collaboration implementation: chat, calls and meetings](docs/collaboration/prd.md)
 - [Product and module specification](docs/product.md)
 - [Architecture and ownership](docs/architecture.md)
 - [SSO configuration](docs/sso.md)

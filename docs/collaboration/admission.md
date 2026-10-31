@@ -126,3 +126,30 @@ and Compose configuration pass. [HTTP evidence](../measurements/collaboration-na
 retains the initial fixture permission, Jackson-array mapping and HTTP-status
 expectation failures; production permission checks and 422 validation status were
 preserved. No live stack or phone was changed.
+
+## Internal Matrix credential storage
+
+Schema 106 and `EncryptedCollaborationProviderSessionRepository` retain internal
+Matrix credentials using the existing AES-256-GCM identity keyring. Persisted AAD
+is `hris:matrix:{company}:{account}:{device}:{generation}`. SQL fixes the Matrix
+user namespace to the company/account and the Matrix device ID to its HRIS device.
+These are provider access tokens; this table contains no participant E2EE keys.
+The domain value redacts its string representation. Public controllers never
+return this internal value.
+
+Credential rotation uses an observed generation. A revoked device's secret may
+be cleared while retaining its terminal generation and provider identity; deletion
+and reactivation are forbidden, preventing delayed cleanup from acting on a new
+generation zero. The final device/credential revision is reserved for irreversible
+revocation/retirement. Callers must lock account/device before credential rows and
+own the current policy and transaction. The repository itself grants no access.
+
+Six PostgreSQL scenarios cover concurrent rotation, identity/generation tampering,
+rollback, retirement and revision exhaustion. Actual `pg_dump`/`pg_restore` retains
+both old-key and current-key envelopes, and the complete restored Matrix envelope
+projection decrypts using the retained keyring. Recovery query selection preserves
+older schemas without the new table; 22 recovery-tool cases pass. All 29 database
+cases, eleven registration/registry regressions, eleven admission cases, formatting
+and architecture also pass. [Storage evidence](../measurements/collaboration-provider-storage-2026-10-31.json)
+records these boundaries. The store is not wired to provider I/O/provisioning yet;
+registration remains pending. No provider credential or live runtime was changed.

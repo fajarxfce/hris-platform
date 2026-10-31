@@ -137,6 +137,25 @@ HTTP/worker control workflow after this push. Runtime schema 103 and phone build
 remain unchanged. Continue with provisioning/credentials/broker, not another
 round of already-passing registration checks unless subsequent changes need it.
 
+Schema 106 adds encrypted internal Matrix credential storage, with exact
+company/account/device/generation AAD and deterministic provider identities.
+Generation-checked rotations cannot race past one another. Revocation clears
+secrets while retaining the terminal generation; the final revision is reserved
+for revocation/retirement. Six real PostgreSQL scenarios pass, including complete
+restored old/current-key envelope verification, corruption, rollback, concurrency
+and the revision boundary. All 29 core database, eleven registration/registry,
+eleven admission and 22 recovery-tool cases pass. See [storage evidence](measurements/collaboration-provider-storage-2026-10-31.json).
+Recovery ceiling 106 uses schema-sensitive SQL so current schema-103 backups do
+not query a nonexistent provider table. No new store bean/provisioner is wired yet;
+API/worker context evidence still refers to the registration graph above.
+
+Next: bounded Matrix JWT login/transport, durable provisioning/reconciliation,
+protected gateway and native/browser client admission. Provider credentials are
+internal only. Gateway requests must recheck current HRIS authority; no public
+Synapse path may bypass it. Native SDK token replacement/refresh behavior still
+needs a protocol proof before choosing its gateway token lifecycle. MatrixRTC,
+Apple provider interoperability, native media and all product P0–P8 gates remain.
+
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's
 current handoff for its artifact/source and future versionCode >= 5.

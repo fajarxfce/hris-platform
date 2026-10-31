@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration_provider_credential_storage",
+  "schema": 106,
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "providerIOPerformed": false,
+  "checks": {
+    "providerCredentialScenarios": 6,
+    "providerCredentialElapsedSeconds": 46,
+    "databaseScenarios": 29,
+    "registrationRegressionScenarios": 11,
+    "admissionPolicyScenarios": 11,
+    "recoveryToolScenarios": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "actualPostgresDumpRestore": true,
+    "fullRestoredMatrixEnvelopeProjectionVerified": true,
+    "oldAndCurrentEncryptionKeys": true,
+    "architecture": true,
+    "format": true
+  },
+  "verifiedBehaviors": [
+    "company/account/device/generation authenticated encryption and scoped row access",
+    "concurrent rotations commit exactly one generation",
+    "ciphertext substitution across identity and generation fails authentication",
+    "failed business transaction retains prior encrypted credential",
+    "revocation permits irreversible secret retirement without deleting its generation",
+    "revision limits reserve a terminal revocation and credential-retirement generation",
+    "schema-sensitive recovery queries preserve support for schemas 59 through 105 without the new table"
+  ],
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V106__collaboration_provider_credentials.sql": "7bf2ff02c8999364658edd18df7e539d8f3423cc4eef9fad06fceb56e9dd3695",
+    "modules/collaboration/data/build.gradle.kts": "d4a0f50367aff02b6361996f016825f09764ab473c7067898a754689d1022088",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/crypto/CollaborationProviderPurpose.kt": "21c79d939aaa04fc5bd8445630e4d34bfb7589a6564dd3fc0f548ac26e5b81cb",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationProviderSessionDataSource.kt": "5c779bb01a1d46cf03401b6820c6bb132eba0294a60af9f5f6dbe0954f2cafc0",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationProviderSessionDataSource.kt": "dc86ea48fd919df17c3d802a2a1989ed85974e1c1d44898ec7504e021d261136",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/EncryptedCollaborationProviderSessionRepository.kt": "e0165e060eef0fd43730f4dc60feeaa4247acc61897103daa1ae76f2428806bd",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationProviderCredentialTest.kt": "cb50164596583d23992b984adee46349c90e061cc3a21680e703714ea431c71b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationProviderSession.kt": "1e2abf3c0c2c98ca18b32410282135a157750e9e306f906ac4b3bdeca4bf1ce5",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationProviderSessionRepository.kt": "7e382b8783a8355c447765526639ab9ade1181212d422e391b33990474401b60",
+    "tool/recovery_set.py": "20230671c6bf98b38e8cdf2cb99aed6026986907541ee659f29007f059de97b5",
+    "tool/test_recovery_set.py": "66097c0b83999670948afabdcaee62b8df624d534e995363b7841e4f61b0868d"
+  }
+}

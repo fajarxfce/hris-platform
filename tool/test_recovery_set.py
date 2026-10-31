@@ -27,10 +27,22 @@ class RecoverySetTest(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
 
+    def test_envelope_projection_keeps_older_schemas_and_binds_matrix_credentials(self):
+        for schema in (59, 103, 105):
+            sql = recovery.envelope_query(schema)
+            self.assertNotIn("collaboration_provider_sessions", sql)
+            self.assertIn("native_push_registrations", sql)
+        sql = recovery.envelope_query(106)
+        self.assertIn("'hris:matrix:'||company_id||':'||account_id||':'||device_id||':'||generation", sql)
+        self.assertIn("FROM collaboration_provider_sessions WHERE token_encrypted IS NOT NULL", sql)
+        self.assertIn("LIMIT 100001", sql)
+        with self.assertRaises(recovery.RecoveryError):
+            recovery.envelope_query(107)
+
     def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105):
+        for schema in (59, 101, 102, 103, 104, 105, 106):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 106, None, 'invalid'):
+        for schema in (58, 107, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

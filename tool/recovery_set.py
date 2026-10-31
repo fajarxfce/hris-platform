@@ -33,9 +33,10 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # and account RLS for these records.
 # V105 extends only the client-module vocabulary; its migration test restores
 # the function and preserves existing policy revisions through pg_dump/pg_restore.
-MAX_SCHEMA = 105
-ENVELOPES_SQL = """COPY (
-SELECT * FROM (
+# V106 binds internal Matrix token envelopes to company/account/device/generation.
+# Query selection preserves restoration of earlier schemas without the new table.
+MAX_SCHEMA = 106
+BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
  UNION ALL SELECT 'hris:totp:'||account_id, secret_encrypted FROM mfa_enrollments
@@ -47,8 +48,19 @@ SELECT * FROM (
  FROM consumed_refresh_tokens r JOIN native_sessions s ON s.id=r.session_id WHERE r.replay_encrypted IS NOT NULL
  UNION ALL SELECT 'hris:push:'||account_id||':'||session_id||':'||version, token_encrypted
  FROM native_push_registrations WHERE token_encrypted IS NOT NULL
-) envelopes LIMIT 100001
-) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');"""
+"""
+
+
+def envelope_query(schema):
+    validate_schema({"observedSchema": schema})
+    collaboration = ""
+    if int(schema) >= 106:
+        collaboration = """
+ UNION ALL SELECT 'hris:matrix:'||company_id||':'||account_id||':'||device_id||':'||generation, token_encrypted
+ FROM collaboration_provider_sessions WHERE token_encrypted IS NOT NULL
+"""
+    return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
+            ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 
 
 def keyring(active, encoded, *, required):
@@ -208,7 +220,7 @@ def verify_database_keys(directory, keys, log):
             records = temporary / "envelopes.tsv"
             capture_file([
                 "docker", "exec", "--env", "PGOPTIONS=-c statement_timeout=30000 -c lock_timeout=5000",
-                container, "psql", "-X", "-q", "-U", "hris_migrator", "-d", "hris", "-v", "ON_ERROR_STOP=1", "-c", ENVELOPES_SQL,
+                container, "psql", "-X", "-q", "-U", "hris_migrator", "-d", "hris", "-v", "ON_ERROR_STOP=1", "-c", envelope_query(manifest["observedSchema"]),
             ], records, log, limit=512 * 1024 ** 2, timeout=60)
             result = json.loads(database.captured([
                 "java", "-Xmx128m", "-Dloader.main=dev.fajar.hris.recovery.RecoveryKeyVerifier", "-cp", str(jar),

@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Actual native application-worker interoperability — 1 November 2026
+
+Mobile `ccc7c4fc5bd91f2ae99e3133b932dcdfa8f8ecd8` is pushed. The separate Android proof resolves the real shared
+application worker/SyncTask with encrypted Android stores, protected SDK records and real
+HRIS admission. Exact Queued UUID/text survives a confirmed PID death; the second process
+proves the worker restores the closed sender, sends one encrypted event, acquires original
+history and retires completion. The peer decrypts the original body/logical ID. A repeated
+worker pass sends nothing. The new strict trace counter recognizes a conversation-summary
+GET separately; it does not count that read as direct-conversation admission.
+
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/ccc7c4fc5bd91f2ae99e3133b932dcdfa8f8ecd8/docs/collaboration-native-worker.md)
+and [measurement](../docs/measurements/chat-native-worker-2026-11-01.json) retain seven Mobile/four
+Platform source hashes and all attempts. Worker test passes in 70s: two processes, one
+death, one encrypted send, zero early sends/admission failures and cleanup confirmed.
+The prior native sender regression passes in 78s: four processes, three deaths, three
+sends, held room never sent, 22/22/22 admissions, zero failures. Both use proof APK
+`924cdd45` on the dedicated API-35 emulator. All 51 Python driver cases pass; server
+compile, format and architecture pass. Mobile root checks complete with 2,710 desktop
+cases/426 suites, no failures/errors/skips. An initial release packaging failure and
+successful unchanged-code retry are recorded separately. The emulator is stopped.
+
+**Continue actual WorkManager lifecycle evidence now, then all P0–P8.** Direct invocation
+of the actual worker is not proof of Android scheduling/automatic OS startup. Native
+fixture login/workspace inputs are fictional; no live provider/phone/Starter change or
+complete PRD group is accepted. Add both native scenarios to Mobile CI after pinning
+this Platform fixture commit; its pending workflow draft also adds apps.shared triggers
+and safe evidence uploads. Never upload private fixture.json. Continue remote history,
+drafts/cancel, push/replies, media/actions, keys/backups, Apple/web, calls and meetings.
+The user requested phone progress installs during the long run, but WireGuard ADB is
+currently unreachable. Mobile is preparing release build 5 and must install-only when
+connected, preserving signer/data; last confirmed phone build is 4. Keep working and
+push each validated atomic commit.
+
+
 ## Latest-head capacity recovery — 1 November 2026
 
 Mobile `4213d5f5926ae5f299a0fd1969ceb73f181df4c4` is pushed. Capacity recovery without a receipt anchor now

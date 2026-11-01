@@ -25,6 +25,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val heldRoom = AtomicReference<String?>()
     private val heldRoomSends = AtomicInteger()
     private val applicationDeviceReads = AtomicInteger()
+    private val applicationSummaryReads = AtomicInteger()
     private val applicationConversationReads = AtomicInteger()
     private val applicationRoomReads = AtomicInteger()
     private val applicationAdmissionFailures = AtomicInteger()
@@ -58,6 +59,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                     pages.zipWithNext().all { (a, b) -> b.getValue(it) > a.getValue(it) }
             }
     }
+
+    fun applicationSummaryReadCount() = applicationSummaryReads.get()
 
     fun applicationAdmissions() =
         mapOf(
@@ -132,6 +135,9 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
         val counter =
             when {
                 request.requestURI.matches(Regex(root + "native-device")) -> applicationDeviceReads
+                request.requestURI.matches(
+                    Regex(root + "direct-conversations/[0-9a-f-]{36}/summary")
+                ) -> applicationSummaryReads
                 request.requestURI.matches(Regex(root + "direct-conversations/[0-9a-f-]{36}")) ->
                     applicationConversationReads
                 request.requestURI.matches(

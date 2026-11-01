@@ -48,7 +48,8 @@
         "../measurements/collaboration-history-focus-2026-11-01.json",
         "../measurements/collaboration-provider-page-2026-11-01.json",
         "../measurements/collaboration-original-receipts-2026-11-01.json",
-        "../measurements/collaboration-retirement-2026-11-01.json"
+        "../measurements/collaboration-retirement-2026-11-01.json",
+        "../measurements/chat-native-worker-2026-11-01.json"
       ]
     },
     {
@@ -151,7 +152,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/measurements/collaboration-sender-identity-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/measurements/chat-thread-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/measurements/chat-background-delivery-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/4213d5f5926ae5f299a0fd1969ceb73f181df4c4/docs/measurements/chat-history-recovery-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/4213d5f5926ae5f299a0fd1969ceb73f181df4c4/docs/measurements/chat-history-recovery-2026-11-01.json",
+        "../measurements/chat-native-worker-2026-11-01.json"
       ]
     },
     {

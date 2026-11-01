@@ -1,5 +1,24 @@
 # Agent continuation — HRIS workspace
 
+## Later bounded-window native run audited — 1 November 2026
+
+Mobile [run 41335935547](https://github.com/fajarxfce/hris-mobile/actions/runs/41335935547)
+at `f9041e62` / Platform `79326538` passes all SDK/direct/scheduled cases in
+53.186s / 56.09s / 82.571s with proof APK `85583fca`. [Audit](measurements/chat-window-native-ci-2026-11-01.json)
+binds 18 downloaded files and retains the failed bf83 run 41334029287. The direct worker
+completes in one pass, confirms 33 encrypted originals, four history actions, 43 references,
+ten state-only references and 30/28/30 admissions with zero failures. Only the oldest original
+is explicitly checked after Stop. WorkManager ordinary-death recovery remains automatic,
+SUCCEEDED/runAttempt1, with restored network and complete cleanup. SDK isolation and six
+cleanup tests also pass.
+
+This includes the bounded-window source and inactive composer-v1 storage. It does not test
+603 originals on Android or the newer composer UI/v2/automatic draft recovery. The pass does
+not explain the prior exhausted-retry failure; newer native runs retain controlled categories
+and sanitized gateway observations for diagnosis. No Platform production code, schema or
+live deployment changed. Mobile is now running full integration for draft recovery; release 7
+is still installed. Continue the long run and all remaining communication groups.
+
 ## Later native window run retained as failed — 1 November 2026
 
 [Run 41334029287 audit](measurements/chat-window-ci-failure-2026-11-01.json) binds 16 files

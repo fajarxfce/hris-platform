@@ -32,6 +32,21 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val headReads = AtomicInteger()
     private val applicationAtHead = AtomicReference<Map<String, Int>?>(null)
     private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
+    private val providerPages = AtomicInteger()
+    private val positionedPages = AtomicInteger()
+    private val applicationAtProviderPage = AtomicReference<Map<String, Int>?>(null)
+
+    fun admittedProviderPages(): Boolean {
+        val before = applicationAtProviderPage.get() ?: return false
+        val after = applicationAdmissions()
+        return providerPages.get() in 2..3 &&
+            positionedPages.get() == providerPages.get() - 1 &&
+            before.getValue("failures") == 0 &&
+            after.getValue("failures") == 0 &&
+            listOf("device", "conversation", "room").all {
+                before.getValue(it) >= 6 && after.getValue(it) > before.getValue(it)
+            }
+    }
 
     fun applicationAdmissions() =
         mapOf(
@@ -119,6 +134,19 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
         response: HttpServletResponse,
         chain: FilterChain,
     ) {
+        if (
+            request.method == "GET" &&
+                request.requestURI.matches(Regex("/_matrix/client/v3/rooms/[^/]+/messages")) &&
+                request.parameterMap.keys in
+                    listOf(setOf("dir", "limit"), setOf("dir", "limit", "from")) &&
+                request.getParameter("dir") == "b" &&
+                request.getParameter("limit") == "20"
+        ) {
+            providerPages.updateAndGet { minOf(it + 1, 64) }
+            if (request.parameterMap.containsKey("from"))
+                positionedPages.updateAndGet { minOf(it + 1, 64) }
+            applicationAtProviderPage.compareAndSet(null, applicationAdmissions())
+        }
         if (
             request.method == "GET" &&
                 request.requestURI.matches(Regex("/_matrix/client/v3/rooms/[^/]+/messages")) &&

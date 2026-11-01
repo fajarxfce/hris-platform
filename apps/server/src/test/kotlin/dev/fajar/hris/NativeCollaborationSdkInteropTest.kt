@@ -259,6 +259,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "historyBodiesRestored",
                     "commonHistoryAcquisitionOwned",
                     "latestHistoryHeadOwned",
+                    "providerHistoryPageOwned",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -292,6 +293,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             assertTrue(trace.applicationAdmittedBeforeSend())
             assertTrue(trace.applicationAdmittedAroundHistory())
             assertTrue(trace.admittedSingleHeadRead())
+            assertTrue(trace.admittedProviderPages())
             val history = proof.path("historyWindow")
             for ((name, bounds) in
                 mapOf(
@@ -335,6 +337,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "commonHistoryAcquisitionOwned" to true,
                     "latestHistoryHeadOwned" to true,
                     "admittedSingleHeadRead" to true,
+                    "providerHistoryPageOwned" to true,
+                    "admittedProviderPages" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,
                     "applicationAdmittedAroundHistory" to true,

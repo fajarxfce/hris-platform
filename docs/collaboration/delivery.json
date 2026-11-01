@@ -150,7 +150,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/980c7d76ba3d7555d9d584bee47951629ad1eeab/docs/measurements/chat-setup-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/measurements/collaboration-sender-identity-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/measurements/chat-thread-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/measurements/chat-background-delivery-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/measurements/chat-background-delivery-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/4213d5f5926ae5f299a0fd1969ceb73f181df4c4/docs/measurements/chat-history-recovery-2026-11-01.json"
       ]
     },
     {
@@ -562,7 +563,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Application-owned scheduled delivery is validated in Mobile 9bf2c532. Finish latest-head capacity recovery and actual Android worker/WorkManager interoperability; encrypted-store fixture restart does not complete background acceptance.",
+    "Application-owned delivery and latest-head recovery are validated in Mobile 4213d5f5. Prove actual Android worker and WorkManager lifecycle interoperability; simulated-provider container restart does not complete background acceptance.",
     "Complete provider history paging, durable drafts and pending cancellation, groups, rich messages/actions, verification, search and notifications/inline reply; preserve exact sender/content and native transaction evidence.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",

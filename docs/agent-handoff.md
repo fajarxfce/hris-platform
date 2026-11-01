@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Latest-head capacity recovery — 1 November 2026
+
+Mobile `4213d5f5926ae5f299a0fd1969ceb73f181df4c4` is pushed. Capacity recovery without a receipt anchor now
+reads a scoped SDK head, validates owner/device/room/event and re-admits the exact room
+before shutdown/restoration. An absent head changes nothing. The delivery worker can
+recover a lost native ACK plus full history focus without another enqueue/resume;
+initial runtime-opening/close-pending contention backs off. Explicit foreground Refresh
+reopens history and reacquires a child while preserving owned local content. Cancellation
+and changed admission prevent late restore/publication; no enrollment/bootstrap is added.
+
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/4213d5f5926ae5f299a0fd1969ceb73f181df4c4/docs/collaboration-history-recovery.md) and [measurement](https://github.com/fajarxfce/hris-mobile/blob/4213d5f5926ae5f299a0fd1969ceb73f181df4c4/docs/measurements/chat-history-recovery-2026-11-01.json)
+bind nine matching source inputs. Focused checks pass in 169s; full checks in 240s:
+2,710 desktop / 426 suites, 358 domain browser, 58 presentation browser, 170 Android
+host, 14 worker and two binding tests, with zero failures/errors/skips. Relevant Android
+and Wasm builds and quality checks passed; lint has zero errors and one existing warning.
+APK `98cd76d4`, AAR `0bba8390`, proof APK `75a576d1` are built, not installed. Initial
+fixture formatting and successful incremental compiler-cache fallback are recorded.
+No new actual-server/SDK/WorkManager/emulator, Apple runtime, phone/live deployment or
+Starter change. Simulated native/wire integration is not native provider acceptance.
+
+**Continue actual native worker interoperability now, then all P0–P8.** Reuse the actual
+worker with protected Android stores and real HRIS/SDK adapters; prove a queued command
+survives process death before worker execution, exact encrypted delivery, original-history
+recovery and retirement. Preserve earlier provider evidence as separate runs. A direct
+worker proof still requires separate WorkManager lifecycle acceptance. Remote history,
+drafts/cancel, push/inline reply, groups/media/actions, key continuity/backups, Apple/web,
+calls and meetings remain. No full PRD group is accepted. Keep pushing atomic increments.
+
+
 ## Application-owned background chat delivery — 1 November 2026
 
 Mobile `9bf2c5324fa6801dcdb1020f4058dd8164be038c` is pushed. Exact encrypted intent now wakes a singleton

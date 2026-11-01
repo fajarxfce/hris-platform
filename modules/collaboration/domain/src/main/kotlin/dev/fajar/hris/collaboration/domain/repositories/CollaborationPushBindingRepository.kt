@@ -12,7 +12,8 @@ interface CollaborationPushBindingRepository {
     fun find(companyId: UUID, accountId: UUID, deviceId: UUID): Result<CollaborationPushBinding?>
 
     /**
-     * Own auth-lookup transaction; the result only identifies the scope for subsequent admission.
+     * Caller owns a separate auth-lookup transaction; result only identifies subsequent admission
+     * scope.
      */
     fun findKey(key: CollaborationPushKey): Result<CollaborationPushBinding?>
 

@@ -1,0 +1,228 @@
+{
+  "date": "2026-11-01",
+  "base": "08fec5ae342ea11b61d2d7fa93ece515f7691688",
+  "inputs": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "2e9de2f089eb8d0f5b366f9fc2811c72f61db54797aaca7cd5ffff6738b4561c",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationPushBindingRepository.kt": "7a978e14cdf3d14cdcd13ca8277acad5c792ce97b57706dc71243a6e19372750",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationPushReceipt.kt": "fe5ffcfb8a3142d7d1d6467757fa6f24c8a9aff599e971d7321f243346cae145",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/HandleCollaborationPush.kt": "3af6e75a0ee5e4c11d1750b44da0783056cc241a34a4a44263e1292b5de16b63"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 54.46,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*NativeCollaborationRegistrationTest.pushCallback*",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 54,
+  "reports": {
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": {
+      "sha256": "c1d62db6a56f6292e988ed641c91d437edc7dab21b0f52d6a8c7fa3bcc742d35",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.055
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": {
+      "sha256": "f7de95ebfb3fd19330f0e4bfa63b0aefd656c35cf848c7b329500bb27223e872",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.017
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": {
+      "sha256": "82caae1f8735b6388de8f1cf05fdec608a9964f79b449d4fc9f22d74b5b3610b",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": {
+      "sha256": "8c28219f3d72955e0d666a605798b0021720e6c620d7a8ebff279081ee7ff93a",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": {
+      "sha256": "374fb519dd21a4879e357d4dfdaffb156379d6ba6bf315fecedbfe9abbfcfde7",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.005
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": {
+      "sha256": "b902ff158adaf7ae899125416595d92d2c5331cb97f42a9d9c9922f7d9760d25",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.098
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": {
+      "sha256": "525f6da98880597513d018a83022c8c31caffe4ba1a19b32c1c592232eeee0f8",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": {
+      "sha256": "7b53d2ee19f9beacc2253974afe52a625f555b5576744a56eb54884fdbe6eff4",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest.xml": {
+      "sha256": "483b7c3ef1c962fe31879a8dad36bc3736da0cb864543ecd2ad75d40c41d4f7b",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.012
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+      "sha256": "7affe68b270106889ae7fd0cce2174465779e72881ff3abc2443b7767daa3548",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": {
+      "sha256": "08cb6676bdd1f04e2c728c3db237e12941d0030fc96e30586e1030f4e9ff4e16",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.036
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": {
+      "sha256": "090d38da865706ab919cc0bcd27d42c069211385bb139b453f1fb691cf4baf82",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.005
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": {
+      "sha256": "58f1675ab78dd9f2764211a408a17f854e3184591570f105d1f12c9a007fa415",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 18.511
+    }
+  },
+  "earlierRuns": [
+    {
+      "run": 1,
+      "exitCode": 1,
+      "wallSeconds": 43.859,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":modules:collaboration:domain:test",
+        ":modules:collaboration:data:test",
+        "--tests",
+        "*NativeCollaborationRegistrationTest.pushCallback*",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 43,
+      "result": "49 domain pass; nine new SQL cases, eight fail. The new use case omitted the separate lookup transaction, so transaction-local key lookup returned unknown. Fixed by owning a zero-account lookup transaction before current scoped admission, and clarified the repository contract. No RLS relaxation."
+    },
+    {
+      "run": 2,
+      "exitCode": 0,
+      "wallSeconds": 46.539,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":modules:collaboration:domain:test",
+        ":modules:collaboration:data:test",
+        "--tests",
+        "*NativeCollaborationRegistrationTest.pushCallback*",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 46,
+      "result": "49 domain plus nine new SQL cases and format/architecture pass. Final run adds actual credential/device/purged-parent retirement and target-expiry/backwards-clock rollback checks."
+    }
+  ],
+  "proved": [
+    "Current ordered guards and narrow background policy admit expired short access/no-MFA opaque wake while interactive identity still fails.",
+    "Actual immutable DIRECT room projection accepts owned events and suppresses foreign rooms without retiring valid capabilities.",
+    "Temporary registration/permission/account/company/membership loss suppresses; registration re-enable retains original key.",
+    "Unknown, revoked parent, purged parent, revoked device and changed credentials reject only the original key.",
+    "Reserved version-zero identity accepts early callback and remains stable across lost activation response and publication.",
+    "Actual SQL append rolls back on failed Result, interruption, caller deadline, target expiry and backwards clock.",
+    "Four simultaneous duplicate callbacks retain one revision; a partial two-company batch retries without duplicating its already committed head.",
+    "Current permission is rechecked after waiting for the actual membership guard. Malformed/oversized batch and disabled/expired work never acquire a key."
+  ],
+  "limits": [
+    "No private HTTP endpoint, dependency injection, worker FCM delivery, actual Synapse callback or live migration in this commit.",
+    "Ten selected SQL cases run; full NativeCollaborationRegistrationTest suite was not rerun. Domain task was up-to-date in final run, with matching source reports from prior runs.",
+    "Storage uses explicit 24-hour opaque wake lifetime, not a delivery or read receipt.",
+    "Phone release10/c037 remains installed; no Mobile source change."
+  ]
+}

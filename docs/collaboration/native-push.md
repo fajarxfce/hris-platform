@@ -262,3 +262,26 @@ format/architecture pass. Real signed OAuth succeeds after dispatch expiry witho
 starting FCM; a real stalled response body obeys the short dispatch timeout. Final
 integration76s /76.499s wall with nine unchanged inputs reuses focused32s push
 reports. The intermediate incorrect Gradle module path is retained; source unchanged.
+
+## Durable callback admission implemented — 1 November 2026
+
+`HandleCollaborationPush.accept` validates1–32 distinct fixed-format capabilities
+and a maximum30-second caller budget. The use case owns a separate zero-account
+lookup transaction because the raw source installs transaction-local lookup scope.
+It then starts each exact company/account transaction and reacquires policy,
+company, membership, account, native parent, device, gateway and push-binding guards.
+No lookup projection authorizes delivery. Current narrow background policy is
+reused; short access/MFA expiry still denies interactive content separately.
+
+Unknown/permanently retired keys are returned for removal. Temporary authority,
+registration or client unavailability suppresses without deleting a valid key.
+An event requires the actual immutable DIRECT ownership projection. Quiet hints
+need no room. Valid hints append a24h coalesced wake with caller/target deadline and
+clock checks after writes; failed Result/interruption rolls back. Each key commits
+independently, so a failed multi-key request can safely retry its completed prefix.
+This accepts an early version-zero pusher callback before activation publication.
+
+[Evidence](../measurements/chat-push-callback-admission-2026-11-01.json):ten selected
+actual SQL cases plus49 domain policies, format/architecture pass in54s /54.460s
+wall. The first missing lookup transaction and subsequent nine-case pass are
+retained. No private HTTP route, DI, worker send or live provider acceptance yet.

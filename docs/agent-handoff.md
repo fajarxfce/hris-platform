@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Durable callback admission proved — 1 November 2026
+
+[Evidence](measurements/chat-push-callback-admission-2026-11-01.json):
+`HandleCollaborationPush.accept` bounds32 keys/30s and owns separate lookup then
+ordered current-authority transactions. Owned DIRECT events and quiet hints commit
+one24h wake; temporary loss suppresses, permanent retirement/unknown keys reject.
+Each key commits independently; retries preserve earlier committed heads. Late
+caller/target expiry, backwards time, failed Result and interruption roll back.
+Ten actual SQL cases plus49 domain policies and format/architecture pass in54s /
+54.460s wall, four unchanged inputs. Four simultaneous duplicates and a two-company
+partial batch are covered, as is waiting on an actual membership guard.
+
+First43s run exposed a real omission of the separate transaction for transaction-
+local key lookup (eight of nine new SQL cases failed). The use case now owns it;
+RLS stays unchanged and the port comment explicitly states caller ownership.
+Second46s nine-case pass is retained; final adds retirement/expiry branches.
+No DI/private HTTP/worker delivery or live migration. **Continue immediately:**
+private numeric source allowlist, bounded stream and cancellable admission executor,
+actual API/worker contexts, then current-target-fenced FCM worker and Mobile reply.
+Phone stays release10/c037; next validated Mobile product update11+, notify first,
+explicit10.77.77.3:5555 install-only. All54 PRD groups remain unaccepted.
+
 ## Dispatch deadline and offline retention proved — 1 November 2026
 
 [Evidence](measurements/chat-push-dispatch-deadline-2026-11-01.json) / [contract](collaboration/native-push.md):

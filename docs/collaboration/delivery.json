@@ -148,7 +148,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/829b2566065cc78ea289445dc416c692dc63a6e5/docs/measurements/chat-inbox-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/5f03349facc328e1ef1d3071418f472909ad1d20/docs/measurements/chat-participants-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/980c7d76ba3d7555d9d584bee47951629ad1eeab/docs/measurements/chat-setup-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/measurements/collaboration-sender-identity-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/measurements/collaboration-sender-identity-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/measurements/chat-thread-2026-11-01.json"
       ]
     },
     {
@@ -560,10 +561,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "The generic command completion archive now passes Mobile and Starter checks and preserves immutable identity after releasing pending capacity. Integrate HRIS encrypted completion proof, archived lookup/replay and restartable journal cleanup, then Chat UI and all P0\u2013P8.",
-    "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
-    "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
-    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",
-    "Continue P1\u2013P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
+    "Owned text thread and app routes are validated in Mobile b78553c3. Implement platform-scheduled delivery with existing SyncTask/WorkManager and durable command recovery; route-owned foreground sending does not complete offline acceptance.",
+    "Complete provider history paging, durable drafts and pending cancellation, groups, rich messages/actions, verification, search and notifications/inline reply; preserve exact sender/content and native transaction evidence.",
+    "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
+    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2–P8.",
+    "Continue all 54 feature groups. Current component and foreground UI checks do not accept full product features, background operation or capacity."
   ]
 }

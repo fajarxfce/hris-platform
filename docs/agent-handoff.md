@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Owned text thread and app navigation — 1 November 2026
+
+Mobile `b78553c3b7b093e6a106e279ca432a3c02dc8453` is pushed with the company-gated Chat service,
+inbox/participant/setup/thread navigation, owned local history and exact send-intent
+recovery. Projection binds original sender/content and complete native device/transaction
+identity; copied logical IDs cannot merge unrelated messages. Entry retains company
+denials across cancellation and closes late child timelines. A thread owns finite
+foreground staging/delivery and original-history receipt recovery; confirmed-only
+queues do not reopen delivery. Application ownership retains the parent SDK.
+
+[Contract and reviewed fictional screenshots](https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/collaboration-thread.md) and
+[measurement](https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/measurements/chat-thread-2026-11-01.json) bind 30 matching source inputs and
+all six attempts. Focused checks pass in 88s, full checks in 232s: 2,660 desktop /
+421 suites, 332 domain browser, 55 presentation browser, 170 Android host and no
+failures/errors/skips. Android lint has zero errors and one existing warning. APK
+`2339d0a5`, AAR `bfab470b`, proof APK `52633bd5` are built, not installed. No new
+actual-server/emulator/Apple runtime, phone/live deployment or Starter change.
+
+**Continue platform-scheduled delivery immediately, then all P0–P8.** The
+[next implementation](https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/collaboration-delivery-next.md) uses existing SyncTask/WorkManager,
+key-only scheduler payloads and encrypted commands as the work source. Add bounded
+owned work discovery, durable wakeups, worker orchestration and startup/ownership
+recovery, then remove route-owned transport. Local Older covers acquired history only;
+drafts remain volatile. No full PRD group is accepted. Continue the authorized long
+run and push every validated atomic commit.
+
+
 ## Trusted local sender identity — 1 November 2026
 
 Mobile `5c5b2a81395d2b629e62cacfadbb05ef6cafe031` is pushed. The Android adapter reads only the initialized,

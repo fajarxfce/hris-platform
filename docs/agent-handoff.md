@@ -1,5 +1,26 @@
 # Agent continuation — HRIS workspace
 
+## Release 6 prepared and hosted native evidence audited — 1 November 2026
+
+Mobile `97ef0639` records release 6 from product commit `2d6753ee`, ready but **not installed**.
+Use `.work/release-phone-2026-11-01-build6/` in Mobile, including current preflight/install-only
+helpers. APK SHA-256 `63cba8dccec9c50e73b13f39f4645304b98cec7b84d79b8091f5f5e9299d27ba`,
+87,264,632 bytes, arm64, version 1.0.0/code 6. Signer/API/Firebase/VCS/alignment checks pass;
+non-debuggable/non-testOnly; 295s build, zero lint errors/one existing warning. Phone ADB
+still times out; last confirmed installed version is 4. Notify before installation and
+preserve exact signer/data identity. Do not use the older build5 helpers or drive phone UI.
+
+[Hosted native evidence](measurements/chat-native-ci-2026-11-01.json) audits run `41322946959`
+at Mobile `1a114442`/Platform `075e63db`, APK `9a42e773` on API 35. Scheduled/SDK/direct-worker
+cases pass in 70.507/61.405/27.600s: ordinary-death automatic scheduling, sender restoration,
+exact original/completion, one/three/one encrypted sends, no admission failures, complete
+cleanup and restored network settings. Earlier `41319810722` ClosePending failure remains
+recorded; this later pass does not prove it fixed. Foreground paging from `2d6753ee` is not
+part of that hosted proof. Continue native fixture drain/error preservation and foreground
+ViewModel/provider evidence, bounded local browsing, drafts/cancellation and all P0–P8.
+Mobile `.work/native-foreground-next.txt` is design only. No live release or Starter change.
+
+
 ## Bounded foreground remote history — 1 November 2026
 
 Mobile `2d6753ee64f4616adec6ad05783ad2d197a535e9` is pushed. The thread now pages provider

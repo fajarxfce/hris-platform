@@ -146,7 +146,8 @@
         "../measurements/command-archive-2026-11-01.json",
         "../measurements/collaboration-retirement-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/829b2566065cc78ea289445dc416c692dc63a6e5/docs/measurements/chat-inbox-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/5f03349facc328e1ef1d3071418f472909ad1d20/docs/measurements/chat-participants-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/5f03349facc328e1ef1d3071418f472909ad1d20/docs/measurements/chat-participants-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/980c7d76ba3d7555d9d584bee47951629ad1eeab/docs/measurements/chat-setup-2026-11-01.json"
       ]
     },
     {

@@ -1,5 +1,25 @@
 # Agent continuation — HRIS workspace
 
+## Recoverable Chat setup — 1 November 2026
+
+Mobile `980c7d76ba3d7555d9d584bee47951629ad1eeab` adds an owned setup page with explicit activation,
+provisioning wait/retry, retained-operation continuation and readiness. Entry does
+not enroll or bootstrap. Confirmed registration/job receipts reconcile without
+resending; confirmed bootstrap installs the protected runtime and retires control
+before publishing device readiness. Application DI registers inbox, participants
+and setup. [Contract/screenshots](https://github.com/fajarxfce/hris-mobile/blob/980c7d76ba3d7555d9d584bee47951629ad1eeab/docs/collaboration-setup-presentation.md) and
+[measurement](https://github.com/fajarxfce/hris-mobile/blob/980c7d76ba3d7555d9d584bee47951629ad1eeab/docs/measurements/chat-setup-2026-11-01.json) retain all attempts and
+21 matched inputs. Full validation takes 330s: 2,606 desktop, 311 domain browser,
+32 presentation browser, zero failures/errors/skips and zero Android lint errors.
+APK `7d5df852` is built, not installed. No phone/live/Starter change.
+
+Continue trusted local sender identity, thread composition, app navigation and
+owned delivery, then all remaining P0–P8. No full PRD group is accepted. Bootstrap
+build/platform binding, expired issuance, cross-family keys and lost-key recovery
+still need explicit protocol work. Identity caching must not be described as key
+continuity. Keep working and push each validated atomic commit.
+
+
 ## Participant discovery and durable direct opening — 1 November 2026
 
 Mobile `5f03349facc328e1ef1d3071418f472909ad1d20` is pushed with company-admitted participant search,

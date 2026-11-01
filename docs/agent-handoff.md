@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Actual Android WorkManager execution — 1 November 2026
+
+Mobile `6f5ff9223193ca486dd61d0b84d5a16c866b93de` is pushed. The separate normal proof Activity queues while its
+owned emulator is offline; read-only WorkSpec/system-job checks confirm task-key-only
+input, the production SyncWorker and CONNECTED constraint. The Activity is backgrounded,
+its PID is killed without force-stopping the package, and the job is retained. Restored
+connectivity causes OS process startup and actual factory/task execution. The observer
+never calls the worker. Exact original history/completion and one encrypted gateway event
+establish delivery; radio settings and owned package resources are cleaned up.
+
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/6f5ff9223193ca486dd61d0b84d5a16c866b93de/docs/collaboration-workmanager.md)
+and [measurement](measurements/chat-workmanager-2026-11-01.json) bind six Mobile/four Platform
+inputs. Scheduled run passes in 76s (two processes/one ordinary death/one encrypted send,
+zero admission failures). Both previous native scenarios pass in a combined 112s on APK
+`3b5eb0d5`: sender recovery retains four processes/three deaths/three sends and no held-room
+send; the direct worker retains one send/peer decryption. All 62 Python cases pass. Server
+compile/quality: 28s; final Mobile build/lint/quality: 85s; root checks: 57s, 2,710 desktop
+cases/426 suites, zero failures/errors/skips. The first run's fixture namespace timeout is
+retained: WorkManager correctly held the job offline, while the observer queried only the
+default namespace. Namespace-aware correlation/inspection fixed the fixture. Emulator stopped.
+
+**Continue remote older history, durable drafts and safe pending cancellation, then all
+P0–P8.** Deliberate interruption during sending, retry/cancellation races, production login
+recovery, incoming FCM/replies, Apple/web and scale remain separate acceptance. No full PRD
+group, live provider change or Starter port. Pin this fixture commit in Mobile's native CI,
+add the scheduled test and safe stopped/started/radio evidence, and retain both previous
+native tests. Audit hosted artifacts separately. The user still wants phone progress
+installed during the long run: release 5 is prepared, but WireGuard ADB is unavailable and
+the reconnect question is pending. Do not stop implementation; keep pushing atomic commits.
+
+
 ## Actual native application-worker interoperability — 1 November 2026
 
 Mobile `ccc7c4fc5bd91f2ae99e3133b932dcdfa8f8ecd8` is pushed. The separate Android proof resolves the real shared

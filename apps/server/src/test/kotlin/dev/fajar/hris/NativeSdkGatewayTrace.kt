@@ -3,15 +3,18 @@ package dev.fajar.hris
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
+import org.springframework.web.util.UriUtils
 
 /** Bounded, code-only observations: never credentials, IDs, cursor/filter values or bodies. */
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -19,6 +22,16 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val observations = mutableListOf<Map<String, Any>>()
     private val encryptedSendAllowed = AtomicBoolean()
     private val earlyEncryptedSends = AtomicInteger()
+    private val heldRoom = AtomicReference<String?>()
+    private val heldRoomSends = AtomicInteger()
+
+    fun holdRoom(roomId: String) {
+        require(roomId.startsWith('!') && roomId.length in 2..255)
+        check(heldRoom.compareAndSet(null, roomId))
+    }
+
+    fun heldRoomSendCount() = heldRoomSends.get()
+
     private val syncFaultLock = Any()
     private var syncFaultArmed = false
     private var failedCursor: ByteArray? = null
@@ -52,6 +65,10 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 !encryptedSendAllowed.get()
         ) {
             earlyEncryptedSends.updateAndGet { minOf(it + 1, 512) }
+        }
+        if (request.method == "PUT" && request.requestURI.matches(encryptedSendRoute)) {
+            val room = UriUtils.decode(request.requestURI.split('/')[5], StandardCharsets.UTF_8)
+            if (room == heldRoom.get()) heldRoomSends.updateAndGet { minOf(it + 1, 512) }
         }
         val keyRequest =
             if (request.requestURI == "/_matrix/client/v3/keys/upload")

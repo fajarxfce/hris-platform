@@ -97,6 +97,31 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
         val room =
             ((created as Result.Success).value as CollaborationMatrixRoomCreation.Created).roomId
         publishSdkRoom(owner, sender.device, recipient.native.fixture.account, room, conversation)
+        val heldRecipient = sdkOwner(sdkPeer(owner))
+        val heldConversation = UUID.randomUUID()
+        val heldCreated =
+            rooms.create(
+                CollaborationMatrixDirectRoom(
+                    owner.fixture.company,
+                    heldConversation,
+                    owner.fixture.account,
+                    heldRecipient.native.fixture.account,
+                ),
+                providerLogin.value.accessToken,
+                clock.instant().plusSeconds(20),
+            )
+        assertInstanceOf(Result.Success::class.java, heldCreated)
+        val heldRoom =
+            ((heldCreated as Result.Success).value as CollaborationMatrixRoomCreation.Created)
+                .roomId
+        publishSdkRoom(
+            owner,
+            sender.device,
+            heldRecipient.native.fixture.account,
+            heldRoom,
+            heldConversation,
+        )
+        trace.holdRoom(heldRoom)
         val root =
             generateSequence(Path.of(System.getProperty("user.dir")).toAbsolutePath()) { it.parent }
                 .take(5)
@@ -116,6 +141,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "recipient" to recipient.session,
                 "roomId" to room,
                 "conversationId" to conversation.toString(),
+                "heldRoomId" to heldRoom,
+                "heldLogicalId" to UUID.randomUUID().toString(),
+                "heldBody" to "fictional-hris-held-${UUID.randomUUID()}",
                 "body" to "fictional-hris-${UUID.randomUUID()}",
                 "reply" to "fictional-hris-${UUID.randomUUID()}",
                 "logicalId" to UUID.randomUUID().toString(),
@@ -219,6 +247,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "messageIntentRestored",
                     "queueMappingRecovered",
                     "queueWriterExclusive",
+                    "perRoomDeliveryIsolated",
+                    "heldQueueRestored",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -226,6 +256,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 0,
                 trace.earlyEncryptedSendCount(),
                 "An early send completed after queue admission",
+            )
+            assertEquals(
+                0,
+                trace.heldRoomSendCount(),
+                "Unadmitted room attempted an encrypted send",
             )
             verifyCiphertext(
                 sender,
@@ -257,6 +292,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "messageIntentRestored" to true,
                     "queueMappingRecovered" to true,
                     "queueWriterExclusive" to true,
+                    "perRoomDeliveryIsolated" to true,
+                    "heldQueueRestored" to true,
+                    "heldRoomNeverSent" to true,
                     "pausedAcrossRestart" to true,
                     "syncInterruptedAfterRestart" to true,
                     "syncRetriedWithRetainedCursor" to true,

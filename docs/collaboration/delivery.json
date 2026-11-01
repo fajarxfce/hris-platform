@@ -37,7 +37,8 @@
         "../measurements/collaboration-sync-recovery-2026-11-01.json",
         "../measurements/collaboration-runtime-reuse-2026-11-01.json",
         "../measurements/collaboration-native-writer-2026-11-01.json",
-        "../measurements/collaboration-message-staging-2026-11-01.json"
+        "../measurements/collaboration-message-staging-2026-11-01.json",
+        "../measurements/collaboration-room-queue-2026-11-01.json"
       ]
     },
     {
@@ -114,7 +115,8 @@
         "../measurements/collaboration-runtime-reuse-2026-11-01.json",
         "../measurements/collaboration-message-intents-2026-11-01.json",
         "../measurements/collaboration-native-writer-2026-11-01.json",
-        "../measurements/collaboration-message-staging-2026-11-01.json"
+        "../measurements/collaboration-message-staging-2026-11-01.json",
+        "../measurements/collaboration-room-queue-2026-11-01.json"
       ]
     },
     {
@@ -200,7 +202,8 @@
       "evidence": [
         "../measurements/collaboration-message-intents-2026-11-01.json",
         "../measurements/collaboration-native-writer-2026-11-01.json",
-        "../measurements/collaboration-message-staging-2026-11-01.json"
+        "../measurements/collaboration-message-staging-2026-11-01.json",
+        "../measurements/collaboration-room-queue-2026-11-01.json"
       ]
     },
     {
@@ -510,7 +513,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Prove per-room queue controls with actual async initialization and a second held room, then implement the admitted delivery lifetime, durable recipient logical-ID/event-alias reconciliation, bounded history and Chat list/setup/conversation UI. Common staging and native uncertainty recovery are implemented; delivery must preserve unknown/cross-family attempts and SDK keys/cursors.",
+    "Implement the admitted per-room delivery lifetime and durable result reconciliation using the proven async initialization and room controls. Then recipient logical-ID/event-alias coalescing, bounded durable history, bootstrap/cross-family recovery and Chat list/setup/conversation UI. Preserve unknown attempts, keys/cursors and a single native transport retry owner.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

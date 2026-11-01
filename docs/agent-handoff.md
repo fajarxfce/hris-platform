@@ -12,12 +12,16 @@ suite 65.560s, Gradle 95s; cleanup true. Driver 45 cases pass, fixture/quality 3
 See [measurement](measurements/collaboration-retirement-2026-11-01.json): 307 Mobile
 and 33 Platform source hashes match, proof APK `9e9dcdbd`.
 
-Mobile domain/storage/DI integration passes focused checks in 150s, plus final
-native fixture build/quality in 55s. Root application checks remain pending while
-Mobile pins this validated Platform fixture commit. No phone/live change; dedicated
-emulator stopped. This checkpoint does not accept a PRD feature group. Continue
-Mobile full validation, Chat UI scheduling, Apple/web, backup, rich messages and
-all calls/meetings. Keep every atomic commit pushed; do not stop at this checkpoint.
+Mobile implementation [`070d3ab5`](https://github.com/fajarxfce/hris-mobile/commit/070d3ab5f718229ab88dcc7b0a36ad3cd1f5a346)
+is pushed; its workflow pins validated Platform fixture `f80be739`. All 307 source
+hashes match the immutable Mobile commit. Focused checks pass in 150s, final native
+fixture build/quality in 55s. Full Mobile root/browser/Wasm/Android/proof/lint passes
+in 197s: 2,535 desktop / 165 Android host / 280 domain browser / 219 data browser /
+35 database browser, zero failures/errors/skips and zero lint errors. Dev APK
+`5c9487c1` is built, not installed; proof APK still `9e9dcdbd`. No phone/live change;
+dedicated emulator stopped. This checkpoint does not accept a PRD feature group.
+Continue Chat UI scheduling, Apple/web, backup, rich messages and all calls/meetings.
+Keep every atomic commit pushed; do not stop at this checkpoint.
 
 Prior CI audits are recorded separately: ACK recovery control `41295813930` passes
 484 desktop / 460 browser / 389 iOS simulator cases and Xcode build, with 279 hashes

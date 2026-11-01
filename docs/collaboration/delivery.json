@@ -47,7 +47,8 @@
         "../measurements/collaboration-history-head-2026-11-01.json",
         "../measurements/collaboration-history-focus-2026-11-01.json",
         "../measurements/collaboration-provider-page-2026-11-01.json",
-        "../measurements/collaboration-original-receipts-2026-11-01.json"
+        "../measurements/collaboration-original-receipts-2026-11-01.json",
+        "../measurements/collaboration-retirement-2026-11-01.json"
       ]
     },
     {
@@ -142,7 +143,8 @@
         "../measurements/collaboration-history-restart-2026-11-01.json",
         "../measurements/collaboration-history-reopening-2026-11-01.json",
         "../measurements/collaboration-original-receipts-2026-11-01.json",
-        "../measurements/command-archive-2026-11-01.json"
+        "../measurements/command-archive-2026-11-01.json",
+        "../measurements/collaboration-retirement-2026-11-01.json"
       ]
     },
     {

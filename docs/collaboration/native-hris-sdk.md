@@ -244,3 +244,21 @@ history reads require distinct live admission boundaries. Mandatory evidence add
 `encryptedSendCount: 3`. All 40 Python driver cases pass, including mismatched PIDs,
 transactions, ACK/journal flags and terminal evidence. This extends Android fixture
 evidence; it does not accept Chat UI, native background delivery or other platforms.
+
+## Interrupted completion retirement
+
+The [retirement proof](../measurements/collaboration-retirement-2026-11-01.json)
+extends the actual exchange to four distinct processes. After repairing the ACK
+journal, common retirement archives both sent commands and stops before exact journal
+cleanup. The driver validates the third PID and original transaction, force-stops it,
+and admits a fourth process only after the old process is gone. The final process
+starts neither sync nor delivery. It validates both completion proofs, runs common
+reconciliation/recovery, removes the two receipts, reopens SQLite and checks that
+matching insertion remains completed while changed-intent insertion is rejected.
+
+Both `completionCleanupRecovered` and driver-owned `processRestartedAfterCompletion`
+are mandatory. Archive/receipt checkpoint booleans are strict; checkpoints carry no
+message body or event ID. Final proof must belong to the fourth PID and retained
+transaction. The server still verifies exactly three encrypted sends, no held-room
+send, original identity and complete cleanup. This accepts the interruption scenario,
+not Chat UI, push, backup, calls, meetings or product capacity.

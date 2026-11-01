@@ -310,7 +310,8 @@
     "features/collaboration/domain/src/commonTest/kotlin/dev/fajar/starter/collaboration/domain/StageCollaborationTextTest.kt": "500575fbd02f280879216d4701462fec11542eb67821bd73e6f59eb37799e7ac",
     "gradle/libs.versions.toml": "f81abaf71b5318a035ed5f93c48b9e141e02ce7914a0db52572a70b2197a0569",
     "gradle/verification-metadata.xml": "635f50bc43711565337268ee277c29950455d701a433d6d2690e0721e87ca900",
-    "settings.gradle.kts": "f19c10c24b139531db943def8d6dde4a5108159b39e878a76c751d4cb7a7a2c8"
+    "settings.gradle.kts": "f19c10c24b139531db943def8d6dde4a5108159b39e878a76c751d4cb7a7a2c8",
+    ".github/workflows/collaboration-hris.yml": "d7ad81229e7b0febb0853a9967318ac9180da664615f5341fb5d9163550ef8d7"
   },
   "platformSourceSha256": {
     "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "68d7a68081a9d2f4549996f7a627745124e1a74446c9e6f9cb4edd7cf6b1cceb",
@@ -453,11 +454,67 @@
       "errors": 0,
       "skipped": 0,
       "processes": 4,
-      "forcedProcessDeaths": 3
+      "forcedProcessDeaths": 3,
+      "workflowPinBeforeFixtureCommit": "79f11ee521e7ae3c96f4473773648f4243c1d8a1"
     },
     "fullApplication": {
-      "result": "pending",
-      "notes": "Run root/browser/Wasm/Android/proof/lint checks after pinning the validated Platform fixture commit."
+      "result": "passed",
+      "seconds": 197,
+      "reports": {
+        "tests": {
+          "desktopTest": {
+            "suites": 408,
+            "tests": 2535,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "database/wasmJsBrowserTest": {
+            "suites": 6,
+            "tests": 35,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "data/wasmJsBrowserTest": {
+            "suites": 30,
+            "tests": 219,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "testAndroidHostTest": {
+            "suites": 27,
+            "tests": 165,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "domain/wasmJsBrowserTest": {
+            "suites": 24,
+            "tests": 280,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        "lintErrors": {
+          "android": 0,
+          "collaboration-proof": 0
+        }
+      },
+      "targets": [
+        ":check",
+        ":core:database:wasmJsBrowserTest",
+        ":features:collaboration:domain:wasmJsBrowserTest",
+        ":features:collaboration:data:wasmJsBrowserTest",
+        ":features:collaboration:data:testAndroidHostTest",
+        ":apps:shared:compileKotlinWasmJs",
+        ":apps:android:assembleDevDebug",
+        ":apps:android:lintDevDebug",
+        ":apps:collaboration-proof:assembleDebug",
+        ":apps:collaboration-proof:lintDebug"
+      ]
     }
   },
   "actualSdk": {
@@ -536,6 +593,11 @@
       "path": "apps/collaboration-proof/build/outputs/apk/debug/collaboration-proof-debug.apk",
       "sha256": "9e9dcdbd7fd5535894ac2126cfe158843f65f203995b5ba3f4dd0c309fc62ff0",
       "installedOnlyInDedicatedEmulator": true
+    },
+    "devApk": {
+      "path": "apps/android/build/outputs/apk/dev/debug/android-dev-debug.apk",
+      "sha256": "5c9487c196341b58fc8bb9c9ec729a748f01bbf41d64e5308f2744ad8be3ef58",
+      "installed": false
     }
   },
   "notes": [
@@ -544,6 +606,12 @@
     "The fourth Android process does not start sync or delivery. It validates retained completion and journal, reconciles/recoveries without writes, removes exactly two receipts, reopens storage and validates same-ID replay plus changed-intent rejection.",
     "Server confirms exactly 3 encrypted sends, 22/22/22 live admission reads with no failure, and no held-room send. The driver independently verifies all four PIDs and original transactions.",
     "Starter generic archive is already ported at 8afab2a3; Apple evidence is audited separately. This HRIS policy is not copied to Starter.",
-    "No Chat UI scheduling or complete PRD group is accepted. Continue Chat UI, Apple/web adapters, backup, rich messages and every call/meeting phase."
-  ]
+    "No Chat UI scheduling or complete PRD group is accepted. Continue Chat UI, Apple/web adapters, backup, rich messages and every call/meeting phase.",
+    "After actual local proof, the workflow checkout was pinned to validated Platform fixture f80be739 before full Mobile validation; executable source inputs are unchanged."
+  ],
+  "platformFixtureCommit": "f80be73987224fda12d5a3a08a96ec6716538cc9",
+  "implementationCommits": {
+    "mobile": "070d3ab5f718229ab88dcc7b0a36ad3cd1f5a346",
+    "platformFixture": "f80be73987224fda12d5a3a08a96ec6716538cc9"
+  }
 }

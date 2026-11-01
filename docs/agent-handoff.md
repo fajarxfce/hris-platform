@@ -2,6 +2,14 @@
 
 ## Active collaboration implementation — 1 November 2026
 
+Control-denial checkpoint Mobile `92d91275` is now verified in hosted CI:
+control `41258471231` passes all 26 steps (201 desktop, 177 browser, 177 iOS
+simulator); HRIS `41258471223` passes all 17 steps with an actual SDK run in
+64.046s, process restart, retained-cursor recovery and completed cleanup.
+The recorded 131 Mobile/24 Platform hashes match the immutable checkouts;
+[evidence](measurements/collaboration-control-denial-2026-11-01.json) retains the
+reports. This is separate from the newer owned-summary/cache work.
+
 Mobile `820e3c3c11d94e2467c2df9270d785fffdb9d5ee` now consumes the owned summary page/detail contract at Platform
 `8813ea9eee28cafc274eafcd41456340f132ae2f`; CI pins that backend.
 [Evidence](measurements/collaboration-mobile-summaries-2026-11-01.json): one new

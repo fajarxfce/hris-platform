@@ -109,7 +109,8 @@
         "direct-summaries.md",
         "../measurements/collaboration-direct-summaries-2026-11-01.json",
         "../measurements/collaboration-local-list-2026-11-01.json",
-        "../measurements/collaboration-runtime-reuse-2026-11-01.json"
+        "../measurements/collaboration-runtime-reuse-2026-11-01.json",
+        "../measurements/collaboration-message-intents-2026-11-01.json"
       ]
     },
     {
@@ -172,7 +173,8 @@
         "direct-room-provisioning.md",
         "../measurements/collaboration-direct-room-provisioning-2026-10-31.json",
         "../measurements/collaboration-local-list-2026-11-01.json",
-        "../measurements/collaboration-runtime-reuse-2026-11-01.json"
+        "../measurements/collaboration-runtime-reuse-2026-11-01.json",
+        "../measurements/collaboration-message-intents-2026-11-01.json"
       ]
     },
     {
@@ -190,8 +192,10 @@
     {
       "id": "CHAT-04",
       "requiredBehavior": "Owned offline history, drafts, durable message/attachment queue, cancel pending, bounded retry and recovery after process/device restart.",
-      "status": "planned",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "../measurements/collaboration-message-intents-2026-11-01.json"
+      ]
     },
     {
       "id": "CHAT-05",
@@ -500,7 +504,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement immutable application message intents and native transaction reconciliation before admitting queue delivery; use the verified owned list and shared runtime entry for Chat navigation/setup/conversation UI. Complete bounded history windows, message projections and bootstrap/cross-family recovery without resetting SDK keys/cursors.",
+    "Implement the exclusive native queue writer, cancellation/drain ownership and durable native-transaction mapping using the owned message intents; prove process death between enqueue and mapping before admitting delivery. Connect Chat list/setup/conversation UI, bounded history and bootstrap/cross-family recovery without resetting SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

@@ -285,3 +285,34 @@ This accepts an early version-zero pusher callback before activation publication
 actual SQL cases plus49 domain policies, format/architecture pass in54s /54.460s
 wall. The first missing lookup transaction and subsequent nine-case pass are
 retained. No private HTTP route, DI, worker send or live provider acceptance yet.
+
+## Restricted callback HTTP implemented — 1 November 2026
+
+`HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED` defaults false independently of outgoing
+activation. Enabling it requires collaboration/Matrix/push and one to32 numeric
+socket peers/CIDRs in `HRIS_MATRIX_PUSH_CALLBACK_SOURCES`. Hostnames, DNS, scoped
+addresses and ambiguous IPv4 forms cannot authorize. `server.forward-headers-strategy`
+must remain NONE. A private TLS listener and exclusion from public API ingress
+are still required; the socket peer allowlist is not a replacement for TLS.
+
+Only exact POST `/_matrix/push/v1/notify` enters the controller. Source validation
+precedes input acquisition. Queries, compressed bodies and non-JSON are rejected.
+Actual streamed data is capped8KiB with2s elapsed checks and four body readers.
+The enabled connector validates its effective body socket timeout at1–5000ms
+without altering upload behavior. Tomcat's marked ERROR dispatch gets a narrow
+callback-only handler using server-populated attributes, the same source allowlist
+and fixed bounded output. An actual stalled read now produces408, not native401.
+
+Four owned FutureTask executions use a10s monotonic caller limit and no waiting
+queue. Timeout, caller interruption and shutdown cancel that task; a still-running
+bounded JDBC operation keeps consuming its execution slot. Domain cancellation
+propagates. Success contains only rejected unknown/permanent keys and no-store;
+current durable per-key transactions complete before acknowledgment. No callback
+body/capability is logged. Queue/handler DI composes in both application roles.
+
+[Evidence](../measurements/chat-push-private-ingress-2026-11-01.json):14 delivery,
+42 actual API and six actual worker cases, format/architecture pass in116s /
+117.140s wall. Spoofed forwarding headers from127.0.0.2 cannot bypass the source
+check even with a cookie/bearer and no body bytes sent. Earlier compiler and actual
+Tomcat error-dispatch failures are retained. Private TLS/provider end-to-end,
+FCM worker delivery, client receive/reply and live rollout remain separate work.

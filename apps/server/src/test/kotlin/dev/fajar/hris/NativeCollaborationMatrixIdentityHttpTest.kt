@@ -33,6 +33,8 @@ import tools.jackson.databind.json.JsonMapper
             "HRIS_COLLABORATION_ENABLED=true",
             "HRIS_MATRIX_ENABLED=true",
             "HRIS_COLLABORATION_PUSH_ENABLED=true",
+            "HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED=true",
+            "HRIS_MATRIX_PUSH_CALLBACK_SOURCES=127.0.0.1/32",
             "HRIS_MATRIX_PUSH_GATEWAY_URL=https://push.example.test/_matrix/push/v1/notify",
             "HRIS_MATRIX_SERVER_NAME=matrix.example.test",
             "HRIS_MATRIX_JWT_ISSUER=urn:hris:matrix:fixture",
@@ -81,6 +83,153 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         }
 
         @JvmStatic @AfterAll fun stopProvider() = provider.close()
+    }
+
+    @Test
+    fun privatePushCallbackCommitsBeforeReplyAndKeepsTemporaryDisablementRecoverable() {
+        val n = native()
+        val (device, gateway) = enroll(n)
+        savePush(n)
+        assertEquals(200, pusher(n, gateway).statusCode())
+        val key = provider.pushes.last()["pushkey"].asString()
+        val unknown = "hriscp1_" + "a".repeat(64)
+        val body = callbackBody(listOf(key, unknown))
+        val response = callback(body)
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        assertEquals(
+            listOf(unknown),
+            json.readTree(response.body())["rejected"].toList().map { it.asString() },
+        )
+        fun revision() =
+            database()
+                .queryForObject(
+                    "select revision from collaboration_push_hints where company_id=? and device_id=?",
+                    Long::class.java,
+                    n.fixture.company,
+                    device,
+                )
+        assertEquals(1L, revision())
+        repeat(2) { assertEquals(response.body(), callback(body).body()) }
+        assertEquals(1L, revision())
+        savePush(n, expected = 0, enabled = false)
+        assertEquals("{\"rejected\":[]}", callback(callbackBody(listOf(key))).body())
+        assertEquals(1L, revision())
+        savePush(n, expected = 1)
+        clock.set(clock.instant().plusSeconds(901))
+        assertEquals(200, callback(callbackBody(listOf(key))).statusCode())
+        assertEquals(1L, revision())
+        database()
+            .update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                n.session,
+            )
+        val retired = callback(callbackBody(listOf(key)))
+        assertEquals(200, retired.statusCode())
+        assertEquals(key, json.readTree(retired.body())["rejected"][0].asString())
+    }
+
+    @Test
+    fun privatePushCallbackRejectsASpoofedForwardedPeerBeforeReadingItsBody() {
+        java.net.Socket().use { socket ->
+            socket.bind(InetSocketAddress("127.0.0.2", 0))
+            socket.connect(InetSocketAddress("127.0.0.1", port), 2000)
+            socket.soTimeout = 2000
+            socket
+                .getOutputStream()
+                .write(
+                    ("POST /_matrix/push/v1/notify HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 8192\r\nX-Forwarded-For: 127.0.0.1\r\nForwarded: for=127.0.0.1;proto=https\r\nAuthorization: Bearer fixture\r\nCookie: SESSION=fixture\r\nConnection: close\r\n\r\n")
+                        .toByteArray()
+                )
+            socket.getOutputStream().flush()
+            // No body bytes are ever supplied. Authentication must reject before body acquisition.
+            val status = socket.getInputStream().bufferedReader().readLine()
+            assertTrue(status.startsWith("HTTP/1.1 403"), status)
+        }
+    }
+
+    @Test
+    fun privatePushCallbackRejectsMalformedCompressedQueriedAndOversizedInput() {
+        for (body in
+            listOf(
+                "{}",
+                "[]",
+                "{\"notification\":{},\"notification\":{}}",
+                callbackBody(listOf("hriscp1_" + "b".repeat(64))) + " {}",
+            )) assertEquals(400, callback(body).statusCode())
+        val valid = callbackBody(listOf("hriscp1_" + "b".repeat(64)))
+        assertEquals(415, callback(valid, contentType = "text/plain").statusCode())
+        assertEquals(415, callback(valid, encoding = "gzip").statusCode())
+        assertEquals(400, callback(valid, suffix = "?source=trusted").statusCode())
+        for (chunked in listOf(false, true)) assertEquals(
+            413,
+            callback(" ".repeat(8193), chunked = chunked).statusCode(),
+        )
+        assertEquals(200, callback(valid).statusCode())
+    }
+
+    @Test
+    fun privatePushCallbackStalledSocketIsBoundedAndTheNextRequestStillWorks() {
+        val started = System.nanoTime()
+        java.net.Socket().use { socket ->
+            socket.connect(InetSocketAddress("127.0.0.1", port), 2000)
+            socket.soTimeout = 7000
+            socket
+                .getOutputStream()
+                .write(
+                    ("POST /_matrix/push/v1/notify HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 100\r\nConnection: close\r\n\r\n{")
+                        .toByteArray()
+                )
+            socket.getOutputStream().flush()
+            val status = socket.getInputStream().bufferedReader().readLine()
+            assertTrue(status.startsWith("HTTP/1.1 408"), status)
+        }
+        assertTrue(Duration.ofNanos(System.nanoTime() - started) < Duration.ofSeconds(7))
+        assertEquals(200, callback(callbackBody(listOf("hriscp1_" + "c".repeat(64)))).statusCode())
+    }
+
+    private fun callbackBody(keys: List<String>) =
+        json.writeValueAsString(
+            mapOf(
+                "notification" to
+                    mapOf(
+                        "counts" to mapOf("unread" to 1),
+                        "id" to "",
+                        "type" to null,
+                        "sender" to "",
+                        "devices" to
+                            keys.map {
+                                mapOf(
+                                    "app_id" to "dev.fajar.hris.chat",
+                                    "pushkey" to it,
+                                    "data" to mapOf("format" to "event_id_only"),
+                                )
+                            },
+                    )
+            )
+        )
+
+    private fun callback(
+        body: String,
+        contentType: String = "application/json",
+        encoding: String? = null,
+        suffix: String = "",
+        chunked: Boolean = false,
+    ): HttpResponse<String> {
+        HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build().use { client ->
+            val request =
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/push/v1/notify$suffix"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Content-Type", contentType)
+            encoding?.let { request.header("Content-Encoding", it) }
+            val publisher =
+                if (chunked) HttpRequest.BodyPublishers.ofInputStream { body.byteInputStream() }
+                else HttpRequest.BodyPublishers.ofString(body)
+            return client.send(
+                request.POST(publisher).build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        }
     }
 
     @Test

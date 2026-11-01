@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Private callback HTTP and runtime graph proved — 1 November 2026
+
+[Evidence](measurements/chat-push-private-ingress-2026-11-01.json): default-disabled
+`POST /_matrix/push/v1/notify` uses numeric socket-peer/CIDR admission, strict8KiB
+body/32-key decoding, four body readers and four cancellable dispatch slots with
+no waiting queue/10s budget. Source denial precedes body acquisition; forwarded
+headers never authorize. Current queue/handler DI now composes in API and worker.
+
+14 delivery +42 actual API +6 actual worker cases, format/architecture pass in116s /
+117.140s wall, eleven unchanged inputs. Real127.0.0.2 spoofing is denied before any
+body; real stalled body returns408 at about5s and the next request works. Preserve
+first12s vararg-lambda compiler fix and second76s actual timeout-response failure:
+Tomcat ERROR dispatch changed408 to401 via native auth. The callback-only ERROR
+filter now uses server attributes/source checks and fixed output, leaving the
+ordinary native error chain unchanged. Existing guarded admission commit4fe92b35
+and core dispatch/retention08fec5ae are pushed. No live migration or app change.
+
+**Continue immediately:** private TLS reverse-proxy/public-route exclusion and
+actual Synapse callback acceptance, then current-target-fenced queue/FCM worker,
+Mobile receive/decrypt/reply and proved Starter ports. Research confirms Synapse
+v1.164.1 RegularPolicyForHTTPS uses platformTrust; OpenSSL honors SSL_CERT_FILE.
+Use an owned test CA rather than disabling certificate verification. Actual
+provider fixture still has no callback configuration; earlier tests only register
+pushers. A deployable listener is still required before enabling the callback flag.
+No large-company throughput or full PRD group acceptance. Phone release10/c037;
+next validated Mobile product11+, notify first, explicit10.77.77.3:5555 install-only.
+
 ## Durable callback admission proved — 1 November 2026
 
 [Evidence](measurements/chat-push-callback-admission-2026-11-01.json):

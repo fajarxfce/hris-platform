@@ -24,6 +24,51 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationPushQueueSource(sql: DSLContext): CollaborationPushQueueDataSource =
+        PostgresCollaborationPushQueueDataSource(sql)
+
+    @Bean
+    fun collaborationPushQueue(
+        source: CollaborationPushQueueDataSource
+    ): CollaborationPushQueueRepository = StoredCollaborationPushQueueRepository(source)
+
+    @Bean
+    fun handleCollaborationPush(
+        bindings: CollaborationPushBindingRepository,
+        queue: CollaborationPushQueueRepository,
+        gateway: CollaborationGatewaySessionRepository,
+        registry: CollaborationRegistryRepository,
+        rooms: CollaborationRoomScopeRepository,
+        sessions: NativeSessionRepository,
+        nativePush: NativePushRegistrationRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        HandleCollaborationPush(
+            bindings,
+            queue,
+            gateway,
+            registry,
+            rooms,
+            sessions,
+            nativePush,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     @ConditionalOnProperty(
         name =
             [

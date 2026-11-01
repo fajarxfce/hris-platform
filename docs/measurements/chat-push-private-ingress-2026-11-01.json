@@ -1,0 +1,220 @@
+{
+  "date": "2026-11-01",
+  "base": "4fe92b35818f456bb819b967615537e63b8abcc3",
+  "inputs": {
+    ".env.example": "2e18f52ee6f6555170d741e891bcc848da2a5ca1f337be2d3e2ad5e100680be1",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "0178554b0554c7168dde2cb235cae6968648a922243f9f1a8ea74999e360fb45",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "afdfab7bfa261d1742763ed0fc100da83dbf7311f6b05937d2826535c7d89075",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "bf4127cd70de4522c085e1c117053b717234220d61ca9b31ac94b6adf23ac4a4",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixPushCallbackController.kt": "51afcb4250a231c63c734be23602057d3b2db3b3b518f8097df66df43efa53a5",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/MatrixPushCallbackSettings.kt": "0068f0dba26aa7c8bb358961542b442e64bb00754f56b3762ccc10229a014d94",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/matrix/MatrixPushCallbackErrorFilter.kt": "792e4c10f99a25672c2f820dc1653444759a345b1745e318c237e0ce22e82f87",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/matrix/MatrixPushCallbackExecutor.kt": "1ed83570b1322629ee7010c3c6c439694da3b55ca3f8ca0eacb137caa802d229",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/matrix/MatrixPushCallbackSources.kt": "d39879ff914d36b123283c21b88b12f3445475e0bd031a978dfd2c0e813c3404",
+    "modules/collaboration/delivery/src/test/kotlin/dev/fajar/hris/collaboration/delivery/MatrixPushCallbackExecutorTest.kt": "12f366287ec8404c3d15e82404c03fcd47a7769aa04a75d40fb5c7c95ad9fa12",
+    "modules/collaboration/delivery/src/test/kotlin/dev/fajar/hris/collaboration/delivery/MatrixPushCallbackSourcesTest.kt": "7c5bfe88cda94a160dbd8cc0c7b9f678c70f2a754ac8b7fc43c510e52d78fdd5"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 117.14,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:delivery:test",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationMatrixIdentityHttpTest",
+      "--tests",
+      "*NativeCollaborationMatrixConfigurationTest",
+      ":apps:worker:test",
+      "--tests",
+      "*CollaborationProvisioningWorkerTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 116,
+  "reports": {
+    "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushCallbackExecutorTest.xml": {
+      "sha256": "58ea62b18e38b4fa2bdffb0c4cf06dc29287bc12b137c0854abe20b0391ef044",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.515
+    },
+    "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushCallbackSourcesTest.xml": {
+      "sha256": "b2d8722ec71b724f64e77b68bc9fe3543d689cabde6f927cf29b37cc2b72c2a8",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.07
+    },
+    "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushNotificationTest.xml": {
+      "sha256": "0c7c6ce3b0f1f7517990474743b2a69a2654f97014404262265db32114490db0",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.166
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixConfigurationTest.xml": {
+      "sha256": "1efcdfe6e2d00a45c38c8385ea4f5368fb6c8755e98efa0fad1361fc43427328",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 10.895
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+      "sha256": "d66c09b7dcdd24a60a4af829402abfaac6c1c4ce9cc806bf85ffd3c5bf104d62",
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 37.807
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": {
+      "sha256": "0a3962d3535361db73c1e76bc9391a4d4eef7072f89fbd86e6d1e805294180fb",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 29.923
+    }
+  },
+  "totals": {
+    "delivery": {
+      "suites": 3,
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.751
+    },
+    "api": {
+      "suites": 2,
+      "tests": 42,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 48.702
+    },
+    "worker": {
+      "suites": 1,
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 29.923
+    }
+  },
+  "earlierRuns": [
+    {
+      "run": 1,
+      "exitCode": 1,
+      "wallSeconds": 13.493,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":modules:collaboration:delivery:test",
+        ":apps:server:test",
+        "--tests",
+        "*NativeCollaborationMatrixIdentityHttpTest",
+        "--tests",
+        "*NativeCollaborationMatrixConfigurationTest",
+        ":apps:worker:test",
+        "--tests",
+        "*CollaborationProvisioningWorkerTest",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 12,
+      "result": "Compilation stopped before tests: Java vararg connector customizer requires parenthesized lambda."
+    },
+    {
+      "run": 2,
+      "exitCode": 1,
+      "wallSeconds": 76.83,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":modules:collaboration:delivery:test",
+        ":apps:server:test",
+        "--tests",
+        "*NativeCollaborationMatrixIdentityHttpTest",
+        "--tests",
+        "*NativeCollaborationMatrixConfigurationTest",
+        ":apps:worker:test",
+        "--tests",
+        "*CollaborationProvisioningWorkerTest",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 76,
+      "result": "14 delivery cases pass; 42 API cases with one failure. Actual socket stops at five seconds, but Tomcat ERROR dispatch reaches native authentication and changes 408 to401. Added a callback-only ERROR filter using server attributes, fixed generic output and original socket-source checks. No general native error/authentication change. Worker not reached."
+    }
+  ],
+  "proved": [
+    "Default-disabled exact private POST route, numeric peer/CIDR allowlist and strict existing decoder; no browser/native session fallback.",
+    "Actual untrusted 127.0.0.2 request with forged forwarding headers/cookie/bearer receives403 before sending any body byte.",
+    "Actual fixed-length/chunked body overflow, duplicate/trailing JSON, compression/query/type denial and next-request recovery.",
+    "Actual stalled body receives408 within seven seconds under existing five-second Tomcat socket bound; callback-specific ERROR dispatch avoids native authentication fallback.",
+    "Actual durable commit before response, replay, unknown/permanent rejection, temporary disable/re-enable and short native access expiry.",
+    "Four execution slots without waiting queue; caller/operation cancellation, timeout, shutdown, bounded uninterruptible work capacity and later work are exercised.",
+    "Actual API and worker contexts compose queue/handler dependencies. Settings require collaboration/Matrix/push and unmodified socket peer strategy."
+  ],
+  "limits": [
+    "No actual Synapse callback yet; API fixture uses owned private HTTP provider for outgoing managed pusher registration.",
+    "Private TLS reverse proxy and public-route exclusion still need deployable configuration and actual provider acceptance. Source allowlist does not replace ingress TLS/network controls.",
+    "No worker FCM send/current-token result fencing, live schema migration or Mobile receive/reply implementation in this commit.",
+    "Socket configuration is validated at connector customization without changing unrelated upload settings. Normal5s read plus2s elapsed checks remain finite; body cap4 and dispatch cap4 are pilot limits, not throughput acceptance.",
+    "No Mobile product change; phone stays installed release10/c037."
+  ]
+}

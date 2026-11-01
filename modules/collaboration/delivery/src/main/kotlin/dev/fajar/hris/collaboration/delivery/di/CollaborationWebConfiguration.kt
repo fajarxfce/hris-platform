@@ -1,9 +1,16 @@
 package dev.fajar.hris.collaboration.delivery.di
 
+import dev.fajar.hris.collaboration.delivery.matrix.MatrixPushCallbackErrorFilter
+import dev.fajar.hris.collaboration.delivery.matrix.MatrixPushCallbackExecutor
 import dev.fajar.hris.collaboration.delivery.matrix.writeMatrixGatewayDenied
+import dev.fajar.hris.collaboration.domain.usecases.HandleCollaborationPush
+import java.time.Clock
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory
+import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
+import org.springframework.core.env.Environment
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -13,6 +20,44 @@ import tools.jackson.databind.ObjectMapper
 
 @Configuration(proxyBeanMethods = false)
 class CollaborationWebConfiguration {
+    @Bean
+    fun collaborationPushCallbackErrors(settings: MatrixPushCallbackSettings) =
+        org.springframework.boot.web.servlet
+            .FilterRegistrationBean(MatrixPushCallbackErrorFilter(settings))
+            .apply {
+                setDispatcherTypes(jakarta.servlet.DispatcherType.ERROR)
+                order = org.springframework.core.Ordered.HIGHEST_PRECEDENCE + 30
+            }
+
+    @Bean
+    fun collaborationPushCallbackSettings(environment: Environment) =
+        matrixPushCallbackSettings(environment)
+
+    @Bean(destroyMethod = "close")
+    fun collaborationPushCallbackExecutor(handler: HandleCollaborationPush, clock: Clock) =
+        MatrixPushCallbackExecutor(handler::accept, clock)
+
+    /** Validate the actual socket read bound; do not change unrelated upload behavior. */
+    @Bean
+    fun collaborationPushCallbackSocketBound(
+        settings: MatrixPushCallbackSettings
+    ): WebServerFactoryCustomizer<TomcatServletWebServerFactory> =
+        WebServerFactoryCustomizer { factory ->
+            if (settings.enabled)
+                factory.addConnectorCustomizers({ connector ->
+                    val protocol =
+                        connector.protocolHandler
+                            as? org.apache.coyote.http11.AbstractHttp11Protocol<*>
+                            ?: error("Matrix callback requires a bounded HTTP socket")
+                    val timeout =
+                        if (protocol.disableUploadTimeout) protocol.connectionTimeout
+                        else protocol.connectionUploadTimeout
+                    require(timeout in 1..5000) {
+                        "Matrix callback socket body timeout must be at most five seconds"
+                    }
+                })
+        }
+
     /** Matrix credentials must never be interpreted by the native bearer or cookie filter. */
     @Bean
     @Order(0)
@@ -26,6 +71,7 @@ class CollaborationWebConfiguration {
         http.formLogin { it.disable() }
         http.httpBasic { it.disable() }
         http.authorizeHttpRequests {
+            it.requestMatchers(HttpMethod.POST, "/_matrix/push/v1/notify").permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/refresh").permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/unstable/dev.fajar.hris/pusher")
                 .permitAll()

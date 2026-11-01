@@ -73,7 +73,13 @@ alias and immutable mapping. [Receipt evidence](../measurements/collaboration-re
 records real SQLite/IndexedDB recovery and ownership/concurrency cases. The journal
 must precede `Sent` projection; its absence never proves delivery.
 
-The common live-admitted sender still needs to connect native results to the journal.
+Mobile `b5834eb84e6f2f89fdd3d63976e86e8d6112f1f4` now connects the common live-admitted
+sender to native results and this journal. [Sender evidence](../measurements/collaboration-sender-2026-11-01.json)
+records 18 new common cases, including late authority/cancellation and partial
+journal capture. Already received facts commit under their original raw account
+fence within five seconds; fresh admission precedes command projection/publication.
+Actual combined sender/SDK recovery integration is the next fixture step.
+
 Incoming recipient coalescing and history reconciliation remain to implement,
 including a crash before native ACK reaches the application journal. Do not add
 a second send retry owner.

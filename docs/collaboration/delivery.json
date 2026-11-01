@@ -119,7 +119,8 @@
         "../measurements/collaboration-message-staging-2026-11-01.json",
         "../measurements/collaboration-room-queue-2026-11-01.json",
         "../measurements/collaboration-delivery-2026-11-01.json",
-        "../measurements/collaboration-receipt-2026-11-01.json"
+        "../measurements/collaboration-receipt-2026-11-01.json",
+        "../measurements/collaboration-sender-2026-11-01.json"
       ]
     },
     {
@@ -208,7 +209,8 @@
         "../measurements/collaboration-message-staging-2026-11-01.json",
         "../measurements/collaboration-room-queue-2026-11-01.json",
         "../measurements/collaboration-delivery-2026-11-01.json",
-        "../measurements/collaboration-receipt-2026-11-01.json"
+        "../measurements/collaboration-receipt-2026-11-01.json",
+        "../measurements/collaboration-sender-2026-11-01.json"
       ]
     },
     {
@@ -518,7 +520,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Connect the common live-admitted sender to the verified native room window and durable outbound receipt journal. Then incoming history must coalesce logical IDs by conversation/authenticated sender with retained aliases/tombstones and conflicting-reuse rejection, including native ACK lost before journal commit. Continue bounded history, bootstrap/cross-family recovery and Chat list/setup/conversation UI; preserve unknown attempts and SDK keys/cursors.",
+    "Prove the common live-admitted sender and durable receipt journal together through actual HRIS control APIs and the native SDK, with interrupted Sent projection and database recovery. Then incoming history must coalesce logical IDs by conversation/authenticated sender with aliases/tombstones and conflicting-reuse rejection, including ACK lost before journal commit. Continue bounded history, command retirement, bootstrap/cross-family recovery and Chat UI; preserve unknown attempts and SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

@@ -135,7 +135,8 @@
         "../measurements/collaboration-history-head-2026-11-01.json",
         "../measurements/collaboration-history-focus-2026-11-01.json",
         "../measurements/collaboration-provider-page-2026-11-01.json",
-        "../measurements/collaboration-history-traversal-2026-11-01.json"
+        "../measurements/collaboration-history-traversal-2026-11-01.json",
+        "../measurements/collaboration-provider-acquisition-2026-11-01.json"
       ]
     },
     {
@@ -233,7 +234,8 @@
         "../measurements/collaboration-history-head-2026-11-01.json",
         "../measurements/collaboration-history-focus-2026-11-01.json",
         "../measurements/collaboration-provider-page-2026-11-01.json",
-        "../measurements/collaboration-history-traversal-2026-11-01.json"
+        "../measurements/collaboration-history-traversal-2026-11-01.json",
+        "../measurements/collaboration-provider-acquisition-2026-11-01.json"
       ]
     },
     {
@@ -543,7 +545,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Wire the admitted common provider-page runtime port and acquisition operation to the new atomic encrypted reference/progress store, preserving late owner changes and company denials. Then resolve originals from retained references, handle cursor resets, reopen SDK clients while preserving keys/cursors/transactions, close the ACK-before-journal gap, retire commands and build Chat UI; continue all P0\u2013P8.",
+    "Resolve retained provider references into original projections without losing unsupported/unavailable work. Common admitted page acquisition and atomic encrypted progress now pass actual Android/server recovery. Add reference resolution and cursor resets, coordinated SDK reopening with retained keys/cursors/transactions, ACK-before-journal reconciliation, command retirement and Chat UI; continue all P0\u2013P8.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

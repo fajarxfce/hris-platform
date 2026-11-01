@@ -34,17 +34,22 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
     private val providerPages = AtomicInteger()
     private val positionedPages = AtomicInteger()
-    private val applicationAtProviderPage = AtomicReference<Map<String, Int>?>(null)
+    private val providerAdmissions = mutableListOf<Map<String, Int>>()
 
     fun admittedProviderPages(): Boolean {
-        val before = applicationAtProviderPage.get() ?: return false
+        val pages = synchronized(providerAdmissions) { providerAdmissions.toList() }
+        val before = pages.firstOrNull() ?: return false
         val after = applicationAdmissions()
         return providerPages.get() in 2..3 &&
+            pages.size == providerPages.get() &&
             positionedPages.get() == providerPages.get() - 1 &&
             before.getValue("failures") == 0 &&
             after.getValue("failures") == 0 &&
+            pages.all { it.getValue("failures") == 0 } &&
             listOf("device", "conversation", "room").all {
-                before.getValue(it) >= 6 && after.getValue(it) > before.getValue(it)
+                before.getValue(it) >= 6 &&
+                    after.getValue(it) > pages.last().getValue(it) &&
+                    pages.zipWithNext().all { (a, b) -> b.getValue(it) > a.getValue(it) }
             }
     }
 
@@ -145,7 +150,9 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             providerPages.updateAndGet { minOf(it + 1, 64) }
             if (request.parameterMap.containsKey("from"))
                 positionedPages.updateAndGet { minOf(it + 1, 64) }
-            applicationAtProviderPage.compareAndSet(null, applicationAdmissions())
+            synchronized(providerAdmissions) {
+                if (providerAdmissions.size < 8) providerAdmissions.add(applicationAdmissions())
+            }
         }
         if (
             request.method == "GET" &&

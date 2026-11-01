@@ -21,6 +21,7 @@ class DisabledCollaborationMatrixRoomHistoryRepository : CollaborationMatrixRoom
         limit: Int,
         bearer: String,
         deadline: Instant,
+        filter: CollaborationRoomHistoryFilter,
     ): Result<CollaborationRoomHistory> = unavailable()
 
     override fun event(

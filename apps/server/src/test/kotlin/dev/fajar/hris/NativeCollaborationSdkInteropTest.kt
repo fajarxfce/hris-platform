@@ -255,6 +255,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "commonSenderOwned",
                     "receiptJournalRecovered",
                     "projectionInterrupted",
+                    "originalHistoryWindowOwned",
+                    "historyBodiesRestored",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -286,6 +288,20 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             )
             assertEquals(0, applicationReads.getValue("failures"))
             assertTrue(trace.applicationAdmittedBeforeSend())
+            val history = proof.path("historyWindow")
+            for ((name, bounds) in
+                mapOf(
+                    "originals" to 2L..2L,
+                    "unavailable" to 0L..128L,
+                    "extractionNanos" to 0L..5_000_000_000L,
+                    "modelCharacters" to 1L..4_194_304L,
+                    "originalCharacters" to 1L..4_194_304L,
+                )) {
+                val field = history.path(name)
+                assertTrue(
+                    field.isIntegralNumber && field.canConvertToLong() && field.asLong() in bounds
+                )
+            }
             writePrivate(
                 directory.resolve("verified.json"),
                 mapOf(
@@ -310,6 +326,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "commonSenderOwned" to true,
                     "receiptJournalRecovered" to true,
                     "projectionInterrupted" to true,
+                    "originalHistoryWindowOwned" to true,
+                    "historyBodiesRestored" to true,
+                    "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,
                     "applicationAdmissions" to trace.applicationAdmissions(),
                     "heldRoomNeverSent" to true,

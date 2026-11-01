@@ -3,10 +3,11 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 import unittest
 from unittest.mock import MagicMock, patch
 
-from collaboration_hris_native import checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
+from collaboration_hris_native import app_write_script, checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
 
 
 class HrisNativeDriverTest(unittest.TestCase):
@@ -16,6 +17,8 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "wrongPassphrasePreserved": True, "exclusiveOwner": True,
                 "queueRestored": True, "transactionReused": True, "identityAfterRestart": True,
                 "messageIntentRestored": True, "queueMappingRecovered": True, "queueWriterExclusive": True, "perRoomDeliveryIsolated": True, "heldQueueRestored": True, "nativeDeliveryOwned": True, "commonSenderOwned": True, "receiptJournalRecovered": True, "projectionInterrupted": True,
+                "originalHistoryWindowOwned": True, "historyBodiesRestored": True,
+                "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
                 "senderTransaction": "first-transaction", "recipientTransaction": "second-transaction"}
 
@@ -29,9 +32,20 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("wrongPassphrasePreserved", None), ("exclusiveOwner", "true"),
                             ("messageIntentRestored", False), ("queueMappingRecovered", 1), ("queueWriterExclusive", None), ("perRoomDeliveryIsolated", False),
                             ("heldQueueRestored", 1), ("nativeDeliveryOwned", False),
-                            ("commonSenderOwned", None), ("receiptJournalRecovered", False), ("projectionInterrupted", 1)):
+                            ("commonSenderOwned", None), ("receiptJournalRecovered", False), ("projectionInterrupted", 1),
+                            ("originalHistoryWindowOwned", False), ("historyBodiesRestored", 1), ("historyWindow", None)):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
+
+    def test_history_metrics_reject_wrong_types_and_bounds_and_drop_unknown_payloads(self):
+        proof = self.evidence()
+        metrics = proof["historyWindow"]
+        self.assertEqual(proof, proof_evidence(proof | {"historyWindow": metrics | {"body": "private-fixture"}}))
+        for name, value in (("originals", 1), ("originals", True), ("unavailable", 129),
+                            ("extractionNanos", -1), ("extractionNanos", 5_000_000_001),
+                            ("modelCharacters", 4_194_305), ("originalCharacters", 0)):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                proof_evidence(proof | {"historyWindow": metrics | {name: value}})
 
     def test_private_ipc_is_atomic_private_and_never_overwrites_old_evidence(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -45,6 +59,45 @@ class HrisNativeDriverTest(unittest.TestCase):
             path.write_bytes(b"x" * 65537)
             with self.assertRaises(ValueError):
                 read_json(path)
+
+    def test_app_signal_is_invisible_until_input_finishes_and_cannot_replace_a_signal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            directory = root / "files/protocol-proof"
+            directory.mkdir(parents=True)
+            target = directory / "gateway-send.json"
+            temporary = target.with_suffix(".json.next")
+            process = subprocess.Popen(["sh", "-c", app_write_script("gateway-send")],
+                                       cwd=root, stdin=subprocess.PIPE,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                process.stdin.write(b'{"ready":')
+                process.stdin.flush()
+                until = time.monotonic() + 5
+                while not temporary.exists() or temporary.stat().st_size == 0:
+                    self.assertLess(time.monotonic(), until)
+                    time.sleep(0.01)
+                self.assertFalse(target.exists())
+                process.stdin.write(b'true}')
+                process.stdin.close()
+                self.assertEqual(0, process.wait(timeout=5))
+                self.assertEqual({"ready": True}, json.loads(target.read_text()))
+                self.assertEqual(0o600, target.stat().st_mode & 0o777)
+                self.assertFalse(temporary.exists())
+                repeated = subprocess.run(["sh", "-c", app_write_script("gateway-send")],
+                                          cwd=root, input=b'{"ready":false}',
+                                          capture_output=True, timeout=5)
+                self.assertNotEqual(0, repeated.returncode)
+                self.assertEqual({"ready": True}, json.loads(target.read_text()))
+            finally:
+                if process.stdin and not process.stdin.closed:
+                    process.stdin.close()
+                stop_process(process)
+
+    def test_app_signal_names_cannot_change_the_owned_shell_command(self):
+        for name in ("../signal", "signal;id", "signal\n", "$(id)", "x" * 65, None):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                app_write_script(name)
 
     def fixture(self, root, base="http://127.0.0.1:43210"):
         private_json(root / "fixture.json", {"baseUrl": base})

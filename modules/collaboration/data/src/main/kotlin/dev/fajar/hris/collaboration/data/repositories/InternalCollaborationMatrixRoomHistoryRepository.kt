@@ -32,6 +32,7 @@ class InternalCollaborationMatrixRoomHistoryRepository(
                 request.limit,
                 bearer,
                 deadline,
+                request.filter.toMatrixFilter(),
             )
         objectNode(raw)
         val chunk = array(raw, "chunk", request.limit)
@@ -61,8 +62,10 @@ class InternalCollaborationMatrixRoomHistoryRepository(
         limit: Int,
         bearer: String,
         deadline: Instant,
+        filter: CollaborationRoomHistoryFilter,
     ): Result<CollaborationRoomHistory> = safeMatrixProviderCall {
-        val raw = source.context(room.roomId, eventId, limit, bearer, deadline)
+        val raw =
+            source.context(room.roomId, eventId, limit, bearer, deadline, filter.toMatrixFilter())
         objectNode(raw)
         val before = array(raw, "events_before", limit)
         val after = array(raw, "events_after", limit)

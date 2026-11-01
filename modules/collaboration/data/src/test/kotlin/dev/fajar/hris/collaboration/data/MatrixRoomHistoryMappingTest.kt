@@ -46,6 +46,7 @@ class MatrixRoomHistoryMappingTest {
     private var reply: JsonNode = node(emptyMap<String, Any>())
     private var calls = 0
     private var observedFrom: String? = null
+    private var observedFilter = emptyMap<String, Boolean>()
     private val repository =
         InternalCollaborationMatrixRoomHistoryRepository(
             object : MatrixRoomHistoryDataSource {
@@ -57,9 +58,11 @@ class MatrixRoomHistoryMappingTest {
                     limit: Int,
                     token: String,
                     deadline: Instant,
+                    filter: Map<String, Boolean>,
                 ): JsonNode {
                     calls++
                     observedFrom = from
+                    observedFilter = filter
                     return reply
                 }
 
@@ -69,8 +72,10 @@ class MatrixRoomHistoryMappingTest {
                     limit: Int,
                     token: String,
                     deadline: Instant,
+                    filter: Map<String, Boolean>,
                 ): JsonNode {
                     calls++
+                    observedFilter = filter
                     return reply
                 }
 
@@ -88,6 +93,64 @@ class MatrixRoomHistoryMappingTest {
         )
 
     private fun node(value: Any): JsonNode = json.readTree(json.writeValueAsBytes(value))
+
+    @Test
+    fun membershipLoadingFlagsReachBothProviderReadsWithoutChangingRoomFraming() {
+        val filter = CollaborationRoomHistoryFilter(true, true)
+        reply = node(mapOf("start" to "t10", "chunk" to listOf(event)))
+        assertInstanceOf(
+            Result.Success::class.java,
+            repository.messages(
+                owner,
+                room,
+                CollaborationRoomPageRequest(null, null, "b", 10, filter),
+                "fixture",
+                Instant.now().plusSeconds(5),
+            ),
+        )
+        assertEquals(
+            mapOf("lazy_load_members" to true, "include_redundant_members" to true),
+            observedFilter,
+        )
+        reply =
+            node(
+                mapOf(
+                    "event" to event,
+                    "events_before" to emptyList<Any>(),
+                    "events_after" to emptyList<Any>(),
+                )
+            )
+        assertInstanceOf(
+            Result.Success::class.java,
+            repository.context(
+                owner,
+                room,
+                "\$fixture",
+                10,
+                "fixture",
+                Instant.now().plusSeconds(5),
+                filter,
+            ),
+        )
+        assertEquals(
+            mapOf("lazy_load_members" to true, "include_redundant_members" to true),
+            observedFilter,
+        )
+        val before = calls
+        assertInstanceOf(
+            Result.Failed::class.java,
+            repository.context(
+                owner,
+                room,
+                "\$fixture",
+                10,
+                "fixture",
+                Instant.now().plusSeconds(5),
+                CollaborationRoomHistoryFilter(false, true),
+            ),
+        )
+        assertEquals(before, calls)
+    }
 
     private fun messages(from: String? = null, limit: Int = 10) =
         repository.messages(

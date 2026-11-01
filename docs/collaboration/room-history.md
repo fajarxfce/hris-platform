@@ -5,16 +5,26 @@ exact retained account/company/server/room ownership:
 
 | Route under `/_matrix/client/v3/rooms/{roomId}` | Accepted parameters |
 | --- | --- |
-| `GET /messages` | `dir=b|f`, optional `from`/`to`, `limit=1..100` (default 10) |
-| `GET /context/{eventId}` | `limit=0..100` (default 10) |
+| `GET /messages` | `dir=b|f`, optional `from`/`to`, `limit=1..100` (default 10), optional membership `filter` |
+| `GET /context/{eventId}` | `limit=0..100` (default 10), optional membership `filter` |
 | `GET /event/{eventId}` | None |
 
 All reads are no-store. Duplicate/unknown query parameters, request bodies,
 URL credentials, malformed event IDs and excessive ranges are rejected. There
-is no arbitrary provider proxy or caller-provided filter. Current admission and
+is no arbitrary provider proxy or event/sender filter. Current admission and
 the immutable room binding are checked before and after external acquisition;
 late denial withholds results even after a successful provider response.
 Ordinary expiry and peer offboarding do not delete retained owned history.
+
+The pinned native SDK requests lazy member loading when opening an event-focused
+timeline. Both paged and context reads accept a JSON `filter` of at most 256
+characters containing only boolean `lazy_load_members` and
+`include_redundant_members`. Redundant members require lazy loading. An absent
+filter or `{}` retains ordinary behavior. The gateway validates this typed
+selection and forwards it to the provider; it does not silently discard it.
+Duplicate JSON keys, trailing tokens, unknown fields and nonboolean values fail
+before provider I/O. Event/sender filtering would require its own cursor contract
+and remains unsupported.
 
 ## Positions and progress
 
@@ -67,3 +77,9 @@ CHAT-01–15, call/meeting delivery, capacity or a platform rollout.
 checks. Full 426s regression passes 34 domain, 194 data, 159 selected API and 112
 worker cases (one existing opt-in skip), format/architecture and both DI graphs.
 No migration, live service or phone update occurred.
+
+The [original-window proof](../measurements/collaboration-original-window-2026-11-01.json)
+now exercises the pinned Android SDK's actual context request through HRIS with
+member-loading flags, original decoding and reopened encrypted local history.
+It retains the initial unsupported-filter failure and the passing 77s corrected
+run. This known-anchor snapshot does not yet establish application history paging.

@@ -421,7 +421,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 "messages?dir=b&limit=101",
                 "messages?dir=b&limit=+1",
                 "messages?dir=b&limit=1&limit=2",
-                "messages?dir=b&filter=%7B%7D",
+                "messages?dir=b&filter=%7B%22types%22%3A%5B%5D%7D",
                 "messages?dir=b&from=raw-position",
                 "context/$eventId?limit=101",
                 "event/$eventId?access_token=foreign",
@@ -448,6 +448,59 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         assertTrue(denied.statusCode() in listOf(401, 403, 409), denied.body())
         assertFalse(denied.body().contains(eventId))
         assertEquals(before + 1, provider.roomCalls.get())
+    }
+
+    @Test
+    fun historyMembershipFiltersReachProviderAndRejectMalformedOrEventFilteringInput() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val room = publishedRoom(n, device)
+        fun encoded(value: String) =
+            java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8)
+        fun read(path: String) = matrixRoom(n, token, "v3/rooms/$room/$path")
+        val filter = """{"lazy_load_members":true,"include_redundant_members":true}"""
+        val page = read("messages?dir=b&limit=10&filter=${encoded(filter)}")
+        assertEquals(200, page.statusCode(), page.body())
+        assertEquals(
+            json.readTree(filter),
+            json.readTree(provider.lastHistoryQuery.get().substringAfter("filter=")),
+        )
+        val event = json.readTree(page.body()).path("chunk").first().path("event_id").asString()
+        val context = read("context/$event?limit=20&filter=${encoded(filter)}")
+        assertEquals(200, context.statusCode(), context.body())
+        assertEquals(
+            json.readTree(filter),
+            json.readTree(provider.lastContextQuery.get().substringAfter("filter=")),
+        )
+        assertEquals(200, read("context/$event?filter=${encoded("{}")}").statusCode())
+        assertEquals(200, read("messages?dir=b&filter=${encoded("{}")}").statusCode())
+        val before = provider.roomCalls.get()
+        for (invalid in
+            listOf(
+                "",
+                "  ",
+                "null",
+                "[]",
+                "true",
+                "{",
+                "{} {}",
+                " ".repeat(257),
+                """{"types":["m.room.message"]}""",
+                """{"senders":[]}""",
+                """{"lazy_load_members":1}""",
+                """{"lazy_load_members":"true"}""",
+                """{"include_redundant_members":true}""",
+                """{"lazy_load_members":true,"lazy_load_members":false}""",
+                """{"lazy_load_members":{"nested":{"deep":true}}}""",
+            )) {
+            assertEquals(400, read("context/$event?filter=${encoded(invalid)}").statusCode())
+            assertEquals(400, read("messages?dir=b&filter=${encoded(invalid)}").statusCode())
+        }
+        assertEquals(
+            400,
+            read("context/$event?filter=${encoded(filter)}&filter=${encoded(filter)}").statusCode(),
+        )
+        assertEquals(before, provider.roomCalls.get())
     }
 
     private fun sync(
@@ -1332,6 +1385,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val roomCalls = AtomicInteger()
         val lastMemberQuery = AtomicReference<String>()
         val lastHistoryQuery = AtomicReference<String>()
+        val lastContextQuery = AtomicReference<String>()
         val onRoomHistory = AtomicReference<(() -> Unit)?>(null)
         val onQuery = AtomicReference<(() -> Unit)?>(null)
         private val credentials = ConcurrentHashMap<String, Map<String, Any>>()
@@ -1566,7 +1620,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                                         it["event_id"] ==
                                                             operation.removePrefix("event/")
                                                     }
-                                                operation.startsWith("context/") ->
+                                                operation.startsWith("context/") -> {
+                                                    lastContextQuery.set(request.requestURI.query)
                                                     mapOf(
                                                         "event" to
                                                             events.single {
@@ -1581,6 +1636,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                                         "start" to "private-history-1",
                                                         "end" to "private-history-2",
                                                     )
+                                                }
                                                 else -> error("Unexpected room fixture route")
                                             }
                                         }

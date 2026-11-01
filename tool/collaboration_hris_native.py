@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import signal
 from pathlib import Path
 import subprocess
@@ -34,6 +35,17 @@ def read_json(path):
     return json.loads(path.read_text())
 
 
+def app_write_script(name):
+    if not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9-]{0,63}", name):
+        raise ValueError("Invalid owned fixture name")
+    target = f"files/protocol-proof/{name}.json"
+    temporary = target + ".next"
+    # The final name becomes visible only after cat has consumed all stdin. This driver
+    # exclusively owns the app directory. Android disallows hard links here; mv -n
+    # preserves an old signal, and a retained temporary makes that collision fail.
+    return f"set -eu; umask 077; set -C; cat > {temporary}; mv -n {temporary} {target}; test ! -e {temporary}"
+
+
 def proof_evidence(value):
     if not isinstance(value, dict) or value.get("encryptedBothDirections") is not True or value.get("logicalIdsPreserved") is not True or value.get("syncMode") != "classic":
         raise ValueError("Invalid owned exchange evidence")
@@ -42,7 +54,8 @@ def proof_evidence(value):
                  "queueRestored", "transactionReused", "identityAfterRestart",
                  "messageIntentRestored", "queueMappingRecovered", "queueWriterExclusive",
                  "perRoomDeliveryIsolated", "heldQueueRestored", "nativeDeliveryOwned",
-                 "commonSenderOwned", "receiptJournalRecovered", "projectionInterrupted"):
+                 "commonSenderOwned", "receiptJournalRecovered", "projectionInterrupted",
+                 "originalHistoryWindowOwned", "historyBodiesRestored"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True
@@ -54,6 +67,22 @@ def proof_evidence(value):
         output[name] = field
     if output["senderEventId"] == output["recipientEventId"]:
         raise ValueError("Owned receipts must be distinct")
+    output["historyWindow"] = history_evidence(value.get("historyWindow"))
+    return output
+
+
+def history_evidence(value):
+    if not isinstance(value, dict):
+        raise ValueError("Missing owned history evidence")
+    output = {}
+    limits = {"originals": (2, 2), "unavailable": (0, 128),
+              "extractionNanos": (0, 5_000_000_000),
+              "modelCharacters": (1, 4_194_304), "originalCharacters": (1, 4_194_304)}
+    for name, (minimum, maximum) in limits.items():
+        field = value.get(name)
+        if type(field) is not int or not minimum <= field <= maximum:
+            raise ValueError("Invalid owned history measurement")
+        output[name] = field
     return output
 
 
@@ -115,7 +144,7 @@ def run(apk, sdk, directory):
 
     def write_app(name, value):
         request = subprocess.run([native.adb, "-s", native.serial, "shell", "run-as", PACKAGE,
-                                  "sh", "-c", f"'cat > files/protocol-proof/{name}.json'"],
+                                  "sh", "-c", shlex.quote(app_write_script(name))],
                                  input=json.dumps(value), text=True, capture_output=True, timeout=15)
         if request.returncode:
             raise RuntimeError("Could not deliver owned fixture")

@@ -151,6 +151,7 @@ class AccessNativeCollaborationMatrixDevice(
         if (
             request.direction !in setOf("b", "f") ||
                 request.limit !in 1..100 ||
+                !validCollaborationRoomHistoryFilter(request.filter) ||
                 listOfNotNull(request.from, request.to).any {
                     it.length !in 1..4096 || it.any { char -> char.code !in 33..126 }
                 }
@@ -175,8 +176,14 @@ class AccessNativeCollaborationMatrixDevice(
         roomId: String,
         eventId: String,
         limit: Int,
+        filter: CollaborationRoomHistoryFilter = CollaborationRoomHistoryFilter(),
     ): Result<CollaborationRoomHistory> {
-        if (!validEventId(eventId) || limit !in 0..100) return invalidHistory()
+        if (
+            !validEventId(eventId) ||
+                limit !in 0..100 ||
+                !validCollaborationRoomHistoryFilter(filter)
+        )
+            return invalidHistory()
         return roomOperation(token, correlationId, roomId) { exchange, prepared ->
             exchange.exchange { bearer, deadline ->
                 providerRoomHistory.context(
@@ -186,6 +193,7 @@ class AccessNativeCollaborationMatrixDevice(
                     limit,
                     bearer,
                     deadline,
+                    filter,
                 )
             }
         }

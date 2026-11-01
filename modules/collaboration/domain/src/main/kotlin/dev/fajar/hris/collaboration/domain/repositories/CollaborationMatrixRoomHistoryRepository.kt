@@ -20,6 +20,7 @@ interface CollaborationMatrixRoomHistoryRepository {
         limit: Int,
         bearer: String,
         deadline: Instant,
+        filter: CollaborationRoomHistoryFilter = CollaborationRoomHistoryFilter(),
     ): Result<CollaborationRoomHistory>
 
     fun event(

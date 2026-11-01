@@ -523,7 +523,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement incoming canonical history and bounded SDK windows after the proved common sender/receipt integration. Coalesce by conversation/authenticated sender/logical ID, preserve original content versus edits, reject conflicting reuse and retain aliases/tombstones; reconcile ACK lost before application journaling. Then command retirement, bootstrap/cross-family recovery and Chat list/setup/conversation UI; preserve original transactions and SDK keys/cursors.",
+    "Connect the proved finite original-history window to common live-admitted acquisition, head discovery and bounded provider progress; preserve unresolved events, canonical originals, aliases and redaction tombstones. Reconcile ACK lost before application journaling, then retire commands and build Chat list/setup/conversation UI with bootstrap/cross-family recovery; preserve original transactions and SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

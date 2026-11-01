@@ -179,6 +179,7 @@ class HttpMatrixClientDataSource(
         limit: Int,
         token: String,
         deadline: Instant,
+        filter: Map<String, Boolean>,
     ): JsonNode {
         require(direction in setOf("b", "f") && limit in 1..100)
         for (position in listOfNotNull(from, to)) require(
@@ -188,7 +189,8 @@ class HttpMatrixClientDataSource(
             roomPath(roomId) +
                 "/messages?dir=$direction&limit=$limit" +
                 (from?.let { "&from=${segment(it)}" } ?: "") +
-                (to?.let { "&to=${segment(it)}" } ?: "")
+                (to?.let { "&to=${segment(it)}" } ?: "") +
+                historyFilter(filter)
         return history(path, token, deadline)
     }
 
@@ -198,10 +200,13 @@ class HttpMatrixClientDataSource(
         limit: Int,
         token: String,
         deadline: Instant,
+        filter: Map<String, Boolean>,
     ): JsonNode {
         require(limit in 0..100)
         return history(
-            roomPath(roomId) + "/context/${eventSegment(eventId)}?limit=$limit",
+            roomPath(roomId) +
+                "/context/${eventSegment(eventId)}?limit=$limit" +
+                historyFilter(filter),
             token,
             deadline,
         )
@@ -213,6 +218,12 @@ class HttpMatrixClientDataSource(
         token: String,
         deadline: Instant,
     ): JsonNode = history(roomPath(roomId) + "/event/${eventSegment(eventId)}", token, deadline)
+
+    private fun historyFilter(filter: Map<String, Boolean>): String {
+        require(filter.keys.all { it in setOf("lazy_load_members", "include_redundant_members") })
+        require(filter["include_redundant_members"] != true || filter["lazy_load_members"] == true)
+        return if (filter.isEmpty()) "" else "&filter=" + segment(json.writeValueAsString(filter))
+    }
 
     private fun eventSegment(eventId: String): String {
         require(eventId.length in 2..255 && eventId.startsWith('$'))

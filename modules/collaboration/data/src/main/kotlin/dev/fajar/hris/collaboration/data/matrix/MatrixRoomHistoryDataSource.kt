@@ -12,6 +12,7 @@ interface MatrixRoomHistoryDataSource {
         limit: Int,
         token: String,
         deadline: Instant,
+        filter: Map<String, Boolean> = emptyMap(),
     ): JsonNode
 
     fun context(
@@ -20,6 +21,7 @@ interface MatrixRoomHistoryDataSource {
         limit: Int,
         token: String,
         deadline: Instant,
+        filter: Map<String, Boolean> = emptyMap(),
     ): JsonNode
 
     fun event(roomId: String, eventId: String, token: String, deadline: Instant): JsonNode

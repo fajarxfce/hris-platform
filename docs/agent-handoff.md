@@ -2,6 +2,9 @@
 
 ## Active collaboration implementation — 1 November 2026
 
+Mobile **`90c43ed776556199b5f7319c94b6c0773036b7a3`** is pushed and pins the verified Platform fixture
+**`4944b34f0946d449bc4b7ff4651737db2255ce93`** in HRIS CI.
+
 **Per-room queue enablement is proven; global enable is not room admission.**
 The Android product writer now initializes `Room.timeline()` through async FFI
 before synchronous queue controls. Pinned Rust first access may spawn tasks.

@@ -316,5 +316,3 @@ Platform **`7e95bffdae322e16c9b904d21461b42c19b20012`** (the current HRIS CI pin
 No live/schema/phone change. Starter remains `36116b2`; these HRIS SDK/policy
 changes need no generic port. Atomic commits and every-commit pushes remain
 authorized. Continue implementation; a checkpoint is not completion.
-
-

@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Hosted foreground/native acceptance audited — 1 November 2026
+
+Mobile [run 41331799148](https://github.com/fajarxfce/hris-mobile/actions/runs/41331799148)
+passes with Mobile `2b2d81b3` and Platform `79326538`, APK `d94ba860`, Android API 35.
+[Audit](measurements/chat-foreground-ci-2026-11-01.json) binds 18 downloaded artifacts and
+retains predecessor 41325612922: SDK/scheduled passed there, direct worker failed ClosePending
+before returning its result, so its delivery outcome remains unknown.
+
+Current SDK/direct/scheduled cases pass in 56.228s/67.626s/90.851s. Direct worker recovery
+and real foreground ViewModel acquire 33 encrypted originals with four history actions,
+43 references and ten state-only references, admissions 30/28/30 with zero failures and
+complete cleanup. All originals are asserted before Stop; only the oldest row is explicitly
+asserted after Stop. SDK retains three sends and held-room isolation. WorkManager retains
+its namespaced CONNECTED job with task-only input through ordinary death, starts automatically,
+restores networking and ends SUCCEEDED. Six fixture cleanup unit tests also pass.
+
+Mobile `bf83c71e` subsequently implements bounded 150/50 bidirectional local windows and
+passes full local checks. Its release 7 is installed over code 4 on the authorized phone;
+no uninstall/data clearing/UI launch. This audit has the earlier immutable Mobile source;
+run 41334029287 covers the new window separately. Generic query port `cd7022e` is pushed to
+Starter. Live backend/provider is unchanged. Continue Apple database execution, durable
+composer/submission recovery, safe cancellation, push/replies and all unaccepted P0–P8.
+
 ## Native foreground history and publication ordering — 1 November 2026
 
 The companion Mobile fixture now exercises the actual ChatThreadViewModel after

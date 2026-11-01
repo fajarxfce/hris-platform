@@ -2,6 +2,20 @@
 
 ## Active collaboration implementation — 1 November 2026
 
+Owned DM summary endpoints now expose counterpart labels through one bounded
+database projection. [Contract](collaboration/direct-summaries.md) and
+[evidence](measurements/collaboration-direct-summaries-2026-11-01.json) cover
+25 database/nine HTTP cases in 75s, final owned HTTP-client cleanup check in 49s,
+and the corrected initial cookie fixture (58s). Identity-only APIs are unchanged;
+no schema/DI/live/phone change. Mobile summary adapters and product UI remain next.
+
+Entry/recovery CI at Mobile `4d90c6e0` is fully verified: control `41257419472`
+passes all 26 steps (187 desktop, 163 browser, 163 iOS simulator); protocol
+`41257419463` passes all 40 steps (classic 73.011s, native 86.187s); HRIS
+`41257419507` passes all 17 steps, actual SDK 72.015s with process restart,
+retained-cursor recovery and cleanup. All recorded 24 Platform/131 Mobile hashes
+match the pinned checkouts. See the updated [recovery evidence](measurements/collaboration-sync-recovery-2026-11-01.json).
+
 Mobile `92d91275` control preparation, replay, receipt reconciliation and runtime install/restore
 now preserve denial through failed post-request owner reads. Explicit guards take
 the preceding result. A failed uncertainty write cannot erase the retained denial
@@ -53,13 +67,11 @@ exposed the SDK's post-join metadata confirmation. Both failures are retained;
 three new domain, three database and two HTTP cases verify the correction,
 including malformed requests, identity isolation and permission loss.
 
-**Continue P0–P8; none of the 54 groups is accepted.** Admission read/control
-corrections above are verified. The next implementation is a bounded owned DM
-summary with counterpart labels, acquired in one database statement rather than
-per-row calls; Platform work is in progress, not yet verified. Then connect app
-entry and its shared runtime, product history windows, scoped offline projections,
-bootstrap/cross-family recovery, logical-ID reconciliation and chat UI. These
-HRIS adapters do not require a Starter port.
+**Continue P0–P8; none of the 54 groups is accepted.** Connect the verified
+summary contract to Mobile, then app entry and its shared runtime, product history
+windows, scoped offline projections, bootstrap/cross-family recovery, logical-ID
+reconciliation and chat UI. Keep HRIS admission/provider adapters here and Mobile;
+only reusable proven foundation changes belong in Starter.
 
 Predecessor `0ef8018c` control CI `41250076314` passes all 26 steps:
 158 desktop, 134 browser, 134 iOS simulator cases; 120 source hashes match the

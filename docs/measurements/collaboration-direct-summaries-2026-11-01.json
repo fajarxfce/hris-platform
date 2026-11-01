@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-01",
+  "change": "Bounded owned conversation summaries with counterpart labels",
+  "platformBase": "c5f189ef9b2bcb1efba1c6cd2199d1cacdcbaab9",
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixConfigurationTest.kt": "f191aba9534ff982710ab23e9eaf8507cabd7f66583d9c4bc678788e69bdd004",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationDirectDataSource.kt": "e8129793e80d937edcd9eee98307ef25de5fcc520555729c022d4894734b3d88",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationDirectSummaryRow.kt": "dbb216999ba495306cb9690ab06ec699f9ff8da00eac146bb330140a632c38f4",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationDirectDataSource.kt": "4149d6c9bf362c1f8273a652f4ef8428998abaeec2f5369b12c9559683a140f3",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationDirectRepository.kt": "7781df918125e16ae0481360b069bb0795bc58d210c68a53f8cae42e903f3d65",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "3c4f0c9dea175ef5104584ad505b0268a0dba78ec57a5d94ea5f06a5dd93d0e6",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDirectController.kt": "c8b9e04afadf363abe7a80cc73e7d7cec06813a3b49e094fba3a033fa6cc3aeb",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDirectSummary.kt": "cdaade922280c700e693e5619f90f2a778efcab001fea2f71389e6df97a18c04",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationDirectRepository.kt": "bdc92af9e91161c29c9676dd628642c600b26d0274c54b3fce2acc04de3637db",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/ReadNativeCollaborationDirect.kt": "c68f4702324792308cd7c00576d78a2c1b90e99a9e0094afe161280dd02ef3a5"
+  },
+  "newCases": {
+    "database": 2,
+    "http": 1
+  },
+  "validation": {
+    "data": {
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    },
+    "http": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    },
+    "regressionSeconds": 75,
+    "formatCheck": true,
+    "architectureCheck": true
+  },
+  "finalHttp": {
+    "seconds": 49,
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "reason": "Close the separate anonymous HttpClient explicitly; existing authenticated fixture client stays owned by its fixture."
+  },
+  "initialFailure": {
+    "seconds": 58,
+    "reason": "The anonymous request reused the authenticated browser cookie jar and correctly received 403 invalid_session_transport rather than 401. The corrected fixture verifies both cookie transport and genuinely anonymous access."
+  },
+  "schemaChanged": false,
+  "diGraphChanged": false,
+  "liveChanged": false,
+  "phoneChanged": false,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "notes": [
+    "One SQL statement joins the bounded owned page to counterpart account display names; at most 51 rows with overfetch.",
+    "Explicit account/company filters and forced RLS prevent foreign discovery. Native admission is rechecked after acquisition.",
+    "Current labels remain readable for an admitted participant after the counterpart is offboarded; new-message authorization is separate.",
+    "Existing identity-only endpoints remain compatible. Mobile adapters, product UI and owned offline projections are next."
+  ]
+}

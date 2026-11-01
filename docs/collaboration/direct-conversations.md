@@ -74,3 +74,6 @@ claim that CHAT-01, offline messaging or E2EE delivery is accepted.
 The separate [native room setup/status subresource](direct-room-provisioning.md)
 now provisions and verifies its Matrix room through the durable worker. Opening
 this immutable pair still does not itself create a provider room or admit content.
+
+The [owned summary endpoints](direct-summaries.md) now add counterpart labels in
+one bounded database projection while preserving the identity-only API.

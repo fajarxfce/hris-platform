@@ -104,7 +104,9 @@
         "../measurements/collaboration-owned-sync-2026-10-31.json",
         "https://github.com/fajarxfce/hris-mobile/blob/39217be2f63116dfe2752672a68f25b9479c514b/docs/measurements/collaboration-conversation-commands-2026-10-31.json",
         "../measurements/collaboration-owned-timeline-2026-10-31.json",
-        "../measurements/collaboration-sync-recovery-2026-11-01.json"
+        "../measurements/collaboration-sync-recovery-2026-11-01.json",
+        "direct-summaries.md",
+        "../measurements/collaboration-direct-summaries-2026-11-01.json"
       ]
     },
     {

@@ -3,6 +3,7 @@ package dev.fajar.hris.collaboration.delivery.controllers
 import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.collaboration.delivery.requests.OpenCollaborationDirectRequest
 import dev.fajar.hris.collaboration.domain.entities.CollaborationDirectConversation
+import dev.fajar.hris.collaboration.domain.entities.CollaborationDirectSummary
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.domain.Page
@@ -60,5 +61,41 @@ class NativeCollaborationDirectController(
     ): CollaborationDirectConversation =
         read
             .get(actor, identity.sessionId, identity.sessionVersion, client.version, conversationId)
+            .response()
+
+    @GetMapping("/summaries")
+    fun summaries(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "30") limit: Int,
+    ): Page<CollaborationDirectSummary> =
+        read
+            .summaries(
+                actor,
+                identity.sessionId,
+                identity.sessionVersion,
+                client.version,
+                after,
+                limit,
+            )
+            .response()
+
+    @GetMapping("/{conversationId}/summary")
+    fun summary(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @PathVariable conversationId: UUID,
+    ): CollaborationDirectSummary =
+        read
+            .summary(
+                actor,
+                identity.sessionId,
+                identity.sessionVersion,
+                client.version,
+                conversationId,
+            )
             .response()
 }

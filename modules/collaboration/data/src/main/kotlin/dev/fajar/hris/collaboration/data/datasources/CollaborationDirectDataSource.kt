@@ -21,5 +21,14 @@ interface CollaborationDirectDataSource {
         limit: Int,
     ): List<CollaborationDirectConversationsRecord>
 
+    fun summaries(
+        companyId: UUID,
+        accountId: UUID,
+        after: UUID?,
+        limit: Int,
+    ): List<CollaborationDirectSummaryRow>
+
+    fun summary(companyId: UUID, accountId: UUID, id: UUID): CollaborationDirectSummaryRow?
+
     fun insert(record: CollaborationDirectConversationsRecord)
 }

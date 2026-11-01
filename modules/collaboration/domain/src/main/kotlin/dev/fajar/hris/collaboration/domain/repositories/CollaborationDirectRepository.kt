@@ -1,6 +1,7 @@
 package dev.fajar.hris.collaboration.domain.repositories
 
 import dev.fajar.hris.collaboration.domain.entities.CollaborationDirectConversation
+import dev.fajar.hris.collaboration.domain.entities.CollaborationDirectSummary
 import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.core.domain.Result
 import java.util.UUID
@@ -23,6 +24,16 @@ interface CollaborationDirectRepository {
         after: UUID?,
         limit: Int,
     ): Result<Page<CollaborationDirectConversation>>
+
+    /** One bounded owned projection; labels do not depend on current peer sending eligibility. */
+    fun summaries(
+        companyId: UUID,
+        accountId: UUID,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<CollaborationDirectSummary>>
+
+    fun summary(companyId: UUID, accountId: UUID, id: UUID): Result<CollaborationDirectSummary?>
 
     fun create(conversation: CollaborationDirectConversation): Result<Unit>
 }

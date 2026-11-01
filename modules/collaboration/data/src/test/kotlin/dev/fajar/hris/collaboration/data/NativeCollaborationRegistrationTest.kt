@@ -3752,6 +3752,143 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun directSummariesPageOnlyOwnedCounterpartsAndRetainOffboardedLabels() {
+        val f = Fixture()
+        val parent = f.parent()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val expected =
+            (0..2).associate { index ->
+                val name = "Fictional summary peer $index"
+                val peer = f.peer(name)
+                val id =
+                    success(
+                            f.openDirect()
+                                .execute(f.actor, parent, 0, client, UUID.randomUUID(), peer)
+                        )
+                        .id
+                id to CollaborationParticipantReference(peer, name)
+            }
+        val seen = linkedMapOf<UUID, CollaborationParticipantReference>()
+        var cursor: UUID? = null
+        repeat(3) { index ->
+            val page = success(f.readDirect().summaries(f.actor, parent, 0, client, cursor, 1))
+            assertEquals(1, page.items.size)
+            val value = page.items.single()
+            seen[value.conversation.id] = value.peer
+            assertEquals(expected[value.conversation.id], value.peer)
+            assertEquals(index < 2, page.nextCursor != null)
+            cursor = page.nextCursor?.let(UUID::fromString)
+        }
+        assertEquals(expected.keys.sortedBy(UUID::toString), seen.keys.toList())
+        val id = expected.keys.first()
+        val peer = expected.getValue(id).accountId
+        val original = success(f.readDirect().get(f.actor, parent, 0, client, id))
+        val opposite =
+            success(
+                f.readDirect()
+                    .summary(f.actor.copy(accountId = peer), f.parent(peer), 0, client, id)
+            )
+        assertEquals(original, opposite.conversation)
+        assertEquals(f.account, opposite.peer.accountId)
+        assertEquals(
+            sql.queryForObject(
+                "select display_name from accounts where id=?",
+                String::class.java,
+                f.account,
+            ),
+            opposite.peer.displayName,
+        )
+        sql.update(
+            "update accounts set display_name='Renamed fictional peer',active=false where id=?",
+            peer,
+        )
+        val retained = success(f.readDirect().summary(f.actor, parent, 0, client, id))
+        assertEquals(original, retained.conversation)
+        assertEquals(
+            CollaborationParticipantReference(peer, "Renamed fictional peer"),
+            retained.peer,
+        )
+        for (limit in listOf(0, 51)) assertEquals(
+            "invalid_collaboration_conversation_query",
+            failed(f.readDirect().summaries(f.actor, parent, 0, client, null, limit)),
+        )
+        val unrelated = f.peer("Unrelated fictional summary reader")
+        val unrelatedActor = f.actor.copy(accountId = unrelated)
+        val unrelatedParent = f.parent(unrelated)
+        assertTrue(
+            success(f.readDirect().summaries(unrelatedActor, unrelatedParent, 0, client, null, 30))
+                .items
+                .isEmpty()
+        )
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(f.readDirect().summary(unrelatedActor, unrelatedParent, 0, client, id)),
+        )
+        val other = Fixture()
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(other.readDirect().summary(other.actor, other.parent(), 0, client, id)),
+        )
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            f.actor.companyId,
+            f.account,
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.readDirect().summaries(f.actor, parent, 0, client, null, 30),
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.readDirect().summary(f.actor, parent, 0, client, id),
+        )
+        assertEquals(3, f.rows("collaboration_direct_conversations"))
+    }
+
+    @Test
+    fun directSummariesWithholdAcquiredLabelsWhenNativeAuthorityExpires() {
+        for (single in listOf(false, true)) {
+            val f = Fixture()
+            val parent = f.parent()
+            val client = ClientVersion(ClientPlatform.ANDROID, 1)
+            val peer = f.peer("Fictional late summary peer")
+            val id =
+                success(f.openDirect().execute(f.actor, parent, 0, client, UUID.randomUUID(), peer))
+                    .id
+            val late =
+                object : CollaborationDirectRepository by f.direct {
+                    override fun summaries(
+                        companyId: UUID,
+                        accountId: UUID,
+                        after: UUID?,
+                        limit: Int,
+                    ): Result<Page<CollaborationDirectSummary>> =
+                        f.direct.summaries(companyId, accountId, after, limit).also {
+                            f.clock.at = f.clock.at.plusSeconds(1000)
+                        }
+
+                    override fun summary(
+                        companyId: UUID,
+                        accountId: UUID,
+                        id: UUID,
+                    ): Result<CollaborationDirectSummary?> =
+                        f.direct.summary(companyId, accountId, id).also {
+                            f.clock.at = f.clock.at.plusSeconds(1000)
+                        }
+                }
+            val reader = f.readDirect(late)
+            assertEquals(
+                "native_session_invalid",
+                failed(
+                    if (single) reader.summary(f.actor, parent, 0, client, id)
+                    else reader.summaries(f.actor, parent, 0, client, null, 30)
+                ),
+            )
+            assertEquals(1, f.rows("collaboration_direct_conversations"))
+        }
+    }
+
+    @Test
     fun directReadPaginationAndOffboardedPeerRetainOnlyOwnedMetadata() {
         val f = Fixture()
         val parent = f.parent()

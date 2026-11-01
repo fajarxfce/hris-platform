@@ -61,6 +61,40 @@ class ReadNativeCollaborationDirect(
             }
         }
 
+    fun summaries(
+        actor: Actor,
+        sessionId: UUID,
+        sessionVersion: Long,
+        client: ClientVersion?,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<CollaborationDirectSummary>> {
+        if (limit !in 1..50)
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_conversation_query")
+            )
+        return read(actor, sessionId, sessionVersion, client) {
+            conversations.summaries(requireNotNull(actor.companyId), actor.accountId, after, limit)
+        }
+    }
+
+    fun summary(
+        actor: Actor,
+        sessionId: UUID,
+        sessionVersion: Long,
+        client: ClientVersion?,
+        id: UUID,
+    ): Result<CollaborationDirectSummary> =
+        read(actor, sessionId, sessionVersion, client) {
+            conversations.summary(requireNotNull(actor.companyId), actor.accountId, id).flatMap {
+                if (it == null)
+                    Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "collaboration_conversation_not_found")
+                    )
+                else Result.Success(it)
+            }
+        }
+
     private fun <T> read(
         actor: Actor,
         sessionId: UUID,

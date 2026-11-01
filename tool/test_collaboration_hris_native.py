@@ -27,6 +27,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "providerHistoryRestartPreserved": True,
                 "historyRuntimeReopened": True,
                 "ackBeforeJournalRecovered": True,
+                "completionCleanupRecovered": True,
                 "ackSenderEventId": "$third", "ackTransaction": "ack-transaction",
                 "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
@@ -46,7 +47,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("originalHistoryWindowOwned", False), ("historyBodiesRestored", 1), ("historyWindow", None),
                             ("commonHistoryAcquisitionOwned", 1), ("latestHistoryHeadOwned", 1), ("providerHistoryPageOwned", 1),
                             ("commonProviderHistoryAcquisitionOwned", 1), ("providerHistoryReferencesRestored", 1),
-                            ("providerHistoryReferencesReconciled", 1), ("providerHistoryRestartPreserved", 1), ("historyRuntimeReopened", 1), ("ackBeforeJournalRecovered", 1),
+                            ("providerHistoryReferencesReconciled", 1), ("providerHistoryRestartPreserved", 1), ("historyRuntimeReopened", 1), ("ackBeforeJournalRecovered", 1), ("completionCleanupRecovered", 1),
                             ("ackSenderEventId", "$first"), ("ackSenderEventId", "$second"),
                             ("ackTransaction", "first-transaction")):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
@@ -134,10 +135,10 @@ class HrisNativeDriverTest(unittest.TestCase):
             native.cleanup.assert_called_once()
             return value, read_json(root / "result.json")
 
-    def handshake(self, root, native, restored=None, acknowledged=None, ack_restored=None, final=None):
+    def handshake(self, root, native, restored=None, acknowledged=None, ack_restored=None, archived=None, archive_restored=None, final=None):
         private_json(root / "send.json", {"ready": True})
         private_json(root / "resume.json", {"ready": True})
-        native.process_id.side_effect = [101, None, 202, 202, None, 303]
+        native.process_id.side_effect = [101, None, 202, 202, None, 303, 303, None, 404]
         reads = 0
         def command(*arguments):
             nonlocal reads
@@ -161,8 +162,13 @@ class HrisNativeDriverTest(unittest.TestCase):
                                                   "ackObserved": True, "receiptAbsent": True})
             if name == "gateway-ack-restored":
                 return json.dumps(ack_restored or {"transactionId": "ack-transaction", "processId": 303})
+            if name == "gateway-completed":
+                return json.dumps(archived or {"transactionId": "ack-transaction", "processId": 303,
+                                              "archiveRetained": True, "receiptRetained": True})
+            if name == "gateway-completion-restored":
+                return json.dumps(archive_restored or {"transactionId": "ack-transaction", "processId": 404})
             if name == "gateway-result":
-                return json.dumps(self.evidence() | {"processId": 303} | (final or {}))
+                return json.dumps(self.evidence() | {"processId": 404} | (final or {}))
             raise AssertionError("Unexpected owned IPC read")
         native.command.side_effect = command
 
@@ -254,7 +260,7 @@ class HrisNativeDriverTest(unittest.TestCase):
             self.assertTrue(result["cleanup"])
             self.assertFalse((root / "native-acknowledged.json").exists())
 
-    def test_final_ack_receipt_must_belong_to_the_third_process_and_retained_transaction(self):
+    def test_final_ack_receipt_must_belong_to_the_fourth_process_and_retained_transaction(self):
         for change in ({"processId": 202}, {"ackTransaction": "replacement-transaction"}):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
@@ -264,6 +270,50 @@ class HrisNativeDriverTest(unittest.TestCase):
                 self.assertFalse(value)
                 self.assertTrue(result["cleanup"])
                 self.assertNotIn("processRestartedAfterAck", result["proof"])
+
+    def test_completion_checkpoint_requires_archive_and_receipt_before_cleanup(self):
+        base = {"processId": 303, "transactionId": "ack-transaction", "archiveRetained": True, "receiptRetained": True}
+        self.assertEqual({"processId": 303, "transactionId": "ack-transaction"},
+                         checkpoint_evidence(base | {"eventId": "$not-evidence"}, completed=True))
+        for name, value in (("archiveRetained", 1), ("receiptRetained", False), ("receiptRetained", "true")):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                checkpoint_evidence(base | {name: value}, completed=True)
+
+    def test_completion_death_requires_the_ack_recovery_process_and_transaction(self):
+        base = {"processId": 303, "transactionId": "ack-transaction", "archiveRetained": True, "receiptRetained": True}
+        for change in ({"processId": 202}, {"transactionId": "replacement"}, {"receiptRetained": False}):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp); native, process = self.fixture(root)
+                self.handshake(root, native, archived=base | change)
+                value, result = self.execute(root, native, process)
+                self.assertFalse(value); self.assertTrue(result["cleanup"])
+                self.assertFalse((root / "native-completed.json").exists())
+
+    def test_completion_recovery_requires_a_fourth_pid_and_the_original_transaction(self):
+        for change in ({"processId": 101}, {"processId": 202}, {"processId": 303}, {"transactionId": "replacement"}):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp); native, process = self.fixture(root)
+                self.handshake(root, native, archive_restored={"processId": 404, "transactionId": "ack-transaction"} | change)
+                value, result = self.execute(root, native, process)
+                self.assertFalse(value); self.assertTrue(result["cleanup"])
+                self.assertFalse((root / "native-completion-restored.json").exists())
+
+    def test_completion_process_must_die_before_cleanup_recovery_starts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); native, process = self.fixture(root)
+            self.handshake(root, native)
+            native.process_id.side_effect = [101, None, 202, 202, None, 303, 303, 303]
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value); self.assertTrue(result["cleanup"])
+            self.assertFalse((root / "native-completed.json").exists())
+
+    def test_third_process_result_cannot_claim_completed_cleanup_recovery(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); native, process = self.fixture(root)
+            self.handshake(root, native, final={"processId": 303})
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value); self.assertTrue(result["cleanup"])
+            self.assertNotIn("processRestartedAfterCompletion", result["proof"])
 
     def test_non_loopback_servers_are_rejected_before_emulator_access(self):
         for base in ("https://127.0.0.1:43210", "http://10.77.77.3:5555", "http://127.0.0.1:80",
@@ -300,9 +350,9 @@ class HrisNativeDriverTest(unittest.TestCase):
                 self.assertEqual(cleaned, value)
                 self.assertEqual(cleaned, result["cleanup"])
                 self.assertTrue(result["passed"])
-                self.assertEqual(self.evidence() | {"processRestarted": True, "processRestartedAfterAck": True}, result["proof"])
-                self.assertEqual(6, native.process_id.call_count)
-                self.assertEqual(3, process.terminate.call_count)
+                self.assertEqual(self.evidence() | {"processRestarted": True, "processRestartedAfterAck": True, "processRestartedAfterCompletion": True}, result["proof"])
+                self.assertEqual(9, native.process_id.call_count)
+                self.assertEqual(4, process.terminate.call_count)
 
     def test_instrumentation_failure_and_cancellation_preserve_safe_evidence(self):
         for replies in ([json.dumps({"complete": False, "failureCategory": "IllegalStateException", "message": "private-fixture"})],

@@ -1,5 +1,30 @@
 # Agent continuation — HRIS workspace
 
+## Completion retirement process-death proof — 1 November 2026
+
+Actual Android/HRIS run `90ac7444ccff4f258b1a78f6c076a226` passes with four distinct
+processes and three forced deaths, including after command archival and before
+journal cleanup. The fourth process uses only owned local evidence, recognizes
+archived receipts, cleans exactly two journal entries, reopens SQLite and rejects
+changed-intent replay. Server still sees exactly three encrypted sends and no
+held-room send; admission is 22/22/22 with zero failures. Native case 43.141s,
+suite 65.560s, Gradle 95s; cleanup true. Driver 45 cases pass, fixture/quality 31s.
+See [measurement](measurements/collaboration-retirement-2026-11-01.json): 307 Mobile
+and 33 Platform source hashes match, proof APK `9e9dcdbd`.
+
+Mobile domain/storage/DI integration passes focused checks in 150s, plus final
+native fixture build/quality in 55s. Root application checks remain pending while
+Mobile pins this validated Platform fixture commit. No phone/live change; dedicated
+emulator stopped. This checkpoint does not accept a PRD feature group. Continue
+Mobile full validation, Chat UI scheduling, Apple/web, backup, rich messages and
+all calls/meetings. Keep every atomic commit pushed; do not stop at this checkpoint.
+
+Prior CI audits are recorded separately: ACK recovery control `41295813930` passes
+484 desktop / 460 browser / 389 iOS simulator cases and Xcode build, with 279 hashes
+matched. Starter archive Apple run `41298641454` passes 84 simulator cases, all 16
+Apple steps and Xcode build, with 15 hashes matched; its other jobs were skipped.
+
+
 ## Validated command archive foundation — 1 November 2026
 
 Mobile [`0a78e8ed`](https://github.com/fajarxfce/hris-mobile/commit/0a78e8edb8d604da6d411a441d3fcdc34511ff65)

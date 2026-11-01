@@ -57,7 +57,7 @@ def proof_evidence(value):
                  "commonSenderOwned", "receiptJournalRecovered", "projectionInterrupted",
                  "originalHistoryWindowOwned", "historyBodiesRestored", "commonHistoryAcquisitionOwned", "latestHistoryHeadOwned", "providerHistoryPageOwned",
                  "commonProviderHistoryAcquisitionOwned", "providerHistoryReferencesRestored",
-                 "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered"):
+                 "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered", "completionCleanupRecovered"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True
@@ -90,7 +90,7 @@ def history_evidence(value):
     return output
 
 
-def checkpoint_evidence(value, staged=False, acknowledged=False):
+def checkpoint_evidence(value, staged=False, acknowledged=False, completed=False):
     if not isinstance(value, dict):
         raise ValueError("Invalid owned queue checkpoint")
     pid = value.get("processId")
@@ -102,6 +102,9 @@ def checkpoint_evidence(value, staged=False, acknowledged=False):
     if acknowledged:
         if value.get("ackObserved") is not True or value.get("receiptAbsent") is not True:
             raise ValueError("Invalid owned acknowledgement checkpoint")
+    if completed:
+        if value.get("archiveRetained") is not True or value.get("receiptRetained") is not True:
+            raise ValueError("Invalid owned completion checkpoint")
     if staged:
         for name in ("protectedStoreReopened", "missingRecordPreserved", "wrongPassphrasePreserved", "exclusiveOwner"):
             if value.get(name) is not True:
@@ -176,6 +179,9 @@ def run(apk, sdk, directory):
         acknowledged = None
         ack_restored = None
         ack_resumed = False
+        archived = None
+        archive_restored = None
+        archive_resumed = False
         while time.monotonic() < until:
             completion = app_json("instrumentation")
             if completion is not None:
@@ -184,16 +190,17 @@ def run(apk, sdk, directory):
                 result["diagnostic"].pop("resultComplete")
                 if completion.get("complete") is not True:
                     raise RuntimeError("Owned native instrumentation failed")
-                if staged is None or restored is None or not resumed or acknowledged is None or ack_restored is None or not ack_resumed:
+                if staged is None or restored is None or not resumed or acknowledged is None or ack_restored is None or not ack_resumed or archived is None or archive_restored is None or not archive_resumed:
                     raise RuntimeError("Owned process restart was not completed")
                 proof = app_json("gateway-result")
                 result["proof"] = proof_evidence(proof)
-                if (type(proof.get("processId")) is not int or proof["processId"] != ack_restored["processId"]
+                if (type(proof.get("processId")) is not int or proof["processId"] != archive_restored["processId"]
                         or result["proof"]["senderTransaction"] != staged["transactionId"]
                         or result["proof"]["ackTransaction"] != acknowledged["transactionId"]):
                     raise RuntimeError("Owned pending receipt did not survive restart")
                 result["proof"]["processRestarted"] = True
                 result["proof"]["processRestartedAfterAck"] = True
+                result["proof"]["processRestartedAfterCompletion"] = True
                 result["passed"] = True
                 break
             if not ready and app_json("gateway-ready") == {"ready": True}:
@@ -249,6 +256,30 @@ def run(apk, sdk, directory):
                     private_json(directory / "native-ack-restored.json", ack_restored)
                     write_app("gateway-ack-resume", {"ready": True})
                     ack_resumed = True
+            if ack_resumed and archived is None:
+                checkpoint = app_json("gateway-completed")
+                if checkpoint is not None:
+                    archived = checkpoint_evidence(checkpoint, completed=True)
+                    if (archived["processId"] != ack_restored["processId"]
+                            or archived["transactionId"] != acknowledged["transactionId"]
+                            or native.process_id() != archived["processId"]):
+                        raise RuntimeError("Owned completion process was not confirmed")
+                    native.command("shell", "am", "force-stop", PACKAGE)
+                    if not stop_process(process) or native.process_id() is not None:
+                        raise RuntimeError("Owned completion process did not stop")
+                    private_json(directory / "native-completed.json", archived)
+                    process = start("hris-completion-recover")
+            if archived is not None and archive_restored is None:
+                checkpoint = app_json("gateway-completion-restored")
+                if checkpoint is not None:
+                    archive_restored = checkpoint_evidence(checkpoint)
+                    if (archive_restored["processId"] in (staged["processId"], restored["processId"], ack_restored["processId"])
+                            or archive_restored["transactionId"] != archived["transactionId"]
+                            or native.process_id() != archive_restored["processId"]):
+                        raise RuntimeError("Owned completion restoration was not confirmed")
+                    private_json(directory / "native-completion-restored.json", archive_restored)
+                    write_app("gateway-completion-resume", {"ready": True})
+                    archive_resumed = True
             if process.poll() is not None:
                 raise RuntimeError("Owned native instrumentation exited without a result")
             time.sleep(0.15)

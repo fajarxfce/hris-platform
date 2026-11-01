@@ -106,7 +106,8 @@
         "../measurements/collaboration-owned-timeline-2026-10-31.json",
         "../measurements/collaboration-sync-recovery-2026-11-01.json",
         "direct-summaries.md",
-        "../measurements/collaboration-direct-summaries-2026-11-01.json"
+        "../measurements/collaboration-direct-summaries-2026-11-01.json",
+        "../measurements/collaboration-local-list-2026-11-01.json"
       ]
     },
     {
@@ -167,7 +168,8 @@
         "direct-room-storage.md",
         "../measurements/collaboration-direct-room-storage-2026-10-31.json",
         "direct-room-provisioning.md",
-        "../measurements/collaboration-direct-room-provisioning-2026-10-31.json"
+        "../measurements/collaboration-direct-room-provisioning-2026-10-31.json",
+        "../measurements/collaboration-local-list-2026-11-01.json"
       ]
     },
     {
@@ -495,7 +497,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Connect admitted common content ports and app entry; complete product history windows, owned offline message projections, bootstrap/cross-family recovery and logical-message reconciliation. Android runtimes now own classic sync and ordered room/timeline observers, with actual process-death and disposal evidence.",
+    "Connect admitted app entry with explicit shared runtime reuse, then Chat navigation/list/setup and conversation UI. Owned encrypted direct-summary cache is verified; complete product history windows, message projections, bootstrap/cross-family recovery and logical-message reconciliation without resetting SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

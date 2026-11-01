@@ -263,6 +263,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "commonProviderHistoryAcquisitionOwned",
                     "providerHistoryReferencesRestored",
                     "providerHistoryReferencesReconciled",
+                    "providerHistoryRestartPreserved",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -290,7 +291,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             )
             val applicationReads = trace.applicationAdmissions()
             assertTrue(
-                listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 8 }
+                listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 10 }
             )
             assertEquals(0, applicationReads.getValue("failures"))
             assertTrue(trace.applicationAdmittedBeforeSend())
@@ -344,6 +345,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "commonProviderHistoryAcquisitionOwned" to true,
                     "providerHistoryReferencesRestored" to true,
                     "providerHistoryReferencesReconciled" to true,
+                    "providerHistoryRestartPreserved" to true,
                     "admittedProviderPages" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,

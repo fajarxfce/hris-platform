@@ -177,6 +177,16 @@ that makes no write. The strict `providerHistoryReferencesReconciled` flag is
 required by Android evidence extraction, the Python driver and server verification;
 numeric truthy substitutes are rejected. Original text bodies are verified afterward.
 
+The proof then explicitly requests the latest page using the common acquisition
+operation. Its new position commits without deleting unseen references or reviving
+resolved ones; another database reopen and reconciliation must leave them intact.
+`providerHistoryRestartPreserved` is a mandatory Boolean across client, driver and
+server evidence. The independent gateway trace requires 3–4 metadata requests:
+unpositioned first/last, positioned requests between them, and increasing admitted
+device/conversation/room reads around every request. The final count is at least ten
+for each resource. This exercises explicit restart, not retirement of a real server
+cursor-encryption key or automatic origin switching after a provider rejection.
+
 See the [Mobile history contract](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/collaboration-history.md#offline-reference-reconciliation).
 This is a bounded two-original fixture, not complete decryption, expired-cursor
 recovery, an ACK-before-journal process-death proof or product/capacity acceptance.

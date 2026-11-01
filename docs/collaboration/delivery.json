@@ -137,7 +137,8 @@
         "../measurements/collaboration-provider-page-2026-11-01.json",
         "../measurements/collaboration-history-traversal-2026-11-01.json",
         "../measurements/collaboration-provider-acquisition-2026-11-01.json",
-        "../measurements/collaboration-history-resolution-2026-11-01.json"
+        "../measurements/collaboration-history-resolution-2026-11-01.json",
+        "../measurements/collaboration-history-restart-2026-11-01.json"
       ]
     },
     {
@@ -237,7 +238,8 @@
         "../measurements/collaboration-provider-page-2026-11-01.json",
         "../measurements/collaboration-history-traversal-2026-11-01.json",
         "../measurements/collaboration-provider-acquisition-2026-11-01.json",
-        "../measurements/collaboration-history-resolution-2026-11-01.json"
+        "../measurements/collaboration-history-resolution-2026-11-01.json",
+        "../measurements/collaboration-history-restart-2026-11-01.json"
       ]
     },
     {
@@ -547,7 +549,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Offline original-reference reconciliation now passes actual Android/server recovery while retaining unknown work and provider progress. Add explicit provider-cursor recovery, coordinated SDK reopening with retained keys/cursors/transactions, ACK-before-journal reconciliation, command retirement and Chat UI; continue all P0–P8.",
+    "Explicit latest-page restart now preserves pending/resolved reference identities and provider progress through actual Android/server recovery. Add coordinated SDK reopening with retained keys/cursors/transactions and active-writer protection, ACK-before-journal reconciliation, command retirement and Chat UI; continue all P0–P8.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

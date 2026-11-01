@@ -33,16 +33,22 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val applicationAtHead = AtomicReference<Map<String, Int>?>(null)
     private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
     private val providerPages = AtomicInteger()
-    private val positionedPages = AtomicInteger()
     private val providerAdmissions = mutableListOf<Map<String, Int>>()
+    private val providerPositions = mutableListOf<Boolean>()
 
     fun admittedProviderPages(): Boolean {
-        val pages = synchronized(providerAdmissions) { providerAdmissions.toList() }
+        val (pages, positions) =
+            synchronized(providerAdmissions) {
+                providerAdmissions.toList() to providerPositions.toList()
+            }
         val before = pages.firstOrNull() ?: return false
         val after = applicationAdmissions()
-        return providerPages.get() in 2..3 &&
+        return providerPages.get() in 3..4 &&
             pages.size == providerPages.get() &&
-            positionedPages.get() == providerPages.get() - 1 &&
+            positions.size == pages.size &&
+            !positions.first() &&
+            !positions.last() &&
+            positions.drop(1).dropLast(1).all { it } &&
             before.getValue("failures") == 0 &&
             after.getValue("failures") == 0 &&
             pages.all { it.getValue("failures") == 0 } &&
@@ -148,10 +154,11 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 request.getParameter("limit") == "20"
         ) {
             providerPages.updateAndGet { minOf(it + 1, 64) }
-            if (request.parameterMap.containsKey("from"))
-                positionedPages.updateAndGet { minOf(it + 1, 64) }
             synchronized(providerAdmissions) {
-                if (providerAdmissions.size < 8) providerAdmissions.add(applicationAdmissions())
+                if (providerAdmissions.size < 8) {
+                    providerAdmissions.add(applicationAdmissions())
+                    providerPositions.add(request.parameterMap.containsKey("from"))
+                }
             }
         }
         if (

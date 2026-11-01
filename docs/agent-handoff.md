@@ -1,5 +1,21 @@
 # Agent continuation — HRIS workspace
 
+## Composer-era native regression audited — 1 November 2026
+
+Mobile [run 41338026431](https://github.com/fajarxfce/hris-mobile/actions/runs/41338026431)
+at `cca28f06` / Platform `79326538` passes SDK/direct/scheduled cases in
+42.32s / 56.409s / 59.092s, proof APK `c8185d69`. [Audit](measurements/chat-draft-composer-native-ci-2026-11-01.json)
+binds twenty downloaded files, including sanitized gateway observations, plus six cleanup
+cases. Existing 33-original foreground/worker and automatic WorkManager recovery assertions
+pass. Final exhausted-retry diagnostics are now retained, but this success does not explain
+the earlier bf83 failure or change its unknown direct-delivery outcome.
+
+This source includes composer-v1 UI; these native fixtures exercise the existing worker and
+foreground route, not the draft transition boundaries. Mobile composer-v2/indexed recovery is
+newer and undergoing root/browser/Android checks with its own freeze-only restart tests.
+Live Platform/provider deployment remains unchanged; no feature group is marked complete.
+Continue Mobile release 8+ install-only after validation and the remaining communication PRD.
+
 ## Later bounded-window native run audited — 1 November 2026
 
 Mobile [run 41335935547](https://github.com/fajarxfce/hris-mobile/actions/runs/41335935547)

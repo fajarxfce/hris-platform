@@ -199,15 +199,7 @@ class InternalCollaborationMatrixSyncRepository(
                     (!fallback.isArray || fallback.size() > 10 || fallback.any { !it.isString })
             )
                 throw MatrixResponseException()
-            val direct =
-                scope.rooms
-                    .groupBy {
-                        user(
-                            if (it.firstAccountId == owner.accountId) it.secondAccountId
-                            else it.firstAccountId
-                        )
-                    }
-                    .mapValues { it.value.map { room -> room.roomId } }
+            val direct = collaborationDirectMetadata(owner, scope)
             CollaborationMatrixSyncBatch(
                 next,
                 filter,

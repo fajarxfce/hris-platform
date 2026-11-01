@@ -1,5 +1,52 @@
 # Mobile native setup ownership
 
+## Admitted room entry and interrupted synchronization
+
+[Evidence](../measurements/collaboration-sync-recovery-2026-11-01.json).
+
+Common admitted conversation entry and retained-cursor sync recovery are implemented.
+Entry verifies the active device, owned DM, READY room and current owner after each
+request; a late result closes only its child. Structured SDK denials survive failed
+post-request reads and disposal. The pinned FFI loop stops on its first error;
+the replacement owns one `syncOnceV2` request, bounded backoff and the SDK's cursor.
+Final denied responses remain visible even when cleanup fails. The gateway also
+confirms the SDK's post-join `m.direct` only when it matches the existing HRIS
+DIRECT scope. No provider metadata writes or arbitrary account-data are enabled. The server fixture
+injects a sync 429 only after actual process death and requires a successful retry
+with that same cursor, both encrypted replies and the original queued transaction.
+
+Twenty-nine new common cases pass. Final full root/browser/Android/Wasm/lint passes
+in 240s: 2,189 desktop cases, 82 domain/81 data browser,
+zero lint errors. Later proof-only corrections each rerun root/proof assembly/lint
+(66s diagnostic, 64s current owner, 65s bounded explicit entry attempts). Actual
+SDK run `c17b1b10` passes in 39.126s (66s Gradle/quality,
+one API and 32 driver cases), with cleanup complete. Backend regression passes
+in 411s with 40 domain, 204 data and 20 HTTP
+cases; focused verification passes in 54s. Format and architecture checks pass. All 24 Platform/131 Mobile
+hashes match before/after. Proof APK `8a212769`; dev APK `87631d85` is built,
+not installed. Emulator stopped; no live/schema/phone changes.
+
+The earlier missing-room failures were a fixture ownership bug: restoration changed
+the local session, but entry retained its old owner. RuntimeNotOpen correctly rejected
+it before SDK join. The initial room-ID hypothesis was incorrect; all attempts are
+retained. A later 503 provider-busy join is also retained. The fixture permits at most
+four explicit idempotent entry attempts; product repositories still issue each join
+once, with no automatic enrollment. The deterministic sync fault remains independent. Two subsequent failed runs
+exposed the SDK's post-join metadata confirmation. Both failures are retained;
+three new domain, three database and two HTTP cases verify the correction,
+including malformed requests, identity isolation and permission loss.
+
+**Continue P0–P8; none of the 54 groups is accepted.** Next, retain received
+server denials in setup/discovery reads when their follow-up session read fails
+(`LoadCollaborationSetup` / `ReadCollaborationConversations` still return that
+later failure directly). Preparation, replay and runtime restoration use the same post-request pattern;
+review their denial propagation as part of that correction. Then connect product entry, bounded history windows,
+scoped offline projections, bootstrap/cross-family recovery and durable logical-ID
+reconciliation to chat UI. Existing DM metadata has actor IDs, so add a bounded
+owned peer-label projection before presenting the conversation list. Do not scan
+5,000 participants or add per-row remote calls. Keep generic verified foundations
+in Starter; these HRIS SDK/admission adapters do not require a Starter port.
+
 ## Owned room timelines
 
 Mobile [0ef8018c](https://github.com/fajarxfce/hris-mobile/commit/0ef8018c)

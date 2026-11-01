@@ -242,6 +242,94 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
     }
 
+    private fun directMetadata(
+        n: Native,
+        token: String?,
+        user: String,
+        body: String? = null,
+        suffix: String = "",
+    ): HttpResponse<String> {
+        val encoded = java.net.URLEncoder.encode(user, java.nio.charset.StandardCharsets.UTF_8)
+        val request =
+            HttpRequest.newBuilder(
+                    URI(
+                        "http://127.0.0.1:$port/_matrix/client/v3/user/$encoded/account_data/m.direct$suffix"
+                    )
+                )
+                .timeout(Duration.ofSeconds(15))
+        token?.let { request.header("Authorization", "Bearer $it") }
+        if (body == null) request.GET()
+        else
+            request
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+        return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
+    }
+
+    @Test
+    fun directMetadataReadsAndConfirmsOnlyTheCurrentHrisOwnedMap() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val peer = UUID.randomUUID()
+        val room = publishedRoom(n, device, peer)
+        fun user(account: UUID) =
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${account.toString().replace("-", "")}:matrix.example.test"
+        val expected = json.writeValueAsString(mapOf(user(peer) to listOf(room)))
+        val current = directMetadata(n, token, user(n.fixture.account))
+        assertEquals(200, current.statusCode(), current.body())
+        assertEquals(json.readTree(expected), json.readTree(current.body()))
+        assertEquals("no-store", current.headers().firstValue("Cache-Control").orElse(""))
+        repeat(2) {
+            val confirmed = directMetadata(n, token, user(n.fixture.account), expected)
+            assertEquals(200, confirmed.statusCode(), confirmed.body())
+            assertTrue(json.readTree(confirmed.body()).isEmpty)
+        }
+        val changed = directMetadata(n, token, user(n.fixture.account), "{}")
+        assertEquals(409, changed.statusCode(), changed.body())
+        assertEquals(
+            "collaboration_direct_metadata_managed",
+            json.readTree(changed.body()).path("org.hris.error_code").asString(),
+        )
+        assertEquals(403, directMetadata(n, token, user(peer)).statusCode())
+        val other = native()
+        val (_, otherToken) = enroll(other)
+        assertEquals(403, directMetadata(other, otherToken, user(n.fixture.account)).statusCode())
+        assertEquals(
+            json.readTree(expected),
+            json.readTree(directMetadata(n, token, user(n.fixture.account)).body()),
+        )
+        database()
+            .update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                n.session,
+            )
+        assertEquals(401, directMetadata(n, token, user(n.fixture.account), expected).statusCode())
+    }
+
+    @Test
+    fun directMetadataRejectsMalformedAndUnauthenticatedRequests() {
+        val n = native()
+        val (_, token) = enroll(n)
+        val user =
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test"
+        assertEquals(200, directMetadata(n, token, user, "{}").statusCode())
+        for (body in
+            listOf(
+                "[]",
+                "{\"@peer\":null}",
+                "{\"@peer\":[1]}",
+                "{\"@peer\":[\"!a\",\"!a\"]}",
+                "{\"@peer\":[\"!a\"],\"@peer\":[\"!b\"]}",
+                "{} {}",
+            )) assertEquals(400, directMetadata(n, token, user, body).statusCode())
+        assertEquals(413, directMetadata(n, token, user, " ".repeat(1_048_577)).statusCode())
+        assertEquals(401, directMetadata(n, null, user).statusCode())
+        assertEquals(401, directMetadata(n, null, user, "{}").statusCode())
+        assertEquals(401, directMetadata(n, n.access, user, "{}").statusCode())
+        assertEquals(400, directMetadata(n, token, user, suffix = "?extra=1").statusCode())
+        assertEquals(400, directMetadata(n, token, user, "{}", "?extra=1").statusCode())
+    }
+
     @Test
     fun roomReadsJoinAndDiscoveryUseCurrentNativeOwnershipAndBoundMemberPosition() {
         val n = native()

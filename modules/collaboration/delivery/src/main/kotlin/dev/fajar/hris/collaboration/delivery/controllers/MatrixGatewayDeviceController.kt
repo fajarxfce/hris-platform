@@ -1,6 +1,7 @@
 package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
+import dev.fajar.hris.collaboration.delivery.requests.matrixDirectMetadataRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyClaimRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyQueryRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
@@ -30,6 +31,18 @@ import tools.jackson.databind.json.JsonMapper
 class MatrixGatewayDeviceController(private val device: AccessNativeCollaborationMatrixDevice) {
     private val parser = parser(512)
     private val envelopeParser = parser(65536)
+
+    @PutMapping("/_matrix/client/v3/user/{userId}/account_data/m.direct")
+    fun confirmDirectMetadata(
+        @PathVariable userId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        keyRequest(request, ::matrixDirectMetadataRequest, 1_048_576) { token, correlation, content
+            ->
+            device.confirmDirectMetadata(token, correlation, userId, content).map {
+                emptyMap<String, Any>()
+            }
+        }
 
     @PutMapping("/_matrix/client/v3/rooms/{roomId}/send/m.room.encrypted/{transactionId}")
     fun roomMessage(

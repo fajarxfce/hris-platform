@@ -182,6 +182,14 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 trace.earlyEncryptedSendCount(),
                 "SDK sent before explicit queue admission",
             )
+            trace.interruptNextRetainedSync()
+            val interruptionDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(25)
+            while (!trace.syncInterrupted()) {
+                if (!process.isAlive) fail<Nothing>(diagnostic(directory))
+                if (System.nanoTime() >= interruptionDeadline)
+                    fail<Nothing>("Restored SDK did not issue a retained sync request")
+                Thread.sleep(100)
+            }
             trace.allowEncryptedSends()
             writePrivate(directory.resolve("resume.json"), mapOf("ready" to true))
             assertTrue(
@@ -192,6 +200,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             val result = json.readTree(Files.readString(directory.resolve("result.json")))
             assertTrue(result.path("passed").asBoolean())
             assertTrue(result.path("cleanup").asBoolean())
+            assertTrue(
+                trace.retainedSyncRecovered(),
+                "SDK failed to retry with its retained cursor",
+            )
             val proof = result.path("proof")
             for (name in
                 listOf(
@@ -239,6 +251,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "transactionReused" to true,
                     "identityAfterRestart" to true,
                     "pausedAcrossRestart" to true,
+                    "syncInterruptedAfterRestart" to true,
+                    "syncRetriedWithRetainedCursor" to true,
                     "artifact" to result.path("artifact"),
                 ),
             )

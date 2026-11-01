@@ -43,6 +43,64 @@ class AccessNativeCollaborationMatrixDevice(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
+    fun directMetadata(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+    ): Result<Map<String, List<String>>> = directMetadata(token, correlationId, userId, null)
+
+    fun confirmDirectMetadata(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+        content: Map<String, List<String>>,
+    ): Result<Unit> =
+        normalizeCollaborationDirectMetadata(content).flatMap {
+            directMetadata(token, correlationId, userId, it).map { Unit }
+        }
+
+    private fun directMetadata(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+        confirmation: Map<String, List<String>>?,
+    ): Result<Map<String, List<String>>> =
+        admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ ->
+                if (userId != expectedUser(initial))
+                    Result.Failed(
+                        Failure(FailureKind.FORBIDDEN, "collaboration_direct_metadata_unavailable")
+                    )
+                else
+                    readRoomScope(initial).flatMap { scope ->
+                        val current = collaborationDirectMetadata(syncOwner(initial), scope)
+                        if (confirmation != null && confirmation != current)
+                            Result.Failed(
+                                Failure(
+                                    FailureKind.CONFLICT,
+                                    "collaboration_direct_metadata_managed",
+                                )
+                            )
+                        else Result.Success(scope)
+                    }
+            },
+            revalidate = { initial, original ->
+                readRoomScope(initial).flatMap { current ->
+                    if (current == original) Result.Success(Unit)
+                    else
+                        Result.Failed(
+                            Failure(FailureKind.CONFLICT, "collaboration_direct_metadata_changed")
+                        )
+                }
+            },
+        ) { exchange, scope ->
+            exchange.confirm().map {
+                collaborationDirectMetadata(syncOwner(exchange.initial), scope)
+            }
+        }
+
     fun capabilities(token: String, correlationId: UUID): Result<Unit> =
         admitted(token, correlationId, prepare = { _, _ -> Result.Success(Unit) }) { exchange, _ ->
             exchange.confirm()

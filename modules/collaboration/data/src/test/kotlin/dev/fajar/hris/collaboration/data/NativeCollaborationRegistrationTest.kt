@@ -4842,6 +4842,142 @@ class NativeCollaborationRegistrationTest {
             )
     }
 
+    @Test
+    fun directMetadataOnlyConfirmsTheCurrentOwnedProjectionWithoutChangingOwnership() {
+        val m = DirectMetadataFixture()
+        val expected = m.expected()
+        assertEquals(
+            expected,
+            success(m.request.directMetadata(m.token, UUID.randomUUID(), m.user)),
+        )
+        repeat(2) {
+            success(m.request.confirmDirectMetadata(m.token, UUID.randomUUID(), m.user, expected))
+        }
+        assertEquals(
+            "collaboration_direct_metadata_managed",
+            failed(m.request.confirmDirectMetadata(m.token, UUID.randomUUID(), m.user, emptyMap())),
+        )
+        assertEquals(
+            "collaboration_direct_metadata_managed",
+            failed(
+                m.request.confirmDirectMetadata(
+                    m.token,
+                    UUID.randomUUID(),
+                    m.user,
+                    mapOf("@foreign:elsewhere.invalid" to listOf(m.room.roomId)),
+                )
+            ),
+        )
+        assertEquals(
+            "collaboration_direct_metadata_unavailable",
+            failed(
+                m.request.directMetadata(m.token, UUID.randomUUID(), "@foreign:elsewhere.invalid")
+            ),
+        )
+        assertEquals(
+            expected,
+            success(m.request.directMetadata(m.token, UUID.randomUUID(), m.user)),
+        )
+        assertEquals(1, m.matrix.logins.get())
+        assertEquals(0, m.matrix.queries.get())
+        assertEquals(0, m.matrix.logouts.get())
+    }
+
+    @Test
+    fun directMetadataRejectsAChangedSnapshotAfterAcquisition() {
+        for (confirm in listOf(false, true)) {
+            val m = DirectMetadataFixture()
+            m.onScope = { count -> if (count > 1) m.rooms.clear() }
+            val result =
+                if (confirm)
+                    m.request.confirmDirectMetadata(
+                        m.token,
+                        UUID.randomUUID(),
+                        m.user,
+                        m.expected(),
+                    )
+                else m.request.directMetadata(m.token, UUID.randomUUID(), m.user)
+            assertEquals("collaboration_direct_metadata_changed", failed(result))
+        }
+    }
+
+    @Test
+    fun directMetadataRetainsNewPermissionDenialAfterProviderAdmission() {
+        for (confirm in listOf(false, true)) {
+            val m = DirectMetadataFixture()
+            m.matrix.onLogin = {
+                sql.update(
+                    "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                    m.g.f.actor.companyId,
+                    m.g.f.account,
+                )
+                m.matrix.issue(it)
+            }
+            val result =
+                if (confirm)
+                    m.request.confirmDirectMetadata(
+                        m.token,
+                        UUID.randomUUID(),
+                        m.user,
+                        m.expected(),
+                    )
+                else m.request.directMetadata(m.token, UUID.randomUUID(), m.user)
+            assertEquals("access_denied", failed(result))
+            assertNull(m.g.f.credential(m.g.device))
+        }
+    }
+
+    private inner class DirectMetadataFixture {
+        val g = GatewayFixture()
+        val token = success(g.bootstrap()).accessToken
+        val matrix = RecordingMatrix(g.f.clock)
+        val peer = UUID.randomUUID()
+        val company = requireNotNull(g.f.actor.companyId)
+        val user = "@${collaborationMatrixLocalpart(company, g.f.account)}:proof.invalid"
+        val peerUser = "@${collaborationMatrixLocalpart(company, peer)}:proof.invalid"
+        val room =
+            CollaborationOwnedRoom(
+                company,
+                UUID.randomUUID(),
+                g.f.account,
+                peer,
+                g.f.account,
+                "proof.invalid",
+                "!owned",
+            )
+        val rooms = mutableListOf(room)
+        var reads = 0
+        var onScope: (Int) -> Unit = {}
+        val request =
+            g.f.matrixIdentity(
+                matrix,
+                roomScopes =
+                    object : CollaborationRoomScopeRepository {
+                        override fun find(
+                            companyId: UUID,
+                            accountId: UUID,
+                            serverName: String,
+                            roomId: String,
+                        ): Result<CollaborationOwnedRoom?> =
+                            error("Only the complete owned metadata scope is read")
+
+                        override fun owned(
+                            companyId: UUID,
+                            accountId: UUID,
+                            limit: Int,
+                        ): Result<List<CollaborationOwnedRoom>> {
+                            assertEquals(company, companyId)
+                            assertEquals(g.f.account, accountId)
+                            assertEquals(10_001, limit)
+                            onScope(++reads)
+                            return Result.Success(rooms.toList())
+                        }
+                    },
+            )
+
+        fun expected() = mapOf(peerUser to listOf(room.roomId))
+    }
+
     private class GatewayFixture {
         val f = Fixture()
         val parent = f.parent()

@@ -47,3 +47,7 @@ parser rejects unexpected labels, malformed/noninteger/excessive counters and
 oversize input, and closes the HTTP owner on parsing failure. Raw metrics are not
 written to the retained evidence. Keep long-poll/media capacity separate from the
 short identity/control exchanges when implementing product transport.
+
+The [owned `m.direct` projection and confirmation](direct-metadata.md) now provide
+the SDK post-join metadata contract. This exact type remains HRIS-managed; the
+change does not authorize arbitrary account-data writes.

@@ -66,6 +66,22 @@ successful cleanup. The complete fixture/quality run passes in 62s: four API cas
 transaction. App outbox reconciliation after provider transaction expiry, push,
 OS wakeup and Apple runtime remain separate acceptance work.
 
+## Interrupted synchronization after restart
+
+The fixture now arms one standard Matrix `M_LIMIT_EXCEEDED`/HTTP 429 response only
+once the second process has restored its store and pending queue. It waits for a
+sync containing `since` before releasing the retained send. The trace hashes that
+cursor in memory and requires a later successful sync with the same digest. No
+cursor, digest, bearer token or message body enters the diagnostic report. Both
+encrypted directions, original transaction/device identity and complete cleanup
+remain required. The injected fault exists only in this test filter.
+
+This reproduces Mobile hosted run `41250076331`: provider-capacity 429 responses
+ended the pinned FFI classic sync loop, whose listener reports no error. Mobile
+now owns a bounded `syncOnceV2` transport pump using the SDK's persisted cursor.
+Success after a fresh process or a reset cursor is insufficient for this scenario.
+The server's production capacity limits and admission behavior are unchanged.
+
 ## Sync compatibility
 
 SDK 26.10.23 pins [Rust SDK 8de215a0](https://github.com/matrix-org/matrix-rust-sdk/blob/8de215a0aa0026afa5754ae5f05a6d168d1a1d60/crates/matrix-sdk/src/client/mod.rs),
@@ -120,3 +136,8 @@ partial results, cancellation, failed installation/mapping and cleanup failures.
 
 Continue admitted bootstrap installation/recovery, application session ownership
 and encrypted logical-ID reconciliation, then UI and all remaining P0–P8 work.
+
+The current [entry/recovery evidence](../measurements/collaboration-sync-recovery-2026-11-01.json)
+retains the obsolete-owner fixture correction and explicit bounded retries of a
+provider-busy join. Fixture retries are distinct from automatic sync transport
+recovery; each product entry call still executes once under its current owner.

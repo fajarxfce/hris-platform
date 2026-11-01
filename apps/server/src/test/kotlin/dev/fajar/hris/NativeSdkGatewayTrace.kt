@@ -3,18 +3,37 @@ package dev.fajar.hris
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
 
 /** Bounded, code-only observations: never credentials, IDs, cursor/filter values or bodies. */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val observations = mutableListOf<Map<String, Any>>()
     private val encryptedSendAllowed = AtomicBoolean()
     private val earlyEncryptedSends = AtomicInteger()
+    private val syncFaultLock = Any()
+    private var syncFaultArmed = false
+    private var failedCursor: ByteArray? = null
+    private var cursorRetrySucceeded = false
+
+    /** Test-only one-shot fault, armed after actual process death and store restoration. */
+    fun interruptNextRetainedSync() =
+        synchronized(syncFaultLock) {
+            check(!syncFaultArmed && failedCursor == null)
+            syncFaultArmed = true
+        }
+
+    fun syncInterrupted() = synchronized(syncFaultLock) { failedCursor != null }
+
+    fun retainedSyncRecovered() = synchronized(syncFaultLock) { cursorRetrySucceeded }
 
     fun allowEncryptedSends() {
         encryptedSendAllowed.set(true)
@@ -39,7 +58,35 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 ContentCachingRequestWrapper(request, 65_536)
             else null
         try {
-            chain.doFilter(keyRequest ?: request, response)
+            val cursor =
+                if (request.method == "GET" && request.requestURI == "/_matrix/client/v3/sync")
+                    request.getParameter("since")?.let {
+                        MessageDigest.getInstance("SHA-256").digest(it.toByteArray())
+                    }
+                else null
+            val inject =
+                synchronized(syncFaultLock) {
+                    if (cursor != null && syncFaultArmed) {
+                        syncFaultArmed = false
+                        failedCursor = cursor
+                        true
+                    } else false
+                }
+            if (inject) {
+                request.setAttribute("fixture.matrix.error", "collaboration_provider_busy")
+                response.status = 429
+                response.contentType = "application/json"
+                response.setHeader("Cache-Control", "no-store")
+                response.writer.write(
+                    """{"errcode":"M_LIMIT_EXCEEDED","error":"Fixture provider busy","retry_after_ms":1000,"org.hris.error_code":"collaboration_provider_busy"}"""
+                )
+            } else {
+                chain.doFilter(keyRequest ?: request, response)
+                if (cursor != null && response.status == 200)
+                    synchronized(syncFaultLock) {
+                        if (failedCursor?.contentEquals(cursor) == true) cursorRetrySucceeded = true
+                    }
+            }
         } finally {
             if (request.requestURI.startsWith("/_matrix/"))
                 synchronized(observations) {
@@ -106,6 +153,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 "send",
                 "sendToDevice",
                 "m.room.encrypted",
+                "m.direct",
                 "pushrules",
                 "room_keys",
                 "version",

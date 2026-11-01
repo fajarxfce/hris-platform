@@ -1,0 +1,403 @@
+{
+  "date": "2026-11-01",
+  "base": "e104414e9b2391849579407993c83daa2138c4f4",
+  "scope": "Managed Matrix pusher activation through current HRIS native device admission; no callback delivery or live rollout",
+  "inputs": {
+    ".env.example": "0c1931228d8bdf4d329fc2a556725dee7b49edaf43521855795be49afe78cf99",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixConfigurationTest.kt": "03093ff3ef7778770879e1e0ea2432adfe73cf4c0d1920a236d9b0ed4c8373aa",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "fe5c1ab3776d55419aa4bf568d396fc1cee693185cbff464b64fc59cdb75063f",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "f997ad915b3fed101123677a6737d325192afa174bb2c4c4b6e018ed05e91227",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "ef1406da0bf6754212cb73981ac45e6148be28220e6e6884b5553364bd8d9b53",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "b2c0781862db510f476ad8359f5730e6f9e0bc64d45bf6341c0ae5659210f4d9",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "1107f5e4655cca2d79b551ffede86843b6ae46ac33a0f7666dd618839501062f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationServicePolicy.kt": "1497cecf3501d246c73293653bac2d24c065f7725cb5934857584e7dc5cabd8c",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "ef42a041cac7cdbdf7200deddd4a420d5c27e7f86bc9a54c451b70f044f05ed1",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/MatrixPushGatewaySettings.kt": "07b22d43f81931e6aba7a4aef93407d36da70708c2f7e2f3dc2efe7d2706073e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixPusherRepository.kt": "f074268d4bf4b3903e0b7947526c8363d31c81537fee7a349e997aba47633f74",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixPushGatewaySettingsTest.kt": "f12f0957483126259780fbaa24e53d39ee21158d4e9f701ca5c061036300caa0",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayPusherController.kt": "d3063c1c3f4e04160de2ec0d94a82af262f2a6fbb159d2ca64c8fbda0161bfd8"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 222.99,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*NativeCollaborationRegistrationTest",
+      "--tests",
+      "*MatrixPushGatewaySettingsTest",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationMatrixIdentityHttpTest",
+      "--tests",
+      "*NativeCollaborationMatrixConfigurationTest",
+      ":apps:worker:test",
+      "--tests",
+      "*CollaborationProvisioningWorkerTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 222,
+  "reports": {
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": {
+      "sha256": "52eac4d712e5b22693647ccb1f99d3c0ec4bf2c21bfdb7cfd2262e7efd5fbe07",
+      "tests": 11,
+      "seconds": 0.059
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": {
+      "sha256": "0f3f6442c9f3467e7cba966d0a47bba30990682ee728000062accee71dbdfbe9",
+      "tests": 3,
+      "seconds": 0.02
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": {
+      "sha256": "5820e45b9fb34a1a3871c07deb0950364bc11f258eb71054116f2564c369707f",
+      "tests": 1,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": {
+      "sha256": "b90926dd6e8b8fde54a36c238f91f893615e1c635bd977fb7f41e1e9c71f65cb",
+      "tests": 3,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": {
+      "sha256": "00e7fc6814d6a6acbdf1dce6c6da229253ecadf87cb0ab49b439c9266287a31a",
+      "tests": 2,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": {
+      "sha256": "d8a3e01fe849e3b0d35ac91b458f1fd241d2ab85238bf0d354f59a131c29310a",
+      "tests": 6,
+      "seconds": 0.086
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": {
+      "sha256": "58932caf394e5856f6787b5962a1bb6a07ed2bad08013b3de84aa61c2b2b815c",
+      "tests": 3,
+      "seconds": 0.006
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": {
+      "sha256": "52b38d272596fc78061931d3c0dac20ea3ca2ba70ff4f91c0c1cc2bb142c6c8b",
+      "tests": 3,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+      "sha256": "c16fc19e2c46c43d824d831e92d6faa78ae3bf551c6759cd72c6e034902b3f8b",
+      "tests": 2,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": {
+      "sha256": "1c153bc9f66537343de472ab9b75ef8b6a73af21a2fac6f3f8c990fd87badbe0",
+      "tests": 3,
+      "seconds": 0.039
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": {
+      "sha256": "5820b231ef15365795f4b88355bbd56cb8afc375249d60d376f904b9252781f9",
+      "tests": 3,
+      "seconds": 0.006
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.MatrixPushGatewaySettingsTest.xml": {
+      "sha256": "adb331572bb34757a2e7e01aec424f97a84127241de1e52e09e2043d0001daa2",
+      "tests": 1,
+      "seconds": 0.084
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": {
+      "sha256": "c5cfcdd3c3f85956c02d4c15dcc610ae26810984a951468d841908dce8b21cb7",
+      "tests": 120,
+      "seconds": 101.134
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixConfigurationTest.xml": {
+      "sha256": "45ec82b97585fb88f43eb63a11d3cee760fbf53ccb861f925887ff13d7fbd7db",
+      "tests": 9,
+      "seconds": 19.139
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+      "sha256": "9514c910d28252a4cb1ee9852da938f8c081cadbe0534c230e4f7e561976a70a",
+      "tests": 29,
+      "seconds": 23.897
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": {
+      "sha256": "eddfd9ff6c9e6a12d852fbd9218a1ee1c60e19df1a343e3914547fe5eb46d883",
+      "tests": 6,
+      "seconds": 31.837
+    }
+  },
+  "totals": {
+    "modules/collaboration/domain": {
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 11
+    },
+    "modules/collaboration/data": {
+      "tests": 121,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 2
+    },
+    "apps/server": {
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 2
+    },
+    "apps/worker": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    }
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "exitCode": 1,
+        "wallSeconds": 23.973,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.pusher*",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.interruptedPusher*",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.concurrentPusher*",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Test compilation failed: missing scoped failure assertion and nested fixture required outer access. Fixed helper and inner fixture.",
+      "hashes": {
+        ".work/pusher-admission-check-1.json": "9247e27b9866cef4006b91a8da2988e199675bc3a8f755a5d3a094e350517a9c",
+        ".work/pusher-admission-check-1.log": "ae2c063650fc59f8150468cd282aa41b3320a8a03dda8472d72f7c1cd3998ec6",
+        ".work/pusher-admission-inputs-1.json": "330dc5fa37d592ab115d0861e838529fb5f104dbc42531c6c28cc541af360afd"
+      }
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "exitCode": 1,
+        "wallSeconds": 40.251,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.pusher*",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.interruptedPusher*",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.concurrentPusher*",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Seven cases ran; five failed while seeding native push registrations because a reused fake token violated existing token_hash uniqueness. Made fixture tokens unique per parent/version; no product or constraint change.",
+      "hashes": {
+        ".work/pusher-admission-check-2.json": "46c49b45f6e3f72f46a505ac357b2b6a7c23487cda907764aec13ea00a38df6c",
+        ".work/pusher-admission-check-2.log": "4669c4dff7f98e83882a4592feedfd1cdc559d974a2554e71780dc83169461a9",
+        ".work/pusher-admission-inputs-2.json": "837b56a93e67d562acc353f7f2727286f8305aa0abcb217b9a49447db084df29",
+        ".work/pusher-admission-check-2.xml": "f43bd9ecdccbb1fd7968270ae5963ce138054f2bb98cfa4d31d3f71c434c77bf"
+      }
+    },
+    {
+      "attempt": 3,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 47.199,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.pusher*",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.interruptedPusher*",
+          "--tests",
+          "*NativeCollaborationRegistrationTest.concurrentPusher*",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "All seven focused SQL admission cases pass, including concurrency, response loss and late revocation.",
+      "hashes": {
+        ".work/pusher-admission-check-3.json": "d20dbc82001eef7d304f805cbcef10b65294ee358ee820f9cdf33e3caddc8538",
+        ".work/pusher-admission-check-3.log": "8f8e4144fe01cd6d9fc06186576cd997afe357852dca51bf4c16b772e450d237",
+        ".work/pusher-admission-inputs-3.json": "32c192cdcd40bb9a19bfebb7ed2bfddacb0e7702ec24703fc91f312f7d878177",
+        ".work/pusher-admission-check-3.xml": "9ae374e922e837dca1d5a39a2843870abdc366bb5f3db31d56d2f6a405ae97a6"
+      }
+    },
+    {
+      "attempt": 4,
+      "result": {
+        "exitCode": 1,
+        "wallSeconds": 13.646,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest",
+          "--tests",
+          "*MatrixPushGatewaySettingsTest",
+          ":apps:server:test",
+          "--tests",
+          "*NativeCollaborationMatrixIdentityHttpTest",
+          "--tests",
+          "*NativeCollaborationMatrixConfigurationTest",
+          ":apps:worker:test",
+          "--tests",
+          "*CollaborationProvisioningWorkerTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Test compilation failed: MockEnvironment is not in this module dependency graph. Used existing StandardEnvironment and isolated MapPropertySource; no new dependency.",
+      "hashes": {
+        ".work/pusher-admission-check-4.json": "999df1e872b386b0840a0fb1bfe152d3e80a0b38db22688701b48d2ab05ba3fc",
+        ".work/pusher-admission-check-4.log": "e3354a0d0c662e4d5d055be54fb5b82a5fba2de7a33ee9757c7f2e774f9601a0",
+        ".work/pusher-admission-inputs-4.json": "9570e36cc4314857db9b090a7f34f66c5be3636172faec70c2bbcd32200f105e"
+      }
+    },
+    {
+      "attempt": 5,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 222.99,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest",
+          "--tests",
+          "*MatrixPushGatewaySettingsTest",
+          ":apps:server:test",
+          "--tests",
+          "*NativeCollaborationMatrixIdentityHttpTest",
+          "--tests",
+          "*NativeCollaborationMatrixConfigurationTest",
+          ":apps:worker:test",
+          "--tests",
+          "*CollaborationProvisioningWorkerTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Forty domain, 121 data, 38 actual API and six actual worker cases pass; format/architecture pass.",
+      "hashes": {
+        ".work/pusher-admission-check-5.json": "64ee73b849a389d32779a1a45166a32f46955c0ef0245b23441fb511d53e8004",
+        ".work/pusher-admission-check-5.log": "bbfebb782e9025481c3de9d695c525f83d7c5fdb81be747c8eb6147fe2ed6095",
+        ".work/pusher-admission-inputs-5.json": "09ee74eeca529cdc2662b47b19c1c25e2441a999981b683a2f16d25d2b13588f"
+      }
+    }
+  ],
+  "boundaries": [
+    "Fixed empty-body vendor endpoint; no caller-selected push token, URL or app identity. Standard pushers/set remains denied.",
+    "Live native registration and immutable binding are revalidated before and after provider I/O and publication; provider calls never hold a SQL transaction.",
+    "Response loss/interruption retain the original reserved opaque identity; concurrent successful calls publish once. Native FCM rotation reuses that identity.",
+    "Push remains disabled by default. Private callback ingress, provider log redaction, durable recovery/outbox, Mobile receive/reply and Apple/web behavior are pending.",
+    "Interactive access/MFA admission is unchanged. Opaque background hints need a separate narrow live-authority policy.",
+    "No live schema115 migration, Synapse rollout, new phone APK or complete PRD feature acceptance."
+  ]
+}

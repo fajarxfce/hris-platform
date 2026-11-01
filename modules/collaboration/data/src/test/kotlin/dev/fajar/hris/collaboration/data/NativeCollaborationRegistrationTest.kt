@@ -10,17 +10,20 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirect
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationPushBindingDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRecipientDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRoomScopeDataSource
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixPusherRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomHistoryRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomMessageRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
+import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationPushBindingRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationSyncCursorRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomHistoryRepository
@@ -42,6 +45,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepos
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixPusherRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomHistoryRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomMessageRepository
@@ -55,7 +59,9 @@ import dev.fajar.hris.core.database.datasources.*
 import dev.fajar.hris.core.database.repositories.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.data.datasources.*
+import dev.fajar.hris.identity.data.datasources.PostgresNativePushRegistrationDataSource
 import dev.fajar.hris.identity.data.repositories.*
+import dev.fajar.hris.identity.data.repositories.StoredNativePushRegistrationRepository
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
@@ -69,6 +75,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.*
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 import org.flywaydb.core.Flyway
 import org.jooq.SQLDialect
@@ -5213,6 +5220,240 @@ class NativeCollaborationRegistrationTest {
         fun expected() = mapOf(peerUser to listOf(room.roomId))
     }
 
+    @Test
+    fun pusherDisabledOrMissingRegistrationNeverAllocatesBindingOrUsesProvider() {
+        val p = PusherFixture(registered = false)
+        assertEquals(
+            "collaboration_push_unavailable",
+            pusherFailure(
+                p.f
+                    .matrixIdentity(p.matrix, providerPush = p.provider, pushEnabled = false)
+                    .ensurePusher(p.token, UUID.randomUUID())
+            ),
+        )
+        assertEquals("collaboration_push_unavailable", pusherFailure(p.ensure()))
+        assertEquals(0, p.f.rows("collaboration_push_bindings"))
+        assertTrue(p.keys.isEmpty())
+        assertEquals(0, p.matrix.logins.get())
+    }
+
+    @Test
+    fun pusherPublicationRetainsKeyAcrossReplayAndNativeTokenRotation() {
+        val p = PusherFixture()
+        repeat(2) { assertEquals(Result.Success(Unit), p.ensure()) }
+        assertEquals(1L, p.binding().version)
+        p.rotate()
+        assertEquals(Result.Success(Unit), p.ensure())
+        assertEquals(3, p.keys.size)
+        assertEquals(1, p.keys.toSet().size)
+        assertTrue(p.keys.all { it.matches(Regex("hriscp1_[a-f0-9]{64}")) })
+        assertEquals(1, p.f.rows("collaboration_push_bindings"))
+        for (action in listOf("collaboration.push_reserved", "collaboration.push_published")) {
+            assertEquals(
+                1,
+                sql.queryForObject(
+                    "select count(*) from audit_entries where resource_id=? and action=?",
+                    Int::class.java,
+                    p.g.device,
+                    action,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun pusherAcceptedWithLostResponseKeepsExactPendingKeyForRetry() {
+        val p = PusherFixture()
+        p.onSet = { Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_response_lost")) }
+        assertEquals("fixture_response_lost", pusherFailure(p.ensure()))
+        val before = p.binding()
+        assertEquals(0L, before.version)
+        p.onSet = { Result.Success(Unit) }
+        assertEquals(Result.Success(Unit), p.ensure())
+        assertEquals(before.reservedAt, p.binding().reservedAt)
+        assertEquals(1L, p.binding().version)
+        assertEquals(2, p.keys.size)
+        assertEquals(1, p.keys.toSet().size)
+    }
+
+    @Test
+    fun pusherRegistrationChangeOrDisablementDuringProviderCallPreventsPublication() {
+        for (enabled in listOf(true, false)) {
+            val p = PusherFixture()
+            p.onSet = {
+                p.rotate(enabled)
+                Result.Success(Unit)
+            }
+            assertEquals(
+                if (enabled) "collaboration_push_registration_changed"
+                else "collaboration_push_unavailable",
+                pusherFailure(p.ensure()),
+            )
+            assertEquals(0L, p.binding().version)
+            p.onSet = { Result.Success(Unit) }
+            if (!enabled) p.rotate()
+            assertEquals(Result.Success(Unit), p.ensure())
+            assertEquals(1L, p.binding().version)
+            assertEquals(1, p.keys.toSet().size)
+        }
+    }
+
+    @Test
+    fun pusherLatePermissionDenialOverridesEvenAProviderFailure() {
+        val p = PusherFixture()
+        p.onSet = {
+            sql.update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                p.f.actor.companyId,
+                p.f.account,
+            )
+            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_failed"))
+        }
+        assertEquals(FailureKind.FORBIDDEN, (p.ensure() as Result.Failed).failure.kind)
+        assertEquals(0L, p.binding().version)
+        assertEquals(FailureKind.FORBIDDEN, (p.ensure() as Result.Failed).failure.kind)
+        assertEquals(1, p.keys.size)
+    }
+
+    @Test
+    fun interruptedPusherCallRetainsReservationAndExpiryBoundsItsProviderDeadline() {
+        val p = PusherFixture()
+        p.onSet = { throw InterruptedException() }
+        try {
+            assertThrows(InterruptedException::class.java) { p.ensure() }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(0L, p.binding().version)
+        p.onSet = { Result.Success(Unit) }
+        assertEquals(Result.Success(Unit), p.ensure())
+        assertEquals(1, p.keys.toSet().size)
+        val expiring = PusherFixture()
+        val at = expiring.f.clock.at.plusSeconds(1)
+        expiring.rotate(expiresAt = at)
+        expiring.onSet = { deadline ->
+            assertEquals(at, deadline)
+            expiring.f.clock.at = at
+            Result.Success(Unit)
+        }
+        assertEquals("collaboration_push_unavailable", pusherFailure(expiring.ensure()))
+        assertEquals(0L, expiring.binding().version)
+    }
+
+    @Test
+    fun concurrentPusherRequestsShareReservationAndPublishOnceAfterUnlockedProviderCalls() {
+        val p = PusherFixture()
+        val entered = CountDownLatch(2)
+        val release = CountDownLatch(1)
+        val pool = Executors.newFixedThreadPool(2)
+        p.onSet = {
+            entered.countDown()
+            assertTrue(release.await(5, TimeUnit.SECONDS))
+            Result.Success(Unit)
+        }
+        try {
+            val first = pool.submit<Result<Unit>> { p.ensure() }
+            val second = pool.submit<Result<Unit>> { p.ensure() }
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            assertEquals(0L, p.binding().version)
+            release.countDown()
+            assertEquals(Result.Success(Unit), first.get(5, TimeUnit.SECONDS))
+            assertEquals(Result.Success(Unit), second.get(5, TimeUnit.SECONDS))
+            assertEquals(1L, p.binding().version)
+            assertEquals(2, p.keys.size)
+            assertEquals(1, p.keys.toSet().size)
+            assertEquals(
+                1,
+                sql.queryForObject(
+                    "select count(*) from audit_entries where resource_id=? and action='collaboration.push_published'",
+                    Int::class.java,
+                    p.g.device,
+                ),
+            )
+        } finally {
+            release.countDown()
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
+    private inner class PusherFixture(registered: Boolean = true) {
+        val g = GatewayFixture()
+        val f = g.f
+        val token = success(g.bootstrap()).accessToken
+        val matrix = RecordingMatrix(f.clock)
+        val keys = ConcurrentLinkedQueue<String>()
+        var onSet: (Instant) -> Result<Unit> = { Result.Success(Unit) }
+        val provider =
+            object : CollaborationMatrixPusherRepository {
+                override fun set(pushKey: String, bearer: String, deadline: Instant): Result<Unit> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertTrue(matrix.issued.containsKey(bearer))
+                    assertTrue(deadline > f.clock.at)
+                    keys.add(pushKey)
+                    return onSet(deadline)
+                }
+
+                override fun remove(
+                    pushKey: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<Unit> = error("Activation never removes a retained device key")
+            }
+
+        init {
+            if (registered) rotate()
+        }
+
+        fun rotate(enabled: Boolean = true, expiresAt: Instant = f.clock.at.plusSeconds(600)) {
+            val current =
+                success(f.transactions.run(f.actor) { f.nativePush.find(f.account, g.parent) })
+            val next =
+                dev.fajar.hris.identity.domain.entities.NativePushRegistration(
+                    g.parent,
+                    f.account,
+                    dev.fajar.hris.identity.domain.entities.PushPlatform.ANDROID,
+                    enabled,
+                    (current?.version ?: -1) + 1,
+                    current?.registeredAt ?: f.clock.at,
+                    f.clock.at,
+                    expiresAt,
+                )
+            assertEquals(
+                Result.Success(true),
+                f.transactions.run(f.actor) {
+                    f.nativePush.save(
+                        next,
+                        if (enabled) "fixture-native-push-token-${g.parent}-${next.version}"
+                        else null,
+                        current?.version,
+                    )
+                },
+            )
+        }
+
+        fun ensure() =
+            f.matrixIdentity(matrix, providerPush = provider, pushEnabled = true)
+                .ensurePusher(token, UUID.randomUUID())
+
+        fun binding() =
+            requireNotNull(
+                success(
+                    f.transactions.run(f.actor) {
+                        f.pushBindings.find(requireNotNull(f.actor.companyId), f.account, g.device)
+                    }
+                )
+            )
+    }
+
+    private fun pusherFailure(result: Result<*>): String {
+        assertInstanceOf(Result.Failed::class.java, result)
+        return (result as Result.Failed).failure.code
+    }
+
     private class GatewayFixture {
         val f = Fixture()
         val parent = f.parent()
@@ -5308,6 +5549,23 @@ class NativeCollaborationRegistrationTest {
                         "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 17 }),
                     )
                 ),
+            )
+        private val pushCrypto =
+            JceIdentityTokenDataSource(
+                dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(
+                    "fixture",
+                    "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 17 }),
+                )
+            )
+        val nativePush =
+            StoredNativePushRegistrationRepository(
+                PostgresNativePushRegistrationDataSource(dsl),
+                pushCrypto,
+            )
+        val pushBindings =
+            EncryptedCollaborationPushBindingRepository(
+                PostgresCollaborationPushBindingDataSource(dsl),
+                pushCrypto,
             )
         val gateway =
             EncryptedCollaborationGatewaySessionRepository(
@@ -5667,6 +5925,9 @@ class NativeCollaborationRegistrationTest {
                 DisabledCollaborationMatrixRoomHistoryRepository(),
             providerRoomMessage: CollaborationMatrixRoomMessageRepository =
                 DisabledCollaborationMatrixRoomMessageRepository(),
+            providerPush: CollaborationMatrixPusherRepository =
+                DisabledCollaborationMatrixPusherRepository(),
+            pushEnabled: Boolean = false,
         ) =
             AccessNativeCollaborationMatrixDevice(
                 gateway,
@@ -5699,9 +5960,12 @@ class NativeCollaborationRegistrationTest {
                 journal,
                 transactions,
                 IdentitySecurityPolicy(),
-                CollaborationServicePolicy(true),
+                CollaborationServicePolicy(true, pushEnabled),
                 CollaborationMatrixPolicy(true, serverName),
                 clock,
+                pushBindings,
+                providerPush,
+                nativePush,
             )
 
         fun gatewayHead(device: UUID) =

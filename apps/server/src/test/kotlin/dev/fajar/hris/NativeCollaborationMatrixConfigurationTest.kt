@@ -19,6 +19,7 @@ import org.springframework.test.context.TestPropertySource
         [
             "HRIS_COLLABORATION_ENABLED=true",
             "HRIS_MATRIX_ENABLED=true",
+            "HRIS_MATRIX_PUSH_GATEWAY_URL=invalid unused push endpoint",
             "HRIS_MATRIX_ORIGIN=http://127.0.0.1:9",
             "HRIS_MATRIX_SERVER_NAME=matrix.example.test",
             "HRIS_MATRIX_JWT_ISSUER=urn:hris:matrix:fixture",
@@ -44,12 +45,25 @@ class NativeCollaborationMatrixConfigurationTest : NativeCollaborationApiFixture
         }
     }
 
+    @Autowired
+    private lateinit var pushPolicy:
+        dev.fajar.hris.collaboration.domain.entities.CollaborationServicePolicy
+    @Autowired
+    private lateinit var pushRepository:
+        dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixPusherRepository
+
     @Autowired private lateinit var owner: MatrixHttpClientOwner
     @Autowired private lateinit var policy: CollaborationMatrixPolicy
 
     @Test
     fun enabledApiGraphRegistersWithoutWaitingForItsUnavailablePrivateProvider() {
         assertTrue(policy.enabled)
+        assertFalse(pushPolicy.pushEnabled)
+        assertTrue(
+            pushRepository
+                is
+                dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixPusherRepository
+        )
         assertEquals("matrix.example.test", policy.serverName)
         assertFalse(owner.client.isTerminated)
         val n = native()

@@ -42,7 +42,141 @@ class AccessNativeCollaborationMatrixDevice(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val pushBindings: CollaborationPushBindingRepository,
+    private val providerPush: CollaborationMatrixPusherRepository,
+    private val nativePush: NativePushRegistrationRepository,
 ) {
+    fun ensurePusher(token: String, correlationId: UUID): Result<Unit> {
+        if (!service.pushEnabled) return pushUnavailable()
+        return admitted(
+            token,
+            correlationId,
+            prepare = { initial, observation -> preparePusher(initial, observation.actor) },
+            revalidate = { initial, prepared -> checkPusher(initial, prepared) },
+        ) { exchange, prepared ->
+            exchange
+                .exchange { bearer, deadline ->
+                    providerPush.set(
+                        prepared.key.value,
+                        bearer,
+                        minOf(deadline, prepared.registration.expiresAt),
+                    )
+                }
+                .flatMap { exchange.publishPusher(prepared) }
+        }
+    }
+
+    private class PusherPreparation(
+        val binding: CollaborationPushBinding,
+        val key: CollaborationPushKey,
+        val registration: dev.fajar.hris.identity.domain.entities.NativePushRegistration,
+    )
+
+    private fun preparePusher(
+        initial: CollaborationGatewaySession,
+        actor: Actor,
+    ): Result<PusherPreparation> {
+        val read = nativePush.find(initial.accountId, initial.nativeSessionId)
+        if (read is Result.Failed) return read
+        val registration = (read as Result.Success).value
+        if (!activePushRegistration(initial, registration)) return pushUnavailable()
+        val locked = pushBindings.lock(initial.companyId, initial.deviceId)
+        if (locked is Result.Failed) return locked
+        val found = pushBindings.find(initial.companyId, initial.accountId, initial.deviceId)
+        if (found is Result.Failed) return found
+        val previous = (found as Result.Success).value
+        val binding =
+            previous
+                ?: CollaborationPushBinding(
+                    initial.companyId,
+                    initial.accountId,
+                    initial.deviceId,
+                    initial.nativeSessionId,
+                    0,
+                    clock.instant().truncatedTo(ChronoUnit.MICROS),
+                    null,
+                )
+        if (!samePushOwner(initial, binding)) return invalidProvider()
+        if (previous == null) {
+            val reserved =
+                pushBindings.reserve(binding).flatMap {
+                    journal.record(
+                        actor,
+                        ChangeRecord(
+                            "collaboration_device",
+                            initial.deviceId,
+                            "collaboration.push_reserved",
+                        ),
+                    )
+                }
+            if (reserved is Result.Failed) return reserved
+        }
+        return pushBindings.key(binding).flatMap { key ->
+            if (key == null) pushChanged()
+            else Result.Success(PusherPreparation(binding, key, requireNotNull(registration)))
+        }
+    }
+
+    private fun samePushOwner(
+        initial: CollaborationGatewaySession,
+        binding: CollaborationPushBinding,
+    ): Boolean =
+        binding.companyId == initial.companyId &&
+            binding.accountId == initial.accountId &&
+            binding.deviceId == initial.deviceId &&
+            binding.nativeSessionId == initial.nativeSessionId &&
+            binding.reservedAt <= clock.instant() &&
+            binding.version in 0L..1L &&
+            ((binding.version == 1L) == (binding.publishedAt != null)) &&
+            (binding.publishedAt?.let { it >= binding.reservedAt && it <= clock.instant() } !=
+                false)
+
+    private fun activePushRegistration(
+        initial: CollaborationGatewaySession,
+        registration: dev.fajar.hris.identity.domain.entities.NativePushRegistration?,
+    ): Boolean {
+        val now = clock.instant()
+        return registration != null &&
+            registration.accountId == initial.accountId &&
+            registration.sessionId == initial.nativeSessionId &&
+            registration.enabled &&
+            registration.platform.name == initial.platform.name &&
+            registration.version in 0L..9999L &&
+            registration.registeredAt <= registration.updatedAt &&
+            registration.updatedAt <= now &&
+            registration.expiresAt > now
+    }
+
+    private fun checkPusher(
+        initial: CollaborationGatewaySession,
+        prepared: PusherPreparation,
+    ): Result<Unit> =
+        nativePush.find(initial.accountId, initial.nativeSessionId).flatMap { current ->
+            if (!activePushRegistration(initial, current)) pushUnavailable()
+            else if (current != prepared.registration) pushChanged()
+            else
+                pushBindings.find(initial.companyId, initial.accountId, initial.deviceId).flatMap {
+                    binding ->
+                    if (
+                        binding == null ||
+                            !samePushOwner(initial, binding) ||
+                            binding.version < prepared.binding.version ||
+                            binding.copy(
+                                version = prepared.binding.version,
+                                publishedAt = prepared.binding.publishedAt,
+                            ) != prepared.binding
+                    )
+                        pushChanged()
+                    else Result.Success(Unit)
+                }
+        }
+
+    private fun pushUnavailable() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_push_unavailable"))
+
+    private fun pushChanged() =
+        Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_push_registration_changed"))
+
     fun directMetadata(
         token: String,
         correlationId: UUID,
@@ -1024,6 +1158,51 @@ class AccessNativeCollaborationMatrixDevice(
                     validateObservation(admission, current.admission).flatMap {
                         extraCheck().flatMap {
                             if (clock.instant() >= deadline) changed() else Result.Success(Unit)
+                        }
+                    }
+                }
+            }
+
+        fun publishPusher(prepared: PusherPreparation): Result<Unit> =
+            transactions.run(scope) {
+                observe(scope, initial).flatMap { current ->
+                    validateObservation(admission, current.admission).flatMap {
+                        checkPusher(initial, prepared).flatMap validate@{
+                            if (clock.instant() >= deadline) return@validate changed()
+                            pushBindings.lock(initial.companyId, initial.deviceId).flatMap {
+                                pushBindings
+                                    .find(initial.companyId, initial.accountId, initial.deviceId)
+                                    .flatMap { binding ->
+                                        if (binding == null) pushChanged()
+                                        else if (binding.version == 1L) Result.Success(Unit)
+                                        else
+                                            pushBindings
+                                                .publish(
+                                                    binding,
+                                                    clock.instant().truncatedTo(ChronoUnit.MICROS),
+                                                )
+                                                .flatMap { published ->
+                                                    if (!published) pushChanged()
+                                                    else
+                                                        journal.record(
+                                                            current.actor,
+                                                            ChangeRecord(
+                                                                "collaboration_device",
+                                                                initial.deviceId,
+                                                                "collaboration.push_published",
+                                                            ),
+                                                        )
+                                                }
+                                    }
+                                    .flatMap {
+                                        validateObservation(admission, current.admission).flatMap {
+                                            checkPusher(initial, prepared).flatMap {
+                                                if (clock.instant() >= deadline) changed()
+                                                else Result.Success(Unit)
+                                            }
+                                        }
+                                    }
+                            }
                         }
                     }
                 }

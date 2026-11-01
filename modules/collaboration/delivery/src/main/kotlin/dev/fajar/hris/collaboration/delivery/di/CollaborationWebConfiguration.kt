@@ -27,6 +27,8 @@ class CollaborationWebConfiguration {
         http.httpBasic { it.disable() }
         http.authorizeHttpRequests {
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/refresh").permitAll()
+            it.requestMatchers(HttpMethod.POST, "/_matrix/client/unstable/dev.fajar.hris/pusher")
+                .permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/upload").permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/query").permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/claim").permitAll()

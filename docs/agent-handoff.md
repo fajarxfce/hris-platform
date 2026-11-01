@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Managed pusher activation proved — 1 November 2026
+
+[Contract](collaboration/native-push.md) / [evidence](measurements/chat-pusher-admission-2026-11-01.json):
+fixed empty-body vendor POST uses current gateway/interactive admission, reserves
+one encrypted opaque identity before unlocked provider I/O and publishes once.
+Current native push registration/version/expiry are fenced around the call and
+publication; response loss, interruption, concurrent calls, late permission loss,
+disable/re-enable and token rotation are exercised. Default-disabled conditional
+configuration validates the fixed HTTPS URL only when enabled. Standard
+pushers/set remains denied, and clients never choose or receive keys/targets.
+40 domain + 121 data + 38 actual API + six actual worker cases pass, along with
+format/architecture (222s Gradle / 222.990s wall, 13 unchanged inputs). Preserve
+all four preceding attempts: two compiler-fixture issues, unique fake-token seed
+correction and the passing seven-case focused run. No production workaround.
+
+**Continue immediately:** implement the narrowly scoped background push admission
+policy (parent refresh lifetime/current authority, not short interactive access
+expiry), private callback ingress and safe provider logging, durable callback/
+feed/outbox, then Mobile receive/decrypt/reply and verified Starter ports. The
+current outgoing source is implemented and validated; earlier scratch drafts are
+historical. Do not reapply them. Keep the push flag off until callback/delivery
+is ready. No live migration/provider rollout or PRD group acceptance has occurred.
+
+Hosted five-case native run 41351236140 is now [audited](measurements/chat-cancellation-native-ci-2026-11-01.json)
+at Mobile 302aa192 / Platform d48ac2f8: five native + six cleanup cases, 32 hashes,
+APK 5438147b, all three recovery workers pass once. No hosted pending-key 503 was
+observed; local earlier evidence separately exercised that branch. Mobile audit
+3941bfc1 is pushed. Phone remains release 10 / c0371a38, untouched since 20:44 UTC.
+Next validated Mobile product checkpoint is code 11+, notify first and install-only
+to explicit 10.77.77.3:5555. Continue full P0–P8 after every atomic commit/push.
+
 ## Stable encrypted push binding and restore proved — 1 November 2026
 
 [Storage evidence](measurements/chat-push-binding-storage-2026-11-01.json) / [contract](collaboration/native-push.md):

@@ -77,6 +77,38 @@ records full database/domain/data and actual API/worker regression checks plus 3
 Python recovery cases. The first corruption-fixture failure and correction are
 retained. No live schema change, DI/controller or admitted callback is included.
 
+## Managed activation implemented — 1 November 2026
+
+`POST /_matrix/client/unstable/dev.fajar.hris/pusher` is an empty-body vendor
+extension using only the admitted Matrix gateway bearer. Cookies/native access
+bearers, duplicate authorization, queries, bodies and alternate protocol routes
+are rejected. The response is only `{}` with `Cache-Control: no-store`; callers
+cannot select an app, pushkey, callback or native token. Standard `/pushers/set`
+remains blocked. Activation uses the existing current interactive account/company/
+member/native-session/device/MFA/client-policy exchange.
+
+Preparation reserves the original encrypted key and journal before provider I/O.
+The current enabled, unexpired, matching-platform native registration is captured
+and revalidated around the unlocked external call and final publication. Its
+expiry also bounds the provider deadline. Lost responses/interruption retain the
+same reservation; parallel callers share that identity and publish once. Token
+rotation preserves the pusher key, while a changed registration during a call
+prevents publication. Current denial overrides provider failure; post-journal
+expiry rolls publication back. No plaintext target is returned or logged.
+
+`HRIS_COLLABORATION_PUSH_ENABLED` defaults false. Enabling it alongside the existing
+collaboration/Matrix flags requires `HRIS_MATRIX_PUSH_GATEWAY_URL` with the fixed
+HTTPS callback contract. The disabled repository performs no provider I/O. Keep
+the flag off until private callback ingress, safe provider logging and durable
+recovery/delivery are deployed.
+
+[Admission evidence](../measurements/chat-pusher-admission-2026-11-01.json): 40 domain,
+121 data, 38 actual API and six actual worker cases pass, with format/architecture
+in 222s Gradle / 222.990s wall and 13 unchanged inputs. Earlier fixture/compiler
+failures and the seven-case focused success are retained. Both disabled API and
+enabled worker dependency graphs are exercised. This proves outgoing activation,
+not background callback authority, FCM delivery or Mobile receive/reply.
+
 ## Following implementation boundaries
 
 Use Matrix v1.16 `event_id_only` HTTP pushers. The server fixes app identity and a

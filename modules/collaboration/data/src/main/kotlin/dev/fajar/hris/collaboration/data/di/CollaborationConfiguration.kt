@@ -24,6 +24,42 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+                "HRIS_COLLABORATION_PUSH_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    fun collaborationPushGateway(environment: Environment): MatrixPushGatewayConfiguration =
+        matrixPushGatewaySettings(environment)
+
+    @Bean
+    fun collaborationMatrixPusher(
+        source: ObjectProvider<MatrixPusherDataSource>,
+        configuration: ObjectProvider<MatrixPushGatewayConfiguration>,
+    ): CollaborationMatrixPusherRepository {
+        val gateway = configuration.ifAvailable
+        val transport = source.ifAvailable
+        return if (gateway != null && transport != null)
+            InternalCollaborationMatrixPusherRepository(transport, gateway)
+        else DisabledCollaborationMatrixPusherRepository()
+    }
+
+    @Bean
+    fun collaborationPushBindingSource(sql: DSLContext): CollaborationPushBindingDataSource =
+        PostgresCollaborationPushBindingDataSource(sql)
+
+    @Bean
+    fun collaborationPushBindings(
+        source: CollaborationPushBindingDataSource,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationPushBindingRepository =
+        EncryptedCollaborationPushBindingRepository(source, crypto)
+
+    @Bean
     fun collaborationMatrixRoomMessage(
         source: ObjectProvider<MatrixRoomMessageDataSource>
     ): CollaborationMatrixRoomMessageRepository =
@@ -234,7 +270,8 @@ class CollaborationConfiguration {
     @Bean
     fun collaborationServicePolicy(environment: Environment) =
         CollaborationServicePolicy(
-            environment.getProperty("HRIS_COLLABORATION_ENABLED", Boolean::class.java, false)
+            environment.getProperty("HRIS_COLLABORATION_ENABLED", Boolean::class.java, false),
+            environment.getProperty("HRIS_COLLABORATION_PUSH_ENABLED", Boolean::class.java, false),
         )
 
     @Bean
@@ -480,6 +517,9 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        pushBindings: CollaborationPushBindingRepository,
+        providerPush: CollaborationMatrixPusherRepository,
+        nativePush: NativePushRegistrationRepository,
     ) =
         AccessNativeCollaborationMatrixDevice(
             gateway,
@@ -508,6 +548,9 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            pushBindings,
+            providerPush,
+            nativePush,
         )
 
     @Bean

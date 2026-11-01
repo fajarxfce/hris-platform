@@ -51,6 +51,8 @@ import tools.jackson.databind.json.JsonMapper
             "hris.worker.enabled=false",
             "HRIS_COLLABORATION_ENABLED=true",
             "HRIS_MATRIX_ENABLED=true",
+            "HRIS_COLLABORATION_PUSH_ENABLED=true",
+            "HRIS_MATRIX_PUSH_GATEWAY_URL=https://push.example.test/_matrix/push/v1/notify",
             "HRIS_IDENTITY_ACTIVE_KEY=fixture",
         ],
 )

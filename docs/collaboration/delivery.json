@@ -176,7 +176,9 @@
         "native-push.md",
         "../measurements/chat-push-delivery-profile-2026-11-01.json",
         "../measurements/chat-matrix-pusher-transport-2026-11-01.json",
-        "../measurements/chat-push-binding-storage-2026-11-01.json"
+        "../measurements/chat-push-binding-storage-2026-11-01.json",
+        "../measurements/chat-pusher-admission-2026-11-01.json",
+        "../measurements/chat-cancellation-native-ci-2026-11-01.json"
       ]
     },
     {
@@ -342,8 +344,11 @@
     {
       "id": "CHAT-13",
       "requiredBehavior": "Per-conversation notifications, native inline reply, mark read/mute, locked-screen privacy and precise deep links.",
-      "status": "planned",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "native-push.md",
+        "../measurements/chat-pusher-admission-2026-11-01.json"
+      ]
     },
     {
       "id": "CHAT-14",
@@ -598,8 +603,8 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Actual SDK, WorkManager, frozen-only and cancelled-draft recovery have source-bound native proof. A pending own-key publication now remains retryable without allowing an unconfirmed send. Pin the corrected five-case fixture and audit its hosted run; preserve earlier failures.",
-    "History paging, durable composer/recovery and queued-only cancellation with confirmation UI are implemented and tested. Continue opaque pusher/FCM admission and native inline replies, then groups, rich messages/actions, verification and search; preserve sender/content and transaction evidence.",
+    "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
+    "Managed outgoing pusher activation is validated through actual API/worker contexts. Continue narrow background admission, private callback ingress and safe provider logging, durable callback/feed/outbox and Mobile receive/decrypt/reply; push remains disabled until delivery is ready.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."

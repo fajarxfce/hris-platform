@@ -32,6 +32,8 @@ import tools.jackson.databind.json.JsonMapper
         [
             "HRIS_COLLABORATION_ENABLED=true",
             "HRIS_MATRIX_ENABLED=true",
+            "HRIS_COLLABORATION_PUSH_ENABLED=true",
+            "HRIS_MATRIX_PUSH_GATEWAY_URL=https://push.example.test/_matrix/push/v1/notify",
             "HRIS_MATRIX_SERVER_NAME=matrix.example.test",
             "HRIS_MATRIX_JWT_ISSUER=urn:hris:matrix:fixture",
             "HRIS_MATRIX_JWT_AUDIENCE=matrix:fixture",
@@ -79,6 +81,161 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         }
 
         @JvmStatic @AfterAll fun stopProvider() = provider.close()
+    }
+
+    @Test
+    fun managedPusherUsesExistingNativeRegistrationAndKeepsSecretTargetsServerSide() {
+        val n = native()
+        val (device, gateway) = enroll(n)
+        val before = provider.pushes.size
+        val missing = pusher(n, gateway)
+        assertEquals(503, missing.statusCode())
+        assertEquals(
+            "collaboration_push_unavailable",
+            json.readTree(missing.body())["org.hris.error_code"].asString(),
+        )
+        assertEquals(before, provider.pushes.size)
+        savePush(n)
+        repeat(2) {
+            val response = pusher(n, gateway)
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("{}", response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        }
+        savePush(n, expected = 0)
+        assertEquals(200, pusher(n, gateway).statusCode())
+        val sent = provider.pushes.toList().drop(before)
+        assertEquals(3, sent.size)
+        assertEquals(1, sent.map { it["pushkey"].asString() }.toSet().size)
+        assertTrue(sent.all { it["pushkey"].asString().matches(Regex("hriscp1_[a-f0-9]{64}")) })
+        assertTrue(
+            sent.all {
+                it["app_id"].asString() == "dev.fajar.hris.chat" && it["kind"].asString() == "http"
+            }
+        )
+        assertTrue(
+            sent.all {
+                it["data"]["format"].asString() == "event_id_only" &&
+                    it["data"]["url"].asString() ==
+                        "https://push.example.test/_matrix/push/v1/notify"
+            }
+        )
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from collaboration_push_bindings where company_id=? and device_id=?",
+                    Long::class.java,
+                    n.fixture.company,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun managedPusherRejectsCookieNativeBearerCallerTargetsAndAlternateProtocolRoutes() {
+        val n = native()
+        val (_, gateway) = enroll(n)
+        savePush(n)
+        val before = provider.pushes.size
+        assertEquals(401, pusher(n).statusCode())
+        assertEquals(401, pusher(n, n.access).statusCode())
+        assertEquals(401, pusher(n, gateway, duplicate = true).statusCode())
+        assertEquals(400, pusher(n, gateway, suffix = "?access_token=untrusted").statusCode())
+        assertEquals(
+            400,
+            pusher(
+                    n,
+                    gateway,
+                    body =
+                        "{\"pushkey\":\"untrusted\",\"data\":{\"url\":\"https://elsewhere.invalid\"}}",
+                )
+                .statusCode(),
+        )
+        assertEquals(403, pusher(n, gateway, method = "GET").statusCode())
+        val standard =
+            n.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/pushers/set"))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Authorization", "Bearer $gateway")
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(403, standard.statusCode())
+        assertEquals(before, provider.pushes.size)
+    }
+
+    @Test
+    fun temporaryNativePushDisablementBlocksActivationAndReenableReusesTheSamePusher() {
+        val n = native()
+        val (_, gateway) = enroll(n)
+        savePush(n)
+        assertEquals(200, pusher(n, gateway).statusCode())
+        val original = provider.pushes.last()["pushkey"].asString()
+        val before = provider.pushes.size
+        savePush(n, expected = 0, enabled = false)
+        assertEquals(503, pusher(n, gateway).statusCode())
+        assertEquals(before, provider.pushes.size)
+        savePush(n, expected = 1)
+        assertEquals(200, pusher(n, gateway).statusCode())
+        assertEquals(original, provider.pushes.last()["pushkey"].asString())
+    }
+
+    private fun savePush(n: Native, expected: Long? = null, enabled: Boolean = true) {
+        val path = "/api/v1/auth/native/push-registration" + if (enabled) "" else "/disable"
+        val body: Map<String, Any?> =
+            if (enabled)
+                mapOf(
+                    "platform" to "ANDROID",
+                    "token" to "fixture-fcm-${n.session}-${expected}",
+                    "expectedVersion" to expected,
+                )
+            else mapOf("expectedVersion" to expected)
+        val response =
+            n.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path"))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Authorization", "Bearer ${n.access}")
+                    .header("Content-Type", "application/json")
+                    .header("Idempotency-Key", UUID.randomUUID().toString())
+                    .method(
+                        if (enabled) "PUT" else "POST",
+                        HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)),
+                    )
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(200, response.statusCode(), response.body())
+    }
+
+    private fun pusher(
+        n: Native,
+        token: String? = null,
+        suffix: String = "",
+        body: String? = null,
+        duplicate: Boolean = false,
+        method: String = "POST",
+    ): HttpResponse<String> {
+        val builder =
+            HttpRequest.newBuilder(
+                    URI(
+                        "http://127.0.0.1:$port/_matrix/client/unstable/dev.fajar.hris/pusher$suffix"
+                    )
+                )
+                .timeout(Duration.ofSeconds(10))
+        token?.let { builder.header("Authorization", "Bearer $it") }
+        if (duplicate) builder.header("Authorization", "Bearer ambiguous")
+        return n.fixture.browser.send(
+            builder
+                .method(
+                    method,
+                    body?.let(HttpRequest.BodyPublishers::ofString)
+                        ?: HttpRequest.BodyPublishers.noBody(),
+                )
+                .build(),
+            HttpResponse.BodyHandlers.ofString(),
+        )
     }
 
     private fun enroll(n: Native): Pair<UUID, String> {
@@ -1549,6 +1706,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
 
     private class Provider : AutoCloseable {
         val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+        val pushes = ConcurrentLinkedQueue<tools.jackson.databind.JsonNode>()
         val keyUploads = AtomicInteger()
         val keyQueries = AtomicInteger()
         val keyClaims = AtomicInteger()
@@ -1616,6 +1774,18 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                     )
                                 credentials[token] = identity
                                 identity + mapOf("access_token" to token, "expires_in_ms" to 600000)
+                            }
+                            "/_matrix/client/v3/pushers/set" -> {
+                                assertEquals("POST", request.requestMethod)
+                                assertNull(request.requestURI.rawQuery)
+                                val bearer =
+                                    request.requestHeaders
+                                        .getFirst("Authorization")
+                                        .removePrefix("Bearer ")
+                                assertTrue(credentials.containsKey(bearer))
+                                val body = parser.readTree(request.requestBody.readNBytes(8193))
+                                pushes.add(body)
+                                emptyMap<String, Any>()
                             }
                             "/_matrix/client/v3/keys/query" -> {
                                 keyQueries.incrementAndGet()

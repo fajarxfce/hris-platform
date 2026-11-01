@@ -1,0 +1,205 @@
+{
+  "date": "2026-11-01",
+  "base": "24841839d27d03c3fe38cd83abd7c9aefffa994e",
+  "inputs": {
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/matrix/MatrixPushNotification.kt": "991f48593b83782e21bfbb8d2ceff905e699bbe9e66beb55c5d7b0899a7a6dc5",
+    "modules/collaboration/delivery/src/test/kotlin/dev/fajar/hris/collaboration/delivery/MatrixPushNotificationTest.kt": "de89d99fbe9040ec95fc7f345060bf1581423f9df4a4631011585016d65d0990",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationPushAdmission.kt": "1c359ed67894973a672dffd17e66d0f5ba7ee7077e515be087944c6299d4a73f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationPushHint.kt": "8e6edf6455618badfcec669fc16b637182de7a130920323f211d22b696c644b4",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationPushAdmissionPolicy.kt": "b2fd7b8e8691df0419dcde8677e734181693bba4501ad496a183fbd64a14764f",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationPushAdmissionPolicyTest.kt": "6849a247eb2fdf6931b13d268a2927cf4bec2a08f53406e2b24d232fd93968e3"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 30.517,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:delivery:test",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 30,
+  "reports": {
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": {
+      "sha256": "b0fe8cb201ad83c7c7b4a3b9e9da1df32f50a9b1e4cf6932fa69bcf1f347fbb0",
+      "tests": 11,
+      "seconds": 0.011
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": {
+      "sha256": "8b31beefa3354019cb57024119b10d95c9ed1c87d72bdff08a5eb4d94fcc9fe2",
+      "tests": 3,
+      "seconds": 0.012
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": {
+      "sha256": "27f17ecefac84b8d2bddd90ddd1f93f5959324ebf526d955b63ea0142a6623f1",
+      "tests": 1,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": {
+      "sha256": "3e876d45a2ed43ea3b923fd4035db7b94bca23e4602acd98fd5aca1d30509d22",
+      "tests": 3,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": {
+      "sha256": "dd11ca2d1d95e26a6d12d50ee0bd00a23fc1b7001f61f105649436f5240a7d4b",
+      "tests": 2,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": {
+      "sha256": "3f77dd907528fa662d50615e3f4a0913b8765f7ac21614745a66b77e72df3e5a",
+      "tests": 6,
+      "seconds": 0.087
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": {
+      "sha256": "2a349ace15066717d87f872214b11bd6cef9a5a4bdcb61c45881ad2b66821d5f",
+      "tests": 3,
+      "seconds": 0.006
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": {
+      "sha256": "33f68228904062191b48edba7dac4209a1db1008a5dbc4fe67831f5dd295db06",
+      "tests": 3,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest.xml": {
+      "sha256": "2f2228124aa41ce3a9cb8495595fc163757940a48d7ddf0df940ef57baeb30f6",
+      "tests": 9,
+      "seconds": 0.068
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+      "sha256": "d4e24671fdafd42a21890cfb3a57181b6f1ee60bde0f1267a4f97c7050ec5dfb",
+      "tests": 2,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": {
+      "sha256": "107828135f20503265f0dc4964d8f1179f3242cc133785d69ae214528b9d6f29",
+      "tests": 3,
+      "seconds": 0.041
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": {
+      "sha256": "120d9ce0b1cb4c3876e1961f27712719a6c8d7ae2ce182ef13e8f9632387b689",
+      "tests": 3,
+      "seconds": 0.007
+    },
+    "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushNotificationTest.xml": {
+      "sha256": "e35040721098152f89e0876ba6030561caf5cd6df3dc138af707c693b054a167",
+      "tests": 5,
+      "seconds": 0.223
+    }
+  },
+  "totals": {
+    "modules/collaboration/domain": {
+      "tests": 49,
+      "suites": 12,
+      "failures": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/delivery": {
+      "tests": 5,
+      "suites": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "exitCode": 1,
+        "wallSeconds": 15.703,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:delivery:test",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "49 domain cases ran; seven new cases failed because the fixture set Account.version=2 but left securityVersion=0 while its parent used credentialVersion=2. Set the named fixture securityVersion; production policy unchanged. Delivery tests had not run.",
+      "hashes": {
+        ".work/push-hint-check-1.json": "616067837713eec4cdc4d3ba0c9d2a90908b4cdb6fd8f7a84fcaab3f2b75d976",
+        ".work/push-hint-check-1.log": "937c47a3bc984877a17908fd1698aab2647e5d22aece15dfdd75dd0ea947f687",
+        ".work/push-hint-check-1.xml": "b9855e23aa89479c8b4c4e96c65aa725974c0f29edda837e0ec4f973ad471226",
+        ".work/push-hint-inputs-1.json": "98200abafe86440a981f5a403dff580d440c205cc0c97314e3fa1238943e5cbb"
+      }
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 30.517,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:delivery:test",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "49 domain and five delivery decoder cases pass, including retained interactive access/MFA denial. Format/architecture pass.",
+      "hashes": {
+        ".work/push-hint-check-2.json": "9f7f556b9fcdb598f515d10fc6886780910c000996d500391e5c51808d6c7677",
+        ".work/push-hint-check-2.log": "094189edc3379e53469908a26d1f6653fedb9fa99f6bae4a945ace05fb116e6a",
+        ".work/push-hint-inputs-2.json": "d630ac52b20157f056716b008367e953293b7b2ab3c19766fff3521b761e89a4"
+      }
+    }
+  ],
+  "boundaries": [
+    "Pure background authority and bounded event_id_only decoder only; no callback endpoint, DI or schema change.",
+    "Opaque wake hints ignore short native/gateway access and MFA age, while requiring current account/company/member/chat permission, live native parent/credential version, exact active bound device, native push registration and client availability. Interactive content/reply admission is unchanged and separately asserted denied.",
+    "Permanent native parent/device retirement may reject a retained pusher; temporary loss of registration/access/client availability suppresses it without removal. Pending binding publication is accepted as identity only.",
+    "Prepared target revalidation fences registration and session/device/gateway versions, exact identity, elapsed deadlines and backwards observations.",
+    "Decoder limit 8192 bytes, 32 distinct opaque keys, bounded JSON depth/string/number lengths, duplicate/trailing-token rejection. Counts and priority are validated but not exposed as authoritative badge/delivery data.",
+    "Synapse v1.164.1 event_id_only and legacy empty badge sentinels are matched to inspected provider source and tested as payload fixtures; actual callback transport is not yet proved.",
+    "No phone build, live provider rollout, receive/reply delivery or complete PRD group acceptance."
+  ]
+}

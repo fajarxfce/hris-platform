@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Background hint boundary proved — 1 November 2026
+
+[Policy/decoder evidence](measurements/chat-push-hint-policy-2026-11-01.json) / [contract](collaboration/native-push.md):
+49 domain + five delivery cases and format/architecture pass (30s / 30.517s wall,
+six unchanged inputs). First run's seven new-case failures were an Account fixture
+version/securityVersion mix-up; the explicit securityVersion corrects it without
+changing the policy. Both short access expiries and absent MFA allow only opaque
+hints; actual interactive content admission remains denied. Current parent/device/
+account/member/company/client/native-registration checks distinguish permanent
+retirement from temporary suppression. Pending binding publication is identity,
+not authority; late versions and deadlines are fenced. Strict 8 KiB/32-device
+callback decoding excludes plaintext and handles Synapse's empty legacy badge
+sentinels. Actual callback transport remains unproved. No DI/schema/live change.
+
+**Continue immediately:** safe provider logging, restricted callback ingress and
+bounded persistent hint/outbox state before provider acknowledgment; then actual
+worker dispatch with current target-version checks, Mobile receive/decrypt/reply
+and verified generic Starter ports. Pure policy/decoder are now implemented; wire
+them into the owning use case, do not duplicate or weaken interactive admission.
+Outgoing activation commit 24841839 is pushed. The full PRD remains active.
+Phone stays installed release 10 / c0371a38; next validated Mobile product update
+uses code 11+, notify first and explicit install-only to 10.77.77.3:5555.
+
 ## Managed pusher activation proved — 1 November 2026
 
 [Contract](collaboration/native-push.md) / [evidence](measurements/chat-pusher-admission-2026-11-01.json):

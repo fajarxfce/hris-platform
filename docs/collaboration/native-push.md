@@ -109,6 +109,42 @@ failures and the seven-case focused success are retained. Both disabled API and
 enabled worker dependency graphs are exercised. This proves outgoing activation,
 not background callback authority, FCM delivery or Mobile receive/reply.
 
+## Background hint policy and decoder implemented — 1 November 2026
+
+`collaborationPushTarget` resolves a narrow hint decision from current guarded
+inputs. Short native/gateway access expiry and MFA age do not stop opaque pushes;
+ordinary interactive admission still rejects those expired/missing proofs. Hints
+require the current active account/company/member/chat permission, unexpired and
+unrevoked native parent with matching credential version, exact active bound
+device, current enabled native registration and current client availability.
+Gateway metadata supplies the known app build, without treating its access token
+as background authority. The parent, registration, gateway lifetime, scheduled
+client policy and 30-second ceiling bound each prepared result.
+
+A permanently missing/revoked/expired parent or retired device permits rejection
+of its retained pusher. Temporary registration/access/client unavailability merely
+suppresses delivery, allowing re-enable with the same identity. Inconsistent
+foreign projections also suppress without deleting another owner's key. Reserved
+binding version zero can identify early callbacks. Version-fenced revalidation
+allows its sole publication transition while rejecting late token/session/device/
+gateway changes and expired/backwards observations. Event hints separately require
+exact immutable DIRECT ownership; this is not removable group/context admission.
+
+`matrixPushNotification` accepts only 8 KiB and 32 distinct fixed-app opaque keys,
+with bounded JSON depth/strings/numbers and duplicate/trailing-token rejection.
+Content, names, arbitrary device data/URL/tweaks and malformed IDs are rejected.
+Counts/priority are validated, then discarded: the callback exposes only optional
+room/event IDs and redacted keys. A count-only hint is silent. Synapse's legacy
+badge `id=""`, `type=null`, `sender=""` sentinels are accepted only without an event;
+nonempty variants are rejected. The eventual HTTP owner must also limit stream
+size/time, concurrency and private ingress before invoking the decoder.
+
+[Policy/decoder evidence](../measurements/chat-push-hint-policy-2026-11-01.json): 49
+domain and five delivery cases, format/architecture pass in 30s / 30.517s wall.
+The first fixture security-version mismatch is retained and corrected without
+changing production policy. Payload shapes match inspected Synapse v1.164.1 source;
+actual callback transport, durable reception and delivery are still pending.
+
 ## Following implementation boundaries
 
 Use Matrix v1.16 `event_id_only` HTTP pushers. The server fixes app identity and a

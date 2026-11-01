@@ -178,7 +178,8 @@
         "../measurements/chat-matrix-pusher-transport-2026-11-01.json",
         "../measurements/chat-push-binding-storage-2026-11-01.json",
         "../measurements/chat-pusher-admission-2026-11-01.json",
-        "../measurements/chat-cancellation-native-ci-2026-11-01.json"
+        "../measurements/chat-cancellation-native-ci-2026-11-01.json",
+        "../measurements/chat-push-hint-policy-2026-11-01.json"
       ]
     },
     {
@@ -347,7 +348,8 @@
       "status": "in_progress",
       "evidence": [
         "native-push.md",
-        "../measurements/chat-pusher-admission-2026-11-01.json"
+        "../measurements/chat-pusher-admission-2026-11-01.json",
+        "../measurements/chat-push-hint-policy-2026-11-01.json"
       ]
     },
     {
@@ -604,7 +606,7 @@
   },
   "next": [
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
-    "Managed outgoing pusher activation is validated through actual API/worker contexts. Continue narrow background admission, private callback ingress and safe provider logging, durable callback/feed/outbox and Mobile receive/decrypt/reply; push remains disabled until delivery is ready.",
+    "Managed outgoing activation and narrow background hint policy/decoder are validated. Continue safe provider logging, private callback ingress, durable callback/feed/outbox and actual worker dispatch, then Mobile receive/decrypt/reply; push remains disabled until delivery is ready.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."

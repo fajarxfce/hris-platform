@@ -29,6 +29,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val applicationRoomReads = AtomicInteger()
     private val applicationAdmissionFailures = AtomicInteger()
     private val applicationBeforeSend = AtomicInteger(-1)
+    private val headReads = AtomicInteger()
+    private val applicationAtHead = AtomicReference<Map<String, Int>?>(null)
     private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
 
     fun applicationAdmissions() =
@@ -38,6 +40,17 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             "room" to applicationRoomReads.get(),
             "failures" to applicationAdmissionFailures.get(),
         )
+
+    fun admittedSingleHeadRead(): Boolean {
+        val before = applicationAtHead.get() ?: return false
+        val after = applicationAdmissions()
+        return headReads.get() == 1 &&
+            before.getValue("failures") == 0 &&
+            after.getValue("failures") == 0 &&
+            listOf("device", "conversation", "room").all {
+                before.getValue(it) >= 4 && after.getValue(it) > before.getValue(it)
+            }
+    }
 
     fun applicationAdmittedBeforeSend() = applicationBeforeSend.get() == 1
 
@@ -106,6 +119,16 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
         response: HttpServletResponse,
         chain: FilterChain,
     ) {
+        if (
+            request.method == "GET" &&
+                request.requestURI.matches(Regex("/_matrix/client/v3/rooms/[^/]+/messages")) &&
+                request.parameterMap.keys == setOf("dir", "limit") &&
+                request.getParameter("dir") == "b" &&
+                request.getParameter("limit") == "1"
+        ) {
+            headReads.updateAndGet { minOf(it + 1, 64) }
+            applicationAtHead.compareAndSet(null, applicationAdmissions())
+        }
         if (
             request.method == "GET" &&
                 request.requestURI.matches(Regex("/_matrix/client/v3/rooms/[^/]+/context/[^/]+"))

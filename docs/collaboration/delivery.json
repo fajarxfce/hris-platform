@@ -40,7 +40,11 @@
         "../measurements/collaboration-message-staging-2026-11-01.json",
         "../measurements/collaboration-room-queue-2026-11-01.json",
         "../measurements/collaboration-delivery-2026-11-01.json",
-        "../measurements/collaboration-sender-integration-2026-11-01.json"
+        "../measurements/collaboration-sender-integration-2026-11-01.json",
+        "../measurements/collaboration-history-2026-11-01.json",
+        "../measurements/collaboration-original-window-2026-11-01.json",
+        "../measurements/collaboration-history-acquisition-2026-11-01.json",
+        "../measurements/collaboration-history-head-2026-11-01.json"
       ]
     },
     {
@@ -122,7 +126,11 @@
         "../measurements/collaboration-delivery-2026-11-01.json",
         "../measurements/collaboration-receipt-2026-11-01.json",
         "../measurements/collaboration-sender-2026-11-01.json",
-        "../measurements/collaboration-sender-integration-2026-11-01.json"
+        "../measurements/collaboration-sender-integration-2026-11-01.json",
+        "../measurements/collaboration-history-2026-11-01.json",
+        "../measurements/collaboration-original-window-2026-11-01.json",
+        "../measurements/collaboration-history-acquisition-2026-11-01.json",
+        "../measurements/collaboration-history-head-2026-11-01.json"
       ]
     },
     {
@@ -213,7 +221,11 @@
         "../measurements/collaboration-delivery-2026-11-01.json",
         "../measurements/collaboration-receipt-2026-11-01.json",
         "../measurements/collaboration-sender-2026-11-01.json",
-        "../measurements/collaboration-sender-integration-2026-11-01.json"
+        "../measurements/collaboration-sender-integration-2026-11-01.json",
+        "../measurements/collaboration-history-2026-11-01.json",
+        "../measurements/collaboration-original-window-2026-11-01.json",
+        "../measurements/collaboration-history-acquisition-2026-11-01.json",
+        "../measurements/collaboration-history-head-2026-11-01.json"
       ]
     },
     {
@@ -523,7 +535,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement head discovery and bounded provider progress after the proved common live-admitted original-history acquisition. Preserve unresolved events, canonical originals, aliases and redaction tombstones. Reconcile ACK lost before application journaling, then retire commands and build Chat list/setup/conversation UI with bootstrap/cross-family recovery; preserve original transactions and SDK keys/cursors.",
+    "Finish bounded provider history progress after latest-event discovery and live-admitted original acquisition. Preserve unresolved events, canonical originals, aliases and redaction tombstones. Reconcile ACK lost before application journaling, then retire commands and build Chat list/setup/conversation UI with bootstrap/cross-family recovery; preserve original transactions and SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

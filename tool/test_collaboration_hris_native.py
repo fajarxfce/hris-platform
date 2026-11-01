@@ -19,6 +19,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "messageIntentRestored": True, "queueMappingRecovered": True, "queueWriterExclusive": True, "perRoomDeliveryIsolated": True, "heldQueueRestored": True, "nativeDeliveryOwned": True, "commonSenderOwned": True, "receiptJournalRecovered": True, "projectionInterrupted": True,
                 "originalHistoryWindowOwned": True, "historyBodiesRestored": True,
                 "commonHistoryAcquisitionOwned": True,
+                "latestHistoryHeadOwned": True,
                 "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
                 "senderTransaction": "first-transaction", "recipientTransaction": "second-transaction"}
@@ -35,7 +36,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("heldQueueRestored", 1), ("nativeDeliveryOwned", False),
                             ("commonSenderOwned", None), ("receiptJournalRecovered", False), ("projectionInterrupted", 1),
                             ("originalHistoryWindowOwned", False), ("historyBodiesRestored", 1), ("historyWindow", None),
-                            ("commonHistoryAcquisitionOwned", 1)):
+                            ("commonHistoryAcquisitionOwned", 1), ("latestHistoryHeadOwned", 1)):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
 

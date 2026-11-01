@@ -86,3 +86,22 @@ run. This known-anchor snapshot does not yet establish application history pagin
 The [common acquisition proof](../measurements/collaboration-history-acquisition-2026-11-01.json)
 additionally verifies current application admission before and after the SDK
 context read, followed by product-owned encrypted history storage and reopening.
+
+## Mobile head discovery
+
+[Validation and actual SDK evidence](../measurements/collaboration-history-head-2026-11-01.json).
+
+Android's owned runtime uses the same admitted `/messages` endpoint with `dir=b`
+and `limit=1` to select an opaque anchor when the common acquisition has none.
+It borrows the application's public transport and reads the current SDK session;
+the existing SDK remains the crypto/sync/delivery owner. Caller/parent cancellation
+stops the request, while the public pool survives runtime disposal. The mobile
+reader bounds responses to 256 KiB and rejects foreign/malformed heads. It neither
+advances provider positions nor clears local history on an empty visible result.
+
+The real SDK fixture now requests this head and checks that it equals the latest
+encrypted reply before using the common history acquisition. Server trace assertions
+require exactly one unpositioned `dir=b&limit=1` read, with HRIS device/conversation/
+room admission before and after acquisition. This adds no production backend route,
+provider store or migration. Ordinary Matrix token rejection remains a failed live
+operation; HRIS control admission establishes company read restrictions.

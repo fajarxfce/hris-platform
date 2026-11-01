@@ -67,8 +67,16 @@ but has not executed this scenario.
 Owned logical intents, common staging and native restart mapping now exist.
 The native per-room delivery lifetime is now implemented and
 [verified through the product port](../measurements/collaboration-delivery-2026-11-01.json).
-The common live-admitted sender, durable receipt/recipient coalescing, event aliases
-and history reconciliation remain to implement. Do not add a second send retry owner.
+Mobile `8d8fb233feee480e6e7dc7bc0430195ccf906005` now implements the encrypted outbound
+receipt journal and offline command-state reconciliation, including every observed
+alias and immutable mapping. [Receipt evidence](../measurements/collaboration-receipt-2026-11-01.json)
+records real SQLite/IndexedDB recovery and ownership/concurrency cases. The journal
+must precede `Sent` projection; its absence never proves delivery.
+
+The common live-admitted sender still needs to connect native results to the journal.
+Incoming recipient coalescing and history reconciliation remain to implement,
+including a crash before native ACK reaches the application journal. Do not add
+a second send retry owner.
 
 Remaining acceptance must cover restart before/after send/response/local ACK,
 long offline reconnect, repeated notification hints, conflicting identity reuse,

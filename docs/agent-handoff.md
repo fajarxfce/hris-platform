@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Dispatch deadline and offline retention proved — 1 November 2026
+
+[Evidence](measurements/chat-push-dispatch-deadline-2026-11-01.json) / [contract](collaboration/native-push.md):
+FCM operation budget now stays separate from provider storage lifetime. Default
+300-second retention is preserved; explicit RECOVERABLE permits up to24h with a
+separate short dispatch deadline. Checks before/after OAuth, around complete FCM
+I/O and after outcome mapping suppress late sends/results, including UNREGISTERED.
+Actual signed OAuth returning after expiry never starts FCM; a real stalled body
+is cancelled at the short budget. OAuth itself remains separately bounded10s.
+
+20 core push cases pass in32s /33.015s wall; integration adds13 communications
+policy, nine actual API and eight actual worker cases, format/architecture in76s /
+76.499s wall. Nine source inputs unchanged. Intermediate8s task-selection failure
+used an incorrect module prefix; fixed command only. Final core task is up-to-date
+with focused source-matching reports. No live Firebase send or app source change.
+
+**Continue immediately:** connect existing callback decoder/background policy to
+schema116 queue with current admission, then private bounded HTTP ingress, fenced
+worker delivery and Mobile receive/decrypt/reply. Do not reuse Ready30s as FCM TTL.
+Periodic/reconnect/full-sync recovery and all-company ownership remain necessary;
+24h storage is no receipt guarantee. No live migration or PRD group acceptance.
+Phone stays release10/c037; next validated app product checkpoint11+, notify first,
+explicit10.77.77.3:5555 install-only, then continue full P0–P8 work.
+
 ## Durable push queue and restore proved — 1 November 2026
 
 [Evidence](measurements/chat-push-queue-2026-11-01.json) / [contract](collaboration/native-push.md):

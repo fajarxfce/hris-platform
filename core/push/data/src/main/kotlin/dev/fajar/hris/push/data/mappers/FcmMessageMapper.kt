@@ -23,7 +23,7 @@ fun fcmMessage(message: PushMessage, now: Instant): Map<String, Any> {
         } <= 1024
     )
     val ttl = Duration.between(now, message.expiresAt).seconds
-    require(ttl in 1..300)
+    require(ttl in 1..message.retention.maximumSeconds)
     val delivery = message.delivery
     val visible =
         when (delivery) {

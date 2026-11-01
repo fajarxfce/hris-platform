@@ -74,12 +74,13 @@ class FcmPushRepositoryTest {
     private fun repository(
         timeout: Duration = Duration.ofSeconds(2),
         credentials: PushCredentialDataSource = PushCredentialDataSource { "test-google-access" },
+        clock: Clock = Clock.fixed(now, ZoneOffset.UTC),
     ) =
         FcmPushRepository(
             credentials,
-            FcmPushDataSource(client, endpoint, timeout),
+            FcmPushDataSource(client, endpoint, timeout, clock),
             json,
-            Clock.fixed(now, ZoneOffset.UTC),
+            clock,
         )
 
     private fun message(delivery: PushDelivery = PushDelivery.Background("hris_inbox")) =
@@ -109,6 +110,211 @@ class FcmPushRepositoryTest {
                 .setDefaultRetriesEnabled(false)
                 .build()
         return GooglePushCredentialDataSource(credentials)
+    }
+
+    @Test
+    fun recoverableStorageKeepsItsDayLifetimeWithAShortIndependentDispatchBudget() {
+        val body = AtomicReference<String>()
+        handler.set { exchange ->
+            body.set(String(exchange.requestBody.readNBytes(8193)))
+            reply(exchange, 200, """{"name":"projects/test/messages/accepted"}""")
+        }
+        val message =
+            PushMessage(
+                "fixture-target-token",
+                mapOf("eventCode" to "fixture.wake"),
+                now.plusSeconds(86400),
+                PushDelivery.Visible("HRIS", "New message"),
+                dispatchDeadline = now.plusSeconds(30),
+                retention = PushRetention.RECOVERABLE,
+            )
+        assertEquals(Result.Success(PushOutcome.ACCEPTED), repository().send(message))
+        val payload = json.readTree(body.get())["message"]
+        assertEquals("86400s", payload["android"]["ttl"].asString())
+        assertEquals(
+            now.plusSeconds(86400).epochSecond.toString(),
+            payload["apns"]["headers"]["apns-expiration"].asString(),
+        )
+        assertEquals("HIGH", payload["android"]["priority"].asString())
+        assertFalse(payload.has("notification"))
+    }
+
+    @Test
+    fun recoverableRetentionRequiresAnExplicitShortBudgetAndDoesNotExpandDefaultLifetime() {
+        for (message in
+            listOf(
+                PushMessage(
+                    "fixture-target-token",
+                    mapOf("eventCode" to "fixture.wake"),
+                    now.plusSeconds(301),
+                    dispatchDeadline = now.plusSeconds(30),
+                ),
+                PushMessage(
+                    "fixture-target-token",
+                    mapOf("eventCode" to "fixture.wake"),
+                    now.plusSeconds(86401),
+                    dispatchDeadline = now.plusSeconds(30),
+                    retention = PushRetention.RECOVERABLE,
+                ),
+                PushMessage(
+                    "fixture-target-token",
+                    mapOf("eventCode" to "fixture.wake"),
+                    now.plusSeconds(86400),
+                    retention = PushRetention.RECOVERABLE,
+                ),
+                PushMessage(
+                    "fixture-target-token",
+                    mapOf("eventCode" to "fixture.wake"),
+                    now.plusSeconds(10),
+                    dispatchDeadline = now.plusSeconds(20),
+                ),
+            )) assertInstanceOf(Result.Failed::class.java, repository().send(message))
+        assertEquals(0, received.get())
+    }
+
+    @Test
+    fun expiredDispatchDoesNotAcquireCredentialsAndLateResponsesCannotRetireATarget() {
+        val at = AtomicReference(now)
+        val clock =
+            object : Clock() {
+                override fun getZone() = ZoneOffset.UTC
+
+                override fun withZone(zone: java.time.ZoneId): Clock = this
+
+                override fun instant() = at.get()
+            }
+        val credentials = AtomicInteger()
+        val sends = AtomicInteger()
+        val source = PushDataSource { _, _, deadline ->
+            sends.incrementAndGet()
+            at.set(deadline)
+            PushHttpResponse(
+                404,
+                """{"error":{"status":"NOT_FOUND","details":[{"@type":"type.googleapis.com/google.firebase.fcm.v1.FcmError","errorCode":"UNREGISTERED"}]}}"""
+                    .toByteArray(),
+                null,
+            )
+        }
+        val repo =
+            FcmPushRepository(
+                PushCredentialDataSource {
+                    credentials.incrementAndGet()
+                    "fixture-access"
+                },
+                source,
+                json,
+                clock,
+            )
+        val expired =
+            PushMessage(
+                "fixture-target-token",
+                mapOf("eventCode" to "fixture.wake"),
+                now.plusSeconds(300),
+                dispatchDeadline = now,
+            )
+        assertEquals(
+            "push_delivery_unavailable",
+            (repo.send(expired) as Result.Failed).failure.code,
+        )
+        assertEquals(0, credentials.get())
+        val valid =
+            PushMessage(
+                expired.token,
+                expired.data,
+                expired.expiresAt,
+                dispatchDeadline = now.plusSeconds(1),
+            )
+        assertEquals("push_delivery_unavailable", (repo.send(valid) as Result.Failed).failure.code)
+        assertEquals(1, credentials.get())
+        assertEquals(1, sends.get())
+    }
+
+    @Test
+    fun actualOAuthFinishingAfterDispatchExpiryNeverStartsAnFcmRequest() {
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        handler.set { exchange ->
+            val request = String(exchange.requestBody.readNBytes(65537))
+            assertTrue(request.contains("assertion="))
+            entered.countDown()
+            check(release.await(5, TimeUnit.SECONDS))
+            reply(
+                exchange,
+                200,
+                """{"access_token":"test-oauth-token","expires_in":3600,"token_type":"Bearer"}""",
+            )
+        }
+        val credentials = oauth()
+        val at = Instant.now()
+        val deadline = at.plusMillis(500)
+        val message =
+            PushMessage(
+                "fixture-target-token",
+                mapOf("eventCode" to "fixture.wake"),
+                at.plusSeconds(86400),
+                dispatchDeadline = deadline,
+                retention = PushRetention.RECOVERABLE,
+            )
+        val executor = Executors.newSingleThreadExecutor()
+        val pending =
+            executor.submit<Result<PushOutcome>> {
+                repository(credentials = credentials, clock = Clock.systemUTC()).send(message)
+            }
+        try {
+            assertTrue(entered.await(2, TimeUnit.SECONDS))
+            Thread.sleep(
+                Duration.between(Instant.now(), deadline).toMillis().coerceAtLeast(0) + 100
+            )
+            release.countDown()
+            val result = pending.get(3, TimeUnit.SECONDS)
+            assertEquals("push_delivery_unavailable", (result as Result.Failed).failure.code)
+            assertEquals("test-oauth-token", credentials.accessToken())
+            assertEquals(1, received.get())
+        } finally {
+            release.countDown()
+            pending.cancel(true)
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
+    @Test
+    fun shortDispatchDeadlineCancelsARealStalledBodyDespiteLongProviderStorage() {
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        handler.set { exchange ->
+            exchange.sendResponseHeaders(200, 100)
+            exchange.responseBody.write('{'.code)
+            exchange.responseBody.flush()
+            entered.countDown()
+            check(release.await(5, TimeUnit.SECONDS))
+        }
+        val executor = Executors.newSingleThreadExecutor()
+        val pending =
+            executor.submit<Result<PushOutcome>> {
+                val at = Instant.now()
+                repository(clock = Clock.systemUTC())
+                    .send(
+                        PushMessage(
+                            "fixture-target-token",
+                            mapOf("eventCode" to "fixture.wake"),
+                            at.plusSeconds(86400),
+                            dispatchDeadline = at.plusMillis(500),
+                            retention = PushRetention.RECOVERABLE,
+                        )
+                    )
+            }
+        try {
+            assertTrue(entered.await(2, TimeUnit.SECONDS))
+            val result = pending.get(1200, TimeUnit.MILLISECONDS)
+            assertEquals("push_delivery_unavailable", (result as Result.Failed).failure.code)
+            assertEquals(1, received.get())
+        } finally {
+            release.countDown()
+            pending.cancel(true)
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
     }
 
     @Test

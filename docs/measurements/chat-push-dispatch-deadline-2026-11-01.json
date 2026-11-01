@@ -1,0 +1,230 @@
+{
+  "date": "2026-11-01",
+  "base": "f92feed52bb83dcc0fa062b962130990c6b731df",
+  "inputs": {
+    "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/datasources/FcmPushDataSource.kt": "8a21916f2fc9b7f179620d1150095964b9aef2c79cbe844733d38184d10e626d",
+    "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/datasources/PushDataSource.kt": "4caa7dd62be56bd563ce05b6729de3799730cf8db027051ef43724ac329aff09",
+    "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/di/PushConfiguration.kt": "aea124cfb56293f07be8a6a262f022fa131428687551c1cc7a1bc0f2541994e1",
+    "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/mappers/FcmMessageMapper.kt": "918c1033c1c38077d0f4a03a3b025509cd7fbd00fe940176488a47a9c93eef10",
+    "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/repositories/FcmPushRepository.kt": "ca2e9c6d96cc244c08da936c337362e1214dd4ef9a818aeb227a4e59a68133d5",
+    "core/push/data/src/test/kotlin/dev/fajar/hris/push/data/FcmPushRepositoryTest.kt": "c303051fe009559477e5bad392feffd11002263bd52cb3e888a9dc467c552e35",
+    "core/push/domain/src/main/kotlin/dev/fajar/hris/push/domain/entities/PushMessage.kt": "5d798a80f9e6971ad5d93ad6e2a9f24139d5b7213469b3c151f2694b30fcb747",
+    "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/transport/PushDispatchDeadline.kt": "4ac636d6dab125066e173cd45c3bea969baf87adda2e694fa3b8d3cb2de9f70a",
+    "core/push/domain/src/main/kotlin/dev/fajar/hris/push/domain/entities/PushRetention.kt": "f989caaa5d639b32d865f3effa89a555ac5b5b4a41f1f6157308c57314f68c96"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 76.499,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":core:push:data:test",
+      ":modules:communications:domain:test",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationMatrixConfigurationTest",
+      ":apps:worker:test",
+      "--tests",
+      "*InboxPushWorkerTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 76,
+  "reports": {
+    "core/push/data/build/test-results/test/TEST-dev.fajar.hris.push.data.FcmPushRepositoryTest.xml": {
+      "sha256": "35b041e10be3d487d8a26360d2b43b73847c04680d859cf1fc5cfae3d29a1c63",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 2.68
+    },
+    "core/push/data/build/test-results/test/TEST-dev.fajar.hris.push.data.PushTransportBoundaryTest.xml": {
+      "sha256": "13cb6d21f9f5ff4511ca3ac8b08a76e5368c971bae74572b367196b8cdf65396",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.367
+    },
+    "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.AnnouncementActionPolicyTest.xml": {
+      "sha256": "b8547cd5288650acf4f5430676f2ab51e7ee6899b5b8334b8d2baa133447316f",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.051
+    },
+    "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.AnnouncementPolicyTest.xml": {
+      "sha256": "820c1ffdf49c194dc8f3621acaec2a408278445bf91571ebd5978976d7397bd2",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.012
+    },
+    "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.AnnouncementPublicationPolicyTest.xml": {
+      "sha256": "8c1c09488233c873ec77608caee328ac3ec7f6e6a726fa35160dc7f070db51e2",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.003
+    },
+    "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.InboxPushPolicyTest.xml": {
+      "sha256": "345148935578cc655846a6f5efcfbe5ed9f090570c25ff93d6b717eb1c4b33b5",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.002
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixConfigurationTest.xml": {
+      "sha256": "5d16c58e13e59d0f19079eb0efa948afa5fcf132290ee4939bc7c3373ee0782b",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 20.063
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxPushWorkerTest.xml": {
+      "sha256": "69a8ebe6d8acf7cdcaa9f68a289b6ea678a87f766e2701495f3fc77873126b19",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 18.574
+    }
+  },
+  "totals": {
+    "push": {
+      "suites": 2,
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.047
+    },
+    "communicationsDomain": {
+      "suites": 4,
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.06799999999999999
+    },
+    "api": {
+      "suites": 1,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 20.063
+    },
+    "worker": {
+      "suites": 1,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 18.574
+    }
+  },
+  "earlierRuns": [
+    {
+      "run": 1,
+      "exitCode": 0,
+      "wallSeconds": 33.015,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":core:push:data:test",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 32,
+      "result": "All 20 core push cases and format/architecture pass."
+    },
+    {
+      "run": 2,
+      "exitCode": 1,
+      "wallSeconds": 8.234,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":core:push:data:test",
+        ":features:communications:domain:test",
+        ":apps:server:test",
+        "--tests",
+        "*NativeCollaborationMatrixConfigurationTest",
+        ":apps:worker:test",
+        "--tests",
+        "*InboxPushWorkerTest",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 8,
+      "result": "Task selection failed before tests: incorrect :features:communications path; corrected to :modules:communications. No product changes."
+    }
+  ],
+  "proved": [
+    "Explicit default 300-second and recoverable 86400-second provider retention ceilings, with independent at-most-five-minute dispatch budget.",
+    "Real owned HTTP serialization keeps day-long Android/APNs expiry with 30-second dispatch deadline.",
+    "Expired work never acquires OAuth; successful real signed OAuth returning late never starts FCM.",
+    "Real response body stall is cancelled by 500ms dispatch budget despite long provider storage; late UNREGISTERED is not published.",
+    "Existing cancellation, bounded transport, inbox policy and actual API/worker application contexts pass."
+  ],
+  "limits": [
+    "Core tests were up-to-date in final integration run; source-matching reports originate from focused run1.",
+    "API/worker context checks retain their fixture push configuration; no live Firebase credentials or send.",
+    "OAuth remains independently bounded; it can outlive a shorter caller budget but cannot start late FCM.",
+    "Recoverable retention is opt-in and no delivery guarantee. No chat producer, callback/worker wiring, client recovery or live provider/deployment acceptance.",
+    "Phone remains installed release10 at Mobile c0371a38. No app source changed."
+  ]
+}

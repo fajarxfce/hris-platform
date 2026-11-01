@@ -51,6 +51,7 @@ class PushConfiguration {
             FcmPushDataSource(
                 pushHttpClient,
                 URI("https://fcm.googleapis.com/v1/projects/$project/messages:send"),
+                clock = clock,
             ),
             json,
             clock,

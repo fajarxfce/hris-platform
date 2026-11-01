@@ -181,7 +181,8 @@
         "../measurements/chat-cancellation-native-ci-2026-11-01.json",
         "../measurements/chat-push-hint-policy-2026-11-01.json",
         "../measurements/chat-push-provider-logging-2026-11-01.json",
-        "../measurements/chat-push-queue-2026-11-01.json"
+        "../measurements/chat-push-queue-2026-11-01.json",
+        "../measurements/chat-push-dispatch-deadline-2026-11-01.json"
       ]
     },
     {
@@ -353,7 +354,8 @@
         "../measurements/chat-pusher-admission-2026-11-01.json",
         "../measurements/chat-push-hint-policy-2026-11-01.json",
         "../measurements/chat-push-provider-logging-2026-11-01.json",
-        "../measurements/chat-push-queue-2026-11-01.json"
+        "../measurements/chat-push-queue-2026-11-01.json",
+        "../measurements/chat-push-dispatch-deadline-2026-11-01.json"
       ]
     },
     {

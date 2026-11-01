@@ -3,7 +3,8 @@
 ## Delivery transport implemented — 1 November 2026
 
 `PushMessage.delivery` explicitly selects `Background` (default) or `Visible`.
-Both retain bounded data-only FCM fields, target validation and 1–300 second TTL.
+Both retain bounded data-only FCM fields and target validation. The default TTL
+remains 1–300 seconds; explicit recoverable retention is described below.
 Android uses NORMAL/HIGH respectively and always lets the admitted application
 post the notification. No global/Android `notification` field bypasses that flow.
 Apple background remains content-available/priority 5. Visible provides a generic
@@ -236,3 +237,28 @@ Port generic primitives to Starter only after Mobile validation. CHAT-13 and all
 
 References: [Matrix push gateway](https://spec.matrix.org/v1.16/push-gateway-api/),
 [pushers](https://spec.matrix.org/v1.16/client-server-api/#push-notifications).
+
+## Separate dispatch and provider retention implemented — 1 November 2026
+
+`PushMessage.dispatchDeadline` defaults to the existing expiry. It must not exceed
+that expiry and allows at most five minutes of remaining operation budget. The
+repository checks it before credentials, after OAuth, around FCM and after outcome
+mapping. FCM request plus full-body timeout is clamped to the remaining budget.
+An expired result cannot publish ACCEPTED or UNREGISTERED to its caller. OAuth
+remains independently bounded to10s and can finish after a shorter caller budget;
+it then cannot begin FCM. Cancellation and bounded response handling are preserved.
+
+`PushRetention.SHORT_LIVED` remains the default300-second storage ceiling.
+Explicit `RECOVERABLE` permits up to86400 seconds and therefore requires a separate
+short dispatch deadline for long hints. Android TTL/APNs expiry use provider
+storage lifetime after credential acquisition; they never inherit a30-second
+admission budget. Retention is a ceiling, not a delivery guarantee or authority to
+read content. Current producer/client admission and periodic/reconnect/full sync
+remain mandatory. This change does not enable a chat producer or live FCM send.
+
+[Evidence](../measurements/chat-push-dispatch-deadline-2026-11-01.json):20 push,
+13 communications policy, nine actual API and eight actual worker cases pass,
+format/architecture pass. Real signed OAuth succeeds after dispatch expiry without
+starting FCM; a real stalled response body obeys the short dispatch timeout. Final
+integration76s /76.499s wall with nine unchanged inputs reuses focused32s push
+reports. The intermediate incorrect Gradle module path is retained; source unchanged.

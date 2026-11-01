@@ -105,3 +105,10 @@ require exactly one unpositioned `dir=b&limit=1` read, with HRIS device/conversa
 room admission before and after acquisition. This adds no production backend route,
 provider store or migration. Ordinary Matrix token rejection remains a failed live
 operation; HRIS control admission establishes company read restrictions.
+
+The mobile adapter additionally bounds retained focused-cache keys to 16 per SDK
+client lifetime, including uncertain creation. View disposal does not release a
+key. [Evidence](../measurements/collaboration-history-focus-2026-11-01.json) records
+regression and actual SDK validation. Product pagination, coherent post-page
+snapshots and safe client reopening remain separate work; no gateway route,
+provider position or database migration changes in this increment.

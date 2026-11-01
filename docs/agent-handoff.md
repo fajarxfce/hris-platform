@@ -2,12 +2,20 @@
 
 ## Active collaboration implementation — 1 November 2026
 
+Mobile `820e3c3c11d94e2467c2df9270d785fffdb9d5ee` now consumes the owned summary page/detail contract at Platform
+`8813ea9eee28cafc274eafcd41456340f132ae2f`; CI pins that backend.
+[Evidence](measurements/collaboration-mobile-summaries-2026-11-01.json): one new
+domain/four data cases, focused 61s, full root/browser/Android/Wasm/lint 232s,
+2,208 desktop cases, 97 domain/85 data browser, zero lint errors. Both summary
+paths share current-owner/denial guards, bounded decoding and exact counterpart
+validation. No UI, live service or phone change; encrypted owned projections are next.
+
 Owned DM summary endpoints now expose counterpart labels through one bounded
 database projection. [Contract](collaboration/direct-summaries.md) and
 [evidence](measurements/collaboration-direct-summaries-2026-11-01.json) cover
 25 database/nine HTTP cases in 75s, final owned HTTP-client cleanup check in 49s,
 and the corrected initial cookie fixture (58s). Identity-only APIs are unchanged;
-no schema/DI/live/phone change. Mobile summary adapters and product UI remain next.
+no schema/DI/live/phone change. Mobile summary adapters are verified above; owned cache and product UI remain next.
 
 Entry/recovery CI at Mobile `4d90c6e0` is fully verified: control `41257419472`
 passes all 26 steps (187 desktop, 163 browser, 163 iOS simulator); protocol
@@ -67,11 +75,14 @@ exposed the SDK's post-join metadata confirmation. Both failures are retained;
 three new domain, three database and two HTTP cases verify the correction,
 including malformed requests, identity isolation and permission loss.
 
-**Continue P0–P8; none of the 54 groups is accepted.** Connect the verified
-summary contract to Mobile, then app entry and its shared runtime, product history
-windows, scoped offline projections, bootstrap/cross-family recovery, logical-ID
-reconciliation and chat UI. Keep HRIS admission/provider adapters here and Mobile;
-only reusable proven foundation changes belong in Starter.
+**Continue P0–P8; none of the 54 groups is accepted.** Build encrypted owned
+conversation-list projections and app entry with explicit shared runtime ownership,
+then product history windows, offline message projections, bootstrap/cross-family
+recovery, logical-ID reconciliation and chat UI. Treat summary UUID continuation
+as live page navigation; it gives neither snapshot completeness nor change order.
+Keep native SDK keys/stores intact. The current 512-item observer cap is a guard,
+not a product history window. Keep HRIS adapters in Mobile/Platform and port only
+verified reusable foundations to Starter.
 
 Predecessor `0ef8018c` control CI `41250076314` passes all 26 steps:
 158 desktop, 134 browser, 134 iOS simulator cases; 120 source hashes match the

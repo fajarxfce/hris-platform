@@ -141,3 +141,22 @@ The current [entry/recovery evidence](../measurements/collaboration-sync-recover
 retains the obsolete-owner fixture correction and explicit bounded retries of a
 provider-busy join. Fixture retries are distinct from automatic sync transport
 recovery; each product entry call still executes once under its current owner.
+
+## Common sender and receipt projection
+
+The [sender integration](../measurements/collaboration-sender-integration-2026-11-01.json)
+uses product HRIS setup/conversation API adapters and the common sender against
+the same actual SDK runtime after staging process death. A sender-only disposable
+HRIS credential remains in private fixture input; artifacts never include it.
+The fixture seeds local login/workspace state and records actual server admission
+counts: device/conversation/room each succeed three times, with two rounds before
+the first encrypted send and the third before command projection.
+
+After the real ACK is journaled, a test repository deliberately refuses `Sent`.
+The fixture reopens the real app database and verifies both retained receipt and
+original staged intent, then uses product local reconciliation once and checks
+idempotent replay. Independent SDK receipt observation, both encrypted directions,
+native keys/cursors and the paused sibling room still pass. Strict client proof
+flags and separate server counters make these checks mandatory. This is database
+reopening after the injected fault; actual process death after ACK remains a
+separate history-reconciliation case.

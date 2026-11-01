@@ -39,7 +39,8 @@
         "../measurements/collaboration-native-writer-2026-11-01.json",
         "../measurements/collaboration-message-staging-2026-11-01.json",
         "../measurements/collaboration-room-queue-2026-11-01.json",
-        "../measurements/collaboration-delivery-2026-11-01.json"
+        "../measurements/collaboration-delivery-2026-11-01.json",
+        "../measurements/collaboration-sender-integration-2026-11-01.json"
       ]
     },
     {
@@ -120,7 +121,8 @@
         "../measurements/collaboration-room-queue-2026-11-01.json",
         "../measurements/collaboration-delivery-2026-11-01.json",
         "../measurements/collaboration-receipt-2026-11-01.json",
-        "../measurements/collaboration-sender-2026-11-01.json"
+        "../measurements/collaboration-sender-2026-11-01.json",
+        "../measurements/collaboration-sender-integration-2026-11-01.json"
       ]
     },
     {
@@ -210,7 +212,8 @@
         "../measurements/collaboration-room-queue-2026-11-01.json",
         "../measurements/collaboration-delivery-2026-11-01.json",
         "../measurements/collaboration-receipt-2026-11-01.json",
-        "../measurements/collaboration-sender-2026-11-01.json"
+        "../measurements/collaboration-sender-2026-11-01.json",
+        "../measurements/collaboration-sender-integration-2026-11-01.json"
       ]
     },
     {
@@ -520,7 +523,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Prove the common live-admitted sender and durable receipt journal together through actual HRIS control APIs and the native SDK, with interrupted Sent projection and database recovery. Then incoming history must coalesce logical IDs by conversation/authenticated sender with aliases/tombstones and conflicting-reuse rejection, including ACK lost before journal commit. Continue bounded history, command retirement, bootstrap/cross-family recovery and Chat UI; preserve unknown attempts and SDK keys/cursors.",
+    "Implement incoming canonical history and bounded SDK windows after the proved common sender/receipt integration. Coalesce by conversation/authenticated sender/logical ID, preserve original content versus edits, reject conflicting reuse and retain aliases/tombstones; reconcile ACK lost before application journaling. Then command retirement, bootstrap/cross-family recovery and Chat list/setup/conversation UI; preserve original transactions and SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

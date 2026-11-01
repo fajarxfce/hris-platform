@@ -137,7 +137,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             fixture,
             mapOf(
                 "baseUrl" to "http://127.0.0.1:$port",
-                "sender" to sender.session,
+                // This disposable API credential stays in private fixture input, never proof
+                // artifacts.
+                "sender" to (sender.session + ("hrisAccessToken" to owner.access)),
                 "recipient" to recipient.session,
                 "roomId" to room,
                 "conversationId" to conversation.toString(),
@@ -250,6 +252,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "perRoomDeliveryIsolated",
                     "heldQueueRestored",
                     "nativeDeliveryOwned",
+                    "commonSenderOwned",
+                    "receiptJournalRecovered",
+                    "projectionInterrupted",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -275,6 +280,12 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 proof.path("recipientEventId").asString(),
                 recipient.session.getValue("userId"),
             )
+            val applicationReads = trace.applicationAdmissions()
+            assertTrue(
+                listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 3 }
+            )
+            assertEquals(0, applicationReads.getValue("failures"))
+            assertTrue(trace.applicationAdmittedBeforeSend())
             writePrivate(
                 directory.resolve("verified.json"),
                 mapOf(
@@ -296,6 +307,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "perRoomDeliveryIsolated" to true,
                     "heldQueueRestored" to true,
                     "nativeDeliveryOwned" to true,
+                    "commonSenderOwned" to true,
+                    "receiptJournalRecovered" to true,
+                    "projectionInterrupted" to true,
+                    "applicationAdmittedBeforeSend" to true,
+                    "applicationAdmissions" to trace.applicationAdmissions(),
                     "heldRoomNeverSent" to true,
                     "pausedAcrossRestart" to true,
                     "syncInterruptedAfterRestart" to true,

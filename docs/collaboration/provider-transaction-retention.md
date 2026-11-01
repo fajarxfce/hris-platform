@@ -78,7 +78,12 @@ sender to native results and this journal. [Sender evidence](../measurements/col
 records 18 new common cases, including late authority/cancellation and partial
 journal capture. Already received facts commit under their original raw account
 fence within five seconds; fresh admission precedes command projection/publication.
-Actual combined sender/SDK recovery integration is the next fixture step.
+[Actual combined integration](../measurements/collaboration-sender-integration-2026-11-01.json)
+now verifies real HRIS admission before native sending, actual ACK journaling,
+injected projection failure and recovery after the app database reopens. The
+independent native observer, original mapping and held-room isolation agree.
+The fixture still seeds local login/workspace state; it does not claim login UI
+or a new process death after ACK.
 
 Incoming recipient coalescing and history reconciliation remain to implement,
 including a crash before native ACK reaches the application journal. Do not add

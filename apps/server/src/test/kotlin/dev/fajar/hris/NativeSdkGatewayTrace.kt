@@ -24,6 +24,21 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val earlyEncryptedSends = AtomicInteger()
     private val heldRoom = AtomicReference<String?>()
     private val heldRoomSends = AtomicInteger()
+    private val applicationDeviceReads = AtomicInteger()
+    private val applicationConversationReads = AtomicInteger()
+    private val applicationRoomReads = AtomicInteger()
+    private val applicationAdmissionFailures = AtomicInteger()
+    private val applicationBeforeSend = AtomicInteger(-1)
+
+    fun applicationAdmissions() =
+        mapOf(
+            "device" to applicationDeviceReads.get(),
+            "conversation" to applicationConversationReads.get(),
+            "room" to applicationRoomReads.get(),
+            "failures" to applicationAdmissionFailures.get(),
+        )
+
+    fun applicationAdmittedBeforeSend() = applicationBeforeSend.get() == 1
 
     fun holdRoom(roomId: String) {
         require(roomId.startsWith('!') && roomId.length in 2..255)
@@ -54,6 +69,27 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
 
     fun earlyEncryptedSendCount() = earlyEncryptedSends.get()
 
+    private fun recordApplicationAdmission(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ) {
+        if (request.getHeader("X-HRIS-Sender-Proof") != "1") return
+        val root = "/api/v1/companies/[0-9a-f-]{36}/collaboration/"
+        val counter =
+            when {
+                request.requestURI.matches(Regex(root + "native-device")) -> applicationDeviceReads
+                request.requestURI.matches(Regex(root + "direct-conversations/[0-9a-f-]{36}")) ->
+                    applicationConversationReads
+                request.requestURI.matches(
+                    Regex(root + "direct-conversations/[0-9a-f-]{36}/room")
+                ) -> applicationRoomReads
+                else -> null
+            }
+        if (counter == null || request.method != "GET" || response.status != 200)
+            applicationAdmissionFailures.updateAndGet { minOf(it + 1, 64) }
+        else counter.updateAndGet { minOf(it + 1, 64) }
+    }
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -67,6 +103,17 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             earlyEncryptedSends.updateAndGet { minOf(it + 1, 512) }
         }
         if (request.method == "PUT" && request.requestURI.matches(encryptedSendRoute)) {
+            applicationBeforeSend.compareAndSet(
+                -1,
+                if (
+                    applicationDeviceReads.get() >= 2 &&
+                        applicationConversationReads.get() >= 2 &&
+                        applicationRoomReads.get() >= 2 &&
+                        applicationAdmissionFailures.get() == 0
+                )
+                    1
+                else 0,
+            )
             val room = UriUtils.decode(request.requestURI.split('/')[5], StandardCharsets.UTF_8)
             if (room == heldRoom.get()) heldRoomSends.updateAndGet { minOf(it + 1, 512) }
         }
@@ -105,6 +152,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                     }
             }
         } finally {
+            recordApplicationAdmission(request, response)
             if (request.requestURI.startsWith("/_matrix/"))
                 synchronized(observations) {
                     if (observations.size < 512)

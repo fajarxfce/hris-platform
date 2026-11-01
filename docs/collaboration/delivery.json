@@ -36,7 +36,8 @@
         "../measurements/collaboration-owned-sync-2026-10-31.json",
         "../measurements/collaboration-sync-recovery-2026-11-01.json",
         "../measurements/collaboration-runtime-reuse-2026-11-01.json",
-        "../measurements/collaboration-native-writer-2026-11-01.json"
+        "../measurements/collaboration-native-writer-2026-11-01.json",
+        "../measurements/collaboration-message-staging-2026-11-01.json"
       ]
     },
     {
@@ -112,7 +113,8 @@
         "../measurements/collaboration-local-list-2026-11-01.json",
         "../measurements/collaboration-runtime-reuse-2026-11-01.json",
         "../measurements/collaboration-message-intents-2026-11-01.json",
-        "../measurements/collaboration-native-writer-2026-11-01.json"
+        "../measurements/collaboration-native-writer-2026-11-01.json",
+        "../measurements/collaboration-message-staging-2026-11-01.json"
       ]
     },
     {
@@ -197,7 +199,8 @@
       "status": "in_progress",
       "evidence": [
         "../measurements/collaboration-message-intents-2026-11-01.json",
-        "../measurements/collaboration-native-writer-2026-11-01.json"
+        "../measurements/collaboration-native-writer-2026-11-01.json",
+        "../measurements/collaboration-message-staging-2026-11-01.json"
       ]
     },
     {
@@ -507,7 +510,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement the common live-admitted sender and per-room delivery lifetime using the verified owned intents and exclusive paused native writer. Reconcile uncertain attempts and publish native transaction mappings before enabling delivery. Then connect Chat list/setup/conversation UI, bounded durable history and bootstrap/cross-family recovery without resetting SDK keys/cursors.",
+    "Prove per-room queue controls with actual async initialization and a second held room, then implement the admitted delivery lifetime, durable recipient logical-ID/event-alias reconciliation, bounded history and Chat list/setup/conversation UI. Common staging and native uncertainty recovery are implemented; delivery must preserve unknown/cross-family attempts and SDK keys/cursors.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

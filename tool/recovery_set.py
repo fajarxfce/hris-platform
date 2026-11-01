@@ -39,7 +39,7 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V108 retains company/account/device provisioning fences and durable job links.
 # V109 retains one authenticated gateway token replay per native device.
 # V113 adds a public recipient projection; no new secret envelope format.
-MAX_SCHEMA = 113
+MAX_SCHEMA = 114
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Native foreground history and publication ordering — 1 November 2026
+
+The companion Mobile fixture now exercises the actual ChatThreadViewModel after
+worker recovery, using 32 encrypted peer seeds. Platform schema 114 fixes an observed
+key-discovery race: read-only discovery verifies keys against the committed reservation
+before publisher readback is recorded. Claims, to-device submission and room messages
+retain confirmed-publication requirements. Every provider identity remains signature/
+fingerprint checked, with current authority and late-result fences.
+
+[Contract](collaboration/key-publication-race.md) and
+[measurement](measurements/chat-foreground-native-2026-11-01.json) retain 10 Mobile/13
+Platform source hashes and all attempts. The same APK `d685231d` failed before and
+passed after the server correction, with no forced key refresh: 94s, one worker send,
+32 peer seeds, four older actions, 43 references, ten state-only references, 33 canonical
+originals acquired and the oldest row retained after Stop. Admissions 30/28/30, zero failures, cleanup complete.
+The SDK and actual WorkManager regressions both pass in a combined 120s: three/one
+sends, held room isolated, automatic ordinary-death recovery and network restoration.
+
+Final Mobile checks pass: 2,733 desktop cases/427 suites, six cleanup tests, APK/lint/
+format/architecture/detekt. Platform's final 110 registration/crypto-admission and 26
+API cases pass. Forty domain cases and 97 unchanged data cases passed in the earlier
+broad run, whose three failures remain recorded and were corrected in the 110-case
+rerun. Seven of those data cases cover schema 112→113→114 preservation and actual
+restricted-role dump/restore. Recovery's 11 cases accept 114 and reject 115; 63 driver
+cases pass. The temporary forced-refresh experiment and mistaken status expectations
+are recorded separately. Emulator stopped; no live deployment or Starter change.
+
+**Continue the long run.** Pin this Platform commit in Mobile's native CI, run/upload
+its proof cleanup tests, push the companion commit, and audit hosted artifacts. Then
+continue bounded local browsing beyond ten pages, durable drafts and safe cancellation,
+incoming FCM/replies, richer messages, key continuity/backups and calls/meetings. No
+full PRD group is accepted. Release 6 remains ready but uninstalled; the latest phone
+ADB attempt still timed out. Last confirmed installed code was 4. Use the build6
+preflight/install-only helpers, notify first, preserve signer/data and do not drive
+phone UI. Device availability does not block implementation.
+
 ## Release 6 prepared and hosted native evidence audited — 1 November 2026
 
 Mobile `97ef0639` records release 6 from product commit `2d6753ee`, ready but **not installed**.

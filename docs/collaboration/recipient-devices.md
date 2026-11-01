@@ -2,7 +2,9 @@
 
 Schema 113 adds `collaboration_recipient_devices`, a read-only security-barrier
 view for the current actor/company. It returns only company, account, device,
-retained public-key fingerprint and an aggregate `receive_until` deadline. The
+retained public-key fingerprint and an aggregate `receive_until` deadline. Schema 114
+adds `publication_confirmed` and includes committed immutable reservations before
+the publisher records its provider readback. The
 underlying device registry, session binding and key-publication tables keep
 their existing private application-role RLS. No label, native session ID, login
 credential, MFA timestamp or participant private key appears in the projection.
@@ -21,7 +23,13 @@ does not expose everyone else's device keys. Current product admission, client
 policy, MFA and conversation authorization still belong to the use case. This
 projection is not a login credential or a substitute for those checks.
 
-A recipient device must be active with a confirmed immutable key publication.
+A candidate device must be active with an immutable key reservation. Every key
+returned by the provider still needs its canonical self signature and retained
+fingerprint checked; a reservation alone never supplies trusted key bytes. A
+missing provider key is allowed only before publication confirmation. A confirmed
+key disappearing fails the query. Room-message admission still requires at least
+one confirmed recipient. Key claims and encrypted to-device submissions also
+retain their confirmed-publication requirement and independently verify keys.
 At least one bound native parent must be unrevoked, within its hard lifetime,
 and match the account's current credential/security version. Expired short
 access tokens, normal token rotation and old MFA verification do not remove an
@@ -43,8 +51,8 @@ and owns its per-account bounds, device-set completeness and pre/post-exchange
 checks. The view by itself grants no provider operation. Group/resource-context
 membership and browser-parent enrollment will extend their own eligibility
 contracts; this initial view authorizes only existing direct pairs and self.
-The schema adds no secret envelope; recovery's reviewed ceiling becomes 113 and
-114 remains rejected. Preserve the view's restricted owner and role grants when
+These schemas add no secret envelope; recovery's reviewed ceiling is 114 and
+115 remains rejected. Preserve the view's restricted owner and role grants when
 restoring a backup.
 
 [Evidence](../measurements/collaboration-recipient-devices-2026-10-31.json)
@@ -52,3 +60,10 @@ records seven actual PostgreSQL cases, schema-112 upgrade preservation and
 pg_dump/restore of the restricted owner/RLS behavior. Full relevant database,
 domain, data, API and worker checks pass; the existing opt-in worker retention
 case remains skipped. No production deployment or client rollout occurred.
+
+Schema 114 closes the publication race described in [recipient key query](device-key-query.md):
+the provider can announce its new device key while the publisher's HRIS readback
+transaction is still pending. Both reservation and confirmation retain identical
+scope, hard-parent eligibility and pin validation. The existing evidence below
+remains the schema-113 baseline; the foreground/native measurement records the
+schema-114 upgrade, restore and race checks separately.

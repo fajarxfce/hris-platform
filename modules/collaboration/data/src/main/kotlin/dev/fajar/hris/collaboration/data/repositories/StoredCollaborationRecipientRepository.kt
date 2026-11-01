@@ -27,6 +27,7 @@ class StoredCollaborationRecipientRepository(private val store: CollaborationRec
                         requireNotNull(it.deviceId),
                         requireNotNull(it.fingerprint),
                         requireNotNull(it.receiveUntil).toInstant(),
+                        requireNotNull(it.publicationConfirmed),
                     )
                 }
             }

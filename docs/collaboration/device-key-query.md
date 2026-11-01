@@ -15,7 +15,7 @@ are accepted. User names must identify the selected company and configured
 Matrix server; alternate spellings cannot cause foreign account lookups.
 
 An empty device list means all currently eligible HRIS devices of that account.
-It never becomes a provider wildcard. The use case selects confirmed published
+It never becomes a provider wildcard. The use case selects pinned reserved or confirmed
 devices through the [recipient projection](recipient-devices.md), after checking
 current account/membership/CHAT permission and an existing direct pair, or self.
 Requested unknown, unrelated or unavailable accounts produce empty key entries
@@ -31,7 +31,7 @@ renewal keeps its existing generation fence and never logs out a losing token.
 
 Before and after a recipient-key exchange, admission and the selected device set
 are acquired again. Newly eligible devices, removals, security changes or changed
-hard deadlines invalidate the captured result and require a fresh query. An
+hard deadlines or publication state invalidate the captured result and require a fresh query. An
 unavailable peer then yields an empty entry on that fresh query. Current caller
 denial takes precedence over a provider error. Requests with no eligible device
 still perform the final current check and make no provider key-query request.
@@ -40,7 +40,10 @@ The provider adapter permits only the exact requested user/device collections.
 It drops unsigned device labels and other users' signatures. Every returned
 identity must have the expected user/device, valid canonical Ed25519 self
 signature and the retained fingerprint. A confirmed device missing from the
-provider result is an invalid response; it is not silently omitted. A replacement
+provider result is an invalid response; it is not silently omitted. Before confirmation,
+an absent provider key produces an empty entry without consuming any one-time key.
+When the provider exposes that reserved identity, it must pass exactly the same
+signature and fingerprint checks as a confirmed identity. A replacement
 identity returns `collaboration_device_key_recovery_required`, without clearing
 client crypto state or overwriting the stored fingerprint.
 
@@ -59,3 +62,16 @@ and backup retain their own gates. Actual SDK traffic through the complete HRIS
 gateway is not established by the component-level provider/HTTP tests. A client
 with no eligible peer device must keep its message pending rather than reporting
 a self-only ciphertext as delivered.
+
+## Publication ordering
+
+Reservation commits before provider upload. Matrix may emit `device_lists.changed`
+as soon as it stores the key, before HRIS records the publisher's fenced readback.
+Filtering solely on that later confirmation lets an SDK receive the change, query
+HRIS during the gap and cache an empty device list with no later provider change.
+Schema 114 makes the prior reservation discoverable as a candidate. Provider
+readback in the query verifies actual keys against that immutable pin; it does not
+promote the publication row or relax account/device authority. Confirmation racing
+with the query invalidates its captured result, so the SDK receives a retryable
+failure instead of acknowledging an obsolete empty list. Unuploaded reservations
+remain empty and cannot exhaust provider one-time keys or authorize a room send.

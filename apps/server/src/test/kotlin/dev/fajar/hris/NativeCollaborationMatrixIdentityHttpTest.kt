@@ -1,6 +1,9 @@
 package dev.fajar.hris
 
 import com.sun.net.httpserver.HttpServer
+import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
+import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
+import dev.fajar.hris.core.domain.Result
 import java.net.InetSocketAddress
 import java.net.URI
 import java.net.http.*
@@ -739,7 +742,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         )
     }
 
-    private fun enrolledRoomPeer(n: Native, peer: UUID): UUID {
+    private fun enrolledRoomPeer(n: Native, peer: UUID, published: Boolean = true): UUID {
         val db = database()
         val parent = UUID.randomUUID()
         val device = UUID.randomUUID()
@@ -785,11 +788,12 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             peer,
             "a".repeat(64),
         )
-        db.update(
-            "update collaboration_device_key_publications set version=1,published_at=now() where company_id=? and device_id=?",
-            n.fixture.company,
-            device,
-        )
+        if (published)
+            db.update(
+                "update collaboration_device_key_publications set version=1,published_at=now() where company_id=? and device_id=?",
+                n.fixture.company,
+                device,
+            )
         return parent
     }
 
@@ -836,7 +840,18 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             )
         val before = provider.roomSends.get()
         assertEquals(403, send().statusCode())
-        val parent = enrolledRoomPeer(n, peer)
+        val parent = enrolledRoomPeer(n, peer, published = false)
+        assertEquals(403, send().statusCode())
+        assertEquals(before, provider.roomSends.get())
+        assertEquals(
+            1,
+            database()
+                .update(
+                    "update collaboration_device_key_publications set version=1,published_at=now() where company_id=? and account_id=?",
+                    n.fixture.company,
+                    peer,
+                ),
+        )
         repeat(2) {
             val response = send()
             assertEquals(200, response.statusCode(), response.body())
@@ -1102,6 +1117,180 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val absent = uploadKeys(n, token, unknown, path = "query")
         assertEquals(200, absent.statusCode(), absent.body())
         assertTrue(json.readTree(absent.body()).path("device_keys").path(key.user).isEmpty)
+    }
+
+    private fun reserveFixtureKeys(n: Native, device: UUID, key: KeyPayload) {
+        val keys =
+            requireNotNull(
+                matrixKeyUploadRequest(json.readTree(json.writeValueAsString(key.body())))
+                    .deviceKeys
+            )
+        val fingerprint = validateCollaborationDeviceKeys(keys, key.user, key.device)
+        assertInstanceOf(Result.Success::class.java, fingerprint)
+        database()
+            .update(
+                "insert into collaboration_device_key_publications(company_id,device_id,account_id,fingerprint,version,reserved_at) values(?,?,?,?,0,now())",
+                n.fixture.company,
+                device,
+                n.fixture.account,
+                (fingerprint as Result.Success).value,
+            )
+    }
+
+    private fun queryFixtureKeys(n: Native, token: String, key: KeyPayload) =
+        uploadKeys(
+            n,
+            token,
+            json.writeValueAsString(mapOf("device_keys" to mapOf(key.user to emptyList<String>()))),
+            path = "query",
+        )
+
+    private fun confirmFixtureKeys(device: UUID) {
+        assertEquals(
+            1,
+            database()
+                .update(
+                    "update collaboration_device_key_publications set version=1,published_at=now() where device_id=? and version=0",
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun keyQuerySeesPinnedProviderPublicationBeforePublisherReadbackCommits() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        reserveFixtureKeys(n, device, key)
+        val absent = queryFixtureKeys(n, token, key)
+        assertEquals(200, absent.statusCode(), absent.body())
+        assertTrue(json.readTree(absent.body()).path("device_keys").path(key.user).isEmpty)
+        // Exact interleaving: the provider now exposes keys and emits its change event,
+        // while HRIS still retains the original unconfirmed reservation.
+        provider.putDeviceKeys(key)
+        val concurrent = queryFixtureKeys(n, token, key)
+        assertEquals(200, concurrent.statusCode(), concurrent.body())
+        assertEquals(
+            setOf(key.device),
+            json
+                .readTree(concurrent.body())
+                .path("device_keys")
+                .path(key.user)
+                .propertyNames()
+                .toSet(),
+        )
+        assertEquals(
+            0L,
+            database()
+                .queryForObject(
+                    "select version from collaboration_device_key_publications where device_id=?",
+                    Long::class.java,
+                    device,
+                ),
+        )
+        confirmFixtureKeys(device)
+        assertEquals(
+            json.readTree(concurrent.body()),
+            json.readTree(queryFixtureKeys(n, token, key).body()),
+        )
+        provider.removeDeviceKeys(key)
+        val missingConfirmed = queryFixtureKeys(n, token, key)
+        assertEquals(503, missingConfirmed.statusCode(), missingConfirmed.body())
+        assertFalse(json.readTree(missingConfirmed.body()).has("device_keys"))
+    }
+
+    @Test
+    fun reservedAndConfirmedCandidatesRejectDifferentValidlySignedProviderKeys() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val expected = fixtureKeys(n, device)
+        reserveFixtureKeys(n, device, expected)
+        val changed = fixtureKeys(n, device)
+        for (confirmed in listOf(false, true)) {
+            if (confirmed) confirmFixtureKeys(device)
+            provider.putDeviceKeys(changed)
+            val denied = queryFixtureKeys(n, token, expected)
+            assertEquals(409, denied.statusCode(), denied.body())
+            assertFalse(json.readTree(denied.body()).has("device_keys"))
+            provider.putDeviceKeys(expected)
+            assertEquals(200, queryFixtureKeys(n, token, expected).statusCode())
+        }
+    }
+
+    @Test
+    fun publicationTransitionWithholdsAnObsoleteQueryAndAllowsAnExplicitRetry() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        reserveFixtureKeys(n, device, key)
+        provider.putDeviceKeys(key)
+        provider.onKeyQuery.set { confirmFixtureKeys(device) }
+        try {
+            val changed = queryFixtureKeys(n, token, key)
+            assertEquals(503, changed.statusCode(), changed.body())
+            assertFalse(json.readTree(changed.body()).has("device_keys"))
+            assertEquals(200, queryFixtureKeys(n, token, key).statusCode())
+        } finally {
+            provider.onKeyQuery.set(null)
+        }
+    }
+
+    @Test
+    fun earlyKeyDiscoveryDoesNotGrantClaimUntilPublicationIsConfirmed() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        reserveFixtureKeys(n, device, key)
+        val body =
+            json.writeValueAsString(
+                mapOf(
+                    "one_time_keys" to mapOf(key.user to mapOf(key.device to "signed_curve25519"))
+                )
+            )
+        provider.putDeviceKeys(key)
+        val discovered = queryFixtureKeys(n, token, key)
+        assertEquals(200, discovered.statusCode(), discovered.body())
+        assertEquals(1, json.readTree(discovered.body()).path("device_keys").path(key.user).size())
+        val before = provider.keyClaims.get()
+        val queried = provider.keyQueries.get()
+        val absent = uploadKeys(n, token, body, path = "claim")
+        assertEquals(200, absent.statusCode(), absent.body())
+        assertTrue(json.readTree(absent.body()).path("one_time_keys").path(key.user).isEmpty)
+        assertEquals(before, provider.keyClaims.get())
+        assertEquals(queried, provider.keyQueries.get())
+        confirmFixtureKeys(device)
+        provider.putDeviceKeys(fixtureKeys(n, device))
+        assertEquals(409, uploadKeys(n, token, body, path = "claim").statusCode())
+        assertEquals(before, provider.keyClaims.get())
+        provider.putDeviceKeys(key)
+        val available = uploadKeys(n, token, body, path = "claim")
+        assertEquals(200, available.statusCode(), available.body())
+        assertEquals(before + 1, provider.keyClaims.get())
+        // There are no uploaded one-time keys. A valid identity alone is not delivery evidence.
+        assertTrue(json.readTree(available.body()).path("one_time_keys").path(key.user).isEmpty)
+    }
+
+    @Test
+    fun pendingPublicationCannotBypassNativeParentRevocation() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        reserveFixtureKeys(n, device, key)
+        provider.putDeviceKeys(key)
+        provider.onKeyQuery.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val denied = queryFixtureKeys(n, token, key)
+            assertEquals(401, denied.statusCode(), denied.body())
+            assertFalse(json.readTree(denied.body()).has("device_keys"))
+        } finally {
+            provider.onKeyQuery.set(null)
+        }
     }
 
     @Test
@@ -1376,6 +1565,16 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val onKeyUpload = AtomicReference<(() -> Unit)?>(null)
         private val keys =
             ConcurrentHashMap<Pair<String, String>, tools.jackson.databind.JsonNode>()
+
+        fun putDeviceKeys(value: KeyPayload) {
+            keys[value.user to value.device] =
+                parser.readTree(parser.writeValueAsString(value.body())).path("device_keys")
+        }
+
+        fun removeDeviceKeys(value: KeyPayload) {
+            keys.remove(value.user to value.device)
+        }
+
         private val keyIds = ConcurrentHashMap<Pair<String, String>, MutableSet<String>>()
         val logins = AtomicInteger()
         val queries = AtomicInteger()

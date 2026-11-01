@@ -471,7 +471,7 @@ class AccessNativeCollaborationMatrixDevice(
             prepareQuery(initial, CollaborationMatrixKeyQuery(mapOf(peerUser to emptyList())))
         if (resolved is Result.Failed) return resolved
         val targets = (resolved as Result.Success).value
-        if (targets.devices.isEmpty())
+        if (targets.devices.values.none { it.publicationConfirmed })
             return Result.Failed(
                 Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
             )
@@ -578,7 +578,9 @@ class AccessNativeCollaborationMatrixDevice(
         val captured = snapshotCollaborationKeyQuery(request)
         if (captured is Result.Failed) return captured
         val query = (captured as Result.Success).value
-        return recipientOperation(token, correlationId, query) { exchange, prepared ->
+        return recipientOperation(token, correlationId, query, includeReserved = true) {
+            exchange,
+            prepared ->
             val expanded = prepared.providerRequest()
             if (expanded.devices.isEmpty()) {
                 exchange.confirm().map {
@@ -669,19 +671,20 @@ class AccessNativeCollaborationMatrixDevice(
         token: String,
         correlationId: UUID,
         query: CollaborationMatrixKeyQuery,
+        includeReserved: Boolean = false,
         operation: (Exchange, QueryPreparation) -> Result<T>,
     ): Result<T> =
         admitted(
             token,
             correlationId,
-            prepare = { initial, _ -> prepareQuery(initial, query) },
+            prepare = { initial, _ -> prepareQuery(initial, query, includeReserved) },
             extraAccounts = { initial ->
                 collaborationKeyQueryAccounts(query, initial.companyId, provider.serverName).map {
                     it.values.toSet()
                 }
             },
             revalidate = { initial, original ->
-                prepareQuery(initial, query).flatMap { current ->
+                prepareQuery(initial, query, includeReserved).flatMap { current ->
                     if (original != current) recipientsChanged() else Result.Success(Unit)
                 }
             },
@@ -691,6 +694,7 @@ class AccessNativeCollaborationMatrixDevice(
     private fun prepareQuery(
         initial: CollaborationGatewaySession,
         request: CollaborationMatrixKeyQuery,
+        includeReserved: Boolean = false,
     ): Result<QueryPreparation> {
         val resolved =
             collaborationKeyQueryAccounts(request, initial.companyId, provider.serverName)
@@ -749,7 +753,9 @@ class AccessNativeCollaborationMatrixDevice(
             eligible
                 .filter { row ->
                     val requested = request.devices.getValue(names.getValue(row.accountId))
-                    requested.isEmpty() || collaborationMatrixDeviceId(row.deviceId) in requested
+                    (includeReserved || row.publicationConfirmed) &&
+                        (requested.isEmpty() ||
+                            collaborationMatrixDeviceId(row.deviceId) in requested)
                 }
                 .associateBy { it.deviceId }
         return Result.Success(QueryPreparation(accounts, selected))
@@ -765,9 +771,16 @@ class AccessNativeCollaborationMatrixDevice(
         for ((user, account) in prepared.accounts) {
             val rows = prepared.devices.values.filter { it.accountId == account }
             val devices = response.deviceKeys[user] ?: emptyMap()
-            if (devices.keys != rows.map { collaborationMatrixDeviceId(it.deviceId) }.toSet())
+            val selected = rows.associateBy { collaborationMatrixDeviceId(it.deviceId) }
+            if (
+                devices.keys.any { it !in selected } ||
+                    selected.any { (id, row) -> row.publicationConfirmed && id !in devices }
+            )
                 return invalidProvider()
-            for (row in rows) {
+            // A reservation commits before the provider publishes and emits device-list changes.
+            // Verify newly visible provider keys even while the publisher's readback is pending.
+            // An unuploaded reservation may be absent; confirmed keys may never disappear.
+            for (row in rows.filter { collaborationMatrixDeviceId(it.deviceId) in devices }) {
                 val deviceId = collaborationMatrixDeviceId(row.deviceId)
                 val checked =
                     validateCollaborationDeviceKeys(devices.getValue(deviceId), user, deviceId)

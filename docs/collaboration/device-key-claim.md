@@ -9,7 +9,9 @@ nulls, duplicate fields, trailing input and URL credentials are rejected.
 
 Current self/direct account authority and confirmed recipient devices determine
 the actual selection. Unknown, unpublished, removed or inaccessible devices
-produce empty entries without provider consumption. Short access/MFA freshness
+produce empty entries without provider consumption. Early discovery of a pinned
+provider key through schema 114 does not grant permission to consume its one-time
+keys before publication confirmation. Short access/MFA freshness
 of an offline peer is not its hard device eligibility. This selection does not
 add browser-parent, group or resource-context authority.
 

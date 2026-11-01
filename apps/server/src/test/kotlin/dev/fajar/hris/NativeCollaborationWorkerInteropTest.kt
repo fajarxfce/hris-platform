@@ -42,7 +42,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
     @Autowired private lateinit var trace: NativeSdkGatewayTrace
 
     companion object {
-        private val provider by lazy { NativeSdkMatrixServer() }
+        private val provider by lazy { NativeSdkMatrixServer(messageBurst = 64) }
 
         @JvmStatic
         @DynamicPropertySource
@@ -134,21 +134,34 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "originalHistoryAcquired",
                 "completionRetired",
                 "repeatedWorkerComplete",
+                "foregroundHistoryPaged",
+                "foregroundStoppedHistoryRetained",
             )) assertTrue(proof.path(flag).asBoolean(), flag)
+        val seedEvents = proof.path("historyPeerEvents")
+        assertTrue(seedEvents.isArray)
+        assertEquals(32, seedEvents.size())
+        val historyEvents = List(32) { seedEvents.path(it).asString() }
+        assertEquals(32, historyEvents.size)
+        assertEquals(32, historyEvents.distinct().size)
+        assertFalse(proof.path("eventId").asString() in historyEvents)
+        assertTrue(proof.path("historyPages").asInt() in 2..4)
+        assertTrue(proof.path("providerReferences").asLong() in 33..80)
+        assertTrue(proof.path("pendingStateReferences").asInt() in 0..20)
         assertEquals(
-            1,
+            33,
             trace.snapshot().count {
                 it["method"] == "PUT" &&
                     it["route"] == "/_matrix/client/v3/rooms/_/send/m.room.encrypted/_" &&
                     it["status"] == 200
             },
-            "The persisted worker intent must send exactly once",
+            "One worker send plus 32 distinct encrypted peer history seeds are required",
         )
         assertEquals(0, trace.earlyEncryptedSendCount())
         assertEquals(0, trace.applicationAdmissions().getValue("failures"))
         assertEquals(1, trace.applicationSummaryReadCount())
         assertTrue(trace.applicationAdmittedBeforeSend())
         verifyCiphertext(sender, room, proof.path("eventId").asString())
+        historyEvents.forEach { verifyCiphertext(recipient, room, it) }
         assertEquals(
             2,
             database()
@@ -168,7 +181,10 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "cleanup" to true,
                 "processes" to 2,
                 "forcedProcessDeaths" to 1,
-                "encryptedSends" to 1,
+                "encryptedSends" to 33,
+                "workerEncryptedSends" to 1,
+                "seededPeerEncryptedSends" to 32,
+                "foregroundHistoryAccepted" to true,
                 "applicationAdmissions" to trace.applicationAdmissions(),
                 "proof" to json.convertValue(proof, Map::class.java),
                 "artifact" to json.convertValue(result.path("artifact"), Map::class.java),

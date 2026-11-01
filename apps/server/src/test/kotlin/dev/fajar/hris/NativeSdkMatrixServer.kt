@@ -11,7 +11,11 @@ import org.testcontainers.images.builder.Transferable
 import tools.jackson.databind.json.JsonMapper
 
 /** Only fictional credentials and a private loopback provider; no production configuration. */
-class NativeSdkMatrixServer : AutoCloseable {
+class NativeSdkMatrixServer(messageBurst: Int = 10) : AutoCloseable {
+    init {
+        require(messageBurst in 10..64)
+    }
+
     private val json = JsonMapper.builder().build()
     private val secret =
         requireNotNull(javaClass.getResourceAsStream("/matrix-signing.fixture"))
@@ -29,6 +33,9 @@ class NativeSdkMatrixServer : AutoCloseable {
                             "server_name" to "matrix.example.test",
                             "report_stats" to false,
                             "enable_registration" to false,
+                            // Only the bounded historical-message fixture opts into a larger burst.
+                            "rc_message" to
+                                mapOf("per_second" to 0.2, "burst_count" to messageBurst),
                             "password_config" to mapOf("enabled" to false),
                             "jwt_config" to
                                 mapOf(

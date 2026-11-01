@@ -46,11 +46,23 @@ def evidence(value, queued, restored):
     if type(passes) is not int or not 1 <= passes <= 4:
         raise ValueError("Worker exceeded its bounded attempts")
     for key in ("encryptedReceived", "senderRuntimeRestoredByWorker", "originalHistoryAcquired",
-                "completionRetired", "repeatedWorkerComplete"):
+                "completionRetired", "repeatedWorkerComplete", "foregroundHistoryPaged",
+                "foregroundStoppedHistoryRetained"):
         if value.get(key) is not True:
             raise ValueError("Missing worker proof")
         result[key] = True
-    return result | {"eventId": event, "passes": passes}
+    pages, references, pending = (value.get(key) for key in ("historyPages", "providerReferences", "pendingStateReferences"))
+    if (type(pages) is not int or not 2 <= pages <= 4 or type(references) is not int or not 33 <= references <= 80
+            or type(pending) is not int or not 0 <= pending <= 20):
+        raise ValueError("Invalid bounded foreground history progress")
+    peers = value.get("historyPeerEvents")
+    if (not isinstance(peers, list) or len(peers) != 32
+            or any(not isinstance(item, str) or not re.fullmatch(r"\$[!-~]{1,254}", item) for item in peers)
+            or len(set(peers)) != 32 or event in peers):
+        raise ValueError("Invalid encrypted history seed events")
+    return result | {"eventId": event, "passes": passes, "historyPages": pages,
+                     "providerReferences": references, "pendingStateReferences": pending,
+                     "historyPeerEvents": list(peers)}
 
 
 def diagnostic(status):

@@ -1874,16 +1874,29 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
-    fun peerWithNoConfirmedKeyReturnsEmptyWithoutQueryingUnconfirmedProviderKeys() {
+    fun peerKeyQueryVerifiesAReservedIdentityAcrossProviderPublication() {
         val q = KeyQueryFixture(published = false)
-        val result = q.read(CollaborationMatrixKeyQuery(mapOf(q.peerKeys.userId to emptyList())))
+        val query = CollaborationMatrixKeyQuery(mapOf(q.peerKeys.userId to emptyList()))
+        val key = requireNotNull(q.keys.remove(q.peerKeys.userId to q.peerKeys.deviceId))
         assertEquals(
             Result.Success(
                 CollaborationMatrixKeyQueryResult(mapOf(q.peerKeys.userId to emptyMap()))
             ),
-            result,
+            q.read(query),
         )
-        assertEquals(0, q.calls.get())
+        assertEquals(1, q.calls.get())
+        q.keys[q.peerKeys.userId to q.peerKeys.deviceId] = key
+        assertEquals(
+            Result.Success(
+                CollaborationMatrixKeyQueryResult(
+                    mapOf(q.peerKeys.userId to mapOf(q.peerKeys.deviceId to key))
+                )
+            ),
+            q.read(query),
+        )
+        assertEquals(2, q.calls.get())
+        assertEquals(0, q.claimCalls.get())
+        assertEquals(0, q.sendCalls.get())
         assertEquals(
             0L,
             sql.queryForObject(

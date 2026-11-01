@@ -29,6 +29,8 @@ provider key query. Envelope sender and recipient Curve25519 keys must match
 those validated identities. A stale device/key cannot be replaced silently.
 Inaccessible, missing or unpublished targets reject the whole submission with
 `collaboration_recipient_unavailable`; no partial discard is reported as success.
+Schema 114's early key discovery does not relax either sender or recipient
+publication requirements for encrypted to-device submission.
 Short access/MFA freshness of a still-eligible offline peer does not remove it.
 
 Current caller admission, own publication and recipient eligibility are checked

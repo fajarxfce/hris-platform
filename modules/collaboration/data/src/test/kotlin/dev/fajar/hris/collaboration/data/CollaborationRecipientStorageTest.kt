@@ -45,6 +45,8 @@ class CollaborationRecipientStorageTest {
             Flyway.configure().dataSource(source).target("113").load().migrate()
             assertEquals(before, snapshots())
             owner.execute("grant select on collaboration_recipient_devices to recipient_fixture")
+            Flyway.configure().dataSource(source).target("114").load().migrate()
+            assertEquals(before, snapshots())
         }
 
         fun snapshots() =
@@ -72,7 +74,14 @@ class CollaborationRecipientStorageTest {
                 String::class.java,
             )
         assertEquals(
-            listOf("company_id", "account_id", "device_id", "fingerprint", "receive_until"),
+            listOf(
+                "company_id",
+                "account_id",
+                "device_id",
+                "fingerprint",
+                "receive_until",
+                "publication_confirmed",
+            ),
             columns,
         )
         f.run {
@@ -252,11 +261,21 @@ class CollaborationRecipientStorageTest {
     }
 
     @Test
-    fun unconfirmedKeysAndDeletedParentsStayRetainedWithoutRecipientEligibility() {
+    fun reservationsKeepTheirPinAndPublicationStateWhileDeletedParentsRemainIneligible() {
         val f = Fixture()
         val pending = f.participant(published = false)
         f.pair(f.sender.account, pending.account)
-        assertEquals(emptyList<Any>(), f.read(accounts = setOf(pending.account)))
+        val reserved = f.read(accounts = setOf(pending.account)).single()
+        assertEquals(pending.device, reserved.deviceId)
+        assertFalse(reserved.publicationConfirmed)
+        owner.update(
+            "update collaboration_device_key_publications set version=1,published_at=now() where device_id=?",
+            pending.device,
+        )
+        assertEquals(
+            reserved.copy(publicationConfirmed = true),
+            f.read(accounts = setOf(pending.account)).single(),
+        )
         owner.update("delete from native_sessions where id=?", f.peer.parent)
         assertEquals(emptyList<Any>(), f.read(accounts = setOf(f.peer.account)))
         assertEquals(

@@ -46,6 +46,37 @@ Synapse's current implementation associates new pushers with device IDs. This
 proves retained registration, not callback delivery or mobile notification display.
 No DI/controller/schema change or live deployment has occurred for this adapter.
 
+## Encrypted device binding implemented — 1 November 2026
+
+Schema 115 retains one unpredictable `hriscp1_` key per immutable company/account/
+native-session/provider-device binding. Only its SHA-256 lookup and AES-GCM envelope
+are stored. AAD binds the immutable IDs, reservation microsecond timestamp and
+key hash. The scoped repository returns a redacted key wrapper; metadata lookup
+runs in its own transaction and identifies the next locks, without authorizing
+chat. RLS scopes ordinary reads/writes to the account and selected company.
+
+Reservation commits before provider I/O. The one 0-to-1 publication transition
+preserves the original key/ciphertext; concurrent or lost responses reuse that
+identity. SQL rejects replacement/deletion, foreign or missing parent bindings,
+inactive devices and publication after revocation. Parent purging retains the
+identity; callback admission must still reject that parent. The recovery tool
+now authenticates this envelope at schema 115 while retaining earlier-schema
+queries and rejecting unreviewed schema 116. Real dump/restore verifies both old
+and current keyring material and the actual recovery SQL.
+
+The key stays stable when a native FCM registration/token rotates. Actual delivery
+must reread and fence that registration's current version; no FCM token is copied
+into Synapse. This refines the earlier proposal to rotate the capability on every
+registration change: stable device identity avoids duplicate provider pushers and
+out-of-order deletion when notifications are re-enabled. A different device gets
+a different key. Temporary push disablement or access loss must suppress delivery;
+only permanent device/parent retirement may remove its retained pusher.
+
+[Storage/recovery evidence](../measurements/chat-push-binding-storage-2026-11-01.json)
+records full database/domain/data and actual API/worker regression checks plus 33
+Python recovery cases. The first corruption-fixture failure and correction are
+retained. No live schema change, DI/controller or admitted callback is included.
+
 ## Following implementation boundaries
 
 Use Matrix v1.16 `event_id_only` HTTP pushers. The server fixes app identity and a

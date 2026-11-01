@@ -175,7 +175,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/648410c4860f1e493669c3e9b8cf8ad529c07a0e/docs/measurements/chat-cancellation-policy-2026-11-01.json",
         "native-push.md",
         "../measurements/chat-push-delivery-profile-2026-11-01.json",
-        "../measurements/chat-matrix-pusher-transport-2026-11-01.json"
+        "../measurements/chat-matrix-pusher-transport-2026-11-01.json",
+        "../measurements/chat-push-binding-storage-2026-11-01.json"
       ]
     },
     {

@@ -1,5 +1,49 @@
 # Agent continuation — HRIS workspace
 
+## Stable encrypted push binding and restore proved — 1 November 2026
+
+[Storage evidence](measurements/chat-push-binding-storage-2026-11-01.json) / [contract](collaboration/native-push.md):
+schema 115 stores one immutable encrypted/hash-looked-up pusher key per company,
+account, native parent and provider device; only reservation-to-publication changes.
+Owned RLS, competing guards, late denial/interruption rollback, missing/revoked
+parents, ciphertext/context tampering and actual dump/restore with old/current
+keyring and production recovery SQL pass. Full validation: 30 database, 40 domain, 221 data, 26 api, 6 worker,
+format/architecture; 603.453s wall, nine unchanged source inputs.
+33 Python recovery cases pass. The first 63s run had one invalid corruption
+assertion: removing optional Base64 padding changed no decoded bytes; fixture
+now removes bytes. Original failure is retained, product unchanged.
+
+Key lifecycle decision: retain the same opaque key across FCM token/registration
+rotation, then fence current native registration version at every actual delivery.
+This refines earlier rotation-on-registration wording and prevents duplicate
+pushers/stale remove-versus-re-enable races. Different immutable device means a
+new key. Temporary disablement suppresses delivery; only permanent device/parent
+retirement can remove the provider pusher. Lookup or publication is never current
+chat authority. No DI/controller/live migration or delivery is claimed.
+
+**Continue immediately:** integrate outgoing admission with the existing private
+AccessNativeCollaborationMatrixDevice exchange runner and a fixed vendor extension
+endpoint, conditional disabled-by-default push configuration, and real API/worker
+context tests. Then implement private callback ingress, safe provider logging,
+durable callback/feed/outbox, Mobile receive/decrypt/reply and verified Starter ports.
+`.work/push-binding-next.txt` records concrete seams; `.work/pusher-admission-methods.txt`
+is an uncompiled draft, not product code. Review/fix labels and current publication
+time checks while applying. Never accept a client FCM key or callback URL.
+
+Background hint admission needs its own narrow policy: existing interactive
+collaborationParentDeadline requires short native access expiry. Do not silently
+stop notifications after that token expires or weaken normal sync/reply/MFA access.
+Resolve live parent, account/company/permission, device, room and native push target;
+opaque hints grant no new read/write privilege. Preserve selected-company Mobile
+ownership; no invisible workspace change. All 54 PRD groups remain unaccepted.
+
+Mobile 2e4e1081 and Platform 929bb7cd are pushed; five-case native run 41351236140
+at Mobile 302aa192 / Platform d48ac2f8 is still to audit. Phone remains installed
+release 10 / c0371a38, untouched since 20:44 UTC. Next validated Mobile product
+checkpoint uses code 11+, notify first, explicit 10.77.77.3:5555 and install-only.
+Continue after commit/push; no checkpoint stop and no repeated phone build for
+Platform-only changes.
+
 ## Matrix pusher transport proved; continue admitted bindings — 1 November 2026
 
 [Contract](collaboration/native-push.md) / [evidence](measurements/chat-matrix-pusher-transport-2026-11-01.json):
@@ -13,8 +57,8 @@ product. No DI/public controller, callback delivery, schema or live service chan
 
 Next implement encrypted/versioned company-account-session-device push bindings,
 current registration/access admission, durable callback recovery/outbox and Android
-receive/decrypt/reply. Capabilities must rotate on changed identity/registration,
-reject stale callbacks and never expose FCM tokens to Synapse or logs. Do not reuse
+receive/decrypt/reply. Capabilities are scoped to immutable device identity; actual delivery must fence
+the current registration and never expose FCM tokens to Synapse or logs. Do not reuse
 expiring gateway access as background authority or silently switch workspace.
 
 Hosted release-10-source run 41347895253 at c0371a38 / old Platform bad75bd0 is now

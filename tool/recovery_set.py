@@ -39,7 +39,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V108 retains company/account/device provisioning fences and durable job links.
 # V109 retains one authenticated gateway token replay per native device.
 # V113 adds a public recipient projection; no new secret envelope format.
-MAX_SCHEMA = 114
+# V115 retains encrypted opaque Matrix push keys bound to immutable native devices.
+MAX_SCHEMA = 115
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -83,6 +84,13 @@ def envelope_query(schema):
         collaboration += (" UNION ALL SELECT 'hris:matrix-gateway:v1:'||"
                           "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),replay_encrypted"
                           " FROM collaboration_gateway_sessions WHERE replay_encrypted IS NOT NULL\n")
+    if int(schema) >= 115:
+        fields = ["company_id::text", "account_id::text", "device_id::text", "native_session_id::text",
+                  "((extract(epoch FROM reserved_at)*1000000)::bigint)::text", "key_hash"]
+        canonical = "||':'||".join(fields)
+        collaboration += (" UNION ALL SELECT 'hris:matrix-push:v1:'||"
+                          "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),key_encrypted"
+                          " FROM collaboration_push_bindings\n")
     return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
             ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 

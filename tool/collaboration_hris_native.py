@@ -55,7 +55,7 @@ def proof_evidence(value):
                  "messageIntentRestored", "queueMappingRecovered", "queueWriterExclusive",
                  "perRoomDeliveryIsolated", "heldQueueRestored", "nativeDeliveryOwned",
                  "commonSenderOwned", "receiptJournalRecovered", "projectionInterrupted",
-                 "originalHistoryWindowOwned", "historyBodiesRestored"):
+                 "originalHistoryWindowOwned", "historyBodiesRestored", "commonHistoryAcquisitionOwned"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True

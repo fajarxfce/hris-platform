@@ -29,6 +29,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val applicationRoomReads = AtomicInteger()
     private val applicationAdmissionFailures = AtomicInteger()
     private val applicationBeforeSend = AtomicInteger(-1)
+    private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
 
     fun applicationAdmissions() =
         mapOf(
@@ -39,6 +40,16 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
         )
 
     fun applicationAdmittedBeforeSend() = applicationBeforeSend.get() == 1
+
+    fun applicationAdmittedAroundHistory(): Boolean {
+        val before = applicationAtHistory.get() ?: return false
+        val after = applicationAdmissions()
+        return before.getValue("failures") == 0 &&
+            after.getValue("failures") == 0 &&
+            listOf("device", "conversation", "room").all {
+                before.getValue(it) >= 4 && after.getValue(it) > before.getValue(it)
+            }
+    }
 
     fun holdRoom(roomId: String) {
         require(roomId.startsWith('!') && roomId.length in 2..255)
@@ -95,6 +106,12 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
         response: HttpServletResponse,
         chain: FilterChain,
     ) {
+        if (
+            request.method == "GET" &&
+                request.requestURI.matches(Regex("/_matrix/client/v3/rooms/[^/]+/context/[^/]+"))
+        ) {
+            applicationAtHistory.compareAndSet(null, applicationAdmissions())
+        }
         if (
             request.method == "PUT" &&
                 request.requestURI.matches(encryptedSendRoute) &&

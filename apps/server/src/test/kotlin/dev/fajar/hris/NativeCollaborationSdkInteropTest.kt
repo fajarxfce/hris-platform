@@ -257,6 +257,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "projectionInterrupted",
                     "originalHistoryWindowOwned",
                     "historyBodiesRestored",
+                    "commonHistoryAcquisitionOwned",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -284,10 +285,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             )
             val applicationReads = trace.applicationAdmissions()
             assertTrue(
-                listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 3 }
+                listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 5 }
             )
             assertEquals(0, applicationReads.getValue("failures"))
             assertTrue(trace.applicationAdmittedBeforeSend())
+            assertTrue(trace.applicationAdmittedAroundHistory())
             val history = proof.path("historyWindow")
             for ((name, bounds) in
                 mapOf(
@@ -328,8 +330,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "projectionInterrupted" to true,
                     "originalHistoryWindowOwned" to true,
                     "historyBodiesRestored" to true,
+                    "commonHistoryAcquisitionOwned" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,
+                    "applicationAdmittedAroundHistory" to true,
                     "applicationAdmissions" to trace.applicationAdmissions(),
                     "heldRoomNeverSent" to true,
                     "pausedAcrossRestart" to true,

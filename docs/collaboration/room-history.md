@@ -83,3 +83,6 @@ now exercises the pinned Android SDK's actual context request through HRIS with
 member-loading flags, original decoding and reopened encrypted local history.
 It retains the initial unsupported-filter failure and the passing 77s corrected
 run. This known-anchor snapshot does not yet establish application history paging.
+The [common acquisition proof](../measurements/collaboration-history-acquisition-2026-11-01.json)
+additionally verifies current application admission before and after the SDK
+context read, followed by product-owned encrypted history storage and reopening.

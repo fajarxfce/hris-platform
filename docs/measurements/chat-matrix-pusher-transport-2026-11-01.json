@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-01",
+  "scope": "Fixed Matrix event-only opaque pusher transport; not HRIS registration admission or push delivery acceptance",
+  "inputs": {
+    "base": "a31cd57a77faef5a112ea1625d898f4d4cd2d922",
+    "files": {
+      "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "f464c92604624cc7fa403194fb690a49004045d8f9f514746cff9a33ccec2d48",
+      "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixPushGatewayConfiguration.kt": "916d4be1602bc455ad117079c1933bdef90e789826ecea893eb3d0b6581c8479",
+      "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixPusherDataSource.kt": "3800e631a7e067682a69c55764d3d685927149b62eb1e87e9f8ddb75818328cb",
+      "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixPusherRepository.kt": "8206f8eca7ff4af07706b8d18d3c4f88c8e6cdc6832e3613cf0c58eb3c4d6721",
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixPusherInteropTest.kt": "560e1afc61325232677ccc13daaead29a98f72e4852e60391cd492011b270553",
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixPusherTransportTest.kt": "52dd5409889451df6a36ea81b5c240c2fb11a056d6177eae15ce7d26d09775b9",
+      "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixPusherRepository.kt": "e03175177ebb3df52bc088d09db6f2e6799e73b84370b5e007a47a61b5a40bd4"
+    }
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 53.045,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*MatrixPusher*Test",
+      "--tests",
+      "*MatrixProviderTransportTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 52,
+  "suites": [
+    {
+      "name": "dev.fajar.hris.collaboration.data.MatrixProviderTransportTest",
+      "tests": 23,
+      "seconds": 3.865,
+      "sha256": "a93f315a44e72410ea141a604eb8fe8c8264ca51b4d6409f9fdaec94e466eafe"
+    },
+    {
+      "name": "dev.fajar.hris.collaboration.data.MatrixPusherInteropTest",
+      "tests": 2,
+      "seconds": 21.91,
+      "sha256": "d013c28712f1336e3e82b4a8bf51a25676f76a5521817b47bc75f469df10b1e6"
+    },
+    {
+      "name": "dev.fajar.hris.collaboration.data.MatrixPusherTransportTest",
+      "tests": 4,
+      "seconds": 0.446,
+      "sha256": "bb854647e2fb6a70571d1a69c35abe0972f69242b9ffae7a9a3931e46a3348ad"
+    }
+  ],
+  "attempts": [
+    {
+      "result": "failed",
+      "evidence": {
+        "exitCode": 1,
+        "wallSeconds": 50.769,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*MatrixPusher*Test",
+          "--tests",
+          "*MatrixProviderTransportTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Two new interop assertions called Jackson JsonNode.map on the whole array rather than Kotlin element mapping; helper now returns List<JsonNode>. Four new transport and 23 existing transport cases passed. No product workaround.",
+      "logSha256": "4c646f062131caef186debb75680f7142a73c159111f37cb98496fab4f6f0f81",
+      "reports": {
+        "TEST-dev.fajar.hris.collaboration.data.MatrixPusherInteropTest.xml": "70ef687e1f4546c06cdcff85652e8d8956cefb4be9daafdb18493e1b1eb9c758",
+        "TEST-dev.fajar.hris.collaboration.data.MatrixPusherTransportTest.xml": "e298cfc18922186cca907b49b4696fc1f42f183e9e89d4b7cd837e252b9ab199",
+        "TEST-dev.fajar.hris.collaboration.data.MatrixProviderTransportTest.xml": "789119ed41d285dd0552200300b5c79ccf3185ec6ec4d2eccc885f3a39e10101"
+      }
+    },
+    {
+      "result": "passed",
+      "logSha256": "352c703f052d17a7ad164f44ec1328f2ed3912546836fb4164d1770276691ef9"
+    }
+  ],
+  "upstreamReview": {
+    "version": "Synapse v1.164.1",
+    "files": {
+      "synapse-httppusher.py.txt": "8210098606de3743a04fb2ae9b15309bd1760cccd532b40a1e0d0fab22e55451",
+      "synapse-pusherpool.py.txt": "e12e2bd4ecf33bc793021e03f263fe419f352daefb4d981072e4a5b72e6eab36",
+      "synapse-pusher.py.txt": "88e68ef938c567cf7754cc75b9a73c13ec27dfb6bc4022acfc8c82b9c7afd0dd"
+    },
+    "finding": "Current Synapse associates new pushers with device_id, not an expiring access_token_id. Registration persists after a real five-second credential expiry and renewal in the fixture."
+  },
+  "limits": [
+    "No DI binding or public controller yet",
+    "No callback service, durable notification feed or live FCM send",
+    "No provider callback request or device notification acceptance",
+    "Pusher capability generation, encryption and current HRIS admission are next",
+    "Fixed HTTPS gateway endpoint is operator-owned; no endpoint URL from clients/provider responses",
+    "No database migration or live service change"
+  ]
+}

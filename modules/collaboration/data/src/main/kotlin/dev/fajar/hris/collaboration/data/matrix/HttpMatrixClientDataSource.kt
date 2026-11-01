@@ -26,7 +26,8 @@ class HttpMatrixClientDataSource(
     MatrixToDeviceDataSource,
     MatrixRoomAccessDataSource,
     MatrixRoomHistoryDataSource,
-    MatrixRoomMessageDataSource {
+    MatrixRoomMessageDataSource,
+    MatrixPusherDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder(
@@ -48,6 +49,21 @@ class HttpMatrixClientDataSource(
         require(maximumConcurrent in 1..128)
         require(client.followRedirects() == HttpClient.Redirect.NEVER)
         require(client.connectTimeout().orElse(Duration.ofSeconds(6)) <= Duration.ofSeconds(5))
+    }
+
+    override fun setPusher(body: Map<String, Any?>, token: String, deadline: Instant): JsonNode {
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/pushers/set",
+                "POST",
+                body,
+                token,
+                deadline,
+                maximumRequestBytes = 8192,
+                maximumResponseBytes = 8192,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
     }
 
     override fun login(jwt: String, deviceId: String, deadline: Instant): MatrixLoginData {
@@ -479,7 +495,7 @@ class HttpMatrixClientDataSource(
     private fun roomRequest(
         path: String,
         method: String,
-        body: Map<String, Any>?,
+        body: Map<String, Any?>?,
         token: String,
         deadline: Instant,
         maximumResponseBytes: Int = 65536,

@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Matrix pusher transport proved; continue admitted bindings — 1 November 2026
+
+[Contract](collaboration/native-push.md) / [evidence](measurements/chat-matrix-pusher-transport-2026-11-01.json):
+fixed HTTPS callback/app ID, opaque server key, event-only content, explicit
+idempotent removal, 8 KiB limits and existing owned/cancellable HTTP transport.
+29 tests/three suites plus format/architecture pass (52s Gradle). Actual Synapse
+retains two independent keys across restart, repeated registration/removal and
+five-second provider credential expiry. The initial two fixture assertion failures
+(Jackson whole-node map shadowing) are retained and corrected without changing the
+product. No DI/public controller, callback delivery, schema or live service change.
+
+Next implement encrypted/versioned company-account-session-device push bindings,
+current registration/access admission, durable callback recovery/outbox and Android
+receive/decrypt/reply. Capabilities must rotate on changed identity/registration,
+reject stale callbacks and never expose FCM tokens to Synapse or logs. Do not reuse
+expiring gateway access as background authority or silently switch workspace.
+
+Hosted release-10-source run 41347895253 at c0371a38 / old Platform bad75bd0 is now
+[audited](measurements/chat-cancellation-ui-native-ci-2026-11-01.json): four native
+cases, six cleanup cases, 26 hashes, proof APK 86d3115a; SDK 60.410s, scheduled
+88.926s, queued/frozen pair 105.883s. It does not exercise dialog/cancelled-original
+or pending-key correction. New five-case run 41351236140 at Mobile 302aa192 is in
+progress; inspect its actual outcome later. Mobile audit 2e4e1081 is pushed.
+Phone remains verified release 10, install-only; next app product checkpoint 11+.
+Continue the full unaccepted PRD after each atomic commit/push; no checkpoint stop.
+
 ## Push transport profiles validated; continue registration — 1 November 2026
 
 [Native push contract](collaboration/native-push.md) and

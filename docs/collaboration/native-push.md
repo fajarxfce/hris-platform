@@ -24,6 +24,28 @@ in 58s Gradle / 59.222s wall. A preceding 14s compilation failure and its explic
 map-type fix are retained. This does not prove live FCM, a chat producer, Android
 receive/reply, an Apple notification extension or incoming-call handling.
 
+## Matrix pusher transport implemented — 1 November 2026
+
+`CollaborationMatrixPusherRepository` exposes set/remove for server-issued keys
+matching `hriscp1_` plus 64 lowercase hex characters. The adapter fixes app ID
+`dev.fajar.hris.chat`, generic display names, `append=true`, and `event_id_only`.
+Operator configuration accepts only HTTPS with the exact push-gateway path, no
+credentials/query/fragment and a bounded address. No native FCM token, provider
+route or arbitrary notification content is accepted by this contract. Removal
+uses the same app/key with explicit JSON null kind. Both paths use the existing
+owned transport, with 8 KiB request/response limits, bounded deadline/capacity,
+strict empty-object success, no redirects and no automatic send retries.
+
+[Actual-provider and transport evidence](../measurements/chat-matrix-pusher-transport-2026-11-01.json):
+29 cases/three suites pass, format/architecture pass (52s Gradle). Two fixture
+mapping failures from the first run are retained; conversion to a Kotlin list
+fixed Jackson's whole-node map shadowing. Actual Synapse v1.164.1 registration is
+repeatable, survives restart, keeps a second key after repeated first-key removal,
+and survives real five-second access-token expiry followed by same-device renewal.
+Synapse's current implementation associates new pushers with device IDs. This
+proves retained registration, not callback delivery or mobile notification display.
+No DI/controller/schema change or live deployment has occurred for this adapter.
+
 ## Following implementation boundaries
 
 Use Matrix v1.16 `event_id_only` HTTP pushers. The server fixes app identity and a

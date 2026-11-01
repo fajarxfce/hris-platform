@@ -1,0 +1,189 @@
+{
+  "date": "2026-11-01",
+  "base": "e5eebcd44a81fd78302ea625f469de405eaf46e9",
+  "inputs": {
+    "build.gradle.kts": "17b73edaff3a35e1a99bacfda8235018ff3a8af7e474628d165b5c58c284dc48",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderFixture.kt": "e37ef4be53bbf8675e77b76dba013e7026616c51252bb23815c639a45802248e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixPusherInteropTest.kt": "f62eea1c349e5f0b79eac68d3bf4a50ea73bec60c27c4cc4bcf15aa0eaa0371c",
+    "deploy/synapse/hris_push_logging.py": "b5c0d82f53094c8cad8f18d3dc504c531ef28106c13fa0d4a21e0fb6b23e57a4",
+    "deploy/synapse/logging.json": "40a1a731a07327c8f3b215b40f5149904c0d84ad5ad9e556b88eca04dfb0f805",
+    "tool/test_collaboration_push_logging.py": "411c436ea144d166482934b35a93e0f0347ab86447374212f64864dc600c2f11"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 48.097,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*MatrixPusherInteropTest",
+      "collaborationPushLoggingCheck",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 47,
+  "provider": {
+    "version": "Synapse v1.164.1",
+    "tests": 2,
+    "seconds": 20.84,
+    "reportSha256": "bacb09cb64ea03e5bb8600675621ead2009e975177382e7fc36bdef266b3af2e",
+    "cases": [
+      {
+        "name": "providerCredentialExpiryDoesNotEraseTheDeviceBinding()",
+        "classname": "dev.fajar.hris.collaboration.data.MatrixPusherInteropTest",
+        "time": "12.884"
+      },
+      {
+        "name": "actualProviderRetainsDevicePushersAcrossRetryRestartAndIndependentRemoval()",
+        "classname": "dev.fajar.hris.collaboration.data.MatrixPusherInteropTest",
+        "time": "7.943"
+      }
+    ]
+  },
+  "python": {
+    "tests": 7,
+    "seconds": 0.047
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 60.921,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*MatrixPusherInteropTest",
+          "collaborationPushLoggingCheck",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Two actual Synapse cases and seven Python cases pass. Initial evidence used a live log consumer; subsequent review required a bounded full snapshot so restart cannot end the observed stream unnoticed.",
+      "hashes": {
+        ".work/push-logging-check-1.json": "05ccbedaaf8fb578397435a84980ff979cc2d736347d5e07ca7270ffcf3cca9b",
+        ".work/push-logging-check-1.log": "e035dc3297439b199efd82b58d5a79801c5d58ff035a303fd061c2adf74f1a10",
+        ".work/push-logging-check-1.xml": "137e25cfe784ac282208b42c5bee9b2bb09dced868263b8cf14e8655cbc02b79",
+        ".work/push-logging-inputs-1.json": "60471934efc815495ef60907fa175724fe84667021d697d5df0732b8237eba28"
+      }
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "exitCode": 1,
+        "wallSeconds": 13.5,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*MatrixPusherInteropTest",
+          "collaborationPushLoggingCheck",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "The stronger log snapshot fixture did not compile because docker-java core LogContainerResultCallback is not exposed. Used the existing public API ResultCallback.Adapter without adding a dependency; formatter/config unchanged.",
+      "hashes": {
+        ".work/push-logging-check-2.json": "52abed792bdf1bb4bbe96134f7822e7d5c01ae5af14f347cf4b8dca609fb1bcb",
+        ".work/push-logging-check-2.log": "1a2192c3497331aee5b7ca4e50931f5d14b4e3a2deec99cf85b73560c4486041",
+        ".work/push-logging-inputs-2.json": "c47494559e5953d1a8957a5def19258b587957d4bf0c2d8a5d20dcace3dc9390"
+      }
+    },
+    {
+      "attempt": 3,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 48.097,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*MatrixPusherInteropTest",
+          "collaborationPushLoggingCheck",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Two actual Synapse cases and seven Python cases pass; final snapshot includes starts and removal, survives actual restart, has a five-second/1-MiB/4096-line acquisition bound and always closes its callback. Format/architecture pass.",
+      "hashes": {
+        ".work/push-logging-check-3.json": "d57860800b5b79051c186ec154baa8901177515afbf23be0c9627f4360adafe0",
+        ".work/push-logging-check-3.log": "a9d0c83e1480c583b7ccfc3c7b4d3129d08144a40fd12142e0e258d830bc3f77",
+        ".work/push-logging-inputs-3.json": "8b6333f0019652315d5fa5db04e3d9b81d6dcafd3551410297c81b03cabf1730"
+      }
+    }
+  ],
+  "boundaries": [
+    "Deployable exact Python final-output formatter and JSON log configuration are loaded in the actual pinned Synapse pusher fixtures.",
+    "Redaction covers substitutions, exception chains, existing exception cache, logger fields, stack text and partial namespace occurrences. Rendered output is capped at 16 KiB UTF-8 after redaction. Malformed formatting emits a fixed message; termination still propagates.",
+    "Seven Python tests are included in the root Gradle check through collaborationPushLoggingCheck.",
+    "Provider tests still prove repeated registration, independent removal, restart persistence and real five-second credential expiry/renewal; log snapshots assert positive redacted lifecycle records and absence of raw capability prefixes.",
+    "This redacts the HRIS pusher capability namespace, not arbitrary credentials or message content. Request bodies and secrets must remain excluded from diagnostics.",
+    "No live Synapse deployment, callback endpoint or push delivery acceptance. Phone remains release10."
+  ]
+}

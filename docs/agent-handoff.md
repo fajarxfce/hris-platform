@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Provider push logging proved — 1 November 2026
+
+[Evidence](measurements/chat-push-provider-logging-2026-11-01.json) / [deployable files](../deploy/synapse/README.md):
+exact Python formatter/JSON logging configuration load in both actual Synapse
+pusher fixtures. Final-output redaction covers message args, exception/stack/cache,
+partial key namespace and output bounds; failure is fixed text, termination passes
+through. Two provider + seven Python cases and format/architecture pass in 47s /
+48.097s wall (six unchanged inputs). Original 60s pass used a live consumer;
+review tightened this to a bounded final log snapshot covering restart/removal.
+The intermediate missing docker-java core helper compilation failure is retained;
+existing public API Adapter fixed it with no new dependency or formatter change.
+Root check now includes the seven Python cases. No live configuration change.
+
+**Continue immediately:** implement persistent coalesced callback/dispatch state,
+restricted HTTPS callback ingress, and actual worker send/target-version fencing.
+Policy/decoder e5eebcd4 and activation 24841839 are pushed. Use the existing narrow
+background policy and decoder; retain short interactive access/MFA gates for content.
+`.work/push-callback-next.txt` contains the concrete queue/guard/HTTP seams, copied
+from the current review; it is a design draft, not implemented schema. Proposed
+one head per immutable device, monotonic hint/ack revisions, bounded event receipts,
+lease-fenced delivery, preservation of newer callbacks during network I/O, and
+startup/full Matrix sync after missed/coalesced FCM. No exactly-once FCM claim.
+
+Before accepting offline notifications, review the existing transport's 300-second
+FCM TTL against longer disconnected devices and implement explicit reconnect/
+periodic reconciliation or a reviewed longer store-and-forward hint profile.
+Do not silently inherit Inbox's short lifetime as complete chat recovery. Stream
+budgets also need an actual socket/private-proxy read timeout, since checking
+elapsed time around a blocking read cannot interrupt the underlying socket.
+Continue Mobile receive/decrypt/reply and verified Starter ports after backend.
+Phone stays release 10/c037; next validated product code 11+, notify first and
+explicit install-only to 10.77.77.3:5555. All 54 PRD groups remain unaccepted.
+
 ## Background hint boundary proved — 1 November 2026
 
 [Policy/decoder evidence](measurements/chat-push-hint-policy-2026-11-01.json) / [contract](collaboration/native-push.md):

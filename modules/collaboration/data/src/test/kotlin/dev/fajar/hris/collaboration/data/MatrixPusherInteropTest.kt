@@ -20,7 +20,7 @@ class MatrixPusherInteropTest {
 
     @Test
     fun actualProviderRetainsDevicePushersAcrossRetryRestartAndIndependentRemoval() {
-        MatrixProviderFixture("10m").use { f ->
+        MatrixProviderFixture("10m", pushLogging = true).use { f ->
             f.start()
             val initial = f.login()
             val source = HttpMatrixClientDataSource(f.client, f.config, f.clock)
@@ -85,12 +85,13 @@ class MatrixPusherInteropTest {
                 resumed.remove(second, peer.accessToken, f.clock.instant().plusSeconds(10)),
             )
             assertTrue(pushers(f, renewed.accessToken).isEmpty())
+            f.assertPushLogsRedacted(expectRemoval = true)
         }
     }
 
     @Test
     fun providerCredentialExpiryDoesNotEraseTheDeviceBinding() {
-        MatrixProviderFixture("5s").use { f ->
+        MatrixProviderFixture("5s", pushLogging = true).use { f ->
             f.start()
             val expired = f.login()
             val repository =
@@ -125,6 +126,7 @@ class MatrixPusherInteropTest {
                 repository.set(first, renewed.accessToken, f.clock.instant().plusSeconds(4)),
             )
             assertEquals(1, pushers(f, renewed.accessToken).size)
+            f.assertPushLogsRedacted()
         }
     }
 

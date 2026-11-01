@@ -1,5 +1,6 @@
 package dev.fajar.hris.collaboration.data
 
+import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.model.*
 import dev.fajar.hris.collaboration.data.matrix.*
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
@@ -7,6 +8,8 @@ import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
 import dev.fajar.hris.core.domain.Result
 import java.net.URI
 import java.net.http.*
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -22,6 +25,7 @@ class MatrixProviderFixture(
     lifetime: String,
     val clock: Clock = Clock.systemUTC(),
     messageBurst: Int? = null,
+    private val pushLogging: Boolean = false,
 ) : AutoCloseable {
     init {
         require(lifetime in setOf("5s", "10m"))
@@ -85,6 +89,8 @@ class MatrixProviderFixture(
                             "url_preview_enabled" to false,
                             "enable_metrics" to false,
                         ) +
+                            (if (pushLogging) mapOf("log_config" to "/data/logging.json")
+                            else emptyMap()) +
                             (messageBurst?.let {
                                 mapOf(
                                     "rc_message" to mapOf("per_second" to 0.2, "burst_count" to it)
@@ -94,6 +100,24 @@ class MatrixProviderFixture(
                 ),
                 "/data/homeserver.yaml",
             )
+            .apply {
+                if (pushLogging) {
+                    val root =
+                        generateSequence(Path.of("").toAbsolutePath()) { it.parent }
+                            .first {
+                                Files.isRegularFile(it.resolve("deploy/synapse/logging.json"))
+                            }
+                    for (name in listOf("logging.json", "hris_push_logging.py")) {
+                        withCopyToContainer(
+                            Transferable.of(
+                                Files.readAllBytes(root.resolve("deploy/synapse/$name"))
+                            ),
+                            "/data/$name",
+                        )
+                    }
+                    withEnv("PYTHONPATH", "/data")
+                }
+            }
             .withCreateContainerCmdModifier { command ->
                 command.withEntrypoint("python", "-m", "synapse.app.homeserver")
                 command.hostConfig!!
@@ -128,6 +152,51 @@ class MatrixProviderFixture(
             clock.instant(),
             clock.instant().plusSeconds(60),
         )
+
+    fun assertPushLogsRedacted(expectRemoval: Boolean = false) {
+        check(pushLogging)
+        var leaked = false
+        var redacted = false
+        var started = false
+        var stopped = false
+        var bytes = 0
+        var suffix = ""
+        val reader =
+            object : ResultCallback.Adapter<Frame>() {
+                override fun onNext(frame: Frame) {
+                    bytes += frame.payload.size
+                    if (bytes > 1024 * 1024) {
+                        close()
+                        return
+                    }
+                    val text = suffix + frame.payload.toString(Charsets.UTF_8)
+                    leaked = leaked || text.contains("hriscp1_")
+                    redacted = redacted || text.contains("<hris-push-key>")
+                    started = started || text.contains("Starting pusher")
+                    stopped = stopped || text.contains("Stopping pusher")
+                    suffix = text.takeLast(32)
+                }
+            }
+        reader.use {
+            org.testcontainers.DockerClientFactory.instance()
+                .client()
+                .logContainerCmd(server.containerId)
+                .withStdOut(true)
+                .withStdErr(true)
+                .withFollowStream(false)
+                .withTail(4096)
+                .exec(it)
+            assertTrue(
+                it.awaitCompletion(5, TimeUnit.SECONDS),
+                "Bounded provider log snapshot timed out",
+            )
+        }
+        assertTrue(bytes in 1..1024 * 1024, "Provider log snapshot exceeded its evidence bound")
+        assertTrue(started && redacted, "Provider must emit a redacted pusher lifecycle record")
+        if (expectRemoval)
+            assertTrue(stopped, "Provider removal must be included in the log snapshot")
+        assertFalse(leaked, "Provider logs must not contain an opaque push capability")
+    }
 
     fun start() {
         server.start()

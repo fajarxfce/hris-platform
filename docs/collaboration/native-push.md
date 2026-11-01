@@ -145,6 +145,26 @@ The first fixture security-version mismatch is retained and corrected without
 changing production policy. Payload shapes match inspected Synapse v1.164.1 source;
 actual callback transport, durable reception and delivery are still pending.
 
+## Provider log redaction proved — 1 November 2026
+
+[Deployable configuration](../../deploy/synapse/README.md) uses a single final-output
+formatter that redacts the opaque pusher namespace after substitutions, exception
+chains, cached exception text and stack rendering. It copies the record before
+formatting, caps rendered UTF-8 output at 16 KiB, and emits a fixed diagnostic on
+formatting failure instead of Python logging's raw-argument fallback. Termination
+still propagates. This is not an arbitrary-secret scrubber; request bodies, native
+tokens, bearer headers and plaintext remain excluded from diagnostics.
+
+[Evidence](../measurements/chat-push-provider-logging-2026-11-01.json): the exact
+module/config load in both actual Synapse v1.164.1 pusher cases, including retained
+registration after restart and five-second provider credential expiry/renewal.
+Bounded final snapshots positively contain redacted startup/removal records and
+no raw pusher namespace. Snapshot ownership closes on all exits, with a five-second,
+1-MiB/4096-line evidence bound. Seven Python regression cases run in root `check`.
+47s Gradle / 48.097s wall, format/architecture pass. The first passing live-consumer
+proof and the compiler fix for the stronger restart-safe snapshot are retained.
+No live provider configuration or callback deployment has occurred.
+
 ## Following implementation boundaries
 
 Use Matrix v1.16 `event_id_only` HTTP pushers. The server fixes app identity and a

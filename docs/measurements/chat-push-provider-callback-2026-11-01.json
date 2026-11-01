@@ -1,0 +1,111 @@
+{
+  "date": "2026-11-01",
+  "base": "78588c7e9a1a2de894e4f74fff5de0d129627970",
+  "inputs": {
+    "apps/server/build.gradle.kts": "1063919583d2c2ea945b7018d8618f75a64eb6aa1e401885f4e7b03c8b8db080",
+    "gradle/libs.versions.toml": "24abff33872cbcbcfcaa41827c361453db7e242f1ce43148c7866fbd87e481ca",
+    "apps/server/src/test/kotlin/dev/fajar/hris/MatrixPushProviderFixture.kt": "78339e3bce9d8b12341292414989f6a21436106099e53a32ca76f9812f11d0c3",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationPushProviderHttpTest.kt": "709902587426270af18a7175380e50feaa676ab60963f09e9574dae5ef681d70",
+    "deploy/synapse/push-gateway.nginx.conf": "5797c4757f50f76a54a958df312697ef783acefd21fd3ab626daa1a2cfba430f",
+    "deploy/synapse/push-public-deny.nginx.conf": "5f012c56a28167d69bdd17a85ae30de374e6c5d9ba486d03ccee79f78e168500"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 221.378,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationPushProviderHttpTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 220,
+  "reports": {
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationPushProviderHttpTest.xml": {
+      "sha256": "0be48da3dabfd3cbaa0b8d0a9cd85010a03bd706672bde180902c8a25b409ebe",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suiteSeconds": 39.909,
+      "cases": [
+        {
+          "name": "actualSynapseRetriesAcrossPrivateTlsOutageAndRemovesOnlyTheRetiredPusher()",
+          "classname": "dev.fajar.hris.NativeCollaborationPushProviderHttpTest",
+          "time": "17.622"
+        }
+      ]
+    }
+  },
+  "providers": {
+    "synapse": "ghcr.io/element-hq/synapse:v1.164.1@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+    "nginx": "nginx@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+    "nginxObservedVersion": "1.30.6"
+  },
+  "earlierRuns": [
+    {
+      "run": 1,
+      "exitCode": 1,
+      "wallSeconds": 15.702,
+      "unchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":apps:server:test",
+        "--tests",
+        "*NativeCollaborationPushProviderHttpTest",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "gradleSeconds": 15,
+      "result": "Test compilation stopped: existing Bouncy Castle provider dependency lacks PKIX certificate builders. Added bcpkix test dependency at existing1.86 catalog version; no TLS bypass or runtime application dependency."
+    }
+  ],
+  "proved": [
+    "Exact deployable Nginx private listener/public-denial include load in a pinned provider fixture. Public callback403, private trusted-TLS callback200 and8193-byte input413.",
+    "Default untrusted Java TLS rejects the ephemeral fixture CA; configured client and actual Synapse verify the private leaf certificate normally. No insecure TLS switch.",
+    "Actual managed API pusher registration uses actual Synapse and current encrypted HRIS device binding.",
+    "Synthetic opaque encrypted event sent while private proxy is stopped causes actual Synapse failing_since metadata. Restarting proxy lets provider retry commit that exact event to actual API/RLS/durable queue, clearing provider failure.",
+    "Current native parent revocation causes a subsequent actual callback to return rejection and Synapse removes the only retained pusher. Previously queued event is preserved.",
+    "Fixture containers/network/clients close; post-run Testcontainers inventory is empty."
+  ],
+  "limits": [
+    "Synthetic ciphertext tests provider protocol/wake delivery, not native SDK decryption/E2EE. Existing native encryption proofs are separate.",
+    "Room provisioning metadata is a scoped SQL fixture with actual Synapse room; publication worker acceptance remains separately recorded.",
+    "No FCM queue worker, device receive/reply, live migration/provider rollout, full PRD group or capacity acceptance.",
+    "Local pilot proxy limits are four active requests/source and20 requests/sec with16 burst; these are not5k-company sizing claims.",
+    "Phone remains installed release10/c037; no Mobile product source changed."
+  ]
+}

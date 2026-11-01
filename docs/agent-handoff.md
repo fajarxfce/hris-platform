@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Actual private TLS callback and provider retry proved — 1 November 2026
+
+[Evidence](measurements/chat-push-provider-callback-2026-11-01.json) /
+[deployment configuration](../deploy/synapse/README.md): pinned Synapse1.164.1 and
+Nginx1.30.6 load the exact private TLS listener/public-denial include. Public403,
+private200,8193-byte413 and untrusted-certificate rejection pass. An ephemeral
+owned CA is trusted normally by Synapse through SSL_CERT_FILE; no TLS bypass.
+Actual proxy outage produces Synapse failing_since; recovery retries the exact
+synthetic encrypted event through API/RLS into the durable queue and clears that
+failure. Native-parent revocation then makes Synapse remove the pusher, retaining
+the previous queued event. Test1/39.909s suite/17.622s method; format/architecture
+pass,220s Gradle /221.378s wall, six unchanged inputs. Dependency catalog update
+rebuilt modules; first15s compiler failure required test-only bcpkix at existing1.86.
+Room publication is fixture SQL; native decryption and worker provisioning are
+separate existing proofs. All test containers are reaped; no live deployment.
+
+**Continue immediately:** implement current-target-fenced queue/FCM worker using
+HandleCollaborationPush's existing guarded observation, then Mobile receive/decrypt/
+reply, all-company reconnect/periodic/full recovery, and proved Starter ports.
+`.work/chat-worker-next.txt` captures concrete lease, target/registration, lifecycle,
+retry and payload considerations. Core retention/dispatch, current append and HTTP
+are implemented; do not recreate them. Sender must have its own disabled-by-default
+opt-in and require FCM configuration. Current16 global leases are pilot bounds.
+Phone remains release10/c037; next validated Mobile product11+, notify first and
+explicit10.77.77.3:5555 install-only. Continue full P0–P8, all54 groups unaccepted.
+
 ## Private callback HTTP and runtime graph proved — 1 November 2026
 
 [Evidence](measurements/chat-push-private-ingress-2026-11-01.json): default-disabled

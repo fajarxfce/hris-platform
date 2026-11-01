@@ -316,3 +316,23 @@ body/capability is logged. Queue/handler DI composes in both application roles.
 check even with a cookie/bearer and no body bytes sent. Earlier compiler and actual
 Tomcat error-dispatch failures are retained. Private TLS/provider end-to-end,
 FCM worker delivery, client receive/reply and live rollout remain separate work.
+
+## Actual Synapse callback and private TLS proved — 1 November 2026
+
+The [deployable Nginx listener and public denial](../../deploy/synapse/README.md)
+load unchanged in a pinned Nginx1.30.6/Synapse1.164.1 fixture. An owned ephemeral CA
+is trusted through ordinary OpenSSL/Java verification; an untrusted Java client
+rejects it. Public callback access returns403, private TLS200 and oversized input413.
+Stopping the proxy produces actual Synapse failing_since; restarting it lets the
+provider retry the exact synthetic encrypted event through API/RLS into the durable
+queue and clears the provider failure. Revoking the native HRIS parent makes a
+subsequent callback remove the retained Synapse pusher while preserving the prior
+queued event. Scoped room publication metadata is fixture SQL; this case does not
+claim native SDK cryptography, the publication worker or FCM/device receipt.
+
+[Evidence](../measurements/chat-push-provider-callback-2026-11-01.json):one actual
+provider/API case,39.909s suite/17.622s method, format/architecture pass;220s Gradle /
+221.378s wall, six unchanged inputs. First15s test compile needed PKIX certificate
+builders in addition to the existing crypto provider; test-only bcpkix uses the
+existing1.86 version. All owned containers are reaped. No live provider rollout or
+capacity acceptance; queue/FCM worker and Mobile receive/reply are the next work.

@@ -70,6 +70,7 @@ dependencies {
     testImplementation(libs.swagger.parser)
     testImplementation(libs.pdfbox)
     testImplementation(libs.bouncycastle)
+    testImplementation(libs.bouncycastle.pkix)
     testImplementation(libs.spring.test)
     testImplementation(libs.spring.flyway)
     testImplementation(libs.spring.webmvc.test)

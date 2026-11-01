@@ -184,7 +184,8 @@
         "../measurements/chat-push-queue-2026-11-01.json",
         "../measurements/chat-push-dispatch-deadline-2026-11-01.json",
         "../measurements/chat-push-callback-admission-2026-11-01.json",
-        "../measurements/chat-push-private-ingress-2026-11-01.json"
+        "../measurements/chat-push-private-ingress-2026-11-01.json",
+        "../measurements/chat-push-provider-callback-2026-11-01.json"
       ]
     },
     {
@@ -359,7 +360,8 @@
         "../measurements/chat-push-queue-2026-11-01.json",
         "../measurements/chat-push-dispatch-deadline-2026-11-01.json",
         "../measurements/chat-push-callback-admission-2026-11-01.json",
-        "../measurements/chat-push-private-ingress-2026-11-01.json"
+        "../measurements/chat-push-private-ingress-2026-11-01.json",
+        "../measurements/chat-push-provider-callback-2026-11-01.json"
       ]
     },
     {

@@ -262,3 +262,27 @@ message body or event ID. Final proof must belong to the fourth PID and retained
 transaction. The server still verifies exactly three encrypted sends, no held-room
 send, original identity and complete cleanup. This accepts the interruption scenario,
 not Chat UI, push, backup, calls, meetings or product capacity.
+
+
+## Frozen draft recovery across Android process death
+
+The native application-worker fixture now runs two independent cases: ordinary QUEUED
+intent and FROZEN_DRAFT before command admission. The latter requires zero pending commands
+and the same stored draft revision, submission ID and body hash both before and after actual
+process death. The real app worker admits that original, sends one encrypted message,
+archives its original receipt and confirms draft clearing. Both cases then acquire the
+existing 32 encrypted peer seeds and exercise the foreground history route.
+
+[Evidence](../measurements/chat-frozen-native-2026-11-01.json) binds 44 Mobile/four Platform
+inputs and proof APK `1a664545`. The combined 227s run passes four cases in three suites:
+SDK, WorkManager, ordinary queue and frozen draft. The two workers each finish in one pass,
+with four history actions, 43 references, ten state-only references and 30/28/30 application
+admissions with zero failures. Initial scheduled-validator and provider-setup failures are
+retained. PREPARED remains a valid scheduler handshake; each worker case owns its provider
+and Spring trace state. The original provider failure code was not captured, so its exact
+cause is not asserted; future setup errors retain safe kind/code diagnostics.
+
+Local execution is separate from hosted CI. Pin the committed Platform fixture in Mobile
+and audit a matching hosted run. This does not accept physical iPhone/web behavior, capacity,
+all chat features or the complete communications PRD. The installed release8 predates these
+fixture-only changes; no additional phone installation follows from them.

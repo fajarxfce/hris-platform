@@ -72,6 +72,35 @@ class WorkerEvidenceTest(unittest.TestCase):
             with self.subTest(update=update), self.assertRaises(ValueError):
                 evidence(self.completed() | update, self.queued(), self.queued(456))
 
+    def frozen(self, pid=123):
+        return self.queued(pid) | {"state": "FROZEN_DRAFT", "pendingCommandCount": 0,
+                                   "draftRevision": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"}
+
+    def test_frozen_boundary_requires_an_empty_outbox_and_original_draft_revision(self):
+        self.assertEqual(self.frozen(), checkpoint(self.frozen(), "FROZEN_DRAFT"))
+        for update in ({"pendingCommandCount": False}, {"pendingCommandCount": 1},
+                       {"draftRevision": None}, {"draftRevision": "invalid"}, {"state": "QUEUED"}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                checkpoint(self.frozen() | update, "FROZEN_DRAFT")
+        with self.assertRaises(ValueError):
+            checkpoint(self.frozen())
+
+    def test_frozen_recovery_cannot_be_substituted_with_queued_or_recreated_intent(self):
+        completed = self.completed() | {"initialState": "FROZEN_DRAFT", "frozenDraftRecovered": True,
+                                       "outboxEmptyBeforeRecovery": True, "draftConfirmedCleared": True}
+        result = evidence(completed, self.frozen(), self.frozen(456))
+        self.assertEqual("FROZEN_DRAFT", result["initialState"])
+        self.assertTrue(result["draftConfirmedCleared"])
+        for update in ({"initialState": "QUEUED"}, {"frozenDraftRecovered": False},
+                       {"outboxEmptyBeforeRecovery": False}, {"draftConfirmedCleared": False}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                evidence(completed | update, self.frozen(), self.frozen(456))
+        for restored in (self.queued(456), self.frozen(456) | {"draftRevision": self.queued()["messageId"]}):
+            with self.subTest(restored=restored), self.assertRaises(ValueError):
+                evidence(completed, self.frozen(), restored)
+        with self.assertRaises(ValueError):
+            evidence(completed, self.queued(), self.queued(456))
+
 
 if __name__ == "__main__":
     unittest.main()

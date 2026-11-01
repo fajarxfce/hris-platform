@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Native frozen-draft recovery proved; continue — 1 November 2026
+
+[Source and artifact evidence](measurements/chat-frozen-native-2026-11-01.json) records actual
+Android/Synapse/HRIS execution with proof APK `1a6645456001c0c06c1db8ec12ed405c2d9015986ff7366ca9fe32e1b2d2363d`.
+Final combined run: 227s Gradle / 227.82s wall, four tests/three suites, zero failures. SDK
+suite 48.362s, scheduled 44.822s, worker pair 110.945s (ordinary 50.339s/frozen 40.341s methods).
+Both worker cases preserve original identity through real death, send once and acquire 33
+originals, with four history actions, 43 references/10 state-only, 30/28/30 admissions, zero failures.
+Frozen checkpoints prove zero commands and the same draft revision on both sides of death;
+confirmation clears the draft. All cleanup succeeds; owned emulator is stopped.
+
+Initial native run had SDK/queued passes, but PREPARED was accidentally excluded by the
+new shared validator and frozen setup failed at provider login before its Android driver.
+Both are retained: restored PREPARED with a scheduler-handshake test; provider and Spring
+trace are now isolated per test. Exact initial provider failure code was lost, so do not
+claim an observed 429. Safe kind/code diagnostics now preserve future setup failures.
+Python 66 cases and Platform test compilation/format/architecture pass (28s/28.739s).
+Mobile proof/quality passes 80s/84.218s after splitting a fixture method rejected by detekt;
+that earlier 141s/144.762s quality failure is retained. No product/runtime workaround.
+
+**Continue immediately:** commit/push Platform, pin its exact commit in Mobile native CI,
+commit/push Mobile fixture/evidence and audit the hosted result. Release 8 is installed from
+Mobile 43cce8c0; no new phone build is needed for these fixture changes. Then fix the reviewed
+composer distinction: technical checkpoint contention currently uses draft_changed, which
+makes the UI ask to reload despite unchanged target text. Use a separate retryable busy
+code and preserve true conflicting-edit reload; validate and continue all P0–P8. No complete
+feature group or live provider deployment is claimed. Draft recovery implementation is
+Mobile 1ddfba6e; its root/browser/Android evidence is linked in the delivery ledger.
+
 ## Composer-era native regression audited — 1 November 2026
 
 Mobile [run 41338026431](https://github.com/fajarxfce/hris-mobile/actions/runs/41338026431)

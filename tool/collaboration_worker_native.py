@@ -17,7 +17,7 @@ from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic
 
 
 def checkpoint(value, state="QUEUED", restored=False):
-    if not isinstance(value, dict) or value.get("state") != state or value.get("taskKey") != "hris.collaboration-delivery":
+    if state not in ("PREPARED", "QUEUED", "FROZEN_DRAFT", "COMPLETED") or not isinstance(value, dict) or value.get("state") != state or value.get("taskKey") != "hris.collaboration-delivery":
         raise ValueError("Invalid worker checkpoint")
     pid = value.get("processId")
     message = value.get("messageId")
@@ -30,12 +30,34 @@ def checkpoint(value, state="QUEUED", restored=False):
         raise ValueError("Invalid worker digest")
     if restored and value.get("senderRuntimeOpen") is not False:
         raise ValueError("Worker must restore its own sender runtime")
-    return {"processId": pid, "messageId": message, "bodySha256": digest,
-            "state": state, "taskKey": "hris.collaboration-delivery"}
+    result = {"processId": pid, "messageId": message, "bodySha256": digest,
+              "state": state, "taskKey": "hris.collaboration-delivery"}
+    if state == "FROZEN_DRAFT":
+        revision = value.get("draftRevision")
+        if (type(value.get("pendingCommandCount")) is not int or value["pendingCommandCount"] != 0
+                or not isinstance(revision, str) or str(uuid.UUID(revision)) != revision):
+            raise ValueError("Frozen draft requires its original revision and an empty outbox")
+        result.update(draftRevision=revision, pendingCommandCount=0)
+    return result
 
 
 def evidence(value, queued, restored):
+    initial_state = queued.get("state") if isinstance(queued, dict) else None
+    if initial_state not in ("QUEUED", "FROZEN_DRAFT"):
+        raise ValueError("Invalid original worker state")
+    queued = checkpoint(queued, initial_state)
+    restored = checkpoint(restored, initial_state)
     result = checkpoint(value, "COMPLETED")
+    if value.get("initialState", "QUEUED") != initial_state:
+        raise ValueError("Worker completion changed its original preparation boundary")
+    result["initialState"] = initial_state
+    if initial_state == "FROZEN_DRAFT":
+        if queued["draftRevision"] != restored["draftRevision"]:
+            raise ValueError("Restored draft revision changed before worker recovery")
+        for flag in ("frozenDraftRecovered", "outboxEmptyBeforeRecovery", "draftConfirmedCleared"):
+            if value.get(flag) is not True:
+                raise ValueError("Missing frozen-draft recovery evidence")
+            result[flag] = True
     if (result["processId"] != restored["processId"] or result["processId"] == queued["processId"]
             or any(result[key] != queued[key] or result[key] != restored[key] for key in ("messageId", "bodySha256"))):
         raise ValueError("Worker completion did not retain the original intent")
@@ -77,6 +99,9 @@ def diagnostic(status):
 def run(apk, sdk, directory):
     directory = Path(directory).resolve(strict=True)
     fixture = read_json(directory / "fixture.json")
+    initial_state = fixture.get("initialState", "QUEUED")
+    if initial_state not in ("QUEUED", "FROZEN_DRAFT"):
+        raise ValueError("Unsupported worker preparation boundary")
     home = urlparse(fixture["baseUrl"])
     if (home.scheme != "http" or home.hostname != "127.0.0.1" or not 1024 <= (home.port or 0) <= 65535
             or home.username or home.password or home.query or home.fragment or home.path not in ("", "/")):
@@ -126,7 +151,7 @@ def run(apk, sdk, directory):
             if queued is None:
                 observed = app_json("worker-queued")
                 if observed is not None:
-                    queued = checkpoint(observed)
+                    queued = checkpoint(observed, initial_state)
                     if native.process_id() != queued["processId"]:
                         raise RuntimeError("Queued worker process was not confirmed")
                     native.command("shell", "am", "force-stop", PACKAGE)
@@ -137,7 +162,7 @@ def run(apk, sdk, directory):
             elif restored is None:
                 observed = app_json("worker-restored")
                 if observed is not None:
-                    restored = checkpoint(observed, restored=True)
+                    restored = checkpoint(observed, initial_state, restored=True)
                     if (restored["processId"] == queued["processId"] or native.process_id() != restored["processId"]
                             or any(restored[key] != queued[key] for key in ("messageId", "bodySha256"))):
                         raise RuntimeError("Worker restore lost the original intent")

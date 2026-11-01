@@ -4,6 +4,7 @@ import uuid
 
 from collaboration_scheduled_native import application_backgrounded, completion, queued_work, restored_work
 from collaboration_scheduled_network import EmulatorNetwork
+from collaboration_worker_native import checkpoint
 
 
 class SchedulingEvidenceTest(unittest.TestCase):
@@ -16,6 +17,12 @@ class SchedulingEvidenceTest(unittest.TestCase):
         self.restored = self.queued | {"processId": 202, "senderRuntimeOpen": False}
         self.result = self.restored | {"state": "COMPLETED", "workState": "SUCCEEDED", "eventId": "$ciphertext",
                      "senderRuntimeRestoredByWorker": True, "originalHistoryAcquired": True, "completionRetired": True}
+
+    def test_preparation_handshake_uses_the_shared_checkpoint_validator(self):
+        self.assertEqual(self.prepared, checkpoint(self.prepared, "PREPARED"))
+        for state in ("QUEUED", "FROZEN_DRAFT", "COMPLETED", "UNKNOWN"):
+            with self.subTest(state=state), self.assertRaises(ValueError):
+                checkpoint(self.prepared, state)
 
     def test_queue_keeps_only_the_bound_task_metadata(self):
         result = queued_work(self.queued | {"body": "fictional-private", "credential": "excluded"}, self.prepared)

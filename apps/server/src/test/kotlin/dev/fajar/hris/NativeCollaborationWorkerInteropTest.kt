@@ -12,13 +12,14 @@ import java.nio.file.attribute.PosixFilePermissions
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
@@ -36,6 +37,7 @@ import org.springframework.test.context.TestPropertySource
             "hris.test.worker-proof=true",
         ]
 )
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
     @Autowired private lateinit var matrix: CollaborationMatrixRepository
     @Autowired private lateinit var rooms: CollaborationMatrixRoomRepository
@@ -60,13 +62,22 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                     .toString()
             }
         }
-
-        @JvmStatic @AfterAll fun closeMatrix() = provider.close()
     }
+
+    // Each proof owns provider rate buckets and identities as well as its application trace.
+    // DirtiesContext then reacquires the next provider origin for the next test method.
+    @AfterEach fun closeMatrix() = provider.close()
 
     @Test
     @Timeout(value = 8, unit = TimeUnit.MINUTES)
-    fun actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce() {
+    fun actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce() = verify(false)
+
+    @Test
+    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    fun actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce() = verify(true)
+
+    private fun verify(frozenOnly: Boolean) {
+        val initialState = if (frozenOnly) "FROZEN_DRAFT" else "QUEUED"
         val owner = native()
         val sender = sdkOwner(owner)
         val recipient = sdkOwner(sdkPeer(owner))
@@ -82,7 +93,13 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                     at.plusSeconds(60),
                 )
             )
-        assertInstanceOf(Result.Success::class.java, login)
+        assertInstanceOf(
+            Result.Success::class.java,
+            login,
+            (login as? Result.Failed)?.failure?.let {
+                "Provider login failed: ${it.kind}/${it.code}"
+            },
+        )
         val creation =
             rooms.create(
                 CollaborationMatrixDirectRoom(
@@ -117,6 +134,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "roomId" to room,
                 "conversationId" to conversation.toString(),
                 "logicalId" to UUID.randomUUID().toString(),
+                "initialState" to initialState,
                 "body" to "fictional-hris-worker-**literal** <tag> 😀\n${UUID.randomUUID()}",
             ),
         )
@@ -127,6 +145,13 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
         assertEquals(2, result.path("processes").asInt())
         assertEquals(1, result.path("forcedProcessDeaths").asInt())
         val proof = result.path("proof")
+        assertEquals(initialState, proof.path("initialState").asString())
+        for (flag in
+            listOf(
+                "frozenDraftRecovered",
+                "outboxEmptyBeforeRecovery",
+                "draftConfirmedCleared",
+            )) assertEquals(frozenOnly, proof.path(flag).asBoolean(), flag)
         for (flag in
             listOf(
                 "encryptedReceived",
@@ -181,6 +206,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "cleanup" to true,
                 "processes" to 2,
                 "forcedProcessDeaths" to 1,
+                "initialState" to initialState,
                 "encryptedSends" to 33,
                 "workerEncryptedSends" to 1,
                 "seededPeerEncryptedSends" to 32,

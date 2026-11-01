@@ -155,7 +155,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/measurements/chat-background-delivery-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/4213d5f5926ae5f299a0fd1969ceb73f181df4c4/docs/measurements/chat-history-recovery-2026-11-01.json",
         "../measurements/chat-native-worker-2026-11-01.json",
-        "../measurements/chat-workmanager-2026-11-01.json"
+        "../measurements/chat-workmanager-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/1ddfba6e3ffb4f4324bab6ed722f601b75f2bd17/docs/measurements/chat-draft-recovery-2026-11-01.json",
+        "../measurements/chat-frozen-native-2026-11-01.json"
       ]
     },
     {

@@ -115,6 +115,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "sender" to sender.session,
                 "recipient" to recipient.session,
                 "roomId" to room,
+                "conversationId" to conversation.toString(),
                 "body" to "fictional-hris-${UUID.randomUUID()}",
                 "reply" to "fictional-hris-${UUID.randomUUID()}",
                 "logicalId" to UUID.randomUUID().toString(),
@@ -215,6 +216,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "queueRestored",
                     "transactionReused",
                     "identityAfterRestart",
+                    "messageIntentRestored",
+                    "queueMappingRecovered",
+                    "queueWriterExclusive",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -250,6 +254,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "queueRestored" to true,
                     "transactionReused" to true,
                     "identityAfterRestart" to true,
+                    "messageIntentRestored" to true,
+                    "queueMappingRecovered" to true,
+                    "queueWriterExclusive" to true,
                     "pausedAcrossRestart" to true,
                     "syncInterruptedAfterRestart" to true,
                     "syncRetriedWithRetainedCursor" to true,

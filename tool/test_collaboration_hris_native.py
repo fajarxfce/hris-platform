@@ -15,6 +15,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "protectedStoreReopened": True, "missingRecordPreserved": True,
                 "wrongPassphrasePreserved": True, "exclusiveOwner": True,
                 "queueRestored": True, "transactionReused": True, "identityAfterRestart": True,
+                "messageIntentRestored": True, "queueMappingRecovered": True, "queueWriterExclusive": True,
                 "senderEventId": "$first", "recipientEventId": "$second",
                 "senderTransaction": "first-transaction", "recipientTransaction": "second-transaction"}
 
@@ -25,7 +26,8 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("senderTransaction", "raw body"), ("syncMode", "native"),
                             ("recipientEventId", "$first"), ("logicalIdsPreserved", 1),
                             ("protectedStoreReopened", 1), ("missingRecordPreserved", False),
-                            ("wrongPassphrasePreserved", None), ("exclusiveOwner", "true")):
+                            ("wrongPassphrasePreserved", None), ("exclusiveOwner", "true"),
+                            ("messageIntentRestored", False), ("queueMappingRecovered", 1), ("queueWriterExclusive", None)):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
 

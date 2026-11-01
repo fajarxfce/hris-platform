@@ -1,5 +1,30 @@
 # Agent continuation — HRIS workspace
 
+## Bounded foreground remote history — 1 November 2026
+
+Mobile `2d6753ee64f4616adec6ad05783ad2d197a535e9` is pushed. The thread now pages provider
+references and acquires bounded original windows, with owned offline reads, separate paging
+errors/loading, explicit exact-anchor recovery and cancellation/denial guards. State-only
+references do not open message focuses or imply missing messages. Concurrent provider growth
+keeps the scan open. [Contract](https://github.com/fajarxfce/hris-mobile/blob/2d6753ee64f4616adec6ad05783ad2d197a535e9/docs/collaboration-remote-history.md)
+and [measurement](https://github.com/fajarxfce/hris-mobile/blob/2d6753ee64f4616adec6ad05783ad2d197a535e9/docs/measurements/chat-remote-history-2026-11-01.json)
+include all attempts, 18 source hashes and a visually inspected 320dp/200% text screenshot.
+Final checks passed: 2,733 desktop cases/427 suites, 368 domain-browser cases, 70 presentation-
+browser cases and 170 Android-host cases; zero failures/errors/skips. Platform runtime and
+Starter are unchanged. No complete PRD group is accepted.
+
+Continue actual native foreground paging evidence, bounded sliding/bidirectional local
+browsing beyond the existing ten-page window, durable drafts, safe cancellation and all
+remaining P0–P8. First prepare the updated mobile release and fix/audit native fixture
+cleanup: hosted `41319810722` passed SDK but failed direct-worker instrumentation at
+`HrisWorkerProofContainer.close` with ClosePending. Driver cleanup succeeded; no worker
+result was read, so do not infer delivery acceptance. Preserve primary errors and use the
+existing bounded close-drain contract. Newer native run `41322946959` is still active and
+must be audited. Release 5 is prepared but uninstalled; phone WireGuard ADB still times out
+and the reconnect question is pending. Continue independently, notify before install-only,
+preserve signer/data and push every validated atomic commit.
+
+
 ## Actual Android WorkManager execution — 1 November 2026
 
 Mobile `6f5ff9223193ca486dd61d0b84d5a16c866b93de` is pushed. The separate normal proof Activity queues while its

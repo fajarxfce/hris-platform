@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Trusted local sender identity — 1 November 2026
+
+Mobile `5c5b2a81395d2b629e62cacfadbb05ef6cafe031` is pushed. The Android adapter reads only the initialized,
+protected SDK record and returns Matrix identity without SDK client/directory/network
+acquisition or credential mutation. Owned local identity is encrypted under account/
+company scope, with first-write/exact-replay publication and existing history key-loss
+protection. Native-family replacement preserves identity metadata, not cryptographic
+key continuity. [Contract](https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/collaboration-sender-identity.md) and
+[measurement](https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/measurements/collaboration-sender-identity-2026-11-01.json) bind
+29 source inputs and all attempts. Focused checks pass in 162s, full checks in 203s:
+2,622 desktop / 417 suites, 320 domain browser, 226 data browser, 170 Android host,
+zero failures/errors/skips and zero Android lint errors. Seven new storage cases
+run on SQLite/IndexedDB; nine domain and five Android host cases pass. APK `51944ab4`
+and proof APK `fe5b22b5` are compiled, not installed. No new actual-server/emulator or
+Apple runtime proof, phone/live change, Starter change or full PRD group acceptance.
+
+Continue the message thread, app routes, owned delivery scheduling and all P0–P8.
+Canonical history and pending intent must match complete trusted sender/content
+identity before UI merging; a peer-controlled logical ID is insufficient. Keep offline
+local access separate from setup/live sending, and preserve explicit runtime/child
+lifetimes. Continue the authorized long run and push each validated atomic commit.
+
+
 ## Recoverable Chat setup — 1 November 2026
 
 Mobile `980c7d76ba3d7555d9d584bee47951629ad1eeab` adds an owned setup page with explicit activation,

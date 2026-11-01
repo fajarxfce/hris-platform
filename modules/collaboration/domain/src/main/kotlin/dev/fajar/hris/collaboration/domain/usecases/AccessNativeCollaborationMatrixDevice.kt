@@ -475,16 +475,7 @@ class AccessNativeCollaborationMatrixDevice(
             return Result.Failed(
                 Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
             )
-        return keys.find(initial.companyId, initial.accountId, initial.deviceId).flatMap { own ->
-            if (own == null || own.version != 1L || own.publishedAt == null) keysRequired()
-            else if (
-                own.companyId != initial.companyId ||
-                    own.accountId != initial.accountId ||
-                    own.deviceId != initial.deviceId
-            )
-                invalidProvider()
-            else Result.Success(RoomMessagePreparation(room, own, targets))
-        }
+        return confirmedOwnKeys(initial).map { own -> RoomMessagePreparation(room, own, targets) }
     }
 
     private data class RoomMessagePreparation(
@@ -553,16 +544,7 @@ class AccessNativeCollaborationMatrixDevice(
             return Result.Failed(
                 Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
             )
-        return keys.find(initial.companyId, initial.accountId, initial.deviceId).flatMap { own ->
-            if (own == null || own.version != 1L || own.publishedAt == null) keysRequired()
-            else if (
-                own.companyId != initial.companyId ||
-                    own.accountId != initial.accountId ||
-                    own.deviceId != initial.deviceId
-            )
-                invalidProvider()
-            else Result.Success(ToDevicePreparation(recipients, own))
-        }
+        return confirmedOwnKeys(initial).map { own -> ToDevicePreparation(recipients, own) }
     }
 
     private data class ToDevicePreparation(
@@ -1092,6 +1074,29 @@ class AccessNativeCollaborationMatrixDevice(
 
     private fun keysChanged() =
         Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_device_key_recovery_required"))
+
+    /** A valid reservation is temporary unavailability, never malformed encrypted content. */
+    private fun confirmedOwnKeys(
+        initial: CollaborationGatewaySession
+    ): Result<CollaborationDeviceKeyPublication> =
+        keys.find(initial.companyId, initial.accountId, initial.deviceId).flatMap { own ->
+            if (own == null) keysRequired()
+            else if (
+                own.companyId != initial.companyId ||
+                    own.accountId != initial.accountId ||
+                    own.deviceId != initial.deviceId
+            )
+                invalidProvider()
+            else
+                when {
+                    own.version == 0L && own.publishedAt == null ->
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "collaboration_device_keys_pending")
+                        )
+                    own.version == 1L && own.publishedAt != null -> Result.Success(own)
+                    else -> invalidProvider()
+                }
+        }
 
     private fun keysRequired() =
         Result.Failed(Failure(FailureKind.VALIDATION, "collaboration_device_keys_required"))

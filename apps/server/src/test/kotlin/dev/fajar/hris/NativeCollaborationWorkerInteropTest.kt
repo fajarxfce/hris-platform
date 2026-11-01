@@ -70,14 +70,21 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
 
     @Test
     @Timeout(value = 8, unit = TimeUnit.MINUTES)
-    fun actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce() = verify(false)
+    fun actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce() =
+        verify("QUEUED")
 
     @Test
     @Timeout(value = 8, unit = TimeUnit.MINUTES)
-    fun actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce() = verify(true)
+    fun actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce() =
+        verify("FROZEN_DRAFT")
 
-    private fun verify(frozenOnly: Boolean) {
-        val initialState = if (frozenOnly) "FROZEN_DRAFT" else "QUEUED"
+    @Test
+    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    fun actualApplicationWorkerRetainsCancelledDraftAcrossDeathAndSendsIndependentIntentOnce() =
+        verify("CANCELLED_DRAFT")
+
+    private fun verify(initialState: String) {
+        val frozenOnly = initialState == "FROZEN_DRAFT"
         val owner = native()
         val sender = sdkOwner(owner)
         val recipient = sdkOwner(sdkPeer(owner))
@@ -152,6 +159,20 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "outboxEmptyBeforeRecovery",
                 "draftConfirmedCleared",
             )) assertEquals(frozenOnly, proof.path(flag).asBoolean(), flag)
+        if (initialState == "CANCELLED_DRAFT") {
+            for (flag in
+                listOf(
+                    "cancelledArchiveRetained",
+                    "cancelledReceiptAbsent",
+                    "cancelledReplayDidNotSchedule",
+                    "cancelledDraftConfirmedCleared",
+                    "cancelledAbsentFromHistory",
+                )) assertTrue(proof.path(flag).asBoolean(), flag)
+            assertNotEquals(
+                proof.path("messageId").asString(),
+                proof.path("cancelledMessageId").asString(),
+            )
+        }
         for (flag in
             listOf(
                 "encryptedReceived",

@@ -102,5 +102,54 @@ class WorkerEvidenceTest(unittest.TestCase):
             evidence(completed, self.queued(), self.queued(456))
 
 
+    def cancelled(self, pid=123):
+        return self.queued(pid) | {"state": "CANCELLED_DRAFT", "pendingCommandCount": 1,
+            "cancelledMessageId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", "cancelledBodySha256": "b" * 64,
+            "cancelledDraftRevision": "cccccccc-cccc-4ccc-8ccc-cccccccccccc", "cancelledArchiveRetained": True,
+            "cancelledReceiptAbsent": True, "cancelledReplayDidNotSchedule": True}
+
+    def cancelled_completed(self):
+        return self.completed() | {"initialState": "CANCELLED_DRAFT", **{k: v for k, v in self.cancelled().items()
+            if k.startswith("cancelled") and k != "cancelledDraftRevision"},
+            "cancelledDraftConfirmedCleared": True, "cancelledAbsentFromHistory": True}
+
+    def test_cancelled_checkpoint_requires_distinct_identity_archive_and_independent_pending_command(self):
+        self.assertEqual(self.cancelled(), checkpoint(self.cancelled(), "CANCELLED_DRAFT"))
+        for update in ({"cancelledMessageId": self.queued()["messageId"]}, {"cancelledMessageId": "invalid"},
+                       {"cancelledBodySha256": "A" * 64}, {"cancelledBodySha256": None},
+                       {"cancelledDraftRevision": "invalid"}, {"pendingCommandCount": True},
+                       {"pendingCommandCount": 0}, {"pendingCommandCount": 2},
+                       {"cancelledArchiveRetained": False}, {"cancelledReceiptAbsent": False},
+                       {"cancelledReplayDidNotSchedule": 1}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                checkpoint(self.cancelled() | update, "CANCELLED_DRAFT")
+        private = self.cancelled() | {"body": "hidden", "credential": "hidden"}
+        self.assertEqual(self.cancelled(), checkpoint(private, "CANCELLED_DRAFT"))
+
+    def test_cancelled_recovery_requires_original_archive_and_exact_draft_across_death(self):
+        proof = self.cancelled_completed()
+        self.assertEqual("CANCELLED_DRAFT", evidence(proof, self.cancelled(), self.cancelled(456))["initialState"])
+        for key in ("cancelledArchiveRetained", "cancelledReceiptAbsent", "cancelledReplayDidNotSchedule",
+                    "cancelledDraftConfirmedCleared", "cancelledAbsentFromHistory"):
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                evidence(proof | {key: False}, self.cancelled(), self.cancelled(456))
+        for change in ({"cancelledMessageId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd"},
+                       {"cancelledBodySha256": "c" * 64}, {"cancelledDraftRevision": self.queued()["messageId"]}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                evidence(proof, self.cancelled(), self.cancelled(456) | change)
+        for change in ({"initialState": "QUEUED"}, {"cancelledBodySha256": "c" * 64},
+                       {"cancelledMessageId": self.queued()["messageId"]}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                evidence(proof | change, self.cancelled(), self.cancelled(456))
+        with self.assertRaises(ValueError):
+            evidence(proof, self.queued(), self.queued(456))
+
+    def test_cancelled_proof_never_exports_raw_body_or_private_extra_fields(self):
+        proof = self.cancelled_completed() | {"cancelledBody": "hidden", "credential": "hidden"}
+        result = evidence(proof, self.cancelled(), self.cancelled(456))
+        self.assertNotIn("cancelledBody", result)
+        self.assertNotIn("credential", result)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -52,7 +52,11 @@
         "../measurements/chat-native-worker-2026-11-01.json",
         "../measurements/chat-workmanager-2026-11-01.json",
         "../measurements/chat-frozen-native-2026-11-01.json",
-        "../measurements/chat-draft-recovery-native-ci-2026-11-01.json"
+        "../measurements/chat-draft-recovery-native-ci-2026-11-01.json",
+        "../measurements/chat-frozen-native-ci-2026-11-01.json",
+        "../measurements/chat-cancellation-policy-regression-native-ci-2026-11-01.json",
+        "../measurements/chat-cancellation-native-2026-11-01.json",
+        "key-publication-pending.md"
       ]
     },
     {
@@ -161,7 +165,13 @@
         "https://github.com/fajarxfce/hris-mobile/blob/1ddfba6e3ffb4f4324bab6ed722f601b75f2bd17/docs/measurements/chat-draft-recovery-2026-11-01.json",
         "../measurements/chat-frozen-native-2026-11-01.json",
         "../measurements/chat-draft-recovery-native-ci-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/448ab3ad85ba9174fb7f1911ec85d54d3e4968f7/docs/measurements/chat-draft-contention-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/448ab3ad85ba9174fb7f1911ec85d54d3e4968f7/docs/measurements/chat-draft-contention-2026-11-01.json",
+        "../measurements/chat-frozen-native-ci-2026-11-01.json",
+        "../measurements/chat-cancellation-policy-regression-native-ci-2026-11-01.json",
+        "../measurements/chat-cancellation-native-2026-11-01.json",
+        "key-publication-pending.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/c0371a38d1ae2f8c890c300648ec849089c3836a/docs/measurements/chat-cancellation-ui-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/648410c4860f1e493669c3e9b8cf8ad529c07a0e/docs/measurements/chat-cancellation-policy-2026-11-01.json"
       ]
     },
     {
@@ -267,7 +277,13 @@
         "https://github.com/fajarxfce/hris-mobile/blob/1ddfba6e3ffb4f4324bab6ed722f601b75f2bd17/docs/measurements/chat-draft-recovery-2026-11-01.json",
         "../measurements/chat-frozen-native-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/448ab3ad85ba9174fb7f1911ec85d54d3e4968f7/docs/measurements/chat-draft-contention-2026-11-01.json",
-        "../measurements/chat-draft-recovery-native-ci-2026-11-01.json"
+        "../measurements/chat-draft-recovery-native-ci-2026-11-01.json",
+        "../measurements/chat-frozen-native-ci-2026-11-01.json",
+        "../measurements/chat-cancellation-policy-regression-native-ci-2026-11-01.json",
+        "../measurements/chat-cancellation-native-2026-11-01.json",
+        "key-publication-pending.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/c0371a38d1ae2f8c890c300648ec849089c3836a/docs/measurements/chat-cancellation-ui-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/648410c4860f1e493669c3e9b8cf8ad529c07a0e/docs/measurements/chat-cancellation-policy-2026-11-01.json"
       ]
     },
     {
@@ -577,8 +593,8 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Actual Android SDK, ordinary WorkManager process death and frozen-only draft recovery have separately source-bound proof. Audit the newest four-case hosted run and continue remaining native/web/background boundaries; none of these proofs accepts all background features.",
-    "Provider history paging and durable composer/recovery have recorded implementation evidence. Continue queued cancellation and its confirmation UI, groups, rich messages/actions, verification, search and incoming notifications/inline reply; preserve original sender/content and transaction evidence.",
+    "Actual SDK, WorkManager, frozen-only and cancelled-draft recovery have source-bound native proof. A pending own-key publication now remains retryable without allowing an unconfirmed send. Pin the corrected five-case fixture and audit its hosted run; preserve earlier failures.",
+    "History paging, durable composer/recovery and queued-only cancellation with confirmation UI are implemented and tested. Continue opaque pusher/FCM admission and native inline replies, then groups, rich messages/actions, verification and search; preserve sender/content and transaction evidence.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."

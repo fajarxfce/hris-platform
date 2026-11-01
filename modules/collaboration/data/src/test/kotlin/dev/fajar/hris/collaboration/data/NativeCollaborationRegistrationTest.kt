@@ -2289,6 +2289,91 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun pendingSenderPublicationKeepsSendsRetryableUntilExactUploadCommits() {
+        val q = KeyQueryFixture(publishedSender = false)
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        q.upload.provider.onUpload = { request ->
+            val accepted = q.upload.provider.accept(request)
+            entered.countDown()
+            check(release.await(10, TimeUnit.SECONDS))
+            accepted
+        }
+        Executors.newSingleThreadExecutor().use { executor ->
+            val publishing =
+                executor.submit<Result<CollaborationMatrixKeyCounts>> { q.upload.upload() }
+            try {
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
+                assertEquals(0L, q.upload.publication()?.version)
+                for (blocked in listOf(q.send(), q.sendRoom())) {
+                    val failed = blocked as Result.Failed
+                    assertEquals(FailureKind.UNAVAILABLE, failed.failure.kind)
+                    assertEquals("collaboration_device_keys_pending", failed.failure.code)
+                }
+                assertEquals(0, q.sendCalls.get())
+                assertEquals(0, q.roomSendCalls.get())
+            } finally {
+                release.countDown()
+            }
+            assertInstanceOf(Result.Success::class.java, publishing.get(5, TimeUnit.SECONDS))
+        }
+        assertEquals(1L, q.upload.publication()?.version)
+        assertEquals(Result.Success(Unit), q.send())
+        assertEquals(Result.Success("\$fictional-event"), q.sendRoom())
+        assertEquals(1, q.sendCalls.get())
+        assertEquals(1, q.roomSendCalls.get())
+        assertEquals("fictional-transaction", q.sent?.transactionId)
+        assertEquals(q.roomMessage(), q.roomMessageSeen)
+    }
+
+    @Test
+    fun pendingSenderPublicationPreservesLostReplyReservationUntilRetryConfirms() {
+        val q = KeyQueryFixture(publishedSender = false)
+        q.upload.provider.onUpload = { request ->
+            q.upload.provider.accept(request)
+            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_lost_upload_reply"))
+        }
+        assertEquals("fixture_lost_upload_reply", failed(q.upload.upload()))
+        val reserved = requireNotNull(q.upload.publication())
+        assertEquals(0L, reserved.version)
+        for (blocked in listOf(q.send(), q.sendRoom())) {
+            val failed = blocked as Result.Failed
+            assertEquals(FailureKind.UNAVAILABLE, failed.failure.kind)
+            assertEquals("collaboration_device_keys_pending", failed.failure.code)
+        }
+        assertEquals(0, q.sendCalls.get())
+        assertEquals(0, q.roomSendCalls.get())
+        q.upload.provider.onUpload = null
+        assertInstanceOf(Result.Success::class.java, q.upload.upload())
+        val confirmed = requireNotNull(q.upload.publication())
+        assertEquals(reserved.fingerprint, confirmed.fingerprint)
+        assertEquals(reserved.reservedAt, confirmed.reservedAt)
+        assertEquals(1L, confirmed.version)
+        assertEquals(Result.Success(Unit), q.send())
+        assertEquals(Result.Success("\$fictional-event"), q.sendRoom())
+    }
+
+    @Test
+    fun pendingSenderPublicationDoesNotHideRevokedPermission() {
+        val q = KeyQueryFixture(publishedSender = false)
+        q.upload.provider.onUpload = { request ->
+            q.upload.provider.accept(request)
+            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_lost_upload_reply"))
+        }
+        assertEquals("fixture_lost_upload_reply", failed(q.upload.upload()))
+        assertEquals(0L, q.upload.publication()?.version)
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            q.company,
+            q.upload.g.f.account,
+        )
+        assertEquals("access_denied", failed(q.send()))
+        assertEquals("access_denied", failed(q.sendRoom()))
+        assertEquals(0, q.sendCalls.get())
+        assertEquals(0, q.roomSendCalls.get())
+    }
+
+    @Test
     fun encryptedToDeviceRequiresOwnPublicationAndRejectsPartialRecipientBatches() {
         val pending = KeyQueryFixture(publishedSender = false)
         assertEquals(

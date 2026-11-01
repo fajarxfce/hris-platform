@@ -17,7 +17,7 @@ from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic
 
 
 def checkpoint(value, state="QUEUED", restored=False):
-    if state not in ("PREPARED", "QUEUED", "FROZEN_DRAFT", "COMPLETED") or not isinstance(value, dict) or value.get("state") != state or value.get("taskKey") != "hris.collaboration-delivery":
+    if state not in ("PREPARED", "QUEUED", "FROZEN_DRAFT", "CANCELLED_DRAFT", "COMPLETED") or not isinstance(value, dict) or value.get("state") != state or value.get("taskKey") != "hris.collaboration-delivery":
         raise ValueError("Invalid worker checkpoint")
     pid = value.get("processId")
     message = value.get("messageId")
@@ -38,12 +38,32 @@ def checkpoint(value, state="QUEUED", restored=False):
                 or not isinstance(revision, str) or str(uuid.UUID(revision)) != revision):
             raise ValueError("Frozen draft requires its original revision and an empty outbox")
         result.update(draftRevision=revision, pendingCommandCount=0)
+    if state == "CANCELLED_DRAFT":
+        cancelled_id, cancelled_digest = cancelled_identity(value, message)
+        revision = value.get("cancelledDraftRevision")
+        if (not isinstance(revision, str) or str(uuid.UUID(revision)) != revision
+                or type(value.get("pendingCommandCount")) is not int or value["pendingCommandCount"] != 1):
+            raise ValueError("Cancelled draft requires its original revision and one independent pending command")
+        result.update(cancelledMessageId=cancelled_id, cancelledBodySha256=cancelled_digest,
+                      cancelledDraftRevision=revision, pendingCommandCount=1)
+        for flag in ("cancelledArchiveRetained", "cancelledReceiptAbsent", "cancelledReplayDidNotSchedule"):
+            if value.get(flag) is not True:
+                raise ValueError("Missing retained cancellation checkpoint")
+            result[flag] = True
     return result
+
+
+def cancelled_identity(value, primary):
+    cancelled_id, digest = value.get("cancelledMessageId"), value.get("cancelledBodySha256")
+    if (not isinstance(cancelled_id, str) or str(uuid.UUID(cancelled_id)) != cancelled_id or cancelled_id == primary
+            or not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest)):
+        raise ValueError("Invalid distinct cancellation identity")
+    return cancelled_id, digest
 
 
 def evidence(value, queued, restored):
     initial_state = queued.get("state") if isinstance(queued, dict) else None
-    if initial_state not in ("QUEUED", "FROZEN_DRAFT"):
+    if initial_state not in ("QUEUED", "FROZEN_DRAFT", "CANCELLED_DRAFT"):
         raise ValueError("Invalid original worker state")
     queued = checkpoint(queued, initial_state)
     restored = checkpoint(restored, initial_state)
@@ -57,6 +77,17 @@ def evidence(value, queued, restored):
         for flag in ("frozenDraftRecovered", "outboxEmptyBeforeRecovery", "draftConfirmedCleared"):
             if value.get(flag) is not True:
                 raise ValueError("Missing frozen-draft recovery evidence")
+            result[flag] = True
+    if initial_state == "CANCELLED_DRAFT":
+        cancelled_id, digest = cancelled_identity(value, result["messageId"])
+        if (any(queued[key] != restored[key] for key in ("cancelledMessageId", "cancelledBodySha256", "cancelledDraftRevision"))
+                or cancelled_id != queued["cancelledMessageId"] or digest != queued["cancelledBodySha256"]):
+            raise ValueError("Cancelled intent changed across recovery")
+        result.update(cancelledMessageId=cancelled_id, cancelledBodySha256=digest)
+        for flag in ("cancelledArchiveRetained", "cancelledReceiptAbsent", "cancelledReplayDidNotSchedule",
+                     "cancelledDraftConfirmedCleared", "cancelledAbsentFromHistory"):
+            if value.get(flag) is not True:
+                raise ValueError("Missing cancellation recovery evidence")
             result[flag] = True
     if (result["processId"] != restored["processId"] or result["processId"] == queued["processId"]
             or any(result[key] != queued[key] or result[key] != restored[key] for key in ("messageId", "bodySha256"))):
@@ -100,7 +131,7 @@ def run(apk, sdk, directory):
     directory = Path(directory).resolve(strict=True)
     fixture = read_json(directory / "fixture.json")
     initial_state = fixture.get("initialState", "QUEUED")
-    if initial_state not in ("QUEUED", "FROZEN_DRAFT"):
+    if initial_state not in ("QUEUED", "FROZEN_DRAFT", "CANCELLED_DRAFT"):
         raise ValueError("Unsupported worker preparation boundary")
     home = urlparse(fixture["baseUrl"])
     if (home.scheme != "http" or home.hostname != "127.0.0.1" or not 1024 <= (home.port or 0) <= 65535

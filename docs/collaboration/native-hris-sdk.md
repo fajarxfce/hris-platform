@@ -160,3 +160,23 @@ native keys/cursors and the paused sibling room still pass. Strict client proof
 flags and separate server counters make these checks mandatory. This is database
 reopening after the injected fault; actual process death after ACK remains a
 separate history-reconciliation case.
+
+## Original history, provider references and offline resolution
+
+The Android fixture discovers the latest encrypted reply, acquires original text
+through the common admitted history use case, and stages bounded provider metadata
+with its durable continuation. It reopens the encrypted database, checks all
+references, replays the initial position and continues from restored progress.
+Device/conversation/room admission must increase between each provider request.
+
+Offline reference reconciliation then matches the two retained original events,
+removes only their pending indexes and preserves every unresolved metadata entry.
+The fixture checks unchanged provider position/total references, one revision
+increment, persistence across another database reopen and a second reconciliation
+that makes no write. The strict `providerHistoryReferencesReconciled` flag is
+required by Android evidence extraction, the Python driver and server verification;
+numeric truthy substitutes are rejected. Original text bodies are verified afterward.
+
+See the [Mobile history contract](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/collaboration-history.md#offline-reference-reconciliation).
+This is a bounded two-original fixture, not complete decryption, expired-cursor
+recovery, an ACK-before-journal process-death proof or product/capacity acceptance.

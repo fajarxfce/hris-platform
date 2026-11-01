@@ -136,7 +136,8 @@
         "../measurements/collaboration-history-focus-2026-11-01.json",
         "../measurements/collaboration-provider-page-2026-11-01.json",
         "../measurements/collaboration-history-traversal-2026-11-01.json",
-        "../measurements/collaboration-provider-acquisition-2026-11-01.json"
+        "../measurements/collaboration-provider-acquisition-2026-11-01.json",
+        "../measurements/collaboration-history-resolution-2026-11-01.json"
       ]
     },
     {
@@ -235,7 +236,8 @@
         "../measurements/collaboration-history-focus-2026-11-01.json",
         "../measurements/collaboration-provider-page-2026-11-01.json",
         "../measurements/collaboration-history-traversal-2026-11-01.json",
-        "../measurements/collaboration-provider-acquisition-2026-11-01.json"
+        "../measurements/collaboration-provider-acquisition-2026-11-01.json",
+        "../measurements/collaboration-history-resolution-2026-11-01.json"
       ]
     },
     {
@@ -545,10 +547,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Resolve retained provider references into original projections without losing unsupported/unavailable work. Common admitted page acquisition and atomic encrypted progress now pass actual Android/server recovery. Add reference resolution and cursor resets, coordinated SDK reopening with retained keys/cursors/transactions, ACK-before-journal reconciliation, command retirement and Chat UI; continue all P0\u2013P8.",
+    "Offline original-reference reconciliation now passes actual Android/server recovery while retaining unknown work and provider progress. Add explicit provider-cursor recovery, coordinated SDK reopening with retained keys/cursors/transactions, ACK-before-journal reconciliation, command retirement and Chat UI; continue all P0–P8.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",
-    "Continue P1\u2013P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
+    "Continue P1–P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
   ]
 }

@@ -65,8 +65,10 @@ is not room admission and must not substitute for it. Swift exposes related APIs
 but has not executed this scenario.
 
 Owned logical intents, common staging and native restart mapping now exist.
-The admitted product delivery lifetime, recipient coalescing, event aliases and
-history reconciliation remain to implement. Do not add a second send retry owner.
+The native per-room delivery lifetime is now implemented and
+[verified through the product port](../measurements/collaboration-delivery-2026-11-01.json).
+The common live-admitted sender, durable receipt/recipient coalescing, event aliases
+and history reconciliation remain to implement. Do not add a second send retry owner.
 
 Remaining acceptance must cover restart before/after send/response/local ACK,
 long offline reconnect, repeated notification hints, conflicting identity reuse,

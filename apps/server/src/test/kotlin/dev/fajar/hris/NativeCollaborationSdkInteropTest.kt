@@ -249,6 +249,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "queueWriterExclusive",
                     "perRoomDeliveryIsolated",
                     "heldQueueRestored",
+                    "nativeDeliveryOwned",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -294,6 +295,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "queueWriterExclusive" to true,
                     "perRoomDeliveryIsolated" to true,
                     "heldQueueRestored" to true,
+                    "nativeDeliveryOwned" to true,
                     "heldRoomNeverSent" to true,
                     "pausedAcrossRestart" to true,
                     "syncInterruptedAfterRestart" to true,

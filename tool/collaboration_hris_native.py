@@ -41,7 +41,7 @@ def proof_evidence(value):
     for name in ("protectedStoreReopened", "missingRecordPreserved", "wrongPassphrasePreserved", "exclusiveOwner",
                  "queueRestored", "transactionReused", "identityAfterRestart",
                  "messageIntentRestored", "queueMappingRecovered", "queueWriterExclusive",
-                 "perRoomDeliveryIsolated", "heldQueueRestored"):
+                 "perRoomDeliveryIsolated", "heldQueueRestored", "nativeDeliveryOwned"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True

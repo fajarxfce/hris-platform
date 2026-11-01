@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Durable push queue and restore proved — 1 November 2026
+
+[Evidence](measurements/chat-push-queue-2026-11-01.json) / [contract](collaboration/native-push.md):
+schema116 stores one coalesced wake head per immutable device with64 bounded event
+fingerprints, monotonic received/ack revisions and worker-only fenced leases.
+Recent duplicates don't advance; later callbacks remain pending after an old ACK.
+Quiet signals preserve visible identity and can recover after smaller retry budgets.
+Eleven queue cases prove concurrent callbacks/claims, global16/per-call8 caps,
+RLS, real expiry, stale/foreign leases, finite retries, rollback and actual restore.
+Upgrade preserves a pre-existing encrypted binding; dump/restore keeps its key,
+in-flight lease plus newer callback, normal RLS and next-worker continuation.
+Recovery accepts116 with unchanged115 envelope query and rejects117.
+
+Full schema regression passes:30 database +49 domain +137 selected data +38 actual
+API +6 actual worker,24 recovery Python, format/architecture;357s /357.972s wall,
+nine unchanged inputs. First45s run only needed explicit run<Unit> in interrupted
+fixture; subsequent66s focused11-case pass also included the reviewed quiet-retry
+refinement and real restore. Final run adds simultaneous worker claim contenders.
+No DI, admitted callback, dispatch adapter, live migration or app source change.
+
+**Continue immediately:** connect private callback/current-background admission
+and durable queue, then fenced worker FCM delivery and Mobile receive/decrypt/reply.
+Existing pure policy/decoder e5eebcd4, activation24841839 and safe provider logging
+43c09384 are pushed. Queue code is now implemented; do not recreate earlier drafts.
+`.work/push-callback-next.txt` records concrete seams and latest review findings.
+Keep operation deadline (Ready30s) separate from FCM TTL; review explicit dispatch
+deadline and recoverable offline hints before inheriting the current300s transport
+limit. Startup/reconnect/periodic sync still needs explicit ownership. No exactly-
+once FCM or large-company capacity claim; current16 global leases are pilot bounds.
+
+API already has Tomcat5s socket timeout. Preserve attachment upload behavior while
+bounding private callback stream/concurrency and enforcing numeric source allowlist;
+ignore forged forwarded headers and prove stalled-body handling. A private TLS
+proxy listener can provide its own tighter limits without adding another Tomcat
+connector automatically. Reuse the existing owned InboxPushWorker task/timer/
+DeadlineTask pattern with finite chat leases and parallelism. Validate actual API
+and worker contexts for the upcoming DI change. All54 groups remain unaccepted.
+Phone remains verified release10/c037. Next validated Mobile product checkpoint
+uses11+, notify first, explicit10.77.77.3:5555 and install-only; then continue work.
+
 ## Provider push logging proved — 1 November 2026
 
 [Evidence](measurements/chat-push-provider-logging-2026-11-01.json) / [deployable files](../deploy/synapse/README.md):

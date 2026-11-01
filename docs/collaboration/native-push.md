@@ -165,6 +165,49 @@ no raw pusher namespace. Snapshot ownership closes on all exits, with a five-sec
 proof and the compiler fix for the stronger restart-safe snapshot are retained.
 No live provider configuration or callback deployment has occurred.
 
+## Durable coalesced hints implemented — 1 November 2026
+
+Schema 116 adds one wake head per retained immutable device binding, without
+message plaintext or a new secret envelope. Each head stores monotonic received/
+acknowledged revisions, at most 64 SHA-256 event fingerprints, the latest visible
+room/event identity, bounded times and worker lease metadata. Exact recent retries
+do not advance or restart exhausted work. Older-than-window retries can wake again;
+Matrix/client original identity must deduplicate notification display. This is
+at-least-once recovery, not exactly-once FCM delivery.
+
+Callbacks arriving during a lease advance the received revision while preserving
+the lease. Finishing only acknowledges the claimed revision, leaving newer work
+pending. Quiet hints never overwrite visible event identity; a consumer must compare
+`visibleRevision` with `deliveredRevision` and its age before presenting an alert.
+An untouched pending quiet hint coalesces. A new quiet hint after an attempted or
+exhausted revision can recover, including when a worker uses a smaller retry budget.
+
+Ordinary RLS requires the exact company/account. Only workers can claim or finish
+delivery. Claims return at most eight heads with a global maximum of 16 active
+leases; lease duration is 1–60 seconds and attempts are bounded to eight per revision.
+Late/foreign leases cannot acknowledge a replacement claim. New work releases stale
+backoff without losing an active lease. These are bounded pilot settings, not
+5,000-employee throughput acceptance. Lifetime storage allows 1–86,400 seconds;
+the current FCM transport remains at 300 seconds and has no chat producer yet.
+One small head remains per retained device; this is not a historical event feed.
+Startup/full Matrix sync remains necessary after lost/coalesced hints.
+
+[Evidence](../measurements/chat-push-queue-2026-11-01.json): 30 database, 49 domain,
+137 selected data, 38 actual API and six actual worker cases, plus 24 Python
+recovery cases and format/architecture pass (357s Gradle / 357.972s wall, nine
+unchanged inputs). Eleven queue cases cover concurrent callbacks/claims, RLS,
+actual expiry, retry/rollback and restore. A pre-existing encrypted binding survives
+115-to-116 migration; actual dump/restore retains an in-flight lease plus newer
+callback, original key, normal RLS and correct next-worker continuation. Recovery
+now accepts 116 with the same envelope projection as 115, and rejects unreviewed
+117. The earlier compiler fixture issue and focused success are retained.
+
+This increment has no DI/controller/dispatch adapter or live migration. Current
+background admission and room ownership must precede append; queue metadata never
+grants authority. Wire the existing policy/decoder into the private callback and
+worker before enabling delivery. Keep operation deadlines separate from FCM
+store-and-forward lifetime, and implement explicit offline notification recovery.
+
 ## Following implementation boundaries
 
 Use Matrix v1.16 `event_id_only` HTTP pushers. The server fixes app identity and a

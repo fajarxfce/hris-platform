@@ -1,0 +1,473 @@
+{
+  "date": "2026-11-01",
+  "base": "43c09384fda225c09139d56fe3c7e0a1d8307d51",
+  "inputs": {
+    "tool/recovery_set.py": "10a93b8c031d48cf5aad1ec9ece08868d4dd1ac213a562b090c15fc01504f170",
+    "tool/test_recovery_set.py": "a37fb91a4dabc1122119479fdc4a6bc0dc4abe5aa1c0c9069b44a63dc3fb429f",
+    "core/database/src/main/resources/db/migration/V116__collaboration_push_hints.sql": "8711afd73f91511c86571d6690fd139d99f162f5804c76ebc56dd35df470803d",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationPushQueueDataSource.kt": "5af83aeebed16d93d213733f710fd0c9f25fa9e96f1e3c02510ef40a5bf03a62",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationPushQueueDataSource.kt": "8b0a096bd464a8664535dc372c258635d521816d3844fceb7a248021a5b06261",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationPushQueueRepository.kt": "4014d1ad975070e2be608d5576e4fb953617eb4e44aeb812d22eb49e720ae866",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationPushQueueTest.kt": "10b0655e85f598de6be6911653f758fd68760706b2258d178ff245f2279a456d",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationPushHead.kt": "4661698a47f2bafdaaffabe34fc4068ec8b2a795f855168f72ddc6b64d7dfc74",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationPushQueueRepository.kt": "297898f3c3954e9e2e3b38087a9423bbf9997a0b1cfe797af1c6becf63f3449c"
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 357.972,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":core:database:test",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*CollaborationPushQueueTest",
+      "--tests",
+      "*CollaborationPushBindingStorageTest",
+      "--tests",
+      "*NativeCollaborationRegistrationTest",
+      "--tests",
+      "*MatrixPushGatewaySettingsTest",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationMatrixIdentityHttpTest",
+      "--tests",
+      "*NativeCollaborationMatrixConfigurationTest",
+      ":apps:worker:test",
+      "--tests",
+      "*CollaborationProvisioningWorkerTest",
+      "recoverySetCheck",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 357,
+  "reports": {
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": {
+      "sha256": "ca9e3c68ef9e8b154d5b2f4fed1a210c6ec1ebc49d7866fee5b8a47a7ebf6f70",
+      "tests": 1,
+      "seconds": 7.918
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": {
+      "sha256": "3efb6f89637a635b0f19a3b97b4f23f9e34b391776c578800c805af0ee1f7db9",
+      "tests": 1,
+      "seconds": 6.053
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": {
+      "sha256": "6f49b2cf1195263b660252be0fe6048ce8464d78b96e397093863bd6ed68e537",
+      "tests": 1,
+      "seconds": 8.883
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": {
+      "sha256": "bf4653270a27f14a41e3b1f1bbb316409f67d754a8e638eee91d0278045d5a0e",
+      "tests": 1,
+      "seconds": 9.285
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": {
+      "sha256": "a2dee709d7ba0e6c694aadb1b0d6668f2516edee0c13f52bd768c4983420a272",
+      "tests": 1,
+      "seconds": 8.844
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": {
+      "sha256": "381a4bb0bda7873d20587092820ce5d8660ae8fbc6d3981ab4975635e920dbb7",
+      "tests": 2,
+      "seconds": 0.005
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": {
+      "sha256": "24fbbcab3cb9572079895b4c4b3e12f1fa1175750abe51bddc3b957d42714580",
+      "tests": 1,
+      "seconds": 7.308
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": {
+      "sha256": "dbccc9f9f0c9693b791736c0dff5a0e82556ee539593e53acbcfda51d9c32923",
+      "tests": 1,
+      "seconds": 5.275
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": {
+      "sha256": "980244d3d92f28353b9741716e9014bf67f41eea1040c119ff3a57690fe5cc32",
+      "tests": 1,
+      "seconds": 6.475
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": {
+      "sha256": "5bcf0767ae93c61114cca951981e3584fc8f4c3c6b1644f6533ce1aae5a533bf",
+      "tests": 1,
+      "seconds": 5.828
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": {
+      "sha256": "e2c6fda720a8315f8710469adc9525bfef0842abe597a7b81d3c3f9f464a34d2",
+      "tests": 1,
+      "seconds": 5.868
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": {
+      "sha256": "9f5d104869e6a3f19467a5aa4c2fe4651740b95b8559261551e6d98256863341",
+      "tests": 1,
+      "seconds": 6.434
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": {
+      "sha256": "f557bd2e66b890ec6820d1dc9f8792b09c306a2260e65b2c295759699434280f",
+      "tests": 1,
+      "seconds": 6.302
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+      "sha256": "5e1dd2a45cb7d9facff613158a271c5bd12c912bbde0f17154d951e002469009",
+      "tests": 15,
+      "seconds": 7.205
+    },
+    "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": {
+      "sha256": "5270f52182e0ebbd9ad89b9414416e5777eb8e1bfd21ebd31d1cdd05621424fe",
+      "tests": 1,
+      "seconds": 6.397
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": {
+      "sha256": "2c46b91d2996cab61eb225394582f212895f3e1312dfa75593350fb81c85552d",
+      "tests": 11,
+      "seconds": 0.054
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": {
+      "sha256": "484b698306f823786ea2807c9fc2083f079dae5fe145b1c1a62e5ac94c3fe4d8",
+      "tests": 3,
+      "seconds": 0.016
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": {
+      "sha256": "7c010f79ae208ecabf4790cbc0bf41f75308ff8b87bbaf2030d677c884991606",
+      "tests": 1,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": {
+      "sha256": "e2df09f43f03fcb60e79bec95a33af287497139fdd2ab962624134716da7142b",
+      "tests": 3,
+      "seconds": 0.003
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": {
+      "sha256": "bd69dc6247635ddc338c1d266c7f68dd3d8ae1d11376ef1a82453de2a17b1a05",
+      "tests": 2,
+      "seconds": 0.004
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": {
+      "sha256": "5d173b6d58edb073516669cb949b860f20a159180ef01ddb6aa01b154006617a",
+      "tests": 6,
+      "seconds": 0.095
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": {
+      "sha256": "5c23a069ebbadc6c7baef09ea39c932535389e0d0a294845de1d3b3d7205347a",
+      "tests": 3,
+      "seconds": 0.006
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": {
+      "sha256": "177cdd86e16190a26f8af0907819ed0ec606cb1a0749e8f7076e6b1100f3e6e0",
+      "tests": 3,
+      "seconds": 0.005
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest.xml": {
+      "sha256": "6476764ed2f7df327bd11d4aceeeab815b14a162c25332075f0bf093325e1582",
+      "tests": 9,
+      "seconds": 0.011
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+      "sha256": "6b2b52a22e3f5548496cd77dd71c9b75a03bc0facd36dbec701c4c187806a2ba",
+      "tests": 2,
+      "seconds": 0.005
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": {
+      "sha256": "e97fff758dc05bdfd948eb9ab36d76935c31256ab1a9fb54535d2f623f850c0b",
+      "tests": 3,
+      "seconds": 0.046
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": {
+      "sha256": "19ad855242dd13881da0cfd1770eaeae5c7475c929ed49690da8a9bee81c39b1",
+      "tests": 3,
+      "seconds": 0.006
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.CollaborationPushBindingStorageTest.xml": {
+      "sha256": "78bfa62a9ebfde7eee5c695da843a303e630e9ae854a4e13ce1977aef0cf9aaf",
+      "tests": 5,
+      "seconds": 11.521
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.CollaborationPushQueueTest.xml": {
+      "sha256": "6c067aa27c4d0241ef6192b392fe25a7a8f2c2ad5d88d8e13083a39bcf01b9b8",
+      "tests": 11,
+      "seconds": 17.046
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.MatrixPushGatewaySettingsTest.xml": {
+      "sha256": "58747ddfc1d2977d9ec07a22f504b5b10434378cd56eb79a392963553a45360c",
+      "tests": 1,
+      "seconds": 0.005
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": {
+      "sha256": "d78e79b3e121ed36265fd99442f34052ce7bd1e1a1ceb34417f78331a2db5df2",
+      "tests": 120,
+      "seconds": 97.819
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixConfigurationTest.xml": {
+      "sha256": "783c88e478570bf3bfad94875a75f25dbc7d3b707df86770922a9bef68026557",
+      "tests": 9,
+      "seconds": 19.971
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+      "sha256": "0736fabe833818ef2aeb5ec9976752474c5b61092e0a487a75f0397be82bdea5",
+      "tests": 29,
+      "seconds": 23.811
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": {
+      "sha256": "b8a4b51132bd8cc4ab8bb5de15a571fe3058e63affd08bebf9cddf37abbea82b",
+      "tests": 6,
+      "seconds": 29.982
+    }
+  },
+  "totals": {
+    "core/database": {
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 15
+    },
+    "modules/collaboration/domain": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 12
+    },
+    "modules/collaboration/data": {
+      "tests": 137,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 4
+    },
+    "apps/server": {
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 2
+    },
+    "apps/worker": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    }
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "exitCode": 1,
+        "wallSeconds": 45.663,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*CollaborationPushQueueTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Schema generation and product compiled; test compilation needed an explicit run<Unit> type for the deliberate interrupted transaction. No tests ran.",
+      "hashes": {
+        ".work/push-queue-check-1.json": "19ec523df9a7e37ad304f2ff5ddab335d0dc5ac258b58f2f1346ce993c588bcf",
+        ".work/push-queue-check-1.log": "534a756612fd918b6f144153d22c26f79f25796557281513856119dd8dd9820f",
+        ".work/push-queue-inputs-1.json": "1a39f74b202db3ad4aea5cf0f30ca1948f7d1de0206d1a5db96d5c39d9206dda"
+      }
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 67.274,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*CollaborationPushQueueTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Added explicit test type, pre-existing-binding upgrade and actual dump/restore evidence. Refined quiet coalescing to untouched pending revisions so a new quiet hint can recover after a smaller worker retry budget. All11 focused queue cases pass, plus format/architecture.",
+      "hashes": {
+        ".work/push-queue-check-2.json": "e21b42680821de5606370feaf0615c63cbd39f4ae200dab722a5dc86af573faa",
+        ".work/push-queue-check-2.log": "683dcb7442a223f2a31fd9f0ae6ea876ac38914ffff200572e23e1931076f2e9",
+        ".work/push-queue-check-2.xml": "fb8504a511fa7f3a2a0fdf76d9140a801038ff66e5236329f148cab98e537d45",
+        ".work/push-queue-inputs-2.json": "6450c2047486daad7c8554c41258b96cf16d1d67c1533467ead3651a7c940a1b"
+      }
+    },
+    {
+      "attempt": 3,
+      "result": {
+        "exitCode": 0,
+        "wallSeconds": 357.972,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":core:database:test",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*CollaborationPushQueueTest",
+          "--tests",
+          "*CollaborationPushBindingStorageTest",
+          "--tests",
+          "*NativeCollaborationRegistrationTest",
+          "--tests",
+          "*MatrixPushGatewaySettingsTest",
+          ":apps:server:test",
+          "--tests",
+          "*NativeCollaborationMatrixIdentityHttpTest",
+          "--tests",
+          "*NativeCollaborationMatrixConfigurationTest",
+          ":apps:worker:test",
+          "--tests",
+          "*CollaborationProvisioningWorkerTest",
+          "recoverySetCheck",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Strengthened global-capacity case with three actual concurrent claimants, then ran schema regression through core database/domain/data and actual API/worker contexts. All260 JVM and24 recovery-tool cases pass, plus format/architecture.",
+      "hashes": {
+        ".work/push-queue-check-3.json": "6fa3bcdefce1a7eac40f1c76b226d2690a86a38e0da59380837c7d5196ab2d47",
+        ".work/push-queue-check-3.log": "85ee8a4204d55056c3f9cf5859e138acd74b00564c8e81feadadf8daa30a610b",
+        ".work/push-queue-inputs-3.json": "46c176436259933c1a431ae8e6778c51091576fd9861b29697e7f3e3b31b9537"
+      }
+    }
+  ],
+  "queueCases": [
+    {
+      "name": "expiredAndForeignLeasesCannotCompleteAReplacementWorkersClaim()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "1.279"
+    },
+    {
+      "name": "callbacksDuringDeliverySurviveOldAcknowledgementsAndQuietHintsStayQuiet()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "0.302"
+    },
+    {
+      "name": "requestFailureAndInterruptionRollBackHintsAndAcknowledgements()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "0.187"
+    },
+    {
+      "name": "restoredQueueKeepsInFlightIdentityAndNewerCallbacksBesideEncryptedBindings()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "2.844"
+    },
+    {
+      "name": "parallelDuplicateCallbacksAdvanceOnceAndDistinctCallbacksDoNotLoseUpdates()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "0.22"
+    },
+    {
+      "name": "ownerScopeCannotBorrowAnotherQueueOrClaimWorkerAuthority()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "0.196"
+    },
+    {
+      "name": "retryBudgetsAreFinitePerRevisionAndNewEventsReleaseStaleBackoff()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "0.446"
+    },
+    {
+      "name": "newQuietHintCanRecoverAfterASmallerWorkersRetryBudget()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "0.218"
+    },
+    {
+      "name": "claimFanoutAndGlobalCapacityStayBoundedAcrossWorkers()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "2.095"
+    },
+    {
+      "name": "receiptReplayAndQuietCoalescingPreserveOneBoundedHead()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "1.252"
+    },
+    {
+      "name": "shortHintExpiryIsRealAndStructuralMutationsCannotRewriteProgress()",
+      "classname": "dev.fajar.hris.collaboration.data.CollaborationPushQueueTest",
+      "time": "1.294"
+    }
+  ],
+  "recoveryPython": {
+    "tests": 24,
+    "seconds": 0.091,
+    "task": "recoverySetCheck"
+  },
+  "boundaries": [
+    "Schema116 adds one coalesced wake head per retained immutable push binding, with at most64 event fingerprints; no message plaintext or new encryption format.",
+    "Exact duplicates within the bounded receipt window do not advance the head. Older retries can wake again; Matrix and client original identity remain authoritative. No exactly-once FCM claim.",
+    "New callbacks preserve the active lease and advance revision. Acknowledgement completes only the captured revision, preserving newer work. Count-only hints never replace visible event identity; consumers must compare visibleRevision against deliveredRevision and age before displaying.",
+    "Worker-only claims are bounded to8 per call/16 global active leases,1..60-second leases and1..8 attempts per revision. These are pilot bounds, not capacity acceptance. Queue lifetime accepts1..86400 seconds; no producer or FCM TTL behavior has changed.",
+    "Actual concurrent duplicate/distinct callbacks and competing workers, RLS, missing parent identity, stale/foreign/expired leases, lost completion/retry, cancellation/denial rollback, real expiry, malformed mutation and restored continuation pass.",
+    "V115-to116 migration preserves a pre-existing encrypted binding. Actual pg_dump/restore keeps active lease plus newer callback, decryptable stable binding, normal RLS and next-worker progress; original DB remains unchanged by restored operations.",
+    "Recovery accepts116, uses unchanged115 envelope projection and rejects117. No live migration, admitted callback endpoint, worker dispatch adapter or Mobile receive/reply exists yet.",
+    "Phone remains release10/c037; no new app product code in this increment. All54 full PRD groups remain unaccepted."
+  ]
+}

@@ -40,7 +40,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V109 retains one authenticated gateway token replay per native device.
 # V113 adds a public recipient projection; no new secret envelope format.
 # V115 retains encrypted opaque Matrix push keys bound to immutable native devices.
-MAX_SCHEMA = 115
+# V116 retains bounded wake/lease metadata; no new encrypted envelope format.
+MAX_SCHEMA = 116
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

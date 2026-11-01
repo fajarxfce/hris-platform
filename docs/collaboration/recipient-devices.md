@@ -52,7 +52,7 @@ checks. The view by itself grants no provider operation. Group/resource-context
 membership and browser-parent enrollment will extend their own eligibility
 contracts; this initial view authorizes only existing direct pairs and self.
 These recipient schemas add no secret envelope. Recovery now also supports schema
-115's separate [encrypted push binding](native-push.md); unreviewed schema 116 remains
+116's [encrypted push binding and bounded wake recovery](native-push.md); unreviewed schema 117 remains
 rejected. Preserve the view's restricted owner and role grants when restoring a backup.
 
 [Evidence](../measurements/collaboration-recipient-devices-2026-10-31.json)

@@ -1,5 +1,25 @@
 # Agent continuation — HRIS workspace
 
+## Recovery-era hosted run audited; Mobile release 9 installed — 1 November 2026
+
+[Hosted audit](measurements/chat-draft-recovery-native-ci-2026-11-01.json) verifies Mobile
+41340935053 at 1ddfba6e / Platform 79326538: SDK 54.085s, direct worker 63.689s and
+scheduled worker 62.336s, six cleanup cases, twenty evidence hashes. APK SHA-256
+`cd32c3984577324f919dee9eaa14e0e65bcb881f47fd2544aefc150ad24263c7`. Ordinary queued recovery
+retains 33 encrypted originals, four history actions, 43 references/10 state-only and zero
+admission failures. WorkManager automatically recovers ordinary death (SUCCEEDED/attempt 1).
+This source contains app draft recovery but the fixture starts with a queued command;
+explicit frozen-only proof belongs to the later four-case fixture and its separate evidence.
+Run 41344248284 at Mobile 448ab3ad / Platform bad75bd0 is now running that newer fixture.
+
+Mobile release 9 from 448ab3ad is installed and verified in place on the authorized phone at
+20:01 UTC, with existing signer/data and no UI launch. Technical draft contention feedback
+is fixed and its complete checks are committed. Mobile is now implementing queued-only
+cancellation with authenticated immutable archives and full-record arbitration against
+staging; storage/domain/application tests are in progress. Continue confirmation UI, incoming
+push/replies and all remaining P0–P8. Live backend/provider deployment is unchanged; no full
+PRD group is accepted. Keep latest detailed product/build evidence in Mobile's handoff.
+
 ## Native frozen-draft recovery proved; continue — 1 November 2026
 
 [Source and artifact evidence](measurements/chat-frozen-native-2026-11-01.json) records actual

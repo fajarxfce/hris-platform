@@ -1,5 +1,43 @@
 # Collaboration checkpoint history — 1 November 2026
 
+## Validated command archive foundation — 1 November 2026
+
+Mobile [`0a78e8ed`](https://github.com/fajarxfce/hris-mobile/commit/0a78e8edb8d604da6d411a441d3fcdc34511ff65)
+and Starter [`8afab2a`](https://github.com/fajarxfce/compose-fluent-starter/commit/8afab2a30c7313ecaa1d4b2c88359f45d942aa18)
+are pushed; their 15 source/test/schema hashes match exactly.
+[Evidence](../measurements/command-archive-2026-11-01.json) records atomic retention
+of the entire encrypted command plus bounded proof while removing pending work.
+The raw store compares the complete observed record and current account/session;
+equal-revision replacement cannot inherit another completion. Immutable archives
+fence future same-ID insertion and retain key-loss protection after pending capacity
+is released. SQLite schema 11 / IndexedDB version 10 preserve existing commands.
+No feature infers completion or starts transport from this storage operation.
+
+Ten new scenarios pass on actual SQLite and IndexedDB. Review strengthened the
+initial revision-only version after its passing checks; both versions' sources,
+results and artifacts remain distinct in the measurement. Corrected focused checks
+pass in 118s (37 SQLite / 35 browser). Final Mobile full checks pass in 326s,
+2,496 desktop / 165 Android host / 262 domain browser / 198 data browser / 35 database
+browser; Starter full checks pass in 152s, 341 desktop / 35 database browser. All
+have zero failures/errors/skips and zero lint errors. No phone or live change.
+
+**Next: HRIS encrypted completion proof, archived read/replay, admitted local
+retirement and restartable journal cleanup, then Chat UI and all P0–P8.**
+See [continuation contract](https://github.com/fajarxfce/hris-mobile/blob/0a78e8edb8d604da6d411a441d3fcdc34511ff65/docs/collaboration-retirement.md).
+Keep uncertain legacy work and validate original-history sender/content and aliases.
+The completion and receipt stores have separate transactions; interrupted cleanup
+must recognize immutable archives without recreating pending messages. All 54
+product feature groups remain unaccepted. Current backend/live services are unchanged.
+
+Additional hosted audits are now recorded. ACK recovery HRIS `41295813903` at
+`9da09b6b` passes all 17 steps, 165 Android host cases and native run `c1aa858e`
+(45.883s case / 95.540s suite), cleanup true, exactly three encrypted sends and
+22/22/22 admissions. All 279 Mobile / 33 Platform hashes match its pinned fixture.
+SDK reopening control `41293329837` at `69ba59de` passes all 28 steps, 464 desktop /
+440 browser / 371 iOS simulator cases and Xcode host build, with 272 hashes matched.
+These are predecessor-specific results, not evidence for the new archive policy.
+
+
 ## ACK-before-journal recovery
 
 **ACK-before-journal recovery now passes actual Android/HRIS process death.**

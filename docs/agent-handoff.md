@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Application-owned background chat delivery — 1 November 2026
+
+Mobile `9bf2c5324fa6801dcdb1020f4058dd8164be038c` is pushed. Exact encrypted intent now wakes a singleton
+application SyncTask; startup and ownership renewal also request its key. The worker
+scans selected-company commands, uses an encrypted generation/CAS cursor for restart-safe
+room fairness, and bounds each pass/room/staging batch. It replays exact room operations,
+requires explicit failed-room retry, recovers original evidence before uncertain native
+resume, and retires only proven completion. A blocked room cannot stop healthy batches.
+The thread now queues/observes and wakes the worker; native sending no longer belongs
+to a destination. Scope loss/cancellation release late native children.
+
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/collaboration-background-delivery.md) and [measurement](https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/measurements/chat-background-delivery-2026-11-01.json)
+bind 32 matching source inputs and eight attempts. Full checks passed in 320s: 2,700
+desktop / 426 suites, 352 domain / 233 data / 56 presentation browser, 170 Android host,
+12 worker integration and two binding cases, with no failures/errors/skips. Android lint
+has zero errors and one existing warning. APK `4e47ea8c`, AAR `97a1280f`, proof APK
+`17ad74cc` are built, not installed. Worker integration uses real encrypted storage and
+simulated HTTP/native fixtures; container restart is not Android process-death evidence.
+No new server/emulator/Apple runtime, phone/live deployment or Starter change.
+
+**Continue latest-head capacity recovery and actual Android worker interoperability now,
+then all P0–P8.** [Next work](https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/collaboration-delivery-next.md) identifies the unknown-anchor
+recovery gap, repeated incoming-history capacity, and reuse of the actual worker in a
+separately identified native proof. Remote paging, durable drafts/cancel, incoming push
+and inline replies, groups/rich content/actions, cross-family keys, Apple/web adapters,
+calls and meetings remain. No complete PRD group is accepted. Continue long run and push
+each validated atomic commit; do not stop at this checkpoint.
+
+
 ## Owned text thread and app navigation — 1 November 2026
 
 Mobile `b78553c3b7b093e6a106e279ca432a3c02dc8453` is pushed with the company-gated Chat service,

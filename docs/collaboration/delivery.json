@@ -149,7 +149,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/5f03349facc328e1ef1d3071418f472909ad1d20/docs/measurements/chat-participants-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/980c7d76ba3d7555d9d584bee47951629ad1eeab/docs/measurements/chat-setup-2026-11-01.json",
         "https://github.com/fajarxfce/hris-mobile/blob/5c5b2a81395d2b629e62cacfadbb05ef6cafe031/docs/measurements/collaboration-sender-identity-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/measurements/chat-thread-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/b78553c3b7b093e6a106e279ca432a3c02dc8453/docs/measurements/chat-thread-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/9bf2c5324fa6801dcdb1020f4058dd8164be038c/docs/measurements/chat-background-delivery-2026-11-01.json"
       ]
     },
     {
@@ -561,10 +562,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Owned text thread and app routes are validated in Mobile b78553c3. Implement platform-scheduled delivery with existing SyncTask/WorkManager and durable command recovery; route-owned foreground sending does not complete offline acceptance.",
+    "Application-owned scheduled delivery is validated in Mobile 9bf2c532. Finish latest-head capacity recovery and actual Android worker/WorkManager interoperability; encrypted-store fixture restart does not complete background acceptance.",
     "Complete provider history paging, durable drafts and pending cancellation, groups, rich messages/actions, verification, search and notifications/inline reply; preserve exact sender/content and native transaction evidence.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
-    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2–P8.",
-    "Continue all 54 feature groups. Current component and foreground UI checks do not accept full product features, background operation or capacity."
+    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
+    "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."
   ]
 }

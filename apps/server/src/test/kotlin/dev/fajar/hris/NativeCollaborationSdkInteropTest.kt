@@ -150,6 +150,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "reply" to "fictional-hris-${UUID.randomUUID()}",
                 "logicalId" to UUID.randomUUID().toString(),
                 "replyId" to UUID.randomUUID().toString(),
+                "ackLogicalId" to UUID.randomUUID().toString(),
+                "ackBody" to "fictional-hris-ack **literal** <tag> 😀\n${UUID.randomUUID()}",
             ),
         )
         var process: Process? = null
@@ -224,7 +226,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             trace.allowEncryptedSends()
             writePrivate(directory.resolve("resume.json"), mapOf("ready" to true))
             assertTrue(
-                process.waitFor(120, TimeUnit.SECONDS),
+                process.waitFor(180, TimeUnit.SECONDS),
                 "Owned native driver exceeded its deadline",
             )
             assertEquals(0, process.exitValue(), diagnostic(directory))
@@ -265,6 +267,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "providerHistoryReferencesReconciled",
                     "providerHistoryRestartPreserved",
                     "historyRuntimeReopened",
+                    "ackBeforeJournalRecovered",
+                    "processRestartedAfterAck",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -290,6 +294,21 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 proof.path("recipientEventId").asString(),
                 recipient.session.getValue("userId"),
             )
+            verifyCiphertext(
+                sender,
+                room,
+                proof.path("ackSenderEventId").asString(),
+                sender.session.getValue("userId"),
+            )
+            assertEquals(
+                3,
+                trace.snapshot().count {
+                    it["method"] == "PUT" &&
+                        it["route"] == "/_matrix/client/v3/rooms/_/send/m.room.encrypted/_" &&
+                        it["status"] == 200
+                },
+                "Original, reply and acknowledged message must each send once",
+            )
             val applicationReads = trace.applicationAdmissions()
             assertTrue(
                 listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 10 }
@@ -297,7 +316,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             assertEquals(0, applicationReads.getValue("failures"))
             assertTrue(trace.applicationAdmittedBeforeSend())
             assertTrue(trace.applicationAdmittedAroundHistory())
-            assertTrue(trace.admittedSingleHeadRead())
+            assertTrue(trace.admittedHistoryHeads())
             assertTrue(trace.admittedProviderPages())
             val history = proof.path("historyWindow")
             for ((name, bounds) in
@@ -341,13 +360,16 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "historyBodiesRestored" to true,
                     "commonHistoryAcquisitionOwned" to true,
                     "latestHistoryHeadOwned" to true,
-                    "admittedSingleHeadRead" to true,
+                    "admittedHistoryHeads" to true,
                     "providerHistoryPageOwned" to true,
                     "commonProviderHistoryAcquisitionOwned" to true,
                     "providerHistoryReferencesRestored" to true,
                     "providerHistoryReferencesReconciled" to true,
                     "providerHistoryRestartPreserved" to true,
                     "historyRuntimeReopened" to true,
+                    "ackBeforeJournalRecovered" to true,
+                    "processRestartedAfterAck" to true,
+                    "encryptedSendCount" to 3,
                     "admittedProviderPages" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,

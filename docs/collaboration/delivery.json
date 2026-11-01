@@ -46,7 +46,8 @@
         "../measurements/collaboration-history-acquisition-2026-11-01.json",
         "../measurements/collaboration-history-head-2026-11-01.json",
         "../measurements/collaboration-history-focus-2026-11-01.json",
-        "../measurements/collaboration-provider-page-2026-11-01.json"
+        "../measurements/collaboration-provider-page-2026-11-01.json",
+        "../measurements/collaboration-original-receipts-2026-11-01.json"
       ]
     },
     {
@@ -139,7 +140,8 @@
         "../measurements/collaboration-provider-acquisition-2026-11-01.json",
         "../measurements/collaboration-history-resolution-2026-11-01.json",
         "../measurements/collaboration-history-restart-2026-11-01.json",
-        "../measurements/collaboration-history-reopening-2026-11-01.json"
+        "../measurements/collaboration-history-reopening-2026-11-01.json",
+        "../measurements/collaboration-original-receipts-2026-11-01.json"
       ]
     },
     {
@@ -551,7 +553,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Coordinated SDK reopening now passes actual Android/HRIS proof with retained identity, history references and paused transactions under active-writer protection. Implement ACK-before-journal reconciliation using trusted sender and exact original-content identity, command retirement and Chat UI; continue all P0\u2013P8.",
+    "ACK-before-journal recovery now passes actual Android/HRIS proof using trusted sender and exact original-content identity, two real process deaths and exactly three encrypted sends. Implement safe command/journal retirement preserving durable identity and retry deduplication, then Chat UI; continue all P0\u2013P8.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

@@ -214,3 +214,33 @@ runs even if an assertion fails. `gateway-result` is published only after this
 scenario completes; `historyRuntimeReopened` is a required Boolean across Android,
 Python and the server verifier. This does not assert a newly synchronized SDK cursor,
 large-room capacity, or product UI acceptance.
+
+## ACK before journal across a second process death
+
+The fixture now appends a separate message after the existing staging, encryption,
+receipt-projection, provider-traversal and SDK-reopening scenarios. It stages the
+actual plain-text payload through the common use case, retaining protected sender
+and full original-content hash before enqueue. A fixture receipt adapter suspends
+only after the native ACK has arrived and the absent journal row is verified. The
+checkpoint contains PID, transaction and interruption flags, never the ACK event
+ID or body. The driver force-stops that exact process, confirms its exit and starts
+a third process with the same protected store. A restore barrier verifies its new
+PID and retained transaction before recovery can proceed.
+
+Latest admitted original history supplies the receipt evidence. Common local
+recovery appends it once, leaves the original command Staged, and the separate
+journal reconciliation projects Sent after reopening the database. Empty native
+queue state is checked but never used as acknowledgement evidence. The original
+intent, transaction and full-content identity survive. Literal Markdown/HTML,
+emoji and newline characters exercise the explicit plain-text payload identity.
+
+[ACK recovery evidence](../measurements/collaboration-original-receipts-2026-11-01.json)
+records run `39775a6b851040e19d1f4c97059025c8`, **41.453s case / 62.142s suite /
+91s Gradle**, cleanup true, 22/22/22 device/conversation/room admissions and zero
+failures. The gateway independently verifies all three ciphertext events and
+exactly three successful encrypted sends; the held room never sends. Both latest
+history reads require distinct live admission boundaries. Mandatory evidence adds
+`ackBeforeJournalRecovered`, driver-owned `processRestartedAfterAck`, and
+`encryptedSendCount: 3`. All 40 Python driver cases pass, including mismatched PIDs,
+transactions, ACK/journal flags and terminal evidence. This extends Android fixture
+evidence; it does not accept Chat UI, native background delivery or other platforms.

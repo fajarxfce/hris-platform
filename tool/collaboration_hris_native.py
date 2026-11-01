@@ -57,18 +57,20 @@ def proof_evidence(value):
                  "commonSenderOwned", "receiptJournalRecovered", "projectionInterrupted",
                  "originalHistoryWindowOwned", "historyBodiesRestored", "commonHistoryAcquisitionOwned", "latestHistoryHeadOwned", "providerHistoryPageOwned",
                  "commonProviderHistoryAcquisitionOwned", "providerHistoryReferencesRestored",
-                 "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened"):
+                 "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True
-    for name in ("senderEventId", "recipientEventId", "senderTransaction", "recipientTransaction"):
+    for name in ("senderEventId", "recipientEventId", "ackSenderEventId", "senderTransaction", "recipientTransaction", "ackTransaction"):
         field = value.get(name)
         pattern = r"\$[!-~]{1,254}" if name.endswith("EventId") else r"[A-Za-z0-9._~-]{1,128}"
         if not isinstance(field, str) or not re.fullmatch(pattern, field):
             raise ValueError("Invalid owned receipt")
         output[name] = field
-    if output["senderEventId"] == output["recipientEventId"]:
+    if len({output[name] for name in ("senderEventId", "recipientEventId", "ackSenderEventId")}) != 3:
         raise ValueError("Owned receipts must be distinct")
+    if output["ackTransaction"] == output["senderTransaction"]:
+        raise ValueError("Owned crash transactions must be distinct")
     output["historyWindow"] = history_evidence(value.get("historyWindow"))
     return output
 
@@ -88,7 +90,7 @@ def history_evidence(value):
     return output
 
 
-def checkpoint_evidence(value, staged=False):
+def checkpoint_evidence(value, staged=False, acknowledged=False):
     if not isinstance(value, dict):
         raise ValueError("Invalid owned queue checkpoint")
     pid = value.get("processId")
@@ -97,6 +99,9 @@ def checkpoint_evidence(value, staged=False):
         raise ValueError("Invalid owned process identifier")
     if not isinstance(transaction, str) or not re.fullmatch(r"[A-Za-z0-9._~-]{1,128}", transaction):
         raise ValueError("Invalid owned pending transaction")
+    if acknowledged:
+        if value.get("ackObserved") is not True or value.get("receiptAbsent") is not True:
+            raise ValueError("Invalid owned acknowledgement checkpoint")
     if staged:
         for name in ("protectedStoreReopened", "missingRecordPreserved", "wrongPassphrasePreserved", "exclusiveOwner"):
             if value.get(name) is not True:
@@ -162,12 +167,15 @@ def run(apk, sdk, directory):
         result["artifact"] = native.bind({"matrix": {"baseUrl": fixture["baseUrl"]}})
         write_app("gateway-fixture", fixture)
         process = start("hris-stage")
-        until = time.monotonic() + 230
+        until = time.monotonic() + 300
         ready = False
         released = False
         staged = None
         restored = None
         resumed = False
+        acknowledged = None
+        ack_restored = None
+        ack_resumed = False
         while time.monotonic() < until:
             completion = app_json("instrumentation")
             if completion is not None:
@@ -176,14 +184,16 @@ def run(apk, sdk, directory):
                 result["diagnostic"].pop("resultComplete")
                 if completion.get("complete") is not True:
                     raise RuntimeError("Owned native instrumentation failed")
-                if staged is None or restored is None or not resumed:
+                if staged is None or restored is None or not resumed or acknowledged is None or ack_restored is None or not ack_resumed:
                     raise RuntimeError("Owned process restart was not completed")
                 proof = app_json("gateway-result")
                 result["proof"] = proof_evidence(proof)
-                if (type(proof.get("processId")) is not int or proof["processId"] != restored["processId"]
-                        or result["proof"]["senderTransaction"] != staged["transactionId"]):
+                if (type(proof.get("processId")) is not int or proof["processId"] != ack_restored["processId"]
+                        or result["proof"]["senderTransaction"] != staged["transactionId"]
+                        or result["proof"]["ackTransaction"] != acknowledged["transactionId"]):
                     raise RuntimeError("Owned pending receipt did not survive restart")
                 result["proof"]["processRestarted"] = True
+                result["proof"]["processRestartedAfterAck"] = True
                 result["passed"] = True
                 break
             if not ready and app_json("gateway-ready") == {"ready": True}:
@@ -215,6 +225,30 @@ def run(apk, sdk, directory):
             if restored is not None and not resumed and read_json(directory / "resume.json") == {"ready": True}:
                 write_app("gateway-resume", {"ready": True})
                 resumed = True
+            if resumed and acknowledged is None:
+                checkpoint = app_json("gateway-acknowledged")
+                if checkpoint is not None:
+                    acknowledged = checkpoint_evidence(checkpoint, acknowledged=True)
+                    if (acknowledged["processId"] != restored["processId"]
+                            or acknowledged["transactionId"] == staged["transactionId"]
+                            or native.process_id() != acknowledged["processId"]):
+                        raise RuntimeError("Owned acknowledgement process was not confirmed")
+                    native.command("shell", "am", "force-stop", PACKAGE)
+                    if not stop_process(process) or native.process_id() is not None:
+                        raise RuntimeError("Owned acknowledgement process did not stop")
+                    private_json(directory / "native-acknowledged.json", acknowledged)
+                    process = start("hris-ack-recover")
+            if acknowledged is not None and ack_restored is None:
+                checkpoint = app_json("gateway-ack-restored")
+                if checkpoint is not None:
+                    ack_restored = checkpoint_evidence(checkpoint)
+                    if (ack_restored["processId"] in (staged["processId"], restored["processId"])
+                            or ack_restored["transactionId"] != acknowledged["transactionId"]
+                            or native.process_id() != ack_restored["processId"]):
+                        raise RuntimeError("Owned acknowledgement restoration was not confirmed")
+                    private_json(directory / "native-ack-restored.json", ack_restored)
+                    write_app("gateway-ack-resume", {"ready": True})
+                    ack_resumed = True
             if process.poll() is not None:
                 raise RuntimeError("Owned native instrumentation exited without a result")
             time.sleep(0.15)

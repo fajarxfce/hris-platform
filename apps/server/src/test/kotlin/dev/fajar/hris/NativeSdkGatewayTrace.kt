@@ -30,7 +30,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val applicationAdmissionFailures = AtomicInteger()
     private val applicationBeforeSend = AtomicInteger(-1)
     private val headReads = AtomicInteger()
-    private val applicationAtHead = AtomicReference<Map<String, Int>?>(null)
+    private val headAdmissions = mutableListOf<Map<String, Int>>()
     private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
     private val providerPages = AtomicInteger()
     private val providerAdmissions = mutableListOf<Map<String, Int>>()
@@ -67,14 +67,18 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             "failures" to applicationAdmissionFailures.get(),
         )
 
-    fun admittedSingleHeadRead(): Boolean {
-        val before = applicationAtHead.get() ?: return false
+    fun admittedHistoryHeads(): Boolean {
+        val heads = synchronized(headAdmissions) { headAdmissions.toList() }
+        val before = heads.firstOrNull() ?: return false
         val after = applicationAdmissions()
-        return headReads.get() == 1 &&
-            before.getValue("failures") == 0 &&
+        return headReads.get() == 2 &&
+            heads.size == 2 &&
+            heads.all { it.getValue("failures") == 0 } &&
             after.getValue("failures") == 0 &&
             listOf("device", "conversation", "room").all {
-                before.getValue(it) >= 4 && after.getValue(it) > before.getValue(it)
+                before.getValue(it) >= 4 &&
+                    heads.last().getValue(it) > before.getValue(it) &&
+                    after.getValue(it) > heads.last().getValue(it)
             }
     }
 
@@ -169,7 +173,9 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 request.getParameter("limit") == "1"
         ) {
             headReads.updateAndGet { minOf(it + 1, 64) }
-            applicationAtHead.compareAndSet(null, applicationAdmissions())
+            synchronized(headAdmissions) {
+                if (headAdmissions.size < 4) headAdmissions.add(applicationAdmissions())
+            }
         }
         if (
             request.method == "GET" &&

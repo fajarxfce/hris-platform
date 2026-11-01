@@ -1,5 +1,25 @@
 # Agent continuation — HRIS workspace
 
+## Participant discovery and durable direct opening — 1 November 2026
+
+Mobile `5f03349facc328e1ef1d3071418f472909ad1d20` is pushed with company-admitted participant search,
+explicit paging and retained Open preparation/replay. Point summary acquisition
+shares the local list publication mutex; exact peer/version reconciliation precedes
+navigation. Lost responses reuse the same command, and a confirmed operation is not
+resent after a failed summary read. App DI resolves both Chat ViewModels without
+network work. [Contract and screenshots](https://github.com/fajarxfce/hris-mobile/blob/5f03349facc328e1ef1d3071418f472909ad1d20/docs/collaboration-discovery.md) and
+[measurement](https://github.com/fajarxfce/hris-mobile/blob/5f03349facc328e1ef1d3071418f472909ad1d20/docs/measurements/chat-participants-2026-11-01.json) retain 21 source
+hashes and all attempts. Full validation takes 401s: 2,577 desktop, 295 domain browser,
+21 presentation browser, zero failures/errors/skips and zero Android lint errors.
+APK `3a093eba` is built, not installed. No phone/live/Starter change.
+
+Continue setup recovery, message thread, app navigation and owned scheduling, then
+all remaining P0–P8. These pages are DI-registered but not yet exposed as a Home
+service. No complete PRD feature group is accepted. Preserve encrypted SDK identity
+across explicit recovery and never replace an uncertain bootstrap operation silently.
+Keep the authorized long run going and push each validated atomic commit.
+
+
 ## Hosted retirement control and Apple build — 1 November 2026
 
 [Control run 41301133469](https://github.com/fajarxfce/hris-mobile/actions/runs/41301133469)

@@ -25,6 +25,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "providerHistoryReferencesRestored": True,
                 "providerHistoryReferencesReconciled": True,
                 "providerHistoryRestartPreserved": True,
+                "historyRuntimeReopened": True,
                 "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
                 "senderTransaction": "first-transaction", "recipientTransaction": "second-transaction"}
@@ -43,7 +44,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("originalHistoryWindowOwned", False), ("historyBodiesRestored", 1), ("historyWindow", None),
                             ("commonHistoryAcquisitionOwned", 1), ("latestHistoryHeadOwned", 1), ("providerHistoryPageOwned", 1),
                             ("commonProviderHistoryAcquisitionOwned", 1), ("providerHistoryReferencesRestored", 1),
-                            ("providerHistoryReferencesReconciled", 1), ("providerHistoryRestartPreserved", 1)):
+                            ("providerHistoryReferencesReconciled", 1), ("providerHistoryRestartPreserved", 1), ("historyRuntimeReopened", 1)):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
 

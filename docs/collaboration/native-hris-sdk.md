@@ -190,3 +190,27 @@ cursor-encryption key or automatic origin switching after a provider rejection.
 See the [Mobile history contract](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/collaboration-history.md#offline-reference-reconciliation).
 This is a bounded two-original fixture, not complete decryption, expired-cursor
 recovery, an ACK-before-journal process-death proof or product/capacity acceptance.
+
+## Explicit history-runtime reopening
+
+The dedicated fictional Android fixture now fills the product client's 16 retained
+focus slots, including failed context requests, and requires the next distinct
+anchor to return the capacity error. It holds a real sibling-room queue writer
+while invoking the common `ReopenCollaborationHistory` use case, requiring a busy
+result with the original transaction and runtime still owned. After releasing that
+writer, it requests reopening through the same protected repository and live HRIS
+admission flow. Complete SDK draining can outlast a single five-second caller
+wait. The fixture makes at most six explicit common-use-case requests, continuing
+only for `client.collaboration_close_pending`, as with the earlier protected-store
+proof. Other failures stop immediately; the product use case never retries itself.
+
+The fixture requires the restored client to keep the same key fingerprint and
+bootstrap operation, to decrypt the original sent event, and to retain the sibling
+room's original transaction while its send queue stays paused. A repeated readiness
+request must return `Available` without another restore. The encrypted provider
+reference checkpoint is compared before and after another application-database
+reopen. Every raw observer is disposed before client shutdown; replacement cleanup
+runs even if an assertion fails. `gateway-result` is published only after this
+scenario completes; `historyRuntimeReopened` is a required Boolean across Android,
+Python and the server verifier. This does not assert a newly synchronized SDK cursor,
+large-room capacity, or product UI acceptance.

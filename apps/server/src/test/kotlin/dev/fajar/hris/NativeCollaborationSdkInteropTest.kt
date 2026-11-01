@@ -264,6 +264,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "providerHistoryReferencesRestored",
                     "providerHistoryReferencesReconciled",
                     "providerHistoryRestartPreserved",
+                    "historyRuntimeReopened",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
@@ -346,6 +347,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "providerHistoryReferencesRestored" to true,
                     "providerHistoryReferencesReconciled" to true,
                     "providerHistoryRestartPreserved" to true,
+                    "historyRuntimeReopened" to true,
                     "admittedProviderPages" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,

@@ -185,6 +185,7 @@ class DeliverInboxPush(
                             now.plusSeconds(300),
                             dispatch.enqueuedAt.plus(policy.deliveryLifetime),
                         ),
+                        PushDelivery.Background("hris_inbox"),
                     ),
                 )
             }

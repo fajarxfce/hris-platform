@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Push transport profiles validated; continue registration — 1 November 2026
+
+[Native push contract](collaboration/native-push.md) and
+[measurement](measurements/chat-push-delivery-profile-2026-11-01.json) record explicit
+background/visible delivery: Android data-only NORMAL/HIGH and generic Apple
+background/alert. Inbox explicitly preserves its Android collapse identity, also
+applied to Apple. 15 push + 13 domain + eight actual worker cases and format/
+architecture pass (58s / 59.222s), six unchanged inputs. The first compile failure
+and fix are retained. No DI/schema change, live FCM or incoming chat acceptance.
+
+Previous Platform d48ac2f8 and Mobile 302aa192 are pushed. Mobile now pins d48 and
+has a 45-minute native job. New five-case run 41351236140 was pending behind
+41347895253 at c0371a38 (old four-case pin); inspect actual source/results separately.
+Continue fixed Matrix pusher transport/registration, admitted durable callback
+recovery, Android notifications and inline replies, then reusable Starter ports.
+Never silently change the selected company for background work. All PRD work
+remains active; the live provider deployment is unchanged.
+
+Phone remains verified release 10 / c0371a38, installed 20:44 UTC without launch.
+This Platform-only increment needs no new APK. Next validated Mobile product
+checkpoint: code 11+, notify first, explicit 10.77.77.3:5555 and install-only.
+
 ## Cancelled-draft native proof and publication retry corrected — 1 November 2026
 
 [Five-case evidence](measurements/chat-cancellation-native-2026-11-01.json): 356s Gradle / 357.121s wall,

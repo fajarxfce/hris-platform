@@ -82,7 +82,7 @@ class FcmPushRepositoryTest {
             Clock.fixed(now, ZoneOffset.UTC),
         )
 
-    private fun message() =
+    private fun message(delivery: PushDelivery = PushDelivery.Background("hris_inbox")) =
         PushMessage(
             "fixture-target-token",
             mapOf(
@@ -91,6 +91,7 @@ class FcmPushRepositoryTest {
                 "inboxId" to "test-inbox",
             ),
             now.plusSeconds(300),
+            delivery,
         )
 
     private fun oauth(): GooglePushCredentialDataSource {
@@ -127,6 +128,12 @@ class FcmPushRepositoryTest {
         assertNull(sent.get("notification"))
         assertEquals("300s", sent["android"]["ttl"].asString())
         assertEquals("NORMAL", sent["android"]["priority"].asString())
+        assertNull(sent["android"].get("notification"))
+        assertEquals("hris_inbox", sent["android"]["collapse_key"].asString())
+        assertEquals("hris_inbox", sent["apns"]["headers"]["apns-collapse-id"].asString())
+        assertNull(sent["apns"]["payload"]["aps"].get("alert"))
+        assertNull(sent["apns"]["payload"]["aps"].get("mutable-content"))
+        assertNull(sent["apns"]["payload"]["aps"].get("sound"))
         assertEquals("background", sent["apns"]["headers"]["apns-push-type"].asString())
         assertEquals("5", sent["apns"]["headers"]["apns-priority"].asString())
         assertEquals(1, sent["apns"]["payload"]["aps"]["content-available"].asInt())
@@ -135,6 +142,104 @@ class FcmPushRepositoryTest {
             sent["apns"]["headers"]["apns-expiration"].asString(),
         )
         assertEquals(1, received.get())
+    }
+
+    @Test
+    fun visibleDeliveryUsesAndroidDataOnlyHighPriorityAndAnAppleGenericAlert() {
+        val body = AtomicReference<String>()
+        handler.set {
+            body.set(String(it.requestBody.readNBytes(8193)))
+            reply(it, 200, """{"name":"projects/test/messages/accepted"}""")
+        }
+        val message = message(PushDelivery.Visible("HRIS", "New message", "chat_signal"))
+        assertEquals(Result.Success(PushOutcome.ACCEPTED), repository().send(message))
+        val sent = json.readTree(body.get())["message"]
+        assertNull(sent.get("notification"))
+        assertEquals(json.valueToTree(message.data), sent["data"])
+        val android = sent["android"]
+        assertNull(android.get("notification"))
+        assertEquals("300s", android["ttl"].asString())
+        assertEquals("HIGH", android["priority"].asString())
+        assertEquals("chat_signal", android["collapse_key"].asString())
+        val headers = sent["apns"]["headers"]
+        assertEquals("alert", headers["apns-push-type"].asString())
+        assertEquals("10", headers["apns-priority"].asString())
+        assertEquals("chat_signal", headers["apns-collapse-id"].asString())
+        assertEquals(
+            now.plusSeconds(300).epochSecond.toString(),
+            headers["apns-expiration"].asString(),
+        )
+        val aps = sent["apns"]["payload"]["aps"]
+        assertEquals("HRIS", aps["alert"]["title"].asString())
+        assertEquals("New message", aps["alert"]["body"].asString())
+        assertEquals(1, aps["content-available"].asInt())
+        assertEquals(1, aps["mutable-content"].asInt())
+        assertEquals("default", aps["sound"].asString())
+        assertEquals(1, received.get())
+    }
+
+    @Test
+    fun uncollapsedDeliveryOmitsBothProviderCollapseFieldsAndDefaultRemainsSilent() {
+        val body = AtomicReference<String>()
+        handler.set {
+            body.set(String(it.requestBody.readNBytes(8193)))
+            reply(it, 200, """{"name":"projects/test/messages/accepted"}""")
+        }
+        val original = message()
+        val silent = PushMessage(original.token, original.data, original.expiresAt)
+        val visible = message(PushDelivery.Visible("HRIS", "Pesan baru"))
+        for (message in listOf(silent, visible)) {
+            assertEquals(Result.Success(PushOutcome.ACCEPTED), repository().send(message))
+            val sent = json.readTree(body.get())["message"]
+            assertNull(sent["android"].get("collapse_key"))
+            assertNull(sent["apns"]["headers"].get("apns-collapse-id"))
+            if (message === silent) {
+                assertEquals("NORMAL", sent["android"]["priority"].asString())
+                assertEquals("background", sent["apns"]["headers"]["apns-push-type"].asString())
+                assertNull(sent["apns"]["payload"]["aps"].get("alert"))
+            }
+        }
+        assertEquals(2, received.get())
+    }
+
+    @Test
+    fun malformedDeliveryNeverSendsAndDiagnosticValuesRemainRedacted() {
+        val invalid =
+            buildList<PushDelivery> {
+                for (key in listOf("", "x".repeat(65), "invalid/key", "private\nkey")) {
+                    add(PushDelivery.Background(key))
+                    add(PushDelivery.Visible("HRIS", "New message", key))
+                }
+                for (title in listOf("", "   ", "x".repeat(81), "private\ntitle")) {
+                    add(PushDelivery.Visible(title, "New message"))
+                }
+                for (body in listOf("", "   ", "x".repeat(201), "private\u0000body")) {
+                    add(PushDelivery.Visible("HRIS", body))
+                }
+            }
+        for (delivery in invalid) {
+            val result = repository().send(message(delivery)) as Result.Failed
+            assertEquals("push_delivery_failed", result.failure.code)
+            assertFalse(result.toString().contains("private"))
+            assertFalse(delivery.toString().contains("private"))
+        }
+        assertEquals(0, received.get())
+        val mutable = mutableMapOf("signal" to "first")
+        val message =
+            PushMessage(
+                "private-target-token",
+                mutable,
+                now.plusSeconds(1),
+                PushDelivery.Visible("private-title", "private-body", "private-collapse"),
+            )
+        mutable["signal"] = "second"
+        assertEquals(mapOf("signal" to "first"), message.data)
+        assertEquals("PushMessage(<redacted>)", message.toString())
+        assertEquals("Visible(<redacted>)", message.delivery.toString())
+        assertEquals(
+            "Background(<redacted>)",
+            PushDelivery.Background("private-collapse").toString(),
+        )
     }
 
     @Test

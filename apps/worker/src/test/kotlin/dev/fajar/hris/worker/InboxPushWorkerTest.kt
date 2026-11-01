@@ -181,6 +181,7 @@ class InboxPushWorkerTest : CommunicationsWorkerFixture() {
         assertEquals(2, row(inbox)["processed_count"])
         assertEquals(setOf(first.token, second.token), probe.messages.map { it.token }.toSet())
         assertFalse(probe.messages.any { it.token == late.token })
+        assertTrue(probe.messages.all { it.delivery == PushDelivery.Background("hris_inbox") })
         assertEquals(setOf(inbox.toString()), probe.messages.map { it.data["eventId"] }.toSet())
         assertTrue(
             probe.messages.all {

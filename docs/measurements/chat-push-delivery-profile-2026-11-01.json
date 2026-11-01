@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-01",
+  "scope": "Explicit FCM background/visible delivery profiles; no incoming-chat producer or device acceptance",
+  "inputs": {
+    "base": "d48ac2f866e7f6395cad035424b9fe76d9fdb743",
+    "files": {
+      "apps/worker/src/test/kotlin/dev/fajar/hris/worker/InboxPushWorkerTest.kt": "6aa2daf45ef0c465a4a1d0f170b0d1da0b3e48b9df0dba25b66fb7e883c9c83a",
+      "core/push/data/src/main/kotlin/dev/fajar/hris/push/data/mappers/FcmMessageMapper.kt": "be16e3b9e10ca5829d9f2034fc567de0057860b4c9b2545ea90fa9a779431ea6",
+      "core/push/data/src/test/kotlin/dev/fajar/hris/push/data/FcmPushRepositoryTest.kt": "fe75a4c98d0a204f3f244510ac6e2eb46698cab75c561d8719dba05d3dbed961",
+      "core/push/domain/src/main/kotlin/dev/fajar/hris/push/domain/entities/PushMessage.kt": "298c25547601f65350fcaa3a3ea8795c1901408ff2cffccac31ac1a040de2472",
+      "modules/communications/domain/src/main/kotlin/dev/fajar/hris/communications/domain/usecases/DeliverInboxPush.kt": "9f8860cb781d2b6b5761f08adafb108f7cd485bf68a969cd0658984eebd8aa1a",
+      "core/push/domain/src/main/kotlin/dev/fajar/hris/push/domain/entities/PushDelivery.kt": "2ebf10e106381844d3f675614f0e64057464ee8cac54693e2eeb44241a383b1a"
+    }
+  },
+  "validation": {
+    "exitCode": 0,
+    "wallSeconds": 59.222,
+    "unchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":core:push:data:test",
+      ":modules:communications:domain:test",
+      ":apps:worker:test",
+      "--tests",
+      "*InboxPushWorkerTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 58,
+  "suites": {
+    "push": {
+      "suites": 2,
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reports": {
+        "core/push/data/build/test-results/test/TEST-dev.fajar.hris.push.data.FcmPushRepositoryTest.xml": "29a9464f0e9dc5d26351b35f4891104647c21071c8f27d122794d11b4ff97655",
+        "core/push/data/build/test-results/test/TEST-dev.fajar.hris.push.data.PushTransportBoundaryTest.xml": "c05defba7da35da522abdd088938c2d881ed4ef98ba56ab958cc2f65e32f1570"
+      }
+    },
+    "communications": {
+      "suites": 4,
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reports": {
+        "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.AnnouncementActionPolicyTest.xml": "199da55c121d0f1b2a67e377b702036e56d1d909d6fb1a927ff7d9d6ac9800fa",
+        "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.AnnouncementPolicyTest.xml": "dc0dab77a8f49dbdf9b91b7c8046c0ecc172d446df649f159830bcf4cdafccf4",
+        "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.AnnouncementPublicationPolicyTest.xml": "38cc2ea9bf8ea181354418180ace6543f913519acf9acad8caa83541d20dde73",
+        "modules/communications/domain/build/test-results/test/TEST-dev.fajar.hris.communications.domain.InboxPushPolicyTest.xml": "e6eab90ab28e49d1d536e685fa6b31e9a449e30b7408bb0046655c99bd38aa85"
+      }
+    },
+    "worker": {
+      "suites": 1,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reports": {
+        "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxPushWorkerTest.xml": "77ed10bf779b2749db412082b9d8a21cfc444d8faacfde276d09ad2dfb7666b4"
+      }
+    }
+  },
+  "attempts": [
+    {
+      "result": "compile_failed",
+      "reason": "Nested map builder inferred map-valued headers; explicit String value parameters fixed compilation",
+      "evidence": {
+        "exitCode": 1,
+        "wallSeconds": 14.999,
+        "unchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":core:push:data:test",
+          ":modules:communications:domain:test",
+          ":apps:worker:test",
+          "--tests",
+          "*InboxPushWorkerTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "logSha256": "2ba35cde1ecef8e1feb70d7e69a2556d82bf42d0f0bb12f2568cc54011afbef0"
+    },
+    {
+      "result": "passed",
+      "logSha256": "82c2241d0971b88727c7ee69f347d8db6c109ad5052705e56bc36f37abe96e9a"
+    }
+  ],
+  "limits": [
+    "No live Firebase delivery",
+    "No chat pusher binding or receive/reply flow yet",
+    "Apple alert payload is a transport fallback, not NSE/CallKit implementation",
+    "No DI graph or database schema change",
+    "Existing inbox adds the same bounded collapse identity on Apple as Android; its durable recovery remains authoritative"
+  ]
+}

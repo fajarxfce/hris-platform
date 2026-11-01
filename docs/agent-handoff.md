@@ -1,5 +1,20 @@
 # Agent continuation — HRIS workspace
 
+## Later native window run retained as failed — 1 November 2026
+
+[Run 41334029287 audit](measurements/chat-window-ci-failure-2026-11-01.json) binds 16 files
+at Mobile `bf83c71e` / Platform `79326538`, proof APK `8d391c22`. SDK 47.387s and scheduled
+56.862s pass; direct worker fails in 163.103s after exhausting four attempts, before foreground
+assertions. Driver cleanup succeeds, but the final retry category was discarded by a generic
+check. Direct delivery is unknown. This newer failure is not overridden by run 41331799148.
+
+Platform already writes a sanitized `gateway-observations.json` in the direct fixture's
+finally block. Mobile's upload allowlist omitted it. The next Mobile fixture change retains
+the final controlled failure category and uploads that existing bounded file. Investigate the
+resulting evidence before changing runtime retry limits or declaring the native window accepted.
+No Platform code/schema/deployment change follows from this audit. Release 7 remains installed;
+Mobile draft storage and local policy are pushed with JVM/browser validation, UI/recovery next.
+
 ## Hosted foreground/native acceptance audited — 1 November 2026
 
 Mobile [run 41331799148](https://github.com/fajarxfce/hris-mobile/actions/runs/41331799148)

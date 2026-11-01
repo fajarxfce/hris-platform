@@ -144,7 +144,8 @@
         "../measurements/collaboration-history-reopening-2026-11-01.json",
         "../measurements/collaboration-original-receipts-2026-11-01.json",
         "../measurements/command-archive-2026-11-01.json",
-        "../measurements/collaboration-retirement-2026-11-01.json"
+        "../measurements/collaboration-retirement-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/829b2566065cc78ea289445dc416c692dc63a6e5/docs/measurements/chat-inbox-2026-11-01.json"
       ]
     },
     {

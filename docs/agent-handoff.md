@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Read-receipt gateway rollout — 2 November 2026
+
+API/worker now run accepted304be027 at unchanged schema116. Full Verify41475356301
+passes all14 jobs:3159 API cases (five existing optional skips),117 worker cases
+per shard (one existing optional skip),1111 mocked browser and56 actual integration
+cases; all report zero failures. All artifact digests and recovery verification pass.
+Exact CI JARs and built-image contents were verified before replacement.
+[Evidence](measurements/chat-read-receipt-rollout-2026-11-02.json).
+
+Fresh checkpoint dev-before-read-receipts-20261102T163839 and separate key pack
+verify201 relations, two identity envelopes, three objects/2222 bytes. First attempt
+aborted before image changes because runuser inherited Java17; old services restored
+and health passed. Retry explicitly selects Java21 after runuser. Capture, recovery
+verification and replacement pass23.375s. Use explicit JAVA_HOME and PATH for future
+recovery commands; retain the failed attempt evidence and never retry blindly.
+
+API/worker start as10001:10001, zero restarts, exact images, API healthy. Google/person/
+native/document fingerprints and entire migration history match the stopped checkpoint.
+Dashboard2124c6fc index unchanged. Existing HRIS environment, Matrix identity/config,
+Matrix/database containers and old rollback image tags preserved. All three chat push
+flags and SMTP remain false. No provider account, message, grant or phone interaction
+is part of this server check. Matrix recovery remains separate from HRIS backup.
+
+Mobile release18 from clean42f5d157 is installed on10.77.77.3:5555 with exact APK
+pull-back verification, same signer/appUID/first install, no UI launch/data reset.
+Adds private visible-read marks and bounded replay; all54 groups remain open.
+Continue privacy/mute, notification actions/inline replies and the remaining PRD.
+
 ## Native local read-intent recovery accepted — 2 November 2026
 
 [Evidence](measurements/chat-read-receipt-replay-native-2026-11-02.json) pins pushed

@@ -1,0 +1,446 @@
+{
+  "date": "2026-11-02",
+  "scope": "Exact accepted read-receipt gateway packages; API/worker replacement without DDL, grants, messages, provider changes or push activation",
+  "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+  "fullCi": {
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41475356301",
+    "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+    "conclusion": "success",
+    "allFourteenJobsPassed": true,
+    "backend": {
+      "run": "41475356301",
+      "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+      "allEightBackendJobsPassed": true,
+      "api": {
+        "tests": 3159,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "suites": 436
+      },
+      "apiClassesDisjoint": true,
+      "apiClasses": 436,
+      "repeatedParameterizedDisplayLabels": 373,
+      "workerPerShard": {
+        "tests": 117,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "suites": 24
+      },
+      "artifacts": [
+        {
+          "shard": 1,
+          "artifactId": 13158786547,
+          "archiveSha256": "d4a60df27219ef45028d79c90aad7556124e5d5f6947baccd07cee6af073b29d",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 2,
+          "artifactId": 13159775213,
+          "archiveSha256": "b81063bf367e9a708bd935ad95685b1f4fda9a6fcae11434a0b466e3b0140481",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 3,
+          "artifactId": 13159425596,
+          "archiveSha256": "7677c8f145deaa7ddbd633d57b9843b6e702598355e982f07843b18c134bb679",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 4,
+          "artifactId": 13157654968,
+          "archiveSha256": "51ee87539e98151a88b84c9efd83d8bd000e7e8253aec34e2fa0714e02918d94",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 5,
+          "artifactId": 13159080141,
+          "archiveSha256": "5a6a13374531a1963701a3aeff2b93d1b7d204392a810fffaa43652f619029c8",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 6,
+          "artifactId": 13160330351,
+          "archiveSha256": "bf0166667f0ddf9a16c60785ff1b856d1cf5d27884c98f01354e685b30d13429",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 7,
+          "artifactId": 13157339971,
+          "archiveSha256": "d1a2ba7b4b50eec18c0c72fb392bfaac9d48fe0a0acbe51b79e697b69eed060f",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 8,
+          "artifactId": 13158432243,
+          "archiveSha256": "dcbd2127424a683f53bbb310c4bb23d953bf74f639a0d8bd1d9b55c65fff2a7f",
+          "githubDigestVerified": true
+        }
+      ],
+      "collectorCorrection": "JUnit parameterized display names repeat within a class; preserve every reported case and verify class ownership is disjoint across shards. No application or test execution changed.",
+      "fullRunAcceptedAtBackendCollection": false,
+      "fullRunAccepted": true,
+      "finalAcceptance": "All14 jobs now complete; earlier backend collector ran before dashboard integration completed."
+    },
+    "dashboard": {
+      "archives": [
+        {
+          "artifactId": 13160052799,
+          "name": "dashboard-integration-test-reports",
+          "archiveSha256": "5c1c96fd76e347b02b54c4f71cb308feced8c16a57fb0f3da945bcc902f6d961",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13157732241,
+          "name": "dashboard-test-reports-2",
+          "archiveSha256": "a8674219b5ce4304040db050b8ee359037804ac31e34c3bbd636b13e736f229f",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13157632889,
+          "name": "dashboard-test-reports-3",
+          "archiveSha256": "0ee7ff0793cdb54aac31424e98333adf67a69a6733c56a434a334202071d0f52",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13157423355,
+          "name": "dashboard-test-reports-1",
+          "archiveSha256": "3c47756fd26ddbc6cedd27a8af32a319b7cdaaa68bfc18dc1ea0a80c0a7f48c6",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13156828507,
+          "name": "dashboard-test-reports-4",
+          "archiveSha256": "09013ede5bb258842b6387455cd77caea96c30ffb889cfff608eb03df3494e2c",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        }
+      ],
+      "reports": [
+        {
+          "artifact": "dashboard-integration-test-reports",
+          "report": "worker-integration-report/index.html",
+          "htmlSha256": "5d6c7435edef1359a9a2ddc47b8e5b51dcdd2081b17d3cebaa266517e4a1ec65",
+          "stats": {
+            "total": 14,
+            "expected": 14,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 273678.39300000004
+        },
+        {
+          "artifact": "dashboard-integration-test-reports",
+          "report": "integration-report/index.html",
+          "htmlSha256": "8dc11454f3f1473e5de09bbda554960f38e27fcd2f47a0c97d19aac1a54d0c4b",
+          "stats": {
+            "total": 41,
+            "expected": 41,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 304458.864
+        },
+        {
+          "artifact": "dashboard-integration-test-reports",
+          "report": "export-integration-report/index.html",
+          "htmlSha256": "b51c57a1c01c66c625da8c24b28d325e0a91f969eb29c680eee41af709bdb1a1",
+          "stats": {
+            "total": 1,
+            "expected": 1,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 54536.047
+        },
+        {
+          "artifact": "dashboard-test-reports-2",
+          "report": "index.html",
+          "htmlSha256": "c1c9bcde7be5a895b85395451321fcf1af5ee6a4490538f062cd47c19d38d634",
+          "stats": {
+            "total": 278,
+            "expected": 278,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 239259.858
+        },
+        {
+          "artifact": "dashboard-test-reports-3",
+          "report": "index.html",
+          "htmlSha256": "dbb0d22352e44f2b57de92290d37ab6e97ae07d6741e440bcaab9245d636e5c3",
+          "stats": {
+            "total": 278,
+            "expected": 278,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 281312.118
+        },
+        {
+          "artifact": "dashboard-test-reports-1",
+          "report": "index.html",
+          "htmlSha256": "f8e9c06de67110cab4a0b3e2faf82fb3a23b1ebff8bebda3a7fed1926d83a5ad",
+          "stats": {
+            "total": 278,
+            "expected": 278,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 285224.843
+        },
+        {
+          "artifact": "dashboard-test-reports-4",
+          "report": "index.html",
+          "htmlSha256": "736dc1d48cc57797651e6a60c8fa4b7b36c4c279258eaddb75845c6a83f8e0bd",
+          "stats": {
+            "total": 277,
+            "expected": 277,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 250346.23500000002
+        }
+      ],
+      "passed": true
+    },
+    "recovery": {
+      "artifactId": 13159466267,
+      "archiveSha256": "ab817e38568a0853a6ef09140b0bdc9b6f7f1a9ef88b2b40aee0298b27dd2c4b",
+      "githubDigestVerified": true,
+      "reports": [
+        {
+          "file": "recovery-set-result-c0d680bbf9854e51b19016b4facc4eba.json",
+          "sha256": "ebb612483cb93cd479f4e036e61f7c01c3b67858bc3fd83e246d9d82885aaf9b",
+          "summary": {
+            "restorePassed": true,
+            "schema": "116",
+            "identityEnvelopesVerified": 2,
+            "objects": 104,
+            "bytes": 2098795,
+            "sourceUnchangedByRestore": true,
+            "wrongRetiredKeyRejected": true,
+            "separateKeyPack": true,
+            "temporaryResourcesRemoved": true,
+            "typedAccountAuditRestored": true,
+            "announcementDeliveryRestored": true,
+            "announcementEmailRestored": true,
+            "documentMetadataRestored": true,
+            "documentMetadataHistoryRestored": true,
+            "documentMetadataScopeAndConstraintsRestored": true,
+            "retainedIdentityKeyIds": [
+              "current",
+              "old"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41475356301",
+    "headSha": "304be02700cf07e496421c17e90f5a471b4bd68c",
+    "stagedAt": "2026-11-02T16:27:39.836973+00:00",
+    "elapsedSeconds": 24.887,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13158049107,
+        "archiveSha256": "cc2fb66942191ffea8c2f15fca3b04ad442ae20576b780a424eb53769637320a",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-read-receipt-rollout-2026-11-02/packages/api/apps-server.jar",
+        "sha256": "0861c60c2fd0f8d44c2dda751bee62f7b0e220b3fa5916ef7b2471fd519bc51e",
+        "bytes": 98539047
+      },
+      {
+        "role": "worker",
+        "artifactId": 13158991375,
+        "archiveSha256": "dcdfb6629a7b7f8a61eeda1c17123b4c17c1bf6da0c21040df97203269a6244c",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-read-receipt-rollout-2026-11-02/packages/worker/apps-worker.jar",
+        "sha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+        "bytes": 78608126
+      }
+    ]
+  },
+  "images": {
+    "success": true,
+    "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41475356301",
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:collaboration-304be027",
+        "image": "sha256:e43c20af49a757d202598cc03f8e354dbe12daf3e59f201b1db0e630bb198ea8",
+        "packageSha256": "0861c60c2fd0f8d44c2dda751bee62f7b0e220b3fa5916ef7b2471fd519bc51e",
+        "packageBytes": 98539047,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "tag": "hris-dev-worker:collaboration-304be027",
+        "image": "sha256:a7d548c3f0de9bd5f413240becc691f57524368a38ce88d6150d9bae45157256",
+        "packageSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+        "packageBytes": 78608126,
+        "runtimeUser": "10001:10001"
+      }
+    },
+    "existingServicesUnchanged": true,
+    "elapsedSeconds": 75.345
+  },
+  "retainedOldImages": {
+    "api": {
+      "container": "cacfd1121732303b3611163bd74acb3c2055bf38e9cc043249f6d5cc80ea7e27",
+      "image": "sha256:43ded9f0b1b02ffdc501edfefb6812867976e081a4e3d3485011798111e1356d",
+      "retainedTag": "hris-dev-api:before-collaboration-20261102T163147"
+    },
+    "worker": {
+      "container": "471abbe51adcfaf9136c64568ee905726d6ec3dae4597cad1652d6ba91d48f39",
+      "image": "sha256:cb3c633917e52ea18a13869af13b34acd33abfb3ad9c977d33547346c23a6fda",
+      "retainedTag": "hris-dev-worker:before-collaboration-20261102T163147"
+    }
+  },
+  "attempts": [
+    {
+      "success": false,
+      "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+      "schema": 116,
+      "migrationStarted": false,
+      "startedAt": "2026-11-02T16:37:22.660593+00:00",
+      "failureCategory": "CalledProcessError",
+      "apiWorkerSwitchAttempted": false,
+      "elapsedSeconds": 13.903,
+      "reason": "Recovery key verifier inherited Java17 instead of required Java21",
+      "switchAttempted": false,
+      "oldApiWorkerGarageRestored": true,
+      "apiHealth": "UP",
+      "retryCorrection": "Explicit JAVA_HOME and PATH after runuser; new checkpoint and separate attempt record"
+    },
+    {
+      "success": true,
+      "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+      "schema": 116,
+      "migrationStarted": false,
+      "startedAt": "2026-11-02T16:38:39.518589+00:00",
+      "checkpoint": {
+        "dataDirectory": "/home/fajar/.local/state/hris-platform/recovery-data/dev-before-read-receipts-20261102T163839",
+        "keysDirectory": "/home/fajar/.local/state/hris-platform/recovery-keys/dev-before-read-receipts-20261102T163839",
+        "manifestSha256": "d3899f66ada6804de884bbbf57131174d135a78f784380d8f99678f6c847a674",
+        "databaseVerification": {
+          "schema": "116",
+          "failedMigrations": 0,
+          "publicRelations": 201,
+          "invalidConstraints": 0,
+          "runtimeRoles": [
+            "hris_app|f|f|f|f",
+            "hris_worker|f|f|f|f"
+          ],
+          "identityEnvelopesVerified": 2
+        },
+        "storageVerification": {
+          "objects": 3,
+          "bytes": 2222,
+          "inventorySha256": "2e044937f5fcac29c6a34cbb9aae11dc2f89cf8f8280134207fd70dbeddb3dd7"
+        }
+      },
+      "api": {
+        "container": "488578f2375110e73b78e705e844c101601cf5e6706860f8b6fe4aa8cf2491fc",
+        "image": "sha256:e43c20af49a757d202598cc03f8e354dbe12daf3e59f201b1db0e630bb198ea8",
+        "restartCount": 0,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "container": "638c61567561b98bbb870749986c80614cece41a4b2c8231bea7a092b2afec46",
+        "image": "sha256:a7d548c3f0de9bd5f413240becc691f57524368a38ce88d6150d9bae45157256",
+        "restartCount": 0,
+        "runtimeUser": "10001:10001"
+      },
+      "apiHealthy": true,
+      "dashboardUnchanged": true,
+      "providerContainersUnchanged": true,
+      "allMigrationHistoryPreserved": true,
+      "googlePersonNativeDocumentIntegrityPreserved": true,
+      "existingHrisEnvironmentPreserved": true,
+      "chatPushEnabled": false,
+      "smtpEnabled": false,
+      "oldImagesRetained": true,
+      "apiWorkerSwitchAttempted": true,
+      "elapsedSeconds": 23.375
+    }
+  ],
+  "runtime": {
+    "success": true,
+    "source": "304be02700cf07e496421c17e90f5a471b4bd68c",
+    "schema": 116,
+    "migrationStarted": false,
+    "startedAt": "2026-11-02T16:38:39.518589+00:00",
+    "checkpoint": {
+      "dataDirectory": "/home/fajar/.local/state/hris-platform/recovery-data/dev-before-read-receipts-20261102T163839",
+      "keysDirectory": "/home/fajar/.local/state/hris-platform/recovery-keys/dev-before-read-receipts-20261102T163839",
+      "manifestSha256": "d3899f66ada6804de884bbbf57131174d135a78f784380d8f99678f6c847a674",
+      "databaseVerification": {
+        "schema": "116",
+        "failedMigrations": 0,
+        "publicRelations": 201,
+        "invalidConstraints": 0,
+        "runtimeRoles": [
+          "hris_app|f|f|f|f",
+          "hris_worker|f|f|f|f"
+        ],
+        "identityEnvelopesVerified": 2
+      },
+      "storageVerification": {
+        "objects": 3,
+        "bytes": 2222,
+        "inventorySha256": "2e044937f5fcac29c6a34cbb9aae11dc2f89cf8f8280134207fd70dbeddb3dd7"
+      }
+    },
+    "api": {
+      "container": "488578f2375110e73b78e705e844c101601cf5e6706860f8b6fe4aa8cf2491fc",
+      "image": "sha256:e43c20af49a757d202598cc03f8e354dbe12daf3e59f201b1db0e630bb198ea8",
+      "restartCount": 0,
+      "runtimeUser": "10001:10001"
+    },
+    "worker": {
+      "container": "638c61567561b98bbb870749986c80614cece41a4b2c8231bea7a092b2afec46",
+      "image": "sha256:a7d548c3f0de9bd5f413240becc691f57524368a38ce88d6150d9bae45157256",
+      "restartCount": 0,
+      "runtimeUser": "10001:10001"
+    },
+    "apiHealthy": true,
+    "dashboardUnchanged": true,
+    "providerContainersUnchanged": true,
+    "allMigrationHistoryPreserved": true,
+    "googlePersonNativeDocumentIntegrityPreserved": true,
+    "existingHrisEnvironmentPreserved": true,
+    "chatPushEnabled": false,
+    "smtpEnabled": false,
+    "oldImagesRetained": true,
+    "apiWorkerSwitchAttempted": true,
+    "elapsedSeconds": 23.375
+  },
+  "limits": [
+    "Private development runtime health/integrity, not phone chat, FCM or whole feature acceptance.",
+    "Matrix database and crypto stores remain separate from HRIS recovery pack.",
+    "No migration; schema116 and entire migration history unchanged.",
+    "All54 PRD feature groups remain open."
+  ]
+}

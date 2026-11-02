@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Android incoming gaps beyond the SDK window validated — 2 November 2026
+
+[Evidence](measurements/chat-incoming-history-waves-2026-11-02.json) verifies three
+actual Android/HRIS/PostgreSQL/Synapse variants: QUEUED, FROZEN_DRAFT and CANCELLED_DRAFT.
+After receiver SDK closure,175 encrypted peer messages are seeded. Fresh native
+admission drives incoming with no outbox or selected workspace. Each retains176
+originals, exhausts186 provider references in11 incoming turns and survives11 app
+container reopens. Independent foreground Browse takes11 pages with10 state references
+remaining. Every body/identity is checked locally; the server checks ciphertext and
+exactly176 encrypted sends, including only one outgoing worker send.
+
+Final native runs2+3 pass1/2 cases in394.103s/671.255s on identical APK cb5830040a023fbf4a2ab040800f120521b0286da1d4949f3448966d7b525e50
+and unchanged52 Mobile/7 Platform inputs; all cleanup succeeds. Mobile full7 passes
+3,169 desktop,217 Android host,908 browser,6 proof host and10 build-logic cases in
+428.941s. Later proof-only diagnostic/deadline changes pass APK/host/static8 in96.152s.
+
+Initial native1 retains3/5 failures716.614s: existing SDK death and OS scheduling
+regressions pass; two expanded worker fixtures hit210s, and an empty AVD reply causes
+IndexError before another installs. Fixture phase/turn counts now identify progress;
+complete successful fixtures take245.182–260.457s. Worker-resume fixture allows420s
+inside480s Python/10min JUnit; production deadlines are unchanged. Empty AVD responses
+now fail before artifact/device mutation.84 driver tests pass0.363s, including bounded
+private-field-free diagnostics. First owned emulator's unexpected exit has no established
+cause; final owned emulators are stopped. The historical seed provider opts into a
+bounded256-message burst; production rate settings do not change. Send acceptance has
+an independent bounded counter, so the512-row diagnostic trace cannot truncate proof.
+
+No production backend capability changes in this increment. Incoming turns are explicit;
+this is not live FCM/Doze/terminated-app incoming acceptance, OS-scheduled incoming,
+foreground-shared focus exhaustion, notification actions/replies, Apple, or load proof.
+Phone15/private schema103/API-worker2c2a59e3 remain unchanged by this work; branch116
+and disabled chat push remain. All54 PRD groups stay open. Continue Mobile receive/
+privacy/actions/encrypted replies, then compatible private rollout and release16+.
+
+Mobile's same-date handoff/measurement has exact source/report hashes and retained
+failures. Its current Android receiver still routes only inbox pushes; iOS likewise.
+Use a fresh domain recovery-wake generation before fixed scheduling, and treat packet
+room/company as hints only. .work receiver candidates are not applied implementation.
+No active emulator, goal or subagents remain; continue after publishing this increment.
+
 ## Provider-bounded incoming waves validated — 2 November 2026
 
 [Evidence](measurements/chat-incoming-history-boundary-2026-11-02.json) proves existing

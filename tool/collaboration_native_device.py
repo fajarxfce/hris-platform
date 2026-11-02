@@ -43,7 +43,7 @@ class NativeDevice:
     def prepare(self):
         self.lock = (self.directory.parent / f"{self.serial}.lock").open("w")
         fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        if self.command("emu", "avd", "name").splitlines()[0] != "hris-mobile-dev":
+        if self.command("emu", "avd", "name").splitlines()[:1] != ["hris-mobile-dev"]:
             raise RuntimeError("Selected emulator is not the dedicated HRIS AVD")
         if self.command("shell", "getprop", "sys.boot_completed") != "1":
             raise RuntimeError("Dedicated emulator is not booted")

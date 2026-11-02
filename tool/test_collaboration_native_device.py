@@ -61,6 +61,17 @@ class NativeDeviceTest(unittest.TestCase):
                 self.assertEqual([device.adb, "-s", "emulator-5562", "emu", "avd", "name"], command.call_args.args[0])
                 self.assertEqual(1, command.call_count)
 
+    def test_empty_avd_reply_fails_before_artifact_or_device_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            device = self.fixture(Path(directory))
+            for value in ("", "\n", "OK"):
+                with self.subTest(value=value), patch.object(device, "command", return_value=value) as command:
+                    with self.assertRaises(RuntimeError):
+                        device.prepare()
+                    self.assertTrue(device.cleanup())
+                    self.assertFalse(device.installed)
+                    command.assert_called_once_with("emu", "avd", "name")
+
     def test_phone_rejected_before_filesystem_or_adb_access(self):
         with self.assertRaises(ValueError):
             NativeDevice("missing.apk", "10.77.77.3:5555", "sdk", "work")

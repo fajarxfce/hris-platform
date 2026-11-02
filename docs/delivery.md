@@ -1,6 +1,6 @@
 # Delivery and validation
 
-Current communications checkpoint: [native recovery discovery/admission](measurements/chat-native-recovery-directory-2026-11-02.json) passes 55 domain, 144 registration SQL, 15 actual HTTP and seven worker cases plus format/architecture. The bounded default-disabled push worker and Mobile managed pusher client are also validated. Mobile receive/reply and full acceptance remain next. Release11 fixes the reported startup crash and has user confirmation; see the current agent handoff.
+Current communications checkpoint: [bounded incoming Android history](measurements/chat-incoming-history-waves-2026-11-02.json) verifies175 encrypted peer messages in all three draft/outbox variants,11 incoming turns/container reopens, independent foreground Browse and exactly one outgoing send. Final3 native cases pass across two runs on the same APK; initial timeouts/device-probe failure and corrections remain recorded. Mobile root/browser/Android checks and84 Python driver cases pass. Native receive/reply and full acceptance remain next; chat push stays disabled. All54 PRD groups remain open. No private rollout or phone operation by this increment; see the handoff.
 
 ## Verify a development branch
 

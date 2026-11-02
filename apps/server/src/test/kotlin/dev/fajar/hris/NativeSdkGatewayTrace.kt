@@ -22,6 +22,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val observations = mutableListOf<Map<String, Any>>()
     private val encryptedSendAllowed = AtomicBoolean()
     private val earlyEncryptedSends = AtomicInteger()
+    private val acceptedEncryptedSends = AtomicInteger()
     private val heldRoom = AtomicReference<String?>()
     private val heldRoomSends = AtomicInteger()
     private val applicationDeviceReads = AtomicInteger()
@@ -135,6 +136,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     }
 
     fun earlyEncryptedSendCount() = earlyEncryptedSends.get()
+
+    fun acceptedEncryptedSendCount() = acceptedEncryptedSends.get()
 
     private fun recordApplicationAdmission(
         request: HttpServletRequest,
@@ -263,6 +266,14 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             }
         } finally {
             recordApplicationAdmission(request, response)
+            if (
+                request.method == "PUT" &&
+                    response.status == 200 &&
+                    request.requestURI.matches(
+                        Regex("/_matrix/client/v3/rooms/[^/]+/send/m.room.encrypted/[^/]+")
+                    )
+            )
+                acceptedEncryptedSends.updateAndGet { minOf(it + 1, 1024) }
             if (request.requestURI.startsWith("/_matrix/"))
                 synchronized(observations) {
                     if (observations.size < 512)

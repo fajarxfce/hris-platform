@@ -13,7 +13,7 @@ import tools.jackson.databind.json.JsonMapper
 /** Only fictional credentials and a private loopback provider; no production configuration. */
 class NativeSdkMatrixServer(messageBurst: Int = 10) : AutoCloseable {
     init {
-        require(messageBurst in 10..64)
+        require(messageBurst in 10..256)
     }
 
     private val json = JsonMapper.builder().build()

@@ -1,6 +1,6 @@
 import unittest
 
-from collaboration_worker_native import checkpoint, evidence, diagnostic, incoming_evidence
+from collaboration_worker_native import checkpoint, evidence, diagnostic, incoming_evidence, progress_evidence
 
 
 class WorkerEvidenceTest(unittest.TestCase):
@@ -14,21 +14,25 @@ class WorkerEvidenceTest(unittest.TestCase):
                                    "originalHistoryAcquired": True, "completionRetired": True,
                                    "repeatedWorkerComplete": True, "foregroundHistoryPaged": True,
                                    "foregroundStoppedHistoryRetained": True, "historyPages": 2,
-                                   "providerReferences": 42, "pendingStateReferences": 9,
-                                   "historyPeerEvents": [f"$peer-{i}" for i in range(32)], "incoming": self.incoming()}
+                                   "providerReferences": 185, "pendingStateReferences": 9,
+                                   "historyPeerEvents": [f"$peer-{i}" for i in range(175)], "incoming": self.incoming()}
 
     def incoming(self):
         return {"incomingWithoutOutbox": True, "incomingWithoutSelection": True,
                 "incomingFreshNativeAdmission": True, "incomingOriginalAfterOfflineSeed": True,
                 "incomingHistoryRetainedAfterReopen": True, "incomingRuntimeReleased": True,
-                "incomingPasses": 1, "incomingSavedOriginals": 22}
+                "incomingAllOriginalsRecovered": True, "incomingTraversalRetainedAfterReopen": True,
+                "incomingBrowseUnchanged": True, "incomingPasses": 12, "incomingSavedOriginals": 176,
+                "incomingContainerReopens": 12}
 
     def test_incoming_evidence_requires_every_boundary_and_bounded_integer_counts(self):
         for invalid in (None, [], {}, self.incoming() | {"incomingPasses": True},
-                        self.incoming() | {"incomingPasses": 0}, self.incoming() | {"incomingPasses": 5},
+                        self.incoming() | {"incomingPasses": 1}, self.incoming() | {"incomingPasses": 41},
                         self.incoming() | {"incomingSavedOriginals": True},
-                        self.incoming() | {"incomingSavedOriginals": 0},
-                        self.incoming() | {"incomingSavedOriginals": 33}):
+                        self.incoming() | {"incomingSavedOriginals": 175},
+                        self.incoming() | {"incomingSavedOriginals": 177},
+                        self.incoming() | {"incomingContainerReopens": 11},
+                        self.incoming() | {"incomingContainerReopens": True}):
             with self.assertRaises(ValueError):
                 incoming_evidence(invalid)
         for key, value in self.incoming().items():
@@ -40,6 +44,26 @@ class WorkerEvidenceTest(unittest.TestCase):
         self.assertEqual(self.incoming(), incoming_evidence(self.incoming() | {"body": "hidden", "token": "hidden"}))
         with self.assertRaises(ValueError):
             evidence(self.completed() | {"incoming": None}, self.queued(), self.queued(456))
+
+    def test_phase_progress_is_bounded_and_discards_private_extra_fields(self):
+        value = {"phase": "incoming", "seeded": 175, "elapsedMillis": 120000}
+        self.assertEqual(value, progress_evidence(value | {"body": "hidden", "token": "hidden"}))
+        for update in ({"phase": "hidden"}, {"seeded": True}, {"seeded": -1}, {"seeded": 176},
+                       {"elapsedMillis": 480001}, {"elapsedMillis": False}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                progress_evidence(value | update)
+
+    def test_incoming_progress_requires_bounded_counts_flags_and_safe_codes(self):
+        value = {"pass": 12, "originals": 176, "references": 183, "hasNext": False,
+                 "hasPendingSeek": True, "retryRequired": True, "result": "Retry",
+                 "failureKind": "Unavailable", "failureCode": "client.collaboration_history_pending"}
+        self.assertEqual(value, progress_evidence(value | {"body": "hidden", "token": "hidden"}, True))
+        for update in ({"pass": True}, {"pass": 0}, {"pass": 41}, {"originals": 177},
+                       {"references": 257}, {"references": -1}, {"hasNext": 0}, {"hasPendingSeek": 1},
+                       {"retryRequired": "yes"}, {"result": "hidden"}, {"failureCode": "private body"},
+                       {"failureKind": "bad-value"}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                progress_evidence(value | update, True)
 
     def test_nested_instrumentation_diagnostic_is_preserved_without_private_payloads(self):
         result = diagnostic({"complete": False, "failureCategory": "FixtureFailure", "privateBody": "hidden"})
@@ -73,11 +97,11 @@ class WorkerEvidenceTest(unittest.TestCase):
                 evidence(self.completed() | update, self.queued(), self.queued(456))
 
     def test_foreground_history_requires_bounded_progress_and_distinct_peer_events(self):
-        for update in ({"historyPages": True}, {"historyPages": 1}, {"historyPages": 5},
-                       {"providerReferences": 32}, {"providerReferences": 81},
+        for update in ({"historyPages": True}, {"historyPages": 1}, {"historyPages": 13},
+                       {"providerReferences": 175}, {"providerReferences": 225},
                        {"pendingStateReferences": True}, {"pendingStateReferences": 21},
-                       {"historyPeerEvents": ["$peer"] * 32}, {"historyPeerEvents": []},
-                       {"historyPeerEvents": ["$event"] + [f"$peer-{i}" for i in range(31)]},
+                       {"historyPeerEvents": ["$peer"] * 175}, {"historyPeerEvents": []},
+                       {"historyPeerEvents": ["$event"] + [f"$peer-{i}" for i in range(174)]},
                        {"foregroundHistoryPaged": False}, {"foregroundStoppedHistoryRetained": False}):
             with self.subTest(update=update), self.assertRaises(ValueError):
                 evidence(self.completed() | update, self.queued(), self.queued(456))
@@ -86,7 +110,7 @@ class WorkerEvidenceTest(unittest.TestCase):
         self.assertNotIn("body", result)
         self.assertNotIn("credential", result)
         value["historyPeerEvents"].clear()
-        self.assertEqual(32, len(result["historyPeerEvents"]))
+        self.assertEqual(175, len(result["historyPeerEvents"]))
 
     def test_incomplete_or_unbounded_native_evidence_is_rejected(self):
         for update in ({"passes": True}, {"passes": 0}, {"passes": 5}, {"eventId": "invalid"},

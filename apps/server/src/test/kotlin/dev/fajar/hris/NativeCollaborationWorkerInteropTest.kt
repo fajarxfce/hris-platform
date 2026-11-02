@@ -44,7 +44,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
     @Autowired private lateinit var trace: NativeSdkGatewayTrace
 
     companion object {
-        private val provider by lazy { NativeSdkMatrixServer(messageBurst = 64) }
+        private val provider by lazy { NativeSdkMatrixServer(messageBurst = 256) }
 
         @JvmStatic
         @DynamicPropertySource
@@ -69,17 +69,17 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
     @AfterEach fun closeMatrix() = provider.close()
 
     @Test
-    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    @Timeout(value = 10, unit = TimeUnit.MINUTES)
     fun actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce() =
         verify("QUEUED")
 
     @Test
-    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    @Timeout(value = 10, unit = TimeUnit.MINUTES)
     fun actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce() =
         verify("FROZEN_DRAFT")
 
     @Test
-    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    @Timeout(value = 10, unit = TimeUnit.MINUTES)
     fun actualApplicationWorkerRetainsCancelledDraftAcrossDeathAndSendsIndependentIntentOnce() =
         verify("CANCELLED_DRAFT")
 
@@ -192,10 +192,14 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "incomingOriginalAfterOfflineSeed",
                 "incomingHistoryRetainedAfterReopen",
                 "incomingRuntimeReleased",
+                "incomingAllOriginalsRecovered",
+                "incomingTraversalRetainedAfterReopen",
+                "incomingBrowseUnchanged",
             )) assertTrue(incoming.path(flag).asBoolean(), flag)
         val incomingPasses = incoming.path("incomingPasses").asInt()
-        assertTrue(incomingPasses in 1..4)
-        assertTrue(incoming.path("incomingSavedOriginals").asInt() in 1..32)
+        assertTrue(incomingPasses in 2..40)
+        assertEquals(176, incoming.path("incomingSavedOriginals").asInt())
+        assertEquals(incomingPasses, incoming.path("incomingContainerReopens").asInt())
         assertEquals(
             mapOf(
                 "directory" to incomingPasses,
@@ -206,22 +210,18 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
         )
         val seedEvents = proof.path("historyPeerEvents")
         assertTrue(seedEvents.isArray)
-        assertEquals(32, seedEvents.size())
-        val historyEvents = List(32) { seedEvents.path(it).asString() }
-        assertEquals(32, historyEvents.size)
-        assertEquals(32, historyEvents.distinct().size)
+        assertEquals(175, seedEvents.size())
+        val historyEvents = List(175) { seedEvents.path(it).asString() }
+        assertEquals(175, historyEvents.size)
+        assertEquals(175, historyEvents.distinct().size)
         assertFalse(proof.path("eventId").asString() in historyEvents)
-        assertTrue(proof.path("historyPages").asInt() in 2..4)
-        assertTrue(proof.path("providerReferences").asLong() in 33..80)
+        assertTrue(proof.path("historyPages").asInt() in 2..12)
+        assertTrue(proof.path("providerReferences").asLong() in 176..224)
         assertTrue(proof.path("pendingStateReferences").asInt() in 0..20)
         assertEquals(
-            33,
-            trace.snapshot().count {
-                it["method"] == "PUT" &&
-                    it["route"] == "/_matrix/client/v3/rooms/_/send/m.room.encrypted/_" &&
-                    it["status"] == 200
-            },
-            "One worker send plus 32 distinct encrypted peer history seeds are required",
+            176,
+            trace.acceptedEncryptedSendCount(),
+            "One worker send plus 175 distinct encrypted peer history seeds are required",
         )
         assertEquals(0, trace.earlyEncryptedSendCount())
         assertEquals(0, trace.applicationAdmissions().getValue("failures"))
@@ -249,9 +249,9 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "processes" to 2,
                 "forcedProcessDeaths" to 1,
                 "initialState" to initialState,
-                "encryptedSends" to 33,
+                "encryptedSends" to 176,
                 "workerEncryptedSends" to 1,
-                "seededPeerEncryptedSends" to 32,
+                "seededPeerEncryptedSends" to 175,
                 "foregroundHistoryAccepted" to true,
                 "incomingAdmissions" to trace.incomingAdmissions(),
                 "applicationAdmissions" to trace.applicationAdmissions(),
@@ -298,7 +298,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
             trace.allowEncryptedSends()
             writePrivate(directory.resolve("send.json"), mapOf("ready" to true))
             assertTrue(
-                process.waitFor(180, TimeUnit.SECONDS),
+                process.waitFor(420, TimeUnit.SECONDS),
                 "Owned worker driver exceeded its deadline",
             )
             assertEquals(0, process.exitValue(), diagnostic(directory))

@@ -105,13 +105,13 @@ def evidence(value, queued, restored):
             raise ValueError("Missing worker proof")
         result[key] = True
     pages, references, pending = (value.get(key) for key in ("historyPages", "providerReferences", "pendingStateReferences"))
-    if (type(pages) is not int or not 2 <= pages <= 4 or type(references) is not int or not 33 <= references <= 80
+    if (type(pages) is not int or not 2 <= pages <= 12 or type(references) is not int or not 176 <= references <= 224
             or type(pending) is not int or not 0 <= pending <= 20):
         raise ValueError("Invalid bounded foreground history progress")
     peers = value.get("historyPeerEvents")
-    if (not isinstance(peers, list) or len(peers) != 32
+    if (not isinstance(peers, list) or len(peers) != 175
             or any(not isinstance(item, str) or not re.fullmatch(r"\$[!-~]{1,254}", item) for item in peers)
-            or len(set(peers)) != 32 or event in peers):
+            or len(set(peers)) != 175 or event in peers):
         raise ValueError("Invalid encrypted history seed events")
     return result | {"eventId": event, "passes": passes, "historyPages": pages,
                      "providerReferences": references, "pendingStateReferences": pending,
@@ -122,15 +122,54 @@ def incoming_evidence(value):
     if not isinstance(value, dict):
         raise ValueError("Missing incoming recovery evidence")
     flags = ("incomingWithoutOutbox", "incomingWithoutSelection", "incomingFreshNativeAdmission",
-             "incomingOriginalAfterOfflineSeed", "incomingHistoryRetainedAfterReopen", "incomingRuntimeReleased")
+             "incomingOriginalAfterOfflineSeed", "incomingHistoryRetainedAfterReopen", "incomingRuntimeReleased",
+             "incomingAllOriginalsRecovered", "incomingTraversalRetainedAfterReopen", "incomingBrowseUnchanged")
     if any(value.get(key) is not True for key in flags):
         raise ValueError("Incomplete incoming recovery evidence")
     result = {key: True for key in flags}
-    for key, maximum in (("incomingPasses", 4), ("incomingSavedOriginals", 32)):
+    for key, minimum, maximum in (("incomingPasses", 2, 40), ("incomingSavedOriginals", 176, 176),
+                                  ("incomingContainerReopens", 2, 40)):
         count = value.get(key)
-        if type(count) is not int or not 1 <= count <= maximum:
+        if type(count) is not int or not minimum <= count <= maximum:
             raise ValueError("Unbounded incoming recovery evidence")
         result[key] = count
+    if result["incomingPasses"] != result["incomingContainerReopens"]:
+        raise ValueError("Each incoming turn must survive a container reopen")
+    return result
+
+
+def progress_evidence(value, incoming=False):
+    if not isinstance(value, dict):
+        raise ValueError("Missing worker progress")
+    if not incoming:
+        phase = value.get("phase")
+        if phase not in ("restore", "delivery", "seed", "incoming", "foreground", "complete"):
+            raise ValueError("Invalid worker phase")
+        result = {"phase": phase}
+        for key, minimum, maximum in (("seeded", 0, 175), ("elapsedMillis", 0, 480000)):
+            count = value.get(key)
+            if type(count) is not int or not minimum <= count <= maximum:
+                raise ValueError("Invalid worker phase count")
+            result[key] = count
+        return result
+    result = {}
+    for key, minimum, maximum in (("pass", 1, 40), ("originals", 0, 176), ("references", 0, 256)):
+        count = value.get(key)
+        if type(count) is not int or not minimum <= count <= maximum:
+            raise ValueError("Invalid incoming progress count")
+        result[key] = count
+    for key in ("hasNext", "hasPendingSeek", "retryRequired"):
+        if type(value.get(key)) is not bool:
+            raise ValueError("Invalid incoming progress flag")
+        result[key] = value[key]
+    if value.get("result") not in ("Complete", "Retry", "Blocked"):
+        raise ValueError("Invalid incoming progress result")
+    result["result"] = value["result"]
+    for key, pattern in (("failureKind", r"[A-Za-z]{1,32}"), ("failureCode", r"[a-z][a-z0-9_.]{0,95}")):
+        item = value.get(key)
+        if not isinstance(item, str) or not re.fullmatch(pattern, item):
+            raise ValueError("Invalid incoming progress failure")
+        result[key] = item
     return result
 
 
@@ -185,7 +224,7 @@ def run(apk, sdk, directory):
         process = start("hris-worker-stage")
         queued = restored = None
         sent = False
-        deadline = time.monotonic() + 300
+        deadline = time.monotonic() + 480
         while time.monotonic() < deadline:
             if process.poll() is not None:
                 status = app_json("instrumentation")
@@ -224,6 +263,14 @@ def run(apk, sdk, directory):
         result["failureCategory"] = type(error).__name__
         result.setdefault("nativeDiagnostic", diagnostic(app_json("instrumentation")))
     finally:
+        for name, key, incoming_progress in (("worker-progress", "phaseProgress", False),
+                                             ("worker-incoming-progress", "incomingProgress", True)):
+            observed = app_json(name)
+            if observed is not None:
+                try:
+                    result[key] = progress_evidence(observed, incoming_progress)
+                except ValueError:
+                    result[key + "Rejected"] = True
         incoming = app_json("worker-incoming")
         if incoming is not None:
             try:

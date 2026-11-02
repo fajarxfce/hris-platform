@@ -2,6 +2,14 @@
 
 ## Full CI outage fixture corrected — 2 November 2026
 
+Replacement Verify [41448616746](https://github.com/fajarxfce/hris-platform/actions/runs/41448616746)
+is ACTIVE at exact2334e26639eec8204c5e4d481f770a784ea766fb. Do not cancel/duplicate.
+Prepared package/image/checkpoint/deploy guards now target this new run/source; the
+old failure remains archived. Dashboard still has its original2124c6fc build record
+and its source tree is verified equal. The pending deploy script restarts captured
+old services on any pre-migration failure; no automatic post-migration rollback.
+
+
 Full Verify41442782804 at2124c6fc FAILED: seven backend/dashboard jobs pass, backend1
 fails one worker case, downstream integration/recovery skipped. The5.803s provider-
 outage case sees collaboration_provider_unavailable while paused, then
@@ -22,8 +30,8 @@ failures/errors and the one existing opt-in elapsed-retention skip.
 
 Push this atomic correction and dispatch one new full Verify at that exact head.
 The prepared private rollout scripts under .work/chat-private-rollout-2026-11-02
-STILL hardcode failed run41442782804/source2124c6fc: retarget their CI/source guards
-only to the new exact accepted run, preserving original failure records. Runtime
+have been retargeted to replacement41448616746/source2334e266; they still require
+all ten jobs to finish successfully. Preserve original failure records. Runtime
 application trees are unchanged. Dashboard staged assets remain source2124c6fc;
 verify their apps/dashboard tree matches the new CI instead of pretending rebuilt.
 Fresh HRIS checkpoint/clone/deploy/grants and phone install remain unexecuted.

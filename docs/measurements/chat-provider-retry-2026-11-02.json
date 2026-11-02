@@ -163,5 +163,10 @@
     "The original CI proves transient provider rejection after unpause, not its precise underlying HTTP status or cause. No unsupported registration-race diagnosis is claimed.",
     "The production durable queue already defers the observed unavailable/rejected outcome. This change verifies finite eventual recovery; it does not mask terminal access failures or retry without bounds.",
     "Full replacement Verify and its downstream recovery/integration remain required. No accepted API/worker package, HRIS checkpoint/migration/deployment, grant or phone install yet. Existing private schema103 and phone15 remain."
-  ]
+  ],
+  "replacementFullCi": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41448616746",
+    "headSha": "2334e26639eec8204c5e4d481f770a784ea766fb",
+    "observedStatus": "in_progress"
+  }
 }

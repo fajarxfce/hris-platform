@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Mobile shared admitted background worker validated — 2 November 2026
+
+Mobile [d8ebe56f](https://github.com/fajarxfce/hris-mobile/commit/d8ebe56f) extends
+captured local scope through discovery/cursors, frozen draft queue/confirmation/
+review and access observation. Actual encrypted recovery after restart preserves
+one original intent without workspace reads. Its root/browser checks pass with
+2,960 desktop,209 Android host,781 browser and10 build-logic cases.
+
+[0539e241](https://github.com/fajarxfce/hris-mobile/commit/0539e241) adds an ephemeral
+background-admission entry to the existing delivery worker. Exact setup readmission,
+captured local recovery and finite native borrowing share the original wall and
+monotonic deadline. Local/remote inner room logic remains shared. Independent
+credential/runtime/ownership signals cancel pending delivery and dispose observers;
+release closes only the borrowed reference. History capacity defers background
+work without reclaiming foreground or resending. Simultaneous worker calls return
+Retry(busy) without waiting. No serialized grant or message body enters platform jobs.
+
+Sixteen new app cases pass within43 actual collaboration application tests;509
+domain cases, actual DI, proof adapter compilation and static checks pass. Final
+root and app Wasm compilation pass in327s /330.664s on seven unchanged inputs:
+2,976 desktop,209 Android host and10 build-logic cases. The evidence retains the
+initial52s run's two assertion corrections (old waiting behavior and an omitted
+staging-queue close); no product algorithm changed for those corrections. Simulated
+SDK/control-plane fixtures do not constitute new JNI/provider acceptance.
+
+Continue Mobile initial native-parent readiness and monotonic observation across
+pending workspace reads, token rotation and clock rollback. Its three-file/seven-case
+candidate is currently being checked. Then persist all-company collapsed wake
+generations/fair cursors, directory/reconnect/periodic recovery and real receive,
+notification privacy/read/mute/deep links and encrypted inline replies. Reuse the
+single application collector and explicitly await initial retention publication.
+Backend delivery remains disabled; all54 PRD groups remain open. Continue after
+pushed checkpoints. Private server remains schema103/API-worker2c2a59e3; no live
+rollout, new APK/phone install or generic Starter port. Phone stays verified14.
+Owned temporary swap remains active pending safe cleanup; preserve unrelated jobs.
+
 ## Mobile captured local recovery and background control validated — 2 November 2026
 
 Mobile [57df24aa](https://github.com/fajarxfce/hris-mobile/commit/57df24aa) separates

@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Mobile captured local recovery and background control validated — 2 November 2026
+
+Mobile [57df24aa](https://github.com/fajarxfce/hris-mobile/commit/57df24aa) separates
+captured local account/company ownership from remote admission deadlines. Message
+observation, original-receipt recovery/projection/retirement and retained control
+reads work without workspace selection, while preserving retained company denials.
+[2cc2a21a](https://github.com/fajarxfce/hris-mobile/commit/2cc2a21a) extends typed
+background scope through setup and conversation prepare/replay/reconcile. Setup
+readmission requires the matching active device/platform and nonregressing version
+before gate CAS. Room requests require the exact admitted device.
+
+Historical command failures retain explanatory priority but cannot themselves
+confirm a new denial. An explicitly readmitted retry keeps its original operation
+ID; newly observed HRIS denial still gates the company under cancellation or failed
+cleanup. These two increments add31 domain cases. Latest focused500 domain,
+118 presentation and two actual DI cases pass; proof adapter compilation and static
+checks pass. Final root/browser checks pass in249s /252.715s:2,949 desktop,
+209 Android host,772 browser and10 build-logic cases, zero failures/errors/skips.
+See Mobile's contracts and measurement records for exact source hashes and scopes.
+
+Continue captured delivery/draft discovery/cursors/queue/confirmation, then reuse
+the existing bounded worker with separate local and remote scopes. An applied
+Mobile candidate is being checked; its current Git handoff identifies the scratch
+candidate baseline and next checks. Next hold finite background runtime references,
+watch interruption/credential failure, and test initial parent readiness without
+waiting for workspace selection. Durable all-company wake/reconnect/periodic
+recovery, notification privacy/read/mute and inline replies remain required.
+
+No server implementation change, live schema/provider rollout, new JNI acceptance,
+APK build/install or generic Starter port here. Phone stays verified14 from8c557716.
+Backend delivery remains disabled; all54 PRD groups remain open. Continue after
+pushed checkpoints. Owned temporary swap stays active pending safe cleanup;
+preserve unrelated jobs and AVD5558.
+
 ## Mobile shared background history/outbox scope validated — 2 November 2026
 
 Mobile [1d6f9f08](https://github.com/fajarxfce/hris-mobile/commit/1d6f9f08) adds

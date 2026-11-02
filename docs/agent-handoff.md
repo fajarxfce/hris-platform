@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Mobile shared background history/outbox scope validated — 2 November 2026
+
+Mobile [1d6f9f08](https://github.com/fajarxfce/hris-mobile/commit/1d6f9f08) adds
+Selected/Background native conversation entry and original/provider history.
+[9866eb95](https://github.com/fajarxfce/hris-mobile/commit/9866eb950916c940d3c8ef124b46452ebfba9a79)
+extends that scope through existing staging/delivery and corrects SDK-token failure
+classification. Neither background path reads or changes workspace selection.
+Explicit device binding, finite original admission, child cleanup, uncertainty,
+receipt retention and existing bounded merge/projection rules remain shared.
+SDK-token unauthorized no longer closes all local company history; confirmed HRIS
+denials still retain their gate even under cancellation or failed cleanup.
+
+The two increments add25 domain cases. Latest focused469 domain/two actual DI cases,
+proof adapter compilation and static checks pass in130s /134.385s. Root and affected
+browser checks pass in254s /257.828s:2,918 desktop,209 Android host,741 browser and10
+build-logic cases. The records retain an initial history LongMethod failure and an
+outbox fixture's incorrect resume-count expectation, plus their corrections. Sent
+mappings can participate in a later SDK queue inspection; recovery retains the same
+logical intent/transaction and receipt, with no replacement enqueue. No new JNI
+run, APK build or server implementation change in these increments.
+
+Continue captured local ownership for observation/receipt recovery/projection and
+retirement, then local control/discovery/cursor/drafts, remote room-control scope
+and the existing bounded application worker. Keep local fact lifetime separate from
+remote grant expiry. Reuse the application runtime observer; test initial parent
+readiness while workspace observation is pending and preserve foreground retention
+across token rotation. Durable all-company hints/reconnect/periodic recovery,
+notifications/privacy/read/mute and inline replies remain next. Delivery stays
+disabled and all54 PRD groups remain open; continue after checkpoints.
+
+Phone remains verified release14 from8c557716, predating these later changes. No live
+schema/provider rollout or generic Starter port. Owned temporary swap remains active
+pending safe cleanup; preserve unrelated CodePush jobs and AVD5558.
+
 ## Mobile release 14 installed and verified — 2 November 2026
 
 Mobile [4e4c1bd9](https://github.com/fajarxfce/hris-mobile/commit/4e4c1bd9) records

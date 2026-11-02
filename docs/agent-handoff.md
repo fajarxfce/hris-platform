@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Mobile recovery client and native publication checkpoint — 2 November 2026
+
+Mobile [5aa6f752](https://github.com/fajarxfce/hris-mobile/commit/5aa6f75260eb429e98cbb34c600bcbec1c7ee57c)
+is pushed. Its preceding commits implement the own-parent directory/admission client
+and typed Selected/Background conversation reads. Final native runtime publication
+now follows admission in Ensure, Install, Restore and history reopening; pending or
+failed callers cannot expose a client before transferring ownership. The native
+proof adapter is compiled explicitly and includes the earlier pusher API method.
+
+Against this repository's unchanged8b77c4fa source, the same proof APK passes all
+five actual SDK/HRIS/Synapse scenarios in369s /369.345s: encrypted SDK recovery,
+scheduled ordinary process death, queued intent, frozen-only draft and cancelled
+draft with independent delivery. Cleanup passes in all cases. Mobile CI now pins
+8b77c4fa; no hosted result is claimed. Mobile root/browser/native-host/build checks
+also pass. See its [contract and evidence](https://github.com/fajarxfce/hris-mobile/blob/5aa6f75260eb429e98cbb34c600bcbec1c7ee57c/docs/collaboration-runtime-publication.md).
+
+Continue finite background SDK borrowing alongside foreground retention, parent
+replacement/expiry and pending acquisition cleanup. Then extend the existing scope
+through history/outbox and implement durable all-company hints/reconnect/periodic
+recovery, FCM receive/decrypt/privacy/read/mute and inline replies. Never change
+visible workspace selection for a background pass. Keep delivery disabled until
+real receive/recovery acceptance; classic SyncV2 cannot use the SDK's sliding-sync
+NotificationClient as a drop-in. No server implementation change in this note.
+
+Phone remains user-confirmed release11; prior local universal13 was validation
+only. Next useful product update14+, notify first, explicit10.77.77.3:5555
+install-only with signer/data preserved. Owned emulator5560 is stopped. No live
+provider/schema rollout, generic Starter change or full PRD group acceptance.
+Continue after each pushed checkpoint; all54 groups and remaining P0–P8 stay open.
+
 
 ## Native recovery directory and company admission validated — 2 November 2026
 

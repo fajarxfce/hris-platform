@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Healthy recovery batches validated; incoming room progress underway — 2 November 2026
+
+Mobile [5a39b53f](https://github.com/fajarxfce/hris-mobile/commit/5a39b53f) is pushed.
+Successful bounded company batches now persist continuation separately from failures,
+so normal remaining work schedules the same wake without failure backoff. Legacy
+schema1 progress reads under schema2 without losing its original wake/seek/failure.
+Full checks pass3,073 desktop,215 host,836 affected browser,10 build-logic with10
+unchanged inputs (292s /295.868s). Actual WorkManager/Room/Keystore proof passes all
+four scenarios37.916s; three healthy batches cover seven companies/21 callbacks in
+1.593s with zero Retry results. Interrupted work still retries after later companies.
+Directory/admission/company callbacks are synthetic; SDK/FCM acceptance remains open.
+Failed raw-generation and two-clock admission fixtures are preserved in evidence.
+Owned emulator5562/PID15507 and proof process are stopped; phone15 unchanged.
+
+Mobile Apple41405822268 at338fea17 is complete/audited:112 cases/30 suites,
+6 wake tests0.122s, full Xcode1303s and14 verified source hashes. It excludes the
+later continuation change. New [Apple41409790492](https://github.com/fajarxfce/hris-mobile/actions/runs/41409790492)
+is active at5a39b53f0ece41d314738090e330bd7004e528db; do not cancel with another dispatch.
+
+Mobile currently has13 UNCOMMITTED Kotlin inputs under focused checks: account/company-
+owned room seek/in-flight/retry/continuation progress, encrypted CAS repository,
+12 domain/9 shared SQLite-IndexedDB cases and actual DI. No incoming app caller yet.
+Complete validation, captured history-reference scope, then independent incoming
+acquisition and actual SDK/provider/FCM/privacy/reply integration. Foreground older-
+history position must not be reset on every background wake; long offline gaps need
+independent catchup progress. All54 PRD groups remain open. No Starter port is due
+for this HRIS policy. No Platform deployment: private schema103/API-worker2c2a59e3
+remain; branch schema116 is not yet live and chat push stays disabled. Continue.
+
 ## Android company recovery proved; healthy backlog correction underway — 2 November 2026
 
 Mobile [20d1592b](https://github.com/fajarxfce/hris-mobile/commit/20d1592b) records

@@ -11,6 +11,9 @@ if (shardArgument.isPresent || countArgument.isPresent) {
     }
 
     tasks.withType<Test>().configureEach {
+        // Preserve the last executing API case when a hosted job reaches its deadline.
+        // Test descriptors are logged; request bodies, headers and credentials are not added.
+        testLogging.events("started", "failed", "skipped")
         inputs.property("hrisApiTestShard", shard)
         inputs.property("hrisApiTestShards", count)
         doFirst {

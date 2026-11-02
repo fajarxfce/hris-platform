@@ -1,5 +1,46 @@
 # Agent continuation — HRIS workspace
 
+## Full CI reached API time budget; eight shards prepared — 2 November 2026
+
+Replacement41448616746 at2334e266 FAILED by the35-minute Gradle step timeout in
+backend1. Seven jobs succeed; dashboard/recovery integration skip. Its worker HTML
+is complete:117 tests, zero failures, one existing elapsed-retention skip,6m58.71s;
+all six provisioning cases pass47.756s and the corrected outage case passes5.770s.
+No completed API report exists for shard1, so the slow/hung case is not established.
+Successful shard2 has695 API cases, zero failures/four existing skips,27m25.94s before
+adding build/setup time. [Retained evidence](measurements/ci-api-shards-2026-11-02.json).
+
+Only CI configuration/convention logging changes in this atomic commit: eight API
+shards using the existing class-owner algorithm, same35m step/40m job deadlines,
+started/failed/skipped test events, XML alongside HTML artifacts. Shared modules and
+worker checks remain complete per shard; ApiContractHttpTest still belongs to1.
+Full workflow now requires14 successful jobs. Local format/architecture/API test
+compilation with1/8 passes165.774s on two unchanged inputs. No local API execution
+or performance improvement is claimed. Push/dispatch one full run at committed head,
+then retarget all prepared rollout source/run/job-count guards; do not reuse failed
+2334e266 acceptance. Current immutable dashboard tree remains equal.
+
+Four native-priority test/driver inputs in Platform are UNCOMMITTED. Eighteen driver
+regressions pass and the two Kotlin fixtures compile. To permit independent native
+proof work, stage-packages/checkpoint/deploy source comparisons now exclude exactly
+NativeSdkGatewayTrace.kt and NativeCollaborationWorkerInteropTest.kt; all packaged
+runtime inputs must still equal the accepted CI head. No broader exclusion. The
+native proof has NOT executed. Its .work/native-priority-2026-11-02/run-native.py,
+inputs-1.json and apply scripts are prepared. Run single cancellation case first,
+then remaining two variants; preserve source/artifact hashes and failures.
+
+Mobile full native-proof build3 PASSES97.046s on108 inputs:3262 desktop,222 host,
+10 build-logic/six proof-host cases, no failures/errors/skips. Four proof source files
+remain uncommitted (including the obsolete company-fixture constructor repair).
+Actual company WorkManager burst/stage/process-death resume passes45.199s using the
+new proof APK, with no SDK/provider claim. Release17 actual arm64 APK also cold-starts
+twice on owned x86 emulator via libndk_translation,33.918s; onboarding screenshots
+reviewed, no login/chat UI or phone interaction. Owned emulator is STOPPED after the
+second startup (latest owner534984). It must be freshly started before native proof.
+Private Matrix healthy/pre-enrollment retained; HRIS still103, no checkpoint/deploy/
+grants, phone still15. Continue after dispatch: actual SDK proof, guarded rollout and
+install-only17, then notifications/replies and all54 open groups.
+
 ## Release17 ready; latest Apple audit complete — 2 November 2026
 
 Mobile fe485267 records the clean c6347c75 devRelease17 candidate: build/lint433.769s,

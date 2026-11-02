@@ -1,0 +1,79 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "9545b40e8193c8b0619ded7506f9e6c54608b8b7",
+  "sourceSha256": {
+    ".github/workflows/ci.yml": "56511d10082a3beaae79f21224ffd881df57e66056040f81995eb3a834466ab5",
+    "build-logic/src/main/kotlin/hris.api-tests.gradle.kts": "272d7bca26f1bf97ae8330a78a0cfe5678597afd5edd3884fbddc516e4bd3da5"
+  },
+  "previousRun": {
+    "failedRun": "https://github.com/fajarxfce/hris-platform/actions/runs/41448616746",
+    "head": "2334e26639eec8204c5e4d481f770a784ea766fb",
+    "reason": "Gradle step reached35 minute workflow deadline; no completed API report for shard1. Underlying slow/hung API case is not established.",
+    "workerShard1": {
+      "tests": "117",
+      "failures": "0",
+      "skipped": "1",
+      "duration": "6m58.71s"
+    },
+    "provisioningClassShard1": {
+      "tests": "6",
+      "failures": "0",
+      "skipped": "0",
+      "duration": "47.756s"
+    },
+    "apiShard2": {
+      "tests": "695",
+      "failures": "0",
+      "skipped": "4",
+      "duration": "27m25.94s"
+    },
+    "retainedSha256": {
+      ".work/chat-private-rollout-2026-11-02/replacement-backend-1/apps/worker/build/reports/tests/test/index.html": "da2d03e3ffc442939d273f0a10e17514fadf714f4eee470291dcadb36074e487",
+      ".work/chat-private-rollout-2026-11-02/replacement-backend-2/apps/server/build/reports/tests/test/index.html": "ee50fdf07ebb43850fb44bf8dc4195be54e5526bcfaf07395528a7dce827d3ef",
+      ".work/chat-private-rollout-2026-11-02/replacement-backend-1/apps/worker/build/reports/tests/test/OP1ASFIFx8A/index.html": "1aadcabb972fc92989459b30c9e710ea9f260bba5ca67a200e8d607e2c5f2918",
+      ".work/chat-private-rollout-2026-11-02/replacement-ci-failed.log": "f5e4530420e454d5db8c1b6bb5ac7967450f42c766ae31d41ec07a2fb7881e9b",
+      ".work/chat-private-rollout-2026-11-02/replacement-ci-failed.json": "a83623996f931e70f77b4375e8e871844563240cf3eb3be45104e45945bc72ba"
+    },
+    "providerOutageCaseShard1": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 5.77
+    }
+  },
+  "configurationAndApiTestCompile": {
+    "command": [
+      "./gradlew",
+      ":formatCheck",
+      ":architectureCheck",
+      ":apps:server:compileTestKotlin",
+      "-PhrisApiTestShard=1",
+      "-PhrisApiTestShards=8",
+      "-Pkotlin.compiler.execution.strategy=in-process",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 165.774,
+    "inputsUnchanged": true
+  },
+  "newBackendShards": 8,
+  "expectedFullWorkflowJobs": 14,
+  "gradleStepDeadlineMinutes": 35,
+  "backendJobDeadlineMinutes": 40,
+  "testAssignmentAlgorithmChanged": false,
+  "nestedClassOwnershipPreserved": true,
+  "apiContractRemainsShardOne": true,
+  "sharedAndWorkerChecksRemainCompletePerShard": true,
+  "apiCaseStartLogging": true,
+  "xmlReportsAddedAlongsideHtml": true,
+  "scope": [
+    "The failed shard reached the workflow step deadline; its unfinished API case is not known. This does not claim a proven deadlock or slow-case root cause.",
+    "A successful shard reports695 API tests/27m25.94s, while compilation/setup also consumes the35 minute step budget. Eight disjoint API shards reduce assigned work per job; new wall-clock acceptance remains pending.",
+    "Local format/architecture and API-test compilation with shard1/8 pass165.774s; no API test execution is claimed by this compile check.",
+    "Two unrelated uncommitted native-proof test fixtures compile in the local check; they are excluded from this CI-only commit. Full CI runs only committed sources.",
+    "All three chat push flags remain off; private HRIS schema103 and phone15 remain. Native priority, server rollout and remaining54 groups continue."
+  ]
+}

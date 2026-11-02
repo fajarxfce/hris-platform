@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Mobile processed-parent publication validated — 2 November 2026
+
+Mobile [1a55c2a5](https://github.com/fajarxfce/hris-mobile/commit/1a55c2a5) exposes
+processed retention, ownership and cleanup results from its sole Maintain collector.
+Application state explicitly distinguishes pending/observed/stopped, invalidates on
+close/completion and rejects late results. Cleanup failure does not erase a processed
+parent or claim native store readiness. Legacy denial priority and selected task-key
+scheduling remain. Ten new cases pass; full checks pass in298s /301.988s with2,993
+desktop,209 Android host,792 browser and10 build-logic cases, zero failures/skips.
+
+Continue Mobile durable collapsed wake storage, fair all-company recovery and actual
+receive/notification/reply. Its raw global storage candidate is incomplete/unapplied,
+with Room11→12 and IndexedDB10→11 additions; finish concurrency, capacity, cancellation
+and real migration/reopen tests first. Preserve one-time APPEND_OR_REPLACE race
+protection while bounding scheduling. Duplicate deterministic APPEND IDs are unsafe
+per inspected WorkManager2.12 sources; validate the proposed persist-before-pending
+query approach on actual WorkManager. Do not use synthetic account/session scope.
+
+Phone remains verified15 from30d7faab. No new JNI/APK/live rollout or Starter port
+for this increment. Generic wake foundations return to Starter after Mobile proof.
+Backend push stays disabled; all54 PRD groups remain open. Owned emulator5560 is
+stopped; preserve unrelated5558/jobs. Temporary swap remains pending safe cleanup.
+Continue after each push; Mobile handoff and measurements have exact next steps.
+
 ## Mobile release15 delivered with actual Android regression evidence — 2 November 2026
 
 Mobile [30d7faab](https://github.com/fajarxfce/hris-mobile/commit/30d7faab) fixes

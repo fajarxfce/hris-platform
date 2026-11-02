@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Mobile release15 delivered with actual Android regression evidence — 2 November 2026
+
+Mobile [30d7faab](https://github.com/fajarxfce/hris-mobile/commit/30d7faab) fixes
+initial native-parent retention before workspace observation, retains foreground
+through same-parent token rotation and anchors hard expiry across clock rollback.
+Its final root/browser checks pass:2,983 desktop,209 Android host,788 browser and10
+build-logic cases. [94d62e11](https://github.com/fajarxfce/hris-mobile/commit/94d62e11)
+records five actual SDK/HRIS/Synapse regression passes with cleanup in364s /365.046s
+against clean Platforma9706280. The same clean Mobile implementation builds signed
+devRelease15, passes two12s actual application cold starts, then produces an ARM64
+APK with all eight DEX files identical to the startup-tested universal build.
+
+The authorized phone now has release15,87,363,576 bytes, SHA-256
+`39a8bb9cfbaf95c394e228d16aebc2085448d8c4c3d2b0f051fadc13eca6a79e`.
+Install-only update preserved signer/data/UID/first-install time; full installed-file
+hash was computed on the phone. A slow preliminary read-only pull was interrupted
+and preserved in the measurement. No phone UI launch or new user acceptance is
+claimed. Build/lint pass with zero errors and one existing warning.
+
+Continue Mobile explicit processed-parent publication from its sole Maintain
+collector; six files/ten regression cases are prepared but unapplied at this
+checkpoint. Distinguish pending/observed/stopped, separate cleanup failure from
+parent identity, and suppress publication after close or source termination.
+Then implement durable coalesced all-company wakes, fair directory recovery,
+receive/decrypt, notification privacy/read/mute/deep links and encrypted replies.
+One-time Android scheduling already uses APPEND_OR_REPLACE, not KEEP; preserve
+its finishing-worker race fix while bounding new burst scheduling and testing
+persist/schedule/ack gaps. Mobile handoff has the candidate and validation details.
+
+No live schema/provider rollout or generic Starter port; private server remains
+schema103/API-worker2c2a59e3 and backend collaboration push stays disabled. All54 PRD
+groups remain open. Owned emulator5560 is stopped; preserve unrelated5558/jobs.
+Owned temporary swap remains active pending safe RAM headroom. Continue after pushes.
+
 ## Mobile shared admitted background worker validated — 2 November 2026
 
 Mobile [d8ebe56f](https://github.com/fajarxfce/hris-mobile/commit/d8ebe56f) extends

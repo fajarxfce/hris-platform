@@ -200,7 +200,12 @@
         "../measurements/chat-incoming-history-waves-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/dd1a449b9a00a7323d453a48584b179c8e007416/docs/measurements/chat-push-receive-2026-11-02.json",
         "room-lookup.md",
-        "../measurements/chat-room-lookup-2026-11-02.json"
+        "../measurements/chat-room-lookup-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/71c7f80c905e41d68db4975f5576c88800a20bcd/docs/measurements/chat-room-lookup-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/d93e8cd5eef294d3488a7ccb7f64cac6222ed241/docs/measurements/chat-push-priority-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/cc4c11f1b538d48680ee892f6709925bbe5e18ec/docs/measurements/chat-priority-processing-2026-11-02.json",
+        "private-pilot-rollout.md",
+        "../measurements/chat-private-pilot-preparation-2026-11-02.json"
       ]
     },
     {
@@ -644,8 +649,9 @@
   },
   "next": [
     "Employee release15 remains installed. Later validated feature delivery must use16+ with prior notification and install-only. Private backend remains schema103; current collaboration branch schema116 needs a compatible tested rollout.",
+    "Prepared private-pilot-rollout.md is not deployed. Full Verify41442782804 at2124c6fc remains active; audit packages/recovery before fresh schema103 checkpoint, isolated103\u2192116 upgrade and compatible runtime rollout. Preserve existing Google/native/document state.",
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
-    "Private callback/push worker, typed background admission, finite native borrowing, durable all-company wakes/progress and fair company/room continuation are validated. Mobile ee888802 and real SDK/HRIS/Synapse proof validate bounded incoming originals with an empty outbox, no selection and receiver SDK closed during seeding. Direct invocation is distinct from incoming OS/FCM acceptance. Complete independent long-offline catchup and FCM receive/decrypt/privacy/actions/reply before live push activation.",
+    "Native SDK/HRIS/Synapse proof covers incoming gaps beyond128 originals across process/container restarts. Mobile now has strict push receive, encrypted bounded priorities, fresh hinted admission and exact-room original recovery without changing fair company/room/history traversal. Real app DI/SQLite tests use an SDK double for the new priority lane; complete actual native priority and notification read/mute/privacy/actions/inline reply before live push activation.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."

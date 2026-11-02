@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Priority recovery and private pilot preparation — 2 November 2026
+
+Mobile cc4c11f1b538d48680ee892f6709925bbe5e18ec is PUSHED: one encrypted push hint gets a20s admission/exact-room
+original turn, followed by normal fair company recovery. Failed/denied/expired work
+retains both hint and global wake. An expired-credential regression reproduced early
+completion and is corrected. Root/Android/affected browser checks pass344.646s on16
+unchanged inputs:3,262 desktop485 suites,222 host36,981 browser101,10 build-logic2;
+zero failures/errors/skips. Its handoff/measurement retain all attempts and source hashes.
+This follows pushed room lookup71c7f80c and bounded encrypted queue d93e8cd5.
+
+Apple41441078558 at exact d93e8cd5 is ACTIVE: Swift extraction11s, simulator compile672s
+and tests150s pass; full Xcode pending. Do not cancel or dispatch another Apple run.
+It excludes the newest priority-processing increment. Prior receiver dd1a449b Apple
+41436278627 is audited112 core cases/30 suites plus ten Swift cases and full Xcode.
+
+Platform Collaboration control41437984098 at2124c6fc is completely passed. Downloaded
+reports:658 cases/103 suites, six opt-in native/elapsed skips,652 active, no failure/error.
+Both authority/storage and company-settings jobs passed. [Evidence](measurements/chat-private-pilot-preparation-2026-11-02.json)
+archives report hashes. Full ten-job Verify41442782804 at that exact source is ACTIVE;
+audit final jobs/artifacts, do not cancel or treat current progress as acceptance.
+
+[Prepared private rollout](collaboration/private-pilot-rollout.md) records persistent
+internal Synapse/PostgreSQL, protected staged config, fresh coordinated checkpoint,
+isolated103→116 upgrade, compatible exact-JAR images and identity/document preservation.
+No private configuration/service/phone changes yet. Supplementary .work/chat-private-
+rollout-2026-11-02 holds initial plan/control artifact audit. Historical final-development-
+rollout scripts hardcode old CI/source/schema; review/adapt before use, never rerun verbatim.
+Keep provider callbacks/chat FCM off until read/mute/privacy and durable notification
+projection/actions/inline replies exist. Native SDK priority proof remains separate.
+
+Private API-worker2c2a59e3/schema103, dashboard1e0522c0 and installed phone15 unchanged.
+Next release16+ needs prior notice, explicit10.77.77.3:5555 --install-only, no phone UI.
+No Starter port, owned emulator, active goal or subagent. All54 PRD groups remain open;
+continue immediately after this documentation commit.
+
 ## Native room lookup and push receiver continuation — 2 November 2026
 
 [Room lookup](collaboration/room-lookup.md) / [evidence](measurements/chat-room-lookup-2026-11-02.json):

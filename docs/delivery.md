@@ -1,6 +1,6 @@
 # Delivery and validation
 
-Current communications checkpoint: [native room lookup](measurements/chat-room-lookup-2026-11-02.json) resolves an owned direct summary from a push room hint without scanning the directory. Domain/PostgreSQL, API/worker contexts and static checks pass; the two fixture-only corrections are retained. Mobile native receive routing is pushed, and its room-lookup adapter tests are running separately. Priority/decrypt/privacy/actions/replies and live provider/OS acceptance remain; chat push stays disabled. All54 PRD groups remain open. No private rollout or phone operation by this increment; see the handoff.
+Current communications checkpoint: Mobile admission/exact-room push priority recovery passes root/Android/browser checks, with expired-credential retention and fair global recovery. Platform Collaboration control41437984098 passes; full Verify41442782804 is running at2124c6fc. [Private pilot rollout](collaboration/private-pilot-rollout.md) is prepared, not executed. Chat notifications/actions, actual new priority SDK proof and all54 PRD groups remain open. Private schema103 and phone15 are unchanged; chat push stays disabled.
 
 ## Verify a development branch
 

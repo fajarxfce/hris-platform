@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Durable wake foundation proved in Mobile and Starter — 2 November 2026
+
+Mobile [be8ebc7b](https://github.com/fajarxfce/hris-mobile/commit/be8ebc7b) adds
+bounded application-global scheduling generations with transactional capacity,
+replay and exact-generation acknowledgment. Room11→12 and IndexedDB10→11 retain
+prior data. The first SQLite run found already-cancelled writes committing; the
+fix passes actual SQLite/browser regressions and full checks (3,000 desktop,
+209 Android host,42 database-browser,10 build-logic). Details and failed-run
+history live in Mobile's work-wake-storage measurement.
+
+Starter [dab675a](https://github.com/fajarxfce/compose-fluent-starter/commit/dab675a)
+ports 15 identical shared source/test/schema files after Mobile proof. Independent
+root/database-browser/Android/lint/production Web checks pass in301s /305.231s:
+348 desktop,42 browser and six build-logic cases, zero failures/errors/skips.
+Mobile app policy/configuration is excluded. Its six Apple wrappers await Mobile
+hosted run41396150119 at be8ebc7b before port and independent Starter Apple CI.
+No result is accepted until actual downloaded XML and Xcode steps are audited.
+
+Continue Mobile fixed-key wake repository/Request/Resume/Read/Complete policies;
+12 uncommitted inputs are currently under focused checks with ten domain/six data
+regressions and actual application DI/SQLite coverage. Preserve any failures,
+then full root/affected browser validation. These are not yet invoked by a
+registered all-company worker or FCM receive path. Next: bounded WorkManager
+coordination, fair company/room discovery, actual decrypt/notification/reply.
+
+Phone remains verified15 from30d7faab; no server rollout. Private schema103/API-
+worker2c2a59e3 remains, branch push foundations stay disabled. All54 PRD groups
+remain open. Continue after each commit/push; Mobile handoff has exact next steps.
+
 ## Mobile processed-parent publication validated — 2 November 2026
 
 Mobile [1a55c2a5](https://github.com/fajarxfce/hris-mobile/commit/1a55c2a5) exposes

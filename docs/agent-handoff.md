@@ -1,5 +1,20 @@
 # Agent continuation — HRIS workspace
 
+## Mobile release 14 installed and verified — 2 November 2026
+
+Mobile [4e4c1bd9](https://github.com/fajarxfce/hris-mobile/commit/4e4c1bd9) records
+the notified install-only update on the authorized WireGuard phone. Clean8c557716
+source produced the arm64 devRelease14 APK; all eight DEX files match its actual
+application startup-tested universal14. Installed bytes were pulled and match
+SHA256 `be3d42117c0d52e961f668b37ee05625916ef5bece72d0e067500b14fad2945d`.
+The signer, application UID and first-install time are preserved. No app-data
+clear, uninstall or UI launch occurred. Phone now has14; older11 notes below are
+historical. The user confirmed11 opens, not14.
+
+Continue Mobile typed native/history scope, shared outbox and durable all-company
+receive/recovery. Keep backend delivery disabled until actual receive acceptance.
+No live server change or generic Starter port. All54 PRD groups remain open.
+
 ## Mobile finite background runtime references validated — 2 November 2026
 
 Mobile [8c557716](https://github.com/fajarxfce/hris-mobile/commit/8c5577167f86f47d0eebd03ff04e57ae5351a99e)

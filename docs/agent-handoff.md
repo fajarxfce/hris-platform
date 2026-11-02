@@ -46,11 +46,12 @@ Owned emulator5562/PID553348 is stopped and proof package removed. Apple41446374
 atcc4c11f1 is fully audited (112 native core cases,106 source hashes/full Xcode).
 Starter0d4432e generic backup port is independently accepted/pushed.
 
-Mobile clean c6347c75 release17 build/lint and two translated-arm64 emulator cold
-starts pass. Refreshed phone preflight confirms15 and same signer. Installation17
-is ACTIVE in Mobile .work/release-phone-2026-11-02-build17, explicit10.77.77.3:5555
---install-only after user-facing notice. Audit its result before any retry; never
-launch/drive phone UI or clear data. Then record/push Mobile delivery evidence.
+Mobile clean c6347c75 release17 is INSTALLED and pull-back verified in62.534s,
+SHA256b94aedf2b1eb81949d8eeacc82fd2906f0c85b27641e3bcc65fd8884e5fb34d2,87,495,300 bytes.
+Explicit10.77.77.3:5555 --install-only after notice; UID10962/first-install retained,
+non-debuggable, no uninstall/data clear/UI driving. Mobile4f1531a6 records delivery
+and compatible server. Actual-artifact build/lint/two emulator cold starts pass;
+no new physical phone Google/chat/FCM acceptance. Future phone build must exceed17.
 
 Next implementation is staged ONLY as .txt in .work/chat-receipts-2026-11-02:
 17 baseline-hashed inputs add exact public/private receipt POST, owned event/read

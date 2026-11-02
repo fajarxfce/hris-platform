@@ -25,8 +25,8 @@ operator reads the existing employee contact and empty own device/directory, the
 revokes itself. No device or human message is created by this verification.
 
 All three chat push flags remain false. Matrix recovery has its own pre-enrollment
-checkpoint; the HRIS recovery pack does not include Matrix stores. The phone update
-to verified Mobile release17 is handled separately with install-only and no UI driving.
+checkpoint; the HRIS recovery pack does not include Matrix stores. Verified Mobile release17 is installed with exact APK pull-back verification,
+retained app identity/data and no UI driving (Mobile4f1531a6).
 See [operator contract](collaboration/private-pilot-rollout.md) for protected paths.
 Earlier deployment sections below are historical.
 

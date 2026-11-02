@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Actual incoming provider recovery validated — 2 November 2026
+
+Mobile [ee888802](https://github.com/fajarxfce/hris-mobile/commit/ee888802) is pushed.
+[Shared evidence](measurements/chat-incoming-provider-2026-11-02.json) binds five
+actual Android/HRIS/PostgreSQL/Synapse scenarios: 384.631s, zero failures/errors/skips,
+with Platform format/architecture and 81 Python driver cases (0.167s). In each of
+QUEUED, FROZEN_DRAFT and CANCELLED_DRAFT the receiver SDK closes before 32 encrypted
+peer events are seeded. Actual incoming recovery then uses a fresh directory, native
+admission and summary page, with empty outbox and selection reads explicitly rejected.
+Each takes one pass and retains 12 originals, including the old outgoing original,
+after reopening storage; runtime cleanup and subsequent foreground paging pass.
+This is direct fixture invocation with the Android process/peer SDK alive, not incoming
+FCM, Doze, process-death, complete long-offline or all-company provider acceptance.
+
+The initial native run failed four of five cases in 356.106s. A raw fixture join saw
+503 provider_busy; Mobile adds at most three idempotent M_UNKNOWN attempts. Three
+incoming cases reached foreground but failed Unavailable/Unclassified. The fixture
+now republishes foreground retention after reopening; old diagnostics cannot establish
+an exact code or incoming counts. A new bounded incoming checkpoint survives later
+foreground failures. Production M_UNKNOWN mapping is now Service/retryable, with a
+shared regression case. Final trace recovered keys/query and keys/upload 503s; do
+not claim the final run exercised a join 503. Both attempts and hashes are preserved.
+
+Mobile final root/proof/Android release/data-browser checks pass in 301.21s:
+3,124 desktop, 216 Android host, 6 proof host, 299 data browser and 10 build-logic.
+Seven Mobile and four Platform inputs plus APK 5f17598f are frozen through native2.
+All driver cleanup succeeds; owned emulator 5562/PID99409 stopped in 1.003s.
+Unrelated 5560 and phone 15 are untouched. Apple 41414832120 remains active at
+3062bff25c678639204bcf4a5e2e95be85c155d4; simulator tests passed, Xcode building.
+Do not cancel it with another dispatch; audit artifacts on completion. It excludes
+later proof/mapper changes. No generic Starter port is due.
+
+**Continue immediately:** independent durable incoming history traversal/frontier and
+pending-reference progress without resetting foreground Older. Then FCM privacy,
+actions/encrypted replies and compatible private backend rollout. Latest-window
+acquisition alone is not long-offline catchup. All 54 PRD groups remain open.
+Private schema103/API-worker2c2a59e3, branch116 and disabled chat push remain;
+next validated employee release is16+ with prior notification and install-only.
+
 ## Incoming recovery implemented; native driver selects owned emulator — 2 November 2026
 
 Mobile [3062bff2](https://github.com/fajarxfce/hris-mobile/commit/3062bff2) adds incoming

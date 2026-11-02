@@ -1,6 +1,6 @@
 import unittest
 
-from collaboration_worker_native import checkpoint, evidence, diagnostic
+from collaboration_worker_native import checkpoint, evidence, diagnostic, incoming_evidence
 
 
 class WorkerEvidenceTest(unittest.TestCase):
@@ -15,7 +15,31 @@ class WorkerEvidenceTest(unittest.TestCase):
                                    "repeatedWorkerComplete": True, "foregroundHistoryPaged": True,
                                    "foregroundStoppedHistoryRetained": True, "historyPages": 2,
                                    "providerReferences": 42, "pendingStateReferences": 9,
-                                   "historyPeerEvents": [f"$peer-{i}" for i in range(32)]}
+                                   "historyPeerEvents": [f"$peer-{i}" for i in range(32)], "incoming": self.incoming()}
+
+    def incoming(self):
+        return {"incomingWithoutOutbox": True, "incomingWithoutSelection": True,
+                "incomingFreshNativeAdmission": True, "incomingOriginalAfterOfflineSeed": True,
+                "incomingHistoryRetainedAfterReopen": True, "incomingRuntimeReleased": True,
+                "incomingPasses": 1, "incomingSavedOriginals": 22}
+
+    def test_incoming_evidence_requires_every_boundary_and_bounded_integer_counts(self):
+        for invalid in (None, [], {}, self.incoming() | {"incomingPasses": True},
+                        self.incoming() | {"incomingPasses": 0}, self.incoming() | {"incomingPasses": 5},
+                        self.incoming() | {"incomingSavedOriginals": True},
+                        self.incoming() | {"incomingSavedOriginals": 0},
+                        self.incoming() | {"incomingSavedOriginals": 33}):
+            with self.assertRaises(ValueError):
+                incoming_evidence(invalid)
+        for key, value in self.incoming().items():
+            if type(value) is bool:
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    incoming_evidence(self.incoming() | {key: False})
+
+    def test_incoming_evidence_discards_private_extra_fields(self):
+        self.assertEqual(self.incoming(), incoming_evidence(self.incoming() | {"body": "hidden", "token": "hidden"}))
+        with self.assertRaises(ValueError):
+            evidence(self.completed() | {"incoming": None}, self.queued(), self.queued(456))
 
     def test_nested_instrumentation_diagnostic_is_preserved_without_private_payloads(self):
         result = diagnostic({"complete": False, "failureCategory": "FixtureFailure", "privateBody": "hidden"})

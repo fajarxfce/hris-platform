@@ -115,7 +115,23 @@ def evidence(value, queued, restored):
         raise ValueError("Invalid encrypted history seed events")
     return result | {"eventId": event, "passes": passes, "historyPages": pages,
                      "providerReferences": references, "pendingStateReferences": pending,
-                     "historyPeerEvents": list(peers)}
+                     "historyPeerEvents": list(peers), "incoming": incoming_evidence(value.get("incoming"))}
+
+
+def incoming_evidence(value):
+    if not isinstance(value, dict):
+        raise ValueError("Missing incoming recovery evidence")
+    flags = ("incomingWithoutOutbox", "incomingWithoutSelection", "incomingFreshNativeAdmission",
+             "incomingOriginalAfterOfflineSeed", "incomingHistoryRetainedAfterReopen", "incomingRuntimeReleased")
+    if any(value.get(key) is not True for key in flags):
+        raise ValueError("Incomplete incoming recovery evidence")
+    result = {key: True for key in flags}
+    for key, maximum in (("incomingPasses", 4), ("incomingSavedOriginals", 32)):
+        count = value.get(key)
+        if type(count) is not int or not 1 <= count <= maximum:
+            raise ValueError("Unbounded incoming recovery evidence")
+        result[key] = count
+    return result
 
 
 def diagnostic(status):
@@ -208,6 +224,12 @@ def run(apk, sdk, directory):
         result["failureCategory"] = type(error).__name__
         result.setdefault("nativeDiagnostic", diagnostic(app_json("instrumentation")))
     finally:
+        incoming = app_json("worker-incoming")
+        if incoming is not None:
+            try:
+                result["incomingCheckpoint"] = incoming_evidence(incoming)
+            except ValueError:
+                result["incomingCheckpointRejected"] = True
         stopped = stop_process(process)
         result["cleanup"] = native.cleanup() and stopped
         private_json(directory / "result.json", result)

@@ -293,3 +293,23 @@ Local execution is separate from hosted CI. Pin the committed Platform fixture i
 and audit a matching hosted run. This does not accept physical iPhone/web behavior, capacity,
 all chat features or the complete communications PRD. The installed release8 predates these
 fixture-only changes; no additional phone installation follows from them.
+
+
+## Incoming recovery without an outbox or workspace selection
+
+The [incoming provider proof](../measurements/chat-incoming-provider-2026-11-02.json)
+closes the receiver SDK before 32 encrypted peer seeds, then opens a background-only
+application container. Its workspace repository rejects selected-workspace access.
+Fresh real native-device directory/admission and summaries drive the actual incoming
+worker with an empty outbox. Each of three draft/queue variants completes in one pass,
+persists 12 originals (including the previous outgoing original), and verifies exact
+retention after reopening storage. All borrowed runtime resources close before the
+normal foreground history probe resumes and checks the full fixture history.
+
+The driver validates six bounded boolean assertions, pass/original counts and fresh
+HTTP acquisition counts. A separately retained incoming checkpoint preserves evidence
+when a later foreground assertion fails; neither bodies nor opaque IDs are copied.
+SDK and scheduled offline/process-death regressions remain in the same five-case run.
+This phase keeps the Android process and peer SDK alive and directly invokes recovery;
+it does not prove incoming FCM, network-offline/Doze wake, all-company scheduling or
+complete long-offline catchup. Login/provider bindings remain explicit fixtures.

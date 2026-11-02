@@ -190,7 +190,11 @@
         "../measurements/chat-push-worker-2026-11-02.json",
         "native-recovery.md",
         "../measurements/chat-native-recovery-directory-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/10dce241/docs/measurements/chat-pusher-client-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/10dce241/docs/measurements/chat-pusher-client-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/3062bff25c678639204bcf4a5e2e95be85c155d4/docs/measurements/chat-incoming-worker-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/af5cb4dc/docs/measurements/chat-room-recovery-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/5a39b53f0ece41d314738090e330bd7004e528db/docs/measurements/chat-company-continuation-2026-11-02.json",
+        "../measurements/chat-incoming-provider-2026-11-02.json"
       ]
     },
     {
@@ -302,7 +306,11 @@
         "../measurements/chat-cancellation-native-2026-11-01.json",
         "key-publication-pending.md",
         "https://github.com/fajarxfce/hris-mobile/blob/c0371a38d1ae2f8c890c300648ec849089c3836a/docs/measurements/chat-cancellation-ui-2026-11-01.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/648410c4860f1e493669c3e9b8cf8ad529c07a0e/docs/measurements/chat-cancellation-policy-2026-11-01.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/648410c4860f1e493669c3e9b8cf8ad529c07a0e/docs/measurements/chat-cancellation-policy-2026-11-01.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/3062bff25c678639204bcf4a5e2e95be85c155d4/docs/measurements/chat-incoming-worker-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/af5cb4dc/docs/measurements/chat-room-recovery-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/5a39b53f0ece41d314738090e330bd7004e528db/docs/measurements/chat-company-continuation-2026-11-02.json",
+        "../measurements/chat-incoming-provider-2026-11-02.json"
       ]
     },
     {
@@ -627,9 +635,9 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Mobile release11 fixes actual Android host startup using the API origin for the Matrix gateway. It is installed and user-confirmed; next product phone update must use12+ with notification and install-only.",
+    "Employee release15 remains installed. Later validated feature delivery must use16+ with prior notification and install-only. Private backend remains schema103; current collaboration branch schema116 needs a compatible tested rollout.",
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
-    "Private callback, Synapse/TLS outage retry, durable queue, fenced delivery, default-disabled worker and bounded native recovery discovery/admission are validated. Mobile managed pusher activation is locally validated; typed background admission is under test. Complete finite runtime ownership, all-company durable wake/reconnect recovery, receive/decrypt/reply before live activation.",
+    "Private callback/push worker, typed background admission, finite native borrowing, durable all-company wakes/progress and fair company/room continuation are validated. Mobile ee888802 and real SDK/HRIS/Synapse proof validate bounded incoming originals with an empty outbox, no selection and receiver SDK closed during seeding. Direct invocation is distinct from incoming OS/FCM acceptance. Complete independent long-offline catchup and FCM receive/decrypt/privacy/actions/reply before live push activation.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2–P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."

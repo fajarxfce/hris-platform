@@ -183,6 +183,27 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "foregroundHistoryPaged",
                 "foregroundStoppedHistoryRetained",
             )) assertTrue(proof.path(flag).asBoolean(), flag)
+        val incoming = proof.path("incoming")
+        for (flag in
+            listOf(
+                "incomingWithoutOutbox",
+                "incomingWithoutSelection",
+                "incomingFreshNativeAdmission",
+                "incomingOriginalAfterOfflineSeed",
+                "incomingHistoryRetainedAfterReopen",
+                "incomingRuntimeReleased",
+            )) assertTrue(incoming.path(flag).asBoolean(), flag)
+        val incomingPasses = incoming.path("incomingPasses").asInt()
+        assertTrue(incomingPasses in 1..4)
+        assertTrue(incoming.path("incomingSavedOriginals").asInt() in 1..32)
+        assertEquals(
+            mapOf(
+                "directory" to incomingPasses,
+                "admission" to incomingPasses,
+                "summaries" to incomingPasses,
+            ),
+            trace.incomingAdmissions(),
+        )
         val seedEvents = proof.path("historyPeerEvents")
         assertTrue(seedEvents.isArray)
         assertEquals(32, seedEvents.size())
@@ -232,6 +253,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "workerEncryptedSends" to 1,
                 "seededPeerEncryptedSends" to 32,
                 "foregroundHistoryAccepted" to true,
+                "incomingAdmissions" to trace.incomingAdmissions(),
                 "applicationAdmissions" to trace.applicationAdmissions(),
                 "proof" to json.convertValue(proof, Map::class.java),
                 "artifact" to json.convertValue(result.path("artifact"), Map::class.java),

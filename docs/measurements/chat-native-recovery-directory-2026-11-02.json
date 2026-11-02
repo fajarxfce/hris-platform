@@ -1,0 +1,443 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "e1da924b4f6e73dfc59dad10b7b5801b7cba4f98",
+  "scope": "Bounded native-parent device discovery and separately protected per-company admission. No automatic Mobile recovery or live rollout.",
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationDirectoryHttpTest.kt": "ad6816977fe7923524420e76a04150e3e1a714dddbb0f3b24a81f7a334e9d0e2",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationDisabledHttpTest.kt": "a721fea4395ccb9194664198023dfaea592fa9af2cac5e9002ca9c7661849f4e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRegistryDataSource.kt": "e32aa5af73c925c62d94c3fc8f58c153e90a03f4037ffa1a036ed5b3f1e3f942",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRegistryDataSource.kt": "508dc3d193db5829dc746c16cfda6f217c42a46c8808176d5dc6de03181c9106",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "4301ed5c1d37a21f9d84a6fe4703f6613ab8c643e7724a8f6687cb3fe2a148cd",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRegistryRepository.kt": "3ce9bf274b0592cbf7f19d85d465048819c82236eaa9a62ccbb9e4a7e6da956a",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "23a4d3429ee78331bffc8bfff00607f08c2fdbb01da3a537259c4be0728070f3",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDeviceController.kt": "bab54828302745d32ce658fb2224d7dd298113666003d72aab63ce0d850ed4bb",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDirectoryController.kt": "c69e2a2b227fc30f68e70287b49531bed1756ecced7dfbc6d60f9c16d3c5cf1e",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationAdmissionResponse.kt": "22211c5869fde64a9bee0d06ab3ca77b2bb615613ef5d63571f597d124fa398d",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationDirectoryResponse.kt": "e7c23d83f967abd1248562438f3d9c1a7b2ca08c37ced12bb86fd376f8a5cffa",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationNativeDevicePage.kt": "bb7679820b2039894d90b86bef8829a2df73b4231767581fb441850d98f70385",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRegistryRepository.kt": "3073ba0d515a152f566456e57446e87d812c40f354067fe65cc5ef85b229ade7",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/ListNativeCollaborationDevices.kt": "8fa3d517b68fb0bf211e80d8af03deb4083ae712527f83d9506123a4eaf31622",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationAdmissionMfaHttpTest.kt": "62429ecc5d451ff5865157ec680fc9396c3aea69583a66c5dcf1438f6da271b6"
+  },
+  "finalRun": {
+    "exitCode": 0,
+    "wallSeconds": 145.191,
+    "inputsUnchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*NativeCollaborationRegistrationTest",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationDirectoryHttpTest",
+      "--tests",
+      "*NativeCollaborationAdmissionMfaHttpTest",
+      "--tests",
+      "*NativeCollaborationStatusHttpTest",
+      "--tests",
+      "*NativeCollaborationDisabledHttpTest",
+      "--tests",
+      "*NativeCollaborationHttpTest",
+      ":apps:worker:test",
+      "--tests",
+      "*CollaborationProvisioningWorkerTest",
+      "--tests",
+      "*CollaborationPushContextTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 144,
+  "reports": {
+    "domain": {
+      "counts": {
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest",
+          "seconds": 0.016
+        },
+        {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest",
+          "seconds": 0.003
+        },
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest",
+          "seconds": 0.003
+        },
+        {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest",
+          "seconds": 0.004
+        },
+        {
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest",
+          "seconds": 0.091
+        },
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest",
+          "seconds": 0.005
+        },
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest",
+          "seconds": 0.005
+        },
+        {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest",
+          "seconds": 0.012
+        },
+        {
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationPushDeliveryPolicyTest",
+          "seconds": 0.012
+        },
+        {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest",
+          "seconds": 0.004
+        },
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest",
+          "seconds": 0.036
+        },
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest",
+          "seconds": 0.006
+        },
+        {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest",
+          "seconds": 0.064
+        }
+      ]
+    },
+    "data": {
+      "counts": {
+        "tests": 144,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "tests": 144,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest",
+          "seconds": 144.318
+        }
+      ]
+    },
+    "api": {
+      "counts": {
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.NativeCollaborationDirectoryHttpTest",
+          "seconds": 10.205
+        },
+        {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.NativeCollaborationDisabledHttpTest",
+          "seconds": 8.87
+        },
+        {
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.NativeCollaborationHttpTest",
+          "seconds": 9.576
+        },
+        {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.NativeCollaborationStatusHttpTest",
+          "seconds": 9.149
+        },
+        {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.NativeCollaborationAdmissionMfaHttpTest",
+          "seconds": 17.065
+        }
+      ]
+    },
+    "worker": {
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.worker.CollaborationPushContextTest",
+          "seconds": 11.352
+        },
+        {
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "name": "dev.fajar.hris.worker.CollaborationProvisioningWorkerTest",
+          "seconds": 33.13
+        }
+      ]
+    }
+  },
+  "earlierRuns": [
+    {
+      "attempt": 2,
+      "run": {
+        "exitCode": 1,
+        "wallSeconds": 235.803,
+        "inputsUnchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest",
+          ":apps:server:test",
+          "--tests",
+          "*NativeCollaborationDirectoryHttpTest",
+          "--tests",
+          "*NativeCollaborationStatusHttpTest",
+          "--tests",
+          "*NativeCollaborationDisabledHttpTest",
+          "--tests",
+          "*NativeCollaborationHttpTest",
+          ":apps:worker:test",
+          "--tests",
+          "*CollaborationProvisioningWorkerTest",
+          "--tests",
+          "*CollaborationPushContextTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "First HTTP fixture incorrectly assumed MFA enforcement; the shared ApiIntegrationTest disables it."
+    },
+    {
+      "attempt": 3,
+      "run": {
+        "exitCode": 1,
+        "wallSeconds": 74.66,
+        "inputsUnchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest",
+          ":apps:server:test",
+          "--tests",
+          "*NativeCollaborationDirectoryHttpTest",
+          "--tests",
+          "*NativeCollaborationStatusHttpTest",
+          "--tests",
+          "*NativeCollaborationDisabledHttpTest",
+          "--tests",
+          "*NativeCollaborationHttpTest",
+          ":apps:worker:test",
+          "--tests",
+          "*CollaborationProvisioningWorkerTest",
+          "--tests",
+          "*CollaborationPushContextTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "Configuring an account secret alone did not enable enforcement in that inherited HTTP context. Replaced this part with an actual MfaApiFixture test."
+    },
+    {
+      "attempt": 4,
+      "run": {
+        "exitCode": 1,
+        "wallSeconds": 85.129,
+        "inputsUnchanged": true,
+        "command": [
+          "sudo",
+          "-n",
+          "runuser",
+          "-u",
+          "fajar",
+          "-g",
+          "docker",
+          "--",
+          "env",
+          "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+          "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+          "./gradlew",
+          "--no-daemon",
+          "--no-parallel",
+          "--max-workers=1",
+          "-Dorg.gradle.jvmargs=-Xmx1536m",
+          ":modules:collaboration:domain:test",
+          ":modules:collaboration:data:test",
+          "--tests",
+          "*NativeCollaborationRegistrationTest",
+          ":apps:server:test",
+          "--tests",
+          "*NativeCollaborationDirectoryHttpTest",
+          "--tests",
+          "*NativeCollaborationAdmissionMfaHttpTest",
+          "--tests",
+          "*NativeCollaborationStatusHttpTest",
+          "--tests",
+          "*NativeCollaborationDisabledHttpTest",
+          "--tests",
+          "*NativeCollaborationHttpTest",
+          ":apps:worker:test",
+          "--tests",
+          "*CollaborationProvisioningWorkerTest",
+          "--tests",
+          "*CollaborationPushContextTest",
+          "formatCheck",
+          "architectureCheck"
+        ]
+      },
+      "reason": "The strict HTTP test proved protected admission denial, then found metadata discovery still blocked by the global interceptor. Added PendingMfaAllowed only to the native self-device metadata method; company admission remains protected."
+    }
+  ],
+  "executionNotes": [
+    "Final API and worker tasks executed. Domain55 and registration SQL144 remain up-to-date from the successful first run of those unchanged domain/data sources.",
+    "Attempt1 input manifest was prepared but never executed; there is no test result for that manifest.",
+    "One strict MFA HTTP case enrolls and verifies a fictional account through actual endpoints before native exchange. Device publication is fixture SQL; no Synapse/FCM delivery is claimed."
+  ],
+  "checked": [
+    "Current native transport/account/parent with forced RLS; foreign account/parent cannot retarget discovery. Web cookie transport is rejected.",
+    "Page size1..32/default8 with one lookahead and canonical UUID company seek; metadata fields only, including retained provisioning/revoked devices.",
+    "Own-parent metadata survives company permission loss or expired MFA but grants no company content access. Only the exact discovery method allows pending MFA through the global interceptor.",
+    "Company admission exposes the existing guarded device/MFA/client-policy use case, maximum60-second observation with no provider bearer.",
+    "Unknown/foreign/revoked/expired/version-changed parent and inactive account rejected. Invalid sizes/scopes avoid query. Thirty-second/backward/interruption and late credential checks withhold results.",
+    "Malformed repository ownership, version, ordering, duplicate, future-created and stale-cursor results rejected.",
+    "Actual API plus enabled/disabled worker contexts resolve the changed shared graph. Format and architecture checks pass."
+  ],
+  "limits": [
+    "Schema remains116 in tests; existing V104 account-owned device metadata policies suffice. No migration/RLS widening or live database change.",
+    "No benchmark or large-company capacity acceptance. The query uses the existing account/native-parent binding index.",
+    "Mobile typed admission, bounded runtime ownership, durable collapsed-hint recovery, receiver/decryption/reply and Apple/web behavior remain required.",
+    "Keep HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED false; all54 feature groups remain unaccepted."
+  ]
+}

@@ -1,6 +1,7 @@
 package dev.fajar.hris.collaboration.data.repositories
 
 import dev.fajar.hris.collaboration.data.datasources.CollaborationRegistryDataSource
+import dev.fajar.hris.collaboration.data.models.BoundCollaborationDeviceData
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRegistryRepository
 import dev.fajar.hris.core.database.safeDatabaseCall
@@ -13,6 +14,15 @@ import java.util.UUID
 
 class StoredCollaborationRegistryRepository(private val store: CollaborationRegistryDataSource) :
     CollaborationRegistryRepository {
+    override fun listBound(
+        accountId: UUID,
+        nativeSessionId: UUID,
+        afterCompanyId: UUID?,
+        limit: Int,
+    ): Result<List<CollaborationDevice>> = safeDatabaseCall {
+        store.listBound(accountId, nativeSessionId, afterCompanyId, limit).map { it.toDevice() }
+    }
+
     override fun activate(
         companyId: UUID,
         accountId: UUID,
@@ -28,21 +38,21 @@ class StoredCollaborationRegistryRepository(private val store: CollaborationRegi
         accountId: UUID,
         nativeSessionId: UUID,
     ): Result<CollaborationDevice?> = safeDatabaseCall {
-        store.findBound(companyId, accountId, nativeSessionId)?.let { found ->
-            val row = found.device
-            CollaborationDevice(
-                row.id,
-                row.companyId,
-                row.accountId,
-                found.nativeSessionId,
-                CollaborationDeviceState.valueOf(row.state),
-                row.version,
-                row.createdAt.toInstant(),
-                row.revokedAt?.toInstant(),
-                CollaborationPlatform.valueOf(row.platform),
-            )
-        }
+        store.findBound(companyId, accountId, nativeSessionId)?.toDevice()
     }
+
+    private fun BoundCollaborationDeviceData.toDevice() =
+        CollaborationDevice(
+            device.id,
+            device.companyId,
+            device.accountId,
+            nativeSessionId,
+            CollaborationDeviceState.valueOf(device.state),
+            device.version,
+            device.createdAt.toInstant(),
+            device.revokedAt?.toInstant(),
+            CollaborationPlatform.valueOf(device.platform),
+        )
 
     override fun countActiveParentSessions(
         accountId: UUID,

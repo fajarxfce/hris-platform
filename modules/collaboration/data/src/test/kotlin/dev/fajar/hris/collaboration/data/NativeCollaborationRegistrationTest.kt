@@ -56,6 +56,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixSyncR
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationPushBindingRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationPushQueueRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRoomScopeRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
@@ -102,6 +103,248 @@ import tools.jackson.databind.json.JsonMapper
 
 @Testcontainers
 class NativeCollaborationRegistrationTest {
+    @Test
+    fun nativeDirectoryPagesOwnParentReferencesAcrossCompaniesWithoutGrantingContentAccess() {
+        val f = Fixture()
+        val parent = f.parent()
+        val companyIds = listOf(requireNotNull(f.actor.companyId), f.company(), f.company())
+        val devices =
+            companyIds.map { company ->
+                success(f.register(parent, actor = f.actor.copy(companyId = company))).id
+            }
+        f.activate(devices.first())
+        assertInstanceOf(Result.Success::class.java, f.acquire(parent))
+        sql.update(
+            "update collaboration_devices set state='REVOKED',version=version+1,updated_at=now(),revoked_at=now() where id=?",
+            devices.last(),
+        )
+        val anotherParent = f.parent()
+        val otherDevice = success(f.register(anotherParent)).id
+        val other = Fixture()
+        val foreignParent = other.parent()
+        success(other.register(foreignParent))
+        // Own retained metadata can help stop old notifications after access loss.
+        sql.update("delete from membership_permissions where account_id=?", f.account)
+        sql.update("update companies set active=false where id=?", companyIds.last())
+        assertInstanceOf(Result.Failed::class.java, f.acquire(parent))
+        val actor = f.actor.copy(companyId = null, permissions = emptySet())
+        val first = success(f.directory().execute(actor, parent, 0, null, 2))
+        val second = success(f.directory().execute(actor, parent, 0, first.nextAfterCompanyId, 2))
+        assertEquals(f.account, first.accountId)
+        assertEquals(parent, first.nativeSessionId)
+        assertEquals(2, first.devices.size)
+        assertEquals(first.devices.last().companyId, first.nextAfterCompanyId)
+        assertNull(second.nextAfterCompanyId)
+        val all = first.devices + second.devices
+        assertEquals(companyIds.sortedBy { it.toString() }, all.map { it.companyId })
+        assertEquals(devices.toSet(), all.map { it.deviceId }.toSet())
+        assertEquals(
+            setOf(
+                CollaborationDeviceState.ACTIVE,
+                CollaborationDeviceState.PROVISIONING,
+                CollaborationDeviceState.REVOKED,
+            ),
+            all.map { it.state }.toSet(),
+        )
+        assertEquals(
+            listOf(otherDevice),
+            success(f.directory().execute(actor, anotherParent, 0, null, 8)).devices.map {
+                it.deviceId
+            },
+        )
+        assertTrue(
+            success(
+                    f.transactions.run(actor) {
+                        f.registry.listBound(other.account, foreignParent, null, 8)
+                    }
+                )
+                .isEmpty()
+        )
+    }
+
+    @Test
+    fun nativeDirectoryRejectsForeignExpiredRevokedAndReplacedParents() {
+        for (mode in 0..5) {
+            val f = Fixture()
+            var parent = f.parent()
+            success(f.register(parent))
+            val actor = f.actor.copy(companyId = null)
+            when (mode) {
+                0 -> parent = UUID.randomUUID()
+                1 -> {
+                    val other = Fixture()
+                    parent = other.parent()
+                }
+                2 ->
+                    sql.update(
+                        "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                        parent,
+                    )
+                3 ->
+                    sql.update(
+                        "update native_sessions set access_expires_at=now()-interval '1 second' where id=?",
+                        parent,
+                    )
+                4 -> sql.update("update native_sessions set version=version+1 where id=?", parent)
+                5 -> sql.update("update accounts set active=false where id=?", f.account)
+            }
+            val result = f.directory().execute(actor, parent, 0, null, 8)
+            assertInstanceOf(Result.Failed::class.java, result)
+            assertEquals(FailureKind.UNAUTHENTICATED, (result as Result.Failed).failure.kind)
+        }
+    }
+
+    @Test
+    fun nativeDirectoryRejectsScopeAndPageLimitsBeforeReadingReferences() {
+        val f = Fixture()
+        val parent = f.parent()
+        val source =
+            object : CollaborationRegistryRepository by f.registry {
+                override fun listBound(
+                    accountId: UUID,
+                    nativeSessionId: UUID,
+                    afterCompanyId: UUID?,
+                    limit: Int,
+                ): Result<List<CollaborationDevice>> =
+                    error("Invalid input must not read references")
+            }
+        for (limit in listOf(-1, 0, 33, Int.MAX_VALUE)) {
+            val result =
+                f.directory(source).execute(f.actor.copy(companyId = null), parent, 0, null, limit)
+            assertEquals(FailureKind.VALIDATION, (result as Result.Failed).failure.kind)
+        }
+        assertEquals(
+            "platform_scope_required",
+            (f.directory(source).execute(f.actor, parent, 0, null, 8) as Result.Failed).failure.code,
+        )
+        assertEquals(
+            "collaboration_unavailable",
+            (f.directory(source, false).execute(f.actor.copy(companyId = null), parent, 0, null, 8)
+                    as Result.Failed)
+                .failure
+                .code,
+        )
+    }
+
+    @Test
+    fun nativeDirectoryMetadataDoesNotReplaceRequiredMfaForCompanyContent() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        f.activate(device)
+        sql.update(
+            "update accounts set mfa_secret_encrypted='fictional-configured-secret' where id=?",
+            f.account,
+        )
+        assertEquals("mfa_required", (f.acquire(parent) as Result.Failed).failure.code)
+        val metadata =
+            success(f.directory().execute(f.actor.copy(companyId = null), parent, 0, null, 8))
+        assertEquals(listOf(device), metadata.devices.map { it.deviceId })
+    }
+
+    @Test
+    fun nativeDirectoryWithholdsLateBackwardAndInterruptedResults() {
+        for (mode in 0..3) {
+            val f = Fixture()
+            val parent = f.parent()
+            success(f.register(parent))
+            if (mode == 3)
+                sql.update(
+                    "update native_sessions set access_expires_at=? where id=?",
+                    f.clock.at.plusSeconds(1).atOffset(ZoneOffset.UTC),
+                    parent,
+                )
+            val source =
+                object : CollaborationRegistryRepository by f.registry {
+                    override fun listBound(
+                        accountId: UUID,
+                        nativeSessionId: UUID,
+                        afterCompanyId: UUID?,
+                        limit: Int,
+                    ): Result<List<CollaborationDevice>> {
+                        val rows =
+                            f.registry.listBound(accountId, nativeSessionId, afterCompanyId, limit)
+                        when (mode) {
+                            0 -> f.clock.at = f.clock.at.plusSeconds(31)
+                            1 -> f.clock.at = f.clock.at.minusSeconds(1)
+                            2 -> Thread.currentThread().interrupt()
+                            3 -> f.clock.at = f.clock.at.plusSeconds(2)
+                        }
+                        return rows
+                    }
+                }
+            try {
+                if (mode == 2)
+                    assertThrows(InterruptedException::class.java) {
+                        f.directory(source)
+                            .execute(f.actor.copy(companyId = null), parent, 0, null, 8)
+                    }
+                else
+                    assertEquals(
+                        if (mode == 3) "native_session_invalid"
+                        else "collaboration_directory_timeout",
+                        (f.directory(source)
+                                .execute(f.actor.copy(companyId = null), parent, 0, null, 8)
+                                as Result.Failed)
+                            .failure
+                            .code,
+                    )
+            } finally {
+                Thread.interrupted()
+            }
+        }
+    }
+
+    @Test
+    fun nativeDirectoryRejectsInconsistentForeignUnorderedAndOversizedProjections() {
+        val f = Fixture()
+        val parent = f.parent()
+        success(f.register(parent))
+        val actor = f.actor.copy(companyId = null)
+        val own =
+            success(f.transactions.run(actor) { f.registry.listBound(f.account, parent, null, 8) })
+                .single()
+        for (rows in
+            listOf(
+                listOf(own.copy(accountId = UUID.randomUUID())),
+                listOf(own.copy(nativeSessionId = UUID.randomUUID())),
+                listOf(own.copy(createdAt = f.clock.at.plusSeconds(1))),
+                listOf(own, own),
+                List(10) { own },
+            )) {
+            val source =
+                object : CollaborationRegistryRepository by f.registry {
+                    override fun listBound(
+                        accountId: UUID,
+                        nativeSessionId: UUID,
+                        afterCompanyId: UUID?,
+                        limit: Int,
+                    ): Result<List<CollaborationDevice>> = Result.Success(rows)
+                }
+            assertEquals(
+                "invalid_collaboration_directory",
+                (f.directory(source).execute(actor, parent, 0, null, 8) as Result.Failed)
+                    .failure
+                    .code,
+            )
+        }
+        val stale =
+            object : CollaborationRegistryRepository by f.registry {
+                override fun listBound(
+                    accountId: UUID,
+                    nativeSessionId: UUID,
+                    afterCompanyId: UUID?,
+                    limit: Int,
+                ): Result<List<CollaborationDevice>> = Result.Success(listOf(own))
+            }
+        assertEquals(
+            "invalid_collaboration_directory",
+            (f.directory(stale).execute(actor, parent, 0, own.companyId, 8) as Result.Failed)
+                .failure
+                .code,
+        )
+    }
+
     companion object {
         @Container
         @JvmStatic
@@ -6880,6 +7123,19 @@ class NativeCollaborationRegistrationTest {
             platform: CollaborationPlatform = CollaborationPlatform.ANDROID,
             command: RegisterNativeCollaborationDevice = command(),
         ) = command.execute(actor, parent, version, operation, platform, label, client)
+
+        fun directory(
+            registry: CollaborationRegistryRepository = this.registry,
+            enabled: Boolean = true,
+        ) =
+            ListNativeCollaborationDevices(
+                registry,
+                sessions,
+                identities,
+                transactions,
+                clock,
+                CollaborationServicePolicy(enabled = enabled),
+            )
 
         fun acquire(
             parent: UUID,

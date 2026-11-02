@@ -15,6 +15,32 @@ import org.jooq.impl.DSL
 
 class PostgresCollaborationRegistryDataSource(private val sql: DSLContext) :
     CollaborationRegistryDataSource {
+    override fun listBound(
+        accountId: UUID,
+        nativeSessionId: UUID,
+        afterCompanyId: UUID?,
+        limit: Int,
+    ): List<BoundCollaborationDeviceData> {
+        require(limit in 1..33)
+        return sql.select(*D.fields(), B.NATIVE_SESSION_ID)
+            .from(B)
+            .join(D)
+            .on(D.COMPANY_ID.eq(B.COMPANY_ID), D.ID.eq(B.DEVICE_ID), D.ACCOUNT_ID.eq(B.ACCOUNT_ID))
+            .where(
+                B.ACCOUNT_ID.eq(accountId),
+                B.NATIVE_SESSION_ID.eq(nativeSessionId),
+                afterCompanyId?.let { B.COMPANY_ID.gt(it) } ?: DSL.noCondition(),
+            )
+            .orderBy(B.COMPANY_ID)
+            .limit(limit)
+            .fetch {
+                BoundCollaborationDeviceData(
+                    it.into(D),
+                    requireNotNull(it.get(B.NATIVE_SESSION_ID)),
+                )
+            }
+    }
+
     override fun findBound(
         companyId: UUID,
         accountId: UUID,

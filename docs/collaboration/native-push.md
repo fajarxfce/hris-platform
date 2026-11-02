@@ -1,5 +1,10 @@
 # Native chat notifications
 
+Bounded own-parent recovery discovery and separate protected company admission are
+now implemented; see [native recovery](native-recovery.md). Mobile managed-pusher
+activation is locally validated at10dce241. Automatic receive/decrypt/reply and
+all-company recovery remain required before enabling backend delivery.
+
 ## Delivery transport implemented — 1 November 2026
 
 `PushMessage.delivery` explicitly selects `Background` (default) or `Visible`.

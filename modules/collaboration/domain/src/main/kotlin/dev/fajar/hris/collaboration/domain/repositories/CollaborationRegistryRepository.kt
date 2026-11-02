@@ -7,6 +7,14 @@ import java.util.UUID
 
 /** The caller owns the transaction and account guard, including quota checks. */
 interface CollaborationRegistryRepository {
+    /** Account-owned metadata across companies, without acquiring a company/device write lock. */
+    fun listBound(
+        accountId: UUID,
+        nativeSessionId: UUID,
+        afterCompanyId: UUID?,
+        limit: Int,
+    ): Result<List<CollaborationDevice>>
+
     fun findBound(
         companyId: UUID,
         accountId: UUID,

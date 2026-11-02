@@ -695,6 +695,16 @@ class CollaborationConfiguration {
         PostgresCollaborationRegistryDataSource(sql)
 
     @Bean
+    fun listNativeCollaborationDevices(
+        registry: CollaborationRegistryRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        service: CollaborationServicePolicy,
+    ) = ListNativeCollaborationDevices(registry, sessions, identities, transactions, clock, service)
+
+    @Bean
     fun collaborationRegistry(
         source: CollaborationRegistryDataSource
     ): CollaborationRegistryRepository = StoredCollaborationRegistryRepository(source)

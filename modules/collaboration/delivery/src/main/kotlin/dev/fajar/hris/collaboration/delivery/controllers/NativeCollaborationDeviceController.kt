@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.collaboration.delivery.requests.*
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationAdmissionResponse
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationBootstrapResponse
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationDeviceResponse
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixPolicy
@@ -24,7 +25,20 @@ class NativeCollaborationDeviceController(
     private val retry: RetryNativeCollaborationProvisioning,
     private val bootstrap: BootstrapNativeCollaborationGateway,
     private val provider: CollaborationMatrixPolicy,
+    private val admission: AcquireNativeCollaborationAdmission,
 ) {
+    @GetMapping("/admission")
+    fun admission(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+    ): NativeCollaborationAdmissionResponse =
+        NativeCollaborationAdmissionResponse(
+            admission
+                .execute(actor, identity.sessionId, identity.sessionVersion, client.version)
+                .response()
+        )
+
     @PostMapping("/bootstrap", consumes = ["application/json"])
     fun bootstrap(
         actor: Actor,

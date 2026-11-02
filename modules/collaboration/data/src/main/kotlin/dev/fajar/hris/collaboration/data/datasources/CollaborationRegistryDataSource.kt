@@ -7,6 +7,13 @@ import java.time.Instant
 import java.util.UUID
 
 interface CollaborationRegistryDataSource {
+    fun listBound(
+        accountId: UUID,
+        nativeSessionId: UUID,
+        afterCompanyId: UUID?,
+        limit: Int,
+    ): List<BoundCollaborationDeviceData>
+
     fun findBound(
         companyId: UUID,
         accountId: UUID,

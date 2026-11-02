@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+
+## Native recovery directory and company admission validated — 2 November 2026
+
+[Contract](collaboration/native-recovery.md) / [evidence](measurements/chat-native-recovery-directory-2026-11-02.json):
+GET /api/v1/collaboration/native-devices returns bounded own-parent device references
+without selecting a company. GET /api/v1/companies/{companyId}/collaboration/native-device/admission
+exposes the existing protected admission observation. Metadata remains discoverable
+after company access loss/MFA expiry; content admission still requires current
+company/member/account/native-parent/device/MFA/client policy. No schema/RLS widening.
+
+55 domain, 144 registration SQL, 15 actual HTTP and seven worker tests pass;
+format/architecture, 144s Gradle /145.191s wall, 15 unchanged inputs. Final API/worker
+tasks execute; unchanged domain/data tasks reuse their passing reports. Earlier
+MFA fixture failures and the actual interceptor correction are retained. A separate
+strict HTTP case performs real MFA enrollment/native exchange, expires only its
+MFA proof, then proves metadata200/admission403. The exact metadata method uses
+PendingMfaAllowed; no company endpoint receives that annotation.
+
+Mobile10dce241 has the validated managed pusher operation, full root/browser/release
+checks and two actual-app cold starts. Its typed recovery directory/admission client
+is now implemented and undergoing tests. Continue finite foreground/background SDK
+ownership, all-company durable hints/reconnect recovery, receive/decrypt/privacy and
+inline replies. Do not substitute device discovery or the60-second observation for
+content authority. Current SDK NotificationClient requires sliding sync; product
+SyncV2 needs an explicitly scoped integration. Keep backend delivery disabled.
+
+Phone release11 is user-confirmed working; next useful product build12+, notify
+first and explicit10.77.77.3:5555 install-only, preserving signer/data. Owned emulator
+5560 is stopped. No generic Starter change yet, no live provider/schema rollout and
+no full PRD acceptance. Continue P0–P8 and proved reusable ports after every push.
+
+
 ## Automatic chat push worker validated — 2 November 2026
 
 [Evidence](measurements/chat-push-worker-2026-11-02.json): the worker now owns four

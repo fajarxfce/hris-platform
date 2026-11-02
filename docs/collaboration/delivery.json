@@ -206,7 +206,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/cc4c11f1b538d48680ee892f6709925bbe5e18ec/docs/measurements/chat-priority-processing-2026-11-02.json",
         "private-pilot-rollout.md",
         "../measurements/chat-private-pilot-preparation-2026-11-02.json",
-        "../measurements/chat-private-provider-2026-11-02.json"
+        "../measurements/chat-private-provider-2026-11-02.json",
+        "../measurements/chat-private-provider-recovery-2026-11-02.json"
       ]
     },
     {

@@ -75,3 +75,38 @@ Next: complete full Verify package/recovery acceptance, fresh coordinated HRIS
 checkpoint and isolated migration, then compatible API/worker activation. Matrix
 backup must retain its separate database, data/signing key and protected config;
 the older HRIS recovery-set command does not include these new provider stores.
+
+## Provider checkpoint and dashboard candidate
+
+[Recovery evidence](../measurements/chat-private-provider-recovery-2026-11-02.json)
+retains the cold pre-enrollment checkpoint and independent restore. Data is under
+~/.local/state/hris-platform/matrix-recovery-data/pilot-20261102T123710; the matching
+matrix-recovery-keys path holds separate protected signing/config/operator keys.
+The manifest binds source images/contents through the recorded version and hashes;
+all retained data/key files match. The database has176 tables at Synapse schema95,
+zero users and empty media. Initial checkpoint/restart/clone passes17.085s; review
+found its clone role initialization still used an active protected SQL file.
+A second clone initialized roles only from archived keys and passes10.473s without
+changing the source or immutable checkpoint. Both clones are healthy, retain the
+signing key and restricted role, publish no ports and are removed after verification.
+This is pre-enrollment recovery, not acceptance of real encrypted-chat recovery.
+
+Dashboard source2124c6fc builds in3.729s into the retained
+~/.local/share/hris-dashboard-dev/collaboration-2124c6fc directory (220 files,
+3,939,446 bytes); source maps are absent and every file has a recorded hash. It is
+not activated yet. Include it in the compatible rollout: the new API vocabulary
+contains COLLABORATION, so retaining the older dashboard's strict module parser is
+not sufficient. Preserve the old systemd drop-in and immutable1e0522c0 assets.
+
+Concrete guarded operator scripts are supplementary under
+.work/chat-private-rollout-2026-11-02: stage-packages.py requires complete exact-head
+CI and verifies GitHub artifact ZIP digests/JARs; stage-images.py retains old tags
+and checks copied image JARs; checkpoint.py captures fresh quiesced schema103 state;
+verify-upgrade.py restores/migrates it in isolation and checks identity/native/
+document fingerprints plus original migration history. deploy.py explicitly selects
+the migration, compatible images, preserved environments and dashboard activation.
+None of those HRIS rollout scripts has executed. enable-pilot.py adds only
+collaboration.chat through current MFA/versioned membership commands while retaining
+applied role snapshots. Existing module policy needs no change if already enabled.
+Only the existing employee/operator memberships are selected; no human message or
+provider device is created by granting permission.

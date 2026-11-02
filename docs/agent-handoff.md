@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Pre-enrollment provider recovery and staged release — 2 November 2026
+
+[Evidence](measurements/chat-private-provider-recovery-2026-11-02.json) retains a
+cold Matrix checkpoint and two restores. Initial17.085s clone still depended on active
+private init SQL; corrected archived-key role initialization passes10.473s against the
+same immutable checkpoint. All source/key archive hashes verify; zero users,176 tables,
+empty media, restored signing key, no ports, restricted database role and complete
+owned cleanup. Source provider is healthy; no new identities/messages. Operator paths,
+limitations and concrete pending scripts are in [the plan](collaboration/private-pilot-rollout.md).
+
+Dashboard2124c6fc builds3.729s into immutable collaboration-2124c6fc (220 files,
+3,939,446 bytes); include it with API/worker because COLLABORATION extends the API's
+module vocabulary. It is not active. Mobile release16 atcc4c11f1 is built/lint-passed
+464.885s and verified:87,494,648-byte arm64 APK291fbe05606191876cec1dae8eb02c0b1872210a338d92e8b3a4f125f820c07c,
+16KiB alignment, same signer/Firebase/private API, fixture URLs absent. Phone preflight
+confirms current15 and same certificate; installation has not started. Prior notice,
+explicit10.77.77.3:5555 --install-only and no UI driving remain required.
+
+Apple41441078558 atd93e8cd5 now COMPLETE/audited112 core cases/30 suites,96 combined
+source hashes, Swift11s, simulator compile672s/tests150s, full Xcode1320s. New
+Apple41446374520 is ACTIVE at EXACT cc4c11f1b538d48680ee892f6709925bbe5e18ec. Do not
+cancel/duplicate. Full Platform Verify41442782804 at2124c6fc still ACTIVE: all four
+dashboard and three backend shards pass; backend1/downstream recovery/integration
+remain. No HRIS checkpoint/migration/deployment or grant yet. Inspect current run,
+then stage accepted JARs/images, fresh checkpoint, clone upgrade and explicit rollout.
+Current private HRIS schema103/API-worker2c2a59e3/dashboard1e0522c0 and phone15 stay.
+
+One operator read-only inspection logged in with retained bootstrap MFA and revoked
+its own temporary native session afterward. Its first summary used a wrong response
+field membershipActive; actual active field corrected, saved read results intact.
+No permission, company policy, Google binding or employee identity changed. Only two
+memberships exist (employee/operator), so add chat to those existing memberships via
+reviewed APIs; do not create a fake roster or send messages. Notification privacy/
+read/mute/actions/inline reply and all54 groups remain open. Continue after push.
+
 ## Isolated provider running; compatible rollout pending — 2 November 2026
 
 [Provider evidence](measurements/chat-private-provider-2026-11-02.json) and

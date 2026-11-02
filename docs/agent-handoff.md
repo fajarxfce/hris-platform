@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+## Mobile finite background runtime references validated — 2 November 2026
+
+Mobile [8c557716](https://github.com/fajarxfce/hris-mobile/commit/8c5577167f86f47d0eebd03ff04e57ae5351a99e)
+is pushed with [contract/evidence](https://github.com/fajarxfce/hris-mobile/blob/8c5577167f86f47d0eebd03ff04e57ae5351a99e/docs/collaboration-background-runtime.md).
+It retains native parent separately from selected company, reserves a single SDK/store
+before construction and lends finite background references without parent close handles.
+Releasing a background reference preserves foreground ownership; pending acquisition,
+parent expiry/replacement, failed drain and history-reopen races are covered. Admission
+budgets include network/acquisition time using a monotonic deadline.
+
+All five actual SDK/HRIS/Synapse cases are accepted against Platform2308b337
+(implementation8b77c4fa) with the same proof APK and unchanged Kotlin sources. The
+first run's two interruptions are retained: the kernel killed the owned emulator
+for host OOM. The queued/frozen retry passes in169s /169.876s with cleanup. Root,
+Android-host, browser and release checks pass; the record also preserves two browser
+fixture timeouts and a reduced-heap D8 failure plus their successful follow-ups.
+Universal14 passes two12s actual-application cold starts. No server source change.
+
+The immediate Mobile task is a clean-source arm64 release14 build and notified
+install-only update to10.77.77.3:5555, with signer/data and installed-byte verification.
+Phone still has user-confirmed11 until that evidence is recorded. Then continue typed
+native history/background scope and shared outbox/all-company receive recovery.
+ApplicationCollaborationLifetime already starts independently of activities; test
+initial parent readiness without a selected company before wiring incoming work.
+Keep delivery disabled. All54 PRD groups remain open; continue after checkpoints.
+
+Owned emulator5560 is stopped. An8GiB temporary Btrfs swapfile at
+`/var/tmp/hris-validation-2026-11-02.swap` is active, not in fstab, to prevent further
+host OOM during concurrent unrelated CodePush work. Preserve unrelated jobs/AVD5558;
+remove only the owned swapfile once sufficient RAM and the validation workload permit.
+No live schema/provider rollout or generic Starter port.
+
 ## Mobile recovery client and native publication checkpoint — 2 November 2026
 
 Mobile [5aa6f752](https://github.com/fajarxfce/hris-mobile/commit/5aa6f75260eb429e98cbb34c600bcbec1c7ee57c)

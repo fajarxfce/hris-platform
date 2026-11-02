@@ -238,7 +238,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "SDK failed to retry with its retained cursor",
             )
             val proof = result.path("proof")
-            for ((type, minimum) in mapOf("m.read" to 1, "m.read.private" to 2)) {
+            for ((type, minimum) in mapOf("m.read" to 1, "m.read.private" to 4)) {
                 assertTrue(
                     trace.snapshot().count {
                         it["method"] == "POST" &&
@@ -272,6 +272,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "nativeReadReceiptsExchanged",
                     "nativePrivateReceiptIsolated",
                     "nativeReadReceiptStoreRestored",
+                    "nativeLocalReadIntentPrepared",
+                    "nativeLocalReadIntentStoreRestored",
+                    "nativeReadReceiptReplayAdmitted",
+                    "nativeReadReceiptAckUncertaintyRecovered",
                     "commonHistoryAcquisitionOwned",
                     "latestHistoryHeadOwned",
                     "providerHistoryPageOwned",
@@ -376,6 +380,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "nativeReadReceiptsExchanged" to true,
                     "nativePrivateReceiptIsolated" to true,
                     "nativeReadReceiptStoreRestored" to true,
+                    "nativeLocalReadIntentPrepared" to true,
+                    "nativeLocalReadIntentStoreRestored" to true,
+                    "nativeReadReceiptReplayAdmitted" to true,
+                    "nativeReadReceiptAckUncertaintyRecovered" to true,
                     "commonHistoryAcquisitionOwned" to true,
                     "latestHistoryHeadOwned" to true,
                     "admittedHistoryHeads" to true,

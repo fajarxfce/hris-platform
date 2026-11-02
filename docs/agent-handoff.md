@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Native local read-intent recovery accepted — 2 November 2026
+
+[Evidence](measurements/chat-read-receipt-replay-native-2026-11-02.json) pins pushed
+Mobile ae4a1b27 (ae4a1b270d50b7edd7761903a316e033dec70972). Its common receipt runtime contract and bounded sender
+validate retained coverage/history, fresh HRIS device/platform/conversation/room
+before SDK entry and again after provider success, then ACK only the identical
+queued intent. No hidden retry/coalescing; denied or uncertain work stays retained.
+Local read/mark admission a349c84e and encrypted queue875edab6 are also pushed.
+
+Actual HRIS/PostgreSQL/Synapse/Android113.216s PASSES with133 Mobile/25 Platform
+source hashes unchanged. Provider success followed by interrupted app ACK leaves
+exact read coverage and pending intent through real OS death. Next process replays,
+ACKs, reopens and repeats without another send. Seven receipt POSTs return200
+(five private/two public); existing private isolation, three encrypted messages,
+all three process-death stages and owned cleanup still pass. Fixture
+.work/collaboration/37854341d48f45a0b43dc56ca73b985b.27 driver tests pass0.104s;
+missing/non-Boolean application recovery claims reject. Only three Platform test/
+driver inputs change; no production server changes beyond pushed8c87839a gateway.
+
+Mobile full root/proof/browser292.360s passes3299 desktop/230 Android host/10
+build-logic/six proof-host/12 browser cases including explicit reused tasks;
+1732 cases/222 suites fresh,0 failures/errors/skips. Focused133.705s12 domain/two DI
+cases passes. Owned emulator5562/PID790095 boot26.497s, proof removed, stopped1.905s;
+no emulator/heavy job remains. Phone17 and live dac6fb0d/schema116 unchanged, all
+chat push OFF. Current receipt gateway is not yet rolled out to the live pilot.
+
+Commit/push this counterpart, dispatch Mobile full Apple/Xcode, then continue
+worker/foreground receipt integration, privacy/mute, notification actions/inline
+reply and all54 groups. No generic Starter port. User explicitly requests the next
+validated HRIS product build on10.77.77.3:5555 too: notify first, --install-only,
+retain signing/data and never drive their UI. Chat UI exists in17; voice/video/
+meeting UI is still absent. Latest crash-fix confirmation concerns11, not17 chat.
+Do not end at this checkpoint; continue long run with a push for every commit.
+
+
 ## Mobile local read queue accepted — 2 November 2026
 
 Mobile875edab6 is pushed with exact encrypted read markers and a128-intent queue.

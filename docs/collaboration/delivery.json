@@ -58,7 +58,9 @@
         "../measurements/chat-cancellation-native-2026-11-01.json",
         "key-publication-pending.md",
         "../measurements/chat-cancellation-ui-native-ci-2026-11-01.json",
-        "../measurements/chat-read-receipts-native-2026-11-02.json"
+        "../measurements/chat-read-receipts-native-2026-11-02.json",
+        "../measurements/chat-read-receipt-replay-native-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/ae4a1b270d50b7edd7761903a316e033dec70972/docs/measurements/chat-read-receipt-replay-2026-11-02.json"
       ]
     },
     {
@@ -215,7 +217,9 @@
         "../measurements/chat-private-rollout-2026-11-02.json",
         "../measurements/chat-read-receipts-2026-11-02.json",
         "../measurements/chat-read-receipts-native-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json",
+        "../measurements/chat-read-receipt-replay-native-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/ae4a1b270d50b7edd7761903a316e033dec70972/docs/measurements/chat-read-receipt-replay-2026-11-02.json"
       ]
     },
     {

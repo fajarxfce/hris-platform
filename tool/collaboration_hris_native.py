@@ -56,6 +56,7 @@ def proof_evidence(value):
                  "perRoomDeliveryIsolated", "heldQueueRestored", "nativeDeliveryOwned",
                  "commonSenderOwned", "receiptJournalRecovered", "projectionInterrupted",
                  "nativeReadReceiptsExchanged", "nativePrivateReceiptIsolated", "nativeReadReceiptStoreRestored",
+                 "nativeLocalReadIntentPrepared", "nativeLocalReadIntentStoreRestored", "nativeReadReceiptReplayAdmitted", "nativeReadReceiptAckUncertaintyRecovered",
                  "originalHistoryWindowOwned", "historyBodiesRestored", "commonHistoryAcquisitionOwned", "latestHistoryHeadOwned", "providerHistoryPageOwned",
                  "commonProviderHistoryAcquisitionOwned", "providerHistoryReferencesRestored",
                  "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered", "completionCleanupRecovered"):

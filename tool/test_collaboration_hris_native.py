@@ -21,6 +21,10 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "nativeReadReceiptsExchanged": True,
                 "nativePrivateReceiptIsolated": True,
                 "nativeReadReceiptStoreRestored": True,
+                "nativeLocalReadIntentPrepared": True,
+                "nativeLocalReadIntentStoreRestored": True,
+                "nativeReadReceiptReplayAdmitted": True,
+                "nativeReadReceiptAckUncertaintyRecovered": True,
                 "commonHistoryAcquisitionOwned": True,
                 "latestHistoryHeadOwned": True,
                 "providerHistoryPageOwned": True,
@@ -56,6 +60,17 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("ackTransaction", "first-transaction")):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
+
+    def test_local_read_intent_recovery_requires_each_strict_true_flag(self):
+        proof = self.evidence()
+        names = ['nativeLocalReadIntentPrepared', 'nativeLocalReadIntentStoreRestored', 'nativeReadReceiptReplayAdmitted', 'nativeReadReceiptAckUncertaintyRecovered']
+        for name in names:
+            incomplete = {key: value for key, value in proof.items() if key != name}
+            with self.subTest(name=name, missing=True), self.assertRaises(ValueError):
+                proof_evidence(incomplete)
+            for value in (False, None, 1, "true", [], {}):
+                with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                    proof_evidence(proof | {name: value})
 
     def test_history_metrics_reject_wrong_types_and_bounds_and_drop_unknown_payloads(self):
         proof = self.evidence()

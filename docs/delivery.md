@@ -1,5 +1,12 @@
 # Delivery and validation
 
+Latest collaboration increment (2 November): [native local read-intent recovery](measurements/chat-read-receipt-replay-native-2026-11-02.json)
+passes113.216s with seven accepted receipt requests and real process-death recovery;
+Mobile ae4a1b27 provides the local mark and live-admitted replay, full root/proof/
+browser checks pass292.360s. Product worker/UI/notification wiring and Apple coverage
+remain next. Private runtime/phone17 unchanged; all54 groups stay open.
+
+
 Read-receipt increment: exact public/private gateway and scoped sync projection pass focused and broad local checks, including real Synapse privacy/repetition/forward progress. Native SDK/product notification integration remains in progress; runtime remains dac6fb0d. [Evidence](measurements/chat-read-receipts-2026-11-02.json).
 
 Current communications checkpoint: full Verify41454857226 at dac6fb0d passes all14 jobs, including 3,153 active API cases,116 active worker cases,1,111 mocked browser scenarios,56 actual browser workflows and schema116 recovery. The private schema103→116 pilot rollout and role-preserving employee/operator chat grants are accepted; Google/native/document state is preserved. Actual Android priority recovery passes all three lifecycle variants. Mobile release17 installation and exact APK pull-back verification pass; no phone UI driven. Chat push stays disabled while notification read/mute/privacy/actions/replies and all54 PRD groups continue. [Full CI](measurements/collaboration-full-ci-2026-11-02.json) and [rollout](measurements/chat-private-rollout-2026-11-02.json).

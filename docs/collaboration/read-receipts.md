@@ -1,5 +1,23 @@
 # Native Matrix read receipts
 
+The [current native replay proof](../measurements/chat-read-receipt-replay-native-2026-11-02.json)
+and [Mobile ae4a1b27 evidence](https://github.com/fajarxfce/hris-mobile/blob/ae4a1b270d50b7edd7761903a316e033dec70972/docs/measurements/chat-read-receipt-replay-2026-11-02.json)
+now include the product's encrypted local read intent, local admission and common
+live-admitted sender. A real provider receipt succeeds while its local ACK is
+interrupted; an actual later OS process reopens that intent, replays it, commits
+its identical ACK and repeats without another send. Exact read coverage survives.
+The native driver requires four strict-Boolean application recovery claims in
+addition to SDK receipt privacy/store restoration; JVM proof requires at least
+four successful private receipt POSTs. Current run113.216s passes on133 Mobile/25
+Platform source hashes, with seven HTTP200 receipt POSTs (five private/two public),
+three encrypted messages, all existing restart/held-queue assertions and cleanup.
+Twenty-seven Python driver cases pass0.104s, including missing/non-Boolean flags.
+
+This does not invoke product worker/UI/notification actions or deploy the gateway
+to the private live runtime. No whole communications group is closed. Prior
+transport and standalone-native evidence below remains its original checkpoint.
+
+
 The gateway now accepts exact public `m.read` and private `m.read.private`
 receipts for an admitted direct room. `POST /_matrix/client/v3/rooms/{roomId}/receipt/
 {receiptType}/{eventId}` uses only the bound SDK bearer, no query and an empty JSON

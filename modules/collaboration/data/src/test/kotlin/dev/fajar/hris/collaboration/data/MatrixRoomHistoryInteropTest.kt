@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 class MatrixRoomHistoryInteropTest {
     @Test
     fun actualSyncPositionsPaginateEncryptedHistoryAndContextInBothDirectionsToTermination() {
-        MatrixProviderFixture("10m", messageBurst = 64).use { f ->
+        MatrixProviderFixture("10m", messageBurst = 100).use { f ->
             f.start()
             val creator = f.login()
             val account = UUID.randomUUID()
@@ -72,37 +72,37 @@ class MatrixRoomHistoryInteropTest {
             val json = tools.jackson.databind.json.JsonMapper.builder().build()
             fun encode(value: String) =
                 java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8)
-            val sent =
-                (1..25).map { index ->
-                    val response =
-                        f.client.send(
-                            java.net.http.HttpRequest.newBuilder(
-                                    f.config.origin.resolve(
-                                        "/_matrix/client/v3/rooms/${encode(id)}/send/m.room.encrypted/fixture-$index"
-                                    )
+            fun send(index: Int): String {
+                val response =
+                    f.client.send(
+                        java.net.http.HttpRequest.newBuilder(
+                                f.config.origin.resolve(
+                                    "/_matrix/client/v3/rooms/${encode(id)}/send/m.room.encrypted/fixture-$index"
                                 )
-                                .timeout(java.time.Duration.ofSeconds(5))
-                                .header("Authorization", "Bearer ${creator.accessToken}")
-                                .header("Content-Type", "application/json")
-                                .PUT(
-                                    java.net.http.HttpRequest.BodyPublishers.ofString(
-                                        json.writeValueAsString(
-                                            mapOf(
-                                                "algorithm" to "m.megolm.v1.aes-sha2",
-                                                "ciphertext" to "opaque-fixture-$index",
-                                                "session_id" to "fixture",
-                                                "device_id" to creator.deviceId,
-                                                "sender_key" to "fixture",
-                                            )
+                            )
+                            .timeout(java.time.Duration.ofSeconds(5))
+                            .header("Authorization", "Bearer ${creator.accessToken}")
+                            .header("Content-Type", "application/json")
+                            .PUT(
+                                java.net.http.HttpRequest.BodyPublishers.ofString(
+                                    json.writeValueAsString(
+                                        mapOf(
+                                            "algorithm" to "m.megolm.v1.aes-sha2",
+                                            "ciphertext" to "opaque-fixture-$index",
+                                            "session_id" to "fixture",
+                                            "device_id" to creator.deviceId,
+                                            "sender_key" to "fixture",
                                         )
                                     )
                                 )
-                                .build(),
-                            java.net.http.HttpResponse.BodyHandlers.ofString(),
-                        )
-                    assertEquals(200, response.statusCode())
-                    json.readTree(response.body()).path("event_id").asString()
-                }
+                            )
+                            .build(),
+                        java.net.http.HttpResponse.BodyHandlers.ofString(),
+                    )
+                assertEquals(200, response.statusCode())
+                return json.readTree(response.body()).path("event_id").asString()
+            }
+            val sent = (1..25).map(::send)
             val scope =
                 (snapshotCollaborationRoomScope(
                         owner.companyId,
@@ -142,6 +142,7 @@ class MatrixRoomHistoryInteropTest {
             val seen = mutableSetOf<String>()
             var cursor: String? = null
             var pages = 0
+            var initialHead: String? = null
             do {
                 check(pages++ < 10) { "History did not terminate within its fixture bound" }
                 val page =
@@ -154,6 +155,7 @@ class MatrixRoomHistoryInteropTest {
                             deadline(),
                         )
                     )
+                if (initialHead == null) initialHead = page["start"] as String
                 for (event in page["chunk"] as List<*>) assertTrue(
                     seen.add((event as Map<*, *>)["event_id"] as String)
                 )
@@ -197,6 +199,71 @@ class MatrixRoomHistoryInteropTest {
                 history.event(owner, room, "\$missing", creator.accessToken, deadline())
                     as Result.Failed
             assertEquals("collaboration_room_event_not_found", missing.failure.code)
+
+            // The provider's explicit `to` boundary isolates completed waves without timestamp
+            // reconstruction or stopping at an arbitrary overlapping event. New sends during a
+            // partial scan belong to the next wave, even after the adapter is recreated.
+            val delayed = (26..72).map(::send)
+            val first =
+                success(
+                    history.messages(
+                        owner,
+                        room,
+                        CollaborationRoomPageRequest(null, initialHead, "b", 7),
+                        creator.accessToken,
+                        deadline(),
+                    )
+                )
+            val waveHead = first["start"] as String
+            val later = (73..77).map(::send)
+            fun boundedWave(firstPage: Map<String, Any>, stop: String): List<String> {
+                val acquired = mutableListOf<String>()
+                var page = firstPage
+                var steps = 0
+                do {
+                    check(steps++ < 20) { "Bounded provider wave did not terminate" }
+                    acquired +=
+                        (page["chunk"] as List<*>).map { (it as Map<*, *>)["event_id"] as String }
+                    val next = page["end"] as String? ?: break
+                    page =
+                        success(
+                            InternalCollaborationMatrixRoomHistoryRepository(source, crypto)
+                                .messages(
+                                    owner,
+                                    room,
+                                    CollaborationRoomPageRequest(next, stop, "b", 7),
+                                    creator.accessToken,
+                                    deadline(),
+                                )
+                        )
+                } while (true)
+                assertEquals(acquired.size, acquired.distinct().size)
+                return acquired
+            }
+            assertEquals(delayed.reversed(), boundedWave(first, requireNotNull(initialHead)))
+            val second =
+                success(
+                    history.messages(
+                        owner,
+                        room,
+                        CollaborationRoomPageRequest(null, waveHead, "b", 7),
+                        creator.accessToken,
+                        deadline(),
+                    )
+                )
+            assertEquals(later.reversed(), boundedWave(second, waveHead))
+            val caughtUp = second["start"] as String
+            val empty =
+                success(
+                    history.messages(
+                        owner,
+                        room,
+                        CollaborationRoomPageRequest(null, caughtUp, "b", 7),
+                        creator.accessToken,
+                        deadline(),
+                    )
+                )
+            assertTrue(boundedWave(empty, caughtUp).isEmpty())
         }
     }
 }

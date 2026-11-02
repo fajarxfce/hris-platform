@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Provider-bounded incoming waves validated — 2 November 2026
+
+[Evidence](measurements/chat-incoming-history-boundary-2026-11-02.json) proves existing
+Matrix `from`/`to` support against actual isolated Synapse1.164.1, preserving all original
+history/context/direction assertions. Starting after25 events,47 delayed events page
+in batches of7 while5 additional events arrive after the first page. Adapter recreation
+between pages preserves the saved stop boundary; the current wave returns exactly47,
+next wave exactly5, and caught-up wave is empty. One case passes11.167s;
+Gradle37s /38.171s plus format/architecture, unchanged source. Four
+supporting source hashes are retained. These are synthetic encrypted metadata, not
+SDK decryption, OS wake or Mobile worker acceptance. No production source changed.
+
+Initial fixture burst128 violated its existing1..100 constructor guard (15.346s),
+before provider resources/requests. Corrected to100 for77 total sends. The guard and
+production settings remain. Both attempts and XML hashes are retained.
+
+Mobile [cacae157](https://github.com/fajarxfce/hris-mobile/commit/cacae157) is pushed:
+Browse/Incoming encrypted partitions/AAD/indexes are independent, legacy Browse bytes
+still read, and the shared key guard reuses a concurrently published credential.
+A deterministic old-guard failure is preserved; full corrected checks pass3,144
+desktop,216 host,886 affected browser and10 build-logic in336.845s. No incoming catchup
+caller yet. Apple41414832120 at3062bff2 is complete/audited112 core cases/30 suites,
+wake0.124s/Xcode1323s,12 source hashes. New Apple41421351125 is active at exact
+cacae157a83c0653428156fc47e53e97bbe1db9d; do not cancel with another dispatch.
+
+**Continue now:** carry optional untilPosition through Mobile API/runtime/page types;
+atomically retain incoming first-page start, previous completed stop, continuation and
+fair pending-reference position across wakes. Preserve unfinished scans and Browse;
+original/tombstone reconciliation remains separate from metadata coverage. Prove an
+actual SDK gap beyond128 before FCM/privacy/actions/replies and compatible backend
+rollout. All54 PRD groups open, private schema103/API-worker2c2a59e3/branch116/push disabled,
+phone15 and Starter5679c51 unchanged. No emulator/phone operation by this increment.
+
 ## Actual incoming provider recovery validated — 2 November 2026
 
 Mobile [ee888802](https://github.com/fajarxfce/hris-mobile/commit/ee888802) is pushed.

@@ -1,0 +1,119 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "04b0b6c8c37424f5ded59398394616f66a853f20",
+  "initialFailure": {
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      "-Pkotlin.compiler.execution.strategy=in-process",
+      ":modules:collaboration:data:cleanTest",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*MatrixRoomHistoryInteropTest",
+      ":formatCheck",
+      ":architectureCheck"
+    ],
+    "exitCode": 1,
+    "wallSeconds": 15.346,
+    "inputsUnchanged": true,
+    "sourceSha256": {
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomHistoryInteropTest.kt": "f61c5d7245637f47535608fd48b9244d3d5e11e58821d2a4f54fc56613c2238f"
+    },
+    "reports": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    },
+    "reportSha256": {
+      "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.MatrixRoomHistoryInteropTest.xml": "d640db8b0132072a5e6924c0cbc8e83e13710b382200ba7e578eb81c21b48569"
+    }
+  },
+  "correction": {
+    "cause": "Test setup requested128 message burst; existing MatrixProviderFixture only permits1..100. Constructor rejected before provider resources or requests.",
+    "correction": "Use100 within the existing guard for77 total fixture sends. No production configuration or fixture guard change."
+  },
+  "validated": {
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      "-Pkotlin.compiler.execution.strategy=in-process",
+      ":modules:collaboration:data:cleanTest",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*MatrixRoomHistoryInteropTest",
+      ":formatCheck",
+      ":architectureCheck"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 38.171,
+    "inputsUnchanged": true,
+    "sourceSha256": {
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomHistoryInteropTest.kt": "8cb12eb18e17063f8410ff9d9797a52ccb0d87a1a3e3258a33921baa0d43ef47"
+    },
+    "reports": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    },
+    "reportSha256": {
+      "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.MatrixRoomHistoryInteropTest.xml": "62f0448f8b1f2b2e18e3d9ce78662cb946b5d4dd2595563b384aeb485809b353"
+    }
+  },
+  "supportingSourceSha256": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixRoomHistoryRepository.kt": "04900a94bc51e122f2d57a0ccc13f6ef62711fa4124cf98be85549b7a9296d4c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixRoomCursor.kt": "ebdd2789967c19bdf8c28d6606a08fb37c67bb7eda92d9e12693a776177d9b7f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "f464c92604624cc7fa403194fb690a49004045d8f9f514746cff9a33ccec2d48",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderFixture.kt": "e37ef4be53bbf8675e77b76dba013e7026616c51252bb23815c639a45802248e"
+  },
+  "caseSeconds": 11.167,
+  "observations": {
+    "initialEvents": 25,
+    "delayedEvents": 47,
+    "eventsSentDuringPartialWave": 5,
+    "pageLimit": 7,
+    "partialWaveRetainsExactStopBoundary": true,
+    "adapterRecreatedBetweenPages": true,
+    "newEventsExcludedFromPartialWave": true,
+    "nextWaveIncludesAllNewEvents": true,
+    "caughtUpWaveEmpty": true,
+    "finitePaginationAndUniqueEventsAsserted": true
+  },
+  "limits": [
+    "Actual isolated Synapse1.164.1 with repository cursor sealing/opening and real HTTP. Payloads are synthetic encrypted metadata; no Matrix SDK decryption, Mobile worker or FCM acceptance.",
+    "No production code or settings changed. Fixture burst100 remains within existing1..100 guard. Initial128 setup failed before provider resource creation.",
+    "No membership/visibility change, retired-key recovery, federation or capacity acceptance.",
+    "No live rollout or phone/emulator operation."
+  ]
+}

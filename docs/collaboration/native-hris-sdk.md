@@ -313,3 +313,20 @@ SDK and scheduled offline/process-death regressions remain in the same five-case
 This phase keeps the Android process and peer SDK alive and directly invokes recovery;
 it does not prove incoming FCM, network-offline/Doze wake, all-company scheduling or
 complete long-offline catchup. Login/provider bindings remain explicit fixtures.
+
+
+## Provider bounds for independent incoming waves
+
+[Boundary evidence](../measurements/chat-incoming-history-boundary-2026-11-02.json)
+validates the existing encrypted Matrix `from`/`to` gateway repository against isolated
+Synapse. After25 events,47 more arrive; the next wave reads7 per page up to the saved
+previous start. Five further sends occur after its first page. Recreating the adapter
+between pages preserves the exact stop bound: the partial wave yields only its47
+original events, the following wave yields all5 later events, and another wave is
+empty. The original full-history/context/direction assertions remain in the same case.
+
+These are provider metadata with synthetic encrypted payloads, not SDK decryption or
+Mobile worker acceptance. Both positions stay scoped to company/account/device/server/
+room. Mobile still needs to persist and carry both boundaries through its incoming
+traversal. This avoids inferring scan completion from timestamps or incidental event
+overlap. Invalid/retired cursor recovery and visibility changes remain separate checks.

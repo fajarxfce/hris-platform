@@ -194,7 +194,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/3062bff25c678639204bcf4a5e2e95be85c155d4/docs/measurements/chat-incoming-worker-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/af5cb4dc/docs/measurements/chat-room-recovery-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/5a39b53f0ece41d314738090e330bd7004e528db/docs/measurements/chat-company-continuation-2026-11-02.json",
-        "../measurements/chat-incoming-provider-2026-11-02.json"
+        "../measurements/chat-incoming-provider-2026-11-02.json",
+        "../measurements/chat-incoming-history-boundary-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/cacae157a83c0653428156fc47e53e97bbe1db9d/docs/measurements/chat-incoming-history-purpose-2026-11-02.json"
       ]
     },
     {
@@ -310,7 +312,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/3062bff25c678639204bcf4a5e2e95be85c155d4/docs/measurements/chat-incoming-worker-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/af5cb4dc/docs/measurements/chat-room-recovery-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/5a39b53f0ece41d314738090e330bd7004e528db/docs/measurements/chat-company-continuation-2026-11-02.json",
-        "../measurements/chat-incoming-provider-2026-11-02.json"
+        "../measurements/chat-incoming-provider-2026-11-02.json",
+        "../measurements/chat-incoming-history-boundary-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/cacae157a83c0653428156fc47e53e97bbe1db9d/docs/measurements/chat-incoming-history-purpose-2026-11-02.json"
       ]
     },
     {

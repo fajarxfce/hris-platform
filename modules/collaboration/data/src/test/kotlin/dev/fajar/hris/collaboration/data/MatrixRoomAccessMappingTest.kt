@@ -45,6 +45,14 @@ class MatrixRoomAccessMappingTest {
             object : MatrixRoomAccessDataSource {
                 override fun join(roomId: String, token: String, deadline: Instant) = reply
 
+                override fun receipt(
+                    roomId: String,
+                    receiptType: String,
+                    eventId: String,
+                    token: String,
+                    deadline: Instant,
+                ) = reply
+
                 override fun stateEvents(roomId: String, token: String, deadline: Instant) = reply
 
                 override fun memberEvents(
@@ -57,6 +65,33 @@ class MatrixRoomAccessMappingTest {
         )
 
     private fun node(value: Any): JsonNode = json.readTree(json.writeValueAsBytes(value))
+
+    @Test
+    fun receiptAcceptsOnlyEmptySuccessAndNeverReturnsProviderCredentials() {
+        for (body in
+            listOf<Any>(mapOf("access_token" to "private"), listOf("private"), "private")) {
+            reply = node(body)
+            assertEquals(
+                "collaboration_provider_invalid_response",
+                (repository.receipt(
+                        room,
+                        "m.read.private",
+                        "\$event",
+                        "fixture",
+                        Instant.now().plusSeconds(5),
+                    ) as Result.Failed)
+                    .failure
+                    .code,
+            )
+        }
+        reply = node(emptyMap<String, Any>())
+        for (type in listOf("m.read", "m.read.private")) {
+            assertEquals(
+                Result.Success(Unit),
+                repository.receipt(room, type, "\$event", "fixture", Instant.now().plusSeconds(5)),
+            )
+        }
+    }
 
     @Test
     fun joinCannotAdoptAnotherProviderRoomOrExtraCredentialFields() {

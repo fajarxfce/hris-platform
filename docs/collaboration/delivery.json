@@ -211,7 +211,8 @@
         "../measurements/chat-provider-retry-2026-11-02.json",
         "../measurements/native-priority-2026-11-02.json",
         "../measurements/collaboration-full-ci-2026-11-02.json",
-        "../measurements/chat-private-rollout-2026-11-02.json"
+        "../measurements/chat-private-rollout-2026-11-02.json",
+        "../measurements/chat-read-receipts-2026-11-02.json"
       ]
     },
     {
@@ -336,7 +337,9 @@
       "id": "CHAT-05",
       "requiredBehavior": "Pending, sending, server-accepted, device-delivered, read and failed; delivery acknowledgement follows recipient durable storage.",
       "status": "planned",
-      "evidence": []
+      "evidence": [
+        "../measurements/chat-read-receipts-2026-11-02.json"
+      ]
     },
     {
       "id": "CHAT-06",
@@ -372,13 +375,17 @@
       "id": "CHAT-11",
       "requiredBehavior": "Local message/media search, unread filter, pin/archive/mute, draft indicators, jump to message, read-receipt/presence preferences.",
       "status": "planned",
-      "evidence": []
+      "evidence": [
+        "../measurements/chat-read-receipts-2026-11-02.json"
+      ]
     },
     {
       "id": "CHAT-12",
       "requiredBehavior": "Verified device list, QR/security-code verification, new-device notice, revoke, history/read-state sync and key recovery.",
       "status": "planned",
-      "evidence": []
+      "evidence": [
+        "../measurements/chat-read-receipts-2026-11-02.json"
+      ]
     },
     {
       "id": "CHAT-13",
@@ -398,7 +405,8 @@
         "../measurements/chat-push-worker-2026-11-02.json",
         "native-recovery.md",
         "../measurements/chat-native-recovery-directory-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/10dce241/docs/measurements/chat-pusher-client-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/10dce241/docs/measurements/chat-pusher-client-2026-11-02.json",
+        "../measurements/chat-read-receipts-2026-11-02.json"
       ]
     },
     {
@@ -654,6 +662,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Read-receipt gateway and scoped v2 sync pass focused/broad local checks and actual Synapse isolation/forward progress; see ../measurements/chat-read-receipts-2026-11-02.json. Continue native adapter/SDK-store proof, durable read state and notification integration. Live pilot still dac6fb0d; no feature group accepted by this increment.",
     "Mobile release17 from clean c6347c75 is installed and pull-back verified (b94aedf2b1eb81949d8eeacc82fd2906f0c85b27641e3bcc65fd8884e5fb34d2). Same signer, app UID and first-install time retained; no UI launch/data reset. Platform schema116 pilot is active. Continue receipt/mute/privacy/actions/replies; future phone updates must exceed17 with prior notice and explicit10.77.77.3:5555 install-only.",
     "Full Verify41454857226 at dac6fb0d passed all14 jobs. Verified packages/images, fresh checkpoint, isolated103\u2192116 upgrade and live API/worker/dashboard rollout completed, preserving Google/native/document state. Employee/operator collaboration.chat grants and read-only contact/device/directory verification pass. Keep private provider identities/keys and separate Matrix checkpoint; all chat push flags remain false. Evidence: ../measurements/chat-private-rollout-2026-11-02.json.",
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",

@@ -7,6 +7,15 @@ import java.time.Instant
 interface CollaborationMatrixRoomAccessRepository {
     fun join(room: CollaborationOwnedRoom, bearer: String, deadline: Instant): Result<String>
 
+    /** Idempotent provider metadata; the caller authorizes the exact original event first. */
+    fun receipt(
+        room: CollaborationOwnedRoom,
+        receiptType: String,
+        eventId: String,
+        bearer: String,
+        deadline: Instant,
+    ): Result<Unit>
+
     fun state(
         owner: CollaborationSyncOwner,
         room: CollaborationOwnedRoom,

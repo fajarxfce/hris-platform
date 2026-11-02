@@ -247,6 +247,43 @@ class AccessNativeCollaborationMatrixDevice(
             }
         }
 
+    /** No receipt is sent for an event outside the admitted, mapped room history. */
+    fun sendReadReceipt(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        receiptType: String,
+        eventId: String,
+    ): Result<Unit> {
+        if (receiptType !in setOf("m.read", "m.read.private") || !validEventId(eventId))
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_read_receipt")
+            )
+        return roomOperation(token, correlationId, roomId) { exchange, prepared ->
+            exchange
+                .exchange { bearer, deadline ->
+                    providerRoomHistory.event(
+                        prepared.owner,
+                        prepared.room,
+                        eventId,
+                        bearer,
+                        deadline,
+                    )
+                }
+                .flatMap {
+                    exchange.exchange { bearer, deadline ->
+                        providerRoomAccess.receipt(
+                            prepared.room,
+                            receiptType,
+                            eventId,
+                            bearer,
+                            deadline,
+                        )
+                    }
+                }
+        }
+    }
+
     fun roomState(
         token: String,
         correlationId: UUID,

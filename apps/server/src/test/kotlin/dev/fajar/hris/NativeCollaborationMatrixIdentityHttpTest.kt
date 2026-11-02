@@ -700,6 +700,47 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun readReceiptsUseAnExactEmptyBodyAndCurrentOwnedRoomAndEvent() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val room = publishedRoom(n, device)
+        val event = provider.roomStates.getValue(room).first().getValue("event_id") as String
+        fun route(type: String = "m.read.private", id: String = room) =
+            "v3/rooms/$id/receipt/$type/$event"
+        val initial = provider.roomReceipts.get()
+        for (type in listOf("m.read", "m.read.private")) {
+            repeat(2) {
+                val response = matrixRoom(n, token, route(type), "{}")
+                assertEquals(200, response.statusCode(), response.body())
+                assertEquals("{}", response.body())
+                assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            }
+        }
+        assertEquals(initial + 4, provider.roomReceipts.get())
+        for (body in
+            listOf(
+                "[]",
+                "null",
+                "{} {}",
+                "{\"ts\":1}",
+                "{\"thread_id\":\"main\"}",
+                "{\"ts\":1,\"ts\":2}",
+            )) {
+            assertEquals(400, matrixRoom(n, token, route(), body).statusCode())
+        }
+        assertEquals(413, matrixRoom(n, token, route(), " ".repeat(257)).statusCode())
+        assertEquals(400, matrixRoom(n, token, route() + "?extra=1", "{}").statusCode())
+        assertEquals(403, matrixRoom(n, token, route("m.fully_read"), "{}").statusCode())
+        assertEquals(401, matrixRoom(n, null, route(), "{}").statusCode())
+        assertEquals(401, matrixRoom(n, n.access, route(), "{}").statusCode())
+        assertEquals(404, matrixRoom(n, token, route(id = "!foreign"), "{}").statusCode())
+        val other = native()
+        val (_, otherToken) = enroll(other)
+        assertEquals(404, matrixRoom(other, otherToken, route(), "{}").statusCode())
+        assertEquals(initial + 4, provider.roomReceipts.get())
+    }
+
+    @Test
     fun historyRoutesScopePositionsValidateQueriesAndWithholdLateResults() {
         val n = native()
         val (device, token) = enroll(n)
@@ -1888,6 +1929,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val syncs = AtomicInteger()
         val onSync = AtomicReference<(() -> Unit)?>(null)
         val roomStates = ConcurrentHashMap<String, List<Map<String, Any>>>()
+        val roomReceipts = java.util.concurrent.atomic.AtomicInteger()
         val roomCalls = AtomicInteger()
         val lastMemberQuery = AtomicReference<String>()
         val lastHistoryQuery = AtomicReference<String>()
@@ -2119,6 +2161,26 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                             val operation = relative.substringAfter('/')
                                             onRoomHistory.getAndSet(null)?.invoke()
                                             when {
+                                                operation.startsWith("receipt/") -> {
+                                                    assertEquals("POST", request.requestMethod)
+                                                    assertEquals(
+                                                        "{}",
+                                                        request.requestBody
+                                                            .readNBytes(257)
+                                                            .toString(Charsets.UTF_8),
+                                                    )
+                                                    val pieces = operation.split('/')
+                                                    assertEquals(3, pieces.size)
+                                                    assertTrue(
+                                                        pieces[1] in
+                                                            setOf("m.read", "m.read.private")
+                                                    )
+                                                    assertTrue(
+                                                        events.any { it["event_id"] == pieces[2] }
+                                                    )
+                                                    roomReceipts.incrementAndGet()
+                                                    emptyMap<String, Any>()
+                                                }
                                                 operation == "messages" -> {
                                                     lastHistoryQuery.set(request.requestURI.query)
                                                     if (request.requestURI.query.contains("from="))

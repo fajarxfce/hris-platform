@@ -4734,6 +4734,85 @@ class NativeCollaborationRegistrationTest {
         ) // Second provider join completed but its receipt was withheld.
     }
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = [false, true])
+    fun readReceiptRequiresOwnedEventAndRechecksRevocationBeforeAndAfterExternalWrite(
+        afterWrite: Boolean
+    ) {
+        val room = DirectRoomFixture()
+        val matrix = RecordingMatrix(room.f.clock)
+        val metadata = RecordingRooms(room)
+        val tokens =
+            success(
+                room.f
+                    .bootstrap()
+                    .execute(
+                        room.f.actor,
+                        room.parent,
+                        0,
+                        UUID.randomUUID(),
+                        room.device,
+                        1,
+                        null,
+                        room.client,
+                    )
+            )
+        success(room.request())
+        success(room.f.advanceRoom(matrix, metadata).execute(room.f.claimRoom(room.conversation)))
+        val content = RecordingRoomAccess()
+        var acquireFailure: Failure? = null
+        var afterAcquire: (() -> Unit)? = null
+        var acquisitions = 0
+        val history =
+            object :
+                CollaborationMatrixRoomHistoryRepository by DisabledCollaborationMatrixRoomHistoryRepository() {
+                override fun event(
+                    owner: CollaborationSyncOwner,
+                    room: CollaborationOwnedRoom,
+                    eventId: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationRoomHistory> {
+                    acquisitions++
+                    afterAcquire?.invoke()
+                    return acquireFailure?.let { Result.Failed(it) }
+                        ?: Result.Success(CollaborationRoomHistory(mapOf("event_id" to eventId)))
+                }
+            }
+        val request =
+            room.f.matrixIdentity(
+                matrix,
+                providerRoomAccess = content,
+                providerRoomHistory = history,
+            )
+        fun send(
+            type: String = "m.read.private",
+            event: String = "\$event",
+            id: String = metadata.id,
+        ) = request.sendReadReceipt(tokens.accessToken, UUID.randomUUID(), id, type, event)
+        assertEquals("invalid_collaboration_read_receipt", failed(send(type = "m.fully_read")))
+        assertEquals("invalid_collaboration_read_receipt", failed(send(event = "invalid")))
+        assertEquals("collaboration_room_not_found", failed(send(id = "!foreign")))
+        assertEquals(0, acquisitions)
+        acquireFailure = Failure(FailureKind.NOT_FOUND, "fixture_event_missing")
+        assertEquals("fixture_event_missing", failed(send()))
+        assertTrue(content.calls.isEmpty())
+        acquireFailure = null
+        repeat(2) { success(send()) }
+        assertEquals(2, content.calls.size)
+        // The event read is outside a transaction; a completed revocation must fence the write.
+        val revoke = {
+            sql.update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                room.parent,
+            )
+            Unit
+        }
+        if (afterWrite) content.after = revoke else afterAcquire = revoke
+        assertInstanceOf(Result.Failed::class.java, send())
+        assertEquals(if (afterWrite) 3 else 2, content.calls.size)
+    }
+
     @Test
     fun expiredAdmissionOverridesAnOwnedRoomLookupFailureBeforeProviderLogin() {
         val g = GatewayFixture()
@@ -4798,6 +4877,17 @@ class NativeCollaborationRegistrationTest {
         ): Result<CollaborationRoomEvents> {
             called("state")
             return Result.Success(CollaborationRoomEvents(emptyList()))
+        }
+
+        override fun receipt(
+            room: CollaborationOwnedRoom,
+            receiptType: String,
+            eventId: String,
+            bearer: String,
+            deadline: Instant,
+        ): Result<Unit> {
+            called("receipt:$receiptType:$eventId")
+            return Result.Success(Unit)
         }
 
         override fun members(

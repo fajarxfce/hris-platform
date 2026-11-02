@@ -103,6 +103,8 @@ class CollaborationWebConfiguration {
                 .permitAll()
             it.requestMatchers(
                     HttpMethod.POST,
+                    "/_matrix/client/v3/rooms/*/receipt/m.read/*",
+                    "/_matrix/client/v3/rooms/*/receipt/m.read.private/*",
                     "/_matrix/client/v3/rooms/*/join",
                     "/_matrix/client/v3/join/*",
                 )

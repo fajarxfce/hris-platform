@@ -38,7 +38,9 @@ fun snapshotCollaborationRoomScope(
         digest.update(value.toString().toByteArray(Charsets.UTF_8))
         digest.update(0.toByte())
     }
-    add("direct-sync-v1")
+    // Revision change discards an old provider filter that excluded receipt events.
+    // It does not delete client history, credentials or locally retained commands.
+    add("direct-sync-v2-receipts")
     add(companyId)
     add(accountId)
     add(serverName)

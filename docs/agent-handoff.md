@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Read-receipt gateway accepted locally — 2 November 2026
+
+[Contract](collaboration/read-receipts.md) / [evidence](measurements/chat-read-receipts-2026-11-02.json):
+17 source/test inputs add exact public/private metadata POST with owned event proof,
+fresh admission around external I/O and bounded self-private/pair-public sync
+projection. Scope v2 re-registers the receipt filter without changing stored keys,
+commands or independent history cursors. No schema change.
+
+Focused99.155s passes55 domain/13 data/14 delivery/one HTTP case. Broad809.053s
+passes275 data/34 actual HTTP/117 worker cases (one existing optional skip); domain
+and delivery are up-to-date. Zero failures/errors, format/architecture pass. Original
+collector mixed epoch and monotonic origins; preserved report mtimes were re-audited
+against UTC start, excluding16 reused suites from fresh broad counts. Actual owned
+Synapse receipt privacy/repetition/no-backward proof passes7.216s; synthetic encrypted
+envelopes do not prove native SDK/decryption. All input/report hashes retained.
+
+Mobile .work/chat-read-receipt-client-2026-11-02 contains uncommitted native adapter,
+eight host lifetime cases and actual SDK proof extension. Focused check1 is running;
+follow with full root/proof build and owned real HRIS/SDK proof before acceptance.
+Do not run concurrent heavy builds. Continue durable read state, notification mute/
+privacy/actions/encrypted replies, then all54 groups. No whole group closes here.
+
+Live API/worker stay dac6fb0d/schema116, dashboard2124c6fc, all chat push OFF; installed
+phone17 is unchanged. Preserve private Matrix identity/keys/checkpoints. No new phone
+UI acceptance. User confirmed release11 opens; install-only17 was independently
+verified. Push every atomic commit and continue; this is not task completion.
+
+
 ## Private chat pilot deployed — 2 November 2026
 
 [Full CI](measurements/collaboration-full-ci-2026-11-02.json) 41454857226 COMPLETE at

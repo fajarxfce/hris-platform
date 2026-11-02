@@ -252,6 +252,8 @@ class MatrixSyncProjectionTest {
 
         override fun registerFilter(filter: Map<String, Any>): String {
             assertFalse(json.writeValueAsString(filter).contains("!owned"))
+            val roomFilter = filter.getValue("room") as Map<*, *>
+            assertEquals(mapOf("types" to listOf("m.receipt")), roomFilter["ephemeral"])
             return "0"
         }
 

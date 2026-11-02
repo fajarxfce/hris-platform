@@ -181,6 +181,33 @@ class HttpMatrixClientDataSource(
         return parse(response)
     }
 
+    override fun receipt(
+        roomId: String,
+        receiptType: String,
+        eventId: String,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(receiptType in setOf("m.read", "m.read.private"))
+        require(
+            eventId.length in 2..255 &&
+                eventId.startsWith('$') &&
+                eventId.all { it.code in 33..126 }
+        )
+        val response =
+            roomRequest(
+                roomPath(roomId) + "/receipt/${segment(receiptType)}/${segment(eventId)}",
+                "POST",
+                emptyMap(),
+                token,
+                deadline,
+                maximumRequestBytes = 256,
+                maximumResponseBytes = 1024,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
     override fun join(roomId: String, token: String, deadline: Instant): JsonNode {
         val response = roomRequest(roomPath(roomId) + "/join", "POST", emptyMap(), token, deadline)
         if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())

@@ -27,6 +27,23 @@ class InternalCollaborationMatrixRoomAccessRepository(
         room.roomId
     }
 
+    override fun receipt(
+        room: CollaborationOwnedRoom,
+        receiptType: String,
+        eventId: String,
+        bearer: String,
+        deadline: Instant,
+    ): Result<Unit> = safeMatrixProviderCall {
+        require(receiptType in setOf("m.read", "m.read.private"))
+        require(
+            eventId.length in 2..255 &&
+                eventId.startsWith('$') &&
+                eventId.all { it.code in 33..126 }
+        )
+        val response = source.receipt(room.roomId, receiptType, eventId, bearer, deadline)
+        if (!response.isObject || !response.isEmpty) throw MatrixResponseException()
+    }
+
     override fun state(
         owner: CollaborationSyncOwner,
         room: CollaborationOwnedRoom,

@@ -53,7 +53,7 @@ class InternalCollaborationMatrixSyncRepository(
                                     "include_leave" to true,
                                     "state" to mapOf("lazy_load_members" to false),
                                     "timeline" to mapOf("limit" to 20),
-                                    "ephemeral" to mapOf("not_types" to listOf("*")),
+                                    "ephemeral" to mapOf("types" to listOf("m.receipt")),
                                     "account_data" to mapOf("not_types" to listOf("*")),
                                 ),
                         )
@@ -142,6 +142,15 @@ class InternalCollaborationMatrixSyncRepository(
                                 "state" to mapOf("events" to state),
                                 "timeline" to timelineOut,
                                 "account_data" to mapOf("events" to emptyList<Any>()),
+                                "ephemeral" to
+                                    mapOf(
+                                        "events" to
+                                            mapCollaborationReadReceipts(
+                                                events(value, "ephemeral"),
+                                                pair,
+                                                ownUser,
+                                            )
+                                    ),
                             )
                     }
                 }

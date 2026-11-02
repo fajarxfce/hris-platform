@@ -15,6 +15,14 @@ class DisabledCollaborationMatrixRoomAccessRepository : CollaborationMatrixRoomA
         deadline: Instant,
     ): Result<String> = unavailable()
 
+    override fun receipt(
+        room: CollaborationOwnedRoom,
+        receiptType: String,
+        eventId: String,
+        bearer: String,
+        deadline: Instant,
+    ): Result<Unit> = unavailable()
+
     override fun state(
         owner: CollaborationSyncOwner,
         room: CollaborationOwnedRoom,

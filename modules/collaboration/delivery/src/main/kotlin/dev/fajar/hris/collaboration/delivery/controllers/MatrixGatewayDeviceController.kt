@@ -60,6 +60,26 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
             }
         }
 
+    @PostMapping("/_matrix/client/v3/rooms/{roomId}/receipt/{receiptType}/{eventId}")
+    fun receipt(
+        @PathVariable roomId: String,
+        @PathVariable receiptType: String,
+        @PathVariable eventId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        keyRequest(
+            request,
+            { node ->
+                require(node.isObject && node.isEmpty)
+                Unit
+            },
+            maximumBytes = 256,
+        ) { token, correlation, _ ->
+            device.sendReadReceipt(token, correlation, roomId, receiptType, eventId).map {
+                emptyMap<String, Any>()
+            }
+        }
+
     @PostMapping("/_matrix/client/v3/rooms/{roomId}/join", "/_matrix/client/v3/join/{roomId}")
     fun join(@PathVariable roomId: String, request: HttpServletRequest): ResponseEntity<Any> =
         keyRequest(

@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Company progress proved; all-company worker in development — 2 November 2026
+
+Mobile [d262799b](https://github.com/fajarxfce/hris-mobile/commit/d262799b) is pushed:
+account-owned encrypted company seek, unfinished attempt and sticky retry state
+survive restart and reauthentication. New wakes cannot reset a finite sweep;
+clean local completion precedes exact original-wake acknowledgment. Twelve new
+domain/eight storage cases cover fairness, cancellation, concurrent writes, lost
+responses, account replacement, tampering and key loss. Focused checks pass542
+domain/308 data/two DI plus Android/static in152s /155.704s. Full root/browser/
+app-Wasm passes3,044 desktop,215 host,828 affected browser and10 build-logic in
+296s /299.533s on13 unchanged inputs. No consumer was wired by that commit.
+
+Mobile now has an UNCOMMITTED next increment under focused validation: registered
+all-company worker, one processor/one bounded waiter, processed-parent cancellation,
+periodic wake creation, preserved-generation pagination and captured delivery. Its
+new tests cover simultaneous calls, late results, scheduling/ACK gaps, fair retries
+and actual application DI. Current binding uses the existing outgoing delivery
+worker; incoming discovery/decryption and fair room progress still need their own
+path before FCM activation. Continue implementation and native provider proof;
+do not infer acceptance from this in-progress source.
+
+Starter [5679c51](https://github.com/fajarxfce/compose-fluent-starter/commit/5679c51)
+records audited Apple41400133440 at exact136d2e5a:92 simulator cases/26 suites,
+six AppleWorkWakeStoreTest cases0.178s, zero failures/errors/skips, full Xcode586s.
+The generic port is complete; no additional dispatch is pending. HRIS policy stays
+in Mobile. Mobile/Starter measurements bind exact source and report hashes.
+
+No server rollout: private schema103/API-worker2c2a59e3 remain; push disabled and
+all54 PRD groups open. Phone remains15, no new installation. Owned5562 remains
+stopped;5560 is unrelated CodePush. After builds finished, the owned temporary8GiB
+swap was safely disabled (47.997s) and removed with14.46GB available memory; the
+original /swap/swapfile remains enabled. Continue after every push.
+
 ## Durable recovery and bounded Android scheduling proved — 2 November 2026
 
 Mobile [380cc654](https://github.com/fajarxfce/hris-mobile/commit/380cc654) persists

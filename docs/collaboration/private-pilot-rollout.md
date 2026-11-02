@@ -1,7 +1,8 @@
 # Private collaboration pilot rollout
 
-This is the prepared rollout sequence, not a deployed or accepted service. The
-existing private API/worker use2c2a59e3 and schema103; the candidate uses2124c6fc
+The isolated provider services are now running and verified as described below;
+HRIS integration and migration remain pending. The existing private API/worker
+use2c2a59e3 and schema103; the candidate uses2124c6fc
 and schema116. Both Collaboration control jobs41437984098 pass (652 active JVM
 cases in uploaded reports, six opt-in native/elapsed cases skipped). Full ten-job
 Verify41442782804 is in progress. Preserve its exact source and audit the artifacts.
@@ -48,3 +49,29 @@ native SDK behavior and phone acceptance are distinct. This private pilot cannot
 accept load/latency, public rollout, rich chat, calls or meetings. All54 PRD feature
 groups remain open. Continue notification read/mute/privacy, durable display/actions,
 encrypted inline reply and remaining P2–P8 after the usable foreground pilot.
+
+## Isolated provider started — 2 November 2026
+
+[Evidence](../measurements/chat-private-provider-2026-11-02.json): Synapse1.164.1
+and PostgreSQL18.6 run as hris-dev matrix/matrix-database on the internal
+hris-dev_matrix network, with no host ports. HRIS API/worker are not attached yet.
+Staged configuration is private at ~/.config/hris/matrix-pilot/compose.matrix.yml;
+active dev.env and all existing service containers are unchanged. Matrix data is
+at ~/.local/share/hris-matrix-dev/data and hris-dev_matrix-postgres-data. Keep these,
+private keys/config and stable matrix.hris.internal identity; never regenerate on
+continuation. Runtime files are read-only UID10001 (PostgreSQL UID70), with separate
+protected originals. The Synapse role matrix is neither superuser nor BYPASSRLS,
+CREATEROLE or CREATEDB; its database is UTF8/C. Tracked bounded logging is mounted.
+
+Preparation validates the rendered overlay preserves existing environments/mounts/
+ports. Startup passes14.993s; verification and explicit owned restart pass11.274s.
+Versions returns200, unauthenticated whoami401, federation404, JWT is enabled and
+password/registration disabled. Both provider services restart healthy with their
+signing key/database preserved, zero users and no messages created. Existing HRIS
+API remains healthy. This is not end-to-end chat or full recovery acceptance.
+The staged overlay explicitly keeps all three chat push flags false.
+
+Next: complete full Verify package/recovery acceptance, fresh coordinated HRIS
+checkpoint and isolated migration, then compatible API/worker activation. Matrix
+backup must retain its separate database, data/signing key and protected config;
+the older HRIS recovery-set command does not include these new provider stores.

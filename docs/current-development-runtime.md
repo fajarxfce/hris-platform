@@ -4,6 +4,19 @@ Started 29 October 2026 with the user's authorization after installing the Andro
 dev APK. Current audited application and private runtime acceptance are recorded
 below; earlier rollout sections preserve their original sources and dates.
 
+## Isolated chat provider preparation — 2 November 2026
+
+Private Synapse1.164.1/PostgreSQL18.6 are started on the internal hris-dev_matrix
+network with no host ports; API/worker remain2c2a59e3/schema103 and are not yet wired
+to it. Both provider services restart with database/signing key preserved, no user
+or message created, and existing API health unchanged. Active dev.env is unchanged.
+[Operator state and next steps](collaboration/private-pilot-rollout.md) identify the
+protected staged overlay and persistent stores; [evidence](measurements/chat-private-provider-2026-11-02.json)
+separates this from pending HRIS integration/phone acceptance. Preserve these new
+provider stores; the old HRIS recovery-set command does not back them up.
+The phone currently has Mobile release15; release16 is being built separately.
+Full Platform Verify41442782804 remains in progress at2124c6fc. Chat push stays off.
+
 ## Android release installation — 31 October 2026
 
 The user requested the latest Mobile release build on the WireGuard phone.

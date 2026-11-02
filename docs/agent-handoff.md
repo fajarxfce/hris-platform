@@ -1,5 +1,26 @@
 # Agent continuation — HRIS workspace
 
+## Isolated provider running; compatible rollout pending — 2 November 2026
+
+[Provider evidence](measurements/chat-private-provider-2026-11-02.json) and
+[operator plan](collaboration/private-pilot-rollout.md) record private Matrix/PostgreSQL
+startup14.993s and restart/verification11.274s. No host ports; internal network only;
+UTF8/C and restricted provider role, stable matrix.hris.internal, protected persisted
+signing/JWT/config files. No identities/messages created. Existing HRIS containers and
+active dev.env unchanged; API healthy. API/worker2c2a59e3/schema103 are not attached yet.
+Private staging ~/.config/hris/matrix-pilot contains rendered/compose-command JSON and
+protected original/runtime files; do not regenerate. Matrix bind data and named DB
+volume must be retained. HRIS recovery_set.py does not yet include provider backup.
+
+Full Verify41442782804 at2124c6fc still active: four dashboard shards pass, backend and
+downstream integration/recovery pending. Apple41441078558 atd93e8cd5 still building full
+Xcode. Do not cancel or duplicate either run. Current Mobile cc4c11f1 release16 build
+is active in .work/release-phone-2026-11-02-build16/build-arm64.py; inspect result before
+another heavy task. No phone change. Finish full acceptance and APK verification, then
+fresh coordinated checkpoint plus isolated103→116 upgrade before actual HRIS rollout.
+Notify before explicitserial install-only; no phone UI drive. Continue notifications/
+actions/inline replies and all54 open groups after usable foreground pilot.
+
 ## Priority recovery and private pilot preparation — 2 November 2026
 
 Mobile cc4c11f1b538d48680ee892f6709925bbe5e18ec is PUSHED: one encrypted push hint gets a20s admission/exact-room

@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-02",
+  "preparation": {
+    "stagedAt": "2026-11-02T12:23:29.113119+00:00",
+    "serviceNames": [
+      "matrix-database",
+      "matrix"
+    ],
+    "providerVersion": "1.164.1",
+    "serverName": "matrix.hris.internal",
+    "providerNetworkInternal": true,
+    "providerPortsPublished": false,
+    "providerDatabaseRoleRestricted": true,
+    "chatPushEnabled": false,
+    "existingServiceConfigurationPreserved": true,
+    "activeEnvironmentUnchanged": true,
+    "servicesStarted": false
+  },
+  "startup": {
+    "startedAt": "2026-11-02T12:23:50.432826+00:00",
+    "success": true,
+    "providerPortsPublished": false,
+    "providerNetworkInternal": true,
+    "existingContainersUnchanged": true,
+    "activeEnvironmentUnchanged": true,
+    "chatPushEnabled": false,
+    "services": {
+      "matrix-database": {
+        "id": "1c63ff44261f7955de2da93faf45eca9e34f8973bcb32f1f059bcd5c0d6469bd",
+        "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "restartCount": 0
+      },
+      "matrix": {
+        "id": "b80d4cf48d6d081ca8100bf269d6856c315fc8dca98db555b66fb980561b4f91",
+        "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+        "restartCount": 0
+      }
+    },
+    "elapsedSeconds": 14.993
+  },
+  "verification": {
+    "verifiedAt": "2026-11-02T12:25:00.427139+00:00",
+    "success": true,
+    "elapsedSeconds": 11.274,
+    "checks": {
+      "versions": 200,
+      "unauthenticatedStatus": 401,
+      "federationStatus": 404,
+      "registrationDisabled": true,
+      "jwtEnabledPasswordDisabled": true
+    },
+    "providerDatabase": {
+      "users": 0,
+      "schema": 95,
+      "encoding": "UTF8",
+      "collate": "C",
+      "ctype": "C",
+      "role": {
+        "super": false,
+        "bypass": false,
+        "createRole": false,
+        "createDb": false
+      }
+    },
+    "signingKeyAndDatabasePreservedAfterOwnedRestart": true,
+    "providerNetworkInternal": true,
+    "providerPortsPublished": false,
+    "identityOrMessageCreated": false,
+    "existingApiHealthy": true,
+    "activeEnvironmentUnchanged": true,
+    "chatPushEnabled": false
+  },
+  "loggingSourceSha256": {
+    "deploy/synapse/logging.json": "40a1a731a07327c8f3b215b40f5149904c0d84ad5ad9e556b88eca04dfb0f805",
+    "deploy/synapse/hris_push_logging.py": "b5c0d82f53094c8cad8f18d3dc504c531ef28106c13fa0d4a21e0fb6b23e57a4"
+  },
+  "limitations": [
+    "Provider startup and restart only; not an HRIS gateway, device, message, phone or full disaster-recovery acceptance. No user or message created.",
+    "Existing API/worker remain2c2a59e3/schema103 and are not yet attached to the new internal network. Active dev.env unchanged. Staged overlay must be applied only at the reviewed compatible rollout.",
+    "Full Verify41442782804 at2124c6fc still in progress. No HRIS schema or grant changed; chat push remains off."
+  ]
+}

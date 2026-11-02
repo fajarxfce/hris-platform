@@ -1,6 +1,6 @@
 import unittest
 
-from collaboration_worker_native import checkpoint, evidence, diagnostic, incoming_evidence, progress_evidence
+from collaboration_worker_native import checkpoint, evidence, diagnostic, incoming_evidence, priority_evidence, progress_evidence
 
 
 class WorkerEvidenceTest(unittest.TestCase):
@@ -15,7 +15,38 @@ class WorkerEvidenceTest(unittest.TestCase):
                                    "repeatedWorkerComplete": True, "foregroundHistoryPaged": True,
                                    "foregroundStoppedHistoryRetained": True, "historyPages": 2,
                                    "providerReferences": 185, "pendingStateReferences": 9,
-                                   "historyPeerEvents": [f"$peer-{i}" for i in range(175)], "incoming": self.incoming()}
+                                   "historyPeerEvents": [f"$peer-{i}" for i in range(175)], "incoming": self.incoming(), "priority": self.priority()}
+
+    def priority(self):
+        return {"priorityWithoutOutbox": True, "priorityWithoutSelection": True,
+                "priorityQueueRetainedAfterReopen": True, "priorityOriginalRetainedAfterReopen": True,
+                "priorityOldestOfflineEventRecovered": True, "priorityRuntimeReleased": True,
+                "priorityTraversalUnchanged": True, "priorityGlobalWakeRetained": True,
+                "priorityHintCompleted": True, "priorityPasses": 1, "prioritySavedOriginals": 21,
+                "priorityEventId": "$peer-0"}
+
+    def test_priority_requires_bounded_turns_original_oldest_and_every_retention_boundary(self):
+        for invalid in (None, [], {}, self.priority() | {"priorityPasses": True},
+                        self.priority() | {"priorityPasses": 0}, self.priority() | {"priorityPasses": 4},
+                        self.priority() | {"prioritySavedOriginals": True},
+                        self.priority() | {"prioritySavedOriginals": 1},
+                        self.priority() | {"prioritySavedOriginals": 176},
+                        self.priority() | {"priorityEventId": "$peer-174"},
+                        self.priority() | {"priorityEventId": "private text"}):
+            with self.assertRaises(ValueError):
+                priority_evidence(invalid, "$peer-0")
+        for key, value in self.priority().items():
+            if type(value) is bool:
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    priority_evidence(self.priority() | {key: False}, "$peer-0")
+
+    def test_priority_strips_private_fields_and_completion_requires_its_proof(self):
+        self.assertEqual(self.priority(), priority_evidence(self.priority() | {"body": "hidden", "token": "hidden"}, "$peer-0"))
+        for invalid in (None, self.priority() | {"priorityEventId": "$peer-1"}):
+            with self.assertRaises(ValueError):
+                evidence(self.completed() | {"priority": invalid}, self.queued(), self.queued(456))
+        value = {"phase": "priority", "seeded": 175, "elapsedMillis": 150000}
+        self.assertEqual(value, progress_evidence(value))
 
     def incoming(self):
         return {"incomingWithoutOutbox": True, "incomingWithoutSelection": True,

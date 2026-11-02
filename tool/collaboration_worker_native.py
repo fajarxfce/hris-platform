@@ -115,7 +115,29 @@ def evidence(value, queued, restored):
         raise ValueError("Invalid encrypted history seed events")
     return result | {"eventId": event, "passes": passes, "historyPages": pages,
                      "providerReferences": references, "pendingStateReferences": pending,
-                     "historyPeerEvents": list(peers), "incoming": incoming_evidence(value.get("incoming"))}
+                     "historyPeerEvents": list(peers), "incoming": incoming_evidence(value.get("incoming")),
+                     "priority": priority_evidence(value.get("priority"), peers[0])}
+
+
+def priority_evidence(value, oldest):
+    if not isinstance(value, dict):
+        raise ValueError("Missing native priority evidence")
+    flags = ("priorityWithoutOutbox", "priorityWithoutSelection", "priorityQueueRetainedAfterReopen",
+             "priorityOriginalRetainedAfterReopen", "priorityOldestOfflineEventRecovered",
+             "priorityRuntimeReleased", "priorityTraversalUnchanged", "priorityGlobalWakeRetained",
+             "priorityHintCompleted")
+    if any(value.get(key) is not True for key in flags):
+        raise ValueError("Incomplete native priority evidence")
+    result = {key: True for key in flags}
+    for key, minimum, maximum in (("priorityPasses", 1, 3), ("prioritySavedOriginals", 2, 175)):
+        count = value.get(key)
+        if type(count) is not int or not minimum <= count <= maximum:
+            raise ValueError("Unbounded native priority evidence")
+        result[key] = count
+    event = value.get("priorityEventId")
+    if not isinstance(event, str) or not re.fullmatch(r"\$[!-~]{1,254}", event) or event != oldest:
+        raise ValueError("Priority must recover the oldest offline peer event")
+    return result | {"priorityEventId": event}
 
 
 def incoming_evidence(value):
@@ -143,7 +165,7 @@ def progress_evidence(value, incoming=False):
         raise ValueError("Missing worker progress")
     if not incoming:
         phase = value.get("phase")
-        if phase not in ("restore", "delivery", "seed", "incoming", "foreground", "complete"):
+        if phase not in ("restore", "delivery", "seed", "priority", "incoming", "foreground", "complete"):
             raise ValueError("Invalid worker phase")
         result = {"phase": phase}
         for key, minimum, maximum in (("seeded", 0, 175), ("elapsedMillis", 0, 480000)):

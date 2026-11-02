@@ -183,6 +183,23 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "foregroundHistoryPaged",
                 "foregroundStoppedHistoryRetained",
             )) assertTrue(proof.path(flag).asBoolean(), flag)
+        val priority = proof.path("priority")
+        for (flag in
+            listOf(
+                "priorityWithoutOutbox",
+                "priorityWithoutSelection",
+                "priorityQueueRetainedAfterReopen",
+                "priorityOriginalRetainedAfterReopen",
+                "priorityOldestOfflineEventRecovered",
+                "priorityRuntimeReleased",
+                "priorityTraversalUnchanged",
+                "priorityGlobalWakeRetained",
+                "priorityHintCompleted",
+            )) assertTrue(priority.path(flag).asBoolean(), flag)
+        val priorityPasses = priority.path("priorityPasses").asInt()
+        assertTrue(priorityPasses in 1..3)
+        assertTrue(priority.path("prioritySavedOriginals").asInt() in 2..175)
+        assertEquals(priorityPasses, trace.prioritySummaryReadCount())
         val incoming = proof.path("incoming")
         for (flag in
             listOf(
@@ -203,7 +220,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
         assertEquals(
             mapOf(
                 "directory" to incomingPasses,
-                "admission" to incomingPasses,
+                "admission" to incomingPasses + priorityPasses,
                 "summaries" to incomingPasses,
             ),
             trace.incomingAdmissions(),
@@ -214,6 +231,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
         val historyEvents = List(175) { seedEvents.path(it).asString() }
         assertEquals(175, historyEvents.size)
         assertEquals(175, historyEvents.distinct().size)
+        assertEquals(historyEvents.first(), priority.path("priorityEventId").asString())
         assertFalse(proof.path("eventId").asString() in historyEvents)
         assertTrue(proof.path("historyPages").asInt() in 2..12)
         assertTrue(proof.path("providerReferences").asLong() in 176..224)

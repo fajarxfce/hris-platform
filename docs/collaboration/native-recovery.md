@@ -46,3 +46,23 @@ The selected foreground workspace must not be changed to run background work.
 Keep push delivery disabled until receive/decrypt/privacy and durable inline reply
 are usable. These endpoint checks do not accept full chat notifications, live
 Synapse/FCM delivery, load capacity, Apple or browser behavior.
+
+
+## Native priority before the incoming sweep
+
+The Android worker fixture now injects one strict metadata-only push hint for the
+oldest of175 offline peer events. The actual application receiver persists its
+encrypted queue and independent wake; after container reopen, fresh HRIS admission
+and summary-by-room lead to native Matrix original acquisition. The point read must
+retain the exact original/body. Company, room, Browse and Incoming positions stay
+unchanged, the exact hint completes, and the global wake remains for the fair sweep.
+
+[Evidence](../measurements/native-priority-2026-11-02.json) covers queued, frozen-draft
+and cancelled-draft process-death variants. Each requires one priority turn (12
+retained originals around its anchor), then11 incoming turns/reopens and176 originals;
+foreground browsing independently takes11 pages/186 references. The gateway asserts
+one room lookup and counters11 directory/12 admission/11 summary-page requests.
+Ciphertext and exactly one worker send remain checked. No FCM or OS push receipt is
+injected, and this proof does not run the full OS recovery coordinator. The separate
+company WorkManager regression uses synthetic directory/company work. These scopes
+must remain distinct from phone notification or communications feature acceptance.

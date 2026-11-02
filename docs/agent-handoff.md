@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Actual native priority accepted in all three lifecycle variants — 2 November 2026
+
+[Evidence](measurements/native-priority-2026-11-02.json) binds108 Mobile/seven Platform
+inputs and APK343,275,325 bytes SHAa54d65517c55a4a94bd22303dd5ba1380aab0bcf8544dd96e1096e3a3b113a5b.
+Cancelled-draft native run2 passes289.577s; queued/frozen run3 passes569.699s. All three
+use actual HRIS/PostgreSQL/Synapse/Android SDK after process death. Each oldest-of175
+hint needs one priority turn, retains12 originals, preserves independent wake and
+all four progress positions, then recovers176 originals in11 incoming turns/reopens.
+Foreground independently pages11/186 references; one worker send,175 peer ciphertexts,
+queue retention and runtime cleanup asserted. Gateway11 directory/12 admission/11
+summary-page counters plus exact room-lookup assertion pass. Eighteen driver parser
+regressions also pass; no runtime production source changes in this commit.
+
+Initial native run1 fails41.162s before provider interaction because the earlier
+company-only fixture left its owned proof APK. The driver correctly refused it.
+Installed SHA was verified before removing only that proof package; guard unchanged.
+A missing second collector input manifest was corrected before Gradle/provider start.
+All corrected attempts and hashes retained. Mobile full build3 passes97.046s with
+3262 desktop,222 host,10 build-logic/six proof-host cases. Company WorkManager burst/
+process repair passes45.199s with synthetic directory/work and an empty priority lane.
+Real priority above uses actual app bindings; no claim of FCM or OS push delivery.
+
+CI41454857226 is ACTIVE at exactdac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d with eight API
+shards; require all14 jobs. Two prior failures remain archived. Private rollout guards
+now target this source/run/count and require exact job names. Only the two named
+native-proof test files are excluded from runtime source comparison; all packaged
+code must match accepted CI. Do not cancel/duplicate. Current dashboard source2124c6fc
+still matches. Retain .work/chat-private-rollout-2026-11-02/current-rollout-target.json.
+
+Next: audit full CI, stage verified packages/images, fresh coordinated HRIS checkpoint,
+isolated103→116 upgrade, explicit API/worker/dashboard rollout, employee/operator chat
+grants preserving roles, and read-only pilot access verification. HRIS still103, no
+migration/grants/real messages. Matrix private provider/checkpoint retained, push off.
+Mobile release17 atc6347c75 is verified and cold-starts twice via emulator ARM translation;
+phone still15. Notify before explicit10.77.77.3:5555 install-only; no phone UI driving.
+Finish owned emulator cleanup, commit/push counterpart Mobile proof, then continue
+notification read/mute/privacy/actions/inline reply and all54 groups after deployment.
+
 ## Full CI reached API time budget; eight shards prepared — 2 November 2026
 
 Replacement41448616746 at2334e266 FAILED by the35-minute Gradle step timeout in

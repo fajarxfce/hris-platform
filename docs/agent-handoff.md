@@ -1,5 +1,26 @@
 # Agent continuation — HRIS workspace
 
+## Mobile local read queue accepted — 2 November 2026
+
+Mobile875edab6 is pushed with exact encrypted read markers and a128-intent queue.
+[Counterpart evidence](https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json):
+11 actual SQLite and11 IndexedDB storage cases pass; full root161.148s covers3273
+desktop/230 host/10 build-logic cases with explicit reused results. Five browser
+transport cases also pass25.118s after correcting an existing test's unsynchronized
+MockEngine cancellation flag; no HTTP production change. Initial replaceable-intent
+draft and the failed broad attempt are retained. Existing history key protects the
+new namespace; no schema/key reset or age eviction. Other pending read points are
+preserved until exact acknowledgement; timestamp-based supersession is disallowed.
+
+Local admission/mark and live-admitted queued replay are next, followed by notification
+mute/privacy/actions/replies. A privacy change must suppress/cancel queued public
+receipts explicitly, without inventing server ACK. Common runtime receipt methods,
+UI/worker consumption and new full Apple/Xcode coverage still need work. No Starter
+port. All54 groups remain open. Live API/worker dac6fb0d/schema116, chat push OFF,
+phone17 unchanged; private identities, keys and Google/native bindings retained.
+Continue long run and push every commit; storage acceptance is not task completion.
+
+
 ## Actual Android read-receipt proof accepted — 2 November 2026
 
 Mobile c0ad592f is committed with finite native receipt operations and eight host

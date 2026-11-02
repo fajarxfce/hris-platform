@@ -9,13 +9,13 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.push.domain.entities.*
+import dev.fajar.hris.push.domain.repositories.PushRepository
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-/**
- * Opaque wake admission only. Interactive content and reply keep their separate assurance gates.
- */
+/** Opaque wake admission and fenced delivery. Content and reply keep separate assurance gates. */
 class HandleCollaborationPush(
     private val bindings: CollaborationPushBindingRepository,
     private val queue: CollaborationPushQueueRepository,
@@ -32,7 +32,180 @@ class HandleCollaborationPush(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val push: PushRepository,
 ) {
+    fun claim(ownerId: UUID, limit: Int): Result<List<CollaborationPushLease>> {
+        if (!service.enabled || !service.pushEnabled || !provider.enabled)
+            return Result.Success(emptyList())
+        if (limit !in 1..8)
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_push_batch")
+            )
+        val actor = Actor(UUID(0, 0), null, emptySet(), Instant.EPOCH, UUID.randomUUID())
+        return transactions.run(actor) {
+            queue.claim(ownerId, limit, 60, 8).flatMap { heads ->
+                val leases = heads.mapNotNull { it.lease }
+                if (leases.size != heads.size || leases.any { it.ownerId != ownerId })
+                    collaborationPushLeaseLost()
+                else Result.Success(leases)
+            }
+        }
+    }
+
+    /**
+     * Prepare/acknowledge under current guards, with provider I/O strictly outside transactions.
+     */
+    fun deliver(lease: CollaborationPushLease): Result<Unit> {
+        if (!service.enabled || !service.pushEnabled || !provider.enabled) return unavailable()
+        val started = clock.instant()
+        val budget = Budget(started, minOf(started.plusSeconds(20), lease.expiresAt))
+        if (!current(budget)) return collaborationPushLeaseLost()
+        val prepared =
+            withLease<Preparation?>(lease, budget) { observation, head ->
+                val target = observation.target(clock.instant())
+                if (target !is CollaborationPushTarget.Ready)
+                    return@withLease finish(lease).map { null }
+                val event = collaborationPushVisibleEvent(head, lease, clock.instant())
+                if (event != null) {
+                    val room =
+                        step(budget) {
+                            rooms.find(
+                                head.companyId,
+                                head.accountId,
+                                provider.serverName,
+                                event.roomId,
+                            )
+                        }
+                    if (room is Result.Failed) return@withLease room
+                    if (
+                        !collaborationPushRoomOwned(
+                            target.binding,
+                            event,
+                            (room as Result.Success).value,
+                            provider.serverName,
+                        )
+                    )
+                        return@withLease finish(lease).map { null }
+                }
+                val acquired =
+                    step(budget) {
+                        nativePush.token(
+                            head.accountId,
+                            head.nativeSessionId,
+                            target.registration.version,
+                        )
+                    }
+                if (acquired is Result.Failed) return@withLease acquired
+                val token = (acquired as Result.Success).value ?: return@withLease unavailable()
+                val now = clock.instant()
+                if (!sameCollaborationPushTarget(target, observation.target(now), now))
+                    return@withLease unavailable()
+                collaborationPushMessage(head, lease, target, token, now, budget.deadline).map {
+                    Preparation(target, it)
+                }
+            }
+        if (prepared is Result.Failed) return prepared
+        val ready = (prepared as Result.Success).value ?: return Result.Success(Unit)
+        if (!current(budget)) return unavailable()
+        val outcome = push.send(ready.message)
+        return withLease(lease, budget) { observation, head ->
+            val now = clock.instant()
+            val current = observation.target(now)
+            if (current !is CollaborationPushTarget.Ready) return@withLease finish(lease)
+            if (!sameCollaborationPushTarget(ready.target, current, now))
+                return@withLease defer(lease, now)
+            if (outcome is Result.Success && outcome.value == PushOutcome.UNREGISTERED) {
+                val registration = current.registration
+                val saved =
+                    step(budget) {
+                        nativePush.save(
+                            registration.copy(
+                                enabled = false,
+                                version = registration.version + 1,
+                                updatedAt = now.truncatedTo(java.time.temporal.ChronoUnit.MICROS),
+                            ),
+                            null,
+                            registration.version,
+                        )
+                    }
+                if (saved is Result.Failed) return@withLease saved
+                if (!(saved as Result.Success).value) return@withLease collaborationPushLeaseLost()
+            }
+            val retry =
+                (outcome as? Result.Failed)?.let {
+                    collaborationPushRetryAt(it.failure, head.attempts, now, head.expiresAt)
+                }
+            val completed = if (retry == null) finish(lease) else defer(lease, retry)
+            if (completed is Result.Failed) return@withLease completed
+            val after = clock.instant()
+            // These immutable inputs were captured under the held guards. An intentional local
+            // UNREGISTERED mutation must not invalidate its own atomic queue acknowledgment.
+            if (!sameCollaborationPushTarget(ready.target, observation.target(after), after))
+                unavailable()
+            else Result.Success(Unit)
+        }
+    }
+
+    private class Preparation(val target: CollaborationPushTarget.Ready, val message: PushMessage)
+
+    private fun <T> withLease(
+        lease: CollaborationPushLease,
+        budget: Budget,
+        operation: (Observation, CollaborationPushHead) -> Result<T>,
+    ): Result<T> {
+        val actor =
+            Actor(lease.accountId, lease.companyId, emptySet(), budget.started, UUID.randomUUID())
+        return step(budget) {
+            transactions.run(actor) {
+                val lookup =
+                    step(budget) { bindings.find(lease.companyId, lease.accountId, lease.deviceId) }
+                if (lookup is Result.Failed) return@run lookup
+                val initial =
+                    (lookup as Result.Success).value ?: return@run collaborationPushLeaseLost()
+                if (initial.nativeSessionId != lease.nativeSessionId)
+                    return@run collaborationPushLeaseLost()
+                observe(initial, budget).flatMap { observation ->
+                    val loaded =
+                        step(budget) {
+                            queue.find(
+                                lease.companyId,
+                                lease.accountId,
+                                lease.deviceId,
+                                lock = true,
+                            )
+                        }
+                    if (loaded is Result.Failed) return@flatMap loaded
+                    val head =
+                        (loaded as Result.Success).value
+                            ?: return@flatMap collaborationPushLeaseLost()
+                    if (
+                        head.lease != lease ||
+                            head.nativeSessionId != lease.nativeSessionId ||
+                            lease.expiresAt <= clock.instant() ||
+                            head.deliveredRevision >= lease.revision ||
+                            head.revision < lease.revision
+                    )
+                        return@flatMap collaborationPushLeaseLost()
+                    operation(observation, head).flatMap { result ->
+                        if (current(budget) && clock.instant() < lease.expiresAt)
+                            Result.Success(result)
+                        else collaborationPushLeaseLost()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun finish(lease: CollaborationPushLease) =
+        queue.finish(lease).flatMap {
+            if (it) Result.Success(Unit) else collaborationPushLeaseLost()
+        }
+
+    private fun defer(lease: CollaborationPushLease, at: Instant) =
+        queue.defer(lease, at).flatMap {
+            if (it) Result.Success(Unit) else collaborationPushLeaseLost()
+        }
+
     /** Each key commits independently. A failed batch can retry already committed keys safely. */
     fun accept(
         hint: CollaborationPushHint,

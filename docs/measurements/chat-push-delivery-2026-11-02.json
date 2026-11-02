@@ -1,0 +1,314 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "211d5d657c8eb475470a618db6dc5f5e0148030a",
+  "sourceSha256": {
+    "modules/collaboration/data/build.gradle.kts": "6d7ca3033debb2edf727b6ec5e11c4e577294c1dd4d1d37d6b109a11c5d659a7",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "26d5a5ca10979901b7f1b9ba48bf84a8482f49d9c5f8ea2d111844a26f31c042",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "a59a84a80d21ba7effe32bab779bc1265da811292586d24412d47978728b152c",
+    "modules/collaboration/domain/build.gradle.kts": "3322df29b0f0abd7fe01505899b42f82de2b1e9704361f76df8c87d202cac7e3",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/HandleCollaborationPush.kt": "3eabb78ce70d1698e2ed959ddfb6ce567322aea686d8be2e06cd06eb322eeaa1",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationPushDeliveryPolicy.kt": "86a4c49a2ce7302ad91c4fe76c89a4d6779dbbe4c7dec86a0c9b198f3176c4f9",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationPushDeliveryPolicyTest.kt": "004e9670553a806d23f82971c8efbef4eda6bd8db353616bccb6ce6f4549ee91"
+  },
+  "scope": "Current-target-fenced claim, prepare, FCM repository send and atomic queue acknowledgment; worker adapter not yet enabled or implemented.",
+  "finalRun": {
+    "exitCode": 0,
+    "wallSeconds": 393.482,
+    "inputsUnchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:data:test",
+      "--tests",
+      "*NativeCollaborationRegistrationTest",
+      ":apps:server:test",
+      "--tests",
+      "*NativeCollaborationMatrixIdentityHttpTest",
+      "--tests",
+      "*NativeCollaborationMatrixConfigurationTest",
+      ":apps:worker:test",
+      "--tests",
+      "*CollaborationProvisioningWorkerTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 393,
+  "reports": {
+    "domain": {
+      "totals": {
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.128"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.004"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.012"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.013"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.211"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.014"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.024"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.031"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationPushDeliveryPolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.042"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.009"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.095"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.018"
+        },
+        {
+          "name": "dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.033"
+        }
+      ]
+    },
+    "data": {
+      "totals": {
+        "tests": 138,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest",
+          "tests": "138",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "166.744"
+        }
+      ]
+    },
+    "api": {
+      "totals": {
+        "tests": 42,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest",
+          "tests": "33",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "31.513"
+        },
+        {
+          "name": "dev.fajar.hris.NativeCollaborationMatrixConfigurationTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "32.125"
+        }
+      ]
+    },
+    "worker": {
+      "totals": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.CollaborationProvisioningWorkerTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "47.891"
+        }
+      ]
+    }
+  },
+  "focusedRuns": [
+    {
+      "exitCode": 1,
+      "wallSeconds": 93.077,
+      "inputsUnchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":modules:collaboration:domain:test",
+        ":modules:collaboration:data:test",
+        "--tests",
+        "*NativeCollaborationRegistrationTest.pushDelivery*",
+        "--tests",
+        "*NativeCollaborationRegistrationTest.pushCallback*",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "finding": "55 domain cases passed; 18 SQL cases included one fixture failure: arbitrary available_at update correctly violated the immutable-head trigger. No product constraint was changed."
+    },
+    {
+      "exitCode": 1,
+      "wallSeconds": 67.414,
+      "inputsUnchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        ":modules:collaboration:domain:test",
+        ":modules:collaboration:data:test",
+        "--tests",
+        "*NativeCollaborationRegistrationTest.pushDelivery*",
+        "--tests",
+        "*NativeCollaborationRegistrationTest.pushCallback*",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "finding": "All18 SQL cases passed, including real first backoff plus later compressed fixture waits through fenced defer. Formatting then failed because the updated use-case KDoc needed reflow; formatted that comment."
+    }
+  ],
+  "behavior": [
+    "Claims use zero-actor worker scope, per-call1..8, maximum8 attempts and60-second fenced leases; durable global16 cap is unchanged.",
+    "Preparation reacquires current ordered policy/company/member/account/parent/device/gateway/binding guards and exact lease. Token acquisition uses the observed registration version; visible hints require a currently owned direct room.",
+    "Provider I/O occurs outside transactions with a20-second operation budget and separate recoverable24-hour storage lifetime. Payload uses only bounded opaque identifiers and a fixed generic fallback; maximum-size event test stays within1024 data bytes.",
+    "A newer callback remains pending after old acknowledgment. A visible event newer than the captured lease produces only an older quiet wake, then is handled by its own revision.",
+    "Late UNREGISTERED after token rotation defers for the current target and cannot erase the new token. Current token retirement and queue acknowledgment commit or roll back together.",
+    "Lost acknowledgment permits provider repetition using the same stable wake identity. Expiry, backwards time, interruption, missing token, stale/foreign leases, current permission loss and parent revocation are tested.",
+    "Transient failures have at most8 attempts, requested delays5/10/20/40/80/160/300 seconds; new callbacks can recover after exhaustion. Permanent outcomes do not automatically delete valid registrations."
+  ],
+  "backoffEvidence": "First5-second persisted delay rejects an early claim and is actually waited. Later waits are compressed only inside the fixture repository via the real fenced defer transition, while exact requested delays and all eight attempts are checked; this is not a615-second elapsed test.",
+  "runtimeValidation": "42 actual API and6 actual worker cases validate shared PushRepository injection; all138 registration tests retain ordinary RLS separately from the new dedicated worker fixture role.",
+  "limits": [
+    "PushRepository is a fixture sender in these new SQL cases. This does not prove a live FCM/device delivery. Existing signed OAuth/HTTP transport tests are separate evidence.",
+    "Acknowledged queue revisions are processed transport work, not device or message-read receipts; no exactly-once delivery claim.",
+    "The fixed collapse key requires Mobile all-owned-company recovery, current-owner/decryption checks and event deduplication before activation.",
+    "Worker lifecycle adapter/disabled-by-default delivery opt-in, Mobile receive/reply, Apple/web and remaining P0-P8 acceptance are still required. No live schema/provider rollout."
+  ],
+  "phone": "Mobile56a46938 fixes the reported root/API-path startup crash. Release11 is installed in place, all eight DEX files match two successful actual-app emulator cold starts, and user confirmed the app opens. Mobile50a83952 records acceptance; next product release12+."
+}

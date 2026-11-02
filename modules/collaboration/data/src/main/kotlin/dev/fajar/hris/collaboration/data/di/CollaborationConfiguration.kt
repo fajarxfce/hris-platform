@@ -13,6 +13,7 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.push.domain.repositories.PushRepository
 import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.beans.factory.ObjectProvider
@@ -49,6 +50,7 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        push: PushRepository,
     ) =
         HandleCollaborationPush(
             bindings,
@@ -66,6 +68,7 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            push,
         )
 
     @Bean

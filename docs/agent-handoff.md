@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Current chat wake delivery and Android startup fix proved — 2 November 2026
+
+[Delivery evidence](measurements/chat-push-delivery-2026-11-02.json): queued
+claim/prepare/send/ACK now uses complete current authority, owned room, token version
+and exact captured lease. External send stays outside transactions.20-second dispatch
+is separate from24h storage; fixed opaque payload/generic fallback and stable wake
+identity. Callback during I/O survives old ACK; newer visible identity cannot leak
+into an older lease. Late UNREGISTERED cannot retire a replacement token. Current
+retirement/ACK roll back together on failure, late time or interruption. Retry is
+bounded to8 attempts; new callbacks recover after exhaustion.
+
+55 domain +138 full registration SQL +42 actual API +6 actual worker cases pass,
+format/architecture,393s /393.482s, seven unchanged inputs. First92s run had one
+fixture failure: arbitrary available_at mutation hit the required transition trigger.
+Second66s all18 SQL pass, then KDoc formatting failure. Final first retry really
+waits5s; later waits are compressed via actual fenced defer while requested delays
+and finite attempts are checked. Do not claim615s elapsed backoff or live FCM delivery.
+
+**Continue immediately:** add owned worker polling/task/deadline adapter, local4/max8,
+no waiting task queue,60s leases,20s delivery budget,250ms poll, global16 pilot cap.
+Use an independent default-disabled HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED flag
+and require FCM plus collaboration/Matrix/push. Reuse DeadlineTask cancellation;
+prove shutdown, occupied-slot behavior after timeout, and actual enabled/disabled
+worker contexts. Then Mobile receive/decrypt/reply, all-company recovery and ports.
+Current source has no adapter, live rollout or full PRD acceptance. All54 remain open.
+
+User reported release10 force-close during this work. Mobile56a46938 fixes actual
+Android host composition passing an API path to root-only Matrix configuration;
+API audience and encrypted account ownership are preserved. Full root check plus
+actual release-app two cold starts pass. Release11 was installed and pulled-byte
+verified with preserved signer/data; user confirms “Sudah bisa dibuka”. Mobile
+50a83952 records acceptance. Next product phone update12+, notify first, explicit
+10.77.77.3:5555 install-only. Owned emulator5560 is stopped; unrelated emulator5554
+was observed and must be left untouched. Continue full P0–P8 after every checkpoint.
+
+
 ## Actual private TLS callback and provider retry proved — 1 November 2026
 
 [Evidence](measurements/chat-push-provider-callback-2026-11-01.json) /

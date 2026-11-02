@@ -69,11 +69,14 @@ import dev.fajar.hris.identity.data.repositories.StoredNativePushRegistrationRep
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository
 import dev.fajar.hris.jobs.data.datasources.PostgresJobDataSource
 import dev.fajar.hris.jobs.data.repositories.PostgresJobRepository
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.organization.data.datasources.PostgresCompanyDataSource
 import dev.fajar.hris.organization.data.repositories.StoredCompanyRepository
+import dev.fajar.hris.push.domain.entities.*
+import dev.fajar.hris.push.domain.repositories.PushRepository
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.Base64
@@ -84,6 +87,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.flywaydb.core.Flyway
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -105,6 +109,7 @@ class NativeCollaborationRegistrationTest {
         private lateinit var source: DriverManagerDataSource
         private lateinit var sql: JdbcTemplate
         private lateinit var runtime: DriverManagerDataSource
+        private lateinit var pushWorkerRuntime: DriverManagerDataSource
 
         @BeforeAll
         @JvmStatic
@@ -128,7 +133,30 @@ class NativeCollaborationRegistrationTest {
                     "collaboration_fixture",
                     "collaboration-fixture-only",
                 )
+            sql.execute(
+                "create role collaboration_push_worker_fixture login password 'push-worker-fixture-only'"
+            )
+            sql.execute("grant usage on schema public to collaboration_push_worker_fixture")
+            sql.execute(
+                "grant select,insert,update,delete on all tables in schema public to collaboration_push_worker_fixture"
+            )
+            sql.execute(
+                "grant usage,select on all sequences in schema public to collaboration_push_worker_fixture"
+            )
+            sql.execute("grant hris_worker_capability to collaboration_push_worker_fixture")
+            pushWorkerRuntime =
+                DriverManagerDataSource(
+                    postgres.jdbcUrl,
+                    "collaboration_push_worker_fixture",
+                    "push-worker-fixture-only",
+                )
         }
+    }
+
+    @AfterEach
+    fun clearOwnedPushQueueFixture() {
+        // Worker claims are global; each test owns its queue. Ordinary runtime has no TRUNCATE.
+        sql.execute("truncate collaboration_push_hints")
     }
 
     @Test
@@ -5733,8 +5761,320 @@ class NativeCollaborationRegistrationTest {
         assertNull(p.head())
     }
 
-    private inner class PusherFixture(registered: Boolean = true) {
-        val g = GatewayFixture()
+    @Test
+    fun pushDeliveryRetainsANewerCallbackDuringProviderIoAndAcknowledgesOnlyCapturedRevision() {
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        val first = p.f.pushRoom(p.g.parent, p.g.device)
+        val next = first.copy(eventId = "$" + UUID.randomUUID())
+        success(p.accept(first))
+        val messages = mutableListOf<PushMessage>()
+        val handler =
+            p.f.pushHandler(
+                push =
+                    PushRepository { message ->
+                        assertFalse(
+                            org.springframework.transaction.support
+                                .TransactionSynchronizationManager
+                                .isActualTransactionActive()
+                        )
+                        messages.add(message)
+                        if (messages.size == 1) success(p.accept(next))
+                        Result.Success(PushOutcome.ACCEPTED)
+                    }
+            )
+        success(handler.deliver(p.claim(handler)))
+        assertEquals(2, p.head()!!.revision)
+        assertEquals(1, p.head()!!.deliveredRevision)
+        assertEquals(first.eventId, messages.single().data["matrixEventId"])
+        assertTrue(messages.single().expiresAt > p.f.clock.at.plusSeconds(86000))
+        assertTrue(messages.single().dispatchDeadline <= p.f.clock.at.plusSeconds(20))
+        success(handler.deliver(p.claim(handler)))
+        assertEquals(2, p.head()!!.deliveredRevision)
+        assertEquals(next.eventId, messages.last().data["matrixEventId"])
+        assertEquals(2, messages.map { it.data["eventId"] }.toSet().size)
+    }
+
+    @Test
+    fun pushDeliveryQuietOldLeaseCannotBorrowANewerVisibleEvent() {
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        val event = p.f.pushRoom(p.g.parent, p.g.device)
+        success(p.accept(null))
+        val messages = mutableListOf<PushMessage>()
+        val handler =
+            p.f.pushHandler(
+                push =
+                    PushRepository {
+                        messages.add(it)
+                        Result.Success(PushOutcome.ACCEPTED)
+                    }
+            )
+        val old = p.claim(handler)
+        success(p.accept(event))
+        p.f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        success(handler.deliver(old))
+        assertEquals(PushDelivery.Background("hris_chat"), messages.single().delivery)
+        assertFalse(messages.single().data.containsKey("matrixEventId"))
+        assertEquals(1, p.head()!!.deliveredRevision)
+        success(handler.deliver(p.claim(handler)))
+        assertEquals(event.eventId, messages.last().data["matrixEventId"])
+        assertEquals(
+            PushDelivery.Visible("HRIS", "New chat activity", "hris_chat"),
+            messages.last().delivery,
+        )
+    }
+
+    @Test
+    fun pushDeliveryLateUnregisteredCannotDisableANewerTokenAndCurrentRetirementIsAtomic() {
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        success(p.accept(null))
+        val messages = mutableListOf<PushMessage>()
+        val handler =
+            p.f.pushHandler(
+                push =
+                    PushRepository {
+                        messages.add(it)
+                        if (messages.size == 1) p.rotate()
+                        Result.Success(PushOutcome.UNREGISTERED)
+                    }
+            )
+        success(handler.deliver(p.claim(handler)))
+        assertEquals(0, p.head()!!.deliveredRevision)
+        assertNull(p.head()!!.lease)
+        val rotated =
+            success(
+                p.f.transactions.run(p.f.actor) { p.f.nativePush.find(p.f.account, p.g.parent) }
+            )!!
+        assertTrue(rotated.enabled)
+        assertEquals(1, rotated.version)
+        success(handler.deliver(p.claim(handler)))
+        val retired =
+            sql.queryForMap(
+                "select enabled,version,token_hash,token_encrypted from native_push_registrations where session_id=?",
+                p.g.parent,
+            )
+        assertEquals(false, retired["enabled"])
+        assertEquals(2L, retired["version"])
+        assertNull(retired["token_hash"])
+        assertNull(retired["token_encrypted"])
+        assertEquals(1, p.head()!!.deliveredRevision)
+        assertNotEquals(messages.first().token, messages.last().token)
+        assertEquals(messages.first().data["eventId"], messages.last().data["eventId"])
+    }
+
+    @Test
+    fun pushDeliveryLostAcknowledgmentRollsBackTokenRetirementAndReplayKeepsIdentity() {
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        success(p.accept(null))
+        val messages = mutableListOf<PushMessage>()
+        val provider = PushRepository {
+            messages.add(it)
+            Result.Success(PushOutcome.UNREGISTERED)
+        }
+        val queue =
+            object : CollaborationPushQueueRepository by p.f.pushQueue {
+                override fun finish(lease: CollaborationPushLease): Result<Boolean> {
+                    assertTrue(success(p.f.pushQueue.finish(lease)))
+                    return Result.Success(false)
+                }
+            }
+        val broken = p.f.pushHandler(queue = queue, push = provider)
+        val lease = p.claim(broken)
+        assertEquals("collaboration_push_lease_lost", failed(broken.deliver(lease)))
+        assertEquals(lease, p.head()!!.lease)
+        assertEquals(0, p.head()!!.deliveredRevision)
+        assertEquals(
+            true,
+            sql.queryForObject(
+                "select enabled from native_push_registrations where session_id=?",
+                Boolean::class.java,
+                p.g.parent,
+            ),
+        )
+        success(p.f.pushHandler(push = provider).deliver(lease))
+        assertEquals(1, p.head()!!.deliveredRevision)
+        assertEquals(2, messages.size)
+        assertEquals(1, messages.map { it.data["eventId"] }.toSet().size)
+    }
+
+    @Test
+    fun pushDeliveryCurrentDenialBeforeSendSuppressesAndRevocationDuringIoCannotRetireAToken() {
+        val denied = PusherFixture(worker = true)
+        success(denied.ensure())
+        success(denied.accept(null))
+        val captured = denied.claim()
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=?",
+            denied.f.actor.companyId,
+            denied.f.account,
+        )
+        success(denied.f.pushHandler().deliver(captured))
+        assertEquals(1, denied.head()!!.deliveredRevision)
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        success(p.accept(null))
+        val handler =
+            p.f.pushHandler(
+                push =
+                    PushRepository {
+                        sql.update(
+                            "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                            p.g.parent,
+                        )
+                        Result.Success(PushOutcome.UNREGISTERED)
+                    }
+            )
+        success(handler.deliver(p.claim(handler)))
+        assertEquals(1, p.head()!!.deliveredRevision)
+        assertEquals(
+            true,
+            sql.queryForObject(
+                "select enabled from native_push_registrations where session_id=?",
+                Boolean::class.java,
+                p.g.parent,
+            ),
+        )
+    }
+
+    @Test
+    fun pushDeliveryPostwriteExpiryBackwardsTimeAndInterruptionRollBackAcknowledgment() {
+        for (mode in listOf("expiry", "backwards", "interrupt")) {
+            val p = PusherFixture(worker = true)
+            success(p.ensure())
+            success(p.accept(null))
+            val queue =
+                object : CollaborationPushQueueRepository by p.f.pushQueue {
+                    override fun finish(lease: CollaborationPushLease): Result<Boolean> {
+                        val written = p.f.pushQueue.finish(lease)
+                        assertTrue(success(written))
+                        when (mode) {
+                            "expiry" -> p.f.clock.at = p.f.clock.at.plusSeconds(21)
+                            "backwards" -> p.f.clock.at = p.f.clock.at.minusSeconds(1)
+                            else -> throw InterruptedException("fixture termination")
+                        }
+                        return written
+                    }
+                }
+            val handler =
+                p.f.pushHandler(
+                    queue = queue,
+                    push = PushRepository { Result.Success(PushOutcome.UNREGISTERED) },
+                )
+            val lease = p.claim(handler)
+            if (mode == "interrupt")
+                assertThrows(InterruptedException::class.java) { handler.deliver(lease) }
+            else assertInstanceOf(Result.Failed::class.java, handler.deliver(lease))
+            assertEquals(lease, p.head()!!.lease)
+            assertEquals(0, p.head()!!.deliveredRevision)
+            assertEquals(
+                true,
+                sql.queryForObject(
+                    "select enabled from native_push_registrations where session_id=?",
+                    Boolean::class.java,
+                    p.g.parent,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun pushDeliveryTransientRetriesAreFiniteAndANewQuietCallbackCanRecover() {
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        success(p.accept(null))
+        val messages = mutableListOf<PushMessage>()
+        val requestedDelays = mutableListOf<Long>()
+        val queue =
+            object : CollaborationPushQueueRepository by p.f.pushQueue {
+                override fun defer(
+                    lease: CollaborationPushLease,
+                    availableAt: Instant,
+                ): Result<Boolean> {
+                    requestedDelays.add(Duration.between(p.f.clock.at, availableAt).seconds)
+                    // Prove the first real elapsed delay. Compress only later fixture waits through
+                    // the actual fenced transition; never bypass the immutable-head trigger.
+                    return p.f.pushQueue.defer(
+                        lease,
+                        if (requestedDelays.size == 1) availableAt else p.f.clock.at,
+                    )
+                }
+            }
+        val handler =
+            p.f.pushHandler(
+                queue = queue,
+                push =
+                    PushRepository {
+                        messages.add(it)
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_transient"))
+                    },
+            )
+        repeat(8) { index ->
+            val lease = p.claim(handler)
+            success(handler.deliver(lease))
+            assertEquals(index + 1, p.head()!!.attempts)
+            assertNull(p.head()!!.lease)
+            if (index == 0) {
+                assertTrue(p.head()!!.availableAt > p.f.clock.at)
+                assertTrue(success(handler.claim(UUID.randomUUID(), 1)).isEmpty())
+                val waitMillis =
+                    Duration.between(Instant.now(), p.head()!!.availableAt).toMillis() + 100
+                assertTrue(waitMillis in 1..6000)
+                TimeUnit.MILLISECONDS.sleep(waitMillis)
+            }
+        }
+        assertEquals(1, p.head()!!.deliveredRevision)
+        assertEquals(8, messages.size)
+        assertEquals(listOf(5L, 10L, 20L, 40L, 80L, 160L, 300L), requestedDelays)
+        assertEquals(1, messages.map { it.data["eventId"] }.toSet().size)
+        assertTrue(success(handler.claim(UUID.randomUUID(), 1)).isEmpty())
+        success(p.accept(null))
+        val recovered =
+            p.f.pushHandler(push = PushRepository { Result.Success(PushOutcome.ACCEPTED) })
+        success(recovered.deliver(p.claim(recovered)))
+        assertEquals(2, p.head()!!.deliveredRevision)
+        assertEquals(1, p.head()!!.attempts)
+    }
+
+    @Test
+    fun pushDeliveryMissingTokenForeignStaleAndExpiredLeasesNeverSend() {
+        val p = PusherFixture(worker = true)
+        success(p.ensure())
+        success(p.accept(null))
+        val lease = p.claim()
+        val handler = p.f.pushHandler()
+        for (wrong in
+            listOf(
+                lease.copy(companyId = UUID.randomUUID()),
+                lease.copy(accountId = UUID.randomUUID()),
+                lease.copy(deviceId = UUID.randomUUID()),
+                lease.copy(nativeSessionId = UUID.randomUUID()),
+                lease.copy(token = UUID.randomUUID()),
+                lease.copy(ownerId = UUID.randomUUID()),
+                lease.copy(revision = lease.revision + 1),
+            )) assertInstanceOf(Result.Failed::class.java, handler.deliver(wrong))
+        val missing =
+            object : NativePushRegistrationRepository by p.f.nativePush {
+                override fun token(
+                    accountId: UUID,
+                    sessionId: UUID,
+                    expectedVersion: Long,
+                ): Result<String?> = Result.Success(null)
+            }
+        assertEquals(
+            "collaboration_push_unavailable",
+            failed(p.f.pushHandler(nativePush = missing).deliver(lease)),
+        )
+        p.f.clock.at = lease.expiresAt
+        assertInstanceOf(Result.Failed::class.java, handler.deliver(lease))
+        assertEquals(0, p.head()!!.deliveredRevision)
+        assertEquals(lease, p.head()!!.lease)
+    }
+
+    private inner class PusherFixture(registered: Boolean = true, worker: Boolean = false) {
+        val g = GatewayFixture(worker)
         val f = g.f
         val token = success(g.bootstrap()).accessToken
         val matrix = RecordingMatrix(f.clock)
@@ -5805,6 +6145,11 @@ class NativeCollaborationRegistrationTest {
                     f.clock.at.plusSeconds(10),
                 )
 
+        fun claim(handler: HandleCollaborationPush = f.pushHandler()): CollaborationPushLease {
+            f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            return success(handler.claim(UUID.randomUUID(), 1)).single()
+        }
+
         fun head() =
             success(
                 f.transactions.run(f.actor) {
@@ -5827,8 +6172,8 @@ class NativeCollaborationRegistrationTest {
         return (result as Result.Failed).failure.code
     }
 
-    private class GatewayFixture {
-        val f = Fixture()
+    private class GatewayFixture(worker: Boolean = false) {
+        val f = Fixture(worker = worker)
         val parent = f.parent()
         val device = (f.register(parent) as Result.Success).value.id
         val operation = UUID.randomUUID()
@@ -5858,11 +6203,12 @@ class NativeCollaborationRegistrationTest {
         fun refresh(token: String) = f.gatewayRefresh().execute(token, UUID.randomUUID())
     }
 
-    private class Fixture(val account: UUID = UUID.randomUUID()) {
+    private class Fixture(val account: UUID = UUID.randomUUID(), worker: Boolean = false) {
+        private val source = if (worker) pushWorkerRuntime else runtime
         val clock = MutableClock(Instant.now().truncatedTo(ChronoUnit.MICROS))
         val transactions =
-            PostgresTransactionRunner(JdbcTransactionManager(runtime), JdbcTemplate(runtime))
-        private val dsl = DSL.using(TransactionAwareDataSourceProxy(runtime), SQLDialect.POSTGRES)
+            PostgresTransactionRunner(JdbcTransactionManager(source), JdbcTemplate(source))
+        private val dsl = DSL.using(TransactionAwareDataSourceProxy(source), SQLDialect.POSTGRES)
         private val json = JsonMapper.builder().build()
         private val receipts = PostgresOperationReceiptDataSource(dsl)
         val deviceKeys =
@@ -6348,6 +6694,11 @@ class NativeCollaborationRegistrationTest {
             bindings: CollaborationPushBindingRepository = pushBindings,
             members: MembershipRepository = this.members,
             service: CollaborationServicePolicy = CollaborationServicePolicy(true, true),
+            nativePush: NativePushRegistrationRepository = this.nativePush,
+            push: dev.fajar.hris.push.domain.repositories.PushRepository =
+                dev.fajar.hris.push.domain.repositories.PushRepository {
+                    error("Callback admission never sends FCM")
+                },
         ) =
             HandleCollaborationPush(
                 bindings,
@@ -6367,6 +6718,7 @@ class NativeCollaborationRegistrationTest {
                 service,
                 CollaborationMatrixPolicy(true, "proof.invalid"),
                 clock,
+                push,
             )
 
         fun pushRoom(parent: UUID, device: UUID): CollaborationPushEvent {

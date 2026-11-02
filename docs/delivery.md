@@ -1,5 +1,7 @@
 # Delivery and validation
 
+Current communications checkpoint: [fenced chat wake delivery](measurements/chat-push-delivery-2026-11-02.json) passes55 domain,138 registration SQL,42 API and6 worker cases plus format/architecture. Polling adapter, Mobile receive/reply and full acceptance remain next. Mobile release11 fixes the reported startup crash and has user confirmation; see the current agent handoff.
+
 ## Verify a development branch
 
 The `Verify` workflow accepts manual dispatch as well as main pushes and pull

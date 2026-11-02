@@ -336,3 +336,37 @@ provider/API case,39.909s suite/17.622s method, format/architecture pass;220s Gr
 builders in addition to the existing crypto provider; test-only bcpkix uses the
 existing1.86 version. All owned containers are reaped. No live provider rollout or
 capacity acceptance; queue/FCM worker and Mobile receive/reply are the next work.
+
+
+## Current queued delivery boundary
+
+`HandleCollaborationPush.claim/deliver` now claims a bounded worker lease, prepares
+under ordered current authority/owned-room guards, acquires the current native-token
+version, sends outside the transaction and reacquires the complete lease/target
+before acknowledgment. Dispatch is capped at20 seconds, separately from the explicit
+RECOVERABLE provider storage lifetime of up to24 hours. Payload contains bounded
+opaque account/company/parent/device/revision/event identifiers and a fixed generic
+visible fallback, or only a quiet wake. Never include message text, names, ciphertext,
+push keys or FCM tokens in its data map.
+
+An old lease cannot borrow a newer callback's visible identity or acknowledge that
+new revision. Token rotation defeats late UNREGISTERED; current retirement and ACK
+are atomic, including failed-result/expiry/interruption rollback. Lost ACK may
+repeat the same wake ID. At most eight attempts use bounded5–300-second backoff;
+new callbacks recover independently after exhaustion. ACK means processed queue
+work, not delivery to a device or message-read confirmation. The single `hris_chat`
+collapse key requires all-owned-company recovery without changing selected workspace.
+
+[Evidence](../measurements/chat-push-delivery-2026-11-02.json):55 domain,138 full
+registration SQL,42 actual API and6 actual worker cases, format/architecture pass
+in393s Gradle /393.482s wall with seven unchanged inputs. The retry test waits the
+first real5 seconds; later delays are captured but compressed through the real fenced
+defer transition. First failure was the fixture's forbidden arbitrary schedule
+rewrite; second was KDoc formatting after all18 focused SQL cases passed. Guards
+and trigger remain unchanged. The sender is a fixture PushRepository in these cases.
+
+Next wire an explicitly owned, bounded polling/task/deadline adapter behind its own
+default-disabled `HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED` flag and require valid
+FCM/collaboration/Matrix/push configuration. Then implement Mobile receive/decrypt/
+reply and reconnect/periodic/full recovery before activation. No live rollout or
+complete CHAT-13 acceptance is claimed here.

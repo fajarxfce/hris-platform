@@ -13,7 +13,7 @@ queue retention and runtime cleanup asserted. Gateway11 directory/12 admission/1
 summary-page counters plus exact room-lookup assertion pass. Eighteen driver parser
 regressions also pass; no runtime production source changes in this commit.
 
-Initial native run1 fails41.162s before provider interaction because the earlier
+Initial native run1 fails41.162s before native SDK execution because the earlier
 company-only fixture left its owned proof APK. The driver correctly refused it.
 Installed SHA was verified before removing only that proof package; guard unchanged.
 A missing second collector input manifest was corrected before Gradle/provider start.
@@ -35,7 +35,8 @@ grants preserving roles, and read-only pilot access verification. HRIS still103,
 migration/grants/real messages. Matrix private provider/checkpoint retained, push off.
 Mobile release17 atc6347c75 is verified and cold-starts twice via emulator ARM translation;
 phone still15. Notify before explicit10.77.77.3:5555 install-only; no phone UI driving.
-Finish owned emulator cleanup, commit/push counterpart Mobile proof, then continue
+Owned emulator5562/PID553348 is stopped and proof package removed. Counterpart Mobile
+proof a212bd2a is committed/pushed. Continue
 notification read/mute/privacy/actions/inline reply and all54 groups after deployment.
 
 ## Full CI reached API time budget; eight shards prepared — 2 November 2026

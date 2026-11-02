@@ -451,6 +451,67 @@ class WorkerConfiguration {
     ): JobTask = AnnouncementPublicationTask(resolve, advance, abort)
 
     @Bean
+    fun collaborationPushSettings() = dev.fajar.hris.worker.push.CollaborationPushWorkerSettings()
+
+    @Bean
+    fun collaborationPushTasks(
+        settings: dev.fajar.hris.worker.push.CollaborationPushWorkerSettings
+    ) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-chat-push-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            // The current SQL statement has its own15-second bound after interruption.
+            setAwaitTerminationSeconds(20)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun collaborationPushTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-chat-push-control-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED",
+                "HRIS_FCM_ENABLED",
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+                "HRIS_COLLABORATION_PUSH_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun collaborationPushWorker(
+        handle: HandleCollaborationPush,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationPushTasks")
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationPushTimers")
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.push.CollaborationPushWorkerSettings,
+    ) =
+        dev.fajar.hris.worker.push.CollaborationPushWorker(
+            handle::claim,
+            handle::deliver,
+            tasks,
+            timers,
+            settings,
+        )
+
+    @Bean
     fun inboxPushSettings(policy: dev.fajar.hris.communications.domain.entities.InboxPushPolicy) =
         dev.fajar.hris.worker.push.InboxPushWorkerSettings(
             pollInterval =

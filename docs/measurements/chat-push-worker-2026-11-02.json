@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "ecc52b86cd266a46c7b0b71f1789ceabd90da164",
+  "scope": "Owned default-disabled collaboration push worker; actual production worker application graph and PostgreSQL runtime-role claims.",
+  "sourceSha256": {
+    ".env.example": "2143ca586ff239ebfd83284ae8231344a0ef8ca5144a8b70bfcc882213da7e56",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/WorkerConfiguration.kt": "76608fb090676e0c5a341905beea29f36bf922265857056f51562856fc9e2347",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/push/CollaborationPushWorker.kt": "9591a73cd11a96f17b5b32cf88abad8b6ac590d352e7ce012f89ddf927ec279c",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/push/CollaborationPushWorkerSettings.kt": "4f912076e140871d63ba730287ea2d0384ef2677154ebb27364459ab59d98ef1",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationPushContextTest.kt": "b75cd39867e97ccd561e1aac4c274948799800ad8087b1d7aa855f1649db31bd",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationPushLoopTest.kt": "02e15ae51aad360ee6d170ed36d6f78ea52a9e8b2d227e9f675fc51a19b3138b"
+  },
+  "finalRun": {
+    "exitCode": 0,
+    "wallSeconds": 119.725,
+    "inputsUnchanged": true,
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      ":apps:worker:test",
+      "--tests",
+      "*CollaborationPushLoopTest",
+      "--tests",
+      "*CollaborationPushContextTest",
+      "--tests",
+      "*CollaborationProvisioningWorkerTest",
+      "formatCheck",
+      "architectureCheck"
+    ]
+  },
+  "gradleSeconds": 119,
+  "reports": {
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": [
+      {
+        "name": "dev.fajar.hris.worker.CollaborationProvisioningWorkerTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "time": "41.527"
+      },
+      {
+        "name": "dev.fajar.hris.worker.CollaborationPushContextTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "time": "14.489"
+      },
+      {
+        "name": "dev.fajar.hris.worker.CollaborationPushLoopTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "time": "0.806"
+      }
+    ]
+  },
+  "checked": [
+    "Four delivery threads by default, validated maximum eight, no waiting task queue, 250 ms fixed-delay polling, 20-second task deadline; durable use case retains 60-second leases, eight attempts and global 16-lease pilot cap.",
+    "Deadline cancellation interrupts its exact task. A cancelled task still cleaning up occupies the original execution slot; another lease is not claimed until that task exits.",
+    "Shutdown interrupts an outstanding claim, closes both owned executors, invokes its callback and prohibits restarting the same lifecycle owner.",
+    "Seven actual WorkerApplication startups exercise all-enabled, absent delivery opt-in, and each of FCM/collaboration/Matrix/managed push/global worker disabled. Global worker default is tested by omitting its property in the enabled case.",
+    "Enabled context uses real HandleCollaborationPush and database queue under the worker runtime role, with a delegating claim observer. Empty queue avoids provider I/O. All six disabled contexts create no collaboration push worker, claims or scheduled work.",
+    "All context task/timer executors terminate after close. Synthetic credentials are generated in an owned temporary directory and deleted; no real Firebase credentials are used.",
+    "Production component scanning remains intact. An explicit test-component exclusion prevents unrelated test configurations leaking into programmatic Boot startup.",
+    "Six existing collaboration provisioning worker cases, formatCheck and architectureCheck pass."
+  ],
+  "limits": [
+    "No queued item is delivered through FCM in the application-context test. Current delivery policy/SQL and actual FCM transport have separate existing evidence.",
+    "No live provider, schema or delivery flag is changed. Mobile receive/decrypt/reply and all-owned-company reconnect/periodic recovery remain required before activation.",
+    "Four local and sixteen global leases are bounded pilot defaults, not a measured large-company throughput guarantee.",
+    "CHAT-13 and all 54 communications feature groups remain unaccepted."
+  ]
+}

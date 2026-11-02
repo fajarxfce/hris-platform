@@ -365,8 +365,28 @@ defer transition. First failure was the fixture's forbidden arbitrary schedule
 rewrite; second was KDoc formatting after all18 focused SQL cases passed. Guards
 and trigger remain unchanged. The sender is a fixture PushRepository in these cases.
 
-Next wire an explicitly owned, bounded polling/task/deadline adapter behind its own
-default-disabled `HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED` flag and require valid
-FCM/collaboration/Matrix/push configuration. Then implement Mobile receive/decrypt/
-reply and reconnect/periodic/full recovery before activation. No live rollout or
-complete CHAT-13 acceptance is claimed here.
+## Automatic delivery worker
+
+`CollaborationPushWorker` owns four delivery threads, no waiting task queue and two
+control threads. It polls every 250 ms for available capacity only. Each task has
+an owned 20-second cancellation timer. Cancellation does not release an execution
+slot until its underlying operation exits. Shutdown cancels polling, interrupts
+work and closes both pools; durable leases remain recoverable after process death.
+
+The worker requires explicit `HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED=true` plus
+FCM, collaboration, Matrix and managed push enabled. Global worker disablement also
+prevents startup. Callback ingress has an independent flag, so already-retained
+work can drain while ingress is off. Defaults keep delivery disabled. Capacity and
+timeouts are bounded pilot settings, not a throughput claim.
+
+[Evidence](../measurements/chat-push-worker-2026-11-02.json): 11 tests pass, including
+four loop/lifecycle cases and seven actual application-context configurations in
+one context test. The enabled context claims the real PostgreSQL queue under its
+worker role. All disabled configurations do no chat push work and every context
+terminates its executors. Six provisioning regressions and format/architecture
+pass; 119s Gradle / 119.725s wall, six unchanged inputs. Empty-queue contexts perform
+no FCM send; transport and guarded delivery have separate evidence above.
+
+Mobile receive/decrypt/reply and all-owned-company reconnect/periodic/full recovery
+remain required before activation. No live rollout or complete CHAT-13 acceptance
+is claimed here.

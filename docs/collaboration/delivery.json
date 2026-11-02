@@ -186,7 +186,8 @@
         "../measurements/chat-push-callback-admission-2026-11-01.json",
         "../measurements/chat-push-private-ingress-2026-11-01.json",
         "../measurements/chat-push-provider-callback-2026-11-01.json",
-        "../measurements/chat-push-delivery-2026-11-02.json"
+        "../measurements/chat-push-delivery-2026-11-02.json",
+        "../measurements/chat-push-worker-2026-11-02.json"
       ]
     },
     {
@@ -363,7 +364,8 @@
         "../measurements/chat-push-callback-admission-2026-11-01.json",
         "../measurements/chat-push-private-ingress-2026-11-01.json",
         "../measurements/chat-push-provider-callback-2026-11-01.json",
-        "../measurements/chat-push-delivery-2026-11-02.json"
+        "../measurements/chat-push-delivery-2026-11-02.json",
+        "../measurements/chat-push-worker-2026-11-02.json"
       ]
     },
     {
@@ -621,9 +623,9 @@
   "next": [
     "Mobile release11 fixes actual Android host startup using the API origin for the Matrix gateway. It is installed and user-confirmed; next product phone update must use12+ with notification and install-only.",
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
-    "Private bounded callback, actual Synapse/TLS outage retry, durable queue and current-target-fenced prepare/send/ACK are validated. Add the owned default-disabled FCM delivery adapter, then Mobile receive/decrypt/reply and all-owned-company offline recovery before activation.",
+    "Private callback, actual Synapse/TLS outage retry, durable queue, current-target-fenced delivery and the default-disabled owned worker are validated. Implement Mobile managed pusher activation, receive/decrypt/reply and all-owned-company offline recovery before live activation.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
-    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
+    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2–P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."
   ]
 }

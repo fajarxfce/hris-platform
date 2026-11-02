@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Automatic chat push worker validated — 2 November 2026
+
+[Evidence](measurements/chat-push-worker-2026-11-02.json): the worker now owns four
+parallel delivery slots (maximum eight), no waiting task queue, a 250 ms poll and
+20-second task deadlines. Timed-out work retains its occupied slot until it exits.
+Shutdown interrupts claims and closes both executors. Durable leases, current
+prepare/send/ACK guards and finite retries remain in HandleCollaborationPush.
+
+Eleven tests pass: four lifecycle/bounds cases, one case with seven actual
+WorkerApplication contexts, and six existing provisioning worker cases. Enabled
+context claims the real PostgreSQL queue under the worker role; absent delivery
+opt-in and each required capability/global-worker disablement produce no worker.
+Every context terminates its owned pools. Format/architecture pass; 119s Gradle /
+119.725s wall, six unchanged source/configuration inputs. No FCM send or live
+configuration change is claimed by this worker-context proof.
+
+**Continue immediately:** Mobile managed pusher activation, receive/decrypt/reply
+and all-owned-company recovery. Existing runtime ownership follows only the selected
+workspace, so background recovery must gain explicit bounded account/native-parent
+ownership without changing the visible selection or relaxing interactive admission.
+Keep HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED false until those paths are validated.
+Continue remaining P0–P8 and reusable Starter ports after each pushed checkpoint.
+Mobile release 11 is user-confirmed working; next phone update is 12+, notification
+first and explicit 10.77.77.3:5555 install-only. Leave unrelated emulator 5554 alone.
+
+
 ## Current chat wake delivery and Android startup fix proved — 2 November 2026
 
 [Delivery evidence](measurements/chat-push-delivery-2026-11-02.json): queued

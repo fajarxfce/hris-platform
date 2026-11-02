@@ -305,15 +305,39 @@ class CollaborationProvisioningWorkerTest {
         } finally {
             matrix.dockerClient.unpauseContainerCmd(matrix.containerId).exec()
         }
-        // Advance only this fictional queue deadline; production backoff remains unchanged.
-        database()
-            .update(
-                "update background_jobs set available_at=now()-interval '1 second' where id=?",
-                f.job,
+        // Unpausing the provider does not establish that its earlier timed-out login has settled.
+        // Exercise the real finite retry queue, advancing only this fictional job's deadline.
+        // In CI the first resumed request was rejected and correctly deferred again.
+        for (attempt in 2..4) {
+            database()
+                .update(
+                    "update background_jobs set available_at=now()-interval '1 second' where id=?",
+                    f.job,
+                )
+            val retried = claim(f)
+            assertEquals(attempt, retried.job.attempts)
+            runner.execute(RunningJob(retried), task)
+            val observed = status(f)
+            if (observed["status"] == "SUCCEEDED") break
+            val diagnostic =
+                "attempt=$attempt status=${observed["status"]} code=${observed["failure_code"]}"
+            assertEquals("QUEUED", observed["status"], diagnostic)
+            assertTrue(
+                observed["failure_code"] in
+                    setOf(
+                        "collaboration_provider_rejected",
+                        "collaboration_provider_unavailable",
+                        "collaboration_provider_busy",
+                    ),
+                diagnostic,
             )
-        val retried = claim(f)
-        assertEquals(2, retried.job.attempts)
-        runner.execute(RunningJob(retried), task)
+            assertNull(stored(f), diagnostic)
+            assertEquals("PROVISIONING", deviceState(f), diagnostic)
+            assertTrue(
+                attempt < 4,
+                "Provider did not recover within three resumed leases: $diagnostic",
+            )
+        }
         assertEquals("SUCCEEDED", status(f)["status"])
         assertEquals("ACTIVE", deviceState(f))
         assertEquals(

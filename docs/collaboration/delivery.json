@@ -207,7 +207,8 @@
         "private-pilot-rollout.md",
         "../measurements/chat-private-pilot-preparation-2026-11-02.json",
         "../measurements/chat-private-provider-2026-11-02.json",
-        "../measurements/chat-private-provider-recovery-2026-11-02.json"
+        "../measurements/chat-private-provider-recovery-2026-11-02.json",
+        "../measurements/chat-provider-retry-2026-11-02.json"
       ]
     },
     {
@@ -651,7 +652,7 @@
   },
   "next": [
     "Employee release15 remains installed. Later validated feature delivery must use16+ with prior notification and install-only. Private backend remains schema103; current collaboration branch schema116 needs a compatible tested rollout.",
-    "Isolated Synapse/PostgreSQL now runs and survives restart with no public ports or users; see private-pilot-rollout.md. HRIS remains schema103 and is not yet connected. Full Verify41442782804 at2124c6fc remains active; audit packages/recovery before fresh checkpoint, isolated103\u2192116 upgrade and compatible runtime rollout. Preserve existing Google/native/document state and new Matrix stores.",
+    "Full Verify41442782804 failed one worker outage fixture while seven jobs passed; bounded real-queue fixture correction passes116 active local worker cases. Dispatch/audit replacement full CI, then retarget prepared rollout scripts to its exact source/run. Private HRIS remains schema103; isolated Matrix/checkpoint and dashboard candidate are retained. No phone/grant/deployment yet.",
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
     "Native SDK/HRIS/Synapse proof covers incoming gaps beyond128 originals across process/container restarts. Mobile now has strict push receive, encrypted bounded priorities, fresh hinted admission and exact-room original recovery without changing fair company/room/history traversal. Real app DI/SQLite tests use an SDK double for the new priority lane; complete actual native priority and notification read/mute/privacy/actions/inline reply before live push activation.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",

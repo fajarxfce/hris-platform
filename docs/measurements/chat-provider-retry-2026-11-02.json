@@ -1,0 +1,167 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "1ef1f496ffe7497a71ccd118417dc2665b5bbe85",
+  "sourceSha256": {
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "93977a976a64ed3042b56eb8999659d954058f0d96797d6b3f5e4d8de3598f13"
+  },
+  "previousSourceSha256": {
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "f997ad915b3fed101123677a6737d325192afa174bb2c4c4b6e018ed05e91227"
+  },
+  "failedFullCi": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41442782804",
+    "headSha": "2124c6fc3e8b36f70a2d353447a7a3c0d7dd079f",
+    "status": "completed",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "backend (4)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:28Z",
+        "completedAt": "2026-11-02T12:34:49Z"
+      },
+      {
+        "name": "dashboard (1)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:33Z",
+        "completedAt": "2026-11-02T12:18:59Z"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:29Z",
+        "completedAt": "2026-11-02T12:42:33Z"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "failure",
+        "startedAt": "2026-11-02T12:12:28Z",
+        "completedAt": "2026-11-02T12:42:41Z"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:28Z",
+        "completedAt": "2026-11-02T12:35:01Z"
+      },
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:28Z",
+        "completedAt": "2026-11-02T12:21:11Z"
+      },
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:28Z",
+        "completedAt": "2026-11-02T12:21:18Z"
+      },
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success",
+        "startedAt": "2026-11-02T12:12:28Z",
+        "completedAt": "2026-11-02T12:20:54Z"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "skipped",
+        "startedAt": "2026-11-02T12:42:41Z",
+        "completedAt": "2026-11-02T12:42:41Z"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "skipped",
+        "startedAt": "2026-11-02T12:42:41Z",
+        "completedAt": "2026-11-02T12:42:41Z"
+      }
+    ],
+    "failedCase": "CollaborationProvisioningWorkerTest.providerOutageDefersThenRecoversTheSameDeviceThroughTheActualQueue",
+    "durationSeconds": 5.803,
+    "assertion": "Expected SUCCEEDED, observed QUEUED after the first resumed lease.",
+    "observedProviderFailureCodes": [
+      "collaboration_provider_unavailable",
+      "collaboration_provider_rejected"
+    ],
+    "workerReport": {
+      "tests": 117,
+      "failures": 1,
+      "skipped": 1,
+      "skippedReason": "Existing opt-in elapsed export retention case."
+    },
+    "reportSha256": {
+      "failed-backend-1/apps/worker/build/reports/tests/test/OP1ASFIFx8A/EHGsB9Z-8K4.html": "c9df444adb4b50d4ec99bb4b8bb714a5fd7d4501a1b5fc55a4f11d698c38c85b"
+    },
+    "logSha256": "f3699d620b16df07d6d818442d9e9703e6c15a6b87c28cf0328ee0de7c39e915",
+    "scope": "Seven jobs passed; backend1 failed worker test and downstream dashboard/recovery jobs were skipped. No full acceptance, packages, HRIS migration/deployment or phone installation."
+  },
+  "correction": "The outage fixture no longer assumes immediate success of the first resumed provider request. It exercises at most three resumed real queue leases (attempts2\u20134), advances only the fictional job deadline, accepts only the three existing transient provider failure codes, and verifies no credentials or active device were published before recovery. Final stable-device activation assertions remain.",
+  "productionSourceChanged": false,
+  "productionTimeoutBackoffOrAttemptLimitChanged": false,
+  "localCheck": {
+    "command": [
+      "sudo",
+      "-n",
+      "runuser",
+      "-u",
+      "fajar",
+      "-g",
+      "docker",
+      "--",
+      "env",
+      "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+      "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+      "./gradlew",
+      ":apps:worker:test",
+      ":formatCheck",
+      ":architectureCheck",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      "-Pkotlin.compiler.execution.strategy=in-process"
+    ],
+    "startedAt": "2026-11-02T12:48:53.780145+00:00",
+    "exitCode": 0,
+    "wallSeconds": 298.222,
+    "inputsUnchanged": true
+  },
+  "localReports": {
+    "counts": {
+      "tests": 117,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "suites": 24
+    },
+    "reportSha256": {
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": "2336b1fb3d544060aba00bbf56c87738314af56790d8b579a364b296871b5bce",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationPushContextTest.xml": "65e50ccedbf16d3b338cb0d768ae633241fd1b3ef54ae6b2ede1ed26a3c7937d",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationPushLoopTest.xml": "983c3929f11673892e68f282a6b32f0c848715c0440370fc90b9b3c00a287b4d",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.DirectoryProjectionWorkerTest.xml": "cec169b58146478824c1220ac666e3f206f0207118c9fa917ef6e3ebdff3baf3",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.DocumentValidationWorkerTest.xml": "6135d783b8f09076faf570505e348c58658cd0978aa6e9e7850f6a22d1236dfd",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.EmployeeImportWorkerTest.xml": "bebf0de7457128e623f62ba88ec349409e817467f37e664f2d6b1d7bfb887935",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.IdentityMailWorkerTest.xml": "abc56012f828bb9aadc3d9e4be3a34bdef01ce02fbe9c8c69c0f660e49464991",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxEmailWorkerTest.xml": "7748b955501ee773f96fdfb411645a74da7331853838c838b84051e444cde684",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxPushWorkerTest.xml": "506ab791d2d247a49569924c92a9774a41a60d762f8d31149448993da3d16799",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.LeaveBatchWorkerTest.xml": "e6a7cb40ecd9a77525d894ce8b023305823b1f007d10f9e3ab2adc4fbf4a620c",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest.xml": "a8c102dbd0178e0a190d5fe371bb705a7247bcd3c7ba73e0c1590ca629ca911d",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.MobileSyncWorkerTest.xml": "4a963301a3f87dc45e169cfe1a449fd6161be1a716a9fa2e780a0b00c3bfddce",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.NativeSessionCleanupWorkerTest.xml": "4ed809e1fae490b43d9187a46977bbafa1e295139d3be29aa24011fccd5edcb8",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ObjectCleanupWorkerTest.xml": "0130579f2e908778f0cf7b92574ba133b039d6046b0198f0c99ab5f558b0ddfe",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.OffboardingScheduleWorkerTest.xml": "391e2a3c378c8518c3f0ccbff38f7fd55e5a4634be3d861e0f34b8304ef2da39",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.OnboardingScheduleWorkerTest.xml": "26bde9e1aca45c6b6a479f6ca273af567904ac70625c64c742a6d7cc2884e5fb",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.PayrollCalculationWorkerTest.xml": "1dbe67f0ab011df9bb50eee7a02d5e2c2a4cadbe5db9eb5392d8e20d0fff30f1",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportElapsedRetentionTest.xml": "26e1b4b581189ef094d1fbd8d0932a26b53b1f62ba267fef28a05a42c2bd0b74",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportRetentionWorkerTest.xml": "88759ed7d3e018487ebb2d7b5b12d7f8857683a662ae07801fbb2a710fa67f29",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportWorkerTest.xml": "e3d3986d4fc7e78e9d65d1b51c2cf598ee4579c8a930dadc4f7cd4a55d1c8a51",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.SelfProfileProjectionWorkerTest.xml": "85c11ce8948fea6bf8a0fa10cf7f85282d2f83d1fc7ce440ab6858bdab1e7efe",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationObservationTest.xml": "8e42567ba232b8c5da4497ff0ad9a88ce752d5b6279f5f0bade6f9babc0929d0",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationTest.xml": "c6676ab961f8f959cc60bd2f2efb9d9327ead69e687cd1cd1874917fd1d69336",
+      "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.AnnouncementPublicationWorkerTest.xml": "c1ca892daa1e59b9c4aac0a9f6bd65fa37d1de2d6d1f45947a03ab792f1d26ec"
+    }
+  },
+  "limits": [
+    "The original CI proves transient provider rejection after unpause, not its precise underlying HTTP status or cause. No unsupported registration-race diagnosis is claimed.",
+    "The production durable queue already defers the observed unavailable/rejected outcome. This change verifies finite eventual recovery; it does not mask terminal access failures or retry without bounds.",
+    "Full replacement Verify and its downstream recovery/integration remain required. No accepted API/worker package, HRIS checkpoint/migration/deployment, grant or phone install yet. Existing private schema103 and phone15 remain."
+  ]
+}

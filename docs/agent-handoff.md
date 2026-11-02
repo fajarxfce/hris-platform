@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Full CI outage fixture corrected — 2 November 2026
+
+Full Verify41442782804 at2124c6fc FAILED: seven backend/dashboard jobs pass, backend1
+fails one worker case, downstream integration/recovery skipped. The5.803s provider-
+outage case sees collaboration_provider_unavailable while paused, then
+collaboration_provider_rejected and QUEUED on the first resumed lease. Its assertion
+expected immediate SUCCEEDED. Underlying HTTP status/cause is not established.
+[Evidence](measurements/chat-provider-retry-2026-11-02.json) retains failed HTML/log
+hashes, original source and all jobs; do not call this full acceptance or reuse its
+missing packages as a release.
+
+Only CollaborationProvisioningWorkerTest changes. After the paused first attempt,
+the fixture gives at most three actual resumed leases (2–4), advancing only this
+fictional job's available_at. Each deferral must retain PROVISIONING/no credential
+and one of the existing transient provider codes; terminal/unknown failures fail.
+Final stable identity/activation checks remain. No production timeout, backoff,
+retry cap or source changed. Complete local :apps:worker:test + format/architecture
+passes298.222s on the one unchanged input:117 reports/24 suites,116 active, zero
+failures/errors and the one existing opt-in elapsed-retention skip.
+
+Push this atomic correction and dispatch one new full Verify at that exact head.
+The prepared private rollout scripts under .work/chat-private-rollout-2026-11-02
+STILL hardcode failed run41442782804/source2124c6fc: retarget their CI/source guards
+only to the new exact accepted run, preserving original failure records. Runtime
+application trees are unchanged. Dashboard staged assets remain source2124c6fc;
+verify their apps/dashboard tree matches the new CI instead of pretending rebuilt.
+Fresh HRIS checkpoint/clone/deploy/grants and phone install remain unexecuted.
+
+Mobile7e3ca0c2 records the clean cc4c11f1 release16 candidate; phone still15. Apple
+41446374520 at exactcc4c11f1 is ACTIVE in full Xcode after simulator tests; do not
+cancel/duplicate. Mobile currently has two UNVALIDATED Android backup-policy inputs
+(manifest + res/xml/data_extraction_rules.xml) and a prepared root/resources/lint
+check in .work/android-data-extraction-2026-11-02. Run that next after this worker
+check; port the generic rule to Starter only after Mobile validation. Existing
+release16 artifact stays intact; a later committed policy build needs17+ if chosen
+for phone delivery. Current HRIS schema103 and isolated Matrix stay healthy;
+chat push off, all54 groups open. Continue immediately after push/dispatch.
+
 ## Pre-enrollment provider recovery and staged release — 2 November 2026
 
 [Evidence](measurements/chat-private-provider-recovery-2026-11-02.json) retains a

@@ -110,3 +110,15 @@ collaboration.chat through current MFA/versioned membership commands while retai
 applied role snapshots. Existing module policy needs no change if already enabled.
 Only the existing employee/operator memberships are selected; no human message or
 provider device is created by granting permission.
+
+## Full CI retry-fixture correction
+
+Full Verify41442782804 failed one worker outage case; seven jobs passed and downstream
+integration/recovery did not run. [Evidence](../measurements/chat-provider-retry-2026-11-02.json)
+records a provider rejection on the first resumed lease and correct durable requeue,
+where the fixture required immediate success. The test now permits at most three
+real resumed leases with strict transient-code/no-publication assertions. Full local
+worker/static checks pass298.222s (116 active cases, one existing optional skip).
+Production behavior is unchanged. A new exact-head full Verify is required; the
+old run cannot authorize package staging or rollout. Retarget the prepared scripts
+only after the replacement source/run is recorded and accepted.

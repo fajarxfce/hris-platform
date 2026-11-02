@@ -1,6 +1,6 @@
 # Delivery and validation
 
-Current communications checkpoint: Mobile admission/exact-room push priority recovery passes root/Android/browser checks, with expired-credential retention and fair global recovery. Platform Collaboration control41437984098 passes; full Verify41442782804 is running at2124c6fc. [Private pilot rollout](collaboration/private-pilot-rollout.md) is prepared, not executed. Chat notifications/actions, actual new priority SDK proof and all54 PRD groups remain open. Private schema103 and phone15 are unchanged; chat push stays disabled.
+Current communications checkpoint: Mobile admission/exact-room push priority recovery passes root/Android/browser checks, with expired-credential retention and fair global recovery. Platform Collaboration control41437984098 passes; full Verify41442782804 failed its immediate-retry outage fixture at2124c6fc; the bounded fixture correction passes full local worker checks and requires replacement CI. [Private pilot rollout](collaboration/private-pilot-rollout.md) is prepared, not executed. Chat notifications/actions, actual new priority SDK proof and all54 PRD groups remain open. Private schema103 and phone15 are unchanged; chat push stays disabled.
 
 ## Verify a development branch
 

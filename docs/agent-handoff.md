@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Android company recovery proved; healthy backlog correction underway — 2 November 2026
+
+Mobile [20d1592b](https://github.com/fajarxfce/hris-mobile/commit/20d1592b) records
+actual WorkManager/company consumer/Room/Keystore execution against consumer338fea17.
+Three scenarios pass35.839s:40 rejected enqueues preserve newer wakes, max2 OS jobs
+serialize one company processor, old ACK cannot erase a new wake, and interrupted
+attempts survive process death while later companies advance. Proof process, owned
+emulator5562 and all jobs/resources are closed; phone15 and unrelated5560 untouched.
+Callbacks for directory/admission/company work are fictional: no SDK/FCM acceptance.
+The measurement preserves failed fixture attempts and exact17 source/APK hashes.
+
+Mobile currently has9 UNCOMMITTED Kotlin changes correcting healthy company backlog:
+SyncResult.Retry(null) means a successful bounded batch, so it must schedule a
+continuation without treating the sweep as failed. Durable progress now separates
+continuation from failures/uncertainty, reads schema1 and writes schema2. Tests cover
+multiple batches, restart, failure priority, scheduler failure and storage upgrade.
+Focused1 passed547 domain; two of311 data cases failed in their raw fixture because
+it attempted to reuse a generation. Fixture corrected to fresh authenticated IDs;
+focused2 is running. Native backlog scenario is added but not run. Preserve attempts,
+finish full checks and actual native execution before committing/accepting changes.
+Then continue incoming room discovery/acquisition with durable fair progress, FCM,
+notification privacy/actions and encrypted inline replies. All54 PRD groups open.
+
+Mobile [Apple41405822268](https://github.com/fajarxfce/hris-mobile/actions/runs/41405822268)
+at338fea17b5738698f45c824cd1d6a06142050946 is active: simulator tests succeeded,
+Xcode app building. Do not cancel it with another same-branch dispatch. Audit XML,
+exact source and full Xcode completion; it excludes the new backlog correction.
+Starter5679c51 generic port/Apple proof complete. No new generic port is due here.
+Private Platform schema103/API-worker2c2a59e3 and disabled chat push remain unchanged.
+Continue after every commit/push; Mobile's current handoff supersedes older entries.
+
 ## Company progress proved; all-company worker in development — 2 November 2026
 
 Mobile [d262799b](https://github.com/fajarxfce/hris-mobile/commit/d262799b) is pushed:

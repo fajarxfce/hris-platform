@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Durable recovery and bounded Android scheduling proved — 2 November 2026
+
+Mobile [380cc654](https://github.com/fajarxfce/hris-mobile/commit/380cc654) persists
+fixed-key recovery wakes before enqueue, retains them through failures/cancellation,
+and fences acknowledgment against newer generations. Ten domain/six data cases,
+actual DI/SQLite and full checks pass (3,016 desktop,215 host,808 browser,10 build-logic).
+[e00ab4ee](https://github.com/fajarxfce/hris-mobile/commit/e00ab4ee) adds opt-in two-slot
+Android scheduling, bounded32 callers/keys and eight common regressions. Full root
+passes3,024 desktop/215 host/13 worker-browser/10 build-logic. Actual emulator proof
+passes40 competing requests, two simultaneous tasks, backoff reuse, failed/cancelled
+slot recovery and process-death repair in22.458s. Five final inputs and APK remain
+unchanged throughout. There is no employee task opt-in or FCM acceptance yet.
+
+Mobile raw database Apple run41396150119 at be8ebc7b is completed/audited:112 cases
+in30 suites, six real SQLite wake cases,zero failures/errors/skips and complete
+Xcode app. Starter136d2e5 ports the three generic scheduler files and that Apple
+fixture with independent148s /152.12s root/browser/Android/lint/Web proof (356 desktop,
+13 worker-browser,six build-logic). Starter Apple run41400133440 is active at exact
+136d2e5a607fb20b6f5ccd07bd88ed14b0a6b668; audit XML/Xcode before acceptance. Do not
+cancel it with another same-branch dispatch. Mobile/Starter handoffs and measurements
+contain all source/artifact hashes and next steps.
+
+Continue HRIS account-owned company recovery progress and all-company consumer,
+using current native directory/admission and incoming sync independent of outgoing
+work. Preserve sweep fairness and crash gaps without false acknowledgment; incoming
+wakes must not reset an unfinished sweep. Then receive/decrypt, notifications and
+encrypted inline replies. WorkManager backoff reuse is not proof of immediate FCM
+latency; integrate and measure it separately. All54 PRD groups remain open.
+
+Phone stays release15 from30d7faab; no live deployment, private schema103/API-worker
+2c2a59e3 unchanged, branch push still disabled. Emulator5562/PID4105492 was stopped;
+5560 now belongs to unrelated CodePush AVDcodepush-ci08/PID4082879 and was preserved.
+Recheck ownership before using any emulator. Continue after each commit/push.
+
 ## Durable wake foundation proved in Mobile and Starter — 2 November 2026
 
 Mobile [be8ebc7b](https://github.com/fajarxfce/hris-mobile/commit/be8ebc7b) adds

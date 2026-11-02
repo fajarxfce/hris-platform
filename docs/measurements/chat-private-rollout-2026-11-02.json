@@ -1,0 +1,122 @@
+{
+  "date": "2026-11-02",
+  "source": "dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d",
+  "fullCi": "collaboration-full-ci-2026-11-02.json",
+  "checkpoint": {
+    "success": true,
+    "backup_completed": true,
+    "failures": [],
+    "data_directory": "/home/fajar/.local/state/hris-platform/recovery-data/dev-before-collaboration-20261102T141953",
+    "keys_directory": "/home/fajar/.local/state/hris-platform/recovery-keys/dev-before-collaboration-20261102T141953",
+    "elapsed_seconds_including_restart": 11.468
+  },
+  "checkpointManifestSha256": "fb00b0179b4c398fc5046415cc9906ce7381356ea7b572806a6671f8805c4179",
+  "cloneUpgrade": {
+    "success": true,
+    "beforeSchema": 103,
+    "afterSchema": 116,
+    "originalMigrationHistoryPreserved": true,
+    "googlePersonNativeDocumentIntegrityPreserved": true,
+    "restrictedRuntimeRoles": true,
+    "failedMigrations": 0,
+    "invalidConstraints": 0,
+    "hostPortsPublished": false,
+    "temporaryResourcesRemoved": true,
+    "elapsedSeconds": 17.022
+  },
+  "runtime": {
+    "success": true,
+    "source": "dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d",
+    "schema": 116,
+    "migrationStarted": true,
+    "migrationCompleted": true,
+    "apiWorkerSwitched": true,
+    "dashboardSwitched": true,
+    "api": {
+      "image": "sha256:43ded9f0b1b02ffdc501edfefb6812867976e081a4e3d3485011798111e1356d",
+      "container": "cacfd1121732303b3611163bd74acb3c2055bf38e9cc043249f6d5cc80ea7e27",
+      "restartCount": 0,
+      "startupObserved": true,
+      "runtimeUser": "10001:10001"
+    },
+    "worker": {
+      "image": "sha256:cb3c633917e52ea18a13869af13b34acd33abfb3ad9c977d33547346c23a6fda",
+      "container": "471abbe51adcfaf9136c64568ee905726d6ec3dae4597cad1652d6ba91d48f39",
+      "restartCount": 0,
+      "startupObserved": true,
+      "runtimeUser": "10001:10001"
+    },
+    "apiHealthy": true,
+    "dashboardHealthy": true,
+    "dashboardIndexSha256": "ec8186f22fde67438a6430d4d69aff3adcff018cbdb2845139b7692ec777091c",
+    "googlePersonNativeDocumentIntegrityPreserved": true,
+    "originalMigrationHistoryPreserved": true,
+    "existingHrisEnvironmentPreserved": true,
+    "chatPushEnabled": false,
+    "smtpEnabled": false,
+    "oldImagesRetained": true,
+    "elapsedSeconds": 23.204
+  },
+  "retainedOldImages": {
+    "api": {
+      "container": "0de12fe59ecfef32ec5c0834fe60bcd8f28a484b982c31e3d0cb27a3d3379c4e",
+      "image": "sha256:6b8baeceabfe581a95ebda35184c1680d535dc0efcad0bdbc5594e2b26aeb39e",
+      "retainedTag": "hris-dev-api:before-collaboration-20261102T141830",
+      "startedAt": "2026-10-30T18:01:55.938853953Z"
+    },
+    "worker": {
+      "container": "7e029c51b070e2440ebe6c05b30d3596002f8250cb8592c3bc2c4fc3e2f7da2f",
+      "image": "sha256:8fd602c5a9c23c716fffe86cd592d7fc1cfabbe722316515250acf5bed7f77d0",
+      "retainedTag": "hris-dev-worker:before-collaboration-20261102T141830",
+      "startedAt": "2026-10-30T18:01:56.094334913Z"
+    }
+  },
+  "pilotGrants": {
+    "success": true,
+    "completedAt": "2026-11-02T14:21:38.999836+00:00",
+    "elapsedSeconds": 1.188,
+    "companyModuleAlreadyEnabled": true,
+    "companyPolicyChanged": false,
+    "membershipTypesChanged": [
+      "employee",
+      "operator"
+    ],
+    "addedPermission": "collaboration.chat",
+    "existingPermissionsAndAppliedRoleSnapshotsPreserved": true,
+    "operatorNativeSessionRevoked": true,
+    "googleBindingChanged": false,
+    "providerDeviceCreated": false,
+    "messageSent": false
+  },
+  "pilotAccessAttempts": [
+    {
+      "success": false,
+      "phase": "operatorMfa",
+      "code": "invalid_mfa_code",
+      "context": "Separate access verification was invoked in the same 30-second TOTP window as the successful grant command. The helper finally block revoked its own partial native session. Retry after the next time window; no security rule changed."
+    },
+    {
+      "success": true,
+      "checkedAt": "2026-11-02T14:22:18.169162+00:00",
+      "elapsedSeconds": 0.269,
+      "operatorNativeMfaAuthenticated": true,
+      "operatorSessionRevoked": true,
+      "participantCount": 1,
+      "onlyExistingEmployeeReturned": true,
+      "operatorUnenrolled": true,
+      "nativeDirectoryRead": true,
+      "deviceCreated": false,
+      "messageSent": false,
+      "googleBindingChanged": false
+    }
+  ],
+  "providerRecovery": "chat-private-provider-recovery-2026-11-02.json",
+  "scope": [
+    "Existing Google/person bindings, active native session IDs, document revisions/counts and original migration history match the quiesced baseline after103\u2192116.",
+    "Existing HRIS configuration, identity/sync/FCM material and disabled SMTP retained. Matrix network/config appended through a protected fifth Compose overlay; stable provider identity/keys retained.",
+    "Only collaboration.chat added to existing employee/operator memberships through current native/MFA administration APIs, preserving direct permissions and applied role snapshots. No SQL grant seeds or company policy edits.",
+    "Read-only pilot contact/native-device/directory verification uses and revokes only its owned temporary operator session; no enrollment or human message.",
+    "All three chat push flags remain false until privacy/read/mute/actions/reply acceptance. Matrix pre-enrollment checkpoint is separate from the HRIS recovery pack.",
+    "Phone build17 installation is separate evidence in Mobile. No claim of physical phone chat, new Google login/FCM, encrypted-user backup, rich chat, calls/meeting or scale acceptance."
+  ]
+}

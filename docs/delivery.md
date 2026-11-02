@@ -1,11 +1,11 @@
 # Delivery and validation
 
-Current communications checkpoint: Mobile admission/exact-room push priority recovery passes root/Android/browser checks, with expired-credential retention and fair global recovery. Platform Collaboration control41437984098 passes; full Verify41442782804 failed its immediate-retry outage fixture at2124c6fc; the bounded fixture correction passes full local worker checks and requires replacement CI. [Private pilot rollout](collaboration/private-pilot-rollout.md) is prepared, not executed. Chat notifications/actions, actual new priority SDK proof and all54 PRD groups remain open. Private schema103 and phone15 are unchanged; chat push stays disabled.
+Current communications checkpoint: full Verify41454857226 at dac6fb0d passes all14 jobs, including 3,153 active API cases,116 active worker cases,1,111 mocked browser scenarios,56 actual browser workflows and schema116 recovery. The private schema103→116 pilot rollout and role-preserving employee/operator chat grants are accepted; Google/native/document state is preserved. Actual Android priority recovery passes all three lifecycle variants. Mobile release17 installation is being verified separately. Chat push stays disabled while notification read/mute/privacy/actions/replies and all54 PRD groups continue. [Full CI](measurements/collaboration-full-ci-2026-11-02.json) and [rollout](measurements/chat-private-rollout-2026-11-02.json).
 
 ## Verify a development branch
 
 The `Verify` workflow accepts manual dispatch as well as main pushes and pull
-requests. Feature branches can run the same bounded four-shard backend/dashboard
+requests. Feature branches can run the same bounded eight-shard backend/four-shard dashboard
 matrix and downstream real API/worker browser integration before integration into
 main. From the intended checkout:
 

@@ -1,12 +1,16 @@
 # Private collaboration pilot rollout
 
-The isolated provider services are now running and verified as described below;
-HRIS integration and migration remain pending. The existing private API/worker
-use2c2a59e3 and schema103; the candidate uses2124c6fc
-and schema116. Both Collaboration control jobs41437984098 pass (652 active JVM
-cases in uploaded reports, six opt-in native/elapsed cases skipped). Full ten-job
-Verify41442782804 is in progress. Preserve its exact source and audit the artifacts.
-[Preparation evidence](../measurements/chat-private-pilot-preparation-2026-11-02.json).
+The private pilot is now deployed at API/worker dac6fb0d and schema116 after all14
+jobs in Verify41454857226. A fresh coordinated HRIS checkpoint, isolated103→116
+upgrade and live data-integrity checks pass. Dashboard immutable2124c6fc has the
+same source tree as accepted CI. Existing employee/operator memberships gain only
+collaboration.chat through current MFA administration commands; no company policy
+override, provider enrollment or human message. All chat push flags and SMTP remain
+off. [Rollout evidence](../measurements/chat-private-rollout-2026-11-02.json) and
+[full CI](../measurements/collaboration-full-ci-2026-11-02.json) retain exact hashes,
+backup paths and tests. The preparation/failed-attempt sections below are historical.
+
+The applied operator procedure is retained for later reviewed updates:
 
 1. Stage a persistent internal Synapse1.164.1 with separate PostgreSQL18.6,
    pinned image digests, UTF8/C collation, bounded resources/logs and an internal

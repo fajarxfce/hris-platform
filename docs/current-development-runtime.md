@@ -4,18 +4,31 @@ Started 29 October 2026 with the user's authorization after installing the Andro
 dev APK. Current audited application and private runtime acceptance are recorded
 below; earlier rollout sections preserve their original sources and dates.
 
-## Isolated chat provider preparation — 2 November 2026
+## Chat pilot active — 2 November 2026
 
-Private Synapse1.164.1/PostgreSQL18.6 are started on the internal hris-dev_matrix
-network with no host ports; API/worker remain2c2a59e3/schema103 and are not yet wired
-to it. Both provider services restart with database/signing key preserved, no user
-or message created, and existing API health unchanged. Active dev.env is unchanged.
-[Operator state and next steps](collaboration/private-pilot-rollout.md) identify the
-protected staged overlay and persistent stores; [evidence](measurements/chat-private-provider-2026-11-02.json)
-separates this from pending HRIS integration/phone acceptance. Preserve these new
-provider stores; the old HRIS recovery-set command does not back them up.
-The phone currently has Mobile release15; release16 is being built separately.
-Full Platform Verify41442782804 remains in progress at2124c6fc. Chat push stays off.
+The API/worker now run exact accepted dac6fb0d at schema116 after all14 CI jobs,
+a fresh coordinated checkpoint and an isolated103→116 upgrade. Dashboard assets
+are immutable collaboration-2124c6fc, verified equal to the accepted dashboard tree.
+Both applications start with zero restarts as UID10001; API health and exact dashboard
+index checks pass. Google/person/native-session/document and original migration
+fingerprints are preserved. Existing HRIS configuration and keys remain, SMTP off.
+[Rollout evidence](measurements/chat-private-rollout-2026-11-02.json) includes images,
+retained rollback tags, backup paths, clone checks and live grant/access verification.
+
+Persistent Synapse1.164.1/PostgreSQL18.6 remain internal with no published provider
+ports. API/worker now join hris-dev_matrix alongside the existing default network.
+The protected fifth Compose overlay is active through dev.env; preserve stable
+matrix.hris.internal, its signing/config/DB keys and both provider stores.
+Existing employee/operator memberships have collaboration.chat; other permissions
+and applied roles are retained, no policy override. A temporary owned native/MFA
+operator reads the existing employee contact and empty own device/directory, then
+revokes itself. No device or human message is created by this verification.
+
+All three chat push flags remain false. Matrix recovery has its own pre-enrollment
+checkpoint; the HRIS recovery pack does not include Matrix stores. The phone update
+to verified Mobile release17 is handled separately with install-only and no UI driving.
+See [operator contract](collaboration/private-pilot-rollout.md) for protected paths.
+Earlier deployment sections below are historical.
 
 ## Android release installation — 31 October 2026
 
@@ -120,7 +133,7 @@ and dashboard still returned HTTP 200. Preserve this running private stack.
 Compose project `hris-dev` runs from `/home/fajar/hris/hris-platform`. Its ignored
 `.env` is a symlink to `/home/fajar/.config/hris/dev.env` (mode 600). It selects
 `compose.yml`, `compose.documents.yml`, `compose.wireguard.yml` and
-`compose.push.yml`. Keep all overlays on future updates. Separate random database
+`compose.push.yml`, plus `/home/fajar/.config/hris/matrix-pilot/compose.matrix.yml`. Keep all five overlays on future updates. Separate random database
 passwords and identity/sync keyrings are already configured. Preserve these keys
 and named volumes; generating a new env file is not credential rotation.
 
@@ -142,7 +155,7 @@ Both files and all account access material stay outside Git.
 | --- | --- |
 | API | `http://10.77.77.1:8088/api/v1/`; loopback 8088 also retained |
 | Dashboard | `http://10.77.77.1:5173`, proxying the loopback API |
-| Database | Schema 103; host publication only on `127.0.0.1:55432` |
+| Database | Schema 116; host publication only on `127.0.0.1:55432` |
 | Worker | Separate `hris_worker` role, FCM/storage/scanner enabled |
 | Garage | Private `hris-dev-documents` bucket initialized |
 | ClamAV | Updater and scanner healthy after actual signature download |

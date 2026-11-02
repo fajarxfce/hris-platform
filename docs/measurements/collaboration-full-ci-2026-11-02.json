@@ -1,0 +1,391 @@
+{
+  "date": "2026-11-02",
+  "source": "dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d",
+  "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41454857226",
+  "jobs": [
+    {
+      "name": "dashboard (1)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:45:25Z"
+    },
+    {
+      "name": "dashboard (2)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:46:41Z"
+    },
+    {
+      "name": "dashboard (4)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:47:56Z"
+    },
+    {
+      "name": "backend (6)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T14:04:02Z"
+    },
+    {
+      "name": "dashboard (3)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:47:13Z"
+    },
+    {
+      "name": "backend (5)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:55:51Z"
+    },
+    {
+      "name": "backend (3)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:59:46Z"
+    },
+    {
+      "name": "backend (4)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:57:04Z"
+    },
+    {
+      "name": "backend (8)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:58:39Z"
+    },
+    {
+      "name": "backend (1)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T13:56:54Z"
+    },
+    {
+      "name": "backend (2)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T14:01:39Z"
+    },
+    {
+      "name": "backend (7)",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T13:39:27Z",
+      "completedAt": "2026-11-02T14:00:44Z"
+    },
+    {
+      "name": "recovery-integration",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T14:04:05Z",
+      "completedAt": "2026-11-02T14:05:25Z"
+    },
+    {
+      "name": "dashboard-integration",
+      "conclusion": "success",
+      "startedAt": "2026-11-02T14:04:06Z",
+      "completedAt": "2026-11-02T14:17:32Z"
+    }
+  ],
+  "backend": {
+    "run": "41454857226",
+    "source": "dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d",
+    "allEightBackendJobsPassed": true,
+    "api": {
+      "tests": 3158,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "suites": 436
+    },
+    "apiClassesDisjoint": true,
+    "apiClasses": 436,
+    "repeatedParameterizedDisplayLabels": 373,
+    "workerPerShard": {
+      "tests": 117,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "suites": 24
+    },
+    "artifacts": [
+      {
+        "shard": 1,
+        "artifactId": 13147132645,
+        "archiveSha256": "4a07820eddeba5dc757436abe07ea011054b8fb03bf7a1e64ae0b4f47ac49fa8",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 2,
+        "artifactId": 13147212888,
+        "archiveSha256": "e0f1219370dec88fdd4b16d72913bb87ce54e260e986df414fd4650dd78b9645",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 3,
+        "artifactId": 13147351998,
+        "archiveSha256": "2e9d519d14f05bb2a177357741bb1999834d0ed6e1b488d474f58fa34fd8c642",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 4,
+        "artifactId": 13146807904,
+        "archiveSha256": "43c10dffa24fadb4d75fcdd91bedd3131faa5a4ebc1deab73a1e2946fc94b0a9",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 5,
+        "artifactId": 13146739063,
+        "archiveSha256": "c387c931cbedf7d36a527b72dab17df96a48fb40f558566fde23e8af34e2f7a1",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 6,
+        "artifactId": 13147163610,
+        "archiveSha256": "2e91936b52bc6c1577e9a8662c40baf52d43799afe2e110873e272a0d2b25a64",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 7,
+        "artifactId": 13148181188,
+        "archiveSha256": "83634ea0cf676dbaf00c21f76d3693be657cde115103567664ebd2f774b85fa9",
+        "githubDigestVerified": true
+      },
+      {
+        "shard": 8,
+        "artifactId": 13146883220,
+        "archiveSha256": "2146c62d4b162a51020da226d33c291d131a9c89ec8cce7ce18fe45ae9d4b251",
+        "githubDigestVerified": true
+      }
+    ],
+    "fullRunAccepted": true,
+    "collectorCorrection": "JUnit parameterized display names repeat within a class; preserve every reported case and verify class ownership is disjoint across shards. No application or test execution changed."
+  },
+  "dashboard": {
+    "archives": [
+      {
+        "artifactId": 13149450114,
+        "name": "dashboard-integration-test-reports",
+        "archiveSha256": "c60af5ce1053c8b39b6a3c87ec27de0aebb6cc3f3e6d4254764f6ddd37e3bfdf",
+        "githubDigestVerified": true,
+        "jsonFiles": []
+      },
+      {
+        "artifactId": 13146987148,
+        "name": "dashboard-test-reports-3",
+        "archiveSha256": "a4dde217fc0d4514d85ea2d393e38ba826238dcfd5f1773345223533f073062b",
+        "githubDigestVerified": true,
+        "jsonFiles": []
+      },
+      {
+        "artifactId": 13145753866,
+        "name": "dashboard-test-reports-2",
+        "archiveSha256": "cfc305852d42859af4f1f48c47ff90dc4db80e1ec79b0227cfa76fe91d8ef15d",
+        "githubDigestVerified": true,
+        "jsonFiles": []
+      },
+      {
+        "artifactId": 13145684683,
+        "name": "dashboard-test-reports-4",
+        "archiveSha256": "46fdc54099cc145183eab43b8498f16fa75f064da296829d819d71afceb5e126",
+        "githubDigestVerified": true,
+        "jsonFiles": []
+      },
+      {
+        "artifactId": 13145634196,
+        "name": "dashboard-test-reports-1",
+        "archiveSha256": "5b177e8d3667168609ebb56b2f47af986231abda402356126d733f8da7e2ee7d",
+        "githubDigestVerified": true,
+        "jsonFiles": []
+      }
+    ],
+    "reports": [
+      {
+        "artifact": "dashboard-integration-test-reports",
+        "report": "integration-report/index.html",
+        "htmlSha256": "f095da6c631b29c65ce6410b3b4879e176737e0a9adadc891de971b5d05aa32e",
+        "stats": {
+          "total": 41,
+          "expected": 41,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 337939.984
+      },
+      {
+        "artifact": "dashboard-integration-test-reports",
+        "report": "worker-integration-report/index.html",
+        "htmlSha256": "eefacdc328f78035ecd93a87ea545229611fc5a04bea76c2dd5685d39cd9b661",
+        "stats": {
+          "total": 14,
+          "expected": 14,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 311947.71599999996
+      },
+      {
+        "artifact": "dashboard-integration-test-reports",
+        "report": "export-integration-report/index.html",
+        "htmlSha256": "9745be6fab5a4d257e42d94023625be870a6f930871084795004348801d0474a",
+        "stats": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 63196.243
+      },
+      {
+        "artifact": "dashboard-test-reports-3",
+        "report": "index.html",
+        "htmlSha256": "3deee9f77d325765363e46f0b80c70f944c41ace72fc5a07767983ece8a5b75a",
+        "stats": {
+          "total": 278,
+          "expected": 278,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 266406.239
+      },
+      {
+        "artifact": "dashboard-test-reports-2",
+        "report": "index.html",
+        "htmlSha256": "17468f90f84ecb0ef77fc3ee74ff374e4fd2c33e6fa8c491e1c6b94d0730b795",
+        "stats": {
+          "total": 278,
+          "expected": 278,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 250800.48
+      },
+      {
+        "artifact": "dashboard-test-reports-4",
+        "report": "index.html",
+        "htmlSha256": "fccd80bf909a806e3bdaa3c8436ef83a5be51787b3ba6dd8337b3183b90b3ece",
+        "stats": {
+          "total": 277,
+          "expected": 277,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 286417.786
+      },
+      {
+        "artifact": "dashboard-test-reports-1",
+        "report": "index.html",
+        "htmlSha256": "aac8072a55ade45a1ebee81d48f59b5a73444693222494fa8512a97425f4a79e",
+        "stats": {
+          "total": 278,
+          "expected": 278,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "durationMillis": 213702.793
+      }
+    ],
+    "passed": true
+  },
+  "recovery": {
+    "artifactId": 13148241805,
+    "archiveSha256": "74dee90359d91716bc5f780cd93d91c091c0417c49e599fa5cd2de11b95a346c",
+    "githubDigestVerified": true,
+    "summary": {
+      "restorePassed": true,
+      "schema": "116",
+      "identityEnvelopesVerified": 2,
+      "objects": 104,
+      "bytes": 2098795,
+      "sourceUnchangedByRestore": true,
+      "wrongRetiredKeyRejected": true,
+      "separateKeyPack": true,
+      "temporaryResourcesRemoved": true,
+      "typedAccountAuditRestored": true,
+      "announcementDeliveryRestored": true,
+      "announcementEmailRestored": true,
+      "documentMetadataRestored": true,
+      "documentMetadataHistoryRestored": true,
+      "documentMetadataScopeAndConstraintsRestored": true,
+      "retainedIdentityKeyIds": [
+        "current",
+        "old"
+      ]
+    }
+  },
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41454857226",
+    "headSha": "dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d",
+    "stagedAt": "2026-11-02T14:18:20.174399+00:00",
+    "elapsedSeconds": 22.595,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13146882919,
+        "archiveSha256": "e6f64ca640d2d8b5d850165948bf977f2b1d8071a5f42d4aca5327f77b2ebd99",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-private-rollout-2026-11-02/packages/api/apps-server.jar",
+        "sha256": "6cdf11a84a02e0fcfa155b6464c8d340bb324c5530d948999613e562c2866af9",
+        "bytes": 98533024
+      },
+      {
+        "role": "worker",
+        "artifactId": 13148016101,
+        "archiveSha256": "31a99209e12c260f51aa312531c9ff334d25699a80f24d4c55b84ec3f2952715",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-private-rollout-2026-11-02/packages/worker/apps-worker.jar",
+        "sha256": "d4ed8fe8eaf25d00431e10d06cb93478316554998f4b65bdd7f48104467d5c6a",
+        "bytes": 78602599
+      }
+    ]
+  },
+  "images": {
+    "success": true,
+    "source": "dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41454857226",
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:collaboration-dac6fb0d",
+        "image": "sha256:43ded9f0b1b02ffdc501edfefb6812867976e081a4e3d3485011798111e1356d",
+        "packageSha256": "6cdf11a84a02e0fcfa155b6464c8d340bb324c5530d948999613e562c2866af9",
+        "packageBytes": 98533024,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "tag": "hris-dev-worker:collaboration-dac6fb0d",
+        "image": "sha256:cb3c633917e52ea18a13869af13b34acd33abfb3ad9c977d33547346c23a6fda",
+        "packageSha256": "d4ed8fe8eaf25d00431e10d06cb93478316554998f4b65bdd7f48104467d5c6a",
+        "packageBytes": 78602599,
+        "runtimeUser": "10001:10001"
+      }
+    },
+    "existingServicesUnchanged": true,
+    "elapsedSeconds": 73.948
+  },
+  "scope": [
+    "All eight backend shards and four browser shards plus real API/worker/export browser workflows and schema116 recovery pass.",
+    "API XML keeps every parameterized case and verifies class ownership across shards; display labels are not unique case identities.",
+    "Full CI is exact dac6fb0d; later native priority test-only changes have separate local actual Android evidence. Runtime source comparison excludes only the two named native fixture files.",
+    "This acceptance does not prove live FCM/APNs, phone interaction, encrypted user backup, rich chat, calls/meetings or capacity."
+  ],
+  "priorFailures": [
+    "41442782804: immediate resumed-provider assertion; fixed with bounded fixture retries, production unchanged.",
+    "41448616746: backend1 API step timeout; worker passes, no failing API assertion captured. Eight shards and test-start diagnostics added without relaxing deadlines."
+  ]
+}

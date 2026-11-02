@@ -1,43 +1,67 @@
 # Agent continuation — HRIS workspace
 
-## Actual native priority accepted in all three lifecycle variants — 2 November 2026
+## Private chat pilot deployed — 2 November 2026
 
-[Evidence](measurements/native-priority-2026-11-02.json) binds108 Mobile/seven Platform
-inputs and APK343,275,325 bytes SHAa54d65517c55a4a94bd22303dd5ba1380aab0bcf8544dd96e1096e3a3b113a5b.
-Cancelled-draft native run2 passes289.577s; queued/frozen run3 passes569.699s. All three
-use actual HRIS/PostgreSQL/Synapse/Android SDK after process death. Each oldest-of175
-hint needs one priority turn, retains12 originals, preserves independent wake and
-all four progress positions, then recovers176 originals in11 incoming turns/reopens.
-Foreground independently pages11/186 references; one worker send,175 peer ciphertexts,
-queue retention and runtime cleanup asserted. Gateway11 directory/12 admission/11
-summary-page counters plus exact room-lookup assertion pass. Eighteen driver parser
-regressions also pass; no runtime production source changes in this commit.
+[Full CI](measurements/collaboration-full-ci-2026-11-02.json) 41454857226 COMPLETE at
+exact dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d: all 14 jobs pass. Downloaded artifact
+digests verified. API 3,158 cases/436 suites (3,153 active, five existing optional
+skips), worker 117/24 per shard (116 active, one existing optional skip), no failures
+or errors. XML class ownership is disjoint across eight shards; parameterized display
+labels legitimately repeat within classes. Browser 1,111 mocked scenarios and 41
+actual API +14 worker +one export workflow pass, with zero flaky/skipped cases.
+Schema116 recovery verifies 104 objects, two identity envelopes, separate keys and
+wrong-key rejection. Both prior failures remain archived; do not rerun accepted CI.
 
-Initial native run1 fails41.162s before native SDK execution because the earlier
-company-only fixture left its owned proof APK. The driver correctly refused it.
-Installed SHA was verified before removing only that proof package; guard unchanged.
-A missing second collector input manifest was corrected before Gradle/provider start.
-All corrected attempts and hashes retained. Mobile full build3 passes97.046s with
-3262 desktop,222 host,10 build-logic/six proof-host cases. Company WorkManager burst/
-process repair passes45.199s with synthetic directory/work and an empty priority lane.
-Real priority above uses actual app bindings; no claim of FCM or OS push delivery.
+[Private rollout](measurements/chat-private-rollout-2026-11-02.json) COMPLETE:
+verified API/worker JARs and non-root images, fresh coordinated checkpoint 11.468s,
+isolated103→116 clone 17.022s, then explicit live migration/API-worker/dashboard
+23.204s. API/worker now dac6fb0d, schema116. Dashboard immutable2124c6fc source matches
+the accepted tree and index ec8186f22fde67438a6430d4d69aff3adcff018cbdb2845139b7692ec777091c.
+Google/person bindings, active native session IDs, document revisions/counts,
+original migration prefix and restricted roles preserved. Existing HRIS environment
+preserved; SMTP and all three chat push flags OFF. API/worker use both default and
+internal Matrix networks; stable matrix.hris.internal identity/keys remain.
 
-CI41454857226 is ACTIVE at exactdac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d with eight API
-shards; require all14 jobs. Two prior failures remain archived. Private rollout guards
-now target this source/run/count and require exact job names. Only the two named
-native-proof test files are excluded from runtime source comparison; all packaged
-code must match accepted CI. Do not cancel/duplicate. Current dashboard source2124c6fc
-still matches. Retain .work/chat-private-rollout-2026-11-02/current-rollout-target.json.
+Fresh HRIS checkpoint: ~/.local/state/hris-platform/recovery-data/
+dev-before-collaboration-20261102T141953; separate matching recovery-keys directory.
+Old API/worker tags retained, exact names in measurement. Matrix's separate empty
+pre-enrollment checkpoint pilot-20261102T123710 remains; ordinary HRIS recovery pack
+does not include Matrix. Keep the protected fifth Compose overlay
+~/.config/hris/matrix-pilot/compose.matrix.yml and every preexisting overlay/keyring.
+Do not regenerate provider identity/config, rerun migration scripts or prune volumes.
 
-Next: audit full CI, stage verified packages/images, fresh coordinated HRIS checkpoint,
-isolated103→116 upgrade, explicit API/worker/dashboard rollout, employee/operator chat
-grants preserving roles, and read-only pilot access verification. HRIS still103, no
-migration/grants/real messages. Matrix private provider/checkpoint retained, push off.
-Mobile release17 atc6347c75 is verified and cold-starts twice via emulator ARM translation;
-phone still15. Notify before explicit10.77.77.3:5555 install-only; no phone UI driving.
-Owned emulator5562/PID553348 is stopped and proof package removed. Counterpart Mobile
-proof a212bd2a is committed/pushed. Continue
-notification read/mute/privacy/actions/inline reply and all54 groups after deployment.
+Existing employee/operator memberships gained only collaboration.chat through live
+native/MFA/versioned commands, retaining all applied roles and permissions. Company
+policy already enabled the module. Contact/device/directory reads pass; no enrollment
+or human message. A second operator login in the same TOTP window initially returned
+invalid_mfa_code; its owned partial session was revoked. Next-window retry passes
+without relaxing MFA. All owned operator sessions are revoked; Google binding unchanged.
+
+Actual native priority counterpart Mobile a212bd2a and Platform bc9774eb are pushed:
+108 Mobile/seven Platform inputs, three queued/frozen/cancelled variants pass with
+actual Android SDK/HRIS/Synapse. Oldest-of175 priority uses one turn/12 originals,
+retains global wake and four progress positions, then normal recovery retains176
+originals over11 reopens. See native-priority measurement for every attempt/hash.
+Owned emulator5562/PID553348 is stopped and proof package removed. Apple41446374520
+atcc4c11f1 is fully audited (112 native core cases,106 source hashes/full Xcode).
+Starter0d4432e generic backup port is independently accepted/pushed.
+
+Mobile clean c6347c75 release17 build/lint and two translated-arm64 emulator cold
+starts pass. Refreshed phone preflight confirms15 and same signer. Installation17
+is ACTIVE in Mobile .work/release-phone-2026-11-02-build17, explicit10.77.77.3:5555
+--install-only after user-facing notice. Audit its result before any retry; never
+launch/drive phone UI or clear data. Then record/push Mobile delivery evidence.
+
+Next implementation is staged ONLY as .txt in .work/chat-receipts-2026-11-02:
+17 baseline-hashed inputs add exact public/private receipt POST, owned event/read
+admission before external metadata write, receipt-only sync projection with private
+self filtering, bounded shapes, and v2 filter scope. Includes data/actual provider/
+HTTP/revocation tests, none compiled or executed yet. apply.py requires successful
+runtime rollout and clean checkout; commit this handoff first, then apply, format,
+run focused checks, inspect failures, broaden relevant checks and commit/push only
+accepted code. Staging scripts predate .txt renaming; do not rerun them blindly.
+Continue actual Mobile receipt/mute/privacy/action integration and encrypted inline
+replies, then all54 open groups. This pilot/install is not task completion.
 
 ## Full CI reached API time budget; eight shards prepared — 2 November 2026
 

@@ -209,7 +209,9 @@
         "../measurements/chat-private-provider-2026-11-02.json",
         "../measurements/chat-private-provider-recovery-2026-11-02.json",
         "../measurements/chat-provider-retry-2026-11-02.json",
-        "../measurements/native-priority-2026-11-02.json"
+        "../measurements/native-priority-2026-11-02.json",
+        "../measurements/collaboration-full-ci-2026-11-02.json",
+        "../measurements/chat-private-rollout-2026-11-02.json"
       ]
     },
     {
@@ -653,7 +655,7 @@
   },
   "next": [
     "Employee release15 remains installed. Clean Mobile c6347c75 release17 candidate is built and verified (b94aedf2b1eb81949d8eeacc82fd2906f0c85b27641e3bcc65fd8884e5fb34d2); same signer and private API, zero lint. Notify before explicit10.77.77.3:5555 install-only after compatible schema116 rollout.",
-    "Full Verify41454857226 is active at dac6fb0d17ad8b8b3226a4fbb93233bd315a1d7d after two retained failures (worker assertion, then API step timeout). All eight backend/four dashboard shards and recovery integration pass; dashboard integration runs. Prepared rollout guards require all14 exact jobs and the accepted source. Then execute verified packages/images, a fresh coordinated checkpoint, isolated103\u2192116 upgrade, explicit API/worker/dashboard rollout, role-preserving employee/operator chat grants and read-only pilot verification. HRIS remains103; Matrix pre-enrollment checkpoint and immutable dashboard candidate retained.",
+    "Full Verify41454857226 at dac6fb0d passed all14 jobs. Verified packages/images, fresh checkpoint, isolated103\u2192116 upgrade and live API/worker/dashboard rollout completed, preserving Google/native/document state. Employee/operator collaboration.chat grants and read-only contact/device/directory verification pass. Keep private provider identities/keys and separate Matrix checkpoint; all chat push flags remain false. Evidence: ../measurements/chat-private-rollout-2026-11-02.json.",
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
     "Actual Android SDK/HRIS/Synapse priority proof now passes queued, frozen and cancelled variants: oldest of175 offline peer events, one priority turn,12 retained originals, independent wake and all four progress positions preserved across reopens. Normal recovery retains176 originals in11 turns. Evidence: ../measurements/native-priority-2026-11-02.json and Mobile a212bd2a. Full Apple41446374520 also passes (112 native core cases/106 source hashes). Strict injected metadata does not accept FCM/OS delivery. Complete notification read/mute/privacy/actions/inline reply before enabling live chat push.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",

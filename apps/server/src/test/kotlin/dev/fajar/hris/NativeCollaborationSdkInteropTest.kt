@@ -238,6 +238,16 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "SDK failed to retry with its retained cursor",
             )
             val proof = result.path("proof")
+            for ((type, minimum) in mapOf("m.read" to 1, "m.read.private" to 2)) {
+                assertTrue(
+                    trace.snapshot().count {
+                        it["method"] == "POST" &&
+                            it["status"] == 200 &&
+                            it["route"] == "/_matrix/client/v3/rooms/_/receipt/$type/_"
+                    } >= minimum,
+                    "Native receipt must cross the owned HRIS gateway",
+                )
+            }
             for (name in
                 listOf(
                     "protectedStoreReopened",
@@ -259,6 +269,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "projectionInterrupted",
                     "originalHistoryWindowOwned",
                     "historyBodiesRestored",
+                    "nativeReadReceiptsExchanged",
+                    "nativePrivateReceiptIsolated",
+                    "nativeReadReceiptStoreRestored",
                     "commonHistoryAcquisitionOwned",
                     "latestHistoryHeadOwned",
                     "providerHistoryPageOwned",
@@ -360,6 +373,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "projectionInterrupted" to true,
                     "originalHistoryWindowOwned" to true,
                     "historyBodiesRestored" to true,
+                    "nativeReadReceiptsExchanged" to true,
+                    "nativePrivateReceiptIsolated" to true,
+                    "nativeReadReceiptStoreRestored" to true,
                     "commonHistoryAcquisitionOwned" to true,
                     "latestHistoryHeadOwned" to true,
                     "admittedHistoryHeads" to true,

@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Actual Android read-receipt proof accepted — 2 November 2026
+
+Mobile c0ad592f is committed with finite native receipt operations and eight host
+lifetime cases. [Native evidence](measurements/chat-read-receipts-native-2026-11-02.json)
+binds114 Mobile/25 Platform inputs: one real HRIS/PostgreSQL/Synapse/Android SDK
+scenario passes109.111s. Five empty receipt POSTs (three private/two public) return200;
+peer-private isolation and retained own SDK metadata in the third OS process before
+sync pass. Existing bidirectional encryption, three original message sends, held-room
+isolation and acknowledgement/completion recovery across three process restarts pass.
+
+Four counterpart fixture/driver inputs now require these facts, accepted receipt
+routes and strict boolean evidence. Python26 regressions pass0.159s; native invocation
+also passes format/architecture. Mobile full root/proof build275.337s passes3262
+desktop/230 host/10 build-logic/six proof-host cases, including explicit reused results;
+1683/218 suites freshly executed. Initial focused build failed only101-line proof
+method after eight passing cases; helper extracted before full/native success.
+
+Owned emulator5562/PID705941 stopped in1.604s, proof package absent. APK343,275,325B
+SHA2564bd9200487608c1efb258d29ddb3762e92bfe32079934307010fb690254cd035. No phone UI,
+FCM or Apple provider claim. Receipt gateway8c87839a is pushed; live pilot remains
+accepted dac6fb0d/schema116, all chat push OFF and phone17 unchanged. Preserve Matrix
+identity/config/checkpoints, original Google/native/document state and old images.
+
+Next: expose Mobile receipt operations through common runtime ownership, implement
+encrypted local read intent/state and admitted replay, then mute/privacy/account-bound
+notification actions/inline replies. Continue all54 groups; none closes here. New
+common changes require full Apple/Xcode coverage. This Matrix/HRIS increment has no
+Starter port. Push every commit and continue long run; no task-completion claim.
+
+
 ## Read-receipt gateway accepted locally — 2 November 2026
 
 [Contract](collaboration/read-receipts.md) / [evidence](measurements/chat-read-receipts-2026-11-02.json):

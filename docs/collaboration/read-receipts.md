@@ -39,3 +39,23 @@ foreign ownership, missing event and revocation before/after the write. The nati
 SDK adapter, persisted application read state, notification suppression/actions,
 mute/privacy and replies still need their own acceptance. No whole PRD group is
 accepted here. Current private runtime remains dac6fb0d/schema116 with chat push OFF.
+
+## Android SDK counterpart
+
+Mobile c0ad592f now proves these routes with the actual SDK and protected local
+stores. [Native evidence](../measurements/chat-read-receipts-native-2026-11-02.json):
+114 Mobile/25 Platform inputs,109.111s, one full owned gateway scenario passes.
+Five empty receipt requests (three private/two public) return200. The peer cannot
+read private metadata, and the owning SDK reads its retained private receipt in
+the third process before synchronization starts. Existing encrypted bidirectional
+exchange, held-room isolation, original acknowledgement and completion recovery
+remain passing across three real process restarts. Three encrypted message sends
+are retained with original transaction identity.
+
+The bounded driver now requires strict booleans for all three receipt facts and
+rejects wrong types. Its26 cases pass0.159s. API trace allows only the three fixed
+receipt path literals; IDs, body and credentials remain omitted. Native test asserts
+actual accepted private/public requests before recording proof. Owned emulator is
+stopped, proof package absent, phone untouched. Product durable read state, mute/
+privacy/actions/replies and native FCM are still separate work; current pilot stays
+at dac6fb0d and all chat push flags remain false.

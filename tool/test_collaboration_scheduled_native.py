@@ -124,6 +124,15 @@ class NetworkOwnershipTest(unittest.TestCase):
             self.assertTrue(network.restore())
             self.assertEqual(calls, len(device.calls))
 
+    def test_alternate_claimed_emulator_restores_its_original_connectivity(self):
+        device = FakeDevice("0")
+        device.serial = "emulator-5562"
+        initial = copy.deepcopy(device.values)
+        network = EmulatorNetwork(device)
+        network.disable()
+        self.assertTrue(network.restore())
+        self.assertEqual(initial, device.values)
+
     def test_lost_mutation_response_still_restores_the_network(self):
         device = FakeDevice()
         initial = copy.deepcopy(device.values)

@@ -1,11 +1,12 @@
 """Native proof cannot target a phone, replace an app or leak owned mappings."""
 from pathlib import Path
+import os
 import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
 
-from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic
+from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic, native_proof_serial
 
 
 class NativeDeviceTest(unittest.TestCase):
@@ -37,6 +38,28 @@ class NativeDeviceTest(unittest.TestCase):
         directory = root / "run"
         directory.mkdir()
         return NativeDevice(apk, "emulator-5560", root / "sdk", directory)
+
+    def test_serial_configuration_is_bounded_before_any_device_access(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual("emulator-5560", native_proof_serial())
+        for serial in ("emulator-5560", "emulator-5562"):
+            with patch.dict(os.environ, {"HRIS_COLLAB_NATIVE_SERIAL": serial}):
+                self.assertEqual(serial, native_proof_serial())
+        for serial in ("", "emulator-5564", "10.77.77.3:5555", "emulator-5562 extra"):
+            with patch.dict(os.environ, {"HRIS_COLLAB_NATIVE_SERIAL": serial}), self.assertRaises(ValueError):
+                native_proof_serial()
+
+    def test_alternate_serial_is_explicit_and_wrong_avd_cannot_be_mutated(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            old = self.fixture(root)
+            device = NativeDevice(old.apk, "emulator-5562", old.sdk, old.directory)
+            with patch("collaboration_native_device.subprocess.run", return_value=subprocess.CompletedProcess([], 0, "codepush-ci08\nOK", "")) as command:
+                with self.assertRaises(RuntimeError):
+                    device.prepare()
+                self.assertTrue(device.cleanup())
+                self.assertEqual([device.adb, "-s", "emulator-5562", "emu", "avd", "name"], command.call_args.args[0])
+                self.assertEqual(1, command.call_count)
 
     def test_phone_rejected_before_filesystem_or_adb_access(self):
         with self.assertRaises(ValueError):

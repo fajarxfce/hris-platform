@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Incoming recovery implemented; native driver selects owned emulator — 2 November 2026
+
+Mobile [3062bff2](https://github.com/fajarxfce/hris-mobile/commit/3062bff2) adds incoming
+acquisition independent of outgoing work, with one company per turn and separate15s
+incoming/outgoing budgets. Actual app/DI/domain/SQLite tests cover no-outbox restart,
+room fairness, original deadlines, late account/denial, cancellation and cleanup.
+Full checks pass3,123 desktop,215 Android host,865 browser,10 build-logic (188.013s).
+All four actual WorkManager/Room/Keystore scheduling scenarios pass46.417s, including
+21 healthy company callbacks with no Retry. SDK/company callbacks in that scheduler
+proof are fictional; real incoming provider acceptance remains next. Failed test
+assertions are retained in Mobile evidence. Room foundations af5cb4dc are committed.
+
+Apple41409790492 at5a39b53f is complete/audited:112 core cases/30 suites, wake0.083s,
+full Xcode1269s,10 verified source inputs. It excludes later room/incoming changes;
+Mobile is dispatching its newer exact implementation head. Phone15 unchanged.
+
+[Driver change](measurements/native-proof-emulator-selection-2026-11-02.json) accepts
+HRIS_COLLAB_NATIVE_SERIAL=emulator-5562 across SDK/worker/scheduled interop. CLI provider
+proof also allows5562. Legacy5560 remains supported, but is currently an unrelated
+CodePush AVD: do not operate it. Both allowed serials still require the exact
+hris-mobile-dev AVD and separate debug proof package; unowned data/mappings, phone
+endpoints and unclaimed connectivity mutation remain rejected. Three new cases;
+all79 collaboration driver tests pass0.179s. Actual alternate-serial SDK proof follows.
+
+**Continue now:** extend existing actual worker/provider fixture to close sender
+runtime before peer seeding, acquire incoming with fresh real directory/admission
+and unavailable workspace selection, verify owned originals survive reopen, then
+retain foreground older-history proof. Next independent recent catchup, FCM privacy/
+actions/replies and compatible backend rollout. Latest bounded window is not long-
+offline recovery. All54 PRD groups remain open. Private schema103/API-worker2c2a59e3,
+branch116, disabled chat push and Starter5679c51 remain. Owned5562/PID65117 is stopped.
+Continue after each commit; no employee install or live change by these increments.
+
 ## Healthy recovery batches validated; incoming room progress underway — 2 November 2026
 
 Mobile [5a39b53f](https://github.com/fajarxfce/hris-mobile/commit/5a39b53f) is pushed.

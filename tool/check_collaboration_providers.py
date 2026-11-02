@@ -23,7 +23,7 @@ import time
 import urllib.error
 import urllib.request
 import uuid
-from collaboration_native_device import NativeDevice, native_diagnostic
+from collaboration_native_device import NativeDevice, native_diagnostic, NATIVE_SERIALS
 from collaboration_protocol_metrics import collect_protocol_counts
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -384,7 +384,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--docker-sudo", action="store_true", help="Use existing noninteractive sudo authorization for Docker only")
     parser.add_argument("--android-apk", type=Path, help="Separate debug protocol APK; never the HRIS app")
-    parser.add_argument("--android-serial", choices=["emulator-5560"], help="Booted hris-mobile-dev emulator")
+    parser.add_argument("--android-serial", choices=NATIVE_SERIALS, help="Booted hris-mobile-dev emulator")
     parser.add_argument("--android-sync-mode", choices=["native", "classic"], default="native", help="Explicit isolated SDK sync implementation")
     parser.add_argument("--android-sdk", type=Path, default=Path.home() / "Android/Sdk")
     options = parser.parse_args()

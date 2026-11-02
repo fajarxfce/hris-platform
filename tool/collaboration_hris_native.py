@@ -12,7 +12,7 @@ import subprocess
 import time
 from urllib.parse import urlparse
 
-from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic
+from collaboration_native_device import NativeDevice, PACKAGE, native_proof_serial, native_diagnostic
 
 
 def private_json(path, value):
@@ -139,7 +139,7 @@ def run(apk, sdk, directory):
             or not 1024 <= (home.port or 0) <= 65535 or home.username or home.password
             or home.query or home.fragment or home.path not in ("", "/")):
         raise ValueError("Only the owned loopback HRIS server is allowed")
-    native = NativeDevice(apk, "emulator-5560", sdk, directory)
+    native = NativeDevice(apk, native_proof_serial(), sdk, directory)
     process = None
     result = {"passed": False, "cleanup": False}
 

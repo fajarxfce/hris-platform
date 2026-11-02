@@ -22,17 +22,17 @@ Build the fixture from Mobile with JDK 21 and `ANDROID_HOME` configured:
 ./gradlew :apps:collaboration-proof:assembleDebug --no-daemon
 ```
 
-Boot Mobile's existing `hris-mobile-dev` AVD on port 5560, then from Platform:
+Boot Mobile's existing `hris-mobile-dev` AVD on unused port 5562, then from Platform:
 
 ```sh
 python3 tool/check_collaboration_providers.py --docker-sudo \
-  --android-serial emulator-5560 \
+  --android-serial emulator-5562 \
   --android-apk ../hris-mobile/apps/collaboration-proof/build/outputs/apk/debug/collaboration-proof-debug.apk
 ```
 
 `--android-sdk` defaults to `~/Android/Sdk`; build-tools 36.0.0 is used to verify
 the artifact's application ID and debuggable flag before installation. The driver
-rejects other serials/AVDs and any existing protocol package or conflicting reverse
+accepts only emulator5560/5562, verifies the HRIS AVD, and rejects other serials/AVDs and any existing protocol package or conflicting reverse
 port. It holds an exclusive emulator lock. Credentials enter the fixture sandbox
 through stdin; they never enter ADB arguments. Cleanup stops/removes only this
 run's APK and reverse port. No real HRIS package or phone is touched. The fixture's

@@ -13,7 +13,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from collaboration_hris_native import app_write_script, private_json, read_json, stop_process
-from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic
+from collaboration_native_device import NativeDevice, PACKAGE, native_proof_serial, native_diagnostic
 
 
 def checkpoint(value, state="QUEUED", restored=False):
@@ -137,7 +137,7 @@ def run(apk, sdk, directory):
     if (home.scheme != "http" or home.hostname != "127.0.0.1" or not 1024 <= (home.port or 0) <= 65535
             or home.username or home.password or home.query or home.fragment or home.path not in ("", "/")):
         raise ValueError("Only the owned loopback HRIS server is allowed")
-    native = NativeDevice(apk, "emulator-5560", sdk, directory)
+    native = NativeDevice(apk, native_proof_serial(), sdk, directory)
     process = None
     result = {"passed": False, "cleanup": False}
 

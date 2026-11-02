@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-02",
+  "baseCommit": "6699fa9dd9d2c10e0e3722c68651a207a3954b05",
+  "sourceSha256": {
+    "tool/check_collaboration_providers.py": "647924288d07ecd0f6c181994a61d8f25c6de6abf4e4272f52fc7efd331d012f",
+    "tool/collaboration_hris_native.py": "7b7452eb82b829182a462ec032dd80564da17a1708274a591734e6c222b7a9b6",
+    "tool/collaboration_native_device.py": "3aebdf81ae3c8cd4115542456a6acabe0757c2a5ecb5e8e3de98b9bfdaf9100f",
+    "tool/collaboration_scheduled_native.py": "c13a6fe37f89bdabae62a5d453c09bbeaad25e5a5095376a8c7cacf6d513bc95",
+    "tool/collaboration_scheduled_network.py": "c3f01b3ec310f20acef24c03e0477da46c953ec05e78fa4da70620b55775a747",
+    "tool/collaboration_worker_native.py": "6b4fbf83bddf13995aabf9af8167eae66f55c4d4b128077454eff86cffa4f593",
+    "tool/test_collaboration_native_device.py": "059e4ed84104bcfc9134a81410730bf0785285e25be06bd0d1228c8779bfb1a4",
+    "tool/test_collaboration_scheduled_native.py": "126f4c5af9d20cca2795aefc5d7302b6bf03535a159ae02228660b96eb5d4fd8"
+  },
+  "validation": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tool",
+      "-p",
+      "test_collaboration_*.py"
+    ],
+    "tests": 79,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 0.179
+  },
+  "newCases": 3,
+  "scope": "Explicit emulator5562 selection for HRIS native driver families and CLI provider proof; existing allowed5560 and default retained. Exact HRIS AVD, debug proof APK, unowned package/reverse-map, claim and cleanup guards remain. Shared connectivity guard accepts only those two serials.",
+  "limits": [
+    "Python driver tests only; actual SDK/provider execution on alternate5562 remains the next increment.",
+    "No backend business change, live rollout or phone action."
+  ]
+}

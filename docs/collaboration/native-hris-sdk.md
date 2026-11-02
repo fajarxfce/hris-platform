@@ -105,14 +105,21 @@ from a terminated sync loop yet.
 ## Reproduction and resource ownership
 
 Build `hris-mobile`'s separate `:apps:collaboration-proof:assembleDebug` artifact.
-Boot only the existing `hris-mobile-dev` AVD at `emulator-5560`. With JDK 21,
+Boot only the existing `hris-mobile-dev` AVD at an unused allowed serial. On the
+shared development host use `emulator-5562`; `5560` currently belongs to another
+project. Never replace that AVD. With JDK 21,
 Docker access and `ANDROID_HOME`, run from Platform:
 
 ```sh
+HRIS_COLLAB_NATIVE_SERIAL=emulator-5562 \
 HRIS_COLLAB_NATIVE_APK=/absolute/path/collaboration-proof-debug.apk \
   ./gradlew --no-parallel --max-workers=1 :apps:server:cleanTest \
   :apps:server:test --tests '*NativeCollaborationSdkInteropTest'
 ```
+
+`HRIS_COLLAB_NATIVE_SERIAL` applies to all three native driver families and accepts
+only5560/5562. Legacy default5560 is retained; always set the actual owned serial on
+a shared host. The selected serial must still identify the `hris-mobile-dev` AVD.
 
 Without the opt-in APK variable the class is skipped. Do not run heavy Mobile
 builds alongside this provider/emulator test on the shared VPS. Source changes

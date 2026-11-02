@@ -3,17 +3,27 @@ from __future__ import annotations
 
 import fcntl
 import hashlib
+import os
 import re
 from pathlib import Path
 import subprocess
 
 PACKAGE = "dev.fajar.hris.collaboration.proof"
+NATIVE_SERIALS = ("emulator-5560", "emulator-5562")
+
+
+def native_proof_serial():
+    """Explicit test-host selection; neither an IP endpoint nor arbitrary AVD is allowed."""
+    serial = os.environ.get("HRIS_COLLAB_NATIVE_SERIAL", "emulator-5560")
+    if serial not in NATIVE_SERIALS:
+        raise ValueError("Native proof requires an allowed HRIS emulator serial")
+    return serial
 
 
 class NativeDevice:
     def __init__(self, apk, serial, sdk, directory):
-        if serial != "emulator-5560":
-            raise ValueError("Native proof requires the dedicated emulator-5560")
+        if serial not in NATIVE_SERIALS:
+            raise ValueError("Native proof requires an allowed HRIS emulator serial")
         self.apk = Path(apk).resolve(strict=True)
         self.serial = serial
         self.sdk = Path(sdk)

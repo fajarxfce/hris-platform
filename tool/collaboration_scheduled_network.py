@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import time
 
+from collaboration_native_device import NATIVE_SERIALS
+
 
 class EmulatorNetwork:
     def __init__(self, native):
-        if native.serial != "emulator-5560" or not native.installed:
+        if native.serial not in NATIVE_SERIALS or not native.installed:
             raise ValueError("Connectivity proof requires the claimed emulator package")
         self.native = native
         self.before = {key: self.read(key) for key in ("airplane_mode_on", "wifi_on", "mobile_data")}

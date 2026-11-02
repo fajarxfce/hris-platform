@@ -1,5 +1,56 @@
 # Agent continuation — HRIS workspace
 
+## Native room lookup and push receiver continuation — 2 November 2026
+
+[Room lookup](collaboration/room-lookup.md) / [evidence](measurements/chat-room-lookup-2026-11-02.json):
+GET direct-conversations/summary-by-room?roomId= resolves one immutable DIRECT binding
+using current company/participant/configured-provider scope, then returns the existing
+owned summary. Printable ASCII2..255; encode as a query value. Native transport,
+client/module policy and session/MFA/account/company admission apply before AND after
+acquisition. Returned ownership/summary identity is checked; no directory scan,
+provider call, new room, message or migration. Shared read DI adds the existing
+room-scope repository, so API and worker context checks are included.
+
+Check3 passes337.786s on5 unchanged inputs:55 domain/13 suites,147 data/1,2 HTTP/1,
+116 active worker/24, zero failures/errors. The unrelated opt-in elapsed export-
+retention case stays skipped (worker report117). Format/architecture pass. Check1
+failed test compilation25.0s because new outer methods referenced private fixture
+DSL; test-owned roomScopes factory fixes it. Check2 passes domain/data and1/2 HTTP
+in202.139s; other case was rejected during fixture room publication because its device
+was still PROVISIONING. Activate the fictional registered fixture device before
+publishing; database guard unchanged. No production code changed after check1.
+
+Mobile dd1a449b9a00a7323d453a48584b179c8e007416 is PUSHED: shared Android/iOS receive
+routing commits a fresh generation before fixed recovery scheduling, separate from
+Inbox. Local account/native-family/audience ownership ignores credential age; no
+workspace/SDK/content I/O at receipt. Root/browser/Android acceptance is recorded in
+its chat-push-receive measurement (3,195 desktop,217 host,602 domain browser,26 full
+app browser,10 build-logic). The first app-browser filter selected no tests; corrected
+unfiltered26/7 suites includes six receiver cases. All executed final cases pass.
+
+Apple41433354322 at8972dc96 failed before any runner/test: hosted macOS capacity.
+Replacement41436278627 at EXACT dd1a449b is now active. Ten Swift envelope checks
+passed8s; core simulator checks/full Xcode remain pending. Do not cancel or dispatch
+another same-branch/scope run while active. Earlier cacae157 Apple audit is retained.
+
+Mobile room lookup is IN PROGRESS on15 frozen Kotlin inputs, with its first focused
+check running from .work/chat-room-lookup-2026-11-02/check.py. It adds byRoom to existing
+RefreshCollaborationList, raw API/adapter mapping, denial/cancellation/expiry tests and
+real app DI/SQLite no-selection/no-SDK reopen acceptance. Do not claim accepted before
+inspecting that check, then root/affected browser/Android checks. No local Platform
+check remains running once this increment is pushed. Continue that work immediately.
+
+Next: bounded encrypted push-priority hints and fresh hinted-company/device admission,
+exact admitted room binding before SDK access, fair all-company recovery retained,
+notification read/mute/privacy, durable action deduplication and encrypted replies.
+Mobile .work has detailed supplementary notes. Compatible private Matrix/API/worker
+rollout and release16+ can expose validated chat progress while chat push remains off
+until usable. Preserve identity/Google bindings and data; notice before phone install,
+explicit serial --install-only, no UI drive. Current private schema103/API-worker
+2c2a59e3, branch116 and phone15 unchanged. All54 groups remain open; no Starter port,
+owned emulator, goal or subagent. Do not stop at this checkpoint.
+
+
 ## Android incoming gaps beyond the SDK window validated — 2 November 2026
 
 [Evidence](measurements/chat-incoming-history-waves-2026-11-02.json) verifies three

@@ -20,6 +20,23 @@ class NativeCollaborationDirectController(
     private val open: OpenNativeCollaborationDirect,
     private val read: ReadNativeCollaborationDirect,
 ) {
+    @GetMapping("/summary-by-room")
+    fun summaryByRoom(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @RequestParam roomId: String,
+    ): CollaborationDirectSummary =
+        read
+            .summaryByRoom(
+                actor,
+                identity.sessionId,
+                identity.sessionVersion,
+                client.version,
+                roomId,
+            )
+            .response()
+
     @PostMapping(consumes = ["application/json"])
     fun open(
         actor: Actor,

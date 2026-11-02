@@ -196,7 +196,11 @@
         "https://github.com/fajarxfce/hris-mobile/blob/5a39b53f0ece41d314738090e330bd7004e528db/docs/measurements/chat-company-continuation-2026-11-02.json",
         "../measurements/chat-incoming-provider-2026-11-02.json",
         "../measurements/chat-incoming-history-boundary-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/cacae157a83c0653428156fc47e53e97bbe1db9d/docs/measurements/chat-incoming-history-purpose-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/cacae157a83c0653428156fc47e53e97bbe1db9d/docs/measurements/chat-incoming-history-purpose-2026-11-02.json",
+        "../measurements/chat-incoming-history-waves-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/dd1a449b9a00a7323d453a48584b179c8e007416/docs/measurements/chat-push-receive-2026-11-02.json",
+        "room-lookup.md",
+        "../measurements/chat-room-lookup-2026-11-02.json"
       ]
     },
     {
@@ -643,7 +647,7 @@
     "Hosted five-case cancellation/process-death recovery is audited at Mobile 302aa192 / Platform d48ac2f8. Preserve earlier failures and distinguish the local pending-key retry observation from hosted runs without it.",
     "Private callback/push worker, typed background admission, finite native borrowing, durable all-company wakes/progress and fair company/room continuation are validated. Mobile ee888802 and real SDK/HRIS/Synapse proof validate bounded incoming originals with an empty outbox, no selection and receiver SDK closed during seeding. Direct invocation is distinct from incoming OS/FCM acceptance. Complete independent long-offline catchup and FCM receive/decrypt/privacy/actions/reply before live push activation.",
     "Finish native/web encrypted adapters and cross-family cryptographic key continuity. Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
-    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2–P8.",
+    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls; complete LiveKit meetings and remaining P2\u2013P8.",
     "Continue all 54 feature groups. Component, UI and simulated-worker checks do not accept full product features, native background operation or meeting capacity."
   ]
 }

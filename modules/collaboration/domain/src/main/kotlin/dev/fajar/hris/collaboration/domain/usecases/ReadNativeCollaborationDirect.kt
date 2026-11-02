@@ -5,6 +5,7 @@ import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepo
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationRoomScopeRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.nativeAuthenticationRequired
@@ -16,6 +17,7 @@ import java.util.UUID
 /** Retained DM metadata is available to a currently admitted participant even if the peer left. */
 class ReadNativeCollaborationDirect(
     private val conversations: CollaborationDirectRepository,
+    private val rooms: CollaborationRoomScopeRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -27,6 +29,71 @@ class ReadNativeCollaborationDirect(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
+    /**
+     * Resolve a push hint through current participant scope without scanning the room directory.
+     */
+    fun summaryByRoom(
+        actor: Actor,
+        sessionId: UUID,
+        sessionVersion: Long,
+        client: ClientVersion?,
+        roomId: String,
+    ): Result<CollaborationDirectSummary> {
+        if (
+            roomId.length !in 2..255 ||
+                !roomId.startsWith('!') ||
+                roomId.any { it.code !in 33..126 }
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_room_request")
+            )
+        return read(actor, sessionId, sessionVersion, client) {
+            val company = requireNotNull(actor.companyId)
+            rooms.find(company, actor.accountId, provider.serverName, roomId).flatMap { room ->
+                if (room == null)
+                    return@flatMap Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "collaboration_conversation_not_found")
+                    )
+                if (room.roomId != roomId) return@flatMap invalidRoomScope()
+                snapshotCollaborationRoomScope(
+                        company,
+                        actor.accountId,
+                        provider.serverName,
+                        listOf(room),
+                    )
+                    .flatMap {
+                        conversations
+                            .summary(company, actor.accountId, room.conversationId)
+                            .flatMap { summary ->
+                                if (summary == null)
+                                    Result.Failed(
+                                        Failure(
+                                            FailureKind.NOT_FOUND,
+                                            "collaboration_conversation_not_found",
+                                        )
+                                    )
+                                else if (
+                                    summary.conversation.id != room.conversationId ||
+                                        summary.conversation.companyId != company ||
+                                        summary.conversation.firstAccountId !=
+                                            room.firstAccountId ||
+                                        summary.conversation.secondAccountId !=
+                                            room.secondAccountId ||
+                                        summary.peer.accountId == actor.accountId ||
+                                        summary.peer.accountId !in
+                                            setOf(room.firstAccountId, room.secondAccountId)
+                                )
+                                    invalidRoomScope()
+                                else Result.Success(summary)
+                            }
+                    }
+            }
+        }
+    }
+
+    private fun invalidRoomScope() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_room_scope_invalid"))
+
     fun list(
         actor: Actor,
         sessionId: UUID,

@@ -1,6 +1,6 @@
 # Delivery and validation
 
-Current communications checkpoint: [bounded incoming Android history](measurements/chat-incoming-history-waves-2026-11-02.json) verifies175 encrypted peer messages in all three draft/outbox variants,11 incoming turns/container reopens, independent foreground Browse and exactly one outgoing send. Final3 native cases pass across two runs on the same APK; initial timeouts/device-probe failure and corrections remain recorded. Mobile root/browser/Android checks and84 Python driver cases pass. Native receive/reply and full acceptance remain next; chat push stays disabled. All54 PRD groups remain open. No private rollout or phone operation by this increment; see the handoff.
+Current communications checkpoint: [native room lookup](measurements/chat-room-lookup-2026-11-02.json) resolves an owned direct summary from a push room hint without scanning the directory. Domain/PostgreSQL, API/worker contexts and static checks pass; the two fixture-only corrections are retained. Mobile native receive routing is pushed, and its room-lookup adapter tests are running separately. Priority/decrypt/privacy/actions/replies and live provider/OS acceptance remain; chat push stays disabled. All54 PRD groups remain open. No private rollout or phone operation by this increment; see the handoff.
 
 ## Verify a development branch
 

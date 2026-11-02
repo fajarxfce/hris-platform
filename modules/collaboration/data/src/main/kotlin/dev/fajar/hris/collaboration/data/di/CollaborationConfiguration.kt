@@ -486,6 +486,7 @@ class CollaborationConfiguration {
     @Bean
     fun readNativeCollaborationDirect(
         conversations: CollaborationDirectRepository,
+        rooms: CollaborationRoomScopeRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -499,6 +500,7 @@ class CollaborationConfiguration {
     ) =
         ReadNativeCollaborationDirect(
             conversations,
+            rooms,
             sessions,
             policies,
             companies,

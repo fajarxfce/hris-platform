@@ -4132,6 +4132,184 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun directRoomLookupResolvesOnlyPublishedOwnedBindingsWithoutDirectoryEnumeration() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val metadata = RecordingRooms(room)
+        val scopes = f.roomScopes()
+        var finds = 0
+        val directOnly =
+            object : CollaborationRoomScopeRepository by scopes {
+                override fun owned(
+                    companyId: UUID,
+                    accountId: UUID,
+                    limit: Int,
+                ): Result<List<CollaborationOwnedRoom>> = error("No directory enumeration")
+
+                override fun find(
+                    companyId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationOwnedRoom?> {
+                    finds++
+                    return scopes.find(companyId, accountId, serverName, roomId)
+                }
+            }
+        val reader = f.readDirect(roomScopes = directOnly)
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(reader.summaryByRoom(f.actor, room.parent, 0, room.client, metadata.id)),
+        )
+        for (invalid in
+            listOf("", "!", "room", "!space room", "!newline\n", "!" + "a".repeat(255))) {
+            assertEquals(
+                "invalid_collaboration_room_request",
+                failed(reader.summaryByRoom(f.actor, room.parent, 0, room.client, invalid)),
+            )
+        }
+        assertEquals(1, finds)
+        success(room.request())
+        success(
+            f.advanceRoom(RecordingMatrix(f.clock), metadata)
+                .execute(f.claimRoom(room.conversation))
+        )
+        val expected =
+            success(reader.summary(f.actor, room.parent, 0, room.client, room.conversation))
+        assertEquals(
+            expected,
+            success(reader.summaryByRoom(f.actor, room.parent, 0, room.client, metadata.id)),
+        )
+        val opposite =
+            success(
+                reader.summaryByRoom(
+                    f.actor.copy(accountId = room.peer),
+                    f.parent(room.peer),
+                    0,
+                    room.client,
+                    metadata.id,
+                )
+            )
+        assertEquals(f.account, opposite.peer.accountId)
+        val unrelated = f.peer("Fictional nonparticipant")
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(
+                reader.summaryByRoom(
+                    f.actor.copy(accountId = unrelated),
+                    f.parent(unrelated),
+                    0,
+                    room.client,
+                    metadata.id,
+                )
+            ),
+        )
+        val foreign = Fixture()
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(
+                foreign
+                    .readDirect()
+                    .summaryByRoom(foreign.actor, foreign.parent(), 0, room.client, metadata.id)
+            ),
+        )
+        sql.update("update accounts set active=false where id=?", room.peer)
+        assertEquals(
+            expected,
+            success(reader.summaryByRoom(f.actor, room.parent, 0, room.client, metadata.id)),
+        )
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            f.actor.companyId,
+            f.account,
+        )
+        assertEquals(
+            failed(reader.summary(f.actor, room.parent, 0, room.client, room.conversation)),
+            failed(reader.summaryByRoom(f.actor, room.parent, 0, room.client, metadata.id)),
+        )
+    }
+
+    @Test
+    fun roomLookupWithholdsLabelsAndNotFoundAfterAuthorityExpiresDuringAcquisition() {
+        for (found in listOf(false, true)) {
+            val room = DirectRoomFixture()
+            val f = room.f
+            val metadata = RecordingRooms(room)
+            success(room.request())
+            success(
+                f.advanceRoom(RecordingMatrix(f.clock), metadata)
+                    .execute(f.claimRoom(room.conversation))
+            )
+            val scopes = f.roomScopes()
+            val late =
+                object : CollaborationRoomScopeRepository by scopes {
+                    override fun find(
+                        companyId: UUID,
+                        accountId: UUID,
+                        serverName: String,
+                        roomId: String,
+                    ): Result<CollaborationOwnedRoom?> =
+                        scopes.find(companyId, accountId, serverName, roomId).also {
+                            f.clock.at = f.clock.at.plusSeconds(1000)
+                        }
+                }
+            val reader = f.readDirect(roomScopes = late)
+            assertEquals(
+                "native_session_invalid",
+                failed(
+                    reader.summaryByRoom(
+                        f.actor,
+                        room.parent,
+                        0,
+                        room.client,
+                        if (found) metadata.id else "!absent",
+                    )
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun roomLookupRejectsSubstitutedRoomOwnershipBeforeReturningLabels() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val metadata = RecordingRooms(room)
+        success(room.request())
+        success(
+            f.advanceRoom(RecordingMatrix(f.clock), metadata)
+                .execute(f.claimRoom(room.conversation))
+        )
+        val scopes = f.roomScopes()
+        for (kind in 0..3) {
+            val forged =
+                object : CollaborationRoomScopeRepository by scopes {
+                    override fun find(
+                        companyId: UUID,
+                        accountId: UUID,
+                        serverName: String,
+                        roomId: String,
+                    ): Result<CollaborationOwnedRoom?> =
+                        scopes.find(companyId, accountId, serverName, roomId).map { value ->
+                            val owned = requireNotNull(value)
+                            when (kind) {
+                                0 -> owned.copy(companyId = UUID.randomUUID())
+                                1 -> owned.copy(serverName = "elsewhere.test")
+                                2 -> owned.copy(roomId = "!substituted")
+                                else -> owned.copy(firstAccountId = owned.secondAccountId)
+                            }
+                        }
+                }
+            assertEquals(
+                "collaboration_room_scope_invalid",
+                failed(
+                    f.readDirect(roomScopes = forged)
+                        .summaryByRoom(f.actor, room.parent, 0, room.client, metadata.id)
+                ),
+            )
+        }
+    }
+
+    @Test
     fun directSummariesPageOnlyOwnedCounterpartsAndRetainOffboardedLabels() {
         val f = Fixture()
         val parent = f.parent()
@@ -6750,12 +6928,20 @@ class NativeCollaborationRegistrationTest {
                 clock,
             )
 
+        fun roomScopes() =
+            StoredCollaborationRoomScopeRepository(PostgresCollaborationRoomScopeDataSource(dsl))
+
         fun readDirect(
             conversations: CollaborationDirectRepository = direct,
             security: IdentitySecurityPolicy = IdentitySecurityPolicy(),
+            roomScopes: CollaborationRoomScopeRepository =
+                StoredCollaborationRoomScopeRepository(
+                    PostgresCollaborationRoomScopeDataSource(dsl)
+                ),
         ) =
             ReadNativeCollaborationDirect(
                 conversations,
+                roomScopes,
                 sessions,
                 policies,
                 companies,

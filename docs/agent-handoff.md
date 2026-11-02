@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Release17 ready; latest Apple audit complete — 2 November 2026
+
+Mobile fe485267 records the clean c6347c75 devRelease17 candidate: build/lint433.769s,
+zero lint,87,495,300-byte arm64 APKb94aedf2b1eb81949d8eeacc82fd2906f0c85b27641e3bcc65fd8884e5fb34d2.
+Same signer/private API/Firebase and16KiB alignment; compiled backup exclusions verified
+through shortened release resource path. Phone read-only preflight confirms15 and same
+signer. NO INSTALL. Starter0d4432e has the independently accepted generic Android XML/
+manifest port; root/resources/lint70.128s,356 desktop/six build-logic,44 existing warnings.
+
+Apple41446374520 atcc4c11f1 COMPLETE/audited:112 native core cases/30 suites, no failures/
+errors/skips;106 combined source hashes, Swift11s, compile740s/tests127s/Xcode1436s,
+associations1s. Shared priority compiles in the app; actual priority behavior still needs
+Android SDK proof. Mobile's build17 measurement contains exact artifact/XML/source hashes.
+No physical iPhone or FCM/OS acceptance. No duplicate Apple dispatch required.
+
+Platform replacement full Verify41448616746 at2334e266 remains ACTIVE. Four dashboard
+shards pass; backend/downstream pending. Source here stays unchanged for prepared
+rollout guards. Prior failure preserved. Package/image/checkpoint/clone/deploy/grants
+still unexecuted; HRIS103 and isolated Matrix unchanged, push/SMTP off. Reviewed
+verify-pilot-access.py is staged in .work/chat-private-rollout-2026-11-02 for after
+grants: actual native/MFA contact/device/directory GETs, no provider enrollment or
+messages, revoke only its owned operator session. Scripts/config secrets stay private.
+
+Mobile now has FOUR uncommitted Android proof inputs in .work/native-priority-2026-11-02.
+Check1 fails33.742s on one function-length rule; extracted phase ownership fixes it.
+Check2 fails121.592s because CompanyRecoveryProofOwner still used the pre-priority
+worker constructor. Its isolated company-sweep fixture now supplies an explicit empty
+priority lane; actual priority uses the new real-container/native helper. Check3 FULL
+is active on108 frozen inputs. One local heavy job only. Platform apply-platform.py
+and its four intended test/driver changes are only staged under matching .work; apply
+after rollout source guards finish. Continue actual SDK proof and notifications/replies,
+then remaining54 open groups. Do not end after this metadata push or installation.
+
 ## Full CI outage fixture corrected — 2 November 2026
 
 Replacement Verify [41448616746](https://github.com/fajarxfce/hris-platform/actions/runs/41448616746)

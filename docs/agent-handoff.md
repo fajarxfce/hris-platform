@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Group migration branch advanced; installed release 28 gates accepted — 3 November 2026
+
+Live remains8b40bd0f/schema116 with chat push ON, SMTP OFF, and the verified private
+rollout below. This checkout is not the group-migration source. Continue that work
+in /home/fajar/hris/.worktrees/communication-space on feat/communication-space,
+latest pushed927a4f12. Its own handoff and docs/collaboration/identity-migration.md
+are authoritative for the ongoing implementation.
+
+That branch now has V117 group directory, bounded contacts and native read policy,
+V118 owned legacy metadata with bounded compound paging, and V119 immutable provider
+user selection. Full39 database cases in18 suites pass,237.316s; recovery12 passes
+through119 with no new encryption envelope. No automatic provider identity/device
+selection, new group HTTP route or Mobile ownership migration is enabled. The next
+repository/policy increment reads eligibility, existing selection and legacy
+candidate in one SQL snapshot; its checks are currently running in that worktree.
+Never deploy those migrations accidentally using this live push release's scripts.
+
+Mobile0d96e737 records matching8273 gates for the installed normal release28:
+native41701412608 with5 provider/230 Android-host/18 proof-host cases and3 inspected
+SystemUI PNGs; control41701412602 with3110 portable and1215 Apple cases, full Xcode822s,
+432 source hashes. Downloaded archive digests and full reports are verified. Do not
+reinstall28. Actual Apple Matrix/APNs/CallKit and all54 communications acceptance
+groups remain open. Starter9959c1d needs no port for these HRIS-specific changes.
+Continue the long run, regular user updates, atomic pushes and Git handoffs.
+
+
 ## Private chat push active; release 28 installed — 3 November 2026
 
 Live API/worker now run accepted source8b40bd0f/schema116. All three chat push flags

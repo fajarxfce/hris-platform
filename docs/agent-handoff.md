@@ -5,7 +5,7 @@
 Live remains8b40bd0f/schema116 with chat push ON, SMTP OFF, and the verified private
 rollout below. This checkout is not the group-migration source. Continue that work
 in /home/fajar/hris/.worktrees/communication-space on feat/communication-space,
-latest pushedfa19ad69 (preceded by453f79d8,93808218,7aabb9e1 and78c3b925). Its own docs/agent-handoff.md,
+latest pushedd92d4206 (preceded by0e3b4b52,fa19ad69,453f79d8 and93808218). Its own docs/agent-handoff.md,
 collaboration/group-provisioning.md and group-credentials.md are authoritative.
 
 That branch now has V117–122: group directory/contacts, immutable provider-user
@@ -13,7 +13,7 @@ selection, native identity/device registration, exact legacy parent/public-key
 references, shared five-parent quota, typed Matrix login preserving actual provider
 keys, encrypted group credential generations/recovery, owned device CAS updates
 bounded organization provisioning metadata/leases, typed proof-fenced queue ports,
-and atomic native registration enqueue.
+atomic native registration enqueue/retry and admitted worker publication.
 No group DI/controller/worker/gateway or Mobile ownership migration is enabled.
 
 V121 credential validation: full98 cases in395.199s (45 database,19 domain,34 data),
@@ -37,8 +37,19 @@ commits with device/binding/receipt/journal, with at most60s current proof deadl
 Failure/cancellation/interruption at every write boundary roll back together;
 registration replay after native refresh preserves the original head.
 
-Next: explicit native retry and worker prepare/publish fences. Retry is WIP in the
-group worktree (not accepted yet); read its current status before editing. Claims
+Explicit retry:22 cases137.393s,3660 unchanged hashes; current proof/MFA/observed
+revisions,60s cooldown, fresh replay, expired pending cancellation, concurrent
+retry and four-boundary rollback. Fresh group worker publication:29 cases158.622s,
+3662 unchanged hashes; actual PostgreSQL with controlled Matrix candidates proves
+released SQL locks during provider I/O, one publication winner, credential reuse/
+rotation and atomic activation/head/journal rollback including post-journal expiry.
+Actual Synapse remains earlier separate port/key continuity evidence. Retained
+DEVICE activation is denied pending runtime/SDK transfer; new devices under retained
+canonical USERS are supported. All checks for those commits completed.
+
+Next: bounded failure/defer outcomes and scheduling, then coherent group runtime
+transfer/gateway/rooms/Mobile ownership. Settlement is WIP in the group worktree;
+read its current status before editing. No group DI/HTTP/scheduler is enabled. Claims
 acquire metadata only; commit before taking account -> parent ->
 device -> queue -> credential guards. External I/O holds no SQL locks. Never logout
 a losing Matrix login: actual Synapse deletes all same-device tokens and E2EE keys.

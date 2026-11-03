@@ -1,0 +1,62 @@
+{
+  "success": true,
+  "completedAt": "2026-11-03T16:41:40.942753+00:00",
+  "seconds": 0.904,
+  "fictionalAccounts": 4,
+  "normalApiMembershipsAndPersonLinks": true,
+  "permissionOnly": "collaboration.chat",
+  "allFourDiscoverable": true,
+  "privatePasswordsUnique": true,
+  "temporaryOperatorSessionRevoked": true,
+  "messageSent": false,
+  "providerEnrollment": false,
+  "firebaseIdentityChanged": false,
+  "phoneTouched": false,
+  "scriptSha256": "62c49b67926db70410a4c70e97fb3c1ddd9fbfb4c88966dfa2242176fe9bbf73",
+  "verification": {
+    "demoAccountsChecked": 4,
+    "results": [
+      {
+        "loginSucceeded": true,
+        "eligibleOtherAccounts": 5
+      },
+      {
+        "loginSucceeded": true,
+        "eligibleOtherAccounts": 5
+      },
+      {
+        "loginSucceeded": true,
+        "eligibleOtherAccounts": 5
+      },
+      {
+        "loginSucceeded": true,
+        "eligibleOtherAccounts": 5
+      }
+    ],
+    "ownedVerificationSessionsRevoked": true,
+    "providerEnrolled": false,
+    "messageSent": false
+  },
+  "databaseContainer": "1e023349da86cba6106f5131a4a06d7e5de4884710e316919b8c2072e8d03f22",
+  "databaseName": "hris",
+  "before": {
+    "fictionalSampleEmployees": 4,
+    "sampleEmployeesWithAccount": 0,
+    "members": 2,
+    "membersWithChat": 2
+  },
+  "after": {
+    "sampleEmployeesWithAccount": 4,
+    "members": 6,
+    "membersWithChat": 6
+  },
+  "provisioning": "Four active fictional accounts seeded in a bounded administrative transaction with distinct random passwords hashed by the application Argon2 defaults. No account passwords reused. Role grants and employee/person binding use the normal authenticated MFA administration APIs with retained operation IDs. No mail/Firebase provider enrollment.",
+  "retainedFailure": "First apply created four accounts and the first membership, then stopped before linking because the script expected profile.id instead of profile.personId. Corrected against PersonProfileResponse and resumed idempotently; no duplicate account or overwritten membership.",
+  "privateEvidence": ".work/chat-demo-2026-11-03; accounts.private.json is secret and MUST NOT be uploaded.",
+  "limits": [
+    "Same-company demo eligibility only; cross-company organization admission still required.",
+    "No actual recipient provider device is enrolled or fictional conversation/message created by this verification.",
+    "Live Platform runtime304/schema116 and chat push flags remain unchanged.",
+    "Google-linked user and installed phone25 not modified."
+  ]
+}

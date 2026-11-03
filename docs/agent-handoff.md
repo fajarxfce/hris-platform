@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Chat demo accounts completed; UX and group scope in progress — 3 November 2026
+
+[Demo evidence](measurements/chat-demo-accounts-2026-11-03.json): the four existing
+SAMPLE employees had no accounts; the company had only two eligible chat members.
+All four now have distinct fictional accounts/password hashes, chat-only grants
+and normal API person bindings. Six company members now have chat; each of the
+four demo logins successfully reads five other eligible contacts. Owned temporary
+sessions revoked. No message/provider enrollment, Firebase mapping or phone change.
+The private manifest/passwords live in.work/chat-demo-2026-11-03 and must never
+be committed. First apply's profile field mismatch was corrected before any link,
+then resumed idempotently. Accounts were administrative demo seeds; grants/person
+links used the normal APIs. Real HRIS PG is1e023349da86cba6106f5131a4a06d7e5de4884710e316919b8c2072e8d03f22;
+1c63ff44261f is MATRIX PG, not HRIS. Preserve both distinct databases.
+
+The user explicitly says these UX complaints do not cancel the long-running full
+PRD. [Cross-company amendment](collaboration/cross-company-chat.md) is committed;
+company-bound discovery alone cannot implement it. Mobile's primary Chat tab,
+compact bubbles/day separators/composer and restored exhaustion pass156 focused
+cases and viewed light/dark-large-text/landscape screenshots. Full check3 is active
+under Mobile.work/chat-ux-2026-11-03; no parallel heavy local Gradle/emulator job.
+Native41667296924 still runs at1136. Apple41667309251 attempt2 now ACCEPTED:
+1097 tests/123 suites,397 source hashes, full Xcode1202s; artifact13250850483 SHA
+d354a19dc0bf94cdf5a3fe7a07db41202405ac2cf776961182c90674db8312a1. New UI source
+needs its own Apple gate. Next validated phone26+ with notice/install-only.
+
+Product FCM run11 reached real encrypted send and callback200 but delivered0.
+New UNCOMMITTED fixture diagnostics capture provider pusher failure/count and
+bounded hint revision/attempt/lease fields in push-state.json; not yet executed.
+Complete that next provider attempt after Mobile checks/builds free local capacity.
+Actual FCM/inline reply, real delivered/read UI, inbox previews, group admission,
+rich messaging, voice/video/meetings and all54 groups remain active. Runtime304,
+schema116/push OFF and Starter9959c1d remain unchanged.
+
+
 ## Product FCM clock fixed; user chat UX priorities active — 3 November 2026
 
 [Clock/attempt evidence](measurements/product-chat-fcm-clock-2026-11-03.json).

@@ -3,7 +3,7 @@
 ## Group graph verified; release 28 remains installed — 3 November 2026
 
 Continue implementation in /home/fajar/hris/.worktrees/communication-space on
-feat/communication-space, latest pushede905b8d6 (preceded byfc1a6c40,84e37752,6dde1489,
+feat/communication-space, latest pushed e905b8d6 (preceded byfc1a6c40,84e37752,6dde1489,
 d92d4206). Its docs/agent-handoff.md and collaboration/group-provisioning.md are
 authoritative. This checkout remains the live push release source, not the group
 migration source; do not deploy group migrations with this checkout's scripts.
@@ -34,15 +34,19 @@ missing/foreign/late-denied metadata is rejected. The command is not yet wired i
 DI/HTTP. Next retained runtime transfer and group gateway/rooms/coherent client
 ownership. Read the branch handoff and ignored runtime-transfer-next.md before edits.
 
-Mobile local SDK identity verification is now WIP in /home/fajar/hris/hris-mobile:
-raw local ed25519/curve25519 reads, the server-compatible fingerprint and a dedicated
-emulator-only paused reopen/empty-store/wrong-passphrase probe. No product caller,
-server transfer or new phone build yet. Its root/Android/proof checks are running;
-read Mobile's current worktree before changing checked inputs. Native execution
-still pending. Never logout losing/late Matrix candidates: Synapse removes
-same-device winning tokens and E2EE keys. Transfer must fence all
-old gateway/provisioning/direct-room provider callers and preserve SDK store/private
-keys and pending transaction IDs. All54 communications acceptance groups remain open.
+Mobile 3d85d569 is pushed: public SDK identity reads and the server-compatible
+fingerprint pass root/Android/proof checks and 461 browser cases. Actual SDK 26.10.23
+emulator proof passes in 74.319s: clean close/process restart retains the keys;
+an empty store differs, a wrong passphrase is rejected, correct reopen still works,
+and file ownership is exclusive and released after client close. The exact emulator
+and owned fixtures are cleaned up. Mobile docs/collaboration-local-identity.md and
+measurements/collaboration-local-sdk-identity-2026-11-03.json record all evidence and
+earlier failed checks. No product caller, ownership transfer or new phone build.
+Hosted CI for this commit is being tracked separately; actual Apple SDK behavior
+remains open. Never logout losing/late Matrix candidates: Synapse removes
+same-device winning tokens and E2EE keys. Transfer must fence all old gateway/
+provisioning/direct-room provider callers and preserve the SDK store, private keys
+and pending transaction IDs. All 54 communications acceptance groups remain open.
 
 Live8b40bd0f/schema116 has chat push ON and SMTP OFF. Phone normal release28 remains
 installed and verified; no reinstall is needed. Mobile0d96e737 records8273 gates:

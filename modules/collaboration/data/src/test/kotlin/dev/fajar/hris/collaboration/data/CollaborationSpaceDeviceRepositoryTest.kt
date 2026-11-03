@@ -49,6 +49,7 @@ class CollaborationSpaceDeviceRepositoryTest {
         owner.execute(
             "grant insert on collaboration_space_devices,collaboration_space_device_sessions to space_registry_fixture"
         )
+        owner.execute("grant update on collaboration_space_devices to space_registry_fixture")
         runtime =
             DriverManagerDataSource(
                 postgres.jdbcUrl,
@@ -203,6 +204,196 @@ class CollaborationSpaceDeviceRepositoryTest {
                     parent,
                 ),
             )
+        }
+    }
+
+    @Test
+    fun competingDeviceTransitionsFenceLateActivationAndOwnedCleanupSurvivesOffboarding() {
+        with(Fixture()) {
+            val parent = parent()
+            val initial = device(parent)
+            success(transactions.run(actor) { repository.register(initial) })
+            fun read(current: Actor = actor, lock: Boolean = false) =
+                success(
+                    transactions.run(current) {
+                        repository.metadata(space, account, initial.id, lock)
+                    }
+                )
+            assertEquals(initial, read(lock = true))
+            assertEquals(initial, read(actor.copy(companyId = companies[0])))
+            assertNull(read(actor.copy(accountId = UUID.randomUUID())))
+            val barrier = java.util.concurrent.CyclicBarrier(2)
+            val pool = java.util.concurrent.Executors.newFixedThreadPool(2)
+            try {
+                val candidates =
+                    listOf(
+                        initial.copy(
+                            state = CollaborationDeviceState.ACTIVE,
+                            version = 1,
+                            updatedAt = at.plusSeconds(1),
+                        ),
+                        initial.copy(
+                            state = CollaborationDeviceState.REVOKED,
+                            version = 1,
+                            updatedAt = at.plusSeconds(1),
+                            revokedAt = at.plusSeconds(1),
+                        ),
+                    )
+                val futures =
+                    candidates.map { candidate ->
+                        pool.submit<Pair<CollaborationSpaceDevice, Result<Unit>>> {
+                            barrier.await(10, java.util.concurrent.TimeUnit.SECONDS)
+                            candidate to
+                                transactions.run(actor) { repository.replace(candidate, 0) }
+                        }
+                    }
+                val results = futures.map { it.get(20, java.util.concurrent.TimeUnit.SECONDS) }
+                assertEquals(1, results.count { it.second is Result.Success })
+                assertEquals(1, results.count { it.second is Result.Failed })
+                val winner = results.single { it.second is Result.Success }.first
+                assertEquals(winner, read())
+                if (winner.state != CollaborationDeviceState.REVOKED) {
+                    success(
+                        transactions.run(actor) {
+                            repository.replace(
+                                winner.copy(
+                                    state = CollaborationDeviceState.REVOKED,
+                                    version = 2,
+                                    revokedAt = at.plusSeconds(2),
+                                    updatedAt = at.plusSeconds(2),
+                                ),
+                                1,
+                            )
+                        }
+                    )
+                }
+            } finally {
+                pool.shutdownNow()
+                assertTrue(pool.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS))
+            }
+            val revoked = requireNotNull(read())
+            assertEquals(CollaborationDeviceState.REVOKED, revoked.state)
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) {
+                    repository.replace(
+                        revoked.copy(
+                            state = CollaborationDeviceState.ACTIVE,
+                            revokedAt = null,
+                            version = revoked.version + 1,
+                        ),
+                        revoked.version,
+                    )
+                },
+            )
+            assertEquals(revoked, read())
+            owner.update("delete from native_sessions where id=?", parent)
+            owner.update(
+                "update company_memberships set active=false,version=version+1 where account_id=?",
+                account,
+            )
+            assertEquals(revoked, read(lock = true))
+            assertNull(
+                success(transactions.run(actor) { repository.findBound(space, account, parent) })
+            )
+            assertNull(read(actor.copy(accountId = UUID.randomUUID())))
+        }
+        with(Fixture()) {
+            val parent = parent()
+            val initial = device(parent)
+            success(transactions.run(actor) { repository.register(initial) })
+            owner.update("delete from native_sessions where id=?", parent)
+            owner.update(
+                "update company_memberships set active=false,version=version+1 where account_id=?",
+                account,
+            )
+            val revoked =
+                initial.copy(state = CollaborationDeviceState.REVOKED, version = 1, revokedAt = at)
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor.copy(companyId = companies[0])) {
+                    repository.replace(revoked, 0)
+                },
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor.copy(accountId = UUID.randomUUID())) {
+                    repository.replace(revoked, 0)
+                },
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) {
+                    repository.replace(
+                        initial.copy(state = CollaborationDeviceState.ACTIVE, version = 1),
+                        0,
+                    )
+                },
+            )
+            success(transactions.run(actor) { repository.replace(revoked, 0) })
+            assertEquals(
+                revoked,
+                success(
+                    transactions.run(actor) {
+                        repository.metadata(space, account, initial.id, lock = true)
+                    }
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun devicePublicationRollsBackOnFailureOrCancellationAndCannotChangeImmutableProviderCoordinates() {
+        with(Fixture()) {
+            val initial = device(parent())
+            success(transactions.run(actor) { repository.register(initial) })
+            val active = initial.copy(state = CollaborationDeviceState.ACTIVE, version = 1)
+            fun read() =
+                success(transactions.run(actor) { repository.metadata(space, account, initial.id) })
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) {
+                    success(repository.replace(active, 0))
+                    Result.Failed(
+                        dev.fajar.hris.core.domain.Failure(
+                            dev.fajar.hris.core.domain.FailureKind.CONFLICT,
+                            "fixture_failure",
+                        )
+                    )
+                },
+            )
+            assertEquals(initial, read())
+            for (error in
+                listOf(
+                    java.util.concurrent.CancellationException("fixture"),
+                    InterruptedException("fixture"),
+                )) {
+                assertThrows(error.javaClass) {
+                    transactions.run<Unit>(actor) {
+                        success(repository.replace(active, 0))
+                        throw error
+                    }
+                }
+                assertEquals(initial, read())
+            }
+            for (changed in
+                listOf(
+                    active.copy(originNativeSessionId = parent()),
+                    active.copy(createdAt = at.minusSeconds(1)),
+                    active.copy(platform = CollaborationPlatform.IOS),
+                )) {
+                assertInstanceOf(
+                    Result.Failed::class.java,
+                    transactions.run(actor) { repository.replace(changed, 0) },
+                )
+                assertEquals(initial, read())
+            }
+            success(transactions.run(actor) { repository.replace(active, 0) })
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) { repository.replace(active, 0) },
+            )
+            assertEquals(active, read())
         }
     }
 

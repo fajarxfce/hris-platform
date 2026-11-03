@@ -14,6 +14,31 @@ import java.util.UUID
 class StoredCollaborationSpaceDeviceRepository(
     private val source: CollaborationSpaceDeviceDataSource
 ) : CollaborationSpaceDeviceRepository {
+    override fun metadata(
+        spaceId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        lock: Boolean,
+    ): Result<CollaborationSpaceDevice?> = safeDatabaseCall {
+        source.find(spaceId, accountId, deviceId, lock)?.let {
+            spaceDeviceFromRow(it, spaceId, accountId).also { device ->
+                require(device.id == deviceId)
+            }
+        }
+    }
+
+    override fun replace(device: CollaborationSpaceDevice, expectedVersion: Long): Result<Unit> =
+        safeDatabaseCall {
+                require(expectedVersion in 0..999999 && device.version == expectedVersion + 1)
+                val row = spaceDeviceToRow(device)
+                spaceDeviceFromRow(row, device.spaceId, device.accountId)
+                source.replace(row, expectedVersion)
+            }
+            .flatMap { changed ->
+                if (changed) Result.Success(Unit)
+                else Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_device_changed"))
+            }
+
     override fun findBound(
         spaceId: UUID,
         accountId: UUID,

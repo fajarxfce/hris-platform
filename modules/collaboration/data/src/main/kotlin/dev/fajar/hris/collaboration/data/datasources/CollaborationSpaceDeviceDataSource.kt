@@ -6,6 +6,15 @@ import java.time.Instant
 import java.util.UUID
 
 interface CollaborationSpaceDeviceDataSource {
+    fun find(
+        spaceId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        lock: Boolean,
+    ): CollaborationSpaceDevicesRecord?
+
+    fun replace(row: CollaborationSpaceDevicesRecord, expectedVersion: Long): Boolean
+
     fun findBound(
         spaceId: UUID,
         accountId: UUID,

@@ -1,0 +1,64 @@
+{
+  "scope": "Owned group device metadata and expected-revision update ports; no public activation endpoint",
+  "baseCommit": "78c3b925",
+  "accepted": {
+    "startedAt": "2026-11-03T21:27:29.122265+00:00",
+    "elapsedSeconds": 90.862,
+    "exitCode": 0,
+    "sourceFiles": 3648,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceMappingTest.xml": {
+        "sha256": "24a36fb82e0a8ef890b9d72cf4a3da028ce833520db3834450bd2f0893965dab",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "8cca0f3a4e0d0ead0d43f8eeadd05b3219a1c7918a5b5515c83dadb2adc7e0bf",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "43495d5453eee82e54291c65ffd9fd9153d187518e42956e689d7b5603db6bd1",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "5b71b932bec3e7b449c6ee93d7411144a40f265add8e59161853596747f42b22",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "evidence": [
+    "Owned metadata can be locked and read after native-parent purge/offboarding; current native binding remains absent and another account receives no row",
+    "Competing actual PostgreSQL activation/revocation updates have exactly one winner; stale publication fails and a revoked device cannot be activated again",
+    "Account-root irreversible cleanup succeeds after offboarding while live activation and foreign/company-scoped writes fail",
+    "Failed Result, cancellation and interruption roll back device publication; origin parent, platform and creation identity cannot change",
+    "Existing native registration and current/retained-key credential recovery regression cases pass"
+  ],
+  "limits": [
+    "Ports still require caller-owned account/native/device transaction guards and current group/client/MFA/native proof for live use",
+    "No group worker queue, controller, gateway or Mobile runtime is enabled",
+    "Live8b40/schema116 pushON/SMTP OFF and installed phone28 remain unchanged"
+  ]
+}

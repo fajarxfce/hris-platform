@@ -166,6 +166,16 @@ class CollaborationSpaceDeviceMappingTest {
     }
 
     private open class Source : CollaborationSpaceDeviceDataSource {
+        override fun find(
+            spaceId: UUID,
+            accountId: UUID,
+            deviceId: UUID,
+            lock: Boolean,
+        ): CollaborationSpaceDevicesRecord? = error("Unexpected metadata read")
+
+        override fun replace(row: CollaborationSpaceDevicesRecord, expectedVersion: Long): Boolean =
+            error("Unexpected update")
+
         override fun findBound(
             spaceId: UUID,
             accountId: UUID,

@@ -7,6 +7,19 @@ import java.util.UUID
 
 /** Caller owns the account/parent guards and the transaction with receipt/journal writes. */
 interface CollaborationSpaceDeviceRepository {
+    /** Owned security metadata survives parent purge/offboarding; not content admission. */
+    fun metadata(
+        spaceId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        lock: Boolean = false,
+    ): Result<CollaborationSpaceDevice?>
+
+    /**
+     * Exact observed revision; native/group admission and journal are the caller's responsibility.
+     */
+    fun replace(device: CollaborationSpaceDevice, expectedVersion: Long): Result<Unit>
+
     fun findBound(
         spaceId: UUID,
         accountId: UUID,

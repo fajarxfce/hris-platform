@@ -1,5 +1,42 @@
 # Agent continuation — HRIS workspace
 
+## Owned group device mutations accepted — 3 November 2026
+
+CollaborationSpaceDeviceRepository now provides owned metadata lookup (optionally
+FOR UPDATE) independent of the active native binding, and expected-revision updates.
+It retains exact immutable provider/original-parent coordinates; revoked state is
+irreversible and terminal revision1000000 remains reserved for cleanup. Caller owns
+current live admission and account/native/device guards. [Evidence](measurements/collaboration-space-device-mutations-2026-11-03.json):
+device-mutation1 PASS90.862s/15 (4 actual registry,3 mapping,5 actual native command,
+3 actual credential/recovery),3648 unchanged source hashes, quality PASS. Two new
+actual registry cases include activation/revocation competition, stale publication,
+offboarding/purged-parent cleanup, foreign scope, immutable identity and failed/
+cancelled/interrupted transaction rollback. The earlier ignored device-mutation-next
+draft is now integrated; do not recopy it. No check currently runs.
+
+Continue the bounded group provisioning queue and worker. V121 encrypted credential
+storage/recovery was accepted in78c3b925; its full98 regression and13 recovery-tool
+cases passed. Read collaboration/group-provisioning.md and group-credentials.md.
+An initial UNTESTED V122 table-only draft lives at ignored
+.work/communication-space-2026-11-03/V122__collaboration_space_provisioning.sql;
+review/finish guards, bounded worker claims, leases, retries/outcomes, migration
+restoration and typed ports before integration. group-provisioning-next.md has
+additional design notes. Neither draft is implementation acceptance.
+
+Do not invent a synthetic HR company for background_jobs. Worker global claim only
+acquires metadata, commits, then preparation/publication take account -> parent ->
+device -> queue -> credential guards. External Matrix I/O holds no SQL locks. Retry
+requires current native proof; publication rechecks authority, request/lease/revision/
+generation and deadlines. Retain bounded terminal outcomes; no infinite provider
+retry or logout of a late/losing candidate. Native registration must enqueue with
+its existing binding/receipt/journal transaction before public wiring.
+
+Legacy transfer/gateway/rooms and Mobile store/worker/push/read ownership remain
+unfinished. All54 communications acceptance groups stay open. Live8b40/schema116,
+phone28 and accepted Mobile8273 gates are unchanged. Continue long-run work and
+regular user/Git updates; every commit is pushed.
+
+
 ## Group credentials and recovery accepted — 3 November 2026
 
 V121 and CollaborationSpaceProviderSessionRepository add exact space/device/account/

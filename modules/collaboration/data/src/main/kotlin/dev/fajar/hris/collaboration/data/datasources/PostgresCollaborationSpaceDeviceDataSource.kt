@@ -17,6 +17,29 @@ import org.jooq.impl.DSL
 
 class PostgresCollaborationSpaceDeviceDataSource(private val sql: DSLContext) :
     CollaborationSpaceDeviceDataSource {
+    override fun find(
+        spaceId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        lock: Boolean,
+    ): CollaborationSpaceDevicesRecord? {
+        val query =
+            sql.selectFrom(D)
+                .where(D.SPACE_ID.eq(spaceId), D.ACCOUNT_ID.eq(accountId), D.ID.eq(deviceId))
+        return if (lock) query.forUpdate().fetchOne() else query.fetchOne()
+    }
+
+    override fun replace(row: CollaborationSpaceDevicesRecord, expectedVersion: Long): Boolean =
+        sql.update(D)
+            .set(row)
+            .where(
+                D.SPACE_ID.eq(row.spaceId),
+                D.ACCOUNT_ID.eq(row.accountId),
+                D.ID.eq(row.id),
+                D.VERSION.eq(expectedVersion),
+            )
+            .execute() == 1
+
     override fun findBound(
         spaceId: UUID,
         accountId: UUID,

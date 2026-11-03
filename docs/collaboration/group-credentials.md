@@ -60,8 +60,15 @@ revocation/clearing and rejection of further advancement.
 
 ## Next integration
 
-Implement owned device lookup/update, bounded organization provisioning requests
-and worker leases. Registration must commit its request with binding, receipt and
+Owned device lookup (optionally FOR UPDATE) and expected-revision updates are now
+implemented. They retain immutable provider/original-parent identity and permit
+irreversible cleanup after offboarding or parent purge. Two new actual PostgreSQL
+cases exercise activation/revocation competition, stale publication, denied scope,
+immutable coordinates and transaction rollback; the15-case [regression](../measurements/collaboration-space-device-mutations-2026-11-03.json)
+passes in90.862s with3648 unchanged hashes and quality checks. These ports do not
+grant current live admission.
+
+Next implement bounded organization provisioning requests and worker leases. Registration must commit its request with binding, receipt and
 journal. Preparation/publication must use current account/native/device authority,
 exact generation/revision and a still-current lease. Keep provider I/O outside SQL
 transactions. A lost/late/losing provider candidate expires naturally: **Synapse

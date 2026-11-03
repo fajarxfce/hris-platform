@@ -1,0 +1,82 @@
+{
+  "scope": "Validated bounded group claim adapter and owned worker loop; no Spring DI/automatic scheduling is enabled yet",
+  "baseCommit": "6dde1489",
+  "accepted": {
+    "startedAt": "2026-11-03T22:49:01.069904+00:00",
+    "elapsedSeconds": 73.475,
+    "exitCode": 0,
+    "sourceFiles": 4357,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.ClaimCollaborationSpaceProvisioningTest.xml": {
+        "sha256": "3fa9def718136043b75bdc98b7b31001f302c1e64b50be0b53732534e5cf581d",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "ca9302b41653893796b67774806c5996021ec21678f323049a3d367ddd31e179",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.worker.CollaborationSpaceProvisioningLoopTest.xml": {
+        "sha256": "f85c60959a10e4a3ccfed04c51ca6e3954460216074eb1d6911877875a7d1728",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "earlierRuns": [
+    {
+      "run": "space-scheduler1",
+      "elapsedSeconds": 13.599,
+      "tests": 0,
+      "reason": "Warnings-as-errors rejected an unnecessary safe call; explicit lease validation replaced it."
+    },
+    {
+      "run": "space-scheduler2",
+      "elapsedSeconds": 114.553,
+      "tests": 13,
+      "failures": 0,
+      "accepted": false,
+      "reason": "Domain/data passed; worker test compile lacked the Result.map extension import."
+    },
+    {
+      "run": "space-scheduler3",
+      "elapsedSeconds": 68.376,
+      "tests": 21,
+      "failures": 7,
+      "reason": "Worker constructor read current active timer pool size (zero before startup); now validates configured scheduled-executor core size."
+    }
+  ],
+  "evidence": [
+    "Claim gates disabled/invalid configuration and bounds before I/O; malformed, duplicate and wrong-owner returned leases cannot schedule partial work",
+    "Actual native registration/claim/publication and finite settlement regressions now pass through the claim use case",
+    "Loop owns a zero-queue fixed executor, reserved submission permits and two control threads; default2 parallel,250ms polling,45s processing timeout",
+    "Absolute lease expiry clips task timeouts; expired claims never start; interrupted tasks still exiting retain their physical executor slot",
+    "Failed advance invokes settlement once; successful advance does not create another outcome",
+    "Bad claims and rejected submissions release reservations without provider work or retained deadline timers",
+    "Shutdown interrupts a blocked claim, closes both pools and forbids restart; stopping before start and failed startup also close resources"
+  ],
+  "limits": [
+    "Loop/claim classes are not yet wired into Spring or enabled; API and worker application contexts must be tested when shared DI changes",
+    "Combined actual Synapse worker integration still pending; earlier domain/data provider boundary uses controlled candidates",
+    "Live8b40/schema116 and installed phone28 unchanged"
+  ]
+}

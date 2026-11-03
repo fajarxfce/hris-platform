@@ -1067,7 +1067,15 @@ class CollaborationSpaceWorkerPublicationTest {
 
         fun claim(device: UUID): CollaborationSpaceProvisioningLease {
             val lease =
-                requireNotNull(success(provisioning.claim(UUID.randomUUID(), 1, 60)).single().lease)
+                success(
+                        ClaimCollaborationSpaceProvisioning(
+                                provisioning,
+                                CollaborationSpacePolicy(true, 28, 28),
+                                CollaborationMatrixPolicy(true, server),
+                            )
+                            .execute(UUID.randomUUID(), 1)
+                    )
+                    .single()
             assertEquals(device, lease.request.deviceId)
             return lease
         }

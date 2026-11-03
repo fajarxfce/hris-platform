@@ -97,7 +97,17 @@ delay, attempts below8 and sufficient request time. Access/identity and unknown
 errors end immediately. An eighth failed attempt cannot create a ninth.
 Matrix HTTP5xx now maps to provider_unavailable;401 remains rejected and429 busy.
 Transport itself does not retry. Raw error parameters and lease tokens stay out
-of journal details. Next implement scheduling and coherent public wiring.
+of journal details.
+
+The claim adapter and owned worker loop are implemented but not wired into Spring.
+Claims gate feature/provider configuration and validate bounded unique leases before
+scheduling. Defaults are two parallel tasks,250ms polling and45s processing timeout,
+clipped by each absolute lease deadline. A zero-capacity executor and reserved
+submission permits bound work; cancelled tasks still exiting retain their physical
+slot. Two control threads keep timeout cancellation available during a blocked
+claim. Failure settlement runs only after failed advance returns. Shutdown cancels
+polling, tasks and timers; restart is forbidden. Next wire opt-in configuration and
+validate both API and worker contexts, including an actual Synapse worker flow.
 
 A worker claim transaction acquires only queue metadata and commits before native
 admission. Preparation/publication then take account, native parent, device and
@@ -191,3 +201,11 @@ a ninth, inactive/offboarded/purged-parent settlement, safe journal and both out
 paths rolling back on failure/cancellation/interruption. Real HTTP fixtures cover
 5xx versus401/429 and unchanged one-request transport behavior. Scheduling and
 public group runtime remain disabled.
+
+[Claim/scheduler evidence](../measurements/collaboration-space-scheduler-2026-11-03.json):
+21 cases pass in73.475s (2 claim policy,11 actual database,8 worker loop),4357 unchanged
+checked source hashes now including apps, quality PASS. Loop tests cover capacity,
+absolute deadlines, delayed cancellation cleanup, failure settlement, invalid claims,
+submission rejection, stopped/failed startup and complete shutdown. An initial
+startup check incorrectly used active timer count; configured core size is now
+validated. No DI or automatically running group worker is enabled yet.

@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Bounded group claim and scheduler classes accepted — 3 November 2026
+
+ClaimCollaborationSpaceProvisioning gates feature/provider/bounds, validates exact
+bounded unique claim metadata and returns leases. The owned worker loop defaults
+to2 parallel/250ms polling/45s processing timeout clipped to the lease deadline.
+Zero task queue + reserved permits + physical active-thread count prevent excess
+work, including cancelled tasks still exiting. Two control threads allow deadlines
+during a blocked claim. Failed advance invokes settlement once; shutdown cancels
+poll/tasks/timers and forbids restart, including stop-before-start or failed startup.
+Classes are NOT wired into Spring yet. No automatic group worker is running.
+
+[Evidence](measurements/collaboration-space-scheduler-2026-11-03.json):
+space-scheduler4 PASS73.475s/21 (2 domain claim,11 actual database,8 worker loop),
+4357 unchanged checked hashes (wrapper now includes apps), quality PASS. Invalid/
+expired/duplicate/wrong-owner claims, rejection, physical slot retention, absolute
+deadlines, failure settlement, startup/shutdown and underlying publication/outcome
+regressions pass. Earlier runs:13.599s compile safe-call warning;114.553s domain/data13
+pass then missing test Result.map import;68.376s/21/7 constructor failures because
+active timer count starts0. Fixed to configured scheduled-executor core pool size.
+All checks are complete; no DI/controller or live configuration changed.
+
+Next wire module repositories/use cases and opt-in worker configuration, test real
+API AND full worker contexts as required by AGENTS, and exercise actual Synapse
+through the wired worker. Ignored group-wiring-next has UNTESTED bean text snippets,
+disabled Matrix repository and base-hashes.json for both config files. It has no
+tests yet. Review/apply with tests; proposed flags are HRIS_COLLABORATION_SPACE_ENABLED
+and HRIS_COLLABORATION_SPACE_PROVISIONING_ENABLED, both defaultfalse, with existing
+global collaboration/Matrix and hris.worker.enabled gates. Reuse one data module
+config entry point. Existing WorkerMatrixFixture is an owned pinned Synapse and can
+prove actual group worker login/whoami and encrypted storage; actual API graph must
+also instantiate the new constructors. Disabled-flag context tests should prove no
+claims and resource cleanup. The older scheduler-next draft is superseded by tracked
+sources/tests (including startup fixes); do not recopy it.
+
+Retained-device runtime/SDK transfer, group gateway/rooms and Mobile ownership still
+remain. Never logout a late/losing candidate. All54 acceptance groups open.
+Live8b40/schema116 and phone28 unchanged. Continue full long run, regular user/Git
+updates and atomic pushes; main checkout handoff points to this worktree.
+
 ## Bounded group failure settlement accepted — 3 November 2026
 
 SettleCollaborationSpaceProvisioningFailure takes account -> queue guards after

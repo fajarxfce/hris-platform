@@ -52,8 +52,9 @@ exact legacy reference or a distinct space-derived user intent. It is initially
 empty and creates no provider identity automatically. Actual concurrent writers,
 scope/origin rejection, retirement and archive restoration pass; full39 core cases
 and12 recovery-tool cases pass. The [identity migration contract](identity-migration.md)
-separates this schema from the still-unimplemented native command and local-store
-migration, including the required coherent eligibility/candidate snapshot.
+now records the implemented coherent selection input and atomic native command,
+with28 passing transaction/admission cases. Device/local-store migration and public
+endpoints remain incomplete; this is not cross-company runtime acceptance.
 
 V118 now exposes an owned legacy provider metadata view to support explicit
 migration. It retains original company/device IDs, Matrix user/device IDs and

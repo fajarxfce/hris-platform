@@ -1,0 +1,98 @@
+{
+  "scope": "Atomic native communication-space identity selection; no provider provisioning or HTTP wiring",
+  "baseCommit": "0267920a",
+  "accepted": {
+    "startedAt": "2026-11-03T20:29:29.338823+00:00",
+    "elapsedSeconds": 63.103,
+    "exitCode": 0,
+    "sourceFiles": 3611,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceIdentityPolicyTest.xml": {
+        "sha256": "d2a7cd98dcf0e261e2b815feb735865fc5c595414047cba46e513278729657cc",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceAdmissionTest.xml": {
+        "sha256": "e93753fbaf07d11cf62bd775fe5422e967be688a0a90aa5fc76fa11e51ddd685",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceMappingTest.xml": {
+        "sha256": "530eabe54a34ff90f8a907b7ec811c575b47cc1ba2e64a7a1cf9e1521e6912c4",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceRepositoryTest.xml": {
+        "sha256": "e1d2ef687ffe423b9c2000e048f4483ba8a98b9ca1569db150dbc011b858b599",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceIdentityMappingTest.xml": {
+        "sha256": "af457c87df21cb1631b913b9e9f65060ec0e37255f0e871be1a7c53e7d39b516",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceIdentityRepositoryTest.xml": {
+        "sha256": "11c81a87cdad435e24e22b54463fc05e11322f23f2c393ffe376b8f6817291ce",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceIdentitySelectionTest.xml": {
+        "sha256": "10069c7159894efe5186cf01fc7ece0a4ccc578ab0e74531041542dada92a368",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "validation": {
+    "database": "PostgreSQL 18.6 Testcontainers with non-owner runtime role and actual RLS, account/native locks, receipt and journal adapters",
+    "commandCases": 6,
+    "regressionCases": 22,
+    "quality": [
+      "formatCheck",
+      "architectureCheck"
+    ],
+    "concurrency": "Two actual native parents with same and distinct operation IDs; observes PostgreSQL Lock wait before release; one identity/journal survives",
+    "rollback": "Failures and CancellationException after identity, receipt, and journal writes; late committed membership loss, MFA permission, access expiry, and interrupted thread; identity/receipt/audit/platform metadata/outbox counts checked",
+    "continuity": "New user intent and retained retired legacy user; receipt replay after lost response; provider change rejected without replacement",
+    "credentials": "Password and native-token methods throw on use; no provider API dependency"
+  },
+  "earlierAttempts": [
+    {
+      "attempt": "identity-command1",
+      "seconds": 40.504,
+      "result": "Rejected; instance Testcontainers startup occurred after BeforeAll fixture. Changed to static managed container."
+    },
+    {
+      "attempt": "identity-command2",
+      "seconds": 49.02,
+      "result": "Rejected; six command cases failed because fixture omitted INSERT for platform_audit_metadata capture trigger. Added the actual required grant and atomic metadata assertions; production RLS unchanged."
+    }
+  ],
+  "limits": [
+    "No group DI/controller/mobile path has been enabled",
+    "Selection authorizes no provider credential, device adoption or room access",
+    "Live remains runtime 8b40/schema116 and installed phone release28 unchanged"
+  ]
+}

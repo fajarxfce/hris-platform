@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Native canonical selection transaction accepted — 3 November 2026
+
+SelectNativeCollaborationSpaceIdentity is implemented, still unwired. Actual
+PostgreSQL tests use the real RLS, stored account/native-session guards, operations
+and journal. Two native parents compete with same/distinct operation IDs; one
+selection/journal remains. Failure/cancellation after each write, late committed
+membership/MFA changes, expiry, interruption and denied replay all roll back.
+The coherent input preserves retired legacy users and rejects provider changes.
+[Evidence](measurements/collaboration-native-identity-selection-2026-11-03.json):
+identity-command3 PASS63.103s/28 fresh cases,3611 unchanged source hashes,
+format/architecture PASS. Two prior fixture setup/grant failures are retained.
+No check is running. No provider/password/token method is used by the command.
+
+Continue group device binding/provisioning, explicit legacy SDK-store continuity,
+room/gateway and Mobile owner/worker/push/read migration before publishing group
+contacts. Existing company/device IDs and Matrix keys cannot be substituted with
+space IDs. Legacy adoption needs exact parent/user/device and retained key identity;
+missing local keys require recovery or a distinct device, never silent rekeying.
+Read collaboration/identity-migration.md. Live8b40/schema116 pushON/SMTP OFF and
+phone28 remain unchanged; all matching8273 gates are accepted. Keep implementing
+the whole communications PRD, push each commit and give regular user/Git updates.
+
+
 ## Coherent canonical input repository and policy — 3 November 2026
 
 The group identity input now reads eligible space, current selection and at most

@@ -36,9 +36,25 @@ domain/data cases pass in46.371s with3609 unchanged source hashes and quality ch
 [Evidence](../measurements/collaboration-identity-selection-input-2026-11-03.json)
 records the earlier compile warning and report-freshness retry separately.
 
-## Next native selection command
+## Implemented native selection command
 
-This command and the following device/runtime migration are **not implemented**.
+`SelectNativeCollaborationSpaceIdentity` now commits provider-user intent, operation
+receipt, audit and outbox atomically. It uses actual operation/account/native-parent
+guards, the coherent input repository, and current account/group/session/client/MFA
+checks before selection and at completion. A repeated request still needs current
+admission; a different operation cannot overwrite an existing choice. No provider
+or password/token acquisition belongs to this command.
+
+[PostgreSQL transaction evidence](../measurements/collaboration-native-identity-selection-2026-11-03.json):
+28 fresh cases pass in63.103s with3611 unchanged source hashes and format/architecture
+checks. Six new command cases include actual lock contention from two native
+parents, duplicate/lost responses, new and retired legacy identities, rollback
+following each write, late committed offboarding/MFA changes, expiry, cancellation,
+interruption and denied replay. The earlier container/grant fixture failures remain
+recorded. No DI/controller is wired and no device/provider grant is implied.
+
+The following device/runtime migration is **not implemented**. Keep these command
+invariants when wiring and integrating it:
 Take the operation receipt guard, exclusive account guard, then native-parent
 guard. Recheck current account, credentials, parent version/proof, MFA, group
 eligibility, client policy and configured Matrix service before work and at

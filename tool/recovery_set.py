@@ -52,7 +52,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # no new encrypted envelope or change to existing purposes/associated data.
 # V121 authenticates organization credentials under their own versioned purpose,
 # including immutable native/provider ownership, generation and all live timestamps.
-MAX_SCHEMA = 121
+# V122 adds bounded organization provisioning metadata/leases and prior outcomes;
+# no new encrypted purpose or change to existing authenticated context.
+MAX_SCHEMA = 122
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

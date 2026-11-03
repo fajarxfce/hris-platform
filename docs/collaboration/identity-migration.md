@@ -151,7 +151,9 @@ bounded work, publication fences and explicit legacy runtime transfer.
 V121 and the [group credential repository](group-credentials.md) now retain exact
 encrypted provider ownership, generations and irreversible cleanup separately from
 legacy company envelopes. Current/retained keys and the production recovery SQL
-are exercised against an actual archive restore. Provisioning queue/workers,
+are exercised against an actual archive restore. V122 adds the bounded operational
+queue, current-parent request proof, finite leases/attempts and retained terminal
+outcomes. Native enqueue, typed queue ports, worker admission/publication,
 group gateway/rooms and local-store adoption are not yet implemented.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.

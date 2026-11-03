@@ -21,12 +21,38 @@ private-key/store continuity or cross-company HRIS messaging.
 
 ## Required worker and persistence contract
 
-Group provisioning needs an explicit organization queue. Existing background_jobs
-requires a real HR company; using a synthetic company or space UUID would violate
-its authority and foreign keys. A feature-owned bounded lease/fence queue can follow
-the existing communication push-worker ownership pattern. Native registration must
-insert its request atomically with device/binding/receipt/journal. Retry requests
-must preserve history and fence older attempts; they require current native proof.
+V122 now provides an initially empty organization provisioning queue. It retains
+one operational head per group device and the immutable original native parent;
+there is no native-session cascading foreign key. Existing background_jobs remains
+company-only. This schema is not wired to native registration or a worker yet.
+
+Each request records native version, account credential version, authentication/MFA
+timestamps, correlation ID and native client platform/build. Insert/retry requires
+the exact current bound parent and a live device. Requests expire within five
+minutes and within the parent access/hard deadline. These are intent/provenance
+checks, not a future admission grant: a global worker claim does not check current
+native/group/client/MFA authority and cannot authorize provider I/O or content.
+
+The worker-only claim function returns at most eight heads, with at most sixteen
+live leases globally. A lease lasts at most sixty seconds, clipped to request
+expiry. Attempts are capped at eight; an expired final lease becomes a retained
+ATTEMPTS_EXHAUSTED outcome without another provider claim. Request expiry becomes
+REQUEST_EXPIRED. Each call terminalizes at most eight expired requests and eight
+exhausted leases using separate indexed ranges, deduplicating overlap. This is
+operational metadata only; the function never changes devices, credentials or keys.
+
+A late worker must match request revision, attempt, owner, token and deadline before
+publication. Owned cancellation invalidates an in-flight lease, including after
+offboarding or parent purge. Retry advances the request revision after a terminal
+outcome, supplies current native proof, resets attempts and retains the prior
+terminal outcome while the new request is pending. Heads cannot be deleted or
+rebound to a replacement parent. The head retains only the last operational outcome;
+native/worker journal integration must preserve required historical business events.
+
+Next implement the typed queue repository and native/worker use cases. Native
+registration must insert its request atomically with device/binding/receipt/journal.
+Explicit retries need their own operation receipt and current native admission;
+lost-response replay cannot silently start another attempt.
 
 A worker claim transaction acquires only queue metadata and commits before native
 admission. Preparation/publication then take account, native parent, device and
@@ -69,3 +95,13 @@ Legacy inbox/outbox/SDK data must remain explicit until the new mapping is accep
 The complete change includes room/gateway admission, Mobile store and owner lifetime,
 drafts, incoming/outgoing work, push/deep links and reads. Accept only after the
 cross-company end-to-end scenario in identity-migration.md succeeds.
+
+## Validation
+
+[Schema/queue evidence](../measurements/collaboration-space-provisioning-queue-2026-11-03.json):
+104 regression cases pass in464.322s with3652 unchanged checked inputs; recovery-tool14
+cases pass in0.011s. Actual PostgreSQL covers concurrent claims, batch/global limits,
+lease replacement, eight-attempt exhaustion, bounded expiry, fresh retry and archive
+restoration. Queue lease/owner fields are internal and must not appear in native
+status responses. Native/worker use-case integration and historical business journal
+coverage remain outstanding.

@@ -1,5 +1,54 @@
 # Agent continuation — HRIS workspace
 
+## Bounded organization provisioning schema accepted — 3 November 2026
+
+V122 adds one operational queue head per group device, exact original native-parent
+request proof, revisioned retry, owned cancellation and worker-only bounded claims.
+Limits: request5m, batch8, global live leases16, lease60s, attempts8; separate indexed
+sweeps terminalize at most8 expired requests plus8 exhausted leases (deduplicated).
+Last terminal outcome survives the next pending request. No cascade/rebind/delete
+of queue identity. Claims only acquire metadata and grant no native/content access.
+Read collaboration/group-provisioning.md for required lock order and integration.
+
+[Evidence](measurements/collaboration-space-provisioning-queue-2026-11-03.json):
+space-provisioning-full1 PASS464.322s/104 (49 full database,19 domain,36 data),3652
+checked inputs unchanged, format/architecture PASS. Recovery-tool14 PASS0.011s,
+reviewed schema122/future123 rejected, encrypted projection identical to121. Actual
+PostgreSQL covers exact proof/scope, two-worker claims/global capacity, late leases,
+eight-attempt exhaustion, seventeen-request bounded expiry, retry/previous outcome,
+parent-purge cancellation and archive/RLS/immutability recovery. Four prototype
+cases passed71.072s before indexed sweep hardening; final104 includes that hardening.
+First test compile needed nullable JDBC map values; no production policy relaxed.
+No check currently runs. All queue work remains unwired.
+
+Next integrate and test typed queue domain/data ports, then native registration
+queue insertion/retry and worker preparation/publication. Six FORMATTED BUT UNTESTED
+port drafts are in ignored .work/communication-space-2026-11-03/provisioning-ports-next
+with files.json mapping to final paths; no tests yet. Review before copying. They
+contain request/head/lease/outcome models, repository, raw SQL source and mapper.
+metadata/claim mapping must validate scope, bounds, unique leases and typed proof;
+finish/defer/cancel must fence exact revision/attempt/owner/token/deadline. Add actual
+repository SQL tests for scope, stale lease fields, fresh retry/prior outcome and
+archive mapping (including restored worker claim); test atomic device+credential+
+queue rollback on failure/cancellation and preserve technical interruption.
+The earlier V122 .work SQL draft/notes are superseded by the accepted tracked SQL.
+
+Native enqueue must commit with device/binding/operation receipt/journal. Worker
+claim commits a queue-only transaction, then preparation/publication take account
+-> parent -> device -> queue -> credential guards. Provider I/O is outside SQL
+locks. Recheck current group/client/MFA/native proof/canonical/retained source and
+lease/generation/deadlines at publication. Global claim metadata is not permission;
+lease tokens/owner fields must stay internal, not native HTTP response fields.
+Retain required historical business events in journal when integrating use cases.
+Never Matrix logout a late/losing candidate; actual Synapse deletes same-device
+winning tokens and E2EE keys. Legacy transfer still requires an explicit runtime
+fence and preserved SDK/private keys/pending transaction ownership.
+
+Live8b40/schema116, phone28 and accepted Mobile8273 gates unchanged. No group native
+endpoint/worker/gateway/room/Mobile migration is enabled; all54 acceptance groups
+remain open. Continue the full long run, regular user/Git updates and atomic pushes.
+
+
 ## Owned group device mutations accepted — 3 November 2026
 
 CollaborationSpaceDeviceRepository now provides owned metadata lookup (optionally

@@ -39,7 +39,8 @@ ten-minute deadline and bounded ASCII content. No token or provider owner enters
 entity string diagnostics.
 
 `tool/recovery_set.py` adds this projection only at schema121. Earlier schema
-projections are unchanged; schema122 remains rejected until reviewed. The existing
+projections are unchanged. V122 adds only provisioning metadata and keeps the V121
+encryption projection unchanged; schema123 remains rejected until reviewed. The existing
 offline `RecoveryKeyVerifier` already decrypts arbitrary bounded purposes using
 the application cipher, so no whitelist or alternate cipher is needed. Keep its
 256-byte purpose limit: the canonical context is hashed, not pasted into the AAD.

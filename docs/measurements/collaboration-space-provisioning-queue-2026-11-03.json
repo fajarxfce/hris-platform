@@ -1,0 +1,302 @@
+{
+  "scope": "V122 bounded organization provisioning metadata, worker claims, finite leases/attempts and prior outcomes; no native/worker runtime wiring",
+  "baseCommit": "7aabb9e1",
+  "accepted": {
+    "startedAt": "2026-11-03T21:41:13.615573+00:00",
+    "elapsedSeconds": 464.322,
+    "exitCode": 0,
+    "sourceFiles": 3652,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": {
+        "sha256": "102f2fb3f23bf223a9e60901b0641333337bab0a20cf271e78f8d89f692b9a7b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": {
+        "sha256": "669db911e11d4ea402b6e60f1605abfc8fda5253aa951b7e49336cf0f146e947",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": {
+        "sha256": "3deb4a7156e805eb0ad1f2a43a47e7f9dbd2e3a842325ba613853dd2d06c16bc",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": {
+        "sha256": "49cbf8238a273854c20c335c55623ad1aa13586488d18fcb47779473eb88fd7b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyIdentityMigrationTest.xml": {
+        "sha256": "0c441c086e28624d8b45ea03fe0ec881380d21fff7fee779aec617f64ee1ecb4",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceCredentialMigrationTest.xml": {
+        "sha256": "825111d2b7e3869fb2bb743a54cb75edf2781042b786cf0102e469307c2420cd",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceDeviceMigrationTest.xml": {
+        "sha256": "ab1b8b0a346908d96273bc067613e68bde6e910a0f97342b95bcc027c445a20a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceDirectoryMigrationTest.xml": {
+        "sha256": "a5767f0c7fda341af36d2784f2cb7b69a8e528ef704acbc35c4ffd03992b91cd",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceIdentityMigrationTest.xml": {
+        "sha256": "7906f529927f9e8b3fa6517f3765119936c96efdd2103294e5b5696102cd41e4",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceProvisioningMigrationTest.xml": {
+        "sha256": "a24afd8737a9385a835e89422e78b217f4ad12e451bd6a209e1509a1808f3136",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": {
+        "sha256": "10e11ce44274845d41186ce86232534fba7de44cb60009708a4e50248d5db668",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": {
+        "sha256": "944f27428c48ec95ec36b33a89a87bf31efc232682ba4f0dc59c284ee9b3dc62",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": {
+        "sha256": "27e41762ce85011f713cfe14a42a5c44f8b075a941bd324c632fe3088dca95d6",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": {
+        "sha256": "8ac5c92abcbbf5085ade9822658bb2e47a2925649be6f6cec97e0cce6433caad",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": {
+        "sha256": "17a513b6d6ecf58bb60e53722ab022875bfa67b97b7e9d1d04b8a1364cff789d",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": {
+        "sha256": "8e9dfbcfd7a377215ea0ceb5bbc63d7de5552d26bbce4690856ec9bb88b9bce4",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": {
+        "sha256": "ccb42ec3dcee9fcf40028ff7396ae0864873224813bc2e8f0c267b3260f3f2a3",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": {
+        "sha256": "587a2f50c289d4fbdca15481514ae9e5797d245e6c19dfa9c9ac0d0ca49c84a5",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+        "sha256": "1c198f8d2c51dbcf05806949d583466ea72f28c5058390f8c8fa9d0f8e290d56",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": {
+        "sha256": "124b9c0dbeb938092b3e045c26da665931379ba4be0dbb63efe1f10f8cbe7497",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": {
+        "sha256": "a20702e7152de6a421bca90e4d9525bccba7306deeede5947f617ef1788fdd4e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDevicePolicyTest.xml": {
+        "sha256": "fd4145e3893e9233208cfe733616cdc216a7d4ac878d3cd6909bda1bed694f8f",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceIdentityPolicyTest.xml": {
+        "sha256": "26f161e877b428e50ec80a17731e2dcfec5f0745eae8358c35377e4765e9a97e",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceAdmissionTest.xml": {
+        "sha256": "74b742f0e82fffef900e414eb32d8b3e80a466c4e6e64c961df0f01c00cc5c40",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyParentRepositoryTest.xml": {
+        "sha256": "e097b34b088007b9a86deeab8ab9baa62a82f61817d3736c71c2997b32b24124",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationProviderCredentialTest.xml": {
+        "sha256": "36293fb81e156c584822966e6b6ba27585a743ba88fc42975df4fb69a4cb958d",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceMappingTest.xml": {
+        "sha256": "7a33cab22c1353a173878922aa0fbc2a35e74fc9e72d31cf85315d7825776a6a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "fd5e13c2ada18545ed514251235d76b662f95d5e04cdb4272ca9a59f5c47c2aa",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderMappingTest.xml": {
+        "sha256": "a7eee694b8eafdfd44eff882b4a62fba1458722def00e04bf48f0f37f664e006",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "9aa325c5f52943ac44b8683678288b9d8c9726239e58b912aaec8b70ed5c7a16",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "81aa8ae801038107c5c5b8e45ef3ee6d94cb99eff2a6e0c4fe70d63cb5341a62",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceIdentitySelectionTest.xml": {
+        "sha256": "06258ead9cc2bf0b005aee9fc49282404c317f7720788386e5bcd316d1df7adc",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyParentMappingTest.xml": {
+        "sha256": "791db1a4a11125b3229a0c16d8031cf843d388bd2329b001d51ed653f315e5c4",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "focusedPrototype": {
+    "result": "PASS before separate indexed expiry/exhaustion sweep hardening",
+    "seconds": 71.072,
+    "cases": 4,
+    "finalHardening": "Full104-case run includes final indexes/ranges and seventeen-request batch-expiry assertions"
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "recoveryTool": {
+    "tests": 14,
+    "seconds": 0.011,
+    "result": "PASS",
+    "maximumReviewedSchema": 122,
+    "projection121Equals122": true,
+    "futureSchema123": "REJECTED"
+  },
+  "bounds": {
+    "headsPerDevice": 1,
+    "requestSeconds": 300,
+    "claimBatch": 8,
+    "globalLiveLeases": 16,
+    "leaseSeconds": 60,
+    "maximumAttempts": 8,
+    "expiredSweep": 8,
+    "exhaustedSweep": 8,
+    "maximumRequestRevision": 999999
+  },
+  "evidence": [
+    "Actual PostgreSQL request proof matches immutable group/native owner, current native version/account credential/authentication/MFA/client fields and bounded parent access/hard deadlines",
+    "Foreign/company scope and non-worker claims fail; owned cancellation survives offboarding/native-parent purge without deleting or rebinding identity",
+    "Competing worker claims obey batch8/global16 with distinct leases; the global metadata role cannot read group device rows without account RLS context",
+    "An expired lease receives a distinct replacement token/attempt; old token/revision cannot finish current work, and eight attempts cannot trigger a ninth provider claim",
+    "Expired final leases retain ATTEMPTS_EXHAUSTED; seventeen expired requests terminalize in bounded batches with REQUEST_EXPIRED and no provider call",
+    "Fresh retry requires the new current native proof, advances revision and retains prior terminal outcome; actual pg_dump/pg_restore preserves full head, original device metadata, owned RLS and mutation guards",
+    "Full49 core database,19 domain,36 data cases pass with3652 unchanged checked inputs and no skipped cases"
+  ],
+  "earlierAttempt": {
+    "attempt": "space-provisioning1",
+    "seconds": 46.822,
+    "result": "Migration/code generation succeeded; test compile rejected JDBC maps with nullable column values. Fixture type corrected to Any?; provider/lease policy unchanged."
+  },
+  "limits": [
+    "Capacity fixture directly seeds24 heads to test infrastructure bounds; it does not authorize exceeding the separately tested five-device native registration limit",
+    "Claim/expiration mutate operational queue metadata only and cannot authorize Matrix I/O, native device activation, credential publication or content",
+    "Head retains the latest terminal outcome through next pending request; required historical business events still need native/worker journal integration",
+    "Typed queue ports, native enqueue/retry, worker admission/publication, legacy transfer, group gateway/rooms and Mobile ownership are not wired",
+    "No provider throughput/performance or participant E2EE/private-key backup claim is made by these schema tests",
+    "Live8b40/schema116 pushON/SMTP OFF, phone28 and Mobile8273 gates are unchanged; all54 communications acceptance groups remain open"
+  ]
+}

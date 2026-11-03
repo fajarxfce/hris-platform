@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Organization directory foundation; push release remains separate — 3 November 2026
+
+Branch feat/communication-space in /home/fajar/hris/.worktrees/communication-space
+starts at Platform8b40bd0f. V117 and its three PostgreSQL tests introduce only the
+stable singleton space and restricted public contact views. No synthetic HR access,
+new provider identities, native/group endpoints or mobile ownership migration.
+[Contract](collaboration/cross-company-chat.md) /
+[evidence](measurements/collaboration-space-directory-2026-11-03.json).
+Focused51.29s/3 cases and full172.935s/33 cases across16 suites PASS, unchanged313
+core/build inputs, no failures/errors/skips; format/architecture PASS, recovery
+Python12 PASS. Earlier two test-helper compile failures remain in .work. Real
+pg_dump/restore preserves the space ID, restricted view owner and runtime directory.
+Recovery schema bound117 adds no encryption envelope. Live remains116.
+
+Continue bounded group directory repository/native admission, versioned device/room
+contracts and explicit existing Matrix identity mapping, then migrate mobile inbox,
+drafts, workers, push and reads together. Directory views alone do not admit rooms.
+Keep account/security/session/client deadlines separate from HR company selection;
+no global role or fake HR membership is allowed for chat. CHAT-01 remains open.
+
+Main checkout /home/fajar/hris/hris-platform remains8b40bd0f pending complete full
+Verify41695437208 and push rollout; do not accidentally build/deploy this worktree's
+V117 instead. Main .work/chat-push-rollout-2026-11-03 has retargeted artifact collectors,
+reviewed image-only staging and new coordinated checkpoint/deploy scripts prepared,
+not executed. Active push flags/SMTP remain OFF. Check current CI before acting.
+The checkpoint now handles nonempty Matrix data and preserves/restores encrypted
+identities/keys/messages; deploy has config/image rollback without overwriting data.
+Use one local heavy job and notice before maintenance or physical installation.
+
+Phone release27 is already installed and pullback-verified: Mobile3b5e1627 records
+it; source8ac28f68 (runtimec770). Do not reinstall. c770 native41691878601 is executing;
+control41691878650 portable has passed and Apple is building Xcode. Old537 native
+41685363689 failed three worker history scenarios with HistoryFocusCapacity;
+artifact13260712457 digest verified, local failure-summary retained. Current local
+QUEUED/FROZEN regression and product FCM run16 have passed as documented below.
+Continue the long run; user requests regular updates, every commit pushed and Git
+handoffs. Do not stop at this database foundation or push activation.
+
 ## Current product push accepted; full release gate repaired — 3 November2026
 
 Actual product FCM run16 PASS271.055s/driver209.335s with Mobilec770a83f product6/peer6,

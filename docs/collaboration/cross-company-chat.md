@@ -20,6 +20,25 @@ company. Room pairs, Matrix identities, credentials, push bindings and encrypted
 mobile partitions carry that company. These are real admission/ownership contracts;
 changing discovery alone would publish contacts that cannot open a usable room.
 
+## Database foundation — 3 November 2026
+
+V117 creates one immutable generated communication-space identity per installation.
+Two security-barrier views admit the current active account through chat permission
+in any active company and expose only account ID/name and public company labels.
+The non-login owner has column-only source privileges, with role-specific RLS;
+application roles cannot assume it. HR/resource RLS and existing company-bound
+provider identities, keys, devices, grants and Google/OIDC bindings are unchanged.
+There is no public group endpoint or client migration in this increment. A future
+repository must bound account pages and company-label aggregation; raw view rows
+are not a public API and do not establish native/device/room admission.
+
+[Validation](../measurements/collaboration-space-directory-2026-11-03.json): all 33
+core database cases in 16 suites, format/architecture, and 12 recovery-tool cases
+pass. Three new actual PostgreSQL cases exercise company switching, committed
+last-membership offboarding, private-data exclusion, account replacement, restricted
+role ownership and real archive restoration. Recovery accepts schema 117 without
+changing any encrypted-envelope format. Live schema remains 116.
+
 ## Required replacement
 
 Organization communication admission must be independent of HR company-resource

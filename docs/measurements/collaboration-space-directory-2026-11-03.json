@@ -1,0 +1,93 @@
+{
+  "recordedAt": "2026-11-03T19:02:42.696252+00:00",
+  "base": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+  "branch": "feat/communication-space",
+  "status": "passed",
+  "scope": "Database-only organization contact directory foundation. No public group API, native session/device migration, client partition migration or live rollout.",
+  "focused": {
+    "startedAt": "2026-11-03T18:57:00.490578+00:00",
+    "elapsedSeconds": 51.29,
+    "exitCode": 0,
+    "sourceFiles": 313,
+    "sourcesUnchanged": true,
+    "junit": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "regression": {
+    "startedAt": "2026-11-03T18:58:38.135048+00:00",
+    "elapsedSeconds": 172.935,
+    "exitCode": 0,
+    "sourceFiles": 313,
+    "sourcesUnchanged": true,
+    "junit": {
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "suites": 16
+  },
+  "quality": {
+    "formatCheck": "passed",
+    "architectureCheck": "passed"
+  },
+  "recoveryTool": {
+    "tests": 12,
+    "exitCode": 0,
+    "elapsedSeconds": 0.095
+  },
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V117__collaboration_space_directory.sql": "dbb62a62d3fe3b9574b218365a556cda40f6681eccad6e241af47059c2341905",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceDirectoryMigrationTest.kt": "0867f31e1014d1e232615e96945b7ffe8a10b65fe092beda703c98b483e3b449",
+    "tool/recovery_set.py": "ece8c5f8e2f53337da5fd0d44927b5eb769a53d48924c4904c481c9b368c26e8",
+    "tool/test_recovery_set.py": "6714900b7bb13f5505c38a9798e10abd743c2c8ca7fe9c031fff54800fb4757c"
+  },
+  "reportSha256": {
+    "TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": "a0c3eeca84008cdfde914551532081dd5b13dc0001d83379592a0cc98f30952b",
+    "TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": "df9ee65ab0a082b5cee1efac5416176ce6285f3c356ec6e3b13d27bc37c72540",
+    "TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": "c6723e3f51903e6cd5d13439c1fec1ef9a894a3a63d233719d45b0eb9dd99d76",
+    "TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": "51e2ad247611800f8253711fd3cea362391f9042cf1628507ff34ecc5c5a0728",
+    "TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": "118820bc7aa58b469985aff0919455a0a89f475eecaaf9dff9c3356ffcc3def7",
+    "TEST-dev.fajar.hris.core.database.CollaborationSpaceDirectoryMigrationTest.xml": "d5bbfa6092106ba79d4a4c49275c3b4f30573d3f2075155a0220b795944442d2",
+    "TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": "e40b60fd23c566ff945f02c561b281da4ed1499ec0c2fb36c1f533a3b3552f72",
+    "TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": "1d783a68c8ab60809882fcc064c0f0b717b35123d95e0d92c8d81b0cfd9b442f",
+    "TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": "160c0ab6a4712f630b678e928b825b17089b709ce8b818b24b04b445cc474950",
+    "TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": "5e74da10e34a1b09b04c986b390c4d11a19f2ef75a5b2121678386b4df05abbd",
+    "TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": "b2d26fc0298ed847f4ce4ea6d099d887165e20efaa2a5c5309feb1f978e9c5ed",
+    "TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": "1d1da0f1e1903941e0a564a9f10e3e4cea5d79cf93f14ab97a16698a7b0043c0",
+    "TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": "24597c141978e5f387d71956b74a1b140bc0b20579a23b53384ddb25d8cafba9",
+    "TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": "6552919770edf8b8a7e93584c98b5906a69cbbc8f3211bb718adcba4589feb18",
+    "TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": "e6f9446e9e6fa70373a9b2498a787a4ba5a6a5d1193055d562d13e45b849dcfe",
+    "TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": "1651175ca014bf2cbffa25221488116465792be44b4ccbdc7f2b1220f52eefaa"
+  },
+  "established": [
+    "Single immutable generated space survives migration repeat and actual pg_dump/pg_restore.",
+    "Eligible account contacts and company labels are independent of selected HR company.",
+    "Existing membership grants, OIDC bindings and legacy device rows remain unchanged.",
+    "Raw other-company profiles, company rows, memberships and permissions remain inaccessible to caller runtime.",
+    "Committed last-membership offboarding, permission revocation, inactive accounts/companies/memberships and actor replacement change directory eligibility.",
+    "Non-login view owner lacks private account columns, HR profiles, identity bindings, sessions and device/key access. Runtime cannot assume this role or mutate space/view.",
+    "Archive restores view ownership and identical directory under runtime RLS."
+  ],
+  "limits": [
+    "This minimal projection alone does not admit native sessions, provider devices or rooms.",
+    "Future repository reads must bound contact pages and company-label aggregation.",
+    "No physical phone or live server change. Existing company-bound Matrix identities and keys are not remapped."
+  ],
+  "earlierAttempts": [
+    {
+      "check": "check1",
+      "result": "rejected before JUnit",
+      "reason": "JDBC UUID list nullability in test helper"
+    },
+    {
+      "check": "check2",
+      "result": "rejected before JUnit",
+      "reason": "JDBC map value nullability in test helper"
+    }
+  ]
+}

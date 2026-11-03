@@ -4,6 +4,14 @@
 
 One modular monolith serves a single organization group with multiple companies. API and worker roles share code and PostgreSQL. The React application consumes the same versioned API as the future Compose client.
 
+The organization communication directory has a separate immutable space identity
+(V117). Its restricted non-login view owner can read only public contact and
+eligibility columns across companies; HR/resource RLS remains company-scoped.
+Eligibility is evaluated from current active account/company/membership and chat
+permission rows, independently of selected HR company. This is a database foundation,
+not native session, device or room authority. Existing Matrix ownership remains
+unchanged until the [cross-company migration](collaboration/cross-company-chat.md).
+
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.

@@ -1,5 +1,18 @@
 # Delivery and validation
 
+## Organization contact directory foundation — 3 November 2026
+
+V117 introduces a stable installation communication space and minimal eligible
+account/company-label views with a restricted non-login owner. Existing HR RLS,
+OIDC/device identities and permissions stay intact. Company switching and committed
+last-membership offboarding are covered, together with actual PostgreSQL archive
+restore, role ownership and forbidden private-column/HR access. All33 database
+cases/16 suites, format/architecture and12 recovery-tool cases pass. Recovery
+supports117 without a new encryption envelope. [Evidence](measurements/collaboration-space-directory-2026-11-03.json).
+This branch is a database foundation; no group API, device/room/client migration
+or live distribution is accepted. Continue [cross-company chat](collaboration/cross-company-chat.md).
+
+
 Latest collaboration increment (2 November): [native local read-intent recovery](measurements/chat-read-receipt-replay-native-2026-11-02.json)
 passes113.216s with seven accepted receipt requests and real process-death recovery;
 Mobile ae4a1b27 provides the local mark and live-admitted replay, full root/proof/

@@ -75,8 +75,9 @@ and queue. Registration now commits its initial request with binding, receipt an
 journal; native replay preserves the original work. The fresh-device worker now
 prepares and publishes under current account/native/device authority,
 exact generation/revision and a still-current lease, with all business writes and
-journal atomic. Provider I/O runs outside SQL transactions. Failed-attempt handling
-and retained-device runtime transfer are still required before public wiring. A lost/late/losing provider candidate expires naturally: **Synapse
+journal atomic. Provider I/O runs outside SQL transactions. Failed/deferred attempts
+now have atomic safe-reason journals and finite retry budgets. Scheduling and
+retained-device runtime transfer are still required before public wiring. A lost/late/losing provider candidate expires naturally: **Synapse
 logout removes the device's other tokens and E2EE keys**, so it cannot clean up a
 losing candidate safely. Retained legacy promotion still needs the explicit
 transfer fence described in [group provisioning](group-provisioning.md).

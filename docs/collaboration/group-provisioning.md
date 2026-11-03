@@ -85,8 +85,19 @@ lease/observation deadline and candidate expiry checks also run after the journa
 Retained DEVICE activation is explicitly rejected until old/new gateway and SDK
 ownership transfer is implemented. Public-key continuity alone cannot authorize
 two runtimes for the same E2EE device. Failed publication leaves its current lease
-for a separate bounded outcome command; no logout or hidden retry occurs.
-Next implement failure/defer journaling and scheduling, then coherent public wiring.
+for the bounded outcome command; no logout or hidden retry occurs.
+
+`SettleCollaborationSpaceProvisioningFailure` runs after the failed publication
+transaction has released its guards. It locks account then queue, checks the exact
+live lease and atomically defers or fails metadata with a safe-reason journal.
+It grants no native/content access and changes no device/credential; cleanup still
+works after account deactivation, offboarding or parent purge. Stale callbacks do
+not duplicate events. Only allowlisted temporary errors retry, with jittered1..30s
+delay, attempts below8 and sufficient request time. Access/identity and unknown
+errors end immediately. An eighth failed attempt cannot create a ninth.
+Matrix HTTP5xx now maps to provider_unavailable;401 remains rejected and429 busy.
+Transport itself does not retry. Raw error parameters and lease tokens stay out
+of journal details. Next implement scheduling and coherent public wiring.
 
 A worker claim transaction acquires only queue metadata and commits before native
 admission. Preparation/publication then take account, native parent, device and
@@ -138,7 +149,7 @@ cases pass in0.011s. Actual PostgreSQL covers concurrent claims, batch/global li
 lease replacement, eight-attempt exhaustion, bounded expiry, fresh retry and archive
 restoration. Queue lease/owner fields are internal and must not appear in native
 status responses. Native registration/retry and successful worker publication now
-have atomic journal integration; failed-attempt outcome integration is still pending.
+have atomic journal integration, including bounded failed/deferred attempt outcomes.
 
 [Typed port evidence](../measurements/collaboration-space-provisioning-ports-2026-11-03.json):
 17 cases pass in102.360s with3658 unchanged source hashes and quality checks. Actual
@@ -172,3 +183,11 @@ generation fences, concurrent candidates, encrypted reuse/rotation and atomic
 rollback. Invalid candidates and authority/time/interruption changes after journal
 writes still roll back all publication. Actual Synapse login/key continuity remains
 the separate earlier port evidence; no scheduler or public group runtime is enabled.
+
+[Failure settlement evidence](../measurements/collaboration-space-failure-settlement-2026-11-03.json):
+65 cases pass in183.446s (2 policy,63 data/transport),3665 unchanged source hashes,
+quality PASS. Actual PostgreSQL covers deferred reclaim, eight real claims without
+a ninth, inactive/offboarded/purged-parent settlement, safe journal and both outcome
+paths rolling back on failure/cancellation/interruption. Real HTTP fixtures cover
+5xx versus401/429 and unchanged one-request transport behavior. Scheduling and
+public group runtime remain disabled.

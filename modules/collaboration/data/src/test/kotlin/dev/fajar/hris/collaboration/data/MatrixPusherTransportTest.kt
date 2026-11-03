@@ -136,7 +136,7 @@ class MatrixPusherTransportTest {
                     307 to "collaboration_provider_rejected",
                     401 to "collaboration_provider_rejected",
                     429 to "collaboration_provider_busy",
-                    503 to "collaboration_provider_rejected",
+                    503 to "collaboration_provider_unavailable",
                 )) {
                 f.handler.set {
                     it.responseHeaders.set("Location", "https://elsewhere.invalid/private")

@@ -1,5 +1,42 @@
 # Agent continuation — HRIS workspace
 
+## Bounded group failure settlement accepted — 3 November 2026
+
+SettleCollaborationSpaceProvisioningFailure takes account -> queue guards after
+failed publication rolls back, then exact live-lease metadata plus safe journal
+commit atomically. No device/credential or content authority changes. Offboarding,
+account deactivation and native-parent purge do not prevent ending failed work.
+Only allowlisted temporary errors defer, with jittered1..30s delay, attempts<8 and
+remaining request time; permanent/access/identity/unknown failures end. Stale
+callbacks do not duplicate events. Raw failure parameters/lease tokens are omitted.
+Shared Matrix HTTP mapping now classifies5xx as provider_unavailable,401 still
+rejected and429 busy; the transport still performs exactly one call.
+
+[Evidence](measurements/collaboration-space-failure-settlement-2026-11-03.json):
+space-settlement2 PASS183.446s/65 (2 policy,63 data/transport),3665 unchanged hashes,
+quality PASS. Four additional actual worker outcome cases cover deferred reclaim,
+eight real1-second claims without a ninth, deactivated/offboarded/purged-parent
+settlement, safe journal, and both defer/final queue+journal writes rolling back on
+failure/cancel/interruption. Actual HTTP login/key upload/logout/pusher regression
+covers5xx vs401/429 with no hidden retry. First compile failed13.397s/0 cases on a
+redundant Math.floorMod conversion under warnings-as-errors; conversion removed.
+All checks complete. No DI/controller/scheduler/group runtime enabled.
+
+Next bounded scheduler/claim adapter and module wiring, then retained runtime/SDK
+transfer and group gateway/rooms/Mobile ownership. Ignored scheduler-next contains
+UNTESTED formatted ClaimCollaborationSpaceProvisioning, worker loop and settings.
+Review capacity reservation, physically occupied cancelled threads, per-lease
+absolute deadlines, shutdown/claim/submission races and timer cleanup; add meaningful
+loop tests and actual API AND worker contexts for shared DI changes. No provider
+side effect may run before fresh admission. Avoid queue -> account lock inversion.
+Keep worker disabled by default until coherent runtime ownership is accepted.
+The old settlement-next drafts are superseded by tracked source/tests; do not recopy.
+Actual Synapse combined worker wiring still needs acceptance; current worker data
+cases use controlled candidates, with actual provider port/key evidence separate.
+
+Live8b40/schema116 pushON/SMTP OFF and installed phone28 unchanged. All54 groups
+remain open. Continue the full long run, regular user/Git updates and atomic pushes.
+
 ## Fresh group device worker publication accepted — 3 November 2026
 
 AdvanceCollaborationSpaceProvisioning reconstructs exact queued native proof and

@@ -1,0 +1,120 @@
+{
+  "scope": "Finite group provisioning failure/defer settlement and transient Matrix HTTP classification",
+  "baseCommit": "d92d4206",
+  "accepted": {
+    "startedAt": "2026-11-03T22:35:22.019574+00:00",
+    "elapsedSeconds": 183.446,
+    "exitCode": 0,
+    "sourceFiles": 3665,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 65,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceProvisioningOutcomePolicyTest.xml": {
+        "sha256": "245d9465d8c5218146243b14bf2136bfaf720273704222f2bc1f4e5fe5518eed",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRepositoryTest.xml": {
+        "sha256": "187bd1ece174b347d98023832bae618e4e90f384127a1bc39fb2961c23fc21ef",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "cfbc8a354275fe57018d1d9cbe862a21d7f2383edaec618da04ca495e2560392",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningMappingTest.xml": {
+        "sha256": "65072402c310267cc957f9e258c2a28866b59e4fc933ff1fd0ed61c112526b1e",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningStorageTest.xml": {
+        "sha256": "eada4eb80a1d84bbe6f21d1457410a8a7b123ea83f3bdb6974a9694710b19321",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "9b31f13d142fec50da339c16c62d4c20196adafb7ecb8bf1249c653f2c34c841",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixProviderTransportTest.xml": {
+        "sha256": "79da5ca38bac78d9ac449174458753c3b13786fc9d151cfdc66bfc3f3516fde0",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixPusherTransportTest.xml": {
+        "sha256": "2a5b84dce284b63f580ebe7b449cac318a101f98da9273151288d4cb2f565005",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "095feac62be5a13e4362afd88ebdd66f495c9dbc74dbc8953d5bc30aa81275a3",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRetryTest.xml": {
+        "sha256": "a2556a52f07f06548d7a32666f6fcec115fac479e38610f2ba392a14cb843a9e",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "05ba51bd4792d2b8dd2a553f1293f11f0dc4ad4b355887af4cdc5b55a1ccd655",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "earlierRun": {
+    "elapsedSeconds": 13.397,
+    "tests": 0,
+    "reason": "Kotlin warnings-as-errors rejected redundant toInt on Math.floorMod(long,int); removed conversion without policy change."
+  },
+  "evidence": [
+    "Current exact lease is required for metadata settlement; stale or already completed callbacks produce no duplicate journal",
+    "Allowlisted temporary failures use jittered delay1..30 seconds only before attempt8 and inside the request/deadline budget; unknown, access and identity errors end immediately",
+    "Actual deferred work is claimed with a new token/attempt; an eighth actual claim terminates without a ninth",
+    "Failed metadata can be closed after account deactivation, offboarding and native-parent purge without altering device or encrypted credential",
+    "Failure, cancellation and interruption after queue mutation or journal roll back settlement for both deferred and terminal outcomes",
+    "Journal contains only safe retained reason/revision/attempt/delay, never raw failure parameters or private lease token",
+    "Actual HTTP login, key upload, logout and pusher tests classify5xx as collaboration_provider_unavailable while401 remains rejected and429 remains busy; transport itself still makes one request without hidden retry"
+  ],
+  "limits": [
+    "No DI/controller/scheduler/group gateway or Mobile owner migration is enabled",
+    "Retained device runtime/SDK transfer still required before activation",
+    "Live8b40/schema116 and phone28 unchanged"
+  ]
+}

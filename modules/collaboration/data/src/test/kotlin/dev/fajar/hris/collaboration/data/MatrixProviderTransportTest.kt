@@ -509,7 +509,7 @@ class MatrixProviderTransportTest {
                     "fictional-access-token",
                     f.login.expiresAt,
                 ) as Result.Failed
-            assertEquals("collaboration_provider_rejected", failure.failure.code)
+            assertEquals("collaboration_provider_unavailable", failure.failure.code)
             assertFalse(failure.toString().contains("private fixture failure"))
             assertEquals(count + 1, f.requests.get())
             val invalid =
@@ -573,6 +573,20 @@ class MatrixProviderTransportTest {
             assertFalse(result.toString().contains(result.accessToken))
             assertFalse(f.config.toString().contains(f.config.jwtSecret))
             assertEquals(1, f.requests.get())
+            for ((status, code) in
+                listOf(
+                    401 to "collaboration_provider_rejected",
+                    429 to "collaboration_provider_busy",
+                    500 to "collaboration_provider_unavailable",
+                    503 to "collaboration_provider_unavailable",
+                )) {
+                val before = f.requests.get()
+                f.handler = { f.respond(it, "private provider error", status) }
+                val failed = f.repository.login(f.login) as Result.Failed
+                assertEquals(code, failed.failure.code)
+                assertFalse(failed.toString().contains("private provider error"))
+                assertEquals(before + 1, f.requests.get())
+            }
         }
     }
 
@@ -627,7 +641,7 @@ class MatrixProviderTransportTest {
                         """{"error":"private fixture message"}""",
                         "collaboration_provider_busy",
                     ),
-                    Triple(503, "{}", "collaboration_provider_rejected"),
+                    Triple(503, "{}", "collaboration_provider_unavailable"),
                 )) {
                 f.handler = {
                     assertEquals("/_matrix/client/v3/logout", it.requestURI.path)

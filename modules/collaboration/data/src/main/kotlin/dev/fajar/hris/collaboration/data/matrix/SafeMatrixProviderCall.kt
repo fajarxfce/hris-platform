@@ -64,8 +64,11 @@ fun <T> safeMatrixProviderCall(operation: () -> T): Result<T> =
                 is MatrixStatusException ->
                     Failure(
                         FailureKind.UNAVAILABLE,
-                        if (cause.status == 429) "collaboration_provider_busy"
-                        else "collaboration_provider_rejected",
+                        when (cause.status) {
+                            429 -> "collaboration_provider_busy"
+                            in 500..599 -> "collaboration_provider_unavailable"
+                            else -> "collaboration_provider_rejected"
+                        },
                     )
                 is IOException,
                 is TimeoutException ->

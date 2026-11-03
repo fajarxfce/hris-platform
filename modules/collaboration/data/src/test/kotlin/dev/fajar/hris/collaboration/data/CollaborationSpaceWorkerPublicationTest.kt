@@ -521,6 +521,223 @@ class CollaborationSpaceWorkerPublicationTest {
         }
     }
 
+    @Test
+    fun failureSettlementDefersBoundedWorkAndRetainsOneAuditWithoutRawFailureData() {
+        val f = Fixture()
+        val id = f.register()
+        val lease = f.claim(id)
+        val device = f.device(id)
+        val failure =
+            Failure(
+                FailureKind.UNAVAILABLE,
+                "collaboration_provider_unavailable",
+                parameters =
+                    mapOf("retryAfterSeconds" to "99999999", "secret" to "fixture-not-for-journal"),
+            )
+        assertTrue(success(f.settle(lease, failure)))
+        val deferred = f.work(id)
+        assertEquals(CollaborationSpaceProvisioningState.QUEUED, deferred.state)
+        assertEquals(1, deferred.attempts)
+        assertNull(deferred.lease)
+        assertNull(deferred.lastOutcome)
+        assertEquals(device, f.device(id))
+        assertNull(f.state(id))
+        assertFalse(success(f.settle(lease, failure)))
+        val rows =
+            owner.queryForList(
+                "select details::text as details from audit_entries where actor_id=? and action='collaboration.space_provisioning_deferred'",
+                f.account,
+            )
+        assertEquals(1, rows.size)
+        assertFalse(rows.single()["details"].toString().contains("fixture-not-for-journal"))
+        assertFalse(rows.single()["details"].toString().contains("99999999"))
+        assertFalse(rows.single()["details"].toString().contains(lease.token.toString()))
+        val millis =
+            java.time.Duration.between(Instant.now(), deferred.availableAt)
+                .toMillis()
+                .coerceAtLeast(0) + 100
+        assertTrue(millis <= 3100)
+        Thread.sleep(millis)
+        val next = f.claim(id)
+        assertEquals(2, next.attempt)
+        assertNotEquals(lease.token, next.token)
+        assertFalse(success(f.settle(lease, failure)))
+        assertTrue(
+            success(
+                f.settle(
+                    next,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_invalid_response"),
+                )
+            )
+        )
+        assertEquals(
+            CollaborationSpaceProvisioningFailure.PROVIDER_IDENTITY_CHANGED,
+            f.work(id).lastOutcome?.failure,
+        )
+    }
+
+    @Test
+    fun failureSettlementSurvivesParentPurgeAndOffboardingWithoutChangingDeviceOrCredential() {
+        val f = Fixture()
+        val id = f.register()
+        val lease = f.claim(id)
+        val device = f.device(id)
+        val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        val state =
+            CollaborationSpaceProviderState(
+                space,
+                f.account,
+                id,
+                f.session,
+                device.matrixUserId,
+                device.matrixDeviceId,
+                0,
+                at,
+                at,
+                at.plusSeconds(300),
+            )
+        success(
+            f.transactions.run(f.actor) {
+                f.credentials.create(
+                    CollaborationSpaceProviderSession(state, "fixture-existing-token")
+                )
+            }
+        )
+        owner.update(
+            "update company_memberships set active=false,version=version+1 where account_id=?",
+            f.account,
+        )
+        owner.update("update accounts set active=false where id=?", f.account)
+        owner.update("delete from native_sessions where id=?", f.session)
+        assertTrue(
+            success(f.settle(lease, Failure(FailureKind.UNAUTHENTICATED, "session_revoked")))
+        )
+        assertEquals(
+            CollaborationSpaceProvisioningFailure.ACCESS_DENIED,
+            f.work(id).lastOutcome?.failure,
+        )
+        assertEquals(device, f.device(id))
+        assertEquals(state, f.state(id))
+        assertFalse(
+            success(
+                f.settle(
+                    lease,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable"),
+                )
+            )
+        )
+        assertEquals(
+            1,
+            owner.queryForObject(
+                "select count(*) from audit_entries where actor_id=? and action='collaboration.space_provisioning_failed'",
+                Int::class.java,
+                f.account,
+            ),
+        )
+    }
+
+    @Test
+    fun eighthClaimIsTerminalAndNeverSchedulesANinthProviderAttempt() {
+        val f = Fixture()
+        val id = f.register()
+        var lease =
+            requireNotNull(success(f.provisioning.claim(UUID.randomUUID(), 1, 1)).single().lease)
+        for (attempt in 2..8) {
+            Thread.sleep(1100)
+            lease =
+                requireNotNull(
+                    success(f.provisioning.claim(UUID.randomUUID(), 1, 1)).single().lease
+                )
+            assertEquals(attempt, lease.attempt)
+        }
+        assertEquals(id, lease.request.deviceId)
+        assertTrue(
+            success(
+                f.settle(
+                    lease,
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable"),
+                )
+            )
+        )
+        val final = f.work(id)
+        assertEquals(8, final.attempts)
+        assertEquals(CollaborationSpaceProvisioningState.FAILED, final.state)
+        assertEquals(
+            CollaborationSpaceProvisioningFailure.PROVIDER_UNAVAILABLE,
+            final.lastOutcome?.failure,
+        )
+        assertTrue(success(f.provisioning.claim(UUID.randomUUID(), 1, 60)).isEmpty())
+    }
+
+    @Test
+    fun settlementQueueAndJournalRollBackOnFailureCancellationAndInterruption() {
+        for (defer in listOf(false, true)) for (stage in listOf("queue", "journal")) for (mode in
+            listOf("failure", "cancel", "interrupt")) {
+            val f = Fixture()
+            val id = f.register()
+            val lease = f.claim(id)
+            val original = f.work(id)
+            val cause =
+                if (defer) Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable")
+                else Failure(FailureKind.FORBIDDEN, "collaboration_access_denied")
+            fun injected(): Result<Unit> {
+                if (mode == "cancel") throw CancellationException("fixture cancellation")
+                if (mode == "interrupt") throw InterruptedException("fixture interruption")
+                return Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_write_failed"))
+            }
+            val queue =
+                object : CollaborationSpaceProvisioningRepository by f.provisioning {
+                    override fun defer(
+                        lease: CollaborationSpaceProvisioningLease,
+                        delaySeconds: Int,
+                    ): Result<Boolean> =
+                        f.provisioning.defer(lease, delaySeconds).flatMap { applied ->
+                            if (stage == "queue") injected().map { applied }
+                            else Result.Success(applied)
+                        }
+
+                    override fun finish(
+                        lease: CollaborationSpaceProvisioningLease,
+                        failure: CollaborationSpaceProvisioningFailure?,
+                    ): Result<Boolean> =
+                        f.provisioning.finish(lease, failure).flatMap { applied ->
+                            if (stage == "queue") injected().map { applied }
+                            else Result.Success(applied)
+                        }
+                }
+            val journal = hookJournal { actor, record ->
+                f.journal.record(actor, record).flatMap {
+                    if (stage == "journal") injected() else Result.Success(Unit)
+                }
+            }
+            fun run() = f.settle(lease, cause, queue, journal)
+            when (mode) {
+                "cancel" -> assertThrows(CancellationException::class.java) { run() }
+                "interrupt" -> assertThrows(InterruptedException::class.java) { run() }
+                else -> failure(run(), "fixture_write_failed")
+            }
+            assertEquals(original, f.work(id))
+            assertEquals(
+                0,
+                owner.queryForObject(
+                    "select count(*) from audit_entries where actor_id=? and action in ('collaboration.space_provisioning_failed','collaboration.space_provisioning_deferred')",
+                    Int::class.java,
+                    f.account,
+                ),
+            )
+            assertTrue(success(f.settle(lease, cause)))
+            assertEquals(
+                1,
+                owner.queryForObject(
+                    "select count(*) from audit_entries where actor_id=? and action in ('collaboration.space_provisioning_failed','collaboration.space_provisioning_deferred')",
+                    Int::class.java,
+                    f.account,
+                ),
+            )
+            f.cancel(id)
+        }
+    }
+
     private inner class Fixture(verifiedMfa: Boolean = false) {
         val baseAt = now.minusSeconds(120)
         val account = UUID.randomUUID()
@@ -832,6 +1049,21 @@ class CollaborationSpaceWorkerPublicationTest {
                     clock,
                 )
                 .execute(lease)
+
+        fun settle(
+            lease: CollaborationSpaceProvisioningLease,
+            failure: Failure,
+            provisioning: CollaborationSpaceProvisioningRepository = this.provisioning,
+            journal: ChangeJournalRepository = this.journal,
+        ): Result<Boolean> =
+            SettleCollaborationSpaceProvisioningFailure(
+                    provisioning,
+                    identities,
+                    journal,
+                    transactions,
+                    Clock.systemUTC(),
+                )
+                .execute(lease, failure)
 
         fun claim(device: UUID): CollaborationSpaceProvisioningLease {
             val lease =

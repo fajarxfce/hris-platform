@@ -137,8 +137,9 @@ enqueues initial intent with current proof and at most60-second deadline. Replay
 preserves the same request after native refresh. Explicit retry is now integrated
 with current proof, observed revisions, cooldown and an atomic receipt/journal;
 worker preparation/publication for fresh group devices is now implemented too,
-with current proof and lease/generation fences. Failure outcomes, scheduling and
-runtime/SDK ownership transfer remain required before exposure.
+with current proof and lease/generation fences. Finite failure/defer outcomes and
+safe journals are integrated. Scheduling and runtime/SDK ownership transfer remain
+required before exposure.
 [Registration evidence](../measurements/collaboration-native-space-device-registration-2026-11-03.json):
 39 passing cases in76.836s,3632 unchanged hashes and quality checks. Five actual
 PostgreSQL command cases include competing fifth/sixth devices, replay, failure and
@@ -162,8 +163,9 @@ queue, current-parent request proof, finite leases/attempts and retained termina
 outcomes. Typed queue ports now validate exact proof/lease fences and atomic
 credential/device/queue rollback against actual PostgreSQL, including archive
 restoration. Native enqueue, revisioned retry and admitted worker publication for
-fresh group devices are integrated. Failure/defer handling, retained-device runtime
-transfer, scheduling, group gateway/rooms and local-store adoption remain unfinished.
+fresh group devices are integrated, including bounded failure/defer handling.
+Retained-device runtime transfer, scheduling, group gateway/rooms and local-store
+adoption remain unfinished.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 

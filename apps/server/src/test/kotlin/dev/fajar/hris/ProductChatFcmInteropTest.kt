@@ -7,8 +7,6 @@ import dev.fajar.hris.core.domain.Result
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFilePermissions
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterAll
@@ -64,23 +62,30 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
     fun realFcmStartsProductAndEncryptedInlineReplyReturnsToThePeer() {
         trace.allowEncryptedSends()
-        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+        // The separate real worker publishes timestamps after UI-driven setup. A frozen API clock
+        // would reject those valid provider credentials as future records and attempt stale writes.
+        clock.followSystemTime()
         provider.startProxy(port)
         val owner = native()
         val control = sdkOwner(owner)
         val peer = sdkOwner(sdkPeer(owner))
         val conversation = UUID.randomUUID()
+        val loginAt = clock.instant()
         val login =
             matrix.login(
                 CollaborationMatrixLogin(
                     owner.fixture.company,
                     owner.fixture.account,
                     control.device,
-                    clock.instant(),
-                    clock.instant().plusSeconds(60),
+                    loginAt,
+                    loginAt.plusSeconds(60),
                 )
             )
-        assertInstanceOf(Result.Success::class.java, login)
+        assertInstanceOf(
+            Result.Success::class.java,
+            login,
+            (login as? Result.Failed)?.failure?.code,
+        )
         val created =
             rooms.create(
                 CollaborationMatrixDirectRoom(

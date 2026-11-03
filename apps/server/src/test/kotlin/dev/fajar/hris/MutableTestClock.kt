@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
 class MutableTestClock
-private constructor(private val value: AtomicReference<Instant>, private val zone: ZoneId) :
+private constructor(private val value: AtomicReference<Instant?>, private val zone: ZoneId) :
     Clock() {
     constructor(initial: Instant) : this(AtomicReference(initial), ZoneOffset.UTC)
 
@@ -18,7 +18,14 @@ private constructor(private val value: AtomicReference<Instant>, private val zon
         value.set(instant)
     }
 
-    override fun instant(): Instant = value.get()
+    /**
+     * Explicit external-process fixtures share wall time with their independently running worker.
+     */
+    fun followSystemTime() {
+        value.set(null)
+    }
+
+    override fun instant(): Instant = value.get() ?: Instant.now()
 
     override fun getZone(): ZoneId = zone
 

@@ -1,0 +1,356 @@
+{
+  "status": "not_accepted",
+  "sourceBase": "73cd2ed9bde1d13e5a410a70b77da514e8735549",
+  "sourceHashes": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/MutableTestClock.kt": "5a421dee878ab59eda71f60ca9d6f1c8d668551acf9dd5e73fa61f7a471114d8",
+    "apps/server/src/test/kotlin/dev/fajar/hris/MutableTestClockTest.kt": "11d7b7ce3d242f116f1c8f198e73d5bf0758df8b3c6a479cd0ec8187647a4404",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmInteropTest.kt": "f2a10456e162202dbd39b2c1f0892b055faa5816c94690622fc1f30a677c482d"
+  },
+  "clockRegression": {
+    "tests": 1,
+    "failures": 0,
+    "skipped": 0,
+    "junitSha256": "9df566dceafde43ccd8de98a53e55eb550875cfd1129f89cb2f94df7922692ee"
+  },
+  "run9": {
+    "attempt": 9,
+    "fixture": "96e2d298-680a-40a2-8409-6c982b01bece",
+    "platformCommit": "73cd2ed9bde1d13e5a410a70b77da514e8735549",
+    "mobileCommit": "1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298",
+    "seconds": 229.056,
+    "driverSeconds": 183.284,
+    "inputsUnchanged": true,
+    "counts": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "result": {
+      "passed": false,
+      "phoneTouched": false,
+      "serial": "emulator-5562",
+      "productApkSha256": "e05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662",
+      "proofApkSha256": "9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b",
+      "failureCategory": "TimeoutError",
+      "failedStage": "setting_up_product",
+      "failureFrames": [
+        "collaboration_product_fcm.py:main:185",
+        "collaboration_product_fcm.py:setup_product:63",
+        "collaboration_product_fcm.py:until:27"
+      ],
+      "privateDiagnostics": {
+        "product-logcat.private.txt": {
+          "saved": true,
+          "truncated": false
+        },
+        "product-jobs.private.txt": {
+          "saved": true,
+          "truncated": false
+        }
+      },
+      "failureScreenshotSaved": true,
+      "failureUiSaved": true,
+      "peerCleanedUp": true,
+      "deviceCleanedUp": true,
+      "cleanedUp": true,
+      "elapsedSeconds": 183.284
+    },
+    "serverStatus": {
+      "registrations": 1,
+      "pushers": 0,
+      "delivered": 0
+    },
+    "lastProgress": {
+      "stage": "waiting_for_matrix_pusher"
+    },
+    "gatewayTraceSha256": "5fcd437a7deeb810cca1c3cca8247d33e32588f1650eddad75b15ecc8c2e5626",
+    "gatewaySummary": [
+      {
+        "method": "GET",
+        "route": "/_matrix/client/versions",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/user/_/account_data/_",
+        "status": 403,
+        "errorCode": "",
+        "count": 6
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/rooms/_/join",
+        "status": 409,
+        "errorCode": "data_conflict",
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "status": 409,
+        "errorCode": "data_conflict",
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "status": 409,
+        "errorCode": "data_conflict",
+        "count": 1
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "status": 503,
+        "errorCode": "collaboration_provider_busy",
+        "count": 5
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/unstable/_/_",
+        "status": 503,
+        "errorCode": "collaboration_provider_busy",
+        "count": 2
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "status": 503,
+        "errorCode": "collaboration_provider_busy",
+        "count": 4
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "status": 503,
+        "errorCode": "collaboration_provider_busy",
+        "count": 4
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/rooms/_/join",
+        "status": 503,
+        "errorCode": "collaboration_provider_busy",
+        "count": 2
+      }
+    ],
+    "observedCollaborationWorkManagerRetries": 2,
+    "processAbsent": true,
+    "imageAndSidecarsAbsent": true,
+    "fixtureCredentialsDeleted": true,
+    "junitSha256": "ffacd28012cf5fe838461d9010de93e96aaa4db37a4a55b3fda02eb4c5911bc3",
+    "screenshots": {
+      "product-notifications-enabled.png": {
+        "sha256": "1f3ca0686b50051c6b8d8448021056507e3c47bf18b12fbeffe0cf18a12c9b60",
+        "actuallyViewed": true
+      },
+      "product-failure.png": {
+        "sha256": "c1bc3e08e746522120911883210bc502dbeefafb297b1ccd704559c1b7094f80",
+        "actuallyViewed": true
+      }
+    },
+    "privateDiagnostics": {
+      "product-logcat.private.txt": {
+        "bytes": 798110,
+        "mode": "0o600",
+        "notForUpload": true
+      },
+      "product-jobs.private.txt": {
+        "bytes": 633065,
+        "mode": "0o600",
+        "notForUpload": true
+      }
+    },
+    "finding": "The product worker runs and invokes managed pusher twice. Both return503 collaboration_provider_busy after initial join/key calls409 data_conflict; no message/FCM delivery. API fixture time is frozen while independently running worker time advances, so provider timestamp incompatibility is being corrected and must be verified by run10."
+  },
+  "run10": {
+    "seconds": 41.658,
+    "failure": "Fixture sampled advancing clock twice for a maximum-60-second JWT; fixed by one loginAt sample. No emulator or message.",
+    "junitSha256": "e0866071939a1c6508f70c7b7ed54b20dd2373c7b6c087c90fcd65b5f1aa1e9b"
+  },
+  "run11": {
+    "seconds": 313.673,
+    "inputsUnchanged": true,
+    "counts": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "junitSha256": "58ac3812667143fa4a61a2cd0c47c3c2be96219e51d1a1ebc1cc74933391033c",
+    "serverStatus": {
+      "registrations": 1,
+      "pushers": 1,
+      "delivered": 0
+    },
+    "result": {
+      "passed": false,
+      "phoneTouched": false,
+      "serial": "emulator-5562",
+      "productApkSha256": "e05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662",
+      "proofApkSha256": "9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b",
+      "killedProductPid": 2894,
+      "sentEventId": "$SEJvtvE37HuRj2cRNBrk_G6S57GuWiMZkMe0p_lu_zQ",
+      "failureCategory": "TimeoutError",
+      "failedStage": "waiting_for_real_fcm",
+      "failureFrames": [
+        "collaboration_product_fcm.py:main:202",
+        "collaboration_product_fcm.py:until:27"
+      ],
+      "privateDiagnostics": {
+        "product-logcat.private.txt": {
+          "saved": true,
+          "truncated": false
+        },
+        "product-jobs.private.txt": {
+          "saved": true,
+          "truncated": false
+        }
+      },
+      "failureScreenshotSaved": true,
+      "failureUiSaved": true,
+      "peerCleanedUp": true,
+      "deviceCleanedUp": true,
+      "cleanedUp": true,
+      "elapsedSeconds": 250.343
+    },
+    "gatewaySummary": [
+      {
+        "method": "GET",
+        "route": "/_matrix/client/versions",
+        "status": 200,
+        "errorCode": "",
+        "count": 2
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/user/_/account_data/_",
+        "status": 403,
+        "errorCode": "",
+        "count": 10
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "status": 200,
+        "errorCode": "",
+        "count": 5
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/rooms/_/join",
+        "status": 200,
+        "errorCode": "",
+        "count": 4
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/state/_/",
+        "status": 200,
+        "errorCode": "",
+        "count": 2
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "status": 200,
+        "errorCode": "",
+        "count": 4
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/messages",
+        "status": 200,
+        "errorCode": "",
+        "count": 5
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "status": 200,
+        "errorCode": "",
+        "count": 14
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/context/_",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/unstable/_/_",
+        "status": 200,
+        "errorCode": "",
+        "count": 2
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/rooms/_/join",
+        "status": 404,
+        "errorCode": "collaboration_room_not_found",
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "status": 503,
+        "errorCode": "collaboration_recipients_changed",
+        "count": 1
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/members",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/claim",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      },
+      {
+        "method": "PUT",
+        "route": "/_matrix/client/v3/sendToDevice/m.room.encrypted/_",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      },
+      {
+        "method": "PUT",
+        "route": "/_matrix/client/v3/rooms/_/send/m.room.encrypted/_",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/_/_/_",
+        "status": 200,
+        "errorCode": "",
+        "count": 1
+      }
+    ],
+    "processAbsent": true,
+    "imageAndSidecarsAbsent": true,
+    "fixtureCredentialsDeleted": true,
+    "screenshots": {
+      "product-chat-ready.png": {
+        "sha256": "7949338c8ec00f754d258a365f2dd274f5c67f3b040e0d55746bc4297172fc99",
+        "actuallyViewed": true
+      },
+      "product-failure.png": {
+        "sha256": "c12e2a615f22b54592aa9dfd578a24e1181bb72ac5d46afbd353d95a7ab4cf75",
+        "actuallyViewed": true
+      }
+    }
+  },
+  "finding": "Advancing API fixture time resolves provider join/key/pusher failures: actual product pusher registers and peer sends encrypted original. FCM delivery remains zero; driver times out waiting for a Firebase-caused process start. Investigate callback/worker delivery next; do not enable live push."
+}

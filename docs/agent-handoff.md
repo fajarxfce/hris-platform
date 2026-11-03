@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Product FCM clock fixed; user chat UX priorities active — 3 November 2026
+
+[Clock/attempt evidence](measurements/product-chat-fcm-clock-2026-11-03.json).
+The independent worker uses wall time; API fixture now explicitly follows it.
+Default fixed test clocks remain unchanged, with a passing mode/zone regression.
+One sampled loginAt keeps JWT lifetime at exactly60 seconds. Run10's rejected
+fixture login is preserved. Run11 passes normal setup, joins/keys and product
+managed-pusher registration; actual encrypted peer send succeeds. Counts1/1/0:
+FCM delivery/process restart still fails after313.673s (driver250.343s). Both
+cleanup results pass, owned process/image/credentials absent. Chat-ready and home
+failure screenshots actually viewed. No live/phone change; push stays OFF.
+Next inspect private callback/worker delivery using bounded safe metadata. Never
+upload raw logs or credentials. No local heavy job remains active.
+
+Latest user priorities do NOT cancel the full communications PRD: bottom Chat tab,
+local-first rendering, compact bubbles/composer with true delivery/read states,
+restored history exhaustion, and employee discovery including cross-company chat.
+The explicit cross-company request supersedes the original company-only CHAT-01;
+implement scope and membership changes in API/RLS/provider ownership as well as UI.
+Mobile is editing navigation/UI now; preserve that work. Phone25 stays installed,
+next validated26+ with notice/install-only, no phone UI driving. Apple41667309251
+attempt2 passed simulator tests and is building Xcode; Native41667296924 is running.
+
+
 ## Product FCM run8 reaches the thread; diagnose unavailable gateway/worker — 3 November 2026
 
 Mobile1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298 is pushed. Application managed-push

@@ -107,3 +107,14 @@ arming faults and independently captures private bounded OS/SDK/job diagnostics 
 failure. Raw logs remain private and must not be uploaded.25 Python cases and
 compile/format/architecture PASS35.569s with unchanged inputs. Run9 with the same
 APK artifacts is next. New diagnostics do not invoke any product worker/use case.
+
+## Advancing fixture clock — 3 November 2026
+
+The API now explicitly shares wall time with its independent real worker; other
+test fixtures retain fixed time. A single loginAt sample keeps a60-second JWT
+inside its strict duration bound. Run11 registers both native FCM and the managed
+Matrix pusher, then the peer sends an actual encrypted original. It still times
+out waiting for Firebase to restart the product (counts1/1/0). Provider activation
+is proven in this run; actual FCM delivery and inline reply are NOT accepted.
+Owned cleanup passed; both relevant screenshots were viewed. See
+[clock and attempts9–11](../measurements/product-chat-fcm-clock-2026-11-03.json).

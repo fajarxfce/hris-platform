@@ -1,71 +1,47 @@
 # Agent continuation — HRIS workspace
 
-## Group credential/device work advanced; release 28 remains installed — 3 November 2026
+## Group graph verified; release 28 remains installed — 3 November 2026
 
-Live remains8b40bd0f/schema116 with chat push ON, SMTP OFF, and the verified private
-rollout below. This checkout is not the group-migration source. Continue that work
-in /home/fajar/hris/.worktrees/communication-space on feat/communication-space,
-latest pushedd92d4206 (preceded by0e3b4b52,fa19ad69,453f79d8 and93808218). Its own docs/agent-handoff.md,
-collaboration/group-provisioning.md and group-credentials.md are authoritative.
+Continue implementation in /home/fajar/hris/.worktrees/communication-space on
+feat/communication-space, latest pushedfc1a6c40 (preceded by84e37752,6dde1489,
+d92d4206). Its docs/agent-handoff.md and collaboration/group-provisioning.md are
+authoritative. This checkout remains the live push release source, not the group
+migration source; do not deploy group migrations with this checkout's scripts.
 
-That branch now has V117–122: group directory/contacts, immutable provider-user
-selection, native identity/device registration, exact legacy parent/public-key
-references, shared five-parent quota, typed Matrix login preserving actual provider
-keys, encrypted group credential generations/recovery, owned device CAS updates
-bounded organization provisioning metadata/leases, typed proof-fenced queue ports,
-atomic native registration enqueue/retry and admitted worker publication.
-No group DI/controller/worker/gateway or Mobile ownership migration is enabled.
+The group branch contains V117–122, directory/canonical identity/device registration,
+shared five-parent quota, encrypted provider generations/recovery and bounded
+provisioning requests. Atomic native enqueue/retry, fresh-device publication,
+bounded failure settlement and scheduling are now wired into shared Spring DI.
+Both group feature/provisioning flags defaultfalse. No group HTTP/gateway/rooms or
+Mobile ownership migration is exposed. Retained DEVICE activation remains denied
+pending explicit runtime/private-key/store transfer; new group devices under a
+retained canonical USER are supported.
 
-V121 credential validation: full98 cases in395.199s (45 database,19 domain,34 data),
-3650 unchanged checked inputs, quality PASS; focused12 cases94.059s and recovery-tool13
-cases0.011s. Actual archive restore and production recovery SQL decrypt current/
-retained-key group credentials and unchanged legacy company credentials. Terminal
-generation/device revision1000000 supports irreversible cleanup after offboarding
-and parent purge. Owned metadata is not content admission. Device mutation ports:
-15 cases90.862s,3648 unchanged hashes, quality PASS; competing activation/revocation,
-stale publication, scope denial, identity preservation and transaction rollback.
+Latest acceptance:14 actual API/worker cases PASS192.349s, full worker127 cases/
+126 active/1 existing opt-in retention skip PASS315.901s,27 suites,8248 unchanged
+source/build/resource inputs, format/architecture PASS. Seven real flag contexts
+verify enabled claims, missing/default/each-false denial and resource termination.
+Actual scheduled native registration through pinned Synapse publishes encrypted
+credential+ACTIVE device+SUCCEEDED head+journal, verifies provider whoami, and keeps
+replay unchanged. API runtime cannot claim the worker queue. All checks complete.
+Earlier queue/schema/archive and native/worker race evidence is retained in that
+branch. No failed run in this wiring unit.
 
-V122 validation: full104 cases464.322s (49 database,19 domain,36 data),3652
-unchanged inputs and quality PASS; recovery-tool14 cases0.011s, projection121=122.
-Claims are bounded to8 per batch/16 live leases/60s, with8 attempts and bounded
-expiry/exhaustion cleanup. Actual archive, proof/scope and stale-lease tests pass.
+Next bounded native setup status for Mobile, then retained runtime transfer and
+group gateway/rooms/coherent client ownership. UNTESTED status drafts and proposed
+cases are in that worktree's ignored .work/communication-space-2026-11-03/space-status-next;
+read the branch handoff before editing. Never logout losing/late Matrix candidates:
+Synapse removes same-device winning tokens and E2EE keys. Transfer must fence all
+old gateway/provisioning/direct-room provider callers and preserve SDK store/private
+keys and pending transaction IDs. All54 communications acceptance groups remain open.
 
-Typed queue ports:17 cases102.360s,3658 unchanged hashes; actual SQL exact lease
-proof, MFA/defer/reclaim/retry, archive claims and device+credential+queue rollback.
-Native enqueue:18 cases106.830s,3658 unchanged hashes, quality PASS; initial request
-commits with device/binding/receipt/journal, with at most60s current proof deadline.
-Failure/cancellation/interruption at every write boundary roll back together;
-registration replay after native refresh preserves the original head.
-
-Explicit retry:22 cases137.393s,3660 unchanged hashes; current proof/MFA/observed
-revisions,60s cooldown, fresh replay, expired pending cancellation, concurrent
-retry and four-boundary rollback. Fresh group worker publication:29 cases158.622s,
-3662 unchanged hashes; actual PostgreSQL with controlled Matrix candidates proves
-released SQL locks during provider I/O, one publication winner, credential reuse/
-rotation and atomic activation/head/journal rollback including post-journal expiry.
-Actual Synapse remains earlier separate port/key continuity evidence. Retained
-DEVICE activation is denied pending runtime/SDK transfer; new devices under retained
-canonical USERS are supported. All checks for those commits completed.
-
-Next: bounded failure/defer outcomes and scheduling, then coherent group runtime
-transfer/gateway/rooms/Mobile ownership. Settlement is WIP in the group worktree;
-read its current status before editing. No group DI/HTTP/scheduler is enabled. Claims
-acquire metadata only; commit before taking account -> parent ->
-device -> queue -> credential guards. External I/O holds no SQL locks. Never logout
-a losing Matrix login: actual Synapse deletes all same-device tokens and E2EE keys.
-Retained runtime transfer and Mobile SDK/private keys/pending transactions require
-explicit coherent ownership migration. Read the branch handoff before continuing;
-ignored old port drafts are superseded by tracked code. Do not deploy these migrations using
-this checkout's live push-release scripts.
-
-Mobile0d96e737 records matching8273 gates for installed normal release28:
-native41701412608 with5 provider/230 Android-host/18 proof-host cases and3 inspected
-SystemUI PNGs; control41701412602 with3110 portable and1215 Apple cases, full Xcode822s,
-432 source hashes. Downloaded archives/reports are verified. Do not reinstall28.
-Actual Apple Matrix/APNs/CallKit and all54 communications acceptance groups remain
-open. Starter9959c1d needs no port for these HRIS-specific changes. Continue the full
-long run, regular user updates, atomic pushes and Git handoffs.
-
+Live8b40bd0f/schema116 has chat push ON and SMTP OFF. Phone normal release28 remains
+installed and verified; no reinstall is needed. Mobile0d96e737 records8273 gates:
+native41701412608 (5 provider,230 Android-host,18 proof-host cases,3 inspected SystemUI
+PNGs), control41701412602 (3110 portable,1215 Apple,full Xcode822s,432 checked hashes).
+Actual Apple Matrix/APNs/CallKit remains open. Starter9959c1d needs no port for these
+HRIS-specific changes. Continue the full long run, frequent user/Git updates and
+push every atomic commit.
 
 ## Private chat push active; release 28 installed — 3 November 2026
 

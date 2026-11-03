@@ -1,0 +1,302 @@
+{
+  "date": "2026-11-03",
+  "scope": "Authorized private HRIS pilot chat push activation; no production or communication-space migration",
+  "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+  "ci": "https://github.com/fajarxfce/hris-platform/actions/runs/41695437208",
+  "ciEvidence": "chat-push-release-ci-2026-11-03.json",
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41695437208",
+    "headSha": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "stagedAt": "2026-11-03T19:16:33.160941+00:00",
+    "elapsedSeconds": 26.86,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13262514290,
+        "archiveSha256": "87f4abdfc957e96f7dbca83363babd50bce794fdee593c992cc2f472bb4aa322",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-push-rollout-2026-11-03/packages/api/apps-server.jar",
+        "sha256": "f487ffd39fbee7f28d3fa33064fdb9d4b6ea0b7098c7cd65caa9b7ae538100e7",
+        "bytes": 98539034
+      },
+      {
+        "role": "worker",
+        "artifactId": 13263215021,
+        "archiveSha256": "8eb0c4cf446bc76612212d43be089297609fd85fbef5c3aa3fc8328aaf830cdd",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-push-rollout-2026-11-03/packages/worker/apps-worker.jar",
+        "sha256": "430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c",
+        "bytes": 78608113
+      }
+    ]
+  },
+  "stagedImages": {
+    "success": true,
+    "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41695437208",
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:chat-push-8b40bd0f",
+        "image": "sha256:08df88ffd7cda11cc11e647422095d60e42bb1b095eb42e8633164bc38ce9287",
+        "packageSha256": "f487ffd39fbee7f28d3fa33064fdb9d4b6ea0b7098c7cd65caa9b7ae538100e7",
+        "packageBytes": 98539034,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "tag": "hris-dev-worker:chat-push-8b40bd0f",
+        "image": "sha256:276c545e35f78ef5fa43213fe48cbff6c18d38e880ea35ddfed81dcf3ce9797a",
+        "packageSha256": "430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c",
+        "packageBytes": 78608113,
+        "runtimeUser": "10001:10001"
+      }
+    },
+    "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+    "dockerfileSha256": "c25d8f22fa916d04eadbd4ebf4c4fc3802c40474b23f55f9d9c801475cbd7c47",
+    "existingServicesUnchanged": true,
+    "buildLibsUnchanged": true,
+    "candidateOverlaySha256": "d013a4543adc9198469d84d66c9d33ad1de0036f9f149a189b406164296ad4b3",
+    "elapsedSeconds": 25.034
+  },
+  "checkpoint": {
+    "success": true,
+    "elapsedSeconds": 33.329,
+    "hris": {
+      "dataDirectory": "/home/fajar/.local/state/hris-platform/recovery-data/chat-push-20261103T192825",
+      "keysDirectory": "/home/fajar/.local/state/hris-platform/recovery-keys/chat-push-20261103T192825",
+      "manifestSha256": "3d7eb44d94f574a806fc9c1437fb7013333d5896be633a0c2452f6335b9be118",
+      "databaseVerification": {
+        "schema": "116",
+        "failedMigrations": 0,
+        "publicRelations": 201,
+        "invalidConstraints": 0,
+        "runtimeRoles": [
+          "hris_app|f|f|f|f",
+          "hris_worker|f|f|f|f"
+        ],
+        "identityEnvelopesVerified": 2
+      },
+      "storageVerification": {
+        "objects": 3,
+        "bytes": 2222,
+        "inventorySha256": "2e044937f5fcac29c6a34cbb9aae11dc2f89cf8f8280134207fd70dbeddb3dd7"
+      }
+    },
+    "matrixDataDirectory": "/home/fajar/.local/state/hris-platform/matrix-recovery-data/chat-push-20261103T192825",
+    "matrixKeysDirectory": "/home/fajar/.local/state/hris-platform/matrix-recovery-keys/chat-push-20261103T192825",
+    "matrixSchema": 95,
+    "matrixTableCount": 176,
+    "matrixCounts": {
+      "users": 1,
+      "devices": 1,
+      "e2e_cross_signing_keys": 0,
+      "e2e_device_keys_json": 1,
+      "e2e_fallback_keys_json": 1,
+      "e2e_one_time_keys_json": 50,
+      "e2e_room_keys": 0,
+      "event_json": 18,
+      "events": 18,
+      "pushers": 0,
+      "refresh_tokens": 0,
+      "room_memberships": 4,
+      "rooms": 2,
+      "access_tokens": 76
+    },
+    "files": {
+      "matrix.dump": {
+        "bytes": 336288,
+        "sha256": "44b95db4a15db7f5053d38ccbc13d7a2dbcf082dbf16aaa28d6e65dd721d986d"
+      },
+      "media.tar": {
+        "bytes": 1536,
+        "sha256": "2f2d03edbff9b39220f5f260defeae802a8b76757834893ccd5e81f39e2685ad"
+      }
+    },
+    "restoredProviderHealthy": true,
+    "signingKeyRestored": true,
+    "temporaryResourcesRemoved": true,
+    "sourceHrisHealthy": true,
+    "identityOrMessageCreated": false
+  },
+  "recoveryVerifier": {
+    "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "apiJarSha256": "f487ffd39fbee7f28d3fa33064fdb9d4b6ea0b7098c7cd65caa9b7ae538100e7",
+    "trackedSnapshotSha256": "b7c20a43c4e861b315e6b713753f94a55749ebfc75e9397488354370b3c58b37",
+    "root": "/home/fajar/hris/hris-platform/.work/chat-push-rollout-2026-11-03/recovery-verifier",
+    "reason": "Use the exact accepted CI JAR for recovery key verification while preserving existing build/libs.",
+    "localBuildLibsModified": false
+  },
+  "firstAttempt": {
+    "success": false,
+    "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "schema": 116,
+    "migrationStarted": false,
+    "startedAt": "2026-11-03T19:30:13.611123+00:00",
+    "failureCategory": "CalledProcessError",
+    "rollbackHealthy": true,
+    "elapsedSeconds": 31.285
+  },
+  "firstAttemptDiagnosis": {
+    "observedError": "failed to set up container networking: Address already in use",
+    "stage": "Matrix recreation after API, worker and gateway startup",
+    "cause": "Dynamic API/worker allocation could claim the stopped static Matrix address. The transient owner was not captured.",
+    "rollback": "Original configuration/images restored; services healthy. No data restoration."
+  },
+  "secondAttemptConfiguration": {
+    "reason": "Dynamic API/worker network allocation can claim the stopped provider address before its static replacement starts. Pin all four private service addresses and start provider first.",
+    "previousCandidateOverlaySha256": "d013a4543adc9198469d84d66c9d33ad1de0036f9f149a189b406164296ad4b3",
+    "candidateOverlaySha256": "6817cd11b01b85b44de9abcb7dcc1385ec9b1b262cf77302c7a96fdab01474b7",
+    "unchangedImages": true,
+    "unchangedEnvironments": true,
+    "startedServices": false
+  },
+  "activation": {
+    "success": true,
+    "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "schema": 116,
+    "migrationStarted": false,
+    "startedAt": "2026-11-03T19:35:51.653691+00:00",
+    "api": {
+      "container": "cbc3565a2dde4ddf551e5974ca23af6c535a003ef804b23e3610806302d4a82e",
+      "image": "sha256:08df88ffd7cda11cc11e647422095d60e42bb1b095eb42e8633164bc38ce9287",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "worker": {
+      "container": "0edb936d0674310d3e4b304edf8887c723ae5e8d149456a97011714c4e1b83b1",
+      "image": "sha256:276c545e35f78ef5fa43213fe48cbff6c18d38e880ea35ddfed81dcf3ce9797a",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "apiHealthy": true,
+    "providerHealthy": true,
+    "privateTlsValidationStatus": 400,
+    "untrustedDirectCallbacks": [
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      }
+    ],
+    "untrustedProxyStatus": 403,
+    "chatPushEnabled": true,
+    "smtpEnabled": false,
+    "hostProviderPortsPublished": false,
+    "existingDatabaseAndStorageUnchanged": true,
+    "existingEnvironmentAndIdentityKeysPreserved": true,
+    "dashboardUnchanged": true,
+    "oldImagesRetained": true,
+    "proxy": {
+      "container": "19245d3d651eec1833c12b1f843b42d83b1e1d3a3fc0061095671086ae7ac67c",
+      "image": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "runtimeUser": "10001:10001"
+    },
+    "matrix": {
+      "container": "00188dc9022bc1df24525c7ec7f92a5c8299a9cf69ea0297052047b5b885f42f",
+      "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+    },
+    "elapsedSeconds": 28.528
+  },
+  "readOnlyPostActivation": {
+    "verifiedAt": "2026-11-03T19:37:08.296219+00:00",
+    "success": true,
+    "readOnly": true,
+    "schema": 116,
+    "hrisComparisons": {
+      "schema": true,
+      "original_migration_history_fingerprint": true,
+      "runtime_roles": true,
+      "failed_migrations": true,
+      "oidc_fingerprint": true,
+      "person_binding_fingerprint": true,
+      "active_native_session_ids": true,
+      "document_revision_fingerprint": true,
+      "document_count": true,
+      "person_count": true
+    },
+    "matrixComparisons": {
+      "users": true,
+      "devices": true,
+      "e2e_cross_signing_keys": true,
+      "e2e_device_keys_json": true,
+      "e2e_room_keys": true,
+      "event_json": true,
+      "events": true,
+      "room_memberships": true,
+      "rooms": true
+    },
+    "providerSchema": 95,
+    "actualSigningKeyPreserved": true,
+    "states": {
+      "api": {
+        "running": true,
+        "restartCount": 0,
+        "image": "sha256:08df88ffd7cda11cc11e647422095d60e42bb1b095eb42e8633164bc38ce9287",
+        "pushFlags": {
+          "HRIS_COLLABORATION_PUSH_ENABLED": "true",
+          "HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED": "true",
+          "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED": "true"
+        }
+      },
+      "worker": {
+        "running": true,
+        "restartCount": 0,
+        "image": "sha256:276c545e35f78ef5fa43213fe48cbff6c18d38e880ea35ddfed81dcf3ce9797a",
+        "pushFlags": {
+          "HRIS_COLLABORATION_PUSH_ENABLED": "true",
+          "HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED": "true",
+          "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED": "true"
+        }
+      },
+      "matrix": {
+        "running": true,
+        "restartCount": 0,
+        "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+      },
+      "proxy": {
+        "running": true,
+        "restartCount": 0,
+        "image": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949"
+      }
+    },
+    "realUserPushSent": false,
+    "newPhoneChatEnrollmentObserved": false
+  },
+  "artifactChecksums": {
+    "checkpoint.py": "2cd6730cc1060c84bf9d6da0cf785cef8aa60ee8d9a336e171501a88687dd496",
+    "deploy.py": "701ca8e8e374545d9917aeb6763a9f7178ccd76c5644f770000f9a6c6ed60a6e",
+    "deploy2.py": "32797338554fbcdd9ca2ffb3a046da47d43244fd342876a4750e0fd016b133a5",
+    "verify-live.py": "7a1a2de715a9ff5fb267c2e71515598ae188782d5399323e74c708803c34a23a",
+    "provider-checkpoint.json": "4151f8433c89497fc0bd384116616d9075996d7fd833b1e39794f9daa0252188",
+    "runtime-result.json": "a7ba6952c6b3d7675ea69175cc3f54407f1cf60d1f0fc682e4b45d584b9997e7",
+    "runtime-result2.json": "50492bcca21d7b884a2074068de23ba7d852a52585ddf6792987684eddbb2f42",
+    "live-verification.json": "5d65de99dd1063b44ff189f0166b842509d3063f1c325ea71490d55687a6eed6"
+  },
+  "phone": {
+    "installedVersionCode": 28,
+    "evidenceRepository": "hris-mobile",
+    "evidence": "docs/measurements/chat-empty-history-phone-2026-11-03.json",
+    "reinstalledDuringActivation": false
+  },
+  "limits": [
+    "No new real-user message, device enrollment or FCM notification was generated in the live pilot. Actual isolated product FCM acceptance is recorded separately in product-chat-fcm-current-ui-2026-11-03.json.",
+    "New group directory schema117 remains isolated in feat/communication-space. Live schema116 and existing company-scoped Matrix identities remain unchanged.",
+    "Release28 is already installed; opening Chat normally allows client enrollment. No phone UI was driven by this deployment.",
+    "Apple/web provider runtime, group ownership migration, recipient acknowledgements, rich chat, calls/video/meetings remain open."
+  ]
+}

@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Private chat push active; release 28 installed — 3 November 2026
+
+Live API/worker now run accepted source8b40bd0f/schema116. All three chat push flags
+are ON; SMTP remains OFF. Full Verify41695437208 passed all14 jobs with downloaded
+artifact audits. [Rollout evidence](measurements/chat-push-private-rollout-2026-11-03.json)
+and [operations](collaboration/private-push-operations.md) supersede earlier pending
+deployment notes below. HRIS and nonempty Matrix checkpoints restored successfully,
+with separate data/key storage and complete temporary cleanup. First activation
+failed on an internal IP collision and rolled back healthy; pinned application IPs
+and provider-first startup passed on retry in28.528s. Source identities, signing
+key, crypto/message tables, Google/person/native/document state and schema history
+match the checkpoint. Private trusted TLS reaches validation; direct/forged and
+non-Synapse callbacks are denied. No real-user notification/message was generated.
+
+Mobile37401799 records installed normal release28 (source8273ae8d), same signer,
+UID/data retained, pulled APK hash806e23a770b52f71218e614d8a87af161af322c92d5852b0311929378d655374.
+Do not reinstall it. c770 native/control runs41691878601/41691878650 passed with
+downloaded reports and actual image review; new8273 runs41701412608/41701412602 are
+in progress. Live push activation itself does not prove enrollment or notification
+on the physical phone; ordinary Chat opening can enroll the installed client.
+
+Continue feat/communication-space in .worktrees/communication-space:5debc632 holds
+the stable directory foundation/V117, not deployed. Bounded directory repository
+and tests are WIP there; data1 passed76.781s/3 cases, format/architecture,3583 source
+hashes unchanged. Review and commit that increment. No group native/device/room API or mobile
+ownership migration is accepted yet. All remaining chat/call/video/meeting scope
+continues. User requires frequent updates, Git handoffs, every commit pushed and
+validated future builds installed with notice. No generic Starter port is needed
+for the HRIS-specific empty-history UI or private runtime configuration.
+
+
 ## Full push release gate accepted; live switch pending — 3 November2026
 
 Full Verify41695437208 at8b40bd0f passed all14 jobs. Digest-verified evidence:

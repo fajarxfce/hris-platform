@@ -1,0 +1,67 @@
+{
+  "scope": "Current native group setup status and safe operational retry metadata; no DI or HTTP exposure",
+  "baseCommit": "fc1a6c40",
+  "accepted": {
+    "startedAt": "2026-11-03T23:08:58.075290+00:00",
+    "elapsedSeconds": 119.361,
+    "exitCode": 0,
+    "sourceFiles": 8252,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDeviceStatusPolicyTest.xml": {
+        "sha256": "84317a7ffabd8729d33c8373b1e7f7c7cd3037234071cbdae0f400db0e613d23",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "f4fc2b8af10e935f801fe24b58a30c53841ae0cacf989b71edd14e7090563370",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRetryTest.xml": {
+        "sha256": "e317ec52eea4f2ec940084ae18ce284fb90117ca095438d8f3d94999adb77c80",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "a079a0791f8a36cf41a8503d993d1157cfab2b02570db078f43656cd44619f5e",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "evidence": [
+    "Pure status projection retains queue revision/state/attempts, safe prior outcome and deadline; explicit retry timing covers pending/expired/failed/cancelled requests and revision exhaustion",
+    "Active or revoked devices have no setup retry; inconsistent device/head ownership, impossible publication phases and future metadata fail closed",
+    "Actual PostgreSQL status reads return absent/pending/revoked devices under current native/group/client admission and preserve the original request across native refresh",
+    "Controlled clock reaches request expiry without rewriting queue state; read never silently restarts work",
+    "Current scope/build/parent/space denial, late committed offboarding, missing/foreign queue metadata and elapsed command budget reject status",
+    "Failure, cancellation and interruption after actual metadata reads leave queue/registration receipts/journal unchanged",
+    "Existing atomic registration, explicit retry and admitted worker publication/settlement regression cases pass"
+  ],
+  "limits": [
+    "The status command is not yet bound in DI or exposed over HTTP; gateway status and retained runtime transfer remain pending",
+    "Status is an observation, never future retry/content/provider authority; queued native proof may predate an ordinary refresh",
+    "No token, Matrix identity, key fingerprint, lease owner/token or native authentication proof appears in the response model",
+    "Live8b40/schema116, installed phone28 and full communications acceptance remain unchanged"
+  ]
+}

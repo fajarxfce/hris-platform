@@ -373,6 +373,164 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         }
     }
 
+    @Test
+    fun groupStatusPreservesPendingWorkAcrossRefreshAndExpiryWithoutWriting() {
+        val f = Fixture()
+        assertNull(success(f.status()))
+        f.select()
+        val receipt = success(f.register(UUID.randomUUID()))
+        val original = f.work(receipt.id)
+        val first = requireNotNull(success(f.status()))
+        assertEquals(receipt.id, first.id)
+        assertEquals(0, first.version)
+        assertEquals(CollaborationDeviceState.PROVISIONING, first.state)
+        assertEquals(CollaborationSpaceProvisioningState.QUEUED, first.provisioning.state)
+        assertEquals(now.plusSeconds(60), first.provisioning.retryNotBefore)
+        assertEquals(now.plusSeconds(60), first.provisioning.expiresAt)
+        assertEquals(now, first.observedAt)
+        owner.update(
+            "update native_sessions set version=1,rotated_at=?::timestamptz where id=?",
+            now.toString(),
+            f.session,
+        )
+        failure(f.status(), "native_session_invalid")
+        assertEquals(first, success(f.status(version = 1)))
+        f.clock.at = now.plusSeconds(60)
+        val expired = requireNotNull(success(f.status(version = 1)))
+        assertEquals(CollaborationSpaceProvisioningState.QUEUED, expired.provisioning.state)
+        assertEquals(expired.observedAt, expired.provisioning.retryNotBefore)
+        assertEquals(original, f.work(receipt.id))
+        assertEquals(0, original.request.nativeSessionVersion)
+        f.counts(1, 1, 1)
+        owner.update(
+            "update collaboration_space_devices set state='REVOKED',version=1,updated_at=?::timestamptz,revoked_at=?::timestamptz where id=?",
+            now.toString(),
+            now.toString(),
+            receipt.id,
+        )
+        val revoked = requireNotNull(success(f.status(version = 1)))
+        assertEquals(CollaborationDeviceState.REVOKED, revoked.state)
+        assertNull(revoked.provisioning.retryNotBefore)
+        assertEquals(original, f.work(receipt.id))
+        f.counts(1, 1, 1)
+    }
+
+    @Test
+    fun groupStatusRechecksAuthorityAfterActualReadsAndRejectsMismatchedMetadata() {
+        val f = Fixture()
+        f.select()
+        success(f.register(UUID.randomUUID()))
+        failure(f.status(request = f.actor.copy(companyId = f.company)), "platform_scope_required")
+        failure(f.status(build = client.copy(build = 27)), "client_update_required")
+        failure(f.status(requestedSpace = UUID.randomUUID()), "collaboration_access_denied")
+        failure(f.status(parent = UUID.randomUUID()), "native_session_invalid")
+        val disabled =
+            object : CollaborationSpaceDeviceRepository by f.registry {
+                override fun findBound(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    nativeSessionId: UUID,
+                ): Result<CollaborationSpaceDevice?> =
+                    error("Disabled status must not read metadata")
+            }
+        failure(
+            f.status(registry = disabled, policy = CollaborationSpacePolicy()),
+            "collaboration_unavailable",
+        )
+        for (variant in 0..3) {
+            val changed =
+                object : CollaborationSpaceProvisioningRepository by f.provisioning {
+                    override fun metadata(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        deviceId: UUID,
+                        lock: Boolean,
+                    ): Result<CollaborationSpaceProvisioning?> =
+                        f.provisioning.metadata(spaceId, accountId, deviceId, lock).map { head ->
+                            when (variant) {
+                                0 -> null
+                                1 ->
+                                    requireNotNull(head)
+                                        .copy(
+                                            request =
+                                                head.request.copy(
+                                                    nativeSessionId = UUID.randomUUID()
+                                                )
+                                        )
+                                2 -> {
+                                    owner.update(
+                                        "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                                        f.company,
+                                        f.account,
+                                    )
+                                    head
+                                }
+                                else -> {
+                                    f.clock.at = now.plusSeconds(30)
+                                    head
+                                }
+                            }
+                        }
+                }
+            failure(
+                f.status(provisioning = changed),
+                when (variant) {
+                    2 -> "collaboration_access_denied"
+                    3 -> "collaboration_admission_changed"
+                    else -> "invalid_collaboration_provisioning"
+                },
+            )
+            if (variant == 2)
+                owner.update(
+                    "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+                    f.company,
+                    f.account,
+                )
+            f.clock.at = now
+        }
+        f.counts(1, 1, 1)
+    }
+
+    @Test
+    fun groupStatusPreservesFailuresCancellationAndInterruptionWithoutMutatingWork() {
+        val f = Fixture()
+        f.select()
+        val receipt = success(f.register(UUID.randomUUID()))
+        val original = f.work(receipt.id)
+        val failed = Result.Failed(Failure(FailureKind.UNAVAILABLE, "database_busy"))
+        for (variant in 0..2) {
+            val interrupted =
+                object : CollaborationSpaceProvisioningRepository by f.provisioning {
+                    override fun metadata(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        deviceId: UUID,
+                        lock: Boolean,
+                    ): Result<CollaborationSpaceProvisioning?> =
+                        f.provisioning.metadata(spaceId, accountId, deviceId, lock).flatMap {
+                            when (variant) {
+                                0 -> failed
+                                1 -> throw CancellationException("Owned status cancellation")
+                                else -> throw InterruptedException("Owned status interruption")
+                            }
+                        }
+                }
+            when (variant) {
+                0 -> assertEquals(failed, f.status(provisioning = interrupted))
+                1 ->
+                    assertThrows(CancellationException::class.java) {
+                        f.status(provisioning = interrupted)
+                    }
+                else ->
+                    assertThrows(InterruptedException::class.java) {
+                        f.status(provisioning = interrupted)
+                    }
+            }
+            assertEquals(original, f.work(receipt.id))
+        }
+        f.counts(1, 1, 1)
+    }
+
     private inner class Fixture {
         val account = UUID.randomUUID()
         val company = UUID.randomUUID()
@@ -546,6 +704,29 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     .execute(actor, session, 0, space, client, UUID.randomUUID())
             )
         }
+
+        fun status(
+            request: Actor = actor,
+            parent: UUID = session,
+            version: Long = 0,
+            requestedSpace: UUID = space,
+            build: ClientVersion? = client,
+            registry: CollaborationSpaceDeviceRepository = this.registry,
+            provisioning: CollaborationSpaceProvisioningRepository = this.provisioning,
+            policy: CollaborationSpacePolicy = CollaborationSpacePolicy(true, 28, 28),
+        ): Result<CollaborationSpaceDeviceStatus?> =
+            GetNativeCollaborationSpaceDeviceStatus(
+                    registry,
+                    provisioning,
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    policy,
+                    IdentitySecurityPolicy(),
+                    clock,
+                )
+                .execute(request, parent, version, requestedSpace, build)
 
         fun register(
             operation: UUID,

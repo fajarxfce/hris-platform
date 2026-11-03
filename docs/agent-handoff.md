@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Bounded native group setup status accepted — 3 November 2026
+
+GetNativeCollaborationSpaceDeviceStatus reads under current root/native/group/
+client/MFA admission, account -> parent guards and a30-second command budget.
+Absent binding returns null; an existing device with missing/foreign/impossible
+head metadata fails closed. Response includes device state/version/platform/origin/
+label, safe operational revision/state/attempts/outcome/deadline/retry timing and
+observation time. It omits provider identity/credentials, fingerprints and lease/
+native proof. Reading after native refresh preserves older queued proof and never
+restarts expired work. Active/revoked/exhausted revisions have no setup retry.
+
+[Evidence](measurements/collaboration-space-native-status-2026-11-03.json):26 PASS
+119.361s,8252 unchanged source/build/resource hashes, format/architecture PASS.
+Two policy cases plus9 actual registration/status,4 retry and11 worker-publication/
+settlement cases. Actual status exercises empty/pending/refreshed/revoked reads,
+controlled-clock expiry, denied scope/client/parent, committed late offboarding,
+missing/foreign head, command deadline and failure/cancel/interruption propagation.
+Queue, receipt and journal remain unchanged. No failed run; checks are complete.
+This new command remains unwired to DI/HTTP; the preceding seven-use-case group
+module/worker graph is already tested and bound behind defaultfalse flags.
+
+Next explicit retained runtime transfer, then group gateway/rooms and coherent
+Mobile ownership. Ignored runtime-transfer-next.md records reviewed call sites,
+a proposed bounded ownership/lease/drain model and Mobile store concerns; it is
+NOT implementation. All old Matrix provider callers need fencing: gateway access/
+renewal, native device provisioning and direct-room provisioning. No losing or
+late candidate may be logged out. Keep original store/private keys/transaction IDs.
+
+API inspection of installed Android SDK26.10.23 confirms Encryption.ed25519Key()
+and curve25519Key() are callable; actual paused reopen/empty-store mismatch and
+process-death behavior still need native testing. No private key export or server
+signature protocol was added. Original store scope contains company/native IDs;
+use explicit durable ownership/alias, never substitute a space ID in that hash.
+Old status drafts are superseded by tracked code/tests; do not recopy them.
+
+Live8b40/schema116 pushON/SMTP OFF and phone28 unchanged. Group runtime remains
+unexposed; all54 acceptance groups open. Continue the full long run, regular user/
+Git updates and push every atomic commit.
+
 ## Opt-in group graph and actual scheduled Synapse flow accepted — 3 November 2026
 
 Shared CollaborationConfiguration now binds the group repositories and seven use

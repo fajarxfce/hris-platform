@@ -73,6 +73,16 @@ journal commit together. Replay after another native refresh returns its origina
 receipt without replacing work. Previous outcome and creation identity survive.
 No public status response may include lease owner/token fields.
 
+`GetNativeCollaborationSpaceDeviceStatus` now supplies a bounded current-native
+setup observation. It returns device state/version and safe queue status/revision,
+attempts, prior outcome, deadline and explicit retry timing. It never acquires a
+provider credential or changes work. Current account/group/client/MFA admission is
+rechecked after metadata reads; an ordinary refresh may observe older queued proof
+without adopting it. A revoked device can show recovery state under current native
+access. Missing or inconsistent heads fail closed. This command is not yet exposed
+through DI/HTTP. [Status evidence](../measurements/collaboration-space-native-status-2026-11-03.json)
+records26 passing policy/actual-database regression cases in119.361s.
+
 `AdvanceCollaborationSpaceProvisioning` now implements admitted preparation and
 publication for fresh group devices, including a new device under a retained
 canonical user. It reconstructs the exact queued native proof instead of adopting

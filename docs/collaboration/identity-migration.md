@@ -116,6 +116,16 @@ records seven passing cases in51.46s with3620 unchanged source hashes, including
 actual PostgreSQL reads through a role granted only the public metadata view,
 reserved/published keys, scope changes, parent purge and cancellation/error mapping.
 
+The group registry repository now retains exact device/native-binding metadata and
+registers both rows in the caller's transaction. Its quota query starts from native
+parents, so old company devices and group devices count once. It caps at six and
+reads current group availability in the same statement; unavailable scope is denied,
+not treated as zero devices. A refresh-capable parent still occupies quota when its
+short access token expires. [Registry repository evidence](../measurements/collaboration-space-device-repository-2026-11-03.json)
+records five cases in42.411s with3628 unchanged source hashes and quality checks,
+including actual duplicate-binding rollback, parent purge, cross-account reads and
+quota/credential/membership transitions. The failed future-version fixture is retained.
+
 The schema and its actual PostgreSQL tests are implemented. Native registration,
 provisioning, group gateway/rooms and local-store adoption are not yet implemented.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)

@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+## Group device registry and shared quota accepted — 3 November 2026
+
+CollaborationSpaceDeviceRepository now maps exact canonical device/legacy key and
+origin-parent metadata, inserts device+binding in the caller transaction, and
+counts live native parents once across old company/group bindings. The bounded
+query starts from parent rows with EXISTS, LIMIT6; current group eligibility and
+count share a SQL snapshot. Unavailable scope denies rather than returning zero.
+Actual PostgreSQL covers capped/deduplicated quota, refresh-capable access expiry,
+revocation/hard expiry/stale credentials, group access changes, duplicate-binding
+rollback, cross-account reads and immutable device retention after parent purge.
+[Evidence](measurements/collaboration-space-device-repository-2026-11-03.json):
+space-device-data2 PASS42.411s/5 cases,3628 unchanged hashes, quality PASS. The first
+run rejected an incorrectly future-version test session that became current after
+account rotation; fixture corrected to old version -1, production query unchanged.
+No check is running. No group DI/controller or provider runtime has been enabled.
+
+Next implement native group registration with explicit NEW/RETAINED intent. Require
+committed canonical selection; lock operation -> account exclusive -> native parent;
+validate account/group/native/client/MFA/provider before/after. RETAINED needs exact
+current source parent, canonical user, provider device/platform and reserved public
+fingerprint; no missing-data fallback. NEW gets distinct HRISG ID and retains old
+stores. Enforce five other active parents before creating a sixth. Device/binding,
+receipt, audit/outbox and eventual provisioning job must commit atomically. Existing
+native binding cannot silently change device/key identity; recovery requiring a new
+device may need a new native parent. A fingerprint does not prove local private keys.
+
+Then complete provisioning/gateway/rooms and Mobile explicit store/owner/worker/push/
+read migration before publishing contacts. Live8b40/schema116 pushON/SMTP OFF and
+phone28 remain unchanged. All matching8273 gates remain accepted. Continue complete
+communications scope, each commit pushed, regular user/Git updates.
+
+
 ## Exact legacy parent metadata port accepted — 3 November 2026
 
 CollaborationLegacyParentRepository.find now reads the V120 view for exact

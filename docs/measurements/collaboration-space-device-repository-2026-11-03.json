@@ -1,0 +1,56 @@
+{
+  "scope": "Group device registry and coherent bounded native-parent quota; still unwired",
+  "baseCommit": "8eeab922",
+  "accepted": {
+    "startedAt": "2026-11-03T20:47:40.551158+00:00",
+    "elapsedSeconds": 42.411,
+    "exitCode": 0,
+    "sourceFiles": 3628,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceMappingTest.xml": {
+        "sha256": "8a898a1b8c01fceea5d2ef734ce0a5e6a1550f8015b78652400279c0288f81f3",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "9db01cec432e937ceb8e6b0bb1dfb6abb90d4c96f84ca3b3728ab8d39efed1ad",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck"
+  ],
+  "validation": [
+    "Actual PostgreSQL stores and reads exact device/native-binding provenance with account RLS",
+    "Native parent rows plus indexed legacy/group EXISTS count duplicates once; result caps at6 for later five-device admission",
+    "Eligible scope and quota share one SQL snapshot; missing scope returns denial, never zero",
+    "Quota counts refresh-capable parents after access-token expiry, excludes revoked/hard-expired/stale-credential parents, and observes membership changes",
+    "Duplicate native binding fails after device insertion and rolls that insertion back under actual TransactionRunner; original device remains",
+    "Parent purge removes live lookup while immutable provider identity/provenance survives; replacement cannot overwrite it",
+    "Mapping validates new/legacy provider IDs, canonical user account/space, native provenance, public fingerprint, platform and state/version/time; technical and cancellation failures remain explicit"
+  ],
+  "earlierAttempt": {
+    "attempt": "space-device-data1",
+    "seconds": 33.099,
+    "result": "Rejected: stale-session fixture used a future credential version1, which correctly became current after account version increased to1. Changed that fixture to the actual old/invalid version -1; production query unchanged."
+  },
+  "limits": [
+    "The quota query and metadata registry do not themselves admit a native registration or provider request",
+    "Registration must hold account/parent guards and atomically add receipt/journal and eventual provisioning work",
+    "No group controller, DI, provider provisioning or Mobile store adoption is wired; live schema116 and phone28 unchanged"
+  ]
+}

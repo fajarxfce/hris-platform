@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-03",
+  "sourceBase": "fd09de67a16b3623c72b5dbb181c5d86e8ce0360",
+  "changedSourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmInteropTest.kt": "b85964ff8666899661e0dd126ecbd12966d0985dd04265f2448dcbf6abda70b2"
+  },
+  "run": {
+    "seconds": 320.655,
+    "exitCode": 1,
+    "inputsUnchanged": true,
+    "counts": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "junitSha256": "08dff6bef26acc994c113d6b6e7cc8dd6acc28681a02d3b5835f12e9d9cdc845",
+    "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc"
+  },
+  "fixture": "92777c0e-d0cf-4bd7-82a1-fe0371a3b2e9",
+  "driverSeconds": 252.355,
+  "failedStage": "waiting_for_real_fcm",
+  "failureCategory": "TimeoutError",
+  "serverCounts": {
+    "registrations": 1,
+    "pushers": 1,
+    "delivered": 0
+  },
+  "pushState": {
+    "providerPushers": {
+      "available": true,
+      "value": 1
+    },
+    "providerHasFailedPush": {
+      "available": true,
+      "value": false
+    },
+    "hints": {
+      "available": true,
+      "value": []
+    }
+  },
+  "evidenceSha256": {
+    "emulator-owner.json": "e9f59e00e5a1a602537e55788a64e312fb4475da540a2b511177427bc6770449",
+    "product-progress.json": "e814b9fa5c989318b0149e7a052a10a97263963165061d482b9a68a51194cd73",
+    "server-status.json": "ca30a790c9044069096ed7eda447828299684ca848f841cd1a618132e64a9d54",
+    "result.json": "34cec21538c13fe98bacccd6aa96c3e2e7cad76a9984e754876ac849940a1170",
+    "gateway-trace.json": "9f648fe25d17e5cb833eee92874f1b7579ba456cbcaebcb7a4d7d91a6af1410f",
+    "push-state.json": "0e429b231a117eeafe4639f3421afa0ef80f6e1ae71e1372358a330ce75fac79"
+  },
+  "visuallyInspected": {
+    "product-notifications-enabled.png": "08b87c4f6e07eafa8d3520e12801dc88fdbf7bb8dbbd559b546162d8548415d5",
+    "product-chat-ready.png": "4d4ca8e8f6d2bf7904df3d27db63e556f80ed761542acb926c8abf59349993ec",
+    "product-failure.png": "a02a4bb2e2176fc8c384ed6e17183c0e25148ec9f2f0557c1c4597abc2d4945e"
+  },
+  "fixtureSecretsRemoved": true,
+  "cleanupConfirmed": true,
+  "phoneTouched": false,
+  "conclusion": "Real encrypted peer original and callback HTTP200; no retained wake hint exists. Synapse still has one pusher and no failed push. This narrows failure to callback admission/room ownership or notification selection before queue delivery. It does not establish an FCM provider/token failure.",
+  "limits": [
+    "Not accepted product FCM/inline reply. Live chat push remains OFF.",
+    "Diagnostics retain only counts/flags and sanitized exception class names. Private OS/worker logs are not committed.",
+    "Immutable product/peer artifacts5 are Mobile1136, not release26 UI. New UI requires its own later fixture artifact.",
+    "All54 acceptance groups remain open."
+  ]
+}

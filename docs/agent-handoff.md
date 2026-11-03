@@ -1,5 +1,24 @@
 # Agent continuation — HRIS workspace
 
+## Product FCM callback retains no wake hint — 3 November 2026
+
+[Run12 evidence](measurements/product-chat-fcm-empty-hints-2026-11-03.json): fresh
+owned run FAIL320.655s, driver252.355s, unchanged inputs, one executed JUnit case.
+Actual application login/device/native registration/managed pusher succeed. Encrypted
+peer original reaches Matrix and callback returns200, but hints table is EMPTY.
+Synapse retains one pusher with no failure. This is before queue/FCM delivery, not
+proof of a provider/token problem. Counts1/1/0, all independent probes available;
+all three settings/chat/home PNGs actually viewed and owned cleanup/secrets removal pass.
+New fixture-only probes map unavailable reads to a safe class name and do not expose
+keys/tokens/bodies. Need inspect callback admission/expected room under actual product
+identity next, then fresh run with matching fingerprints; do not relax authority.
+
+Mobile b5ac30f5 records release26 installed16:56:36UTC, unchanged UID10962/signer/
+data and exact pulled APK21d134bc1e1cbae5e4fdf242da450f1318bdab07c6a5c3568740a7586a540cf4.
+No phone UI driven. New offline inbox previews are WIP and focused Mobile tests now
+own local heavy capacity. Runtime304/schema116/push OFF; all54 groups stay active.
+
+
 ## Chat demo accounts completed; UX and group scope in progress — 3 November 2026
 
 [Demo evidence](measurements/chat-demo-accounts-2026-11-03.json): the four existing

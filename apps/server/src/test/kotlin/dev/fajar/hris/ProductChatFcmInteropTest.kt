@@ -164,8 +164,45 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
             val evidence = directory.resolve("gateway-trace.json")
             Files.writeString(evidence, json.writeValueAsString(trace.snapshot()))
             Files.setPosixFilePermissions(evidence, PosixFilePermissions.fromString("rw-------"))
+            val pushEvidence = directory.resolve("push-state.json")
+            Files.writeString(
+                pushEvidence,
+                json.writeValueAsString(
+                    mapOf(
+                        "providerPushers" to probe { provider.pusherCount() },
+                        "providerHasFailedPush" to probe { provider.providerHasFailedPush() },
+                        "hints" to
+                            probe {
+                                database()
+                                    .queryForList(
+                                        """select revision,delivered_revision,attempt_revision,attempts,
+                                visible_revision,lease_token is not null as leased,
+                                expires_at>current_timestamp as unexpired,
+                                available_at<=current_timestamp as available
+                                from collaboration_push_hints
+                                where company_id=? and account_id=? order by device_id limit 5""",
+                                        owner.fixture.company,
+                                        owner.fixture.account,
+                                    )
+                            },
+                    )
+                ),
+            )
+            Files.setPosixFilePermissions(
+                pushEvidence,
+                PosixFilePermissions.fromString("rw-------"),
+            )
         }
     }
+
+    /** Independent bounded probes preserve unavailable evidence without exposing error payloads. */
+    private fun probe(read: () -> Any): Map<String, Any> =
+        try {
+            mapOf("available" to true, "value" to read())
+        } catch (error: Exception) {
+            if (error is InterruptedException || Thread.currentThread().isInterrupted) throw error
+            mapOf("available" to false, "failureType" to error.javaClass.simpleName)
+        }
 
     private fun runDriver(
         root: Path,

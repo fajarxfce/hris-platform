@@ -1,7 +1,8 @@
 # Organization device provisioning
 
-The native selection and registration commands currently commit identity intent,
-current binding and journal/receipt. They are unwired. The typed internal Matrix
+The native selection and registration commands commit identity intent, current
+binding and journal/receipt. Fresh device registration now also enqueues bounded
+provider work atomically. They are unwired. The typed internal Matrix
 candidate port is implemented and tested against an owned Synapse process; it does
 not supply a public login endpoint or activate an HRIS group device.
 
@@ -24,7 +25,8 @@ private-key/store continuity or cross-company HRIS messaging.
 V122 now provides an initially empty organization provisioning queue. It retains
 one operational head per group device and the immutable original native parent;
 there is no native-session cascading foreign key. Existing background_jobs remains
-company-only. This schema is not wired to native registration or a worker yet.
+company-only. Native registration now inserts its initial head; the worker is not
+wired yet.
 
 Each request records native version, account credential version, authentication/MFA
 timestamps, correlation ID and native client platform/build. Insert/retry requires
@@ -55,9 +57,11 @@ defer compare every typed request proof field, revision, attempt, owner, token a
 exact live deadline. Mapping validates timestamp precision, lifecycle coherence and
 claim bounds/uniqueness. These ports still require caller-owned current admission.
 
-Next integrate native/worker use cases. Native registration must insert its request
-atomically with device/binding/receipt/journal.
-Explicit retries need their own operation receipt and current native admission;
+Native registration now inserts its request atomically with device/binding/receipt/
+journal. It re-observes native authority and clips request life to at most60 seconds
+and current access/hard/MFA expiry. Replay, including after native refresh, preserves
+the original work instead of silently restarting it. Next implement explicit retry
+and admitted worker use cases. Retries need their own receipt and current admission;
 lost-response replay cannot silently start another attempt.
 
 A worker claim transaction acquires only queue metadata and commits before native
@@ -119,3 +123,11 @@ outcomes, owned cleanup and restored worker claims. Failed Result, cancellation 
 interruption roll back encrypted credential, device and queue writes together; a
 positive transaction commits all three. This is storage atomicity, not acceptance
 of worker admission, business journal or provider publication use cases.
+
+[Registration enqueue evidence](../measurements/collaboration-space-registration-queue-2026-11-03.json):
+18 cases pass in106.830s with3658 unchanged source hashes and quality checks. Six
+actual native command cases include exact proof/deadline, native-refresh replay,
+shared quota, retained identities and late admission changes. Failed Result,
+cancellation and interruption after device/queue/receipt/journal writes each roll
+back the entire registration. The first run required a fixture-only device UPDATE
+grant for V122 FOR SHARE; production policy was unchanged.

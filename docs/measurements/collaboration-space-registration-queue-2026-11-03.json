@@ -1,0 +1,77 @@
+{
+  "scope": "Atomic native group device registration and bounded provisioning enqueue, still without public wiring",
+  "baseCommit": "453f79d8",
+  "accepted": {
+    "startedAt": "2026-11-03T22:13:11.071962+00:00",
+    "elapsedSeconds": 106.83,
+    "exitCode": 0,
+    "sourceFiles": 3658,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "9678e42b66407dd0b756629e9609ce645d08ec00ccd8db534251d9cee60b1e30",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "330922daf44a5639b29ae819df7cd85681bce97652a11c7901db5cbaa956080b",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningMappingTest.xml": {
+        "sha256": "fab0c0d064847a49f2c434e77738b9c3144355606fcd660f711625db8e1f368d",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningStorageTest.xml": {
+        "sha256": "46c81f27c9fff1c32296c1761d46ad1d00e98c2f6b76880d47ece33db308304a",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "09461d8bbbe26b6adeadc72a01a7ba0c9975919115b83e904a4c93927ceeca67",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "earlierRun": {
+    "elapsedSeconds": 91.158,
+    "tests": 18,
+    "failures": 6,
+    "reason": "Registration fixture lacked UPDATE on group devices required for V122 trigger FOR SHARE; fixture grant corrected, production admission unchanged."
+  },
+  "evidence": [
+    "Device, native binding, initial queue proof, operation receipt and business journal commit together",
+    "Freshly observed native access/hard/MFA deadline bounds work to at most 60 seconds; request remains intent, not future admission",
+    "Lost-response replay and a second operation on the same registered device preserve the original queue head, including after native-session refresh",
+    "Failure, cancellation and interruption after each of device, queue, receipt and journal writes roll back all state and permit an identical retry",
+    "Existing retained identity, fifth/sixth device race and late group/MFA/source/expiry/clock/interruption regression cases pass"
+  ],
+  "limits": [
+    "Explicit retry and admitted worker/provider publication are not yet integrated",
+    "No DI/controller/scheduler, group gateway/room or Mobile owner migration is enabled",
+    "Live8b40/schema116 and phone28 unchanged"
+  ]
+}

@@ -11,9 +11,10 @@ import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-/** Registers identity intent and its current parent only; provider provisioning is separate. */
+/** Atomically registers identity intent, its native binding and bounded provider work. */
 class RegisterNativeCollaborationSpaceDevice(
     private val registry: CollaborationSpaceDeviceRepository,
+    private val provisioning: CollaborationSpaceProvisioningRepository,
     private val legacyParents: CollaborationLegacyParentRepository,
     private val selections: CollaborationSpaceIdentityRepository,
     private val spaces: CollaborationSpaceRepository,
@@ -197,8 +198,32 @@ class RegisterNativeCollaborationSpaceDevice(
                         parameters = mapOf("maximum" to "5"),
                     )
                 )
+            val refreshed = admission()
+            if (refreshed is Result.Failed) return@run refreshed
+            val current = (refreshed as Result.Success).value
             val id = UUID.randomUUID()
-            val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+            val at = current.admittedAt.truncatedTo(ChronoUnit.MICROS)
+            val deadline = current.expiresAt.truncatedTo(ChronoUnit.MICROS)
+            if (deadline <= at)
+                return@run Result.Failed(
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_admission_expired")
+                )
+            val work =
+                CollaborationSpaceProvisioningRequest(
+                    spaceId,
+                    actor.accountId,
+                    id,
+                    nativeSessionId,
+                    0,
+                    current.nativeSessionVersion,
+                    current.credentialVersion,
+                    actor.authenticatedAt,
+                    actor.mfaVerifiedAt,
+                    actor.correlationId,
+                    current.client,
+                    at,
+                    deadline,
+                )
             val device =
                 CollaborationSpaceDevice(
                     id,
@@ -222,6 +247,7 @@ class RegisterNativeCollaborationSpaceDevice(
             val receipt = MutationReceipt(id, 0)
             registry
                 .register(device)
+                .flatMap { provisioning.enqueue(work) }
                 .flatMap { operations.record(actor, key, receipt) }
                 .flatMap {
                     journal.record(
@@ -235,6 +261,7 @@ class RegisterNativeCollaborationSpaceDevice(
                                 "origin" to origin.name,
                                 "platform" to platform.name,
                                 "version" to "0",
+                                "provisioningRevision" to "0",
                             ),
                         ),
                     )

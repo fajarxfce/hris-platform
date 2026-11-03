@@ -14,6 +14,7 @@ import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import java.time.*
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.concurrent.*
 import org.flywaydb.core.Flyway
@@ -21,6 +22,7 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.jdbc.core.JdbcTemplate
@@ -43,7 +45,7 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
     private lateinit var owner: JdbcTemplate
     private lateinit var runtime: DriverManagerDataSource
     private lateinit var space: UUID
-    private val now = Instant.parse("2026-11-03T20:00:00Z")
+    private lateinit var now: Instant
     private val server = "matrix.example.test"
     private val client = ClientVersion(ClientPlatform.ANDROID, 28)
 
@@ -57,9 +59,11 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         )
         owner.execute("grant usage on schema public to space_device_command_fixture")
         owner.execute("grant select on all tables in schema public to space_device_command_fixture")
-        owner.execute("grant update on accounts,native_sessions to space_device_command_fixture")
         owner.execute(
-            "grant insert on collaboration_space_identities,collaboration_space_devices,collaboration_space_device_sessions,operation_receipts,audit_entries,platform_audit_metadata,outbox_events to space_device_command_fixture"
+            "grant update on accounts,native_sessions,collaboration_space_devices to space_device_command_fixture"
+        )
+        owner.execute(
+            "grant insert on collaboration_space_provisioning,collaboration_space_identities,collaboration_space_devices,collaboration_space_device_sessions,operation_receipts,audit_entries,platform_audit_metadata,outbox_events to space_device_command_fixture"
         )
         runtime =
             DriverManagerDataSource(
@@ -67,10 +71,16 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                 "space_device_command_fixture",
                 "isolated-fixture-only",
             )
+        now = Instant.now().truncatedTo(ChronoUnit.MICROS)
         space =
             requireNotNull(
                 owner.queryForObject("select id from collaboration_spaces", UUID::class.java)
             )
+    }
+
+    @BeforeEach
+    fun clockForTest() {
+        now = Instant.now().truncatedTo(ChronoUnit.MICROS)
     }
 
     @Test
@@ -83,12 +93,29 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         val receipt = success(f.register(operation))
         assertEquals(0, receipt.version)
         val device = f.device()
+        val work = f.work(device.id)
+        assertEquals(device.id, work.request.deviceId)
+        assertEquals(f.session, work.request.nativeSessionId)
+        assertEquals(f.actor.authenticatedAt, work.request.authenticatedAt)
+        assertEquals(f.actor.mfaVerifiedAt, work.request.mfaVerifiedAt)
+        assertEquals(f.actor.correlationId, work.request.correlationId)
+        assertEquals(client, work.request.client)
+        assertEquals(0, work.request.nativeSessionVersion)
+        assertEquals(0, work.request.credentialVersion)
+        assertEquals(0, work.request.revision)
+        assertEquals(now, work.request.requestedAt)
+        assertEquals(now.plusSeconds(60), work.request.expiresAt)
+        assertEquals(CollaborationSpaceProvisioningState.QUEUED, work.state)
+        assertEquals(0, work.attempts)
+        assertNull(work.lease)
+        assertNull(work.lastOutcome)
         assertEquals(receipt.id, device.id)
         assertEquals("HRISG_${compact(device.id)}", device.matrixDeviceId)
         assertEquals(f.session, device.originNativeSessionId)
         assertEquals(receipt.copy(replayed = true), success(f.register(operation)))
         assertEquals(receipt, success(f.register(UUID.randomUUID())))
         f.counts(1, 2, 1)
+        assertEquals(work, f.work(device.id))
         owner.update(
             "update collaboration_space_devices set state='ACTIVE',version=1 where id=?",
             device.id,
@@ -114,6 +141,32 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
             f.session,
         )
         failure(f.register(operation), "native_session_invalid")
+        f.counts(1, 2, 1)
+    }
+
+    @Test
+    fun refreshedNativeReplayPreservesTheOriginalWorkAndParentDeadlineBoundsNewWork() {
+        val f = Fixture()
+        f.select()
+        owner.update(
+            "update native_sessions set access_expires_at=?::timestamptz where id=?",
+            now.plusSeconds(20).toString(),
+            f.session,
+        )
+        val operation = UUID.randomUUID()
+        val receipt = success(f.register(operation))
+        val original = f.work(receipt.id)
+        assertEquals(now.plusSeconds(20), original.request.expiresAt)
+        owner.update(
+            "update native_sessions set version=version+1,rotated_at=?::timestamptz,access_expires_at=?::timestamptz where id=?",
+            now.toString(),
+            now.plusSeconds(900).toString(),
+            f.session,
+        )
+        failure(f.register(operation), "native_session_invalid")
+        assertEquals(receipt.copy(replayed = true), success(f.register(operation, version = 1)))
+        assertEquals(receipt, success(f.register(UUID.randomUUID(), version = 1)))
+        assertEquals(original, f.work(receipt.id))
         f.counts(1, 2, 1)
     }
 
@@ -190,12 +243,14 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
 
     @Test
     fun failuresAndCancellationAfterEachWriteRollBackRegistrationAndAllowAnIdenticalRetry() {
-        for (stage in listOf("device", "receipt", "journal")) for (cancel in listOf(false, true)) {
+        for (stage in listOf("device", "queue", "receipt", "journal")) for (mode in
+            listOf("failure", "cancel", "interrupt")) {
             val f = Fixture()
             f.select()
             val operation = UUID.randomUUID()
             fun injected(): Result<Unit> {
-                if (cancel) throw CancellationException("fixture cancellation")
+                if (mode == "cancel") throw CancellationException("fixture cancellation")
+                if (mode == "interrupt") throw InterruptedException("fixture interruption")
                 return Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_write_failed"))
             }
             val registry =
@@ -203,6 +258,15 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     override fun register(device: CollaborationSpaceDevice): Result<Unit> =
                         f.registry.register(device).flatMap {
                             if (stage == "device") injected() else Result.Success(Unit)
+                        }
+                }
+            val provisioning =
+                object : CollaborationSpaceProvisioningRepository by f.provisioning {
+                    override fun enqueue(
+                        request: CollaborationSpaceProvisioningRequest
+                    ): Result<Unit> =
+                        f.provisioning.enqueue(request).flatMap {
+                            if (stage == "queue") injected() else Result.Success(Unit)
                         }
                 }
             val operations =
@@ -221,25 +285,19 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     if (stage == "journal") injected() else Result.Success(Unit)
                 }
             }
-            if (cancel)
-                assertThrows(CancellationException::class.java) {
-                    f.register(
-                        operation,
-                        registry = registry,
-                        operations = operations,
-                        journal = journal,
-                    )
-                }
-            else
-                failure(
-                    f.register(
-                        operation,
-                        registry = registry,
-                        operations = operations,
-                        journal = journal,
-                    ),
-                    "fixture_write_failed",
+            fun run() =
+                f.register(
+                    operation,
+                    registry = registry,
+                    provisioning = provisioning,
+                    operations = operations,
+                    journal = journal,
                 )
+            when (mode) {
+                "cancel" -> assertThrows(CancellationException::class.java) { run() }
+                "interrupt" -> assertThrows(InterruptedException::class.java) { run() }
+                else -> failure(run(), "fixture_write_failed")
+            }
             f.counts(0, 0, 0)
             assertFalse(success(f.register(operation)).replayed)
             f.counts(1, 1, 1)
@@ -250,6 +308,7 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
     fun completionRejectsLateGroupMfaLegacyClockExpiryAndInterruptedChangesWithoutPartialWrites() {
         for (change in
             listOf("offboard", "mfa", "legacy", "expiry", "backward", "budget", "interrupt")) {
+            now = Instant.now().truncatedTo(ChronoUnit.MICROS)
             val f = Fixture()
             val legacy = if (change == "legacy") f.activeLegacy() else null
             f.select()
@@ -370,6 +429,10 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         val registry =
             StoredCollaborationSpaceDeviceRepository(
                 PostgresCollaborationSpaceDeviceDataSource(sql)
+            )
+        val provisioning =
+            StoredCollaborationSpaceProvisioningRepository(
+                PostgresCollaborationSpaceProvisioningDataSource(sql)
             )
         val legacyParents =
             StoredCollaborationLegacyParentRepository(
@@ -494,11 +557,13 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
             legacy: CollaborationLegacyDevicePosition? = null,
             fingerprint: String? = if (legacy == null) null else "a".repeat(64),
             registry: CollaborationSpaceDeviceRepository = this.registry,
+            provisioning: CollaborationSpaceProvisioningRepository = this.provisioning,
             operations: OperationRepository = this.operations,
             journal: ChangeJournalRepository = this.journal,
         ): Result<MutationReceipt> =
             RegisterNativeCollaborationSpaceDevice(
                     registry,
+                    provisioning,
                     legacyParents,
                     selections,
                     spaces,
@@ -532,7 +597,20 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                 success(transactions.run(actor) { registry.findBound(space, account, parent) })
             )
 
+        fun work(device: UUID): CollaborationSpaceProvisioning =
+            requireNotNull(
+                success(transactions.run(actor) { provisioning.metadata(space, account, device) })
+            )
+
         fun counts(devices: Int, receipts: Int, events: Int) {
+            assertEquals(
+                devices,
+                owner.queryForObject(
+                    "select count(*) from collaboration_space_provisioning where account_id=?",
+                    Int::class.java,
+                    account,
+                ),
+            )
             assertEquals(
                 devices,
                 owner.queryForObject(
@@ -595,7 +673,9 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
     private fun compact(id: UUID) = id.toString().replace("-", "")
 
     private fun <T> success(result: Result<T>): T {
-        assertInstanceOf(Result.Success::class.java, result)
+        assertInstanceOf(Result.Success::class.java, result) {
+            if (result is Result.Failed) result.failure.code else "Unexpected result"
+        }
         return (result as Result.Success).value
     }
 

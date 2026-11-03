@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Native registration queue integrated — 3 November 2026
+
+RegisterNativeCollaborationSpaceDevice now atomically inserts initial provisioning
+work with device, native binding, operation receipt and business journal. Request
+proof is captured from a fresh current admission and expires within60 seconds,
+clipped by access/hard/MFA expiry. It remains intent, not future provider authority.
+Replay and a second registration operation on the same existing device preserve
+the original head, including after native refresh; only explicit retry may replace it.
+
+[Evidence](measurements/collaboration-space-registration-queue-2026-11-03.json):
+space-registration-queue2 PASS106.830s/18,3658 unchanged hashes, quality PASS. Six
+actual native cases cover exact queue proof/deadline, replay/refresh, retained/new
+IDs, fifth/sixth race, failure/cancel/interruption at all four write boundaries and
+late group/MFA/source/expiry/clock/interruption. First run failed91.158s/18/6 because
+the fixture role lacked device UPDATE needed by V122 FOR SHARE; only that fixture
+grant was corrected. No production admission relaxed. All checks complete.
+
+Next explicit native retry (current proof, observed device/head versions, receipt,
+60-second cooldown, failed/cancelled or expired pending only), then admitted worker.
+An UNTESTED formatted retry UC and actual data fixture draft are in ignored
+.work/communication-space-2026-11-03/retry-command-next; review before integration.
+Missing heads fail closed; current registration always inserts one. Retry replay
+never restarts work. Expired pending cancellation + retry + receipt/journal must
+roll back together, including cancellation/interruption and concurrent retry races.
+Claim remains a queue-only committed transaction, then account -> native -> device
+-> queue -> credential guards; provider I/O outside SQL. Never logout late/losing
+Matrix candidates. Legacy transfer, local SDK ownership and group rooms/gateway
+remain outstanding; no DI/HTTP/scheduler or Mobile group migration enabled.
+Live8b40/schema116 and phone28 unchanged. Keep regular user updates, Git evidence,
+atomic pushes and the full long run; all54 communications acceptance groups open.
+
 ## Typed organization provisioning ports accepted — 3 November 2026
 
 Typed queue request/head/lease/outcome models, raw PostgreSQL source and repository

@@ -71,8 +71,8 @@ grant current live admission.
 
 Bounded organization provisioning requests, worker leases and typed ports are now
 implemented and tested, including atomic storage rollback across credential, device
-and queue. Registration must next commit its request with binding, receipt and
-journal. Preparation/publication must use current account/native/device authority,
+and queue. Registration now commits its initial request with binding, receipt and
+journal; native replay preserves the original work. Preparation/publication must use current account/native/device authority,
 exact generation/revision and a still-current lease. Keep provider I/O outside SQL
 transactions. A lost/late/losing provider candidate expires naturally: **Synapse
 logout removes the device's other tokens and E2EE keys**, so it cannot clean up a

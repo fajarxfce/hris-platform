@@ -5,13 +5,14 @@
 Live remains8b40bd0f/schema116 with chat push ON, SMTP OFF, and the verified private
 rollout below. This checkout is not the group-migration source. Continue that work
 in /home/fajar/hris/.worktrees/communication-space on feat/communication-space,
-latest pushed7aabb9e1 (preceded by78c3b925). Its own docs/agent-handoff.md,
+latest pushed93808218 (preceded by7aabb9e1 and78c3b925). Its own docs/agent-handoff.md,
 collaboration/group-provisioning.md and group-credentials.md are authoritative.
 
-That branch now has V117–121: group directory/contacts, immutable provider-user
+That branch now has V117–122: group directory/contacts, immutable provider-user
 selection, native identity/device registration, exact legacy parent/public-key
 references, shared five-parent quota, typed Matrix login preserving actual provider
-keys, encrypted group credential generations/recovery and owned device CAS updates.
+keys, encrypted group credential generations/recovery, owned device CAS updates
+and bounded organization provisioning metadata/leases.
 No group DI/controller/worker/gateway or Mobile ownership migration is enabled.
 
 V121 credential validation: full98 cases in395.199s (45 database,19 domain,34 data),
@@ -23,13 +24,17 @@ and parent purge. Owned metadata is not content admission. Device mutation ports
 15 cases90.862s,3648 unchanged hashes, quality PASS; competing activation/revocation,
 stale publication, scope denial, identity preservation and transaction rollback.
 
-Next: bounded group provisioning queue, native enqueue and worker prepare/publish
-fences. Claims acquire metadata only; commit before taking account -> parent ->
+V122 validation: full104 cases464.322s (49 database,19 domain,36 data),3652
+unchanged inputs and quality PASS; recovery-tool14 cases0.011s, projection121=122.
+Claims are bounded to8 per batch/16 live leases/60s, with8 attempts and bounded
+expiry/exhaustion cleanup. Actual archive, proof/scope and stale-lease tests pass.
+
+Next: typed queue ports, native enqueue/retry and worker prepare/publish fences. Claims acquire metadata only; commit before taking account -> parent ->
 device -> queue -> credential guards. External I/O holds no SQL locks. Never logout
 a losing Matrix login: actual Synapse deletes all same-device tokens and E2EE keys.
 Retained runtime transfer and Mobile SDK/private keys/pending transactions require
 explicit coherent ownership migration. Read the branch handoff before continuing;
-an ignored table-only V122 draft is untested. Do not deploy these migrations using
+ignored typed queue port drafts are untested. Do not deploy these migrations using
 this checkout's live push-release scripts.
 
 Mobile0d96e737 records matching8273 gates for installed normal release28:

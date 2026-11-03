@@ -1,0 +1,94 @@
+{
+  "scope": "Admitted group worker preparation and atomic publication against actual PostgreSQL with controlled Matrix candidates; no scheduler or public wiring",
+  "baseCommit": "0e3b4b52",
+  "accepted": {
+    "startedAt": "2026-11-03T22:29:05.456942+00:00",
+    "elapsedSeconds": 158.622,
+    "exitCode": 0,
+    "sourceFiles": 3662,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "2633e3db67e8fbde6ab73b461a1af30b25e71483eaadd8368aa8450033b988aa",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningMappingTest.xml": {
+        "sha256": "40043bd5f2ce5f44b049f31ee7898a6481d6876da2095bf1d298522b84f7370c",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningStorageTest.xml": {
+        "sha256": "9fbe01191c697f10a7567cd0cdf7758ce8e1ee081634daea74fb219bc6832c6c",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "e86208acad8b473b1113b2c59c7734d10f9e89e6cdc7c22f6b170f83eb3b3f4a",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "ee683257928ba2b1f2f117a488229d6a5477e65079a490cc86e126a2aefd8c06",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRetryTest.xml": {
+        "sha256": "85c8159977f97f8b0fd0ec77652ffde322f80529e106115fb9bed4eabdb9eb59",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "abe066a0575673034205ba43143c7f37de4f7055d279cdb7401cd90e3f9bfdee",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "earlierRun": {
+    "elapsedSeconds": 157.518,
+    "tests": 28,
+    "failures": 0,
+    "reason": "Initial six publication cases; final run adds invalid-candidate and post-journal expiry/MFA/clock/interruption checks."
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "evidence": [
+    "Actual native selection/registration/queue claim proceeds to encrypted credential, ACTIVE device, SUCCEEDED head and journal atomically",
+    "Provider callback acquires account/native/device/queue FOR UPDATE NOWAIT from a separate connection, proving the caller released all SQL guards before the external boundary",
+    "Fresh group devices under both new and retained canonical users keep correct identities and unchanged legacy credential rows; retained DEVICE activation fails before provider I/O pending explicit runtime transfer",
+    "Forged proof/MFA/client/attempt/owner/token/deadline and late native refresh/group loss/cancel/device revocation/credential generation/clock/lease changes cannot publish",
+    "Concurrent candidates have exactly one publication winner and one credential generation; a completed lease cannot call the provider again",
+    "Failure, cancellation and interruption after credential/device/head/journal writes roll back all publication state and permit the same live lease to succeed afterward",
+    "Existing current credentials are reused without a provider call; expired generations rotate while retaining original credential creation",
+    "Invalid provider identity/token/expiry and post-journal lease expiry/clock rollback/MFA change/thread interruption cannot partially activate a device"
+  ],
+  "limits": [
+    "Matrix is a controlled candidate port in these use-case tests; actual Synapse typed login/key continuity was separately accepted in ed4ec799",
+    "Retained device runtime/SDK transfer, bounded failure/defer command, scheduling, group gateway/rooms and Mobile owner migration remain unfinished",
+    "No DI/controller/scheduler or live migration enabled; live8b40/schema116 and installed phone28 unchanged"
+  ]
+}

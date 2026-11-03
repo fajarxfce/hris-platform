@@ -72,7 +72,21 @@ journal commit together. Replay after another native refresh returns its origina
 receipt without replacing work. Previous outcome and creation identity survive.
 No public status response may include lease owner/token fields.
 
-Next implement admitted worker preparation/publication and bounded outcome handling.
+`AdvanceCollaborationSpaceProvisioning` now implements admitted preparation and
+publication for fresh group devices, including a new device under a retained
+canonical user. It reconstructs the exact queued native proof instead of adopting
+a newer session implicitly. The preparation captures the head, device, canonical
+identity, credential metadata and bounded observation. A live credential may be
+reused; an expired generation rotates without resetting provenance. Publication
+requires unchanged observations and current authority, then commits encrypted
+credential, ACTIVE device, completed head and journal together. Final authority,
+lease/observation deadline and candidate expiry checks also run after the journal.
+
+Retained DEVICE activation is explicitly rejected until old/new gateway and SDK
+ownership transfer is implemented. Public-key continuity alone cannot authorize
+two runtimes for the same E2EE device. Failed publication leaves its current lease
+for a separate bounded outcome command; no logout or hidden retry occurs.
+Next implement failure/defer journaling and scheduling, then coherent public wiring.
 
 A worker claim transaction acquires only queue metadata and commits before native
 admission. Preparation/publication then take account, native parent, device and
@@ -123,8 +137,8 @@ cross-company end-to-end scenario in identity-migration.md succeeds.
 cases pass in0.011s. Actual PostgreSQL covers concurrent claims, batch/global limits,
 lease replacement, eight-attempt exhaustion, bounded expiry, fresh retry and archive
 restoration. Queue lease/owner fields are internal and must not appear in native
-status responses. Native/worker use-case integration and historical business journal
-coverage remain outstanding.
+status responses. Native registration/retry and successful worker publication now
+have atomic journal integration; failed-attempt outcome integration is still pending.
 
 [Typed port evidence](../measurements/collaboration-space-provisioning-ports-2026-11-03.json):
 17 cases pass in102.360s with3658 unchanged source hashes and quality checks. Actual
@@ -149,3 +163,12 @@ stale worker publication, all four atomic write boundaries with failure/cancel/
 interruption, expired QUEUED/RUNNING heads and late authority/source/time failures.
 The initial run corrected only a test expectation for the existing session_revoked
 error; an intermediate run was stopped before acceptance.
+
+[Worker publication evidence](../measurements/collaboration-space-worker-publication-2026-11-03.json):
+29 cases pass in158.622s with3662 unchanged source hashes and quality checks. Seven
+actual PostgreSQL worker cases use a controlled Matrix candidate port and cover
+end-to-end native enqueue, released SQL locks at the provider boundary, proof/lease/
+generation fences, concurrent candidates, encrypted reuse/rotation and atomic
+rollback. Invalid candidates and authority/time/interruption changes after journal
+writes still roll back all publication. Actual Synapse login/key continuity remains
+the separate earlier port evidence; no scheduler or public group runtime is enabled.

@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Fresh group device worker publication accepted — 3 November 2026
+
+AdvanceCollaborationSpaceProvisioning reconstructs exact queued native proof and
+prepares under account -> parent -> device -> queue -> credential guards. Matrix
+I/O runs after commit. Publication rechecks current native/group/client/MFA,
+canonical/device/head/credential metadata, lease token/attempt/proof and deadlines;
+encrypted credential + ACTIVE device + SUCCEEDED head + journal commit together.
+Final authority/expiry checks after journal still roll back everything. Current
+credentials are reused, expired generations rotate without resetting provenance.
+Retained DEVICE activation is explicitly rejected until old/new runtime and SDK
+ownership transfer exists; a fresh device under a retained canonical USER is valid.
+
+[Evidence](measurements/collaboration-space-worker-publication-2026-11-03.json):
+space-worker-command2 PASS158.622s/29,3662 unchanged source hashes, quality PASS.
+Seven actual PostgreSQL worker cases use controlled Matrix candidates, including
+native enqueue through publication, separate-connection NOWAIT proof that provider
+I/O holds no SQL guards, forged/late authority/lease/generation failures, competing
+candidates with one winner, credential reuse/rotation, all four atomic publication
+boundaries and invalid candidate/post-journal expiry/MFA/clock/interruption rollback.
+Initial28 cases passed157.518s before final completion checks. Actual Synapse login/
+key continuity is earlier separate port evidence, not this candidate fixture.
+No check runs now; no DI/controller/scheduler/public group runtime is enabled.
+
+Next finish bounded failure/defer outcome handling and scheduler, then coherent
+runtime transfer/gateway/rooms/Mobile ownership. Ignored settlement-next contains
+UNTESTED formatted outcome policy + SettleCollaborationSpaceProvisioningFailure,
+two policy tests and four actual-data test drafts (data-tests.txt intended for the
+existing worker fixture). Review before integrating. Use account -> queue guard
+order, owned metadata only, after failed publication has rolled back. No current
+native admission is required to close failed metadata after offboarding/purge.
+Apply exact live-lease fences, finite jittered delay1..30/attempts<=8/deadline budget
+and atomic safe-reason journal. Raw failure parameters must never be recorded.
+MatrixStatusException currently maps503 as provider_rejected, same as401; consider
+classifying5xx as provider_unavailable with actual transport regression before
+using failure codes for automatic transient retry. Never logout losing candidates.
+Older worker-command-next draft is superseded by tracked source/tests; do not recopy.
+
+Live8b40/schema116 and phone28 unchanged. All54 acceptance groups remain open.
+Continue the full long run, regular user/Git updates and push every atomic commit.
+
 ## Explicit native group provisioning retry accepted — 3 November 2026
 
 RetryNativeCollaborationSpaceProvisioning checks root scope, current native/group/

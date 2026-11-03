@@ -1,5 +1,30 @@
 # Agent continuation — HRIS workspace
 
+## Current worktree and pilot state — 3 November 2026
+
+This branch is feat/communication-space in .worktrees/communication-space. Its
+latest implementationc9607dfc includes stable group directory V117, bounded contacts,
+unwired native contact admission, owned legacy identity projection V118 and bounded
+legacy device inventory. Tests and limits are in the linked measurements below.
+This merge brings in main1545dba5's verified rollout/CI documentation only; application
+sources and migrations are unchanged by the merge. No test/build session is active.
+
+Live runs8b40bd0f/schema116 with chat push ON and SMTP OFF. Phone release28 is already
+installed and verified in Mobile37401799, source8273ae8d. Do not reinstall it or run
+old deployment scripts blindly. [Pilot operations](collaboration/private-push-operations.md)
+and [rollout evidence](measurements/chat-push-private-rollout-2026-11-03.json) are now
+present in this branch too. Mobile8273 native41701412608 and control41701412602 remain
+in progress; portable control has passed. Matching collectors/audits are prepared
+under Mobile.work/chat-empty-history-hosted-2026-11-03 and control-2026-11-03, not
+executed. Audit downloaded reports/digests and inspect actual PNGs before acceptance.
+
+Continue canonical provider identity/legacy aliases and current-parent/device
+adoption, preserving existing SDK stores and keys, then group rooms/gateway and the
+complete Mobile owner/worker/push/read migration. Directory/session observations and
+legacy inventory are not provider or room grants. All54 communications groups stay
+open, including real recipient ACKs, richer chat, Apple/web provider runtime, calls,
+video and meetings. Keep regular user updates, atomic pushes and Git handoffs.
+
 ## Typed legacy inventory pages validated — 3 November 2026
 
 The seven-file draft mentioned below has now been applied and tested. It provides
@@ -126,6 +151,78 @@ artifact13260712457 digest verified, local failure-summary retained. Current loc
 QUEUED/FROZEN regression and product FCM run16 have passed as documented below.
 Continue the long run; user requests regular updates, every commit pushed and Git
 handoffs. Do not stop at this database foundation or push activation.
+
+## Private chat push active; release 28 installed — 3 November 2026
+
+Live API/worker now run accepted source8b40bd0f/schema116. All three chat push flags
+are ON; SMTP remains OFF. Full Verify41695437208 passed all14 jobs with downloaded
+artifact audits. [Rollout evidence](measurements/chat-push-private-rollout-2026-11-03.json)
+and [operations](collaboration/private-push-operations.md) supersede earlier pending
+deployment notes below. HRIS and nonempty Matrix checkpoints restored successfully,
+with separate data/key storage and complete temporary cleanup. First activation
+failed on an internal IP collision and rolled back healthy; pinned application IPs
+and provider-first startup passed on retry in28.528s. Source identities, signing
+key, crypto/message tables, Google/person/native/document state and schema history
+match the checkpoint. Private trusted TLS reaches validation; direct/forged and
+non-Synapse callbacks are denied. No real-user notification/message was generated.
+
+Mobile37401799 records installed normal release28 (source8273ae8d), same signer,
+UID/data retained, pulled APK hash806e23a770b52f71218e614d8a87af161af322c92d5852b0311929378d655374.
+Do not reinstall it. c770 native/control runs41691878601/41691878650 passed with
+downloaded reports and actual image review; new8273 runs41701412608/41701412602 are
+in progress. Live push activation itself does not prove enrollment or notification
+on the physical phone; ordinary Chat opening can enroll the installed client.
+
+Continue feat/communication-space in .worktrees/communication-space:5debc632 holds
+the stable directory foundation/V117, not deployed. Bounded directory repository
+and tests are WIP there; data1 passed76.781s/3 cases, format/architecture,3583 source
+hashes unchanged. Review and commit that increment. No group native/device/room API or mobile
+ownership migration is accepted yet. All remaining chat/call/video/meeting scope
+continues. User requires frequent updates, Git handoffs, every commit pushed and
+validated future builds installed with notice. No generic Starter port is needed
+for the HRIS-specific empty-history UI or private runtime configuration.
+
+
+## Full push release gate accepted; live switch pending — 3 November2026
+
+Full Verify41695437208 at8b40bd0f passed all14 jobs. Digest-verified evidence:
+[release CI](measurements/chat-push-release-ci-2026-11-03.json). API3161 cases across
+438 suites,6 opt-in skipped; worker117/24 with1 elapsed-retention opt-in skipped.
+No failures/errors; API class ownership is disjoint across8 shards. Seven browser
+reports pass with zero flaky/skipped:278+278+277+278 unit/browser cases,41 actual
+API integration,14 actual worker integration,1 export integration. Recovery schema116
+restores104 objects/2098795bytes,2 identity envelopes; all cleanup/unchanged-source,
+retired-key rejection and metadata/history/RLS flags pass. Separate actual product
+FCM run16 and Mobile QUEUED/FROZEN regressions remain below; full Verify does not
+execute its six opt-in native/provider methods.
+
+Accepted JARs downloaded under .work/chat-push-rollout-2026-11-03/packages:
+API SHA f487ffd39fbee7f28d3fa33064fdb9d4b6ea0b7098c7cd65caa9b7ae538100e7,
+worker430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c.
+Existing build/libs untouched. stage-images.py, checkpoint.py and deploy.py are
+prepared/reviewed/syntax-checked but NOT executed. Their hashes are in the evidence.
+Checkpoint now captures the nonempty provider's actual mounted config, encrypted
+identity/device/message fingerprints and signing key, with coordinated HRIS backup
+and isolated restore; cleanup/source restart paths are explicit. Deploy uses exact
+accepted images and private TLS peers, verifies trusted malformed-body400 plus
+untrusted direct/forged-forwarding/proxy403, and restores config/images on failure
+without restoring old data over new messages. Preserve old operator material.
+
+Live remains304be027/schema116, push flags/SMTP OFF. Wait for current Mobile build28
+session93460 before another local heavy job. Mobile8273ae8d is pushed: empty-history
+UI fix,297 tests/4 inspected PNGs. Phone remains27 until normal build/verify/smoke,
+notice and install-only28. The c770 control41691878650 is now accepted in Mobile
+.work/chat-history-local-reuse-control-2026-11-03:3109 portable/1215 Apple cases,
+zero failures/errors/skips,432 hashes, full Xcode. Native41691878601 still runs.
+New8273 native41701412608/control41701412602 queue independently.
+
+Separate worktree /home/fajar/hris/.worktrees/communication-space branch
+feat/communication-space pushed5debc632: V117 directory with33 database/12 recovery
+tests; minimal role preserves HR RLS and old identities. Seven bounded directory
+repository/entity/datasource/test files are WIP there, formatted and architecture
+checked but not compiled/tested, not wired to API/DI. Do not deploy that worktree
+for this release. Continue group ownership/mapping, real ACKs, rich chat and all
+voice/video/meeting work after activation. No stopping at a partial milestone.
 
 ## Current product push accepted; full release gate repaired — 3 November2026
 

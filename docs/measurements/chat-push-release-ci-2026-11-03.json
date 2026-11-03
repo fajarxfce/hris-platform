@@ -1,0 +1,334 @@
+{
+  "recordedAt": "2026-11-03T19:17:45.054646+00:00",
+  "status": "passed",
+  "gate": {
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41695437208",
+    "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "conclusion": "success",
+    "allFourteenJobsPassed": true,
+    "backend": {
+      "run": "41695437208",
+      "source": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+      "allEightBackendJobsPassed": true,
+      "api": {
+        "tests": 3161,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 6,
+        "suites": 438
+      },
+      "apiClassesDisjoint": true,
+      "apiClasses": 438,
+      "repeatedParameterizedDisplayLabels": 373,
+      "workerPerShard": {
+        "tests": 117,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "suites": 24
+      },
+      "artifacts": [
+        {
+          "shard": 1,
+          "artifactId": 13261849734,
+          "archiveSha256": "5c5bb689d6ef2834ec845cacad0dbe16f49a595b10458ecfe5540e34cfdaa3e8",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 2,
+          "artifactId": 13262313030,
+          "archiveSha256": "78710a893dbb3bccea6ca62b0591303b863b4eef6a4fe4e612c3d61a99338501",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 3,
+          "artifactId": 13262467409,
+          "archiveSha256": "5c10d695de17656f8fc866c6fdb3782bb5b08344d3e35e80ba0c2c860e499dbd",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 4,
+          "artifactId": 13262836325,
+          "archiveSha256": "67f0998ef2897c8105cb6fdce966f746baea6142dd3a923679f544f82cc26fa4",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 5,
+          "artifactId": 13263041406,
+          "archiveSha256": "561f124419ecc926c583f24788fd8240407000144fd7003bb1794e6bd95f9e52",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 6,
+          "artifactId": 13262503499,
+          "archiveSha256": "4ae80641d26032b452e4681673d4734aec53721eb52b647e3b1f4beb9268d27a",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 7,
+          "artifactId": 13261077772,
+          "archiveSha256": "ff8cb14254fcdb9409a067e8f2d7c8fa3af02f0ed086cded5df0fdafd66aa5c0",
+          "githubDigestVerified": true
+        },
+        {
+          "shard": 8,
+          "artifactId": 13260894685,
+          "archiveSha256": "ef736adbe8c8eed4b20165d76e08a4c55e016e6ac6357e7ee1da5b3492da43a4",
+          "githubDigestVerified": true
+        }
+      ],
+      "fullRunAccepted": false,
+      "collectorCorrection": "JUnit parameterized display names repeat within a class; preserve every reported case and verify class ownership is disjoint across shards. No application or test execution changed."
+    },
+    "dashboard": {
+      "archives": [
+        {
+          "artifactId": 13263492224,
+          "name": "dashboard-integration-test-reports",
+          "archiveSha256": "1e56fc544763f7f05f72c60b83f5e543cbd95dc55f09846e765470f03a36a583",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13262281077,
+          "name": "dashboard-test-reports-1",
+          "archiveSha256": "9994f8902cf836df2bdef809a35415318c02c338f99a280a301ff6bfa394da6f",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13262221427,
+          "name": "dashboard-test-reports-3",
+          "archiveSha256": "d8496c7dbf3be239931ec8314cf78063a96f7cb66c1443457677cd5e041c8706",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13261226602,
+          "name": "dashboard-test-reports-4",
+          "archiveSha256": "888c6517c66909555b765ed664c2781dce4b110b6d77e811b2fbd9f1ec07a6f1",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        },
+        {
+          "artifactId": 13260493569,
+          "name": "dashboard-test-reports-2",
+          "archiveSha256": "32ec5c5e1db7325a747b7254e2e98064b0d3142bc05117e010f5f78ec2c7a2f1",
+          "githubDigestVerified": true,
+          "jsonFiles": []
+        }
+      ],
+      "reports": [
+        {
+          "artifact": "dashboard-integration-test-reports",
+          "report": "integration-report/index.html",
+          "htmlSha256": "52ac3598ff158ce2acb1dd2c7656b61fa13dc0a1b76eff2a5d1b8f5f5fdcc28d",
+          "stats": {
+            "total": 41,
+            "expected": 41,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 317003.886
+        },
+        {
+          "artifact": "dashboard-integration-test-reports",
+          "report": "worker-integration-report/index.html",
+          "htmlSha256": "f9c33e7f3f5dc38094ce4f7892cbc0d893dc1ff21c7bfc673fc88407a95e5c12",
+          "stats": {
+            "total": 14,
+            "expected": 14,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 307411.279
+        },
+        {
+          "artifact": "dashboard-integration-test-reports",
+          "report": "export-integration-report/index.html",
+          "htmlSha256": "ba5543b9af52c0b61b0b61b74aea9c307acf182b1d08f7555dbc4f72a72e6555",
+          "stats": {
+            "total": 1,
+            "expected": 1,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 58287.044
+        },
+        {
+          "artifact": "dashboard-test-reports-1",
+          "report": "index.html",
+          "htmlSha256": "6cd8804c2244f24197fca6543b78bf1a860f5fc9589de7d1be9da6629e08db91",
+          "stats": {
+            "total": 278,
+            "expected": 278,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 219654.593
+        },
+        {
+          "artifact": "dashboard-test-reports-3",
+          "report": "index.html",
+          "htmlSha256": "e28730ce429315be46eba325a9547218f8a8c60845254b7e5a2f61886a54a220",
+          "stats": {
+            "total": 278,
+            "expected": 278,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 290928.053
+        },
+        {
+          "artifact": "dashboard-test-reports-4",
+          "report": "index.html",
+          "htmlSha256": "186e6e1998c5d3118a414f9fe51073c1ca8c4e44178ae2fee027bbc46fd1e47a",
+          "stats": {
+            "total": 277,
+            "expected": 277,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 293351.536
+        },
+        {
+          "artifact": "dashboard-test-reports-2",
+          "report": "index.html",
+          "htmlSha256": "faa09cfa85c1bdbfc5a4aec3dfdd9aea19ff9f19707a145ad8f8ab9585efc7cc",
+          "stats": {
+            "total": 278,
+            "expected": 278,
+            "unexpected": 0,
+            "flaky": 0,
+            "skipped": 0,
+            "ok": true
+          },
+          "durationMillis": 245526.217
+        }
+      ],
+      "passed": true
+    },
+    "recovery": {
+      "artifactId": 13262228817,
+      "archiveSha256": "c520b6e66847068d4b1387549887bb9f28e9b654fd1dce475d4cc25ca1ed0a85",
+      "githubDigestVerified": true,
+      "reports": [
+        {
+          "file": "recovery-set-result-aefe647ad74140d4b0ac22b9220fc97d.json",
+          "sha256": "ebb612483cb93cd479f4e036e61f7c01c3b67858bc3fd83e246d9d82885aaf9b",
+          "summary": {
+            "restorePassed": true,
+            "schema": "116",
+            "identityEnvelopesVerified": 2,
+            "objects": 104,
+            "bytes": 2098795,
+            "sourceUnchangedByRestore": true,
+            "wrongRetiredKeyRejected": true,
+            "separateKeyPack": true,
+            "temporaryResourcesRemoved": true,
+            "typedAccountAuditRestored": true,
+            "announcementDeliveryRestored": true,
+            "announcementEmailRestored": true,
+            "documentMetadataRestored": true,
+            "documentMetadataHistoryRestored": true,
+            "documentMetadataScopeAndConstraintsRestored": true,
+            "retainedIdentityKeyIds": [
+              "current",
+              "old"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41695437208",
+    "headSha": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+    "stagedAt": "2026-11-03T19:16:33.160941+00:00",
+    "elapsedSeconds": 26.86,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13262514290,
+        "archiveSha256": "87f4abdfc957e96f7dbca83363babd50bce794fdee593c992cc2f472bb4aa322",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-push-rollout-2026-11-03/packages/api/apps-server.jar",
+        "sha256": "f487ffd39fbee7f28d3fa33064fdb9d4b6ea0b7098c7cd65caa9b7ae538100e7",
+        "bytes": 98539034
+      },
+      {
+        "role": "worker",
+        "artifactId": 13263215021,
+        "archiveSha256": "8eb0c4cf446bc76612212d43be089297609fd85fbef5c3aa3fc8328aaf830cdd",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-push-rollout-2026-11-03/packages/worker/apps-worker.jar",
+        "sha256": "430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c",
+        "bytes": 78608113
+      }
+    ]
+  },
+  "optInCasesNotExecutedByFullVerify": [
+    {
+      "report": "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportElapsedRetentionTest.xml",
+      "test": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()",
+      "message": ""
+    },
+    {
+      "report": "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSdkInteropTest.xml",
+      "test": "actualAndroidSdkExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission()",
+      "message": ""
+    },
+    {
+      "report": "apps/server/build/test-results/test/TEST-dev.fajar.hris.ProductChatFcmInteropTest.xml",
+      "test": "realFcmStartsProductAndEncryptedInlineReplyReturnsToThePeer()",
+      "message": ""
+    },
+    {
+      "report": "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationWorkerInteropTest.xml",
+      "test": "actualApplicationWorkerRetainsCancelledDraftAcrossDeathAndSendsIndependentIntentOnce()",
+      "message": ""
+    },
+    {
+      "report": "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationWorkerInteropTest.xml",
+      "test": "actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce()",
+      "message": ""
+    },
+    {
+      "report": "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationWorkerInteropTest.xml",
+      "test": "actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce()",
+      "message": ""
+    },
+    {
+      "report": "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationScheduledInteropTest.xml",
+      "test": "androidWorkManagerRestoresConstrainedIntentAfterOrdinaryProcessDeath()",
+      "message": ""
+    }
+  ],
+  "separateProductFcmEvidence": "docs/measurements/product-chat-fcm-current-ui-2026-11-03.json",
+  "preparedOperatorScriptSha256": {
+    "stage-images.py": "73cfdce2a66a0e5d3f764216058f2487965183957f29cb0e44814813715666eb",
+    "checkpoint.py": "4ba9b84b247de14012a5398fb8cafe6a30610a7f7a68aab1dc85af818b9183a2",
+    "deploy.py": "701ca8e8e374545d9917aeb6763a9f7178ccd76c5644f770000f9a6c6ed60a6e"
+  },
+  "liveState": "Not deployed. Live304/schema116; chat push flags and SMTP remain disabled. TLS material and deployment/checkpoint scripts are staged only.",
+  "next": [
+    "Finish the current Mobile release28 build before running another local heavy job.",
+    "Stage accepted API/worker images without changing build/libs or active services.",
+    "Give maintenance notice, checkpoint current HRIS and nonempty Matrix data/keys, and verify restoration.",
+    "Apply compatible images/private TLS proxy after successful restore; verify actual socket/TLS denials and health; retain config/image rollback without overwriting data."
+  ],
+  "otherWork": "The separate communication-space worktree holds pushed database foundation5debc632 and untested bounded repository WIP. Its schema117 is excluded from this schema116 release."
+}

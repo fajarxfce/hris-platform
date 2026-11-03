@@ -1,7 +1,7 @@
 # Actual Android product FCM acceptance
 
-Status: fixture implemented; product activation integration and passing FCM execution
-remain pending. Live chat
+Status: fixture and Mobile1136fb9e product activation implemented; passing actual FCM
+execution remains pending. Live chat
 push stays disabled. This gate follows the accepted encrypted notification input,
 reviewed reply and Android application host implementations in HRIS Mobile.
 
@@ -76,3 +76,21 @@ The next product build must wire scoped background activation and wakeups after
 chat setup/native push registration. The driver must continue through the normal
 UI; calling this use case directly from the fixture would not prove the product.
 [Committed attempt evidence](../measurements/product-chat-fcm-fixture-2026-11-03.json).
+
+## Product integration and boot-probe correction — 3 November 2026
+
+Mobile1136fb9e now supplies the missing application activation and normal setup/
+registration wakeups. Full root/Wasm/Android/lint PASS495.015s; clean isolated APK
+build5 PASS45.425s. Apple41667309251 and Native41667296924 remain pending. Run7 uses
+those exact new product5/peer5 APKs, but fails before installation: the boot getprop
+subprocess times out while QEMU reports a hanging main loop. Server counts0/0/0;
+no product/FCM behavior has been accepted. Run150.079s/driver99.938s, both cleanups
+pass; process, image/sidecars and private fixture credentials independently absent.
+The inspected failure PNG is entirely black. [Evidence](../measurements/product-chat-fcm-boot-2026-11-03.json).
+
+A single boot-probe timeout now consumes the same100-second total budget and can
+be followed by another probe. It does not extend the deadline or relax real boot,
+AVD and QEMU identity checks. Dead processes stop immediately. Twenty-four Python
+cases pass, including four new boot recovery/deadline/identity/exit cases. Product
+and provider timeouts remain failures. Run8 with the same APKs is next; no emulator
+flags, live service, phone, real account or source image was changed.

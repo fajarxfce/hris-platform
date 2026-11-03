@@ -10,6 +10,49 @@ from collaboration_product_device import PRODUCT, SERIAL, ProductFcmDevice, cent
 
 
 class ProductFcmDeviceTest(unittest.TestCase):
+    def boot_device(self):
+        device = ProductFcmDevice("sdk", "/missing/source", "/missing/run")
+        device.process = Mock()
+        device.process.poll.return_value = None
+        return device
+
+    def test_transient_boot_probe_timeout_still_requires_real_boot_and_identity(self):
+        device = self.boot_device()
+        with patch("collaboration_product_device.subprocess.run", side_effect=[
+            subprocess.TimeoutExpired("adb", 10), subprocess.CompletedProcess([], 0, b"1\n", b"")
+        ]) as run, patch.object(device, "command", side_effect=["hris-mobile-dev\nOK", "1"]) as command:
+            device._wait_for_boot()
+        self.assertEqual(2, run.call_count)
+        self.assertEqual([("emu", "avd", "name"), ("shell", "getprop", "ro.kernel.qemu")], [c.args for c in command.call_args_list])
+
+    def test_repeated_boot_probe_timeouts_cannot_extend_the_total_deadline(self):
+        device = self.boot_device()
+        now = [0.0]
+        def stalled(*args, **kwargs):
+            now[0] += kwargs["timeout"]
+            raise subprocess.TimeoutExpired("adb", kwargs["timeout"])
+        with patch("collaboration_product_device.time.monotonic", side_effect=lambda: now[0]), \
+                patch("collaboration_product_device.subprocess.run", side_effect=stalled) as run, \
+                patch.object(device, "command") as command, self.assertRaises(TimeoutError):
+            device._wait_for_boot()
+        self.assertEqual(100, now[0])
+        self.assertEqual(10, run.call_count)
+        command.assert_not_called()
+
+    def test_boot_completion_from_the_wrong_avd_is_not_accepted(self):
+        device = self.boot_device()
+        with patch("collaboration_product_device.subprocess.run", return_value=subprocess.CompletedProcess([], 0, b"1", b"")), \
+                patch.object(device, "command", return_value="another-avd") as command, self.assertRaises(RuntimeError):
+            device._wait_for_boot()
+        command.assert_called_once_with("emu", "avd", "name")
+
+    def test_exited_owned_emulator_does_not_keep_probing(self):
+        device = self.boot_device()
+        device.process.poll.return_value = 1
+        with patch("collaboration_product_device.subprocess.run") as run, self.assertRaises(RuntimeError):
+            device._wait_for_boot()
+        run.assert_not_called()
+
     def test_only_matching_new_process_started_by_firebase_is_accepted(self):
         event = f"I/am_proc_start( 1200): [0,2345,10200,{PRODUCT},broadcast,{{{PRODUCT}/com.google.firebase.iid.FirebaseInstanceIdReceiver}}]"
         self.assertTrue(started_by_firebase(event, 2345))

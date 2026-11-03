@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Mobile push caller committed; owned FCM run7 stopped during boot — 3 November 2026
+
+Mobile1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298 is pushed. Application registration now
+runs under original background admission after normal setup/native registration;
+full root/Wasm/product+proof/lint PASS495.015s (4,015 desktop,230 Android host,
+18 proof-host,ten logic including reused;2,421 fresh). New Apple41667309251 and
+Native41667296924 are pending; older checkpoint Native41662285409 still running.
+Phone25 remains installed. Normal26 preparation exists, no new phone install.
+
+Clean isolated Mobile build5 PASS45.425s. product5.apk SHAe05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662,
+peer5.apk SHA9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b.
+They are x86 devDebug/proof, loopback18084; NEVER install these APKs on a phone.
+Platform run7 atbe345fe7 FAIL150.079s/driver99.938s before product installation.
+Exact failure is boot getprop timeout; QEMU hanging-main-loop diagnostic, black PNG
+actually viewed. Both cleanups pass, owned PID2403104/image/sidecars/fixture secret
+are absent. Zero registrations/pushers/delivery. [Evidence](measurements/product-chat-fcm-boot-2026-11-03.json).
+
+Driver now tolerates a boot-probe timeout only within its original100-second budget;
+requires boot/AVD/QEMU identity, stops dead processes and preserves product/provider
+failures.24 Python guards pass0.010s. Push this driver/docs change, prepare run8 from
+.work/product-chat-fcm-2026-11-03/run7.py with fresh output names and unchanged
+artifacts5.json, execute one owned scenario. No repeated long five-provider local
+workflow or emulator-flag experiments. Actual product FCM is still UNACCEPTED.
+
+Live runtime304/schema116/push OFF and Starter9959c1d unchanged. Read-only discovery
+confirms live API ID488578f2375110e73b78e705e844c101601cf5e6706860f8b6fe4aa8cf2491fc,
+worker638c61567561b98bbb870749986c80614cece41a4b2c8231bea7a092b2afec46; prior shortened
+API identifier in continuation notes had a typo, not a replacement service. Matrix
+identity unchanged. Finish actual FCM/new-source gates, then validated normal phone26+
+with notice/install-only; no phone UI or real employee tests. Continue all54 groups.
+
 ## Product FCM fixture committed; application activation gap next — 3 November 2026
 
 The owned fixture/driver/real-worker implementation is now committed with20 passing

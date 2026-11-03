@@ -96,18 +96,27 @@ class ProductFcmDevice:
         with (self.directory / "emulator.log").open("w") as log:
             self.process = subprocess.Popen(args, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
         (self.directory / "emulator-owner.json").write_text(json.dumps({"pid": self.process.pid, "serial": SERIAL, "command": args}))
+        self._wait_for_boot()
+
+    def _wait_for_boot(self):
         deadline = time.monotonic() + 100
         while time.monotonic() < deadline:
             if self.process.poll() is not None:
                 raise RuntimeError("Owned emulator exited before boot")
-            result = subprocess.run([self.adb, "-s", SERIAL, "shell", "getprop", "sys.boot_completed"], capture_output=True, timeout=10)
+            try:
+                result = subprocess.run([self.adb, "-s", SERIAL, "shell", "getprop", "sys.boot_completed"],
+                                        capture_output=True, timeout=min(10, max(0.1, deadline - time.monotonic())))
+            except subprocess.TimeoutExpired:
+                # A booting guest may not answer one probe. Keep the original total deadline;
+                # installation, provider and product-command timeouts still fail immediately.
+                continue
             if result.returncode == 0 and result.stdout.strip() == b"1":
                 if self.command("emu", "avd", "name").splitlines()[0] != "hris-mobile-dev":
                     raise RuntimeError("Unexpected AVD")
                 if self.command("shell", "getprop", "ro.kernel.qemu") != "1":
                     raise RuntimeError("Emulator property missing")
                 return
-            time.sleep(1)
+            time.sleep(min(1, max(0, deadline - time.monotonic())))
         raise TimeoutError("Owned emulator boot deadline")
 
     def install_product(self, apk):

@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-03",
+  "status": "Real product FCM still unaccepted; transient boot-probe handling corrected.",
+  "run7": {
+    "attempt": 7,
+    "fixture": "a5863dec-b7d1-4d44-ad05-8fe4cb915b10",
+    "runSeconds": 150.079,
+    "driverSeconds": 99.938,
+    "platformCommit": "be345fe7d5a7711d37418e8a4d4f83b7535788b0",
+    "mobileCommit": "1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298",
+    "mobileArtifacts": [
+      {
+        "file": ".work/product-chat-fcm-2026-11-03/product5.apk",
+        "sha256": "e05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662",
+        "bytes": 104928687,
+        "package": "dev.fajar.hris.mobile.dev",
+        "abis": [
+          "x86_64"
+        ],
+        "buildAttempt": 5,
+        "inputsSha256": "b259a91599c99ccfed3d0d5dfb276413f0a6cfd91b7d8f0734665ad91a6cf7a6"
+      },
+      {
+        "file": ".work/product-chat-fcm-2026-11-03/peer5.apk",
+        "sha256": "9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b",
+        "bytes": 105363835,
+        "package": "dev.fajar.hris.collaboration.proof",
+        "abis": [
+          "x86_64"
+        ],
+        "buildAttempt": 5,
+        "inputsSha256": "b259a91599c99ccfed3d0d5dfb276413f0a6cfd91b7d8f0734665ad91a6cf7a6"
+      }
+    ],
+    "sourceInputsSha256": "26bc06895798cebc3f566da9479996550b933932c8aee953e8838cae8dd4c582",
+    "inputsUnchanged": true,
+    "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+    "result": {
+      "passed": false,
+      "phoneTouched": false,
+      "serial": "emulator-5562",
+      "productApkSha256": "e05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662",
+      "proofApkSha256": "9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b",
+      "failureCategory": "TimeoutExpired",
+      "failedStage": "starting_emulator",
+      "failureFrames": [
+        "collaboration_product_fcm.py:main:157",
+        "collaboration_product_device.py:start:103",
+        "subprocess.py:run:557",
+        "subprocess.py:communicate:1221",
+        "subprocess.py:_communicate:2154",
+        "subprocess.py:_check_timeout:1268"
+      ],
+      "failureScreenshotSaved": true,
+      "failureUiSaved": false,
+      "peerDiagnosticUnavailable": true,
+      "peerCleanedUp": true,
+      "deviceCleanedUp": true,
+      "cleanedUp": true,
+      "elapsedSeconds": 99.938
+    },
+    "serverStatus": {
+      "registrations": 0,
+      "pushers": 0,
+      "delivered": 0
+    },
+    "processAbsent": true,
+    "imageAndSidecarsAbsent": true,
+    "fixtureCredentialsDeleted": true,
+    "screenshot": {
+      "file": "product-failure.png",
+      "sha256": "ca2e7ef708be4e086e78c6921ab25cbd9b871744c1c983089c7de250f7104528",
+      "bytes": 15197,
+      "actuallyViewed": true,
+      "observation": "Entirely black guest screen; no product UI shown."
+    },
+    "limitation": "No product installation/login, pusher activation or FCM message executed. QEMU log reports hanging main loop; exact failure frame is the boot getprop subprocess timeout. The prior 100-second total boot budget did not tolerate one probe timeout."
+  },
+  "driverChange": {
+    "sourceSha256": {
+      "tool/collaboration_product_device.py": "4214aae9c55045a6a6f5a7f3d23fcfae6f3b29c2c0ccc72a7a1fb3499824d114",
+      "tool/test_collaboration_product_device.py": "8e5f099182fcba798cfe6c547632ea683ecb3aadfed3bd1a7a7cd63830196811"
+    },
+    "tests": 24,
+    "seconds": 0.01,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "behavior": "Only a timed-out boot getprop probe retries within the same original100-second budget. Boot completion still verifies AVD and emulator identity; a dead owned process stops immediately. Product/provider command timeouts remain failures."
+  },
+  "next": "Run8 with unchanged source-pinned product5/peer5 artifacts, new driver; preserve all previous attempts. No phone/live changes."
+}

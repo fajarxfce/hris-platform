@@ -9,7 +9,10 @@ See [delivery](delivery.json), [architecture](architecture.md), and
 
 ## Accepted decisions
 
-- Initially 5,000 employees, with company-scoped employee conversations.
+- Initially 5,000 employees in one organization group. Employee DMs must work
+  across its companies (user amendment, 3 November 2026); company membership is
+  not a requirement for contacting an eligible colleague elsewhere in the group.
+  Business records and claim cards retain their own company/resource authorization.
 - Android, iOS and web support chat, voice/video calls and meetings.
 - Self-host Matrix Synapse, LiveKit, recording, speech recognition and AI.
 - One large meeting at a time: 1,000 attendee connections, at most 500
@@ -30,6 +33,31 @@ See [delivery](delivery.json), [architecture](architecture.md), and
 - PSTN, dedicated room hardware, and translated speech audio are outside this
   accepted package. Caption translation is Indonesian/English.
 
+## Chat experience amendment — 3 November 2026
+
+These priorities extend the active implementation; they do not replace calls,
+video, meetings, rich messages or the remaining acceptance groups.
+
+- Chat is a primary mobile bottom tab. A conversation opens above that tab and
+  Back returns to the chat list; notification deep links preserve that parent.
+- Owned local history and drafts render before transport acquisition. Background
+  synchronization does not replace a saved list or thread with a loading page.
+- Bubbles fit their text. Message metadata uses a compact time and distinct
+  accessible icons. Day separators use Today/Yesterday, weekdays for2–6 days ago,
+  then dd/MM/yyyy. Device-delivered requires a recipient durable-storage ACK;
+  read requires an actual reader acknowledgement, never a send response/timer.
+- Restore stored backward exhaustion on entry and suppress duplicate in-flight
+  older requests. Only explicit recovery may retry unresolved history. Keep the
+  composer and scroll anchor usable while a bounded page is acquired.
+- Directory entries must distinguish employee records from login/chat accounts.
+  The current four fictional SAMPLE employees lack accounts; provisioning their
+  demo accounts does not authorize enrolling, messaging or changing real users.
+- Cross-company discovery must return minimal contact identity/company labels;
+  it does not reveal another company's private employee profile or grant access
+  to its HR APIs. Opening a conversation revalidates both people's communication
+  eligibility. Group-wide conversation ownership must survive switching company
+  while account replacement/revocation still closes the correct owners.
+
 ## Feature inventory
 
 Each ID is an acceptance group; every behavior in its row must be accounted for.
@@ -41,7 +69,7 @@ external providers, rollout and capacity.
 
 | ID | Required behavior |
 | --- | --- |
-| CHAT-01 | Company-scoped employee DM from directory, profile, search and work context; active HRIS identity and admission. |
+| CHAT-01 | Organization-wide employee DM, including cross-company colleagues, from a primary bottom Chat tab, directory, profile, name/contact search and work context; active HRIS identity and explicit communication admission. |
 | CHAT-02 | Groups: name, avatar, description, members, admins, invitations, leave, invitation policy and membership history. |
 | CHAT-03 | Multiline text, basic formatting, emoji, mentions, links, quoted replies and reactions; safe data rendering. |
 | CHAT-04 | Owned offline history, drafts, durable message/attachment queue, cancel pending, bounded retry and recovery after process/device restart. |

@@ -1,5 +1,13 @@
 # Collaboration architecture decision
 
+> Scope amendment,3 November2026: employee conversations must span companies in
+> this single organization group. The current company-bound endpoints, account
+> identifiers in Matrix and local owner keys still enforce the earlier scope;
+> removing a directory predicate alone is not an implementation. See
+> [cross-company migration](cross-company-chat.md). Existing ownership checks
+> remain enforced until their replacement and migration are tested.
+
+
 Status: accepted design; implementation/proof status is in [delivery](delivery.json).
 
 ## Services and sources of truth

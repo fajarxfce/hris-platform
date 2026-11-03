@@ -1,0 +1,62 @@
+# Cross-company employee conversations
+
+The user requested this amendment on3 November2026. It is required work under
+CHAT-01, not accepted implementation. The deployment serves one organization
+group, so contact discovery spans its companies; guests remain meeting-only.
+
+## Current mismatch
+
+`ListNativeCollaborationParticipants` reads active company memberships with
+`collaboration.chat`. The private demo currently has two such accounts. The four
+SAMPLE employees created for layout review have no linked accounts. This explains
+why the employee sees only Administrator as a destination. Completing the fictional
+accounts fixes demo eligibility, but does not implement cross-company conversations.
+
+`OpenNativeCollaborationDirect` revalidates both accounts against the selected
+company. Room pairs, Matrix identities, credentials, push bindings and encrypted
+mobile partitions carry that company. These are real admission/ownership contracts;
+changing discovery alone would publish contacts that cannot open a usable room.
+
+## Required replacement
+
+Organization communication admission must be independent of HR company-resource
+admission. Use a stable account identity within the installation's communication
+space, and explicit conversation memberships. An active account with eligible
+employment/communication access in at least one company can contact another
+eligible account in the group. No synthetic HR membership or HR permission is
+granted merely because two people chat.
+
+Expose a bounded contact projection: stable account/contact identity, display name,
+and public company labels. Search supports names and a deliberately published work
+contact identifier; do not expose personal login email by default. Employee rows
+without an eligible account explain that chat access is unavailable instead of
+silently pretending that the person can receive messages. Opening a room rechecks
+current sender/recipient eligibility, block policy and session assurance.
+
+The client owns the organization inbox by audience/account, independent of the
+selected HR company. Business context cards keep their original company/resource
+and require live authorization when opened. A company switch retains chat drafts,
+history and the active communication runtime; account replacement, device revocation
+or confirmed communication denial closes the affected owners. Offboarding from one
+company does not remove group chat when another eligible employment remains.
+
+## Migration and acceptance order
+
+1. Introduce communication-space identities, admission and member projections with
+   narrowly scoped RLS. Prove no company-profile/resource disclosure or cross-account
+   access, including concurrent offboarding and session revocation.
+2. Provide versioned group contact, direct-room and device endpoints. Preserve old
+   endpoints during migration and canonical pair idempotency across both callers.
+3. Map existing company-bound rooms/provider identities explicitly. Never regenerate
+   Matrix identities/keys or silently re-encrypt existing history. Old rooms and
+   pending commands keep their original ownership until a reviewed mapping exists.
+4. Migrate mobile local partitions, runtime ownership, incoming/outgoing workers,
+   push routing, read receipts and notification deep links together. Prove process
+   death, offline drafts, lost responses and account changes preserve the right data.
+5. Exercise two fictional employees from different companies end to end: discover,
+   encrypted send/receive, background notification, inline reply, switch HR company,
+   reopen offline, then revoke communication eligibility. Update Android, Apple and
+   web acceptance before claiming CHAT-01 complete.
+
+The current UI increment moves Chat into bottom navigation and repairs presentation
+and restored pagination. It must not be described as accepting this migration.

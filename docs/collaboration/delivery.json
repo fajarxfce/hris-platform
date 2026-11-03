@@ -686,5 +686,6 @@
     "Finish native/web encrypted adapters, cross-family cryptographic key continuity, group conversations, media/stickers/voice notes, edit/forward/delete and opt-in encrypted Drive/iCloud backups. Full Apple provider interoperability remains separate from Xcode; physical iPhone acceptance is waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle, then LiveKit meetings and remaining P2\u2013P8. Voice/video/meeting UI is still absent.",
     "Continue all54 feature groups. None closes from a component/build/fixture milestone. Push each atomic commit and retain exact evidence and current continuation in Git."
-  ]
+  ],
+  "experienceAmendment": "prd.md#chat-experience-amendment--3-november-2026"
 }

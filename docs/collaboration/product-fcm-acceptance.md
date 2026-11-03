@@ -1,6 +1,7 @@
 # Actual Android product FCM acceptance
 
-Status: fixture implementation in progress; no passing FCM execution yet. Live chat
+Status: fixture implemented; product activation integration and passing FCM execution
+remain pending. Live chat
 push stays disabled. This gate follows the accepted encrypted notification input,
 reviewed reply and Android application host implementations in HRIS Mobile.
 
@@ -14,8 +15,8 @@ No product test endpoint or sign-in bypass is added.
 The driver starts emulator-5562 from a disposable copy of an explicit source image,
 checks AVD/ABI/package/debug mode and uses owned reverse mappings. It cannot select
 a phone. The product fixture APK uses `http://127.0.0.1:18084/api/v1/`; never install
-it on the user's phone. Its data/image, SDK peer and owned processes are cleaned even
-when setup fails. The original image and live HRIS/Matrix/Firebase account remain intact.
+it on the user's phone. The driver attempts bounded cleanup of its data/image, SDK peer and owned processes
+even when setup fails; acceptance requires both cleanup results to be true. The original image and live HRIS/Matrix/Firebase account remain intact.
 
 After setup, ordinary process death must leave the product stopped. The peer sends
 an encrypted original through the real HRIS gateway. Synapse must invoke the private
@@ -36,3 +37,42 @@ configuration after `runuser`/`sudo`, which may filter inherited variables. Exec
 `--rerun` prevents reusing an earlier opt-out/skipped report. Acceptance requires one
 fresh executed case, zero skips/failures/errors, the driver's complete result, and
 independent artifact/visual review. Compile-only and skipped runs never pass this gate.
+
+## Current fixture debugging evidence — 3 November 2026
+
+No real message/FCM delivery has passed this gate yet. Run1 was skipped because
+sudo filtered the opt-in; run2 reused the skipped test report. Both are rejected.
+Run3 reached login but selected a Compose page title instead of the button's
+clickable ancestor. Run4 passed native login and FCM registration, then incorrectly
+looked for device activation on the conversation list. Both owned cleanups passed.
+
+Run5 failed with an emulator timeout and hanging-thread diagnostics. Its old
+`starting_emulator` phase also included installation, so a narrower failing phase
+is not proven. The combined cleanup result was false; subsequent inspection
+confirmed the owned process, disposable image and fixture credentials were gone.
+The captured PNG was empty and cannot provide visual evidence.
+
+Run6 passed login, registered one native FCM device and reached the product's
+“Chat is ready” screen. It timed out during setup; no precise failing frame was
+recorded. Four screenshots were inspected. Peer and emulator cleanup both passed.
+The driver now resolves activation actions from one UI snapshot, checks actual
+thread navigation after Open chat, and records the last action plus failure frames.
+This avoids waiting for a Refresh label after asynchronous provisioning replaces it.
+
+Peer JSON polling uses ADB `shell`, which propagates the remote cat exit status.
+An exact missing-file result means pending; transport, permission, malformed and
+oversized results fail. A read-only emulator observation confirmed that `exec-out
+false` returned zero while `shell false` returned one. Screenshot, UI tree and peer
+diagnostics now have independent capture outcomes. Twenty Python guard/cleanup/
+transition/polling regressions pass; the next owned FCM attempt remains required.
+
+Private detailed attempts are retained in `.work/product-chat-fcm-2026-11-03`.
+They contain no acceptance claim and must not be uploaded wholesale. No live
+configuration, employee account or phone app was changed by these tests.
+
+Production integration gap discovered after run6: HRIS Mobile's
+`ActivateCollaborationPusher` is bound and unit-tested but has no application caller.
+The next product build must wire scoped background activation and wakeups after
+chat setup/native push registration. The driver must continue through the normal
+UI; calling this use case directly from the fixture would not prove the product.
+[Committed attempt evidence](../measurements/product-chat-fcm-fixture-2026-11-03.json).

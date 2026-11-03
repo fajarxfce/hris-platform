@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Product FCM fixture committed; application activation gap next — 3 November 2026
+
+The owned fixture/driver/real-worker implementation is now committed with20 passing
+Python regressions and compile/format/architecture PASS32.929s; source hashes unchanged.
+[Evidence](measurements/product-chat-fcm-fixture-2026-11-03.json) preserves all six
+attempts. This is **not accepted end-to-end FCM delivery**. Run6 passes fictional native
+login, one FCM registration and Chat is ready, then UI setup times out. Four PNGs
+actually viewed; owned peer/emulator cleanup true. Run5 emulator hang and failed
+combined cleanup remain rejected; later process/image/secret-file absence is recorded.
+No encrypted message has been sent by this fixture yet. No live/phone changes.
+
+The driver now uses snapshot-based activation, exact thread navigation, independent
+failure captures and sanitized stack frames. Peer result reads use shell exit status;
+only an exact missing atomic marker is pending. Never install loopback product APKs
+on the phone. [Contract and failure detail](collaboration/product-fcm-acceptance.md).
+
+CONFIRMED PRODUCT GAP: Mobile ActivateCollaborationPusher is bound/tested but has no
+production caller. Mobile is implementing a scoped finite registration worker and
+wakeups after chat activation/native notification registration. Do not bypass the
+application by invoking pusher registration inside this fixture. Rebuild/pin the
+updated product and peer APKs before run7; the existing product.apk lacks integration.
+
+Mobile0a452afb is pushed: corrected intermediate notification checkpoint proof,
+local native100.163s/raw16/runtime4/three deaths/five actions/three viewed PNGs; full
+root127.791s passes3997 desktop/230 host/18 proof-host/10 build-logic including reused
+reports. Native41662285409 at0a452afb is IN PROGRESS; old41650906105 remains rejected.
+Apple41651053921 accepts unchanged a3f common source, but NEW activation code will
+need matching full Apple/Xcode. Phone25 is installed/pull-back verified; next26+
+with notice/install-only, no UI driving. Starter9959c1d unchanged.
+
+Platform runtime304be027/schema116/dashboard2124c6fc remains unchanged, all chat push
+OFF. Preserve Matrix identity/keys/checkpoints and Google/native/document state.
+Continue all54 PRD groups; voice/video/meeting UI absent. Push each atomic commit and
+continue long run. No generic Starter port for HRIS policy/test fixture.
+
 ## Current cross-repository checkpoint — 3 November 2026
 
 Mobile **release25** at a3f39be7390874cf04b807b9abad365393530852 is installed and

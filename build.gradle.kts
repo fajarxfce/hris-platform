@@ -58,6 +58,20 @@ tasks.register<Exec>("collaborationPushLoggingCheck") {
     )
 }
 
+tasks.register<Exec>("collaborationProductFixtureCheck") {
+    group = "verification"
+    commandLine(
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tool",
+        "-p",
+        "test_collaboration_product_*.py",
+    )
+}
+
 tasks.register<JavaExec>("formatCheck") {
     group = "verification"
     classpath = formatter
@@ -102,6 +116,7 @@ tasks.named("check") {
         "workloadToolCheck",
         "deploymentToolCheck",
         "collaborationPushLoggingCheck",
+        "collaborationProductFixtureCheck",
     )
     dependsOn(subprojects.filter { it.buildFile.exists() }.map { "${it.path}:check" })
 }

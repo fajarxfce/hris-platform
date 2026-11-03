@@ -1,0 +1,290 @@
+{
+  "date": "2026-11-03",
+  "status": "fixture-implemented-product-integration-pending",
+  "worktreeBaseCommit": "d615dd0c23b913ebb56a9a3c09d3bda73ccec33a",
+  "sourceSha256": {
+    "build.gradle.kts": "3b03f3b45b8a9997fd42525ae1eac8a639c9d46b3bbd100b1628d7dc9888108b",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmInteropTest.kt": "e54201bd88494ace2336af9f1df8a33a25a14bea1ee75231a1a52799c9fdf795",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmWorker.kt": "e07b502d58f549a60a66966316141580dbb739639f45cce5047c9f86dbf2c405",
+    "tool/collaboration_product_device.py": "eff8ff436f549f868d06940ac269ddaecc0d47be6d797fc57611fb45326ddc01",
+    "tool/collaboration_product_fcm.py": "a8593cdcef4d7d6e03a5f5ed6c9f20add8ffb78b52fdb5f23b5fda3df4de3f9e",
+    "tool/test_collaboration_product_device.py": "203ff96f2071bebe5d732ddcfda98b64fe0131614317311b1e0c9b8a35cf1844",
+    "tool/test_collaboration_product_fcm.py": "b8cd21c027a737b0ac3083ad0fa2649ae3b53e5dcc4d1f9c97900a7d75f74fd3"
+  },
+  "compileAndQuality": {
+    "startedAt": "2026-11-03T15:21:08.378179+00:00",
+    "seconds": 32.929,
+    "exitCode": 0,
+    "inputsUnchanged": true
+  },
+  "pythonRegressionTests": 20,
+  "attempts": [
+    {
+      "startedAt": "2026-11-03T14:42:49.505917+00:00",
+      "seconds": 15.15,
+      "exitCode": 0,
+      "inputsUnchanged": true,
+      "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+      "acceptance": "skipped",
+      "testsExecuted": 0,
+      "testsSkipped": 1,
+      "reason": "sudo did not preserve opt-in environment; no fixture/emulator/provider created",
+      "attempt": 1
+    },
+    {
+      "startedAt": "2026-11-03T14:43:33.634533+00:00",
+      "seconds": 11.994,
+      "exitCode": 0,
+      "inputsUnchanged": true,
+      "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "acceptance": "not_executed",
+      "reason": "Gradle reused the previous skipped report; add task-specific --rerun",
+      "testsExecuted": 0,
+      "attempt": 2
+    },
+    {
+      "startedAt": "2026-11-03T14:44:12.056486+00:00",
+      "seconds": 188.872,
+      "exitCode": 1,
+      "inputsUnchanged": true,
+      "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+      "counts": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "driver": {
+        "passed": false,
+        "phoneTouched": false,
+        "serial": "emulator-5562",
+        "productApkSha256": "2bdaa8799486b5dc4be3f6067cbd69a28cfaf100b9ecd6652f0126556a4b7998",
+        "proofApkSha256": "ebd0ad22edfe1d1db6bdcead7bdfdbbb2c6d57e939c8873b782bd535d75bf7a8",
+        "failureCategory": "TimeoutError",
+        "failedStage": "setting_up_product",
+        "failureCaptureUnavailable": true,
+        "cleanedUp": true,
+        "elapsedSeconds": 142.307
+      },
+      "serverCounts": {
+        "registrations": 0,
+        "pushers": 0,
+        "delivered": 0
+      },
+      "fixtureDirectory": ".work/product-chat-fcm/506e4d96-f695-40fc-9d51-8c597ff918e5",
+      "attempt": 3
+    },
+    {
+      "startedAt": "2026-11-03T14:48:14.704367+00:00",
+      "seconds": 231.092,
+      "exitCode": 1,
+      "inputsUnchanged": true,
+      "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+      "counts": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "driver": {
+        "passed": false,
+        "phoneTouched": false,
+        "serial": "emulator-5562",
+        "productApkSha256": "2bdaa8799486b5dc4be3f6067cbd69a28cfaf100b9ecd6652f0126556a4b7998",
+        "proofApkSha256": "ebd0ad22edfe1d1db6bdcead7bdfdbbb2c6d57e939c8873b782bd535d75bf7a8",
+        "failureCategory": "TimeoutError",
+        "failedStage": "setting_up_product",
+        "failureCaptureUnavailable": true,
+        "cleanedUp": true,
+        "elapsedSeconds": 180.285
+      },
+      "serverCounts": {
+        "registrations": 1,
+        "pushers": 0,
+        "delivered": 0
+      },
+      "fixtureDirectory": ".work/product-chat-fcm/a1452484-1622-4639-aa4f-7abcd47a21de",
+      "attempt": 4
+    },
+    {
+      "startedAt": "2026-11-03T14:54:08.993834+00:00",
+      "seconds": 336.708,
+      "exitCode": 1,
+      "inputsUnchanged": true,
+      "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+      "counts": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "driver": {
+        "passed": false,
+        "phoneTouched": false,
+        "serial": "emulator-5562",
+        "productApkSha256": "2bdaa8799486b5dc4be3f6067cbd69a28cfaf100b9ecd6652f0126556a4b7998",
+        "proofApkSha256": "ebd0ad22edfe1d1db6bdcead7bdfdbbb2c6d57e939c8873b782bd535d75bf7a8",
+        "failureCategory": "TimeoutExpired",
+        "failedStage": "starting_emulator",
+        "failureCaptureUnavailable": true,
+        "cleanedUp": false,
+        "elapsedSeconds": 280.953
+      },
+      "serverCounts": {
+        "registrations": 0,
+        "pushers": 0,
+        "delivered": 0
+      },
+      "fixtureDirectory": ".work/product-chat-fcm/229d41da-1cbc-4bcd-850d-d0cec8db1e7e",
+      "audit": {
+        "observedAt": "2026-11-03T15:04:47.603807+00:00",
+        "run": 5,
+        "result": {
+          "passed": false,
+          "phoneTouched": false,
+          "serial": "emulator-5562",
+          "productApkSha256": "2bdaa8799486b5dc4be3f6067cbd69a28cfaf100b9ecd6652f0126556a4b7998",
+          "proofApkSha256": "ebd0ad22edfe1d1db6bdcead7bdfdbbb2c6d57e939c8873b782bd535d75bf7a8",
+          "failureCategory": "TimeoutExpired",
+          "failedStage": "starting_emulator",
+          "failureCaptureUnavailable": true,
+          "cleanedUp": false,
+          "elapsedSeconds": 280.953
+        },
+        "ownerProcessAbsent": true,
+        "imageAbsent": true,
+        "sidecarAbsent": true,
+        "fixtureSecretsAbsent": true,
+        "pngBytes": 0,
+        "pngViewed": false,
+        "pngUnavailableReason": "Empty capture; emulator command timed out",
+        "emulatorLogEvidence": [
+          "Boot completed in 50047 ms",
+          "detected a hanging thread QEMU2 main loop",
+          "detected a hanging thread QEMU2 CPU0 thread"
+        ],
+        "phaseLimitation": "Old starting_emulator stage included product and peer installation; no more precise phase is proven."
+      },
+      "attempt": 5
+    },
+    {
+      "startedAt": "2026-11-03T15:04:47.906735+00:00",
+      "seconds": 247.404,
+      "exitCode": 1,
+      "inputsUnchanged": true,
+      "workerJarSha256": "8228a34ffc20135418c33a775b9ed2f19542979c24ca47b63b7c7a718a436ccc",
+      "counts": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "driver": {
+        "passed": false,
+        "phoneTouched": false,
+        "serial": "emulator-5562",
+        "productApkSha256": "2bdaa8799486b5dc4be3f6067cbd69a28cfaf100b9ecd6652f0126556a4b7998",
+        "proofApkSha256": "ebd0ad22edfe1d1db6bdcead7bdfdbbb2c6d57e939c8873b782bd535d75bf7a8",
+        "failureCategory": "TimeoutError",
+        "failedStage": "setting_up_product",
+        "failureScreenshotSaved": true,
+        "failureUiSaved": true,
+        "peerCleanedUp": true,
+        "deviceCleanedUp": true,
+        "cleanedUp": true,
+        "elapsedSeconds": 194.431
+      },
+      "serverCounts": {
+        "registrations": 1,
+        "pushers": 0,
+        "delivered": 0
+      },
+      "fixtureDirectory": ".work/product-chat-fcm/f4e1ada1-9742-4da4-b4fa-5f9db89d8651",
+      "audit": {
+        "run": 6,
+        "result": {
+          "passed": false,
+          "phoneTouched": false,
+          "serial": "emulator-5562",
+          "productApkSha256": "2bdaa8799486b5dc4be3f6067cbd69a28cfaf100b9ecd6652f0126556a4b7998",
+          "proofApkSha256": "ebd0ad22edfe1d1db6bdcead7bdfdbbb2c6d57e939c8873b782bd535d75bf7a8",
+          "failureCategory": "TimeoutError",
+          "failedStage": "setting_up_product",
+          "failureScreenshotSaved": true,
+          "failureUiSaved": true,
+          "peerCleanedUp": true,
+          "deviceCleanedUp": true,
+          "cleanedUp": true,
+          "elapsedSeconds": 194.431
+        },
+        "serverCounts": {
+          "registrations": 1,
+          "pushers": 0,
+          "delivered": 0
+        },
+        "screenshotsActuallyViewed": [
+          "observed-login.png",
+          "observed-activation.png",
+          "product-notifications-enabled.png",
+          "product-failure.png"
+        ],
+        "evidence": {
+          "observed-login.png": {
+            "sha256": "a5efd18cbf7ea693e319948557f987104a62732743ecae1a0e285d81f5dc4270",
+            "modifiedAt": "2026-11-03T15:07:24.418868+00:00"
+          },
+          "observed-activation.png": {
+            "sha256": "69c2973dc50f3e6b29e66c03c50748645a9790d458201c05b528382e7a2f8877",
+            "modifiedAt": "2026-11-03T15:08:37.891246+00:00"
+          },
+          "product-notifications-enabled.png": {
+            "sha256": "5d0999277ded67131527167cc2117c4925fa847e4996eca992b18255fd174964",
+            "modifiedAt": "2026-11-03T15:07:40.686173+00:00"
+          },
+          "product-failure.png": {
+            "sha256": "69c2973dc50f3e6b29e66c03c50748645a9790d458201c05b528382e7a2f8877",
+            "modifiedAt": "2026-11-03T15:08:45.386386+00:00"
+          },
+          "product-failure.xml": {
+            "sha256": "77c3708709a35165c32efa17addb9175447888f9a75e04f760f4a152cd1ec2e8",
+            "modifiedAt": "2026-11-03T15:08:47.942434+00:00"
+          },
+          "product-progress.json": {
+            "sha256": "959e886feaf46e8644cd8f0f610109fa1c968d9a06ae2cd3a4981d6e3ca07991",
+            "modifiedAt": "2026-11-03T15:07:57.989497+00:00"
+          },
+          "result.json": {
+            "sha256": "25b4c32f5f5133be09e0b2fe012dc94949c5dca594df02197107e978d2a395a9",
+            "modifiedAt": "2026-11-03T15:08:50.332479+00:00"
+          }
+        },
+        "ownerProcessAbsent": true,
+        "imageAbsent": true,
+        "fixtureSecretsAbsent": true,
+        "finding": "Native login, FCM registration and chat provisioning reached Chat is ready. Driver timed out during setup; no exact failing frame was recorded. Replace stale-label re-search with snapshot-based activation, record frame/stage, and require actual thread navigation before waiting for the pusher. No encrypted message or FCM delivery claimed."
+      },
+      "attempt": 6
+    }
+  ],
+  "findings": [
+    "Native password login and one actual FCM registration succeed in the product app. Run6 reaches Chat is ready; its exact failing driver frame was not recorded.",
+    "Run5 is rejected with TimeoutExpired/hanging-thread diagnostics and failed combined cleanup. Later independent checks find its owned process/image/fixture credentials absent; the zero-byte PNG is not visual evidence.",
+    "Compose action lookup resolves the clickable ancestor, and activation now uses one snapshot instead of re-searching a label that can disappear. Thread navigation is checked before pusher readiness.",
+    "A read-only emulator experiment proves exec-out false returns0 while shell false returns1. Pending peer publication is now separated from transport/permission/malformed failures.",
+    "Mobile ActivateCollaborationPusher has no production caller at0a452afb. Application integration is now being implemented; do not invoke it directly from this fixture."
+  ],
+  "remaining": [
+    "Validate the new Mobile registration path, rebuild isolated product APK, rerun actual FCM/receiver/SystemUI/encrypted-reply chain.",
+    "Inspect each accepted screenshot and verify both cleanup owners; failed/skipped/provider-unexecuted attempts cannot pass.",
+    "No live rollout or real employee message until actual-product acceptance."
+  ],
+  "phoneTouched": false,
+  "liveRuntimeChanged": false,
+  "liveChatPushEnabled": false
+}

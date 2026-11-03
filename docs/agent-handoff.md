@@ -1,29 +1,44 @@
 # Agent continuation — HRIS workspace
 
-## Group migration branch advanced; installed release 28 gates accepted — 3 November 2026
+## Group credential/device work advanced; release 28 remains installed — 3 November 2026
 
 Live remains8b40bd0f/schema116 with chat push ON, SMTP OFF, and the verified private
 rollout below. This checkout is not the group-migration source. Continue that work
 in /home/fajar/hris/.worktrees/communication-space on feat/communication-space,
-latest pushed927a4f12. Its own handoff and docs/collaboration/identity-migration.md
-are authoritative for the ongoing implementation.
+latest pushed7aabb9e1 (preceded by78c3b925). Its own docs/agent-handoff.md,
+collaboration/group-provisioning.md and group-credentials.md are authoritative.
 
-That branch now has V117 group directory, bounded contacts and native read policy,
-V118 owned legacy metadata with bounded compound paging, and V119 immutable provider
-user selection. Full39 database cases in18 suites pass,237.316s; recovery12 passes
-through119 with no new encryption envelope. No automatic provider identity/device
-selection, new group HTTP route or Mobile ownership migration is enabled. The next
-repository/policy increment reads eligibility, existing selection and legacy
-candidate in one SQL snapshot; its checks are currently running in that worktree.
-Never deploy those migrations accidentally using this live push release's scripts.
+That branch now has V117–121: group directory/contacts, immutable provider-user
+selection, native identity/device registration, exact legacy parent/public-key
+references, shared five-parent quota, typed Matrix login preserving actual provider
+keys, encrypted group credential generations/recovery and owned device CAS updates.
+No group DI/controller/worker/gateway or Mobile ownership migration is enabled.
 
-Mobile0d96e737 records matching8273 gates for the installed normal release28:
+V121 credential validation: full98 cases in395.199s (45 database,19 domain,34 data),
+3650 unchanged checked inputs, quality PASS; focused12 cases94.059s and recovery-tool13
+cases0.011s. Actual archive restore and production recovery SQL decrypt current/
+retained-key group credentials and unchanged legacy company credentials. Terminal
+generation/device revision1000000 supports irreversible cleanup after offboarding
+and parent purge. Owned metadata is not content admission. Device mutation ports:
+15 cases90.862s,3648 unchanged hashes, quality PASS; competing activation/revocation,
+stale publication, scope denial, identity preservation and transaction rollback.
+
+Next: bounded group provisioning queue, native enqueue and worker prepare/publish
+fences. Claims acquire metadata only; commit before taking account -> parent ->
+device -> queue -> credential guards. External I/O holds no SQL locks. Never logout
+a losing Matrix login: actual Synapse deletes all same-device tokens and E2EE keys.
+Retained runtime transfer and Mobile SDK/private keys/pending transactions require
+explicit coherent ownership migration. Read the branch handoff before continuing;
+an ignored table-only V122 draft is untested. Do not deploy these migrations using
+this checkout's live push-release scripts.
+
+Mobile0d96e737 records matching8273 gates for installed normal release28:
 native41701412608 with5 provider/230 Android-host/18 proof-host cases and3 inspected
 SystemUI PNGs; control41701412602 with3110 portable and1215 Apple cases, full Xcode822s,
-432 source hashes. Downloaded archive digests and full reports are verified. Do not
-reinstall28. Actual Apple Matrix/APNs/CallKit and all54 communications acceptance
-groups remain open. Starter9959c1d needs no port for these HRIS-specific changes.
-Continue the long run, regular user updates, atomic pushes and Git handoffs.
+432 source hashes. Downloaded archives/reports are verified. Do not reinstall28.
+Actual Apple Matrix/APNs/CallKit and all54 communications acceptance groups remain
+open. Starter9959c1d needs no port for these HRIS-specific changes. Continue the full
+long run, regular user updates, atomic pushes and Git handoffs.
 
 
 ## Private chat push active; release 28 installed — 3 November 2026

@@ -1,12 +1,31 @@
 """Pending peer publication must remain distinct from transport and permission failures."""
 import subprocess
+from pathlib import Path
+import tempfile
 import unittest
 from unittest.mock import Mock, patch
 import xml.etree.ElementTree as ET
 
 from collaboration_native_device import PACKAGE
 from collaboration_product_device import SERIAL
-from collaboration_product_fcm import activate_chat, read_peer
+from collaboration_product_fcm import activate_chat, product_diagnostics, read_peer
+
+
+class ProductFcmDiagnosticsTest(unittest.TestCase):
+    def test_failed_capture_does_not_prevent_the_other_private_bounded_capture(self):
+        with tempfile.TemporaryDirectory() as location:
+            directory = Path(location)
+            data = b"x" * (2 * 1024 * 1024 + 1)
+            with patch("collaboration_product_fcm.subprocess.run", side_effect=[
+                subprocess.TimeoutExpired("adb", 10), subprocess.CompletedProcess([], 0, data, b"")
+            ]) as run:
+                result = product_diagnostics(Mock(adb="adb"), directory)
+            self.assertEqual(2, run.call_count)
+            self.assertFalse(result["product-logcat.private.txt"]["saved"])
+            self.assertEqual({"saved": True, "truncated": True}, result["product-jobs.private.txt"])
+            path = directory / "product-jobs.private.txt"
+            self.assertEqual(2 * 1024 * 1024, path.stat().st_size)
+            self.assertEqual(0o600, path.stat().st_mode & 0o777)
 
 
 class ProductFcmActivationTest(unittest.TestCase):

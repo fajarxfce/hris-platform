@@ -88,5 +88,102 @@
     "skipped": 0,
     "behavior": "Only a timed-out boot getprop probe retries within the same original100-second budget. Boot completion still verifies AVD and emulator identity; a dead owned process stops immediately. Product/provider command timeouts remain failures."
   },
-  "next": "Run8 with unchanged source-pinned product5/peer5 artifacts, new driver; preserve all previous attempts. No phone/live changes."
+  "next": "Run9 with same source-pinned product5/peer5 and added diagnostics. Determine the actual gateway or worker failure before changing product behavior. No phone/live changes.",
+  "run8": {
+    "attempt": 8,
+    "fixture": "e6a953eb-6bb5-4648-bfa6-33016804c719",
+    "platformCommit": "b7ee008ff278d62fe1adc03e51a667a28ab05282",
+    "mobileCommit": "1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298",
+    "seconds": 204.288,
+    "driverSeconds": 155.303,
+    "inputsUnchanged": true,
+    "counts": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "result": {
+      "passed": false,
+      "phoneTouched": false,
+      "serial": "emulator-5562",
+      "productApkSha256": "e05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662",
+      "proofApkSha256": "9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b",
+      "failureCategory": "TimeoutError",
+      "failedStage": "setting_up_product",
+      "failureFrames": [
+        "collaboration_product_fcm.py:main:166",
+        "collaboration_product_fcm.py:setup_product:63",
+        "collaboration_product_fcm.py:until:27"
+      ],
+      "failureScreenshotSaved": true,
+      "failureUiSaved": true,
+      "peerCleanedUp": true,
+      "deviceCleanedUp": true,
+      "cleanedUp": true,
+      "elapsedSeconds": 155.303
+    },
+    "serverStatus": {
+      "registrations": 1,
+      "pushers": 0,
+      "delivered": 0
+    },
+    "lastProgress": {
+      "stage": "waiting_for_matrix_pusher"
+    },
+    "emulatorBootMilliseconds": 31569,
+    "processAbsent": true,
+    "imageAndSidecarsAbsent": true,
+    "fixtureCredentialsDeleted": true,
+    "screenshots": {
+      "product-notifications-enabled.png": {
+        "sha256": "87b02b2b77c51eb4f9620911e1f36b66aca0f07005df00ada6e210fdee9f9600",
+        "actuallyViewed": true
+      },
+      "product-failure.png": {
+        "sha256": "52bf0cc51ec0759bd7acee3190ac587c912b32dec843083f0179982188ab132d",
+        "actuallyViewed": true
+      }
+    },
+    "observation": "Normal login/company/native FCM registration and chat setup/navigation pass. Waiting for managed Matrix pusher times out; thread shows service unavailable. Cause is not established. No encrypted send or FCM delivery occurred."
+  },
+  "diagnostics": {
+    "compile": {
+      "startedAt": "2026-11-03T16:00:36.415521+00:00",
+      "seconds": 35.569,
+      "exitCode": 0,
+      "inputsUnchanged": true,
+      "command": [
+        "sudo",
+        "-n",
+        "runuser",
+        "-u",
+        "fajar",
+        "-g",
+        "docker",
+        "--",
+        "env",
+        "JAVA_HOME=/usr/lib/jvm/java-21-openjdk",
+        "PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin",
+        "./gradlew",
+        ":apps:server:testClasses",
+        ":apps:worker:bootJar",
+        "formatCheck",
+        "architectureCheck",
+        "collaborationProductFixtureCheck",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        "--stacktrace"
+      ]
+    },
+    "pythonTests": 25,
+    "sourceSha256": {
+      "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmInteropTest.kt": "84dadb9e37f2cda871c33aae002f289bc6f7d34faeeeb70b7b596cb796cd6368",
+      "tool/collaboration_product_fcm.py": "cbb17ff580b8579df9c04adf4d5ef06b394946514c59ed2c19fd6ac6b128baf3",
+      "tool/test_collaboration_product_fcm.py": "4dc82d93056dfee8772ccddf9321f78624b79295c6369d87011151cf78399758"
+    },
+    "behavior": "Reuse bounded gateway route/status/error-code trace without arming faults. On failure independently save up to2MiB each of private OS/SDK and job diagnostics with0600 permissions; these raw files must never be uploaded as acceptance evidence."
+  }
 }

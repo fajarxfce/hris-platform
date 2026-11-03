@@ -127,6 +127,25 @@ def reply_to_notification(device, body):
     device.tap(send[0])
 
 
+def product_diagnostics(device, directory):
+    """Private bounded debugging evidence; never upload raw SDK/OS logs as acceptance output."""
+    captured = {}
+    for name, args in (
+        ("product-logcat.private.txt", ["logcat", "-d", "-t", "3000", "-v", "threadtime"]),
+        ("product-jobs.private.txt", ["shell", "dumpsys", "jobscheduler"]),
+    ):
+        try:
+            value = subprocess.run([device.adb, "-s", SERIAL, *args], capture_output=True, timeout=10)
+            if value.returncode:
+                raise RuntimeError("Owned product diagnostics unavailable")
+            with os.fdopen(os.open(directory / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as output:
+                output.write(value.stdout[:2 * 1024 * 1024])
+            captured[name] = {"saved": True, "truncated": len(value.stdout) > 2 * 1024 * 1024}
+        except Exception:
+            captured[name] = {"saved": False}
+    return captured
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--directory", type=Path, required=True)
@@ -205,6 +224,7 @@ def main():
         result["failureFrames"] = [f"{Path(frame.filename).name}:{frame.name}:{frame.lineno}"
                                    for frame in traceback.extract_tb(failure.__traceback__)[-6:]]
         if device.process is not None and device.process.poll() is None:
+            result["privateDiagnostics"] = product_diagnostics(device, directory)
             try:
                 device.capture("product-failure")
                 result["failureScreenshotSaved"] = True

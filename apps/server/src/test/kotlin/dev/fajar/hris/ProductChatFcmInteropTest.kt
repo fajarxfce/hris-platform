@@ -17,12 +17,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
 
 /** Explicit external-provider opt-in. The employee app and sender fixture use separate packages. */
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_PRODUCT_FCM_APK", matches = ".+")
+@Import(NativeSdkGatewayTraceConfiguration::class)
 @TestPropertySource(
     properties =
         [
@@ -56,10 +58,12 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
 
     @Autowired private lateinit var matrix: CollaborationMatrixRepository
     @Autowired private lateinit var rooms: CollaborationMatrixRoomRepository
+    @Autowired private lateinit var trace: NativeSdkGatewayTrace
 
     @Test
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
     fun realFcmStartsProductAndEncryptedInlineReplyReturnsToThePeer() {
+        trace.allowEncryptedSends()
         clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
         provider.startProxy(port)
         val owner = native()
@@ -152,6 +156,9 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
             }
         } finally {
             Files.deleteIfExists(fixture)
+            val evidence = directory.resolve("gateway-trace.json")
+            Files.writeString(evidence, json.writeValueAsString(trace.snapshot()))
+            Files.setPosixFilePermissions(evidence, PosixFilePermissions.fromString("rw-------"))
         }
     }
 

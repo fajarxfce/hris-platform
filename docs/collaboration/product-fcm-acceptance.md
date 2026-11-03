@@ -94,3 +94,16 @@ AVD and QEMU identity checks. Dead processes stop immediately. Twenty-four Pytho
 cases pass, including four new boot recovery/deadline/identity/exit cases. Product
 and provider timeouts remain failures. Run8 with the same APKs is next; no emulator
 flags, live service, phone, real account or source image was changed.
+
+Run8 boots in31.569s and passes login, native FCM registration and normal chat
+activation/navigation. It fails while waiting for a managed Matrix pusher; the
+thread shows “The service is unavailable.” Counts1/0/0, no encrypted send/delivery.
+Run204.288s/driver155.303s, both cleanups true; owned PID2430275, image/sidecars and
+credentials absent. Both screenshots actually viewed. The underlying failure is
+not established; do not infer a product, clock, network or scheduling cause.
+
+The fixture now reuses the bounded gateway route/status/error-code trace without
+arming faults and independently captures private bounded OS/SDK/job diagnostics on
+failure. Raw logs remain private and must not be uploaded.25 Python cases and
+compile/format/architecture PASS35.569s with unchanged inputs. Run9 with the same
+APK artifacts is next. New diagnostics do not invoke any product worker/use case.

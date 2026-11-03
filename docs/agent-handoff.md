@@ -1,35 +1,40 @@
 # Agent continuation — HRIS workspace
 
-## Mobile push caller committed; owned FCM run7 stopped during boot — 3 November 2026
+## Product FCM run8 reaches the thread; diagnose unavailable gateway/worker — 3 November 2026
 
-Mobile1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298 is pushed. Application registration now
-runs under original background admission after normal setup/native registration;
-full root/Wasm/product+proof/lint PASS495.015s (4,015 desktop,230 Android host,
-18 proof-host,ten logic including reused;2,421 fresh). New Apple41667309251 and
-Native41667296924 are pending; older checkpoint Native41662285409 still running.
-Phone25 remains installed. Normal26 preparation exists, no new phone install.
+Mobile1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298 is pushed. Application managed-push
+registration and setup/native-status wakeups pass full root/Wasm/product+proof/lint
+495.015s (4,015 desktop,230 host,18 proof-host,ten logic;2,421 fresh). Clean loopback
+build5 PASS45.425s. Source-pinned product5/peer5 artifacts are in Mobile.work/product-
+chat-fcm-2026-11-03/artifacts5.json; NEVER install these on a phone. Phone25 unchanged,
+normal26 prepared but not built. Apple41667309251 queued, Native41667296924 pending;
+prior checkpoint Native41662285409 still runs. Audit each exact source separately.
 
-Clean isolated Mobile build5 PASS45.425s. product5.apk SHAe05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662,
-peer5.apk SHA9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b.
-They are x86 devDebug/proof, loopback18084; NEVER install these APKs on a phone.
-Platform run7 atbe345fe7 FAIL150.079s/driver99.938s before product installation.
-Exact failure is boot getprop timeout; QEMU hanging-main-loop diagnostic, black PNG
-actually viewed. Both cleanups pass, owned PID2403104/image/sidecars/fixture secret
-are absent. Zero registrations/pushers/delivery. [Evidence](measurements/product-chat-fcm-boot-2026-11-03.json).
+Platformb7ee008f corrects transient boot probes within the original100-second budget;
+24 guards pass. Run7 boot failure/black PNG and cleanup remain recorded. Run8 now boots
+31.569s, passes native login/FCM registration and chat activation, enters the peer thread,
+then pusher wait fails. Thread shows service unavailable; cause NOT ESTABLISHED. Counts
+1 registration/0 pushers/0 delivery, no encrypted message sent. Run204.288s/driver155.303s,
+both cleanups pass; PID2430275/image/sidecars/credential absent, two PNGs actually viewed.
+[Evidence](measurements/product-chat-fcm-boot-2026-11-03.json).
 
-Driver now tolerates a boot-probe timeout only within its original100-second budget;
-requires boot/AVD/QEMU identity, stops dead processes and preserves product/provider
-failures.24 Python guards pass0.010s. Push this driver/docs change, prepare run8 from
-.work/product-chat-fcm-2026-11-03/run7.py with fresh output names and unchanged
-artifacts5.json, execute one owned scenario. No repeated long five-provider local
-workflow or emulator-flag experiments. Actual product FCM is still UNACCEPTED.
+Diagnostic increment reuses existing bounded gateway route/status/error trace (no faults
+armed) and independently captures private bounded SDK/OS/job logs before cleanup. Never
+print/upload raw private logs or fixture JSON.25 Python guards and testClasses/workerJar/
+format/architecture PASS35.569s, all source hashes unchanged. Commit/push this increment,
+then run9 from.work/product-chat-fcm-2026-11-03/run8.py with fresh output names and the
+same artifacts5. Inspect sanitized gateway codes and worker states before changing
+application behavior; no direct fixture invocation may bypass normal app activation.
 
-Live runtime304/schema116/push OFF and Starter9959c1d unchanged. Read-only discovery
-confirms live API ID488578f2375110e73b78e705e844c101601cf5e6706860f8b6fe4aa8cf2491fc,
-worker638c61567561b98bbb870749986c80614cece41a4b2c8231bea7a092b2afec46; prior shortened
-API identifier in continuation notes had a typo, not a replacement service. Matrix
-identity unchanged. Finish actual FCM/new-source gates, then validated normal phone26+
-with notice/install-only; no phone UI or real employee tests. Continue all54 groups.
+No heavy job currently active. Read-only review confirms SDK endpoint derives the app's
+API origin and enterTimeline starts actual sync; no confirmed endpoint/caller failure.
+The test uses MutableTestClock, but background admission converts server duration to a
+local deadline; clock skew is only an unproven hypothesis. Capture evidence first.
+Live runtime304/schema116/push OFF and Starter9959c1d unchanged. API ID
+488578f2375110e73b78e705e844c101601cf5e6706860f8b6fe4aa8cf2491fc, worker
+638c61567561b98bbb870749986c80614cece41a4b2c8231bea7a092b2afec46; Matrix identity intact.
+Finish actual FCM/new-source gates, validated normal phone26+ with notice/install-only,
+then continue all54 groups. No phone UI or real employee tests; voice/video/meeting UI absent.
 
 ## Product FCM fixture committed; application activation gap next — 3 November 2026
 

@@ -134,8 +134,9 @@ journal commit atomically;
 completion rechecks current group/security and retained-source continuity. Clock
 rollback and the 30-second command budget abort the transaction. This command
 enqueues initial intent with current proof and at most60-second deadline. Replay
-preserves the same request after native refresh; explicit retry/worker publication
-still need integration before exposure.
+preserves the same request after native refresh. Explicit retry is now integrated
+with current proof, observed revisions, cooldown and an atomic receipt/journal;
+worker publication still needs integration before exposure.
 [Registration evidence](../measurements/collaboration-native-space-device-registration-2026-11-03.json):
 39 passing cases in76.836s,3632 unchanged hashes and quality checks. Five actual
 PostgreSQL command cases include competing fifth/sixth devices, replay, failure and
@@ -158,8 +159,8 @@ are exercised against an actual archive restore. V122 adds the bounded operation
 queue, current-parent request proof, finite leases/attempts and retained terminal
 outcomes. Typed queue ports now validate exact proof/lease fences and atomic
 credential/device/queue rollback against actual PostgreSQL, including archive
-restoration. Native enqueue is integrated; explicit retry, worker admission/
-publication, group gateway/rooms and local-store adoption are not yet implemented.
+restoration. Native enqueue and explicit revisioned retry are integrated; worker
+admission/publication, group gateway/rooms and local-store adoption remain unfinished.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 

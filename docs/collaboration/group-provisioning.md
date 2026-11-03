@@ -60,9 +60,19 @@ claim bounds/uniqueness. These ports still require caller-owned current admissio
 Native registration now inserts its request atomically with device/binding/receipt/
 journal. It re-observes native authority and clips request life to at most60 seconds
 and current access/hard/MFA expiry. Replay, including after native refresh, preserves
-the original work instead of silently restarting it. Next implement explicit retry
-and admitted worker use cases. Retries need their own receipt and current admission;
-lost-response replay cannot silently start another attempt.
+the original work instead of silently restarting it.
+
+`RetryNativeCollaborationSpaceProvisioning` now requires current native/group/client/
+MFA and canonical/device continuity, exact observed device/head revisions and a
+60-second cooldown measured from the prior request. It accepts failed/cancelled or
+expired pending PROVISIONING heads; unexpired pending and succeeded heads are not
+restarted. A missing head fails closed because current registration inserts one
+atomically. Expired pending cancellation, new revision/proof, receipt and business
+journal commit together. Replay after another native refresh returns its original
+receipt without replacing work. Previous outcome and creation identity survive.
+No public status response may include lease owner/token fields.
+
+Next implement admitted worker preparation/publication and bounded outcome handling.
 
 A worker claim transaction acquires only queue metadata and commits before native
 admission. Preparation/publication then take account, native parent, device and
@@ -131,3 +141,11 @@ shared quota, retained identities and late admission changes. Failed Result,
 cancellation and interruption after device/queue/receipt/journal writes each roll
 back the entire registration. The first run required a fixture-only device UPDATE
 grant for V122 FOR SHARE; production policy was unchanged.
+
+[Native retry evidence](../measurements/collaboration-space-native-retry-2026-11-03.json):
+22 cases pass in137.393s with3660 unchanged source hashes and quality checks. Four
+actual retry scenarios exercise fresh proof/MFA and replay, concurrent retries and
+stale worker publication, all four atomic write boundaries with failure/cancel/
+interruption, expired QUEUED/RUNNING heads and late authority/source/time failures.
+The initial run corrected only a test expectation for the existing session_revoked
+error; an intermediate run was stopped before acceptance.

@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Explicit native group provisioning retry accepted — 3 November 2026
+
+RetryNativeCollaborationSpaceProvisioning checks root scope, current native/group/
+client/MFA, committed canonical and exact bound device continuity under operation
+-> account -> parent -> device -> queue guards. Exact observed device/head versions,
+PROVISIONING state, failed/cancelled or expired pending head and60-second cooldown
+are required. Missing heads fail closed. New proof/deadline, optional expired-head
+cancellation, receipt and journal are atomic. Replay after native refresh returns
+its original receipt and never silently restarts work. No public wiring exists.
+
+[Evidence](measurements/collaboration-space-native-retry-2026-11-03.json):
+space-retry-command3 PASS137.393s/22,3660 unchanged source hashes, quality PASS.
+Four actual retry cases include verified MFA/native refresh/parent deadline/replay,
+competing retries with exactly one winner and stale worker completion, failed/
+cancelled/interrupted writes at all four boundaries, expired queued/running heads,
+and late group/MFA/legacy-source/clock/budget/interruption rollback. First run
+failed124.961s/22/1 on test expected native_session_invalid versus existing
+session_revoked for an unavailable foreign account. Run2 stopped32.237s because
+the text replacement had not matched; no acceptance claimed. Production unchanged
+between those runs. All checks are complete.
+
+Next admitted worker preparation/publication and finite failure/defer handling,
+then runtime ownership transfer, group gateway/rooms and Mobile local ownership.
+An UNTESTED formatted AdvanceCollaborationSpaceProvisioning draft is at ignored
+.work/communication-space-2026-11-03/worker-command-next; no tests yet. It prepares
+under account -> parent -> device -> queue -> credential, calls Matrix outside SQL,
+and rechecks proof/lease/head/device/generation/deadlines before atomic encrypted
+credential + device ACTIVE + queue success + journal. Review and test before use.
+It intentionally rejects retained DEVICE activation until explicit old/new gateway
+and SDK ownership transfer is available; a new group device under a retained
+canonical USER is separate and valid. Failure/defer outcome command and scheduling
+are still missing. Never logout a late/losing candidate (Synapse destroys winning
+same-device tokens and E2EE keys). Older retry-command-next drafts are superseded
+by tracked sources/tests; do not recopy them.
+
+Live8b40/schema116 pushON/SMTP OFF and phone28 unchanged. No group DI/HTTP/worker/
+gateway/room/Mobile ownership migration enabled; all54 acceptance groups open.
+Continue the long run, regular user/Git updates and push every atomic commit.
+
 ## Native registration queue integrated — 3 November 2026
 
 RegisterNativeCollaborationSpaceDevice now atomically inserts initial provisioning

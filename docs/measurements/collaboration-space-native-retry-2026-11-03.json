@@ -1,0 +1,95 @@
+{
+  "scope": "Explicit native group provisioning retry with observed revisions, current admission and atomic journal",
+  "baseCommit": "fa19ad69",
+  "accepted": {
+    "startedAt": "2026-11-03T22:20:14.624854+00:00",
+    "elapsedSeconds": 137.393,
+    "exitCode": 0,
+    "sourceFiles": 3660,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "97f801a80a589f343ecc7abb61ffe546657e4403ff7c9efef143ff53c9a10538",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningMappingTest.xml": {
+        "sha256": "6d70618dadf56a9bd845cc7b740ebff9b325fc7e981049fa65c21a50b48cf018",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningStorageTest.xml": {
+        "sha256": "4c8df0807c07638ad598262bfe3aeea2cdbddea67532c8c25d4304dcdf3abd5a",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "69b0f0a20888cfc11712aa92982d6a330a39daa23de054f02184c67486008344",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRetryTest.xml": {
+        "sha256": "e7f1fc33032145f0f70e3331708da3dd15b6452c8d8ae3b926a06d00afc19c81",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "3c06c48b9b9d91b49eba050b31c3f87c2563879d2127843280f1fc5e2b09cc3b",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "earlierRuns": [
+    {
+      "run": "space-retry-command1",
+      "elapsedSeconds": 124.961,
+      "tests": 22,
+      "failures": 1,
+      "reason": "Foreign unavailable account correctly returned existing session_revoked; test expected native_session_invalid."
+    },
+    {
+      "run": "space-retry-command2",
+      "elapsedSeconds": 32.237,
+      "accepted": false,
+      "reason": "Stopped the owned test executor after noticing the expected-code replacement had not matched formatted source; no completed gate claimed."
+    }
+  ],
+  "evidence": [
+    "Current group/native/client/MFA and committed canonical/device continuity are checked under operation, account, parent, device and queue guards",
+    "Retry accepts only failed/cancelled or expired pending PROVISIONING heads, exact observed device/revision and 60-second cooldown; missing heads and unexpired/succeeded work do not silently restart",
+    "A fresh native version and verified MFA enter the new request, clipped to current parent deadline; prior terminal outcome and original creation survive",
+    "Lost-response replay, including another native refresh, returns the original receipt without advancing work; payload, scope, stale proof and minimum-client mismatches are rejected",
+    "Two concurrent retries of one failed head have exactly one winner; old worker lease cannot publish",
+    "Failure, cancellation and interruption after pending cancellation, revision replacement, receipt or journal roll back the whole operation; both queued and expired running heads are covered",
+    "Late group/MFA/legacy-source/clock/budget/interruption failures preserve the previous head and leave no retry receipt/journal"
+  ],
+  "limits": [
+    "No DI/controller/scheduler or admitted Matrix worker is enabled yet",
+    "Retained-device activation still needs explicit old/new runtime and SDK ownership transfer",
+    "Live8b40/schema116 and phone28 unchanged"
+  ]
+}

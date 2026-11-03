@@ -3,7 +3,7 @@
 ## Group graph verified; release 28 remains installed — 3 November 2026
 
 Continue implementation in /home/fajar/hris/.worktrees/communication-space on
-feat/communication-space, latest pushedfc1a6c40 (preceded by84e37752,6dde1489,
+feat/communication-space, latest pushede905b8d6 (preceded byfc1a6c40,84e37752,6dde1489,
 d92d4206). Its docs/agent-handoff.md and collaboration/group-provisioning.md are
 authoritative. This checkout remains the live push release source, not the group
 migration source; do not deploy group migrations with this checkout's scripts.
@@ -27,11 +27,20 @@ replay unchanged. API runtime cannot claim the worker queue. All checks complete
 Earlier queue/schema/archive and native/worker race evidence is retained in that
 branch. No failed run in this wiring unit.
 
-Next bounded native setup status for Mobile, then retained runtime transfer and
-group gateway/rooms/coherent client ownership. UNTESTED status drafts and proposed
-cases are in that worktree's ignored .work/communication-space-2026-11-03/space-status-next;
-read the branch handoff before editing. Never logout losing/late Matrix candidates:
-Synapse removes same-device winning tokens and E2EE keys. Transfer must fence all
+Native group status now passes26 policy/actual-database cases in119.361s,8252
+unchanged checked inputs and quality. It observes current native/group setup,
+expiry and explicit retry timing without mutating queued proof after a refresh;
+missing/foreign/late-denied metadata is rejected. The command is not yet wired into
+DI/HTTP. Next retained runtime transfer and group gateway/rooms/coherent client
+ownership. Read the branch handoff and ignored runtime-transfer-next.md before edits.
+
+Mobile local SDK identity verification is now WIP in /home/fajar/hris/hris-mobile:
+raw local ed25519/curve25519 reads, the server-compatible fingerprint and a dedicated
+emulator-only paused reopen/empty-store/wrong-passphrase probe. No product caller,
+server transfer or new phone build yet. Its root/Android/proof checks are running;
+read Mobile's current worktree before changing checked inputs. Native execution
+still pending. Never logout losing/late Matrix candidates: Synapse removes
+same-device winning tokens and E2EE keys. Transfer must fence all
 old gateway/provisioning/direct-room provider callers and preserve SDK store/private
 keys and pending transaction IDs. All54 communications acceptance groups remain open.
 

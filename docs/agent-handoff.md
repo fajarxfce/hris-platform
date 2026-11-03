@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Group credentials and recovery accepted — 3 November 2026
+
+V121 and CollaborationSpaceProviderSessionRepository add exact space/device/account/
+original-native-parent/Matrix ownership and a separate authenticated envelope.
+Metadata distinguishes absent from irrevocably cleared generations without decrypting.
+CAS rotation, parent-aware live writes and post-offboarding cleanup are enforced;
+generation/device revision1000000 is reserved for retirement. No parent purge can
+reset provenance. Read collaboration/group-credentials.md and group-provisioning.md.
+
+[Evidence](measurements/collaboration-space-provider-credentials-2026-11-03.json):
+space-credential-full1 PASS395.199s/98 (45 full database,19 domain,34 data),3650 checked
+inputs unchanged, format/architecture checks PASS. Focused12 cases PASS94.059s;
+recovery-tool13 PASS0.011s, reviewed schema121/future122 rejected. Actual archive
+restore and production recovery SQL decrypt current/retained group keys alongside
+an unchanged legacy company envelope. Offboarding, account deactivation, parent
+purge, terminal counters, CAS races, failed/cancelled/interrupted transactions and
+AAD tampering are covered. First test compile needed an explicit generic Unit;
+production policy was unchanged. No check is currently running.
+
+Next implement owned device lookup/update, bounded organization provisioning queue
+and worker. A draft device metadata/CAS port and two actual data tests are prepared
+in ignored .work/communication-space-2026-11-03/device-mutation-next (files.json and
+base-hashes.json); these are not accepted/integrated yet. Use tracked contracts as
+the authority. Worker claim commits queue metadata first; native preparation and
+publication must take account -> parent -> device -> queue -> credential guards.
+Do not take queue then account while native registration takes the reverse order.
+Provider I/O is outside SQL locks; publication rechecks current native/group/client/
+MFA/canonical/retained-device authority, observation deadline, lease and generation.
+Registration must commit its request with device/binding/receipt/journal before
+exposure. A lost/late/losing Matrix token must expire, never logout.
+
+Retained promotion still needs an explicit old/new runtime transfer fence; current
+registration requires active legacy source. Preserve provider IDs, public/private
+keys, SDK stores and pending transaction ownership. No DI/HTTP group grant, queue,
+gateway/room or Mobile migration is enabled. Live8b40/schema116 pushON/SMTP OFF,
+phone28 and accepted Mobile8273 gates are unchanged. All54 acceptance groups remain
+open. Continue the full communications long run, atomic pushes and user/Git updates.
+
+
 ## Typed group Matrix candidate port accepted — 3 November 2026
 
 CollaborationSpaceMatrixRepository now derives provider coordinates from typed

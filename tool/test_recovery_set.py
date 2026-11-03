@@ -42,7 +42,7 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("extract(epoch FROM token_expires_at)*1000000", expiring)
         self.assertIn(":expires:", expiring)
         with self.assertRaises(recovery.RecoveryError):
-            recovery.envelope_query(121)
+            recovery.envelope_query(122)
 
     def test_gateway_replay_projection_is_schema_gated_and_authenticates_its_metadata(self):
         for schema in (59, 103, 106, 107, 108):
@@ -70,10 +70,21 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("extract(epoch FROM reserved_at)*1000000", sql)
         self.assertIn("key_encrypted", sql)
 
-    def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120):
+    def test_group_credentials_have_separate_bounded_authenticated_recovery_projection(self):
+        self.assertNotIn("collaboration_space_provider_sessions", recovery.envelope_query(120))
+        sql = recovery.envelope_query(121)
+        self.assertIn("hris:matrix-space:v1:", sql)
+        self.assertIn("FROM collaboration_space_provider_sessions WHERE token_encrypted IS NOT NULL", sql)
+        self.assertIn("space_id::text||E'\\n'||account_id::text", sql)
+        self.assertIn("matrix_user_id||E'\\n'||matrix_device_id||E'\\n'||generation::text", sql)
+        self.assertIn("extract(epoch FROM updated_at)*1000000", sql)
+        self.assertIn("extract(epoch FROM token_expires_at)*1000000", sql)
+        self.assertIn("LIMIT 100001", sql)
+
+    def test_schema_gate_accepts_reviewed_group_credentials_and_rejects_unknown_future_schema(self):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 121, None, 'invalid'):
+        for schema in (58, 122, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

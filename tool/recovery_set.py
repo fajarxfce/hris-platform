@@ -50,7 +50,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # metadata; no token or participant-key format is added or rewritten.
 # V120 adds organization device provenance and legacy public-key references only;
 # no new encrypted envelope or change to existing purposes/associated data.
-MAX_SCHEMA = 120
+# V121 authenticates organization credentials under their own versioned purpose,
+# including immutable native/provider ownership, generation and all live timestamps.
+MAX_SCHEMA = 121
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -101,6 +103,15 @@ def envelope_query(schema):
         collaboration += (" UNION ALL SELECT 'hris:matrix-push:v1:'||"
                           "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),key_encrypted"
                           " FROM collaboration_push_bindings\n")
+    if int(schema) >= 121:
+        fields = ["space_id::text", "account_id::text", "device_id::text", "native_session_id::text",
+                  "matrix_user_id", "matrix_device_id", "generation::text",
+                  *["((extract(epoch FROM " + name + ")*1000000)::bigint)::text"
+                    for name in ("created_at", "updated_at", "token_expires_at")]]
+        canonical = "||E'\\n'||".join(fields)
+        collaboration += (" UNION ALL SELECT 'hris:matrix-space:v1:'||"
+                          "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),token_encrypted"
+                          " FROM collaboration_space_provider_sessions WHERE token_encrypted IS NOT NULL\n")
     return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
             ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 

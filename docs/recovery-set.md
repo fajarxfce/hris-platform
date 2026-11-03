@@ -8,9 +8,11 @@ It has no live restore destination and never stops or restarts the source servic
 Use Linux, Python 3.11+, Java 21, Docker and curl with SigV4 support. Build the
 current API JAR first; its offline key-verification entry point reuses the actual
 application cipher without starting Spring, an HTTP server, workers or providers.
-The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–103
-are supported. V103 adds typed document metadata and immutable history, without
-a new encrypted record family. New encryption contracts require reviewing the schema bound.
+The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–121
+are supported by the current verifier. New encryption contracts require reviewing
+the schema bound. V121 adds a distinct authenticated organization Matrix credential
+projection; [its recovery contract](collaboration/group-credentials.md) retains
+legacy company purposes and binds native/provider ownership, generation and expiry.
 
 ## Capture a checkpoint
 
@@ -79,7 +81,8 @@ the original bootstrap-role identity. Verification checks the observed schema,
 Flyway status, constraints and restricted runtime roles. It decrypts every retained
 identity envelope using its original account/session/challenge/version purpose:
 MFA credentials/enrollments, native exchange and refresh replay, credential mail
-and push registrations. Missing or incorrect retired keys fail even if someone
+and push registrations, plus schema-gated Matrix provider/gateway/push credentials
+and organization provider credentials. Missing or incorrect retired keys fail even if someone
 recomputes the key-pack checksum. Decrypted values never enter output or reports.
 Sync keyring validation preserves its configured current/older keys; this does not
 extend existing client cursor deadlines or authorize a previous session.

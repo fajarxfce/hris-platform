@@ -53,6 +53,9 @@ class CollaborationSpaceDeviceMappingTest {
                     "@hris_${compact(position.companyId)}_${compact(account)}:matrix.example.test",
                 matrixDeviceId = "HRIS_${compact(position.deviceId)}",
             )
+        val terminal =
+            device.copy(state = CollaborationDeviceState.REVOKED, version = 1000000, revokedAt = at)
+        assertEquals(terminal, spaceDeviceFromRow(spaceDeviceToRow(terminal), space, account))
         for (value in listOf(device, legacy, device.copy(matrixUserId = legacy.matrixUserId))) {
             assertEquals(value, spaceDeviceFromRow(spaceDeviceToRow(value), space, account))
             var saved: CollaborationSpaceDevicesRecord? = null

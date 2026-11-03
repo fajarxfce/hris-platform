@@ -148,8 +148,11 @@ does not activate an HRIS device or adopt a client SDK store. Follow the
 [group provisioning contract](group-provisioning.md) for credential envelopes,
 bounded work, publication fences and explicit legacy runtime transfer.
 
-Provisioning persistence/workers, group gateway/rooms and local-store adoption are
-not yet implemented.
+V121 and the [group credential repository](group-credentials.md) now retain exact
+encrypted provider ownership, generations and irreversible cleanup separately from
+legacy company envelopes. Current/retained keys and the production recovery SQL
+are exercised against an actual archive restore. Provisioning queue/workers,
+group gateway/rooms and local-store adoption are not yet implemented.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 

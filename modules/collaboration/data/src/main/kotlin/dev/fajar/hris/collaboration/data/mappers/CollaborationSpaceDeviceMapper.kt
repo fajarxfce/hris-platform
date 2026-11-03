@@ -56,7 +56,8 @@ fun spaceDeviceFromRow(
     val created = requireNotNull(row.createdAt).toInstant()
     val updated = requireNotNull(row.updatedAt).toInstant()
     val revoked = row.revokedAt?.toInstant()
-    require(version in 0..999999 && updated >= created)
+    require(version in 0..1000000 && updated >= created)
+    require(state == CollaborationDeviceState.REVOKED || version < 1000000)
     require((state == CollaborationDeviceState.REVOKED) == (revoked != null))
     require(revoked == null || (revoked >= created && revoked <= updated))
     return CollaborationSpaceDevice(

@@ -28,21 +28,25 @@ the existing communication push-worker ownership pattern. Native registration mu
 insert its request atomically with device/binding/receipt/journal. Retry requests
 must preserve history and fence older attempts; they require current native proof.
 
-Worker preparation locks the lease/request and current account/native/device owner
-in a consistent order, verifies group/client/MFA/proof/canonical identity, and
-captures a short observation with expected device and credential generation. The
+A worker claim transaction acquires only queue metadata and commits before native
+admission. Preparation/publication then take account, native parent, device and
+queue-head guards in that order, followed by credential access. Native registration
+already holds account/parent guards before enqueueing: taking the queue first and
+then waiting for the account would introduce a lock inversion. Verify current
+group/client/MFA/proof/canonical identity and capture a short observation with
+expected device and credential generation. The
 provider call runs without SQL locks. Publication rechecks the entire authority,
 lease token, attempt and generation before atomically storing the credential,
 activating the device and completing the request. Bound queue size, active workers,
 attempts, lease durations, query windows and cleanup; retain failed outcomes.
 
-New group credentials need their own authenticated purpose and schema/recovery
-review. Bind immutable owner/provider coordinates, generation and expiry; never
-reinterpret an old company envelope using a space ID. Reserve a terminal generation
-and device revision so exhaustion cannot prevent irreversible revocation. V120's
-device revision currently ends at999999; review that boundary when credential
-retirement is implemented. Restore/decrypt real test envelopes under current and
-retained keys, and reject wrong scope/generation/expiry rather than publishing them.
+V121 and the internal [group credential repository](group-credentials.md) now provide
+a distinct authenticated purpose, immutable native/provider ownership and exact
+generation/expiry binding. Terminal generation and device revision1000000 are
+reserved for irreversible cleanup. Real current/retained-key envelopes and the
+production recovery projection survive an actual PostgreSQL archive restore.
+The native/worker publication flow is still unwired; these persistence checks do
+not grant current group/content access or permit reusing a retired credential.
 
 ## Retained devices and runtime transfer
 

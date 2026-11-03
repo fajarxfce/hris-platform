@@ -5,14 +5,15 @@
 Live remains8b40bd0f/schema116 with chat push ON, SMTP OFF, and the verified private
 rollout below. This checkout is not the group-migration source. Continue that work
 in /home/fajar/hris/.worktrees/communication-space on feat/communication-space,
-latest pushed93808218 (preceded by7aabb9e1 and78c3b925). Its own docs/agent-handoff.md,
+latest pushedfa19ad69 (preceded by453f79d8,93808218,7aabb9e1 and78c3b925). Its own docs/agent-handoff.md,
 collaboration/group-provisioning.md and group-credentials.md are authoritative.
 
 That branch now has V117–122: group directory/contacts, immutable provider-user
 selection, native identity/device registration, exact legacy parent/public-key
 references, shared five-parent quota, typed Matrix login preserving actual provider
 keys, encrypted group credential generations/recovery, owned device CAS updates
-and bounded organization provisioning metadata/leases.
+bounded organization provisioning metadata/leases, typed proof-fenced queue ports,
+and atomic native registration enqueue.
 No group DI/controller/worker/gateway or Mobile ownership migration is enabled.
 
 V121 credential validation: full98 cases in395.199s (45 database,19 domain,34 data),
@@ -29,12 +30,21 @@ unchanged inputs and quality PASS; recovery-tool14 cases0.011s, projection121=12
 Claims are bounded to8 per batch/16 live leases/60s, with8 attempts and bounded
 expiry/exhaustion cleanup. Actual archive, proof/scope and stale-lease tests pass.
 
-Next: typed queue ports, native enqueue/retry and worker prepare/publish fences. Claims acquire metadata only; commit before taking account -> parent ->
+Typed queue ports:17 cases102.360s,3658 unchanged hashes; actual SQL exact lease
+proof, MFA/defer/reclaim/retry, archive claims and device+credential+queue rollback.
+Native enqueue:18 cases106.830s,3658 unchanged hashes, quality PASS; initial request
+commits with device/binding/receipt/journal, with at most60s current proof deadline.
+Failure/cancellation/interruption at every write boundary roll back together;
+registration replay after native refresh preserves the original head.
+
+Next: explicit native retry and worker prepare/publish fences. Retry is WIP in the
+group worktree (not accepted yet); read its current status before editing. Claims
+acquire metadata only; commit before taking account -> parent ->
 device -> queue -> credential guards. External I/O holds no SQL locks. Never logout
 a losing Matrix login: actual Synapse deletes all same-device tokens and E2EE keys.
 Retained runtime transfer and Mobile SDK/private keys/pending transactions require
 explicit coherent ownership migration. Read the branch handoff before continuing;
-ignored typed queue port drafts are untested. Do not deploy these migrations using
+ignored old port drafts are superseded by tracked code. Do not deploy these migrations using
 this checkout's live push-release scripts.
 
 Mobile0d96e737 records matching8273 gates for installed normal release28:

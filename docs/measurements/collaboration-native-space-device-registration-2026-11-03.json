@@ -1,0 +1,109 @@
+{
+  "scope": "Native organization device registration transaction and continuity policy; no provider provisioning",
+  "baseCommit": "971b4d40",
+  "accepted": {
+    "startedAt": "2026-11-03T20:54:05.669589+00:00",
+    "elapsedSeconds": 76.836,
+    "exitCode": 0,
+    "sourceFiles": 3632,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDevicePolicyTest.xml": {
+        "sha256": "c0a53738af207ab8303a7ea9c0e70bb503a8c340ed5eaac20d2ef6d2a0ad61b5",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceIdentityPolicyTest.xml": {
+        "sha256": "1c6ec99b31fef9d04f42e95e309c204fa15756221c3f589bd79fc431763c0a42",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceAdmissionTest.xml": {
+        "sha256": "ddbeda9b355646b7c8d26b8c1723d1c662b141ab6ddc1af69a435ed1854e12b6",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyParentRepositoryTest.xml": {
+        "sha256": "18cacf2bef6ba7c332d42b7b525561722194eb766eb38e55b8a8cc15ae2070d9",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceMappingTest.xml": {
+        "sha256": "861a7e3994436686cef80279f82b5b93b8385bc6b3c1b0ee485e7e7eb459c1a6",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "e1bf8dd60c2be00d061f940ddd2da47abfeaeff1b9ce95b301300d883ab11bcb",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "5cb87e40fd8e0240c86474de9f4c435de8df50c0b8401c05ed4cb2f040e55d71",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceIdentitySelectionTest.xml": {
+        "sha256": "36342a3fd411e0255c4cb40f84134c949e2a3d32a3ea197a6a8953e6053fc005",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyParentMappingTest.xml": {
+        "sha256": "19ee9e8cad7547b6c223b9f77a8dad38c92d5ee6445801a9f34db69835a70a89",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck"
+  ],
+  "newPolicyCases": 3,
+  "newPostgresCommandCases": 5,
+  "regressionCases": 31,
+  "evidence": [
+    "A committed canonical selection is mandatory before registration; no use-case-to-use-case call or provider token acquisition",
+    "Explicit new/retained origin validates request shape, native platform and public-key metadata; existing binding cannot change device/key ownership",
+    "Real operation/account/native guards serialize competing fifth/sixth registrations; exactly one succeeds and the other receives collaboration_device_limit",
+    "Device/binding/receipt/audit/platform metadata/outbox roll back after injected failure or cancellation at each write stage; identical retry succeeds",
+    "Completion revalidates group/account/native/MFA and retained source, rejects late offboarding/new MFA requirement/source revocation/access expiry/clock rollback/30-second budget/interruption",
+    "Lost responses preserve device identity across later ACTIVE metadata state; wrong version/client/company/provider and revoked parent cannot replay",
+    "New provider IDs remain distinct even when the canonical user is a retained legacy user; original provider rows remain unchanged"
+  ],
+  "earlierAttempt": {
+    "attempt": "device-command1",
+    "seconds": 15.053,
+    "result": "Rejected at domain test compilation by Werror for an unnecessary non-null assertion. Replaced test assertion with requireNotNull; no policy relaxation."
+  },
+  "limits": [
+    "No provider request or provisioning job is performed by this registration command yet",
+    "Fingerprint metadata alone does not prove client private-key possession or adopt an SDK store",
+    "Current retained-source continuity requires active/unretired legacy metadata; any future fenced ownership transfer must explicitly account for this before retiring old credentials",
+    "No group DI, controller, gateway/room or Mobile runtime is enabled; live schema116/runtime8b40 and phone28 unchanged"
+  ]
+}

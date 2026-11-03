@@ -126,8 +126,22 @@ records five cases in42.411s with3628 unchanged source hashes and quality checks
 including actual duplicate-binding rollback, parent purge, cross-account reads and
 quota/credential/membership transitions. The failed future-version fixture is retained.
 
-The schema and its actual PostgreSQL tests are implemented. Native registration,
-provisioning, group gateway/rooms and local-store adoption are not yet implemented.
+`RegisterNativeCollaborationSpaceDevice` is now implemented without DI/HTTP wiring.
+It requires a committed canonical selection, explicit new/retained origin and exact
+current native admission under operation/account/parent guards. The shared quota
+prevents a sixth device. Device, binding, receipt and journal commit atomically;
+completion rechecks current group/security and retained-source continuity. Clock
+rollback and the 30-second command budget abort the transaction. This command
+currently records intent only: provisioning work must be integrated before exposure.
+[Registration evidence](../measurements/collaboration-native-space-device-registration-2026-11-03.json):
+39 passing cases in76.836s,3632 unchanged hashes and quality checks. Five actual
+PostgreSQL command cases include competing fifth/sixth devices, replay, failure and
+cancellation after each write, late source/access/MFA changes, expiry and interruption.
+Three new pure-policy cases validate request/provenance; existing admission,
+selection and repository regression cases pass. A test-only compile warning retry
+is recorded separately.
+
+Provisioning, group gateway/rooms and local-store adoption are not yet implemented.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 

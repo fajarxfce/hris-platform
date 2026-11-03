@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Native group device registration transaction accepted — 3 November 2026
+
+RegisterNativeCollaborationSpaceDevice and its pure continuity/request policies
+are implemented, still unwired. It requires committed canonical selection, explicit
+new/retained identity and operation/account/native-parent guards. The shared quota
+serializes fifth/sixth device creation. Current account/group/native/client/MFA and
+retained source are checked at completion; clock rollback/30-second budget deny.
+Device/binding, receipt, audit/platform metadata and outbox roll back atomically.
+[Evidence](measurements/collaboration-native-space-device-registration-2026-11-03.json):
+device-command2 PASS76.836s/39 cases (3 new policy,5 actual PostgreSQL command,31
+regression),3632 hashes unchanged, quality PASS. Werror in the first test compile
+was fixed with requireNotNull; no production policy changed. No check runs.
+
+Next implement group provider credential/provisioning work before any DI/HTTP:
+current registration creates PROVISIONING identity intent only. Existing generic
+background_jobs requires a real HR company and cannot be given a synthetic space
+UUID. Choose an explicit organization work-queue contract (feature-owned bounded
+lease/fence is consistent with existing push workers), or a reviewed generic scope
+extension; do not leak group work into HR company permissions. Persist new group
+token envelopes only with an explicit namespace/AAD and recovery schema review.
+Provider I/O must be outside transactions, with current admission and fenced commit,
+finite retries/timeouts and cleanup after cancellation/lost responses.
+
+Retained-device promotion must preserve original Matrix user/device/key/store and
+stop competing old/new runtime ownership. Current registration continuity requires
+an active/unretired legacy source. Do not retire the old credential/device and then
+silently bypass that check: introduce an explicit completed transfer/mapping fence
+with reviewed admission first. Old device-key identity cannot be deleted or replaced.
+Complete gateway/room and Mobile owner/store/workers/push/reads together; directory
+and registration alone do not accept cross-company CHAT-01 or calls/meetings.
+
+Live8b40/schema116 pushON/SMTP OFF and phone28 remain unchanged. Mobile8273 gates are
+accepted. Continue the entire PRD, every commit pushed, frequent user/Git updates.
+
+
 ## Group device registry and shared quota accepted — 3 November 2026
 
 CollaborationSpaceDeviceRepository now maps exact canonical device/legacy key and

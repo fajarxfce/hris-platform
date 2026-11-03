@@ -1,0 +1,220 @@
+{
+  "date": "2026-11-03",
+  "base": "258bfb1a",
+  "scope": "Owned legacy Matrix metadata projection only; no identity adoption or credential/SDK migration",
+  "focused": {
+    "startedAt": "2026-11-03T19:50:17.111826+00:00",
+    "elapsedSeconds": 61.275,
+    "exitCode": 0,
+    "sourceFiles": 3590,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyIdentityMigrationTest.xml": {
+        "sha256": "a4251d1348f589cb42e0c590e6311a78e39a71b206b4a8ea39b6dd5689916873",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "fullCoreDatabase": {
+    "startedAt": "2026-11-03T19:51:28.631627+00:00",
+    "elapsedSeconds": 211.587,
+    "exitCode": 0,
+    "sourceFiles": 3590,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": {
+        "sha256": "faa58db2629c2c6c08b82e1b11ad516bb0f468227a429c636a4d73f8b9c51a71",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": {
+        "sha256": "42c2e0b8cf0dce7f1d5dd33f8796241a1c7909bbab38be24480fa98a8ce66afb",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": {
+        "sha256": "4fc99b268e235441ff970f456666787c412ad277792a9369ec5e5fb7416eda0d",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": {
+        "sha256": "0d95cce8ed7720add815695e8e3c91244ec3a2b436026fc65994299e56a12354",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyIdentityMigrationTest.xml": {
+        "sha256": "deacc3394ebf22c4f128f9f72b36010de685306db31230664dc1b783405c0a52",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceDirectoryMigrationTest.xml": {
+        "sha256": "40dbe67695cf90acff47f8976632ec2e7b7b29318b04d661e1fe501df15f0b75",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": {
+        "sha256": "8059365f842ad88a21b367c292beb397998ea310049bcd8d8ca02de5456b6efc",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": {
+        "sha256": "527202fd8c6a1996b8cb531d126b0b55e9a2d29d4a00ece401af46dc51aab9c3",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": {
+        "sha256": "991f4b3b2fdadebe6ed81adad31981f8754eb756c1094517b02355f6c6ecad80",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": {
+        "sha256": "522993531e3cc343dabf44509418a311d584229d3fd5f96c10544263fa7031fd",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": {
+        "sha256": "a214e792eb5e2f36fed5f1414604c1068fe67570991ec31fda8753444b80ae59",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": {
+        "sha256": "70e521e9e7d11a8e719b2ffd91c672d727696a015899edd405304a81467dca2a",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": {
+        "sha256": "88fb2657bb9bbdb930a0c26c122dbea40105b8ef2e7bbc5c4091bc8933a8d72f",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": {
+        "sha256": "11943e5c30360f67252ab5b0a58f8e74547a668077f57568cfbfd43b55d80225",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+        "sha256": "7a3ca0e6d947b01213d0e16e6c5dea632785a0213198a2996007afcf1a166492",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": {
+        "sha256": "52d20b37c7da79e52a2ee773937082dd5a180292ba4bea83887d67e747fc4399",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": {
+        "sha256": "c8e590ff80b417ef67dd436cc3140f8415608bd7b5c7e6885446c9f04cecdece",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "recoveryTool": {
+    "exitCode": 0,
+    "elapsedSeconds": 0.107,
+    "sources": {
+      "tool/recovery_set.py": "6c31fdf3b4f50a1ec8e589f515f8cf4dde972b14809ce1e5c4a32df2135eeb79",
+      "tool/test_recovery_set.py": "53b84e858ded55540a7dd8ba618c956e7bf91f9f86407af9aaffc8beab08fe3c"
+    },
+    "unchanged": true,
+    "priorFailure": "One of12 initial cases still treated118 as an unknown future schema. Updated that test boundary to119; supported-schema behavior unchanged."
+  },
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V118__collaboration_legacy_identity_inventory.sql": "2d9a0a8b97a403c52e3e7540f814ad4e3d649088949bb5b6485c4a06aea90316",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationLegacyIdentityMigrationTest.kt": "e442c12abf5976345319263bbc71c2e17785202951528eff8b7932291c80d829",
+    "tool/recovery_set.py": "6c31fdf3b4f50a1ec8e589f515f8cf4dde972b14809ce1e5c4a32df2135eeb79",
+    "tool/test_recovery_set.py": "53b84e858ded55540a7dd8ba618c956e7bf91f9f86407af9aaffc8beab08fe3c"
+  },
+  "previousFocusedAttempt": {
+    "result": {
+      "startedAt": "2026-11-03T19:48:22.930396+00:00",
+      "elapsedSeconds": 78.38,
+      "exitCode": 1,
+      "sourceFiles": 3590,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 3,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.core.database.CollaborationLegacyIdentityMigrationTest.xml": {
+          "sha256": "e055bf97364fe791f2f7b5fe6cfb4f38af0827efb720ccecf7ad4d74dacf6e7f",
+          "tests": 3,
+          "failures": 3,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "classification": "Fixture omitted mandatory provider token expiry and was rejected before V118. Added fixture-only five-minute expiry; production expiry trigger unchanged."
+  },
+  "verified": [
+    "Original provider ciphertext, Matrix user/device identifiers, device rows, membership and permission rows are byte/value-equivalent across migration and archive restoration.",
+    "Minimal owned metadata spans former HR companies and includes revoked/retired identity references; a current eligible company remains mandatory.",
+    "No native binding is required for inventory; the fixture has zero bindings, preserving discoverability after ordinary parent cleanup. This does not admit provider resumption.",
+    "Other accounts cannot read the metadata; selected HR company does not change owned inventory. Committed last-membership offboarding hides it.",
+    "Restricted non-login view owner lacks token, native access hash, gateway replay and login-email column privileges. Application role cannot assume it.",
+    "Real pg_dump/pg_restore preserves restricted view ownership, runtime result and original provider rows.",
+    "36 core database tests in17 suites, format/architecture and12 recovery-tool cases pass."
+  ],
+  "recoveryMaximumSchema": 118,
+  "encryptedEnvelopeFormatChanged": false,
+  "liveSchema": 116,
+  "liveChanged": false,
+  "phoneChanged": false,
+  "limits": [
+    "No group device, room, provider grant, public metadata endpoint or Mobile key-store relocation is implemented by this projection.",
+    "Physical/SDK crypto-store continuity still needs explicit mapping and end-to-end acceptance. No existing Matrix identity is automatically selected, replaced or rekeyed."
+  ]
+}

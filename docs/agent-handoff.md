@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Owned legacy crypto identity inventory — 3 November 2026
+
+V118 adds only the restricted owned metadata view; original provider ciphertext,
+Matrix IDs, devices and HR grants stay unchanged. The view remains useful without
+native bindings and includes retired references without granting resumption.
+Actual PostgreSQL isolation and pg_dump/restore preserve the restricted owner and
+original rows. Focused61.275s/3 cases; full211.587s/36 cases in17 suites,3590 unchanged
+source hashes, format/architecture PASS. Recovery12 PASS/MAX_SCHEMA118, no new AAD or
+envelope. [Evidence](measurements/collaboration-legacy-identity-inventory-2026-11-03.json).
+Initial legacy1 fixture failed mandatory expiry before V118; its three failures and
+the recovery test's old future-schema boundary are retained, then corrected.
+
+Continue a bounded legacy inventory repository and explicit current-parent/device
+adoption. A seven-file repository/test draft is in this agent's session storage,
+not applied yet. Mobile crypto-store owner includes legacy company/native parent;
+never replace that component with spaceId or silently open a fresh store. Multiple
+historical identities/rooms must retain explicit mappings and keys. No group device,
+room, HTTP endpoint, provider token or Mobile migration is exposed yet. All group
+and rich-chat/call/video/meeting work continues; live schema116/pushON and phone28
+are unchanged. Matching Mobile8273 native/control hosted runs remain in progress.
+
+
 ## Native group contact policy, still unwired — 3 November 2026
 
 The contact use case now owns account/session transaction guards and checks current

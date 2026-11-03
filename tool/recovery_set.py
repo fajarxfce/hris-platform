@@ -44,7 +44,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V117 adds the immutable organization communication identity and minimal directory;
 # no new encryption envelope. Its migration test restores identity, view ownership
 # and contact isolation through a real PostgreSQL archive.
-MAX_SCHEMA = 117
+# V118 adds only an owned legacy provider metadata view and restricted non-login
+# owner. Original credential rows and authenticated purposes remain unchanged.
+MAX_SCHEMA = 118
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

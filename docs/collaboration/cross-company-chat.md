@@ -47,6 +47,26 @@ changing any encrypted-envelope format. Live schema remains 116.
 
 ## Required replacement
 
+V118 now exposes an owned legacy provider metadata view to support explicit
+migration. It retains original company/device IDs, Matrix user/device IDs and
+retirement/version metadata, without reading token ciphertext, native credentials,
+gateway replays or login email. The restricted non-login owner cannot access those
+columns and cannot be assumed by the application role. Eligibility in a current
+company is required, while the original HR company and native binding need not
+remain active. Retired references are inventory, never permission to resume them.
+No original row is rewritten, new identity selected or SDK store relocated.
+[Evidence](../measurements/collaboration-legacy-identity-inventory-2026-11-03.json)
+records actual PostgreSQL migration/isolation/restore,36 core cases in211.587s,
+format/architecture and12 recovery-tool cases. Recovery accepts schema118 with
+the same authenticated envelope formats; live schema remains116.
+
+Mobile's current crypto-store ownership contains the original company and native
+parent. A future group owner must explicitly retain that store reference and verify
+the provider user/device match; changing its company component can open a different
+empty store. The inventory supplies server-side identity facts, not client keys or
+proof that a local store exists. Multiple historical identities must stay explicit;
+do not silently merge/rekey rooms or infer a replacement from the selected company.
+
 The initial native contact use case now accepts an account-scoped actor, reads
 current native/account state under account-then-session guards, and rechecks
 security and eligible-space projection after acquiring the contact page. A global

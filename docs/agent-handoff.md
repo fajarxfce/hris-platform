@@ -1,5 +1,51 @@
 # Agent continuation — HRIS workspace
 
+## Current product push accepted; full release gate repaired — 3 November2026
+
+Actual product FCM run16 PASS271.055s/driver209.335s with Mobilec770a83f product6/peer6,
+Platformd00ac5f5, fresh1/0/0/0. Normal login/Chat UI, Firebase-caused restart, actual
+SystemUI encrypted reply, registrations/pushers/delivered1/1/1, all31 admission flags,
+one callback/revision/attempt and full independent cleanup. Five PNGs viewed; three
+SystemUI frames retained in docs/images/product-chat-fcm/current-*.png. Evidence:
+[latest product](measurements/product-chat-fcm-current-ui-2026-11-03.json).
+Mobile also proves both QUEUED/FROZEN_DRAFT native regressions:645.323s, two fresh
+passes,176 encrypted originals/11 incoming reopens/11 foreground pages each; source
+Mobile3824/Platform4325 hashes unchanged. Phone27 normal build is running from Mobile
+8ac28f68 (documentation after c770), session94636; phone remains26 until normal
+verify/smoke/PNG/preflight/notice/install-only. Never install product6/peer6 on phone.
+
+Full Verify41692502923 atd00 is rejected for dashboard shard4:276/277 pass, optional
+MFA dialog Escape occurs while aria-busy=true. Screenshot/trace and digest-verified
+artifact13258595649 retained. Nine local assurance browser cases PASS19.768s after
+waiting for aria-busy=false before dismissal; format passes. Application/runtime
+code is unchanged. [Evidence](measurements/verification-dialog-readiness-2026-11-03.json).
+Dispatch a replacement full Verify after this commit; its concurrency rule will
+supersede the known-failing earlier run. Do not accept d00's partial full run.
+
+Private ingress candidate staged (not activated) at ~/.config/hris/chat-push-pilot.
+Same Matrix server name/config/keys; only a new private CA/leaf, SSL trust bundle,
+exact proxy172.25.0.6/32 and Synapse172.25.0.3 peers. No new host ports. Active env/
+overlay/provider files unchanged. nginx -t passes as UID10001 with read-only root,
+ALL capabilities dropped and bounded tmpfs; first default-cache-dir failure retained.
+[Staging](measurements/chat-push-ingress-preparation-2026-11-03.json). No proxy runs.
+.work/chat-push-rollout-2026-11-03 holds intent/inventory, prepare-ingress.py and CI/
+package collectors currently targeting d00/run41692502923. RETARGET only to the new
+accepted full gate. stage-packages.py preserves build/libs and has no fixture
+exclusions. Image staging/deploy/checkpoint scripts have NOT been copied/retargeted.
+Reuse reviewed prior rollout methods with fresh HRIS and separate Matrix backups,
+restore validation, old-image rollback and socket/TLS/public callback denial checks.
+Live API/worker304be027/schema116, all chat push flags/SMTP OFF; preserve known live
+containers, Google/native/document state and unrelated Docker services.
+
+Mobile current c770 control41691878650 running, native41691878601 pending; old537
+native41685363689 still executing the unfixed pager. Apple537 full CI41685480887 is
+accepted1104/124,419 hashes, full Xcode1318s; c770 still needs its matching control
+Apple result. Old537 control41685363392 has the expected, artifact-verified browser
+Asia/Jakarta failure, fixed bya59d3cd2. All remaining communication groups continue:
+cross-company stable account/space migration, real recipient ACKs, rich chat, real
+Apple/web SDK, calls/video/meetings. Do not stop at phone27 or push activation.
+
+
 ## Actual product FCM and inline reply passed; current UI build continues — 3 November 2026
 
 [Evidence](measurements/product-chat-fcm-session-admission-2026-11-03.json) /

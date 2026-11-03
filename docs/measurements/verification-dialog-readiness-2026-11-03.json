@@ -1,0 +1,46 @@
+{
+  "source": "d00ac5f56c72b167c7c75f177a5512e542fc8e14",
+  "originalRun": "https://github.com/fajarxfce/hris-platform/actions/runs/41692502923",
+  "originalJob": "https://github.com/fajarxfce/hris-platform/actions/runs/41692502923/job/126114413046",
+  "artifact": {
+    "id": 13258595649,
+    "name": "dashboard-test-reports-4",
+    "size_in_bytes": 2194269,
+    "digest": "sha256:d3671f65d1296b435e43205e83db0e76306f2afe7ee104032d488149761977fa"
+  },
+  "githubArchiveDigestVerified": true,
+  "originalStats": {
+    "total": 277,
+    "expected": 276,
+    "unexpected": 1,
+    "flaky": 0,
+    "skipped": 0,
+    "ok": false
+  },
+  "test": "optional verification can be cancelled after a fresh check and restores keyboard focus",
+  "screenshotInspected": true,
+  "traceSha256": "6f776ccedf4f69f4575b29a0bae81a6ed5b78d26ef0b32db96f7c729201bda6e",
+  "cause": "The optional verification test presses Escape immediately after visible content, while the dialog is still aria-busy=true during its fresh session check. Busy dialogs intentionally reject dismissal. The click branch already benefits from actionability waiting; the keyboard branch needs explicit readiness.",
+  "traceTiming": {
+    "lastObservedBusyDialogMillis": 236814.133,
+    "escapeMillis": 236816.312
+  },
+  "fix": "Wait for the existing aria-busy=false state before either dismissal path. Preserve required-MFA, fresh-session, field-retention and focus assertions; no application or authorization code changes.",
+  "local": {
+    "startedAt": "2026-11-03T18:32:54.958339+00:00",
+    "seconds": 19.768,
+    "exitCode": 0,
+    "sourceSha256": "844c90eac71ab910d7a3ab323e207911ba4c924bcac154d7e721268d2ee273aa",
+    "sourceUnchanged": true
+  },
+  "localBrowserStats": {
+    "startTime": "2026-11-03T18:32:55.714Z",
+    "duration": 18973.742000000002,
+    "expected": 9,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "formatCheck": "npx biome check tests/workspace-assurance.spec.ts: pass, one file",
+  "remaining": "Replacement full Verify is required before deployment; the known-failing earlier run is not accepted."
+}

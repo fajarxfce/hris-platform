@@ -258,6 +258,7 @@ test("optional verification can be cancelled after a fresh check and restores ke
     const dialog = page.getByRole("dialog", { name: "Account verification", exact: true });
     await expect(dialog.getByLabel("Authenticator code", { exact: true })).toBeVisible();
     await expect(f.field).toBeHidden();
+    await expect(dialog).toHaveAttribute("aria-busy", "false");
     if (dismiss === "escape") await page.keyboard.press("Escape");
     else await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(dialog).toHaveCount(0);

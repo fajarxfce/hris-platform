@@ -1,10 +1,10 @@
 # Actual Android product FCM acceptance
 
 Status: the bounded actual Android product scenario PASSED on 3 November 2026.
-Run15 uses immutable Mobile1136fb9e product5/peer5 and the corrected server/worker
+Run16 also passes with current Mobilec770a83f product6/peer6 and the corrected server/worker
 session-admission policy. It proves Firebase-caused process restart, a real
 SystemUI notification and inline reply received encrypted by the peer. This is
-one scenario; the newer Chat UI source still needs its own artifact run. Live chat
+one scenario. Current Chat UI and native-history reuse now have matching artifacts. Live chat
 push remains disabled until deployment/ingress and current-artifact checks finish.
 See [accepted evidence](../measurements/product-chat-fcm-session-admission-2026-11-03.json).
 
@@ -155,3 +155,24 @@ never identities, keys, tokens or bodies. Run13's diagnostic nullable-map compil
 failure is retained separately; it executed no fresh provider/JUnit case. Actual
 current-source product acceptance, private ingress rollout, other platforms and
 all remaining PRD groups continue after this bounded success.
+
+## Current UI and repaired foreground paging — 3 November2026
+
+[Run16](../measurements/product-chat-fcm-current-ui-2026-11-03.json) passes271.055s
+with one fresh case; actual driver209.335s. Source Mobilec770a83f and Platformd00ac5f5
+remain unchanged. Product6/peer6 exercise normal Chat navigation and the same real
+Firebase restart/SystemUI encrypted reply path. Counts1/1/1, one delivered revision
+and one attempt;31 admission flags true. All five PNGs inspected and independent
+cleanup verifies the disposable image, emulator process/transport and credentials
+are gone. [Current notification](../images/product-chat-fcm/current-product-chat-notification.png),
+[editor](../images/product-chat-fcm/current-product-chat-reply-editor.png) and
+[acknowledged state](../images/product-chat-fcm/current-product-chat-reply-acknowledged.png)
+are retained. Two separate actual Android QUEUED/FROZEN_DRAFT recovery cases pass
+645.323s, retaining176 encrypted originals and exhausting11 foreground pages each.
+
+Private TLS preparation passes a non-root/read-only nginx configuration check;
+[staging evidence](../measurements/chat-push-ingress-preparation-2026-11-03.json)
+does not activate it. Full Verify found a dashboard test pressing Escape before
+its optional verification dialog finished the fresh check. The readiness assertion
+now waits for aria-busy=false; all nine assurance browser cases pass19.768s. A
+replacement full release gate, deployment checkpoints and live ingress checks remain.

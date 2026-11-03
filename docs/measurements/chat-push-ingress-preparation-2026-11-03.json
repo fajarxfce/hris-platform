@@ -1,0 +1,52 @@
+{
+  "prepared": {
+    "preparedAt": "2026-11-03T18:22:41.757090+00:00",
+    "activeFilesUnchanged": true,
+    "startedServices": false,
+    "source": "d00ac5f56c72b167c7c75f177a5512e542fc8e14",
+    "certificateVerified": true,
+    "publicCaBundleRetained": true,
+    "leafDays": 90,
+    "privateProxyIp": "172.25.0.6",
+    "synapsePeerIp": "172.25.0.3",
+    "providerPortsPublished": false,
+    "serverNamePreserved": "matrix.hris.internal",
+    "candidateOverlaySha256": "4f299ab921c201111717ddf58f76b7216fa947ae8844d13f96e45028a4c88be7",
+    "protectedOriginalFingerprints": {
+      "/home/fajar/.config/hris/matrix-pilot/compose.matrix.yml": "fb01cb7a8b18adc7a1135bc4a04b36ab4fd888e59fca8022c64e2b37c2325b10",
+      "/home/fajar/.config/hris/matrix-pilot/homeserver.yaml.source": "89000eba7112d77e2035820d3426bf928f7a5d0ea11b7dffcb68e7dcaba3d3d1",
+      "/home/fajar/.config/hris/dev.env": "bac3db9e63f8eb4b63a7dc297a15df7694278396e31afbac2e84c41e6bcfe2f3"
+    },
+    "pending": [
+      "exact current product FCM and full backend CI acceptance",
+      "stage accepted API/worker images",
+      "TLS/source denial validation",
+      "fresh HRIS and separate Matrix checkpoints",
+      "reviewed deployment and rollback",
+      "loopback/WireGuard callback denial verification"
+    ],
+    "scratchCorrection": "Bound nginx default protocol temporary directories to an 8MiB tmpfs owned by UID10001; the image root stays read-only."
+  },
+  "initialConfigCheck": {
+    "at": "2026-11-03T18:23:17.812838+00:00",
+    "seconds": 1.948,
+    "exitCode": 1,
+    "oneShotContainerRemoved": true,
+    "liveServicesChanged": false,
+    "configuredUid": "10001:10001",
+    "certificateAndKeyLoadChecked": false
+  },
+  "correctedConfigCheck": {
+    "at": "2026-11-03T18:24:07.543878+00:00",
+    "seconds": 1.718,
+    "exitCode": 0,
+    "oneShotContainerRemoved": true,
+    "liveServicesChanged": false,
+    "configuredUid": "10001:10001",
+    "certificateAndKeyLoadChecked": true
+  },
+  "initialFailure": "Default nginx fastcgi_temp directory tried to use the read-only image root. The candidate now has an 8MiB UID10001 tmpfs for /var/cache/nginx as well as /tmp.",
+  "activeConfigurationChanged": false,
+  "servicesStarted": false,
+  "note": "Private candidate only; source/CA allowlist, checkpoints, rollout and callback denial tests are still required. CA/leaf private keys and rendered secret configuration stay outside Git."
+}

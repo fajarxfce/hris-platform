@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-03",
+  "base": "4423ae9c",
+  "scope": "Unwired account-scope native contact use case and pure session/client policy; no provider or room authority",
+  "finalCheck": {
+    "startedAt": "2026-11-03T19:44:21.291532+00:00",
+    "elapsedSeconds": 27.681,
+    "exitCode": 0,
+    "sourceFiles": 3588,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceAdmissionTest.xml": {
+        "sha256": "a26d9be879048f313db34439f8f1b49ef8df585d32ea44ec4728c1803f070f13",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceSha256": {
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceDirectoryMigrationTest.kt": "0867f31e1014d1e232615e96945b7ffe8a10b65fe092beda703c98b483e3b449",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationSpaceAdmissionTest.kt": "44b4233e6fab51bc27a73747bda382c14738399187d2d785264d3ef2b17d6916",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceContact.kt": "0f8ebdf66d04437479bd634eaea9b6669d4cd84351169d150c4080ff55948891",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpacePolicy.kt": "4dbf6daed33338348f93e8d9172aafb372c07e86fd8de9d1b24cd1a7ac050d70",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceAdmission.kt": "687c40129da0c788b4a0185bd2a8f3ca883c28b51be6bea0f8454b17c139c0bb",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceAdmissionPolicy.kt": "0423a09760754c11828dd480bf40daa88b99b36eceeca58c9c87eaf16f5bf5bd",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceRepository.kt": "2b0bd4f4654a6e8957f2e8a964b7cf0ac32ef7f552c1770c8049b3fc188af9df",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/ListNativeCollaborationSpaceContacts.kt": "08dfa228542ab1b64151a9c29d34c9935e43e8348f5e634b27755fa4cabf1cf2",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceDirectoryTest.kt": "b19475d33b82e365ea1134923550cc6c367c87da7c2d38589b4a7b62968f2280",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/StoredCollaborationSpaceRepositoryTest.kt": "d08fe3c9cf0c94b3e974bc2de024faca1e849c56e378cd3a2f113311d9ca2dbd",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationSpaceDataSource.kt": "1f9f8eeaf9761f33186a8e3b0edfc9ffca817c283fe6e50b55ebe42ca3259c8e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationSpaceDataSource.kt": "adcbbd1636c29a5e54a5c77a45610e0b5d928000178cfcc3ffcf282aae6a0ca5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationSpaceRepository.kt": "5ef7a952eb008dda5dca7643638c923e99c37aa572cb26ea53abb2ce042c6ad2"
+  },
+  "earlierAttempts": [
+    {
+      "name": "admission1",
+      "classification": "Kotlin compile error: cross-module nullable credentialVersion needed a local value",
+      "freshJUnit": false
+    },
+    {
+      "name": "admission2",
+      "classification": "All11 tests rejected the invalid fixture account securityVersion0 against native credentialVersion3. Corrected fixture with explicit securityVersion3; production revocation check retained.",
+      "freshJUnit": true,
+      "tests": 11,
+      "failures": 11
+    }
+  ],
+  "behavior": [
+    "Employee account-scope requests need no global administration permission; live eligible-space projection is still mandatory.",
+    "Company-scoped actor, missing/changed credential, replaced native parent/version/proof, revocation, future times and exact expiry are rejected. Authentication earlier than native issuance remains valid.",
+    "Current global/company security permission union retains MFA setup/proof requirements and clips the observation deadline.",
+    "Group availability defaults disabled and has bounded independent Android/iOS minimum builds. Existing HR company policy and legacy endpoints are unchanged.",
+    "Use case owns account-then-session guards and a transaction; it rechecks current identity/security/space after acquiring public rows.",
+    "Tests with controlled late revocation, added MFA requirement, expiry, database failure and interruption withhold rows, preserve failure classification and make no implicit retry."
+  ],
+  "formatCheck": true,
+  "architectureCheck": true,
+  "schemaLive": 116,
+  "diChanged": false,
+  "endpointExposed": false,
+  "limits": [
+    "The eleven tests are domain/fake-repository checks, not actual HTTP, concurrent PostgreSQL writes or native provider acceptance. Actual bounded directory PostgreSQL checks are recorded separately.",
+    "No device, room, transport, worker or push grant may be minted from this short contact-read observation. Their admission and stable identity migration remain required.",
+    "The new space policy has no environment/DI binding or administration UI in this increment. It is not enabled in the live pilot."
+  ]
+}

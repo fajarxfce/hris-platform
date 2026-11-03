@@ -47,6 +47,25 @@ changing any encrypted-envelope format. Live schema remains 116.
 
 ## Required replacement
 
+The initial native contact use case now accepts an account-scoped actor, reads
+current native/account state under account-then-session guards, and rechecks
+security and eligible-space projection after acquiring the contact page. A global
+administration grant is unnecessary and cannot replace group eligibility. The
+short observation retains exact native parent, proof, credential and version,
+clips access/hard/MFA expiry, and grants no device or room authority. Eleven domain
+cases pass in27.681s; [evidence](../measurements/collaboration-space-native-admission-2026-11-03.json)
+distinguishes these controlled fake-repository cases from actual PostgreSQL reads.
+
+Organization chat availability has its own immutable policy value, disabled by
+default, with independent Android/iOS minimum builds. The selected HR company's
+maintenance/module controls continue to govern its HR resources and existing
+company endpoints. The new group policy is not yet bound to configuration/DI;
+the use case is not exposed over HTTP or consumed by Mobile. Complete the group
+device/room contract before publishing reachable contacts. Public directory reads
+use fresh statement snapshots; they do not reserve peer eligibility for a future
+provider call. Mutations and exchanges need their own current admission and race
+acceptance, without taking company/member locks after account/session locks.
+
 Organization communication admission must be independent of HR company-resource
 admission. Use a stable account identity within the installation's communication
 space, and explicit conversation memberships. An active account with eligible

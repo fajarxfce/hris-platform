@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Native group contact policy, still unwired — 3 November 2026
+
+The contact use case now owns account/session transaction guards and checks current
+identity/security and group eligibility before and after the bounded public page.
+Pure admission preserves exact native parent/proof/version/credential, current MFA
+and strict deadlines. No global grant is required or supplied. Separate immutable
+group availability defaults disabled and bounds Android/iOS minimum builds; it has
+no environment/DI binding yet. No group endpoint/device/room/worker authority or
+Mobile migration is accepted. [Evidence](measurements/collaboration-space-native-admission-2026-11-03.json):
+admission3 PASS27.681s/11 domain cases,3588 unchanged source hashes, format/architecture.
+admission1 compile error and admission2 invalid credential-version fixture failures
+are retained separately. Do not call those prior failures provider regressions.
+
+Continue explicit existing Matrix identity/device/room mappings and group admission
+for mutations/exchanges. Public directory statement snapshots are not a reserved
+peer grant. Avoid adding company/member guards after held account/session guards.
+The legacy company runtime remains intact and live schema116/pushON is recorded in
+main1545dba5. Phone28 remains installed.8273 control portable job passed; Apple and
+native jobs are still running, so whole-run acceptance is pending. Continue all
+remaining communications work and regular user/Git updates.
+
+
 ## Bounded group contacts; live push rollout completed separately — 3 November 2026
 
 The seven new domain/data/test files now provide the bounded public contact

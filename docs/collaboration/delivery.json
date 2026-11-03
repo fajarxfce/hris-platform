@@ -61,7 +61,8 @@
         "../measurements/chat-read-receipts-native-2026-11-02.json",
         "../measurements/chat-read-receipt-replay-native-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/ae4a1b270d50b7edd7761903a316e033dec70972/docs/measurements/chat-read-receipt-replay-2026-11-02.json",
-        "../measurements/chat-read-receipt-rollout-2026-11-02.json"
+        "../measurements/chat-read-receipt-rollout-2026-11-02.json",
+        "../measurements/product-chat-fcm-session-admission-2026-11-03.json"
       ]
     },
     {
@@ -270,7 +271,7 @@
   "features": [
     {
       "id": "CHAT-01",
-      "requiredBehavior": "Company-scoped employee DM from directory, profile, search and work context; active HRIS identity and admission.",
+      "requiredBehavior": "Organization-group employee DM across companies from directory, profile, search and work context; stable communication identity/admission independent of HR company-resource permissions.",
       "status": "in_progress",
       "evidence": [
         "participants.md",
@@ -339,7 +340,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/5a39b53f0ece41d314738090e330bd7004e528db/docs/measurements/chat-company-continuation-2026-11-02.json",
         "../measurements/chat-incoming-provider-2026-11-02.json",
         "../measurements/chat-incoming-history-boundary-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/cacae157a83c0653428156fc47e53e97bbe1db9d/docs/measurements/chat-incoming-history-purpose-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/cacae157a83c0653428156fc47e53e97bbe1db9d/docs/measurements/chat-incoming-history-purpose-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/537b89ae/docs/measurements/chat-inbox-previews-2026-11-03.json"
       ]
     },
     {
@@ -389,7 +391,8 @@
       "evidence": [
         "../measurements/chat-read-receipts-2026-11-02.json",
         "../measurements/chat-read-receipts-native-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/537b89ae/docs/measurements/chat-inbox-previews-2026-11-03.json"
       ]
     },
     {
@@ -423,7 +426,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/10dce241/docs/measurements/chat-pusher-client-2026-11-02.json",
         "../measurements/chat-read-receipts-2026-11-02.json",
         "../measurements/chat-read-receipts-native-2026-11-02.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/875edab6/docs/measurements/chat-read-state-2026-11-02.json",
+        "../measurements/product-chat-fcm-session-admission-2026-11-03.json"
       ]
     },
     {
@@ -679,13 +683,13 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Mobile release25 from clean a3f39be7390874cf04b807b9abad365393530852 is installed on 10.77.77.3:5555 and pull-back verified. Same signer/appId/first-install, no UI launch or data reset. Adds encrypted reviewed-reply drafts and explicit confirmed replay. Next phone build26+, notify before install-only. Current Mobile handoff: https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md.",
-    "Platform runtime304be027/schema116 remains live; API/worker and Matrix identities/keys/checkpoints are unchanged, dashboard2124c6fc unchanged, chat push OFF. Preserve Google/native/document state and explicit Java21 after runuser. Evidence ../measurements/chat-read-receipt-rollout-2026-11-02.json.",
-    "Mobile1136fb9e adds production managed-push activation and scoped background wakeups. Full root/Wasm/Android/lint495.015s passes. New Apple41667309251 and Native41667296924 are pending; checkpoint Native41662285409 remains in progress. Phone25 remains installed; normal26+ follows matching validation.",
-    "Actual product FCM remains unaccepted. Run8 with source-pinned product5/peer5 boots and reaches the thread; pusher wait fails with service unavailable, exact cause unknown. Counts1/0/0, both cleanups and two viewed screenshots recorded. Fixture now captures bounded gateway codes/private worker diagnostics;25 Python cases and35.569s compile/format/architecture pass. Run9 with unchanged APKs is next. See product-fcm-acceptance.md and ../measurements/product-chat-fcm-boot-2026-11-03.json. Chat push stays OFF.",
-    "Finish native/web encrypted adapters, cross-family cryptographic key continuity, group conversations, media/stickers/voice notes, edit/forward/delete and opt-in encrypted Drive/iCloud backups. Full Apple provider interoperability remains separate from Xcode; physical iPhone acceptance is waived.",
-    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle, then LiveKit meetings and remaining P2\u2013P8. Voice/video/meeting UI is still absent.",
-    "Continue all54 feature groups. None closes from a component/build/fixture milestone. Push each atomic commit and retain exact evidence and current continuation in Git."
+    "Mobile release26 from clean bd399317 is installed and pull-back verified on 10.77.77.3:5555. Same signer/appId/first-install and data; no phone UI driven. It adds primary Chat navigation, compact thread/day labels/composer and restored pagination exhaustion. Offline inbox previews are pushed in537b89ae with full local checks and viewed screenshots. Next validated normal build27+, notify immediately before install-only. Current Mobile handoff: https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md.",
+    "Platform runtime304be027/schema116 and dashboard2124c6fc remain live; chat push OFF. Preserve existing Google/native/document state, Matrix identities/keys and both distinct HRIS/Matrix databases. Before enabling push, verify the new normal application artifact and private TLS/CA/provider callback allowlist, then deploy tested API/worker with snapshots and rollback evidence.",
+    "Actual isolated product FCM run15 now passes with Mobile1136 immutable product5/peer5: ordinary process death, Firebase-caused restart, real SystemUI notification/inline reply and encrypted peer receipt. One fresh JUnit pass, all owned cleanup and five inspected PNGs. Session-authentication chronology fix verified with325 passed/one optional skipped backend cases and a fresh worker JAR. See product-fcm-acceptance.md and ../measurements/product-chat-fcm-session-admission-2026-11-03.json. Build artifact6 for the newer UI before current-source acceptance/live enablement.",
+    "The bd399 full Apple gate is accepted (41677479513); its Native41677393348 attempt2 runs after an SDK archive infrastructure failure in attempt1. New537 Apple41685480887 and Native41685363689 are separate gates. Browser control found missing test-only timezone initialization; a narrow fix is being checked locally. Do not infer Apple native SDK/APNs/CallKit behavior from Xcode.",
+    "Complete actual recipient durable-delivery/read ACKs, pending-outbox previews/unread/recent ordering, group cross-company identity/admission/migration, native/web encrypted adapters, cross-family key continuity, group conversations, media/stickers/voice notes, edit/forward/delete and opt-in encrypted Drive/iCloud backups. Four fictional SAMPLE accounts now fix same-company demo directory eligibility; no cross-company or Firebase-login acceptance follows from that seed.",
+    "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle, then LiveKit meetings and remaining P2–P8. Voice/video/meeting UI is still absent. Physical iPhone testing is waived; provider and capacity acceptance remain separate.",
+    "Continue all54 feature groups; none closes from this bounded Android scenario. Keep the user updated, push every atomic commit and retain exact test/source evidence plus current continuation in Git."
   ],
   "experienceAmendment": "prd.md#chat-experience-amendment--3-november-2026"
 }

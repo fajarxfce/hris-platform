@@ -60,7 +60,8 @@ fun collaborationPushTarget(
             parent.credentialVersion != access.account.securityVersion ||
             parent.credentialVersion < 0 ||
             parent.version < 0 ||
-            parent.createdAt > parent.authenticatedAt ||
+            // Native issuance retains the authentication proof's earlier time. Reauthentication
+            // may also follow creation; neither order changes the current background owner.
             parent.authenticatedAt > now ||
             parent.createdAt > parent.rotatedAt ||
             parent.rotatedAt > now ||

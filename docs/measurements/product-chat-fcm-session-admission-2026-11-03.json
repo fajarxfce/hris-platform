@@ -1,0 +1,348 @@
+{
+  "date": "2026-11-03",
+  "sourceBase": "76f35662e8c6dc63230f0b9775488f88f1def42e",
+  "changedSourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmAdmissionProbe.kt": "23b8a45f1893585760f7e2bcb2fd6bd5ee1869d111740b7067565216cb417482",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmCallbackTrace.kt": "9a43b6ff466ed5f9471719cadb575a734123b6fba2728b388f5f8be7cc3d5268",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ProductChatFcmInteropTest.kt": "c41d29fbe7451abe9e988de98234d9fc31088e3b7ddbcc5863a2828063884837",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "bcb4970c9ddbc3a52b31efd132e35118f3da2d8c52af49826e033db6a85e071f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationPushAdmissionPolicy.kt": "563f1ce6fded57aa683eea88de3c41a1ff9e0e3e5706e03df57bd67e00431d88",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationPushAdmissionPolicyTest.kt": "5e9cfe1cf298186cd21c1e12a9fd144a305c189ab01a7f6055a152f5e9b385f2"
+  },
+  "rootCause": "Native session issuance retains the earlier authentication time. The push policy incorrectly required createdAt <= authenticatedAt, so normal UI login suppressed callback retention and worker delivery. Authentication in the future remains suppressed; existing current owner, credentials, lifetime, permission and chronology guards remain enforced.",
+  "backendCheck": {
+    "startedAt": "2026-11-03T17:31:43.250510+00:00",
+    "wallSeconds": 544.699,
+    "exitCode": 0,
+    "inputsUnchanged": true,
+    "workerJarSha256": "430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c"
+  },
+  "backendCounts": {
+    "modules/collaboration/domain": {
+      "tests": 57,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 13
+    },
+    "modules/collaboration/data": {
+      "tests": 150,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 1
+    },
+    "apps/worker": {
+      "tests": 117,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "suites": 24
+    },
+    "apps/server": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 2
+    }
+  },
+  "explicitOptionalSkips": [
+    "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+  ],
+  "backendReportSha256": {
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": "605862531d6e45b31ffd131ca276925f072a061081c0963321d85e8ada1025d1",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": "f3b8f1b033dc0f21e304b5d8ace61180569a0760ed9fed207216a1d7d6fb85e7",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": "9e6a537c09a4ccfa2708826b82e4fda821ab9763c9e5cd3e70a7fa12a5846760",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": "8f7cd221c1e416d789974c69b07f380d973605e4621f7ffa3b3f451b4797b9a5",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": "fe33bc101abfb99104214e892537066ab26348bc8fe247e2e4b9a902c23f2c05",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": "23f80f669f6927dfbb9bf9df331128baf3c9f6866792845c098c3b8af2e84df5",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": "d535b6fe96438542ffa5f1061e4396f0767058161f32311939fecac1d6c7d80b",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest.xml": "fb5b8e38c904fbb9d4583cf37c88c41263f01e385efc924efc7dc5fbdb3b3822",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationPushDeliveryPolicyTest.xml": "bc56afe3fb1a3c3a3303aece942b586d6f15138693c05050d9b7fc4e2a87252e",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": "0a6400c6848005f92c39d8731047859740dbf46fc6d3df417b66d3793e0759b8",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": "8298dbaaf9001b631f56be757eb0dd7770ef4e433d65338d83880404ab865923",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": "216ab918dab0ca90f2e5e834036d5f20d9b3d4315fbbe0fbe654d419e4305884",
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": "9b06e7eb8c922077532d1d7efec7101e95d53b747ec1d25c71ff71f7fdbc3c24",
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": "69194495e271a431aeee9f4d171c7367af331119c7898e3620089b1194d31519",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": "45a4621e332a0818ed482f553a56b58c2d06762dfd4acdb6be569f65c72f64b7",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationPushContextTest.xml": "b0cbfc7654b79f4d6d562bfcb902ccbba489e1e04378698aaed2bc8a81c82f9e",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationPushLoopTest.xml": "4718e02c9d17103595d2f442c75b0941c27d8ff931b273de1257ab919b081c68",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.DirectoryProjectionWorkerTest.xml": "8c71ffc2108b7431faab5a456452a457e68bfdad3f7b4ae5c4248cea48514b8b",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.DocumentValidationWorkerTest.xml": "396ae90f25ee83b3a6049675200ba49cfce3d55a2e5eb9c77eb521eac5e79fee",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.EmployeeImportWorkerTest.xml": "795e28901916935585ddfcc93356d51ad7ac0efccd85115001fd908515054de8",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.IdentityMailWorkerTest.xml": "9385749e92564fea95bee2cb8094f26d9ac41b181675e24fd277c3ee904d82b9",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxEmailWorkerTest.xml": "8a9dc67c8994cf0b209489e58319775a15d97c2a0668527d182d3f93dadf3ce7",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxPushWorkerTest.xml": "07f0b96771b7f6731cc94fe118b3cc58e09a200ae6a7587709bdfcba2f1d8cd2",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.LeaveBatchWorkerTest.xml": "bae0e8da0f323248fc20b945c07fa7ef8e4f6914cec2afa51351c6fb0377e17b",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest.xml": "f17997a3c05eb6a4fa999f5444605961f7cea89987e683eeb55bb111bad6c1b4",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.MobileSyncWorkerTest.xml": "b3f763c30a3421a10ae232069ae4ab071caf457f6aeb595cee9f273bf1707c5b",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.NativeSessionCleanupWorkerTest.xml": "b2c721bc0d7b337fde64ad8ee26103641fcbc7d2415edf3634ff3dc6c2e41c2a",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ObjectCleanupWorkerTest.xml": "8dc29fdc8478d06850c511bef41ac3d5d3c711545761ceee4aea381480e95120",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.OffboardingScheduleWorkerTest.xml": "05f780514cdb78a8c8fe2a94e81b856de13b4f12966d5ee986b2b4a5afa7fb3a",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.OnboardingScheduleWorkerTest.xml": "71b0354b819e26409fe901954a0ca0e0addba53df262d6d0f0181899ae791260",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.PayrollCalculationWorkerTest.xml": "0f2b9ec6bf62214e6137d1d877895ef563d416161be0e89ac61a7363b1cc7112",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportElapsedRetentionTest.xml": "5f7a3d4f133753ae2bb8381c4a5ff08de41c6270858b5ff42b3c7840150a7de6",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportRetentionWorkerTest.xml": "3d5ece3598f2e75f6c4b492482db333fa0215041039b92f44a187b335cbb60ce",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportWorkerTest.xml": "abcc00223322847baf2a4b0ee5c07b7f8a602cf71cd7d030b3198e9a0a058374",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.SelfProfileProjectionWorkerTest.xml": "8700236c8c8e9e2a889c69043b96512a6bcc520a0c848f0825c2913c147c05e0",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationObservationTest.xml": "5e1473a928d9840f36f0a93437a24a79dfa123fc307e61492a3d6de5ce12fd82",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationTest.xml": "05a0ee4ce3ea2a47453dfcc092d486224f99a20eccd70be9c0da09888e6f903f",
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.AnnouncementPublicationWorkerTest.xml": "577fd48e95be192c1ce1e0f6476c62e744ed692c156cee8d9734c4f31ba5a3a4",
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.MutableTestClockTest.xml": "139d8d7d6ba8e1ebf7e1794ae31337342db973c3258cd752a1d6bad6124089c8",
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationPushProviderHttpTest.xml": "36dc17acb6a45d570ddba8dea99cd4b1368b7111c172f073e59ff7a06cd79bbe"
+  },
+  "run13DiagnosticCompileFailure": {
+    "seconds": 31.479,
+    "exitCode": 1,
+    "inputsUnchanged": true
+  },
+  "run13Limit": "A nullable JDBC map return type failed compilation; no fresh JUnit/provider execution. Fixed before run14.",
+  "run14BeforeFix": {
+    "seconds": 351.609,
+    "exitCode": 1,
+    "inputsUnchanged": true,
+    "junitSha256": "b64a91c76bf6dc7492d6b0ba4e52f4d0b516870c2ef1d1065bf0aac588edf70f",
+    "counts": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "run14PushState": {
+    "providerPushers": {
+      "available": true,
+      "value": 1
+    },
+    "providerHasFailedPush": {
+      "available": true,
+      "value": false
+    },
+    "callbacks": [
+      {
+        "status": 200,
+        "parsed": true,
+        "devices": 1,
+        "hasEvent": true,
+        "expectedRoom": true
+      }
+    ],
+    "hints": {
+      "available": true,
+      "value": []
+    }
+  },
+  "run14AdmissionProbe": [
+    {
+      "available": true,
+      "value": []
+    },
+    {
+      "available": true,
+      "value": [
+        {
+          "binding_reserved": true,
+          "binding_published": true,
+          "account_active": true,
+          "company_active": true,
+          "member_active": true,
+          "chat_permission": true,
+          "parent_present": true,
+          "parent_not_revoked": true,
+          "parent_unexpired": true,
+          "credential_current": true,
+          "parent_authenticated": false,
+          "parent_rotated": true,
+          "device_present": true,
+          "device_active": true,
+          "device_created": true,
+          "device_platform": true,
+          "gateway_present": true,
+          "gateway_parent": true,
+          "gateway_platform": true,
+          "gateway_not_revoked": true,
+          "gateway_version": true,
+          "gateway_chronology": true,
+          "gateway_unexpired": true,
+          "registration_present": true,
+          "registration_enabled": true,
+          "registration_platform": true,
+          "registration_version": true,
+          "registration_chronology": true,
+          "registration_unexpired": true,
+          "owned_room_present": true
+        }
+      ]
+    }
+  ],
+  "run14VisuallyInspectedPngSha256": {
+    "product-notifications-enabled.png": "ab6317199991e860e6c5ae6dd74d6294acdacc20f0eeda2ed58ae76ad510383a",
+    "product-chat-ready.png": "8c5dbcdf954e6b8d6fce6c6d7983b18ae24702a8c2e2a74b7fc3e94a60834cb5",
+    "product-failure.png": "bc31a745635250ba48143e416c432fc8cfe458e3b4f40683fe647aefc4764917"
+  },
+  "run15AfterFix": {
+    "startedAt": "2026-11-03T17:41:29.159260+00:00",
+    "seconds": 266.651,
+    "exitCode": 0,
+    "inputsUnchanged": true,
+    "junitSha256": "ed91bf7a766ce8857d9449c52087f9321565c61207ab19208e6a3b5dc0a65528",
+    "counts": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "workerJarSha256": "430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c"
+  },
+  "mobileSource": "1136fb9e529faa2d5ad2f3dc02bf8c7fb326e298",
+  "mobileArtifacts": [
+    {
+      "file": ".work/product-chat-fcm-2026-11-03/product5.apk",
+      "sha256": "e05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662",
+      "bytes": 104928687,
+      "package": "dev.fajar.hris.mobile.dev",
+      "abis": [
+        "x86_64"
+      ],
+      "buildAttempt": 5,
+      "inputsSha256": "b259a91599c99ccfed3d0d5dfb276413f0a6cfd91b7d8f0734665ad91a6cf7a6"
+    },
+    {
+      "file": ".work/product-chat-fcm-2026-11-03/peer5.apk",
+      "sha256": "9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b",
+      "bytes": 105363835,
+      "package": "dev.fajar.hris.collaboration.proof",
+      "abis": [
+        "x86_64"
+      ],
+      "buildAttempt": 5,
+      "inputsSha256": "b259a91599c99ccfed3d0d5dfb276413f0a6cfd91b7d8f0734665ad91a6cf7a6"
+    }
+  ],
+  "fixture": "d480550b-54b8-4bf1-95e5-5092a0685713",
+  "driver": {
+    "passed": true,
+    "phoneTouched": false,
+    "productStartedByPush": true,
+    "notificationShown": true,
+    "encryptedReplyReceived": true,
+    "peerCleanedUp": true,
+    "deviceCleanedUp": true,
+    "cleanedUp": true,
+    "elapsedSeconds": 207.402
+  },
+  "serverCounts": {
+    "registrations": 1,
+    "pushers": 1,
+    "delivered": 1
+  },
+  "pushState": {
+    "providerPushers": {
+      "available": true,
+      "value": 1
+    },
+    "providerHasFailedPush": {
+      "available": true,
+      "value": false
+    },
+    "callbacks": [
+      {
+        "status": 200,
+        "parsed": true,
+        "devices": 1,
+        "hasEvent": true,
+        "expectedRoom": true
+      }
+    ],
+    "hints": {
+      "available": true,
+      "value": [
+        {
+          "revision": 1,
+          "delivered_revision": 1,
+          "attempt_revision": 1,
+          "attempts": 1,
+          "visible_revision": 1,
+          "leased": false,
+          "unexpired": true,
+          "available": true
+        }
+      ]
+    }
+  },
+  "admissionProbe": [
+    {
+      "available": true,
+      "value": []
+    },
+    {
+      "available": true,
+      "value": [
+        {
+          "binding_reserved": true,
+          "binding_published": true,
+          "account_active": true,
+          "company_active": true,
+          "member_active": true,
+          "chat_permission": true,
+          "parent_present": true,
+          "parent_not_revoked": true,
+          "parent_unexpired": true,
+          "credential_current": true,
+          "parent_authentication_not_future": true,
+          "authentication_precedes_session_creation": true,
+          "parent_rotated": true,
+          "device_present": true,
+          "device_active": true,
+          "device_created": true,
+          "device_platform": true,
+          "gateway_present": true,
+          "gateway_parent": true,
+          "gateway_platform": true,
+          "gateway_not_revoked": true,
+          "gateway_version": true,
+          "gateway_chronology": true,
+          "gateway_unexpired": true,
+          "registration_present": true,
+          "registration_enabled": true,
+          "registration_platform": true,
+          "registration_version": true,
+          "registration_chronology": true,
+          "registration_unexpired": true,
+          "owned_room_present": true
+        }
+      ]
+    }
+  ],
+  "evidenceSha256": {
+    "result.json": "00fa11c65e2679566977e896b2b6b5f98b08fd737601b5400ce5060895b6ae0a",
+    "server-status.json": "a5ad9bad3be53ad1046198041406754f6499df7e1ac1321147184f2ad410cf6f",
+    "push-state.json": "5f3851fc7832358b9c751849dcaf72893aa99ae433dfcc701707b28b3f746071",
+    "push-admission.json": "6119a89b077758f272b1c5a929b16452e40acc63f0e7295ac146e71f29c28509",
+    "gateway-trace.json": "e05d827e9d7a855de6caaed23b13e7cb39a7d88f045ab01f3a2f79677f2ac490",
+    "emulator-owner.json": "15aeccb3cdf2cde5a3b7f4cb920464d6323713fd624767000a82c6b172a710b8",
+    "product-progress.json": "e814b9fa5c989318b0149e7a052a10a97263963165061d482b9a68a51194cd73"
+  },
+  "visuallyInspectedPngSha256": {
+    "product-notifications-enabled.png": "6e8657069767f6684c2548ba692f543f8d4d4a33699f22a4601183176d88af5d",
+    "product-chat-ready.png": "78b9ee8b5426464d2b9a4c8c919067cfbe1d1cd5fcd8ce7792217cc617646495",
+    "product-chat-notification.png": "82c5b259b23ba1d77beda0a316e9e09eee5c0e664201b61e0c429dd269836f79",
+    "product-chat-reply-editor.png": "1c7d5cf5a575c86cf0c0d10746e75e077c12ea455a755f19f61749042bb87c36",
+    "product-chat-reply-acknowledged.png": "520e1771411ed29375a1798c505afd7b4be00becbfdb3dba22bce288f8ab6ff2"
+  },
+  "trackedScreenshots": {
+    "docs/images/product-chat-fcm/product-chat-notification.png": "82c5b259b23ba1d77beda0a316e9e09eee5c0e664201b61e0c429dd269836f79",
+    "docs/images/product-chat-fcm/product-chat-reply-editor.png": "1c7d5cf5a575c86cf0c0d10746e75e077c12ea455a755f19f61749042bb87c36",
+    "docs/images/product-chat-fcm/product-chat-reply-acknowledged.png": "520e1771411ed29375a1798c505afd7b4be00becbfdb3dba22bce288f8ab6ff2"
+  },
+  "fixtureSecretsRemoved": true,
+  "ownedEmulatorAbsentAfterRun": true,
+  "scope": "Accepted bounded actual Android product FCM scenario: ordinary product process death, Firebase-caused restart, real SystemUI notification/reply, encrypted peer receipt and cleanup. Retained wake revision1 is delivered/visible once with one attempt. No manual product worker/host wake or test sign-in bypass. Isolated API/PostgreSQL/Synapse/private TLS proxy and real worker use fictional employees.",
+  "limits": [
+    "Immutable artifact5 uses Mobile1136, before the new primary Chat tab and offline inbox previews. Repeat this product gate with freshly verified artifact6 before enabling the latest UI deployment.",
+    "Live runtime304/schema116 and chat push OFF remain unchanged. Private ingress/CA/provider allowlist and deployment checks are still required.",
+    "A single Android scenario does not establish capacity, complete multi-device/read receipts, Apple APNs/CallKit, cross-company ownership or all54 PRD feature groups.",
+    "Firebase private credentials and raw worker/OS logs are never committed."
+  ]
+}

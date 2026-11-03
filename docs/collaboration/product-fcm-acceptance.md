@@ -1,9 +1,12 @@
 # Actual Android product FCM acceptance
 
-Status: fixture and Mobile1136fb9e product activation implemented; passing actual FCM
-execution remains pending. Live chat
-push stays disabled. This gate follows the accepted encrypted notification input,
-reviewed reply and Android application host implementations in HRIS Mobile.
+Status: the bounded actual Android product scenario PASSED on 3 November 2026.
+Run15 uses immutable Mobile1136fb9e product5/peer5 and the corrected server/worker
+session-admission policy. It proves Firebase-caused process restart, a real
+SystemUI notification and inline reply received encrypted by the peer. This is
+one scenario; the newer Chat UI source still needs its own artifact run. Live chat
+push remains disabled until deployment/ingress and current-artifact checks finish.
+See [accepted evidence](../measurements/product-chat-fcm-session-admission-2026-11-03.json).
 
 The opt-in `ProductChatFcmInteropTest` owns a disposable PostgreSQL database, private
 Synapse, verified TLS push proxy and real worker under a restricted database role.
@@ -38,9 +41,9 @@ configuration after `runuser`/`sudo`, which may filter inherited variables. Exec
 fresh executed case, zero skips/failures/errors, the driver's complete result, and
 independent artifact/visual review. Compile-only and skipped runs never pass this gate.
 
-## Current fixture debugging evidence — 3 November 2026
+## Earlier fixture debugging evidence — 3 November 2026
 
-No real message/FCM delivery has passed this gate yet. Run1 was skipped because
+Before the successful run15, no actual FCM/inline reply had passed. Run1 was skipped because
 sudo filtered the opt-in; run2 reused the skipped test report. Both are rejected.
 Run3 reached login but selected a Compose page title instead of the button's
 clickable ancestor. Run4 passed native login and FCM registration, then incorrectly
@@ -118,3 +121,37 @@ out waiting for Firebase to restart the product (counts1/1/0). Provider activati
 is proven in this run; actual FCM delivery and inline reply are NOT accepted.
 Owned cleanup passed; both relevant screenshots were viewed. See
 [clock and attempts9–11](../measurements/product-chat-fcm-clock-2026-11-03.json).
+
+## Session authentication chronology and successful run15 — 3 November 2026
+
+Run14 narrowed the problem to admission before retaining a wake hint: native and
+Matrix pusher counts were one, the real callback returned200 with the expected
+room, but hints stayed empty. Every observed ownership condition passed except the
+policy's assumption that authentication follows session creation. Native issuance
+actually retains authentication performed before the session is created.
+
+The policy now accepts that legitimate order while preserving future-time,
+revocation, credential-version, company/member/permission, device, gateway and
+native registration checks. Two domain regressions cover authentication before
+creation and invalid future/creation-rotation data. A PostgreSQL regression proves
+both callback retention and worker delivery with authentication five seconds earlier.
+The broader check passes325 tests with one explicitly optional elapsed-retention
+skip:57 domain,150 data,117 worker and two server cases,544.699s. A freshly built
+worker artifact is mandatory; its hash is recorded with the sources.
+
+Run15 passes in266.651s, with one fresh JUnit case and unchanged source. The actual
+driver takes207.402s and records one native registration, one managed pusher and
+one delivered/visible wake revision, with one attempt. Android's process-start
+record attributes the new product process to Firebase. SystemUI Reply is used and
+the peer verifies the encrypted reply. All five screenshots were inspected;
+[notification](../images/product-chat-fcm/product-chat-notification.png),
+[reply editor](../images/product-chat-fcm/product-chat-reply-editor.png) and
+[acknowledged state](../images/product-chat-fcm/product-chat-reply-acknowledged.png)
+are retained in Git. Both owned cleanups pass, fixture credentials are removed,
+and no owned emulator remains. The user's phone and live services were unchanged.
+
+The test-only SQL/HTTP probes retain bounded flags/counts and equality results,
+never identities, keys, tokens or bodies. Run13's diagnostic nullable-map compile
+failure is retained separately; it executed no fresh provider/JUnit case. Actual
+current-source product acceptance, private ingress rollout, other platforms and
+all remaining PRD groups continue after this bounded success.

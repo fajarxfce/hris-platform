@@ -7,10 +7,13 @@ group, so contact discovery spans its companies; guests remain meeting-only.
 ## Current mismatch
 
 `ListNativeCollaborationParticipants` reads active company memberships with
-`collaboration.chat`. The private demo currently has two such accounts. The four
-SAMPLE employees created for layout review have no linked accounts. This explains
-why the employee sees only Administrator as a destination. Completing the fictional
-accounts fixes demo eligibility, but does not implement cross-company conversations.
+`collaboration.chat`. The private demo originally had two such accounts, which explained why the user
+saw only Administrator. Four fictional SAMPLE employees now have linked, active
+chat accounts: provisioned through normal membership/profile APIs and verified
+with native logins (see the
+[demo evidence](../measurements/chat-demo-accounts-2026-11-03.json)). Their temporary verification sessions were revoked. This
+fixes demo directory eligibility; it does not establish Firebase sign-in for those
+fictional accounts or implement cross-company conversations.
 
 `OpenNativeCollaborationDirect` revalidates both accounts against the selected
 company. Room pairs, Matrix identities, credentials, push bindings and encrypted

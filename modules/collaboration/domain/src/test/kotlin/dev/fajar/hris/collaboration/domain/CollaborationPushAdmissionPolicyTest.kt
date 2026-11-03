@@ -121,6 +121,29 @@ class CollaborationPushAdmissionPolicyTest {
         )
 
     @Test
+    fun authenticationCanPrecedeNativeSessionCreationAndRemainEligibleForOpaquePush() {
+        for (authenticatedAt in
+            listOf(
+                parent.createdAt.minusNanos(1),
+                parent.createdAt.minusSeconds(300),
+                parent.createdAt.plusSeconds(1),
+            )) {
+            val session = parent.copy(authenticatedAt = authenticatedAt)
+            assertEquals(registration, ready(target(session = session)).registration)
+        }
+    }
+
+    @Test
+    fun futureAuthenticationAndInvalidCreationRotationStillSuppressPush() {
+        for (session in
+            listOf(
+                parent.copy(authenticatedAt = now.plusNanos(1)),
+                parent.copy(createdAt = parent.rotatedAt.plusNanos(1)),
+                parent.copy(rotatedAt = now.plusNanos(1)),
+            )) assertEquals(CollaborationPushTarget.Suppressed, target(session = session))
+    }
+
+    @Test
     fun expiredShortAccessAndMissingMfaAllowOnlyOpaqueHintsWhileInteractiveAdmissionStillDenies() {
         val admitted = ready()
         assertEquals(now.plusSeconds(30), admitted.expiresAt)

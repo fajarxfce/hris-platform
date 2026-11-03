@@ -22,7 +22,7 @@ import org.springframework.test.context.TestPropertySource
 
 /** Explicit external-provider opt-in. The employee app and sender fixture use separate packages. */
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_PRODUCT_FCM_APK", matches = ".+")
-@Import(NativeSdkGatewayTraceConfiguration::class)
+@Import(NativeSdkGatewayTraceConfiguration::class, ProductChatFcmCallbackTraceConfiguration::class)
 @TestPropertySource(
     properties =
         [
@@ -57,6 +57,7 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
     @Autowired private lateinit var matrix: CollaborationMatrixRepository
     @Autowired private lateinit var rooms: CollaborationMatrixRoomRepository
     @Autowired private lateinit var trace: NativeSdkGatewayTrace
+    @Autowired private lateinit var callbackTrace: ProductChatFcmCallbackTrace
 
     @Test
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
@@ -100,6 +101,7 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
         assertInstanceOf(Result.Success::class.java, created)
         val room =
             ((created as Result.Success).value as CollaborationMatrixRoomCreation.Created).roomId
+        callbackTrace.expectRoom(room)
         publishSdkRoom(owner, control.device, peer.native.fixture.account, room, conversation)
         // sdkOwner seeds ACTIVE devices directly. Retire only those two seeded provisioning
         // requests before starting the real worker; product UI enrollment remains real work.
@@ -171,6 +173,7 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
                     mapOf(
                         "providerPushers" to probe { provider.pusherCount() },
                         "providerHasFailedPush" to probe { provider.providerHasFailedPush() },
+                        "callbacks" to callbackTrace.snapshot(),
                         "hints" to
                             probe {
                                 database()
@@ -226,6 +229,9 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
                 .redirectErrorStream(true)
                 .redirectOutput(log.toFile())
                 .start()
+        val admission =
+            ProductChatFcmAdmissionProbe(database(), owner.fixture.company, owner.fixture.account)
+        val observations = mutableListOf<Map<String, Any>>()
         try {
             val deadline = System.nanoTime() + TimeUnit.MINUTES.toNanos(9)
             while (!process.waitFor(1, TimeUnit.SECONDS)) {
@@ -252,6 +258,17 @@ class ProductChatFcmInteropTest : NativeGatewaySdkFixture() {
                     java.nio.file.StandardCopyOption.ATOMIC_MOVE,
                     java.nio.file.StandardCopyOption.REPLACE_EXISTING,
                 )
+                val snapshot = probe { admission.snapshot() }
+                if (observations.lastOrNull() != snapshot) {
+                    if (observations.size == 32) observations.removeAt(0)
+                    observations.add(snapshot)
+                    val path = directory.resolve("push-admission.json")
+                    Files.writeString(path, json.writeValueAsString(observations))
+                    Files.setPosixFilePermissions(
+                        path,
+                        PosixFilePermissions.fromString("rw-------"),
+                    )
+                }
             }
             assertEquals(
                 0,

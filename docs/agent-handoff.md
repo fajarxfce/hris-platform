@@ -1,5 +1,54 @@
 # Agent continuation — HRIS workspace
 
+## Actual product FCM and inline reply passed; current UI build continues — 3 November 2026
+
+[Evidence](measurements/product-chat-fcm-session-admission-2026-11-03.json) /
+[contract](collaboration/product-fcm-acceptance.md). Run15 PASS266.651s, fresh1/0/0/0
+JUnit, source unchanged; driver207.402s. Actual product native login/setup registers
+FCM and managed pusher. Peer encrypted send follows ordinary product death; Android
+attributes the new process to Firebase. Real SystemUI notification/Reply returns
+an encrypted reply to the peer. Counts1/1/1; wake revision1 delivered/visible with
+one attempt. All five PNGs actually viewed; three notification/editor/ack PNGs tracked.
+Both cleanup flags true, fixture credentials gone, owned emulator independently absent.
+No phone/live mutations. Fixture d480550b-54b8-4bf1-95e5-5092a0685713, private evidence
+in.work/product-chat-fcm; wrappers/results under.work/product-chat-fcm-2026-11-03.
+
+Root cause: the push policy required authentication at/after session creation,
+but legitimate native issuance retains earlier authentication. Remove only that
+invalid ordering check; future time, credentials/revocation/ownership and other
+chronology checks remain. Two domain and one PostgreSQL callback+worker regressions
+pass. Broad check544.699s, unchanged inputs:57 domain,150 data,117 worker (one optional
+elapsed-retention skip),two server =325 passed/one skipped. Rebuilt worker SHA
+430620d7e64614db7524de60f0edbe09914e71917ab640542265457ade960b1c.
+Run14 before fix had parsed expected-room callback200 and all observed guards true
+except authentication order, leaving hints empty; all three PNGs viewed. Run13
+was a diagnostic nullable-map compile failure, no fresh JUnit; fixed before14.
+Test-only probes expose bounded flags/counts, never keys/tokens/bodies.
+
+Run15 uses immutable Mobile1136 artifact5 (product SHAe05999a372674776628e89a7dc5e8e9450dc1c20e7c31c8beb40736de02d7662;
+peer SHA9ccd3b6b50d98543b77308e3648af8dcd4ebd1f3ca7aad98b295b83dbb97ad9b).
+New UI still needs artifact6 and its own product run before deployment/push enablement.
+Mobile artifact6 builders/verification prepared; not run. Keep one local heavy job.
+Current Mobile browser check session91254 is active: fixes test-only named-timezone
+module setup found by actual CI (bd399 control41677393371 failed Asia/Jakarta;
+application already loads the module). Do not edit Mobile inputs while it runs.
+
+Mobile537b89ae is pushed: bounded owned offline list previews/drafts and localized
+timestamps, full672.455s check (4037 desktop,230 Android host,18 proof-host,10 logic;
+1805 fresh cases; product lint0; three final PNGs viewed). Physical phone still26,
+installed16:56:36UTC with UID10962/signer/data preserved; do not reinstall26.
+Release27 helpers are prepared and require clean source, checks, emulator smoke,
+images and notice immediately before install-only; never drive phone UI.
+
+bd399 full Apple41677479513 is accepted (1097 cases, full Xcode1258s,410 hashes).
+Its Native41677393348 attempt2 is running; attempt1 emulator archive failed before
+native execution. New537 Apple41685480887 and Native41685363689 are separate gates.
+Audit archives/source/report/PNGs before acceptance. Physical iPhone remains waived.
+Runtime304/schema116/dashboard2124c6fc and chat push OFF; Starter9959c1d unchanged.
+Keep the user updated, push every commit and continue all54 PRD groups: actual ACKs,
+group cross-company migration, rich chat, encrypted backup, calls/video/meetings.
+
+
 ## Product FCM callback retains no wake hint — 3 November 2026
 
 [Run12 evidence](measurements/product-chat-fcm-empty-hints-2026-11-03.json): fresh

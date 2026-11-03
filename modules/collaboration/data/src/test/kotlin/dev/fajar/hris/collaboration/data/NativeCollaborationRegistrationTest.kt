@@ -5921,6 +5921,27 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun pushCallbackAndWorkerAcceptAuthenticationBeforeNativeSessionCreation() {
+        val p = PusherFixture(worker = true, authenticationLeadSeconds = 5)
+        success(p.ensure())
+        val event = p.f.pushRoom(p.g.parent, p.g.device)
+        assertTrue(success(p.accept(event)).rejected.isEmpty())
+        assertEquals(event, p.head()!!.event)
+        val messages = mutableListOf<PushMessage>()
+        val handler =
+            p.f.pushHandler(
+                push =
+                    PushRepository {
+                        messages.add(it)
+                        Result.Success(PushOutcome.ACCEPTED)
+                    }
+            )
+        success(handler.deliver(p.claim(handler)))
+        assertEquals(1, messages.size)
+        assertEquals(1, p.head()!!.deliveredRevision)
+    }
+
+    @Test
     fun pushCallbackPersistsAnOwnedEventAfterBothAccessTokensExpireWithoutMfa() {
         val p = PusherFixture()
         success(p.ensure())
@@ -6584,8 +6605,12 @@ class NativeCollaborationRegistrationTest {
         assertEquals(lease, p.head()!!.lease)
     }
 
-    private inner class PusherFixture(registered: Boolean = true, worker: Boolean = false) {
-        val g = GatewayFixture(worker)
+    private inner class PusherFixture(
+        registered: Boolean = true,
+        worker: Boolean = false,
+        authenticationLeadSeconds: Long = 0,
+    ) {
+        val g = GatewayFixture(worker, authenticationLeadSeconds)
         val f = g.f
         val token = success(g.bootstrap()).accessToken
         val matrix = RecordingMatrix(f.clock)
@@ -6683,9 +6708,9 @@ class NativeCollaborationRegistrationTest {
         return (result as Result.Failed).failure.code
     }
 
-    private class GatewayFixture(worker: Boolean = false) {
+    private class GatewayFixture(worker: Boolean = false, authenticationLeadSeconds: Long = 0) {
         val f = Fixture(worker = worker)
-        val parent = f.parent()
+        val parent = f.parent(authenticationLeadSeconds = authenticationLeadSeconds)
         val device = (f.register(parent) as Result.Success).value.id
         val operation = UUID.randomUUID()
 
@@ -6850,14 +6875,15 @@ class NativeCollaborationRegistrationTest {
             return id
         }
 
-        fun parent(account: UUID = this.account): UUID {
+        fun parent(account: UUID = this.account, authenticationLeadSeconds: Long = 0): UUID {
             val id = UUID.randomUUID()
             val hash = id.toString().replace("-", "").repeat(2)
             sql.update(
-                "insert into native_sessions(id,account_id,refresh_hash,authenticated_at,expires_at,access_hash,access_expires_at,credential_version,created_at,rotated_at) values(?,?,?,now()-interval '1 minute',now()+interval '1 day',?,now()+interval '15 minutes',0,now()-interval '1 minute',now()-interval '1 minute')",
+                "insert into native_sessions(id,account_id,refresh_hash,authenticated_at,expires_at,access_hash,access_expires_at,credential_version,created_at,rotated_at) values(?,?,?,now()-interval '1 minute'-?*interval '1 second',now()+interval '1 day',?,now()+interval '15 minutes',0,now()-interval '1 minute',now()-interval '1 minute')",
                 id,
                 account,
                 hash,
+                authenticationLeadSeconds,
                 hash,
             )
             return id

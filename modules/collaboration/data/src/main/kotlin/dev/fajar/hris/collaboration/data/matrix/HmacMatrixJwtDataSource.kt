@@ -12,7 +12,7 @@ class HmacMatrixJwtDataSource(private val configuration: MatrixProviderConfigura
     private val encoding = Base64.getUrlEncoder().withoutPadding()
 
     override fun sign(subject: String, issuedAt: Instant, expiresAt: Instant): String {
-        require(subject.matches(Regex("hris_[a-f0-9]{32}_[a-f0-9]{32}")))
+        require(subject.matches(Regex("hrisg?_[a-f0-9]{32}_[a-f0-9]{32}")))
         require(expiresAt > issuedAt && expiresAt <= issuedAt.plusSeconds(60))
         require(expiresAt.epochSecond > issuedAt.epochSecond)
         val header =

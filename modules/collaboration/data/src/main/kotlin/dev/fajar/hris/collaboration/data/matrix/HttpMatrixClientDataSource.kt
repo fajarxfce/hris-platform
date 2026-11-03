@@ -68,7 +68,7 @@ class HttpMatrixClientDataSource(
 
     override fun login(jwt: String, deviceId: String, deadline: Instant): MatrixLoginData {
         require(jwt.length in 1..4096 && jwt.all { it.code in 33..126 })
-        require(deviceId.matches(Regex("HRIS_[a-f0-9]{32}")))
+        require(deviceId.matches(Regex("HRISG?_[a-f0-9]{32}")))
         val startedAt = clock.instant()
         val remaining = Duration.between(startedAt, deadline)
         if (remaining <= Duration.ZERO) throw MatrixDeadlineException()

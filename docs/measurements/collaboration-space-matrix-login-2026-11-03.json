@@ -1,0 +1,73 @@
+{
+  "scope": "Typed internal group Matrix login candidates and exact provider identity continuity; no HRIS group gateway/adoption",
+  "baseCommit": "2415e203",
+  "accepted": {
+    "startedAt": "2026-11-03T21:03:19.955692+00:00",
+    "elapsedSeconds": 53.772,
+    "exitCode": 0,
+    "sourceFiles": 3637,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRepositoryTest.xml": {
+        "sha256": "929a740c125efa0acdf39fa87b090078e0b413ff969fc9f45857a8e143bb5c15",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixProviderInteropTest.xml": {
+        "sha256": "0f036170bfd86870f075a03e59a0f23b4a5fb0f4be57ac70f9773757dbbf1e75",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixProviderTransportTest.xml": {
+        "sha256": "a24cbcd0bee22a593263499254b8a3cf9a3e75e9e93604b86fefffbfc2febba7",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixInteropTest.xml": {
+        "sha256": "d8fb1a39ff218f13d86ab027ad4f20b553ef97e0b992ac753ce16ee73ed05930",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck"
+  ],
+  "provider": "Owned isolated Synapse v1.164.1 pinned sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+  "newInteropCases": 1,
+  "newBoundaryCases": 3,
+  "oldProviderRegressionCases": 24,
+  "evidence": [
+    "Actual provider preserves the retained legacy user/device when a distinct logical organization device references it",
+    "A new group device under the retained user receives a distinct HRISG ID; a new group canonical user receives the hrisg space/account namespace",
+    "Original and new group public device keys remain exact across all candidate tokens and an actual provider restart; no logout/key deletion is performed by the new path",
+    "Internal JWT subject/device formatting supports the two explicit namespaces without changing company/room gateway admission policies",
+    "Boundary cases derive coordinates from typed owners, reject unrelated retained namespace, reject expired observation before signing, preserve late candidates for caller fencing and propagate interruption/cancellation without retry/logout"
+  ],
+  "earlierAttempt": {
+    "attempt": "space-matrix1",
+    "seconds": 44.108,
+    "result": "Rejected: actual fixture sampled issuedAt and expiresAt separately, exceeding the strict 60-second JWT lifetime by clock tick. Captured one instant for both fields; production deadline unchanged."
+  },
+  "limits": [
+    "No actual Mobile SDK store adoption, encrypted history migration, group HRIS runtime or peer conversation is accepted",
+    "Public provider keys are not proof that a client retains private keys",
+    "Caller must admit/fence publication and persist credentials with an explicit group envelope and recovery contract",
+    "No group DI/controller/work queue is enabled; live schema116 and phone28 unchanged"
+  ]
+}

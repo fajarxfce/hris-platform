@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Typed group Matrix candidate port accepted — 3 November 2026
+
+CollaborationSpaceMatrixRepository now derives provider coordinates from typed
+space/account/group-device and explicit canonical/retained legacy UUIDs. Signing
+and raw login formatting support hrisg/HRISG while old company/room admission is
+unchanged. Actual isolated Synapse preserves old user/device/public keys, accepts a
+new device on the old user and a new group user, and retains keys across restart.
+[Evidence](measurements/collaboration-space-matrix-login-2026-11-03.json):
+space-matrix2 PASS53.772s/28 cases (1 new actual provider,3 boundary,24 old provider),
+3637 hashes unchanged, quality PASS. First fixture exceeded JWT60s by sampling two
+clock instants; fixed one sampled instant, no policy relaxation. No check runs.
+
+Continue credential storage/recovery and bounded group provisioning work. Read
+collaboration/group-provisioning.md: background_jobs is company-only; do not invent
+an HR company or substitute space IDs. New group envelopes need explicit AAD and
+recovery schema review. Reserve terminal generation/device revision before adding
+retirement (V120 device revision currently max999999). External calls run outside
+SQL locks, and publication needs fresh authority/lease/attempt/generation fences.
+
+IMPORTANT provider behavior already proven by old interop: Synapse logout deletes
+ALL tokens and E2EE keys for the device, including a newer winner. Losing candidates
+must expire, never logout. Retained transfer needs an explicit mapping/fence before
+old credentials/devices are retired; current registration still requires active
+legacy source. Preserve SDK stores/keys and pending transaction ownership; inspect
+MatrixTransactionInteropTest before migrating replay. New provider formatting does
+not accept HRIS group gateway, Mobile private-key adoption or cross-company chat.
+
+Live8b40/schema116 pushON/SMTP OFF and phone28 unchanged; Mobile8273 gates accepted.
+Keep full communications work running, every commit pushed, frequent user/Git updates.
+
+
 ## Native group device registration transaction accepted — 3 November 2026
 
 RegisterNativeCollaborationSpaceDevice and its pure continuity/request policies

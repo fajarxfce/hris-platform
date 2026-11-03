@@ -141,7 +141,15 @@ Three new pure-policy cases validate request/provenance; existing admission,
 selection and repository regression cases pass. A test-only compile warning retry
 is recorded separately.
 
-Provisioning, group gateway/rooms and local-store adoption are not yet implemented.
+The typed internal Matrix login port now handles new/retained user-device
+coordinates and preserves actual provider public keys across restart. Its28-case
+[provider evidence](../measurements/collaboration-space-matrix-login-2026-11-03.json)
+does not activate an HRIS device or adopt a client SDK store. Follow the
+[group provisioning contract](group-provisioning.md) for credential envelopes,
+bounded work, publication fences and explicit legacy runtime transfer.
+
+Provisioning persistence/workers, group gateway/rooms and local-store adoption are
+not yet implemented.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 

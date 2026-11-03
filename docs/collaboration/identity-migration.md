@@ -26,6 +26,16 @@ legacy-row preservation and archive restoration. Full39 core cases in18 suites
 pass in237.316s, with12 recovery-tool cases and unchanged envelope formats.
 Live remains schema116; no group migration has been deployed.
 
+The selection-input repository and pure policy are now implemented without DI or
+HTTP wiring. One query distinguishes unavailable scope from admitted absence and
+returns the current selection or earliest retained identity on the configured
+server. Mapping shares the validated legacy mapper; it never acquires provider
+tokens. Actual PostgreSQL checks cover retirement, timestamp-before-UUID preference,
+company switching, scope transitions and stable stored selection. Eleven fresh
+domain/data cases pass in46.371s with3609 unchanged source hashes and quality checks.
+[Evidence](../measurements/collaboration-identity-selection-input-2026-11-03.json)
+records the earlier compile warning and report-freshness retry separately.
+
 ## Next native selection command
 
 This command and the following device/runtime migration are **not implemented**.

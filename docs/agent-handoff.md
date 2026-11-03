@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Coherent canonical input repository and policy — 3 November 2026
+
+The group identity input now reads eligible space, current selection and at most
+one earliest retained identity on the configured server in ONE statement. An
+unavailable scope cannot be confused with admitted absence. Pure selection retains
+existing/legacy users, including retired references, and rejects source/server
+changes. Shared legacy mapping preserves its prior pagination/error regressions.
+[Evidence](measurements/collaboration-identity-selection-input-2026-11-03.json):
+identity-input3 PASS46.371s/11 fresh cases,3609 source hashes unchanged, format and
+architecture PASS. Actual PostgreSQL covers scope transitions, oldest-time order,
+company independence, persisted selection and server mismatch. Initial Werror and
+fresh-report wrapper failures are retained; no test failure is hidden. No job runs.
+
+Next implement SelectNativeCollaborationSpaceIdentity with operation/account/parent
+guards, exact admission before/after, and atomic selection/receipt/journal writes.
+Actual PostgresOperationRepository/ChangeJournalRepository and stored identity/
+native-session adapters can be exercised directly in data tests. No provider call
+or token decrypt belongs in selection. Then complete device/room/gateway and Mobile
+SDK-store/worker/push/read migration. No group DI or HTTP endpoint is wired yet.
+
+Main checkoutb4b8bbb2 now points to this worktree; live8b40/schema116 pushON/SMTP OFF
+is unchanged. Mobile0d96e737 has accepted8273 native/control/Apple gates and normal
+phone28 already installed. No new install or generic Starter port is needed here.
+Continue the complete communications scope and regular user/Git updates.
+
+
 ## Immutable canonical selection schema validated — 3 November 2026
 
 V119 now stores one immutable provider-user intent per space/account. It starts

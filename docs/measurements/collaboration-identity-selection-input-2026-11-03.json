@@ -1,0 +1,96 @@
+{
+  "date": "2026-11-03",
+  "base": "927a4f12",
+  "scope": "Coherent identity-selection input repository and pure policy; native command/DI/HTTP remain unwired",
+  "check": {
+    "startedAt": "2026-11-03T20:19:19.537529+00:00",
+    "elapsedSeconds": 46.371,
+    "exitCode": 0,
+    "sourceFiles": 3609,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceIdentityPolicyTest.xml": {
+        "sha256": "a0df16d96ba19842ff42f4f649dbf5edac3ecdd0fd929c7f805f915e79f74799",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceRepositoryTest.xml": {
+        "sha256": "7d91442c5f1dc460ae88c2ec946fbf1565b0d348bbeaf94fa4597ed05563ddf8",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceIdentityMappingTest.xml": {
+        "sha256": "71c3e638877cd0aea29bded93e5b8e03105fceff60e3285afc216274fb99bd4b",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceIdentityRepositoryTest.xml": {
+        "sha256": "e829a8a5aeceac0689f024676158facc09900078fff954c36d987982ba5bab22",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceMappingTest.xml": {
+        "sha256": "da8bf4828d4b904076d9706e39f96d534f89120ae6381bbf267fd1dab2d0173b",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceSha256": {
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationSpaceIdentityPolicyTest.kt": "713a0338ffa58a3f16f44d2f12e60e84e3e033107cdfe4d9ae954148ad9b23fe",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceIdentity.kt": "459774722912bfb822da27a93fc645cf33254350756dc5fd273bebf8a05397eb",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceIdentityPolicy.kt": "dfd39359452368f3998ac9d18a47d39d76f7d9d3c34c7c2c48f0881b95105920",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceIdentityRepository.kt": "5c21aa778757a0d945c1a8395e77c717463e339cdae608c83ac8194bc9a2967e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceIdentityRepositoryTest.kt": "206635b45c33b5f659fdf0c8198b8a31ca595254bfd50f8f0376cb890dc562a9",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceIdentityMappingTest.kt": "27ad69074fb9b7d7884fffaa839350ab91cf278ac4ee964616823515e6dd7ae1",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationSpaceIdentityDataSource.kt": "795cbe7cf23d7b2ce4ae08a078309506951000f5e3cf42c1bc57302941f1ca73",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationSpaceIdentityDataSource.kt": "64dee88c157e6fa5c68147462ecfe2686353b6fce15dfcd2707a0b45c75d7816",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/mappers/CollaborationLegacyDeviceMapper.kt": "fe27d088c0d12bf1dac3367812c07fb9062aa37303cfa420efcf5c6c0b94c494",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationLegacyDeviceRepository.kt": "8a2fdb46c925651c0e82b92447764b84acd469f7df02697232726354e1dc661d",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationSpaceIdentityRepository.kt": "be07ee72e9b72a85ae6b60bed66c6003a158d96bfaad369cca9b58754018339c"
+  },
+  "previousAttempts": [
+    {
+      "name": "identity-input1",
+      "classification": "Five pure policy tests passed; data compilation rejected Java boxed-Long spelling under Werror. Replaced it with Kotlin Long.javaObjectType."
+    },
+    {
+      "name": "identity-input2",
+      "classification": "Gradle/quality and six fresh data cases passed. The wrapper required eleven fresh reports, while five unchanged domain cases were UP-TO-DATE. Final run forced only the selected test tasks to rerun."
+    }
+  ],
+  "formatCheck": true,
+  "architectureCheck": true,
+  "verified": [
+    "A single SQL statement returns eligible scope, any existing canonical selection and at most one earliest retained identity on the configured server. Unavailable scope is distinct from an admitted empty inventory.",
+    "Actual PostgreSQL selects the oldest identity before UUID ordering, including a retired device reference; selected HR company does not change the input.",
+    "Committed off/on membership changes cannot turn a previously unavailable input into permission to create a fresh identity. Wrong actor/space yields no input.",
+    "Stored selection suppresses legacy candidate lookup, round-trips unchanged, and a configured-server mismatch produces an explicit migration conflict.",
+    "Five pure cases cover fresh/legacy/immutable selection, exact source/account/device, future timestamps and bounded server authorities.",
+    "Mapping/error tests reject invalid queries and contaminated metadata, preserve driver failures, and propagate interruption. The shared legacy mapper retains its three existing regression cases."
+  ],
+  "diChanged": false,
+  "endpointExposed": false,
+  "liveChanged": false,
+  "phoneChanged": false,
+  "limits": [
+    "No native command, operation receipt/journal atomicity or actual provider call is implemented by this repository increment.",
+    "Current-parent/device admission, SDK-store continuity, group rooms/gateway and Mobile workers/push/read ownership still require implementation and acceptance."
+  ]
+}

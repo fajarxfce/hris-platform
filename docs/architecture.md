@@ -12,6 +12,12 @@ permission rows, independently of selected HR company. This is a database founda
 not native session, device or room authority. Existing Matrix ownership remains
 unchanged until the [cross-company migration](collaboration/cross-company-chat.md).
 
+The contact datasource pages distinct accounts before joining a bounded lateral
+company-label selection in one SQL snapshot. The repository owns typed mapping,
+finite overfetch and acquisition failures; the future use case must separately
+admit native security/session/client policy. No group endpoint or provider authority
+is supplied by this read projection.
+
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.

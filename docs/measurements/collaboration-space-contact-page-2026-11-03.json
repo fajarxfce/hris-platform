@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-03",
+  "base": "5debc632",
+  "scope": "Bounded public communication-space contact repository; no endpoint or device/room admission",
+  "check": {
+    "startedAt": "2026-11-03T19:36:28.642655+00:00",
+    "elapsedSeconds": 76.781,
+    "exitCode": 0,
+    "sourceFiles": 3583,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.StoredCollaborationSpaceRepositoryTest.xml": {
+        "sha256": "8ce4c3f0436b426399987232a2df016e8f3143bb7ff598ac135d7aa8390dae39",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDirectoryTest.xml": {
+        "sha256": "37dc28417331936eef5ee2b6a57a70e87f2a7f7651de56b67843a6f91b1a9e91",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceSha256": {
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceDirectoryMigrationTest.kt": "0867f31e1014d1e232615e96945b7ffe8a10b65fe092beda703c98b483e3b449",
+    "core/database/src/main/resources/db/migration/V117__collaboration_space_directory.sql": "dbb62a62d3fe3b9574b218365a556cda40f6681eccad6e241af47059c2341905",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceContact.kt": "0f8ebdf66d04437479bd634eaea9b6669d4cd84351169d150c4080ff55948891",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceRepository.kt": "2b0bd4f4654a6e8957f2e8a964b7cf0ac32ef7f552c1770c8049b3fc188af9df",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceDirectoryTest.kt": "b19475d33b82e365ea1134923550cc6c367c87da7c2d38589b4a7b62968f2280",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/StoredCollaborationSpaceRepositoryTest.kt": "d08fe3c9cf0c94b3e974bc2de024faca1e849c56e378cd3a2f113311d9ca2dbd",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationSpaceDataSource.kt": "1f9f8eeaf9761f33186a8e3b0edfc9ffca817c283fe6e50b55ebe42ca3259c8e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationSpaceDataSource.kt": "adcbbd1636c29a5e54a5c77a45610e0b5d928000178cfcc3ffcf282aae6a0ca5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationSpaceRepository.kt": "5ef7a952eb008dda5dca7643638c923e99c37aa572cb26ea53abb2ce042c6ad2"
+  },
+  "evidence": [
+    "Actual PostgreSQL account pages 2/2/1 terminate without duplicates; one peer with twelve eligible companies receives eight labels and explicit overflow.",
+    "Selected HR company does not alter the directory. Unknown account/space, committed caller offboarding and peer permission revocation exclude contacts.",
+    "Name search treats percent, underscore and exclamation as literal input, supports apostrophe and case-insensitive matching, and does not search login email.",
+    "Invalid limits/length/control characters fail before I/O; database/mapping errors become typed failures while interruption propagates.",
+    "One SQL statement pages accounts before bounding affiliation rows, with at most 51 times 9 raw rows."
+  ],
+  "formatCheck": true,
+  "architectureCheck": true,
+  "schemaLive": 116,
+  "diChanged": false,
+  "endpointExposed": false,
+  "sourceReportsDirectory": "/home/fajar/hris/.worktrees/communication-space/.work/communication-space-2026-11-03/data1",
+  "limits": [
+    "No concurrency reservation, native client/session policy, group device identity mapping, direct-room API or Mobile ownership migration is accepted.",
+    "Existing runtime and normal phone release28 stay unchanged.",
+    "This contact projection exposes public name/company labels, not work-contact aliases or unavailable employee rows; those remain part of CHAT-01."
+  ]
+}

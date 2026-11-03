@@ -28,9 +28,15 @@ in any active company and expose only account ID/name and public company labels.
 The non-login owner has column-only source privileges, with role-specific RLS;
 application roles cannot assume it. HR/resource RLS and existing company-bound
 provider identities, keys, devices, grants and Google/OIDC bindings are unchanged.
-There is no public group endpoint or client migration in this increment. A future
-repository must bound account pages and company-label aggregation; raw view rows
-are not a public API and do not establish native/device/room admission.
+There is no public group endpoint or client migration in this increment. The
+directory repository now pages at most 50 accounts before acquiring at most eight
+public company labels per account, with explicit label overflow. Its single SQL
+snapshot bounds raw overfetch to 51 accounts times nine labels and searches literal
+display-name text; login email is excluded. Raw view rows do not establish
+native/device/room admission. [Repository evidence](../measurements/collaboration-space-contact-page-2026-11-03.json)
+records three passing cases in76.781s with3583 unchanged source hashes, including
+actual PostgreSQL pagination, company switching, committed offboarding/revocation,
+search escaping, invalid bounds, technical failure mapping and interruption.
 
 [Validation](../measurements/collaboration-space-directory-2026-11-03.json): all 33
 core database cases in 16 suites, format/architecture, and 12 recovery-tool cases

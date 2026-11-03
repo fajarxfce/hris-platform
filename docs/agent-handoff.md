@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Bounded group contacts; live push rollout completed separately — 3 November 2026
+
+The seven new domain/data/test files now provide the bounded public contact
+repository. Accounts are paged before company labels, capped50/8 with finite
+overfetch51/9; literal name search never searches login email. Actual PostgreSQL
+pagination/company-switch/offboarding and error-boundary checks pass:76.781s,
+3 cases/0 failures/errors/skips,3583 source hashes unchanged, format/architecture.
+[Evidence](measurements/collaboration-space-contact-page-2026-11-03.json). No DI,
+endpoint, native admission, device mapping or Mobile migration is wired yet.
+Continue that native group contract; do not publish unusable contacts prematurely.
+
+Main Platform1545dba5 records successful private push activation from8b40bd0f,
+schema116. All three push flags ON, SMTP OFF. Coordinated HRIS/Matrix restore and
+cleanup passed. First switch hit an internal IP collision and rolled back healthy;
+static API/worker addresses and provider-first startup fixed the retry.28.528s,
+private trusted TLS/denied external callbacks and identity/data preservation pass.
+See main docs/measurements/chat-push-private-rollout-2026-11-03.json and operations
+runbook. Do not deploy this branch's V117 as part of that completed rollout.
+
+Mobile37401799 records normal release28 already installed and pullback-verified,
+source8273ae8d; do not reinstall. c770 native/control are fully accepted with
+downloaded artifacts and actual PNG review.8273 native/control runs41701412608 and
+41701412602 remain in progress. All richer chat/call/video/meeting scope continues;
+user asks frequent updates, every commit pushed and Git continuation notes.
+
+
 ## Organization directory foundation; push release remains separate — 3 November 2026
 
 Branch feat/communication-space in /home/fajar/hris/.worktrees/communication-space

@@ -25,6 +25,276 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationSpacePolicy(environment: Environment, service: CollaborationServicePolicy) =
+        CollaborationSpacePolicy(
+            service.enabled &&
+                environment.getProperty(
+                    "HRIS_COLLABORATION_SPACE_ENABLED",
+                    Boolean::class.java,
+                    false,
+                ),
+            environment.getProperty(
+                "HRIS_COLLABORATION_SPACE_MIN_ANDROID_BUILD",
+                Int::class.java,
+                0,
+            ),
+            environment.getProperty("HRIS_COLLABORATION_SPACE_MIN_IOS_BUILD", Int::class.java, 0),
+        )
+
+    @Bean
+    fun collaborationSpaceSource(sql: DSLContext): CollaborationSpaceDataSource =
+        PostgresCollaborationSpaceDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceRepository(
+        source: CollaborationSpaceDataSource
+    ): CollaborationSpaceRepository = StoredCollaborationSpaceRepository(source)
+
+    @Bean
+    fun collaborationLegacyDeviceSource(sql: DSLContext): CollaborationLegacyDeviceDataSource =
+        PostgresCollaborationLegacyDeviceDataSource(sql)
+
+    @Bean
+    fun collaborationLegacyDeviceRepository(
+        source: CollaborationLegacyDeviceDataSource
+    ): CollaborationLegacyDeviceRepository = StoredCollaborationLegacyDeviceRepository(source)
+
+    @Bean
+    fun collaborationLegacyParentSource(sql: DSLContext): CollaborationLegacyParentDataSource =
+        PostgresCollaborationLegacyParentDataSource(sql)
+
+    @Bean
+    fun collaborationLegacyParentRepository(
+        source: CollaborationLegacyParentDataSource
+    ): CollaborationLegacyParentRepository = StoredCollaborationLegacyParentRepository(source)
+
+    @Bean
+    fun collaborationSpaceIdentitySource(sql: DSLContext): CollaborationSpaceIdentityDataSource =
+        PostgresCollaborationSpaceIdentityDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceIdentityRepository(
+        source: CollaborationSpaceIdentityDataSource
+    ): CollaborationSpaceIdentityRepository = StoredCollaborationSpaceIdentityRepository(source)
+
+    @Bean
+    fun collaborationSpaceDeviceSource(sql: DSLContext): CollaborationSpaceDeviceDataSource =
+        PostgresCollaborationSpaceDeviceDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceDeviceRepository(
+        source: CollaborationSpaceDeviceDataSource
+    ): CollaborationSpaceDeviceRepository = StoredCollaborationSpaceDeviceRepository(source)
+
+    @Bean
+    fun collaborationSpaceProvisioningSource(
+        sql: DSLContext
+    ): CollaborationSpaceProvisioningDataSource =
+        PostgresCollaborationSpaceProvisioningDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceProvisioningRepository(
+        source: CollaborationSpaceProvisioningDataSource
+    ): CollaborationSpaceProvisioningRepository =
+        StoredCollaborationSpaceProvisioningRepository(source)
+
+    @Bean
+    fun collaborationSpaceProviderSessionSource(
+        sql: DSLContext
+    ): CollaborationSpaceProviderSessionDataSource =
+        PostgresCollaborationSpaceProviderSessionDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceProviderSessionRepository(
+        source: CollaborationSpaceProviderSessionDataSource,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationSpaceProviderSessionRepository =
+        EncryptedCollaborationSpaceProviderSessionRepository(source, crypto)
+
+    @Bean
+    fun collaborationSpaceMatrix(
+        signing: ObjectProvider<MatrixJwtDataSource>,
+        clients: ObjectProvider<MatrixClientDataSource>,
+        clock: Clock,
+    ): CollaborationSpaceMatrixRepository =
+        clients.ifAvailable?.let {
+            InternalCollaborationSpaceMatrixRepository(signing.getObject(), it, clock)
+        } ?: DisabledCollaborationSpaceMatrixRepository()
+
+    @Bean
+    fun listNativeCollaborationSpaceContacts(
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListNativeCollaborationSpaceContacts(
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun selectNativeCollaborationSpaceIdentity(
+        selections: CollaborationSpaceIdentityRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SelectNativeCollaborationSpaceIdentity(
+            selections,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun registerNativeCollaborationSpaceDevice(
+        registry: CollaborationSpaceDeviceRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        RegisterNativeCollaborationSpaceDevice(
+            registry,
+            provisioning,
+            legacyParents,
+            selections,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun retryNativeCollaborationSpaceProvisioning(
+        registry: CollaborationSpaceDeviceRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        RetryNativeCollaborationSpaceProvisioning(
+            registry,
+            provisioning,
+            legacyParents,
+            selections,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun claimCollaborationSpaceProvisioning(
+        provisioning: CollaborationSpaceProvisioningRepository,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+    ) = ClaimCollaborationSpaceProvisioning(provisioning, policy, provider)
+
+    @Bean
+    fun advanceCollaborationSpaceProvisioning(
+        registry: CollaborationSpaceDeviceRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        credentials: CollaborationSpaceProviderSessionRepository,
+        matrix: CollaborationSpaceMatrixRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        AdvanceCollaborationSpaceProvisioning(
+            registry,
+            provisioning,
+            credentials,
+            matrix,
+            selections,
+            spaces,
+            sessions,
+            identities,
+            journal,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun settleCollaborationSpaceProvisioningFailure(
+        provisioning: CollaborationSpaceProvisioningRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        SettleCollaborationSpaceProvisioningFailure(
+            provisioning,
+            identities,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
     fun collaborationPushQueueSource(sql: DSLContext): CollaborationPushQueueDataSource =
         PostgresCollaborationPushQueueDataSource(sql)
 

@@ -2,7 +2,8 @@
 
 The native selection and registration commands commit identity intent, current
 binding and journal/receipt. Fresh device registration now also enqueues bounded
-provider work atomically. They are unwired. The typed internal Matrix
+provider work atomically. They are bound in shared module DI, with group availability
+disabled by default and no public group HTTP endpoints. The typed internal Matrix
 candidate port is implemented and tested against an owned Synapse process; it does
 not supply a public login endpoint or activate an HRIS group device.
 
@@ -25,8 +26,8 @@ private-key/store continuity or cross-company HRIS messaging.
 V122 now provides an initially empty organization provisioning queue. It retains
 one operational head per group device and the immutable original native parent;
 there is no native-session cascading foreign key. Existing background_jobs remains
-company-only. Native registration now inserts its initial head; the worker is not
-wired yet.
+company-only. Native registration now inserts its initial head; the worker is wired behind
+separate defaultfalse group and provisioning flags.
 
 Each request records native version, account credential version, authentication/MFA
 timestamps, correlation ID and native client platform/build. Insert/retry requires
@@ -99,15 +100,18 @@ Matrix HTTP5xx now maps to provider_unavailable;401 remains rejected and429 busy
 Transport itself does not retry. Raw error parameters and lease tokens stay out
 of journal details.
 
-The claim adapter and owned worker loop are implemented but not wired into Spring.
+The claim adapter and owned worker loop are wired into Spring behind explicit
+HRIS_COLLABORATION_SPACE_ENABLED and HRIS_COLLABORATION_SPACE_PROVISIONING_ENABLED
+flags, plus existing collaboration/Matrix/worker capabilities. Both defaultfalse.
 Claims gate feature/provider configuration and validate bounded unique leases before
 scheduling. Defaults are two parallel tasks,250ms polling and45s processing timeout,
 clipped by each absolute lease deadline. A zero-capacity executor and reserved
 submission permits bound work; cancelled tasks still exiting retain their physical
 slot. Two control threads keep timeout cancellation available during a blocked
 claim. Failure settlement runs only after failed advance returns. Shutdown cancels
-polling, tasks and timers; restart is forbidden. Next wire opt-in configuration and
-validate both API and worker contexts, including an actual Synapse worker flow.
+polling, tasks and timers; restart is forbidden. Actual API and full worker contexts,
+including a scheduled Synapse activation, now pass. Public group runtime ownership
+is still incomplete; these flags remain disabled for deployment.
 
 A worker claim transaction acquires only queue metadata and commits before native
 admission. Preparation/publication then take account, native parent, device and
@@ -126,8 +130,9 @@ a distinct authenticated purpose, immutable native/provider ownership and exact
 generation/expiry binding. Terminal generation and device revision1000000 are
 reserved for irreversible cleanup. Real current/retained-key envelopes and the
 production recovery projection survive an actual PostgreSQL archive restore.
-The native/worker publication flow is still unwired; these persistence checks do
-not grant current group/content access or permit reusing a retired credential.
+The native/worker publication flow is wired behind disabled opt-in configuration;
+persistence alone does not grant current group/content access or permit reusing a
+retired credential.
 
 ## Retained devices and runtime transfer
 
@@ -209,3 +214,12 @@ absolute deadlines, delayed cancellation cleanup, failure settlement, invalid cl
 submission rejection, stopped/failed startup and complete shutdown. An initial
 startup check incorrectly used active timer count; configured core size is now
 validated. No DI or automatically running group worker is enabled yet.
+
+[Opt-in wiring evidence](../measurements/collaboration-space-wiring-2026-11-03.json):
+14 focused API/worker cases pass in192.349s; the full worker suite passes126 active
+cases in315.901s with one existing opt-in retention skip. Both use8248 unchanged
+source/build/resource inputs and quality checks. Seven flag contexts validate real
+claims, default/disabled behavior and resource termination. Actual scheduled native
+registration through pinned Synapse publishes encrypted credentials and ACTIVE
+state atomically, verifies provider identity and retains replay. Retained-device
+private-key/store transfer and public group runtime remain unaccepted.

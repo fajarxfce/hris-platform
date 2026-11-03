@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Opt-in group graph and actual scheduled Synapse flow accepted — 3 November 2026
+
+Shared CollaborationConfiguration now binds the group repositories and seven use
+cases. Group availability requires HRIS_COLLABORATION_SPACE_ENABLED plus existing
+collaboration availability, with independent Android/iOS minimum builds. The group
+worker additionally requires HRIS_COLLABORATION_SPACE_PROVISIONING_ENABLED, Matrix
+and hris.worker.enabled. Both new switches defaultfalse and remain off in examples.
+The actual zero-queue two-thread tasks and two-thread timers are owned by Spring.
+No group HTTP endpoint or live configuration has been enabled.
+
+[Evidence](measurements/collaboration-space-wiring-2026-11-03.json): focused API/worker
+14 PASS192.349s; full :apps:worker:test127 cases/126 active/1 existing opt-in retention
+skip PASS315.901s,27 suites. Both retain8248 unchanged source/build/resource hashes
+and pass format/architecture. Seven actual flag contexts prove enabled claims,
+missing-property/each-false denial and complete executor termination. Actual API
+runtime cannot claim the worker queue. The real scheduled worker consumes native
+registration through pinned Synapse, commits encrypted credential/ACTIVE device/
+SUCCEEDED head/journal, verifies provider whoami, and preserves request replay.
+No failed run in this unit. All test sessions are complete.
+
+Next provide bounded native group setup status for Mobile, then retained runtime
+transfer and group gateway/rooms/coherent client ownership. UNTESTED formatted drafts
+and proposed actual-data cases are in ignored .work/communication-space-2026-11-03/
+space-status-next. They expose current device state, safe queue status/revision,
+expiry and explicit retry timing, with current native admission and no write or
+lease/native/provider proof disclosure. Review before integrating. The prepared
+run-space-status.py gate expects2 policy+9 registration/status+4 retry+11 worker-data
+cases. This draft is not wired to DI or HTTP.
+
+Transfer must fence all old provider users: AccessNativeCollaborationMatrixDevice,
+AdvanceNativeCollaborationProvisioning and AdvanceNativeCollaborationDirectRoom.
+Never logout losing/late candidates; preserve SDK private keys, original store and
+pending transaction IDs. Current retained-device activation remains rejected.
+Group gateway/rooms, local ownership/push/read and cross-company E2EE acceptance
+remain open. Live8b40/schema116 pushON/SMTP OFF and phone28 unchanged. Continue full
+long run, regular user/Git updates and push each atomic commit. Earlier unwired
+bean drafts are superseded by tracked configuration and tests; do not recopy them.
+
 ## Bounded group claim and scheduler classes accepted — 3 November 2026
 
 ClaimCollaborationSpaceProvisioning gates feature/provider/bounds, validates exact

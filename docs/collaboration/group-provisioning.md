@@ -49,8 +49,14 @@ terminal outcome while the new request is pending. Heads cannot be deleted or
 rebound to a replacement parent. The head retains only the last operational outcome;
 native/worker journal integration must preserve required historical business events.
 
-Next implement the typed queue repository and native/worker use cases. Native
-registration must insert its request atomically with device/binding/receipt/journal.
+Typed request/head/lease/outcome ports and PostgreSQL adapters are now implemented.
+Metadata distinguishes missing, pending and prior terminal outcomes. Completion and
+defer compare every typed request proof field, revision, attempt, owner, token and
+exact live deadline. Mapping validates timestamp precision, lifecycle coherence and
+claim bounds/uniqueness. These ports still require caller-owned current admission.
+
+Next integrate native/worker use cases. Native registration must insert its request
+atomically with device/binding/receipt/journal.
 Explicit retries need their own operation receipt and current native admission;
 lost-response replay cannot silently start another attempt.
 
@@ -105,3 +111,11 @@ lease replacement, eight-attempt exhaustion, bounded expiry, fresh retry and arc
 restoration. Queue lease/owner fields are internal and must not appear in native
 status responses. Native/worker use-case integration and historical business journal
 coverage remain outstanding.
+
+[Typed port evidence](../measurements/collaboration-space-provisioning-ports-2026-11-03.json):
+17 cases pass in102.360s with3658 unchanged source hashes and quality checks. Actual
+PostgreSQL covers every lease proof fence, null/verified MFA, due defer/reclaim, prior
+outcomes, owned cleanup and restored worker claims. Failed Result, cancellation and
+interruption roll back encrypted credential, device and queue writes together; a
+positive transaction commits all three. This is storage atomicity, not acceptance
+of worker admission, business journal or provider publication use cases.

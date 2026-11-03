@@ -69,7 +69,9 @@ immutable coordinates and transaction rollback; the15-case [regression](../measu
 passes in90.862s with3648 unchanged hashes and quality checks. These ports do not
 grant current live admission.
 
-Next implement bounded organization provisioning requests and worker leases. Registration must commit its request with binding, receipt and
+Bounded organization provisioning requests, worker leases and typed ports are now
+implemented and tested, including atomic storage rollback across credential, device
+and queue. Registration must next commit its request with binding, receipt and
 journal. Preparation/publication must use current account/native/device authority,
 exact generation/revision and a still-current lease. Keep provider I/O outside SQL
 transactions. A lost/late/losing provider candidate expires naturally: **Synapse

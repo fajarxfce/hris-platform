@@ -1,0 +1,89 @@
+{
+  "scope": "Typed organization provisioning queue ports and atomic storage; native command/worker remain unwired",
+  "baseCommit": "93808218",
+  "accepted": {
+    "startedAt": "2026-11-03T22:03:06.126327+00:00",
+    "elapsedSeconds": 102.36,
+    "exitCode": 0,
+    "sourceFiles": 3658,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProviderStorageTest.xml": {
+        "sha256": "4f57243389a556cfa21c06185fd488ce12c50ba7d7a1dd9b6730b168dbfed0ac",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningMappingTest.xml": {
+        "sha256": "5bbfa4d1e497f15c381efdeffe971286a5dc99be9a3ec2e9f4401f6dcefd3582",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceProvisioningStorageTest.xml": {
+        "sha256": "a560d4b915e8a3c2f073be5aae864564d88e5cf596f75f04413a31a1057e3eec",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "9f2d7ae1a53265ec7425d96ecb26dd38337d50bced19de04cffb0d9ee4e5ee6c",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceDeviceRepositoryTest.xml": {
+        "sha256": "2b1502f9c31d44144abe770eee663a7cbb3dc38fbbb2959b5b70e0e97fe52d8e",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck",
+    "git diff --check"
+  ],
+  "earlierRuns": [
+    {
+      "run": "space-provisioning-data1",
+      "elapsedSeconds": 89.958,
+      "tests": 17,
+      "failures": 2,
+      "reason": "Raw SQL lease proof comparisons used untyped timestamp parameters (SQLSTATE42883); replaced with generated jOOQ typed conditions, preserving every proof fence."
+    },
+    {
+      "run": "space-provisioning-data2",
+      "elapsedSeconds": 102.319,
+      "tests": 17,
+      "failures": 0,
+      "sourcesUnchanged": true,
+      "reason": "Typed comparison fix accepted; final run adds positive MFA and actual defer/reclaim cases."
+    }
+  ],
+  "evidence": [
+    "Actual PostgreSQL fences every lease coordinate, request proof, client, attempt, owner, token and deadline; both nullable and verified MFA paths are exercised",
+    "Deferred work becomes due and receives a new attempt/token; old completion fails; explicit fresh retry retains prior failure and original creation time",
+    "Owned cancellation survives offboarding/native-parent purge; foreign/company scope and application worker claims are denied",
+    "Actual archive restore maps pending and cancelled heads and performs a restored worker claim without changing the source database",
+    "Failed Result, cancellation and interruption after device activation, encrypted credential insertion and queue completion roll back all three; positive publication commits all three",
+    "Mapping rejects malformed lifecycle/outcomes, duplicate/oversized/wrong-owner claims, invalid proof precision and bounds; safe errors preserve cancellation/interruption"
+  ],
+  "limits": [
+    "Storage publication tests do not establish native/worker domain admission or journal integration",
+    "No DI, controller, worker schedule, group gateway, room or Mobile owner migration is enabled",
+    "Live8b40/schema116 pushON/SMTP OFF and installed phone28 unchanged"
+  ]
+}

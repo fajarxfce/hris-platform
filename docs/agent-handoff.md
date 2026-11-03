@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Typed organization provisioning ports accepted — 3 November 2026
+
+Typed queue request/head/lease/outcome models, raw PostgreSQL source and repository
+now cover owned metadata, initial enqueue, revisioned retry, worker claim, finish,
+defer and owned cancellation. Every lease proof field is compared using generated
+jOOQ typed conditions, including exact nullable MFA and timestamps. Domain mapping
+validates lifecycle/outcome coherence, microsecond proof precision, bounded and
+unique worker claims. No DI/controller/scheduler wiring is enabled.
+
+[Evidence](measurements/collaboration-space-provisioning-ports-2026-11-03.json):
+space-provisioning-data3 PASS102.360s/17,3658 unchanged source hashes, format and
+architecture PASS. Actual PostgreSQL covers proof mutations, null/verified MFA,
+due defer/reclaim and stale token, fresh retry/prior outcome, offboarding/purged
+parent cancellation, archive mapping and restored worker claim. Failure, cancellation
+and interruption roll back device+encrypted credential+queue together; the positive
+storage transaction commits all three. These are storage tests, not worker admission.
+Data1 failed89.958s/17/2 because untyped raw timestamp parameter comparisons caused
+SQLSTATE42883. Generated typed conditions fixed it; data2 passed102.319s/17 before
+adding the final MFA/defer cases. All local checks are complete.
+
+Next integrate atomic native registration enqueue and failure tests, explicit native
+retry/receipt/current admission, then worker preparation/publication. Existing
+registration replay must not restart old work after native refresh. Claim commits a
+queue-only transaction before account -> parent -> device -> queue -> credential
+guards; provider I/O holds no SQL locks. Check exact proof/lease/attempt/generation,
+current group/client/MFA/canonical/retained source and deadlines at publication.
+Read collaboration/group-provisioning.md. Never logout losing provider candidates;
+actual Synapse removes winning same-device tokens and E2EE keys. Legacy runtime
+transfer and SDK/private-key/pending-transaction continuity remain outstanding.
+Ignored provisioning-ports-next drafts are superseded by the tracked sources and
+tests; do not recopy them. Earlier handoff sections describe historical checkpoints.
+
+Live8b40/schema116 pushON/SMTP OFF and installed phone28 unchanged. All54 acceptance
+groups remain open; continue the full long run with regular user/Git updates and
+push every atomic commit. No group endpoint/worker/gateway/Mobile migration enabled.
+
 ## Bounded organization provisioning schema accepted — 3 November 2026
 
 V122 adds one operational queue head per group device, exact original native-parent

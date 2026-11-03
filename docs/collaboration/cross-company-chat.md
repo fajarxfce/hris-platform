@@ -60,6 +60,15 @@ records actual PostgreSQL migration/isolation/restore,36 core cases in211.587s,
 format/architecture and12 recovery-tool cases. Recovery accepts schema118 with
 the same authenticated envelope formats; live schema remains116.
 
+The owned inventory repository now uses a bounded compound company/device cursor,
+at most50 records plus one overfetch. Mapping validates original Matrix identity,
+account/space, lifecycle metadata and strict cursor progression. An actual
+PostgreSQL case traverses nine devices in five pages across unsigned UUID boundaries;
+two boundary cases exercise invalid input, driver failure, cancellation and foreign
+metadata. [Evidence](../measurements/collaboration-legacy-device-pages-2026-11-03.json):
+45.064s/3 cases,3597 unchanged source hashes, format/architecture PASS. It is not
+wired to DI or HTTP and does not select an identity automatically.
+
 Mobile's current crypto-store ownership contains the original company and native
 parent. A future group owner must explicitly retain that store reference and verify
 the provider user/device match; changing its company component can open a different

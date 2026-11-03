@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-03",
+  "base": "2342f51a",
+  "scope": "Bounded typed owned legacy device inventory repository; no identity selection or adoption",
+  "check": {
+    "startedAt": "2026-11-03T19:56:36.036421+00:00",
+    "elapsedSeconds": 45.064,
+    "exitCode": 0,
+    "sourceFiles": 3597,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceRepositoryTest.xml": {
+        "sha256": "d80af78426c6cfcb18878a3ed2946ebe244608f942fee741918af2e1af261b73",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceMappingTest.xml": {
+        "sha256": "fee3e43ed77373275ab1e03c314891959d6cfb3b4b37d2c0566f3ad1f86ae7ae",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceSha256": {
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationLegacyDevice.kt": "7e7030730fc5b84410079775715dd88a66c9ad0ac3884b0978949ebbc009d494",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationLegacyDeviceRepository.kt": "a7e28a356fe0fe08651d694ef144df7006d3350ef141bc232e8c2cd8e1c65569",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationLegacyDeviceRepositoryTest.kt": "f119cdd342a57c1f12e58a82e0d3cba86fab6b2d4ed0ab1ad9f720c11e7f2d7e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationLegacyDeviceMappingTest.kt": "c264bac12a0a7fcde9b935d5900b16b2fec3ea88426dd38002ab0f42eb07663b",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationLegacyDeviceDataSource.kt": "100398d2db3abcffb85e9b2b60c330f42c35895957098bc4f5be1a7b6be98725",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationLegacyDeviceDataSource.kt": "bee7fa81e69fd88df40eddc28debf34c9c582c03536ed9ce069c84c860ce3e2c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationLegacyDeviceRepository.kt": "df8019df974b013e58dbd572f69894be23617839bab80e0333bc3d457db0ab60"
+  },
+  "formatCheck": true,
+  "architectureCheck": true,
+  "verified": [
+    "Actual PostgreSQL returns nine devices in five two-item pages across three companies including unsigned UUID boundaries, without duplicates or skips.",
+    "The compound company/device cursor terminates and remains independent of selected HR company. Unknown actor/space and committed last-membership offboarding return no inventory.",
+    "Repository enforces finite limit+1 overfetch, owned space/account, exact original Matrix user/device identity, ordered cursor progress and typed lifecycle metadata.",
+    "Invalid limits perform no I/O; database failures remain typed failures and interruption propagates. Foreign/malformed identity metadata fails mapping."
+  ],
+  "diChanged": false,
+  "endpointExposed": false,
+  "liveSchema": 116,
+  "liveChanged": false,
+  "phoneChanged": false,
+  "limits": [
+    "Inventory does not select a canonical provider user or grant any current-parent/device/room access.",
+    "No existing SDK store, provider credential, crypto key or message is moved or re-encrypted. The full explicit migration and end-to-end acceptance remain required."
+  ]
+}

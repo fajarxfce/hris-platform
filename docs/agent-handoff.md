@@ -1,5 +1,24 @@
 # Agent continuation — HRIS workspace
 
+## Typed legacy inventory pages validated — 3 November 2026
+
+The seven-file draft mentioned below has now been applied and tested. It provides
+a typed owned metadata repository with finite compound company/device paging and
+original Matrix identity/lifecycle validation. Actual PostgreSQL traverses nine
+devices in five pages across unsigned UUID boundaries, without skips/duplicates;
+wrong owner/space and offboarding hide the inventory. Mapping/error/cancellation
+cases pass.45.064s/3 cases,3597 source hashes unchanged, format/architecture PASS.
+[Evidence](measurements/collaboration-legacy-device-pages-2026-11-03.json). No DI,
+HTTP, canonical identity selection, device adoption or crypto-store migration yet.
+
+Next define/persist explicit canonical identity and legacy aliases, with current
+native parent/device admission and preserved local SDK store references. An owned
+inventory row, especially a retired one, supplies no active transport authority.
+Do not substitute spaceId for legacy companyId in existing stores or regenerate
+their keys. Multiple historical identities/rooms must remain explicit. Continue
+all communications requirements; main live schema116/pushON, phone28 unchanged.
+
+
 ## Owned legacy crypto identity inventory — 3 November 2026
 
 V118 adds only the restricted owned metadata view; original provider ciphertext,

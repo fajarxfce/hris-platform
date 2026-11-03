@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Current cross-repository checkpoint — 3 November 2026
+
+Mobile **release25** at a3f39be7390874cf04b807b9abad365393530852 is installed and
+pull-back verified on10.77.77.3:5555. Original signer/appId10962/first-install retained,
+no phone UI launch/data clear. Do not reinstall25; future26+ after prior notice and
+install-only. [Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md)
+is authoritative; older phone18 entries below are historical. Reviewed encrypted drafts
+and explicit confirmed replay pass local root/IndexedDB; Apple41651053921 accepts
+1,094 simulator tests plus full Xcode. Native41650906105 is REJECTED at an intermediate
+recovery assertion; Mobile fixture correction is being validated, not yet accepted.
+
+Platform runtime304be027/schema116 remains unchanged/live, dashboard2124c6fc unchanged.
+All chat push flags/SMTP remain OFF. Preserve Matrix identity/keys/checkpoints, live
+Google/native/document state and all rollback images. Starter9959c1d unchanged.
+
+UNCOMMITTED fixture WIP: ProductChatFcmInteropTest/ProductChatFcmWorker and
+collaboration_product_fcm.py/device.py/tests. Real private FCM credential is consumed
+only by an independently owned worker; fictional PostgreSQL/Synapse/TLS/account data,
+actual product devDebug receiver, separate encrypted SDK peer and disposable AVD image.
+No Firebase test users or real employee messages. [Fixture contract](collaboration/product-fcm-acceptance.md).
+Compile1 PASS40.111s (test classes, actual worker JAR, format/architecture/eight initial
+Python checks). Ten Python cases now pass after clickable-label/FCM-start guards.
+Mobile x86 product/peer APKs compile with18 proof-host cases; new fixture source is
+still UNCOMMITTED/NOT ACCEPTED. No generic Starter port is needed.
+
+.work/product-chat-fcm-2026-11-03 retains run1 SKIPPED (sudo stripped opt-in), run2
+NOT EXECUTED (Gradle reused skipped report), neither is acceptance. Run3 now running
+with explicit environment after runuser and task-specific --rerun; no parallel heavy
+job. Audit real execution/counts, process/fixture cleanup and actual screenshots.
+Product APK targets loopback18084 and MUST NEVER be installed on the phone.
+After fixture acceptance, complete Mobile native checkpoint/full quality/hosted gate,
+then continue full communications PRD. All54 groups OPEN, voice/video/meeting UI absent.
+
 ## Read-receipt gateway rollout — 2 November 2026
 
 API/worker now run accepted304be027 at unchanged schema116. Full Verify41475356301

@@ -24,6 +24,15 @@ hash or gateway replay. It observes the existing company/device crypto namespace
 without rewriting it or relying on native-binding retention. This supports explicit
 future group migration; it does not authorize provider adoption or change HR RLS.
 
+V119 stores one immutable canonical Matrix user intent per space/account. Its
+native selection command uses a coherent eligible snapshot and commits selection,
+receipt, audit and outbox under operation/account/parent guards. V120 adds separate
+organization device IDs and immutable legacy user/device/key references. Parent
+cleanup removes live bindings but preserves original parent provenance and crypto
+identity; a new parent cannot silently reuse a retained device. Public metadata is
+not private-key possession or provider authority. Group registration and runtime
+remain unwired; see [identity migration](collaboration/identity-migration.md).
+
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.

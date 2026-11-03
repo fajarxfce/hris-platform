@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Organization device registry validated — 3 November 2026
+
+V120 adds space devices, immutable native-parent provenance and cascading live
+bindings, plus the restricted legacy parent/public-key view. Retained devices
+reference the exact canonical user, old provider device and reserved fingerprint;
+new devices use distinct HRISG IDs. Nothing is adopted/activated by migration.
+Parent cleanup cannot erase the identity or allow another parent to reuse it.
+[Evidence](measurements/collaboration-space-device-registry-2026-11-03.json):
+focused92.822s/3 cases; combined308.749s/70 cases (42 full core in19 suites plus28
+identity regression),3613 source hashes unchanged, zero failures/errors/skips,
+format/architecture PASS. Recovery12 PASS, MAX_SCHEMA120, future121 rejected,
+envelope formats unchanged. Actual archive restoration and restricted-role
+ownership/key/source/native/state rejection pass. No check is running.
+
+Next add the exact legacy parent/public-key metadata repository, group device
+registry/registration with union native-parent quota and explicit NEW/RETAINED
+intent, then provisioning and gateway/room migration. Drafts for the metadata port
+and its tests are in .work/communication-space-2026-11-03/device-code; they are NOT
+compiled or integrated. Move to proper module layers, format/test, then commit.
+Implementation notes are in device-registration-next.md; the tracked contract is
+collaboration/identity-migration.md. No public group endpoint or DI is wired.
+Fingerprint metadata cannot stand in for local private keys; keep explicit SDK
+store references and enforce the exact old user/device/key on adoption.
+
+Live8b40/schema116 pushON/SMTP OFF and installed phone28 remain unchanged. Matching
+8273 Mobile native/control/Apple checks are accepted. Continue the complete PRD,
+push each commit, maintain Git handoffs and give regular user updates.
+
+
 ## Native canonical selection transaction accepted — 3 November 2026
 
 SelectNativeCollaborationSpaceIdentity is implemented, still unwired. Actual

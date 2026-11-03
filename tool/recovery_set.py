@@ -48,7 +48,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # owner. Original credential rows and authenticated purposes remain unchanged.
 # V119 retains an immutable provider-user selection and references existing identity
 # metadata; no token or participant-key format is added or rewritten.
-MAX_SCHEMA = 119
+# V120 adds organization device provenance and legacy public-key references only;
+# no new encrypted envelope or change to existing purposes/associated data.
+MAX_SCHEMA = 120
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

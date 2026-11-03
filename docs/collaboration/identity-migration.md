@@ -81,6 +81,38 @@ Test lost responses, competing devices, coherent eligibility snapshots, wrong
 server/source, expiry, revocation and rollback before wiring DI/HTTP. Shared DI
 changes must exercise both API and worker application contexts.
 
+## Organization device registry
+
+V120 adds separate space/device and native-binding tables. Each device references
+the exact canonical user. A new device uses a distinct `HRISG_<id>` provider ID;
+a retained device keeps its original `HRIS_<legacy-id>` and an immutable foreign
+key to its reserved public-key fingerprint. Its company reference remains an
+explicit legacy namespace. Neither credentials nor private keys are copied.
+Every new record starts in PROVISIONING; no device is adopted or activated by the
+migration, and the registry contains no gateway credential.
+
+The original native-parent UUID is immutable durable provenance, without a parent
+foreign key. Only the active binding cascades during parent cleanup. This keeps the
+provider identity while preventing a new parent from silently reusing the old
+device ID. A current native binding requires the same account, active parent,
+matching account credential version and unexpired access. Use-case admission still
+owns exact proof/version, MFA, group policy, quota and final revalidation.
+
+`collaboration_space_legacy_parents` adds owned parent/public-key metadata to the
+separate V118 inventory. A cleaned parent disappears here while the original
+inventory survives. Its non-login owner receives only required public columns;
+provider ciphertext, native credentials and login email remain inaccessible.
+A retained candidate must match the canonical user, parent, platform, device and
+key fingerprint, with an active/unretired source. A public fingerprint does not
+prove that the client possesses private keys; reopening and matching the retained
+SDK store is mandatory before client adoption. Other historical identities remain
+explicit, with no silent merge or re-encryption.
+
+The schema and its actual PostgreSQL tests are implemented. Native registration,
+provisioning, group gateway/rooms and local-store adoption are not yet implemented.
+[Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
+records validation and its exact limits.
+
 ## Device and local-store continuity
 
 The new organization owner needs an explicit persisted reference to each retained

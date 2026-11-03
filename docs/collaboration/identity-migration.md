@@ -108,6 +108,14 @@ prove that the client possesses private keys; reopening and matching the retaine
 SDK store is mandatory before client adoption. Other historical identities remain
 explicit, with no silent merge or re-encryption.
 
+The exact parent metadata repository is now implemented too, still unwired. Its
+single bounded lookup correlates space/account/native parent/company/device and
+maps the optional key tuple inside the same failure boundary as acquisition.
+Missing or inconsistent metadata cannot authorize adoption. [Repository evidence](../measurements/collaboration-legacy-parent-metadata-2026-11-03.json)
+records seven passing cases in51.46s with3620 unchanged source hashes, including
+actual PostgreSQL reads through a role granted only the public metadata view,
+reserved/published keys, scope changes, parent purge and cancellation/error mapping.
+
 The schema and its actual PostgreSQL tests are implemented. Native registration,
 provisioning, group gateway/rooms and local-store adoption are not yet implemented.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)

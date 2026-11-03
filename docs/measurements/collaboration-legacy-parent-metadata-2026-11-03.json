@@ -1,0 +1,65 @@
+{
+  "scope": "Exact owned legacy native-parent/public-key metadata repository; no device adoption",
+  "baseCommit": "1249eabc",
+  "accepted": {
+    "startedAt": "2026-11-03T20:42:17.250582+00:00",
+    "elapsedSeconds": 51.46,
+    "exitCode": 0,
+    "sourceFiles": 3620,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceRepositoryTest.xml": {
+        "sha256": "87e31477f97dcb1fc711729832f35aa3cdc77b9477598c87df7941988e59a3f5",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyParentMappingTest.xml": {
+        "sha256": "384e301ceccb41adcfd014a281be3a021f651634eb5c86d153d5a02ed82329d6",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyParentRepositoryTest.xml": {
+        "sha256": "c844612227745d70029ad3d76aec1e086d91a85b20a66141bda590582f254ab4",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyDeviceMappingTest.xml": {
+        "sha256": "4f52919dce31a942fb44188d50e8f8c260e6f12ad21474426b97074438bbd91a",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "quality": [
+    "formatCheck",
+    "architectureCheck"
+  ],
+  "validation": [
+    "Actual PostgreSQL role has SELECT on only the parent view, with no source-table SELECT grants",
+    "One exact lookup correlates space/account/native parent/company/device with LIMIT1",
+    "Absent, reserved and published public-key identities map without acquiring tokens",
+    "Wrong account, parent and company return no row; company selection is independent of the metadata owner",
+    "Current membership loss removes visibility; restoration preserves exact metadata; parent purge removes binding while provider/key inventory survives",
+    "Acquisition and shared legacy mapping reject foreign/partial/key lifecycle records; driver failure maps and cancellation/interruption escape"
+  ],
+  "limits": [
+    "Metadata alone grants no provider/device/room authority",
+    "Missing metadata cannot silently fall back to fresh keys or another owner",
+    "Client private-key possession must be established through its retained SDK store",
+    "No DI, HTTP route, group registration or Mobile adoption is enabled; live schema116 and phone28 unchanged"
+  ]
+}

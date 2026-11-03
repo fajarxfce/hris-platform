@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Exact legacy parent metadata port accepted — 3 November 2026
+
+CollaborationLegacyParentRepository.find now reads the V120 view for exact
+space/account/native-parent/company/device, LIMIT1. Shared legacy mapping and the
+complete optional public-key tuple remain inside safeDatabaseCall. No token is
+acquired. Missing data cannot authorize adoption or silently choose a fresh device.
+[Evidence](measurements/collaboration-legacy-parent-metadata-2026-11-03.json):
+legacy-parent1 PASS51.46s/7 cases,3620 unchanged source hashes, quality PASS.
+Actual PostgreSQL uses a role with SELECT only on this view, validates key lifecycle,
+foreign scope, company independence, group access loss and parent purge. Boundary
+tests cover malformed/partial metadata, driver failure, cancellation/interruption.
+The earlier device-code drafts are now integrated; no check is running.
+
+Next implement group registry domain/data ports, bounded DISTINCT native-parent
+quota shared with legacy devices, and registration with explicit NEW/RETAINED
+intent. Outer active native-session rows plus indexed EXISTS over old/new bindings
+can count each physical parent once and cap at6 for the five-device quota. Avoid
+counting one device for every old HR company. Take operation/account/parent guards,
+require the committed canonical selection, and recheck all admission at completion.
+Keep devices, bindings, receipt/journal and later provisioning job atomic. Missing
+local keys require recovery or a distinct provider ID; public fingerprints do not
+prove private-key possession. Complete provider/gateway/room and Mobile store/
+owner/worker/push/read migration before publishing group contacts. No group DI or
+endpoint is enabled. Live8b40/schema116 and phone28 remain unchanged; continue all
+communications work, each commit pushed, frequent updates and Git handoffs.
+
+
 ## Organization device registry validated — 3 November 2026
 
 V120 adds space devices, immutable native-parent provenance and cascading live

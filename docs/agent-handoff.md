@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Immutable canonical selection schema validated — 3 November 2026
+
+V119 now stores one immutable provider-user intent per space/account. It starts
+empty; no provider user/device is created or adopted. Exact LEGACY foreign keys
+preserve original identity, while SPACE has a distinct space/account-derived name.
+Actual PostgreSQL racing writers, scope/origin/immutability, retirement and restore
+pass. Focused91.61s/3; full237.316s/39 cases in18 suites,3599 source hashes unchanged;
+format/architecture and recovery12 PASS/MAX_SCHEMA119, no new envelope format.
+[Evidence](measurements/collaboration-space-identity-selection-2026-11-03.json) /
+[implementation contract](collaboration/identity-migration.md). No local check runs.
+
+Next implement the native selection repository/use case with ONE coherent query
+for eligible space, current selection and earliest retained user on the configured
+server. Distinguish unavailable scope from admitted absence; separate nullable
+reads could choose a new identity during an eligibility flap. Lock operation,
+exclusive account, native parent; recheck admission and commit selection/receipt/
+journal atomically. No provider call or token decryption for identity selection.
+Preserve explicit SDK-store and legacy room references before group device/room/
+gateway and Mobile worker/push/read migration. No group endpoint or DI is wired.
+
+Mobile0d96e737 now records BOTH matching8273 gates: native41701412608 accepted with
+downloaded artifacts and3 inspected SystemUI PNGs; control41701412602 accepted3110
+portable and1215 Apple cases, full Xcode822s,432 hashes. Phone28 remains installed;
+do not reinstall. Main live8b40/schema116 pushON/SMTP OFF stays unchanged. Continue
+all54 communication groups, frequent updates, every commit pushed and Git handoffs.
+
+
 ## Current worktree and pilot state — 3 November 2026
 
 This branch is feat/communication-space in .worktrees/communication-space. Its

@@ -47,6 +47,14 @@ changing any encrypted-envelope format. Live schema remains 116.
 
 ## Required replacement
 
+V119 now retains one immutable provider-user selection per space/account, with an
+exact legacy reference or a distinct space-derived user intent. It is initially
+empty and creates no provider identity automatically. Actual concurrent writers,
+scope/origin rejection, retirement and archive restoration pass; full39 core cases
+and12 recovery-tool cases pass. The [identity migration contract](identity-migration.md)
+separates this schema from the still-unimplemented native command and local-store
+migration, including the required coherent eligibility/candidate snapshot.
+
 V118 now exposes an owned legacy provider metadata view to support explicit
 migration. It retains original company/device IDs, Matrix user/device IDs and
 retirement/version metadata, without reading token ciphertext, native credentials,

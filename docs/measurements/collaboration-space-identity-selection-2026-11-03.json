@@ -1,0 +1,204 @@
+{
+  "date": "2026-11-03",
+  "base": "ba6adf0a",
+  "scope": "Immutable provider-user selection schema only; initially empty, no native command or provider/device migration",
+  "focused": {
+    "startedAt": "2026-11-03T20:04:10.140558+00:00",
+    "elapsedSeconds": 91.61,
+    "exitCode": 0,
+    "sourceFiles": 3599,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceIdentityMigrationTest.xml": {
+        "sha256": "59e28ecd7c1609c6be429e38b80e1cd6794bef20de1293a721488c25186a12a4",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "fullCoreDatabase": {
+    "startedAt": "2026-11-03T20:06:13.725111+00:00",
+    "elapsedSeconds": 237.316,
+    "exitCode": 0,
+    "sourceFiles": 3599,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": {
+        "sha256": "7a7f0ab539e81cce83a509c26050bfd14dcb75263aa869e643ef22cf4f4e7c8b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": {
+        "sha256": "f23a6075230dc2651ada83a7deb957a74a0d8a8f6a2475cb814aeef1385fa876",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": {
+        "sha256": "19a4d3fa4b73e6db5d190451952992540fedec6ce118e12513fbbee634885fff",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": {
+        "sha256": "27c2b5817e79be328efe7755a31187a54360234a9c18a11a35e0d2ebe357a1ef",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyIdentityMigrationTest.xml": {
+        "sha256": "79a9f7b61b95829a2651fbed6f5fc2d8d7ab789848057906ee9d77ed483839da",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceDirectoryMigrationTest.xml": {
+        "sha256": "f39134e0fc12c496177b9e3a1931d5824f474b6346265ef975e048c6120a59c5",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceIdentityMigrationTest.xml": {
+        "sha256": "bfc2322a9c868da6dbcaf31169d60289c2d5cf8cffc9566fcb9b803b5d2ce118",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": {
+        "sha256": "5829aceb116ea7e292cced6e35f2eafcad4009b84f007a419e48cc85de2ee61d",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": {
+        "sha256": "932c26abf54a762f5a062bd42cf567cfff0c2bf3bd33491618f77dcfc63dcf73",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": {
+        "sha256": "20e386e7c0e879fb3a77f9a5e6db551d44de944b47e73779a9dd525d0308b60b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": {
+        "sha256": "544a8e295e63704d2b2df0305a6b9a28a51dbd475ab1f5d897f467bc72205e42",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": {
+        "sha256": "b8f99a9b4e78e3ade8fb1f09604e71365b22b9535c6b0fdc13d0d3fe2d9f7238",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": {
+        "sha256": "be305e9a243b2801fc5e429a4253bbb66c29e2c81315ff3945de250e3d614178",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": {
+        "sha256": "911ca89e6cf3e38cab7ba83f25f45f184729dfb8cbcefffdddf2536df207e04b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": {
+        "sha256": "37f3be01c204db5c45b52ddd17464ac1ccb522beca899037d9228c0dd3705d85",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+        "sha256": "baeacf52b623445333b76659f2183f5da6d8a2e18a91987a7ac48536e35e2039",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": {
+        "sha256": "46fbbadc4dd454ea974727e0c907ba9fe72b695fb4040f61fb149b846d77d11c",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": {
+        "sha256": "f183ba57537ff4f6258ff08dce1353f267084fc9e72103be577205598b9962bf",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "recovery": {
+    "exitCode": 0,
+    "elapsedSeconds": 0.108,
+    "sources": {
+      "tool/recovery_set.py": "3ef9a9d6f96230f2ebf86a6c13ff8fde95ee76e3d24e724e8c854373397d7128",
+      "tool/test_recovery_set.py": "9d9b4eaccec7270eb2b53e717667955affd9a8d6faced336ab5741047d233d22"
+    },
+    "unchanged": true
+  },
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V119__collaboration_space_identity_selection.sql": "bb4a6d998758525c329e657aed5a6ed6cd7cfbb0b2267c590c07f2da08bba32d",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceIdentityMigrationTest.kt": "e8ebf254f64259f129f24d42b8985874a7dfebe77ac20cea7c4a77c93d1868f0",
+    "tool/recovery_set.py": "3ef9a9d6f96230f2ebf86a6c13ff8fde95ee76e3d24e724e8c854373397d7128",
+    "tool/test_recovery_set.py": "9d9b4eaccec7270eb2b53e717667955affd9a8d6faced336ab5741047d233d22"
+  },
+  "verified": [
+    "Migration leaves all legacy provider rows unchanged and creates no automatic identity selection.",
+    "LEGACY origin references the exact retained provider company/device/account/user; SPACE origin uses the stable space/account-derived provider user.",
+    "Owned reads require current group eligibility; writes require account scope, the current account and current group eligibility. Foreign scope/origin/source/server attempts fail.",
+    "Selections cannot be updated/deleted, including by the fixture migration owner. Credential retirement and company switching preserve the selected provider user.",
+    "Two concurrent actual PostgreSQL writers with different legacy candidates yield one winner and one failed transaction; neither original provider row changes.",
+    "Real pg_dump/pg_restore preserves selection, runtime isolation, immutability and retired provider rows.",
+    "Full39 core cases in18 suites and12 recovery-tool cases pass, with format/architecture."
+  ],
+  "formatCheck": true,
+  "architectureCheck": true,
+  "recoveryMaximumSchema": 119,
+  "encryptedEnvelopeFormatChanged": false,
+  "liveSchema": 116,
+  "liveChanged": false,
+  "phoneChanged": false,
+  "limits": [
+    "Preference for an existing identity, native admission, operation receipts/journal and coherent candidate lookup remain future command responsibilities. No runtime selector or DI/API is wired.",
+    "A selected provider user is not a device credential, Matrix provisioning result, crypto-store proof or conversation membership.",
+    "Existing local keys/stores/rooms are untouched; full mobile/device/room/gateway/worker/push/read migration remains required."
+  ]
+}

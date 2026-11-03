@@ -46,7 +46,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # and contact isolation through a real PostgreSQL archive.
 # V118 adds only an owned legacy provider metadata view and restricted non-login
 # owner. Original credential rows and authenticated purposes remain unchanged.
-MAX_SCHEMA = 118
+# V119 retains an immutable provider-user selection and references existing identity
+# metadata; no token or participant-key format is added or rewritten.
+MAX_SCHEMA = 119
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

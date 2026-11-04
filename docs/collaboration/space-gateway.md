@@ -75,8 +75,8 @@ final inputs and format/architecture checks. Preliminary test-only corrections a
 retained. Lost-response and revoked-access cases exercise actual elapsed replay and
 cooldown under PostgreSQL's wall-clock publication guard.
 
-Before enabling group use, add bounded group request ownership and provider renewal
-without reopening original company runtime slots. Expired group replay cleanup has
+Before enabling group use, connect the [bounded group request storage](space-request-lifecycle.md)
+to current request admission and provider renewal without reopening original company runtime slots. Expired group replay cleanup has
 a typed storage port but still needs its own use case and worker scheduling; the
 existing replay job handles only company gateway heads.
 

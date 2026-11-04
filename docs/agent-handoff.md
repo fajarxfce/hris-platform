@@ -1,5 +1,48 @@
 # Agent continuation — HRIS workspace
 
+## Group request storage accepted — 4 November 2026
+
+Based on272b66b5, V127 supplies seven exact gateway request slots and one reserved
+native provider-renewal slot per group/account/device/original native parent. Gateway
+positions pin the head/version. Real lifetime is at most60s, with current native
+security/access/device and group checks for claims. Reclamation replaces only expired
+requests; exact release cannot delete a successor. Owned metadata/release survive
+purge/offboarding, while worker RLS can only read/lock/delete expired slots. No original
+company runtime is reopened. Typed ports validate shape/scope/precision and exact
+post-write readback inside the safe I/O boundary; callers retain transaction/admission
+ownership. Read [request lifecycle](collaboration/space-request-lifecycle.md).
+
+[Evidence](measurements/collaboration-space-request-storage-2026-11-04.json): focused
+SQL6 PASS92.446s; final all-database76 plus typed-data5 PASS679.944s (81 total, no
+failures/skips),8,333 inputs unchanged, format/architecture PASS. Recovery17 PASS0.012s
+supports127/rejects128 and keeps the126 encrypted projection. Actual competing claims,
+reserved capacity, elapsed reclamation, late release, cancellation/write-readback
+rollback, locked-row cleanup after native purge and archive restore pass. The first
+compile failed on JDBC map nullability; only its test helper changed before focused
+acceptance. All focused inputs stayed unchanged when seven typed files were added.
+All local gates are finished; the evidence recorder has run and is now stale.
+
+NEXT use these leases for native provider renewal and group gateway exchange; no use
+case, DI binding, worker scheduling or product caller is added by storage. Bootstrap
+still requires live provider metadata, so long-idle clients need native provider
+renewal before new credentials. Review the ignored space-request-next/provider-renewal
+outline: native versioned/idempotent command, current canonical/device/completed LEGACY
+provenance, slot0, login/readback outside SQL, exact lease/current admission recheck on
+both I/O outcomes, provider-generation CAS and atomic receipt/journal, exact finally
+release. Keep original Matrix identity/creation time; losing candidates expire without
+logout. A dedicated response should name providerGeneration, not imply device version.
+
+Add group request expiry and gateway replay maintenance; existing scheduling only
+covers company gateway heads. Then group key/room/member authority and Mobile key
+preflight/handover/store/inbox/outbox/drafts/read/history/push/deep-link ownership.
+Preserve original SDK namespaces and uncertain sends; never freeze before local stage
+and current admission. All54 groups and actual Apple Matrix/APNs/CallKit remain open.
+API92/full worker127 were accepted at272b66b5; this increment changes no DI graph and
+does not claim another application-context run. Main277aa0fe, Mobile766572b6/hosted
+code0b804cb2, normal phone28/live8b40/schema116 pushON/SMTPOFF and Starter9959c1d unchanged.
+Continue full long run, frequent updates, atomic immediate pushes and validated new
+product feature installation only. All untracked files in this increment are owned.
+
 ## Group gateway native HTTP accepted — 4 November 2026
 
 Based on 6b92246a, native bootstrap now returns original Matrix user/device identity

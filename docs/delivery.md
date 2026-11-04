@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Bounded group request storage — 4 November 2026
+
+Separate V127 slots and typed storage pass81 checks (all database76 plus data5) in
+679.944s, with8,333 unchanged inputs, format/architecture and17 recovery-tool cases.
+[Evidence](measurements/collaboration-space-request-storage-2026-11-04.json) retains
+focused6 PASS92.446s and the initial test-only JDBC-nullability correction. Real expiry,
+concurrency, rollback, exact late release, scoped cleanup and archive restore pass.
+Read [the lifecycle contract](collaboration/space-request-lifecycle.md) before current
+provider/gateway admission. Native provider renewal, worker maintenance, group rooms
+and Mobile adoption remain unimplemented; this storage increment enables no caller.
+Normal phone28/live8b40/schema116 and all54 communications groups remain unchanged.
+
 ## Native group gateway transport — 4 November 2026
 
 Atomic original Matrix bootstrap identity, native versioned credential issuance,

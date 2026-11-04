@@ -51,6 +51,13 @@ Gateway request/room authority, provider renewal and group runtime adoption rema
 unfinished. Current admission never authorizes deletion of owned local history merely
 because a gateway replay expired.
 
+V127 provides separate [group request lease storage](collaboration/space-request-lifecycle.md).
+Seven gateway slots and one reserved native-renewal slot have finite expiry and exact
+owner/native/gateway coordinates. Typed repositories validate readback and preserve
+cancellation; callers own current admission, transactions and post-I/O authority.
+Operational cleanup preserves device/key provenance and never reopens original company
+runtime slots. Provider renewal, current request use cases and worker DI remain next.
+
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.

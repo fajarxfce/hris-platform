@@ -73,7 +73,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/084662c5bc9277ae8fd56d103a0acda89c3ee5ee/docs/measurements/collaboration-admission-atomic-2026-11-04.json",
         "https://github.com/fajarxfce/hris-mobile/blob/cc87bc297046bcbb7819c055b534a450ebaddf33/docs/measurements/android-release-phone-2026-11-04-build29.json",
         "https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/collaboration-space-directory-usecases.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/measurements/collaboration-space-directory-usecases-2026-11-04.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/measurements/collaboration-space-directory-usecases-2026-11-04.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/0519e0d071a835438854929de1930a59dfc3c368/docs/collaboration-local-list.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/0519e0d071a835438854929de1930a59dfc3c368/docs/measurements/collaboration-list-observation-2026-11-04.json"
       ]
     },
     {
@@ -403,7 +405,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/084662c5bc9277ae8fd56d103a0acda89c3ee5ee/docs/measurements/collaboration-admission-atomic-2026-11-04.json",
         "https://github.com/fajarxfce/hris-mobile/blob/cc87bc297046bcbb7819c055b534a450ebaddf33/docs/measurements/android-release-phone-2026-11-04-build29.json",
         "https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/collaboration-space-directory-usecases.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/measurements/collaboration-space-directory-usecases-2026-11-04.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/measurements/collaboration-space-directory-usecases-2026-11-04.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/0519e0d071a835438854929de1930a59dfc3c368/docs/collaboration-local-list.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/0519e0d071a835438854929de1930a59dfc3c368/docs/measurements/collaboration-list-observation-2026-11-04.json"
       ]
     },
     {
@@ -800,6 +804,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Mobile company-chat queued-observation fix is accepted at 0519e0d071a835438854929de1930a59dfc3c368. Continue durable group identity/device commands, SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Organization directory owning reads are accepted; release29 delivery awaits phone access. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/0519e0d071a835438854929de1930a59dfc3c368/docs/agent-handoff.md",
     "Mobile organization directory owning read/refresh is accepted at 243bdcc070fb1fe24782ad671d208769ce36ba4f. Continue the current company-list queued-observation regression, then durable native identity/device commands, SDK store adoption and hard-parent recovery, group UI and push/background/reply integration. Verified release29 remains pending phone connection; availability does not block work. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/agent-handoff.md",
     "Product release29 from Mobile084662c5 is verified (exact ARM64 emulator startup, native notification/callback proof) and retained locally; phone10.77.77.3:5555 is unavailable, last confirmed release28. Follow Mobile handoff for guarded install-only when available; continue organization local-read/refresh, durable identity/device, runtime adoption and UI/push meanwhile. https://github.com/fajarxfce/hris-mobile/blob/cc87bc297046bcbb7819c055b534a450ebaddf33/docs/agent-handoff.md",
     "Mobile atomic company-chat admission cleanup is accepted at 084662c5bc9277ae8fd56d103a0acda89c3ee5ee. Continue a validated phone update, then organization local-read/refresh admission, durable native identity/device commands, SDK store adoption and hard-parent recovery, group UI and push/background/reply integration. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/084662c5bc9277ae8fd56d103a0acda89c3ee5ee/docs/agent-handoff.md",

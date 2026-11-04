@@ -812,6 +812,91 @@ class CollaborationLegacyRuntimeCompletionMigrationTest {
         )
     }
 
+    @Test
+    fun retainedGroupPushCapabilityRequiresCompletedHandoverAndPreservesCompanyCapability() {
+        val f = Fixture()
+        f.migrate()
+        Flyway.configure().dataSource(f.source).target("136").load().migrate()
+        f.sql.execute(
+            "grant select,insert,update,delete on all tables in schema public to legacy_completion_fixture,legacy_completion_worker"
+        )
+        success(
+            f.run(f.actor.copy(companyId = f.company)) {
+                f.runtime.update(
+                    "insert into collaboration_push_bindings(company_id,account_id,device_id,native_session_id,key_hash,key_encrypted,version,reserved_at) values(?,?,?,?,'${"c".repeat(64)}','original-push-fixture',0,clock_timestamp())",
+                    f.company,
+                    f.account,
+                    f.legacyDevice,
+                    f.parent,
+                )
+            }
+        )
+        val original = f.sql.queryForList("select * from collaboration_push_bindings")
+        f.prepare()
+        val target = requireNotNull(f.targetId)
+        fun reserve(sql: JdbcTemplate) =
+            sql.update(
+                "insert into collaboration_space_push_bindings(space_id,account_id,device_id,native_session_id,matrix_user_id,matrix_device_id,key_hash,key_encrypted,version,reserved_at) values(?,?,?,?,?,?,'${"d".repeat(64)}','group-push-fixture',0,clock_timestamp())",
+                f.space,
+                f.account,
+                target,
+                f.parent,
+                f.legacyUser,
+                "HRIS_${compact(f.legacyDevice)}",
+            )
+        val before = f.snapshot()
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.runWorker {
+                f.publish()
+                reserve(f.worker)
+            },
+        )
+        assertEquals(before, f.snapshot())
+        assertTrue(f.sql.queryForList("select * from collaboration_space_push_bindings").isEmpty())
+        assertTrue(
+            success(
+                f.runWorker {
+                    f.publish()
+                    f.complete()
+                }
+            )
+        )
+        assertEquals(1, success(f.run { reserve(f.runtime) }))
+        val binding = f.sql.queryForList("select * from collaboration_space_push_bindings").single()
+        assertEquals(f.legacyUser, binding["matrix_user_id"])
+        assertEquals("HRIS_${compact(f.legacyDevice)}", binding["matrix_device_id"])
+        assertEquals(target, binding["device_id"])
+        assertNotEquals(f.legacyDevice, target)
+        assertEquals(original, f.sql.queryForList("select * from collaboration_push_bindings"))
+        assertEquals(
+            1,
+            success(
+                f.run {
+                    f.runtime.update(
+                        "update collaboration_space_push_bindings set version=1,published_at=clock_timestamp() where device_id=?",
+                        target,
+                    )
+                }
+            ),
+        )
+        val retained = f.sql.queryForList("select * from collaboration_space_push_bindings")
+        f.sql.update("delete from native_sessions where id=?", f.parent)
+        assertEquals(
+            retained,
+            success(
+                f.run { f.runtime.queryForList("select * from collaboration_space_push_bindings") }
+            ),
+        )
+        assertEquals(original, f.sql.queryForList("select * from collaboration_push_bindings"))
+        val restored = f.restore()
+        assertEquals(
+            retained,
+            restored.queryForList("select * from collaboration_space_push_bindings"),
+        )
+        assertEquals(original, restored.queryForList("select * from collaboration_push_bindings"))
+    }
+
     private inner class Fixture {
         val source = DriverManagerDataSource(postgres.jdbcUrl, postgres.username, postgres.password)
         val sql = JdbcTemplate(source)

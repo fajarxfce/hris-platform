@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Organization push capability storage accepted — 4 November 2026
+
+V136 retains separate encrypted group push capabilities, bound to exact space/account/
+group-device/original-native/Matrix identity. Only immutable reservation to publication
+is allowed. Root ownership and same-transaction lookup cleanup are enforced; completed
+LEGACY handover is mandatory. Original company push records survive unchanged.
+Typed readback and the recovery verifier authenticate the same eight coordinates.
+[Protocol](collaboration/space-push-storage.md), [evidence](measurements/collaboration-space-push-storage-2026-11-04.json).
+
+150 domain/real PostgreSQL/typed storage cases pass (230.795 s), including
+136 domain, six new SQL, two retained migration and six storage cases. Format and
+architecture checks pass on 8,484 unchanged inputs. Recovery: 20 pass
+(0.011 s), including actual generated SQL/archive/key-rotation
+coverage in the storage gate. All sessions closed. No shared DI changed.
+
+NEXT: connect native group pusher reservation/provider publication and both key namespaces
+with deployable log redaction, then group callback admission/queue/worker delivery and
+Mobile background/reply ownership. Preserve actual SDK original queued-key decryption
+proof, store ownership transition and native hard-parent recovery as required work.
+
+Base `7b767bbf` pushed. All 54 PRD groups open; rollout disabled. Live8b40/schema116
+(push on, SMTP off), normal phone28, Mobile product/hosted0b804cb2 and Starter9959c1d unchanged.
+Continue long run, updates, atomic pushes and validated product installs.
+
 ## Native group room metadata and receipts accepted — 4 November 2026
 
 Group gateway routes now expose managed direct hints, room join/state/membership and

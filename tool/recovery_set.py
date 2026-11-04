@@ -61,8 +61,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V125 adds owned public-gateway metadata without any credential/envelope change.
 # V126 adds a separate organization gateway replay namespace and authenticated context.
 # V133 retains per-participant room recovery metadata without a new encryption envelope.
-# V135 adds public recipient metadata without changing encrypted recovery purposes.
-MAX_SCHEMA = 135
+# V136 retains separate group push capabilities with their original device metadata.
+MAX_SCHEMA = 136
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -136,6 +136,14 @@ def envelope_query(schema):
         collaboration += (" UNION ALL SELECT 'hris:matrix-space-gateway:v1:'||"
                           "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),replay_encrypted"
                           " FROM collaboration_space_gateway_sessions WHERE replay_encrypted IS NOT NULL\n")
+    if int(schema) >= 136:
+        fields = ["space_id::text", "account_id::text", "device_id::text", "native_session_id::text",
+                  "matrix_user_id", "matrix_device_id",
+                  "((extract(epoch FROM reserved_at)*1000000)::bigint)::text", "key_hash"]
+        canonical = "||E'\\n'||".join(fields)
+        collaboration += (" UNION ALL SELECT 'hris:matrix-space-push:v1:'||"
+                          "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),key_encrypted"
+                          " FROM collaboration_space_push_bindings\n")
     return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
             ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 

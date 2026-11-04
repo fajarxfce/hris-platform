@@ -1,5 +1,7 @@
 # Architecture
 
+[Current original history access](collaboration/space-original-history-access.md) now uses exact original-room lookup only when the published group binding is absent. Native admission and full metadata revalidation cover both provider outcomes; peer offboarding does not erase owned history.
+
 The [original history protocol](collaboration/space-original-history-protocol.md) preserves explicit original room framing and shares group cursor coordinates before/after adoption. Exact retained devices alone bridge old company cursors; native original lookup and current admission remain separate integration.
 
 The [complete original/group read scope](collaboration/space-read-scope.md) preserves both original and published owned-room tuples, exact adoption overlap and per-room historical aliases. It rejects incomplete capacity without advancing sync; current native/provider admission and sync integration remain separate.

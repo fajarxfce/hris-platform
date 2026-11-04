@@ -606,6 +606,9 @@ class NativeCollaborationSpaceKeyUploadTest {
                 ),
                 DisabledCollaborationMatrixRoomMessageRepository(),
                 DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
+                StoredCollaborationSpaceConversationRepository(
+                    PostgresCollaborationSpaceConversationDataSource(base.sql)
+                ),
             )
 
         fun upload(

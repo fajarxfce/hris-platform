@@ -40,6 +40,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val rooms: CollaborationSpaceRoomRepository,
     private val providerRoomMessage: CollaborationMatrixRoomMessageRepository,
     private val providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository,
+    private val conversations: CollaborationSpaceConversationRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -68,13 +69,24 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         if (!validCollaborationRoomHistoryPage(request)) return invalidHistory()
         return roomRead(token, correlationId, roomId) { exchange, prepared ->
             exchange.exchange { bearer, deadline ->
-                providerRoomHistory.messages(
-                    prepared.owner,
-                    prepared.room,
-                    request,
-                    bearer,
-                    deadline,
-                )
+                when (val room = prepared.room) {
+                    is CollaborationSpaceReadRoom.Published ->
+                        providerRoomHistory.messages(
+                            prepared.owner,
+                            room.value,
+                            request,
+                            bearer,
+                            deadline,
+                        )
+                    is CollaborationSpaceReadRoom.Original ->
+                        providerRoomHistory.messages(
+                            prepared.owner,
+                            room.value,
+                            request,
+                            bearer,
+                            deadline,
+                        )
+                }
             }
         }
     }
@@ -95,15 +107,28 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             return invalidHistory()
         return roomRead(token, correlationId, roomId) { exchange, prepared ->
             exchange.exchange { bearer, deadline ->
-                providerRoomHistory.context(
-                    prepared.owner,
-                    prepared.room,
-                    eventId,
-                    limit,
-                    bearer,
-                    deadline,
-                    filter,
-                )
+                when (val room = prepared.room) {
+                    is CollaborationSpaceReadRoom.Published ->
+                        providerRoomHistory.context(
+                            prepared.owner,
+                            room.value,
+                            eventId,
+                            limit,
+                            bearer,
+                            deadline,
+                            filter,
+                        )
+                    is CollaborationSpaceReadRoom.Original ->
+                        providerRoomHistory.context(
+                            prepared.owner,
+                            room.value,
+                            eventId,
+                            limit,
+                            bearer,
+                            deadline,
+                            filter,
+                        )
+                }
             }
         }
     }
@@ -117,7 +142,24 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         if (!validCollaborationRoomHistoryEventId(eventId)) return invalidHistory()
         return roomRead(token, correlationId, roomId) { exchange, prepared ->
             exchange.exchange { bearer, deadline ->
-                providerRoomHistory.event(prepared.owner, prepared.room, eventId, bearer, deadline)
+                when (val room = prepared.room) {
+                    is CollaborationSpaceReadRoom.Published ->
+                        providerRoomHistory.event(
+                            prepared.owner,
+                            room.value,
+                            eventId,
+                            bearer,
+                            deadline,
+                        )
+                    is CollaborationSpaceReadRoom.Original ->
+                        providerRoomHistory.event(
+                            prepared.owner,
+                            room.value,
+                            eventId,
+                            bearer,
+                            deadline,
+                        )
+                }
             }
         }
     }
@@ -151,26 +193,84 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private fun prepareRoomRead(
         observed: Observation,
         roomId: String,
-    ): Result<RoomReadPreparation> =
-        readBoundRoom(observed.device.spaceId, observed.actor.accountId, roomId).flatMap { room ->
-            val device = observed.device
-            val owner =
-                CollaborationSpaceHistoryOwner(
-                    device.spaceId,
-                    device.accountId,
-                    device.id,
-                    provider.serverName,
-                    device.matrixUserId,
-                    device.matrixDeviceId,
-                    device.legacy,
-                )
-            if (!validCollaborationSpaceHistoryOwner(owner, room)) invalidProvider()
-            else Result.Success(RoomReadPreparation(owner, room))
+    ): Result<RoomReadPreparation> {
+        val device = observed.device
+        val owner =
+            CollaborationSpaceHistoryOwner(
+                device.spaceId,
+                device.accountId,
+                device.id,
+                provider.serverName,
+                device.matrixUserId,
+                device.matrixDeviceId,
+                device.legacy,
+            )
+        if (!validCollaborationSpaceHistoryIdentity(owner)) return invalidProvider()
+        // Only a successful absent group lookup may use separately owned original metadata.
+        return rooms.boundRoom(owner.spaceId, owner.accountId, owner.serverName, roomId).flatMap {
+            bound ->
+            if (bound != null) {
+                snapshotCollaborationSpaceBoundRoom(
+                        owner.spaceId,
+                        owner.accountId,
+                        owner.serverName,
+                        roomId,
+                        bound,
+                        clock.instant(),
+                    )
+                    .flatMap { checked ->
+                        if (!validCollaborationSpaceHistoryOwner(owner, checked)) invalidProvider()
+                        else
+                            Result.Success(
+                                RoomReadPreparation(
+                                    owner,
+                                    CollaborationSpaceReadRoom.Published(checked),
+                                )
+                            )
+                    }
+            } else {
+                val company =
+                    collaborationSpaceHistoryOriginalCompany(owner)
+                        ?: return@flatMap Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "collaboration_room_not_found")
+                        )
+                conversations
+                    .legacyBoundRoom(
+                        owner.spaceId,
+                        owner.accountId,
+                        company,
+                        owner.serverName,
+                        roomId,
+                    )
+                    .flatMap { original ->
+                        if (original == null)
+                            Result.Failed(
+                                Failure(FailureKind.NOT_FOUND, "collaboration_room_not_found")
+                            )
+                        else
+                            snapshotCollaborationSpaceOriginalReadRoom(
+                                    owner,
+                                    original,
+                                    clock.instant(),
+                                )
+                                .flatMap { checked ->
+                                    if (checked.room?.roomId != roomId) invalidProvider()
+                                    else
+                                        Result.Success(
+                                            RoomReadPreparation(
+                                                owner,
+                                                CollaborationSpaceReadRoom.Original(checked),
+                                            )
+                                        )
+                                }
+                    }
+            }
         }
+    }
 
     private data class RoomReadPreparation(
         val owner: CollaborationSpaceHistoryOwner,
-        val room: CollaborationSpaceBoundRoom,
+        val room: CollaborationSpaceReadRoom,
     )
 
     private fun invalidHistory() =

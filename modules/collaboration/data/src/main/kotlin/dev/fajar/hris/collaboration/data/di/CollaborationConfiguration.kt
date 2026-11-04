@@ -963,6 +963,7 @@ class CollaborationConfiguration {
         rooms: CollaborationSpaceRoomRepository,
         providerRoomMessage: CollaborationMatrixRoomMessageRepository,
         providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository,
+        conversations: CollaborationSpaceConversationRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -990,6 +991,7 @@ class CollaborationConfiguration {
             rooms,
             providerRoomMessage,
             providerRoomHistory,
+            conversations,
         )
 
     @Bean

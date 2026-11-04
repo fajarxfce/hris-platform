@@ -293,6 +293,9 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             rooms,
             roomMessages,
             roomHistory,
+            StoredCollaborationSpaceConversationRepository(
+                PostgresCollaborationSpaceConversationDataSource(base.sql)
+            ),
         )
 
     fun queryRequest() =

@@ -2159,14 +2159,249 @@ class CollaborationSpaceWorkerPublicationTest {
     }
 
     @Test
-    fun retainedRoomRequestKeepsOriginalCreatorAndBothCompletedDeviceNamespaces() {
+    fun freshOriginalUserReadsUnadoptedHistoryUnderCurrentNativeAdmission() =
+        originalHistoryAccess(false)
+
+    @Test
+    fun retainedOriginalDeviceReadsUnadoptedHistoryUnderCurrentNativeAdmission() =
+        originalHistoryAccess(true)
+
+    private fun originalHistoryAccess(retained: Boolean) {
         val a = Fixture(verifiedMfa = true)
         val b = Fixture(verifiedMfa = true, existingCompany = a.company)
         val oldA = a.activeLegacy(signed = true)
         val oldB = b.activeLegacy(signed = true)
+        val roomId = "!unadopted-${UUID.randomUUID()}:$server"
+        val conversation = seedOriginalRoom(a, b, oldB, roomId)
+        val id =
+            if (retained) completeRoomDevice(a, oldA)
+            else a.register().also { success(a.advance(a.claim(it), a.provider(it))) }
+        val device = a.device(id)
+        val expectedOwner =
+            CollaborationSpaceHistoryOwner(
+                space,
+                a.account,
+                id,
+                server,
+                device.matrixUserId,
+                device.matrixDeviceId,
+                device.legacy,
+            )
+        val token = success(a.groupBootstrap(id)).tokens.accessToken
+        val credential = a.credential(id)
+        val originals =
+            StoredCollaborationSpaceConversationRepository(
+                PostgresCollaborationSpaceConversationDataSource(a.sql)
+            )
+        val original =
+            success(
+                a.transactions.run(a.actor) {
+                    originals.legacyBoundRoom(space, a.account, a.company, server, roomId)
+                }
+            )!!
+        assertEquals(roomId, requireNotNull(original.room).roomId)
+        assertEquals(conversation, original.conversation.id)
+        assertEquals(a.account, original.conversation.createdBy)
+        assertEquals(b.account, requireNotNull(original.room).createdBy)
+        assertNull(
+            success(
+                a.transactions.run(a.actor) {
+                    a.roomRepository().boundRoom(space, a.account, server, roomId)
+                }
+            )
+        )
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_devices where account_id=?",
+                Int::class.java,
+                b.account,
+            ),
+        )
+        val prior = a.originalSnapshot()
+        var calls = 0
+        var after: () -> Unit = {}
+        var providerFailure: Failure? = null
+        val history =
+            object :
+                CollaborationSpaceMatrixRoomHistoryRepository by DisabledCollaborationSpaceMatrixRoomHistoryRepository() {
+                fun read(
+                    currentOwner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceLegacyConversation,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationRoomHistory> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(expectedOwner, currentOwner)
+                    assertEquals(original, room)
+                    assertEquals(credential.accessToken, bearer)
+                    assertTrue(
+                        deadline > Instant.now() && deadline <= Instant.now().plusSeconds(30)
+                    )
+                    calls++
+                    after()
+                    return providerFailure?.let { Result.Failed(it) }
+                        ?: Result.Success(
+                            CollaborationRoomHistory(mapOf("event_id" to "\$original"))
+                        )
+                }
+
+                override fun messages(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceLegacyConversation,
+                    request: CollaborationRoomPageRequest,
+                    bearer: String,
+                    deadline: Instant,
+                ) = read(owner, room, bearer, deadline)
+
+                override fun context(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceLegacyConversation,
+                    eventId: String,
+                    limit: Int,
+                    bearer: String,
+                    deadline: Instant,
+                    filter: CollaborationRoomHistoryFilter,
+                ) = read(owner, room, bearer, deadline)
+
+                override fun event(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceLegacyConversation,
+                    eventId: String,
+                    bearer: String,
+                    deadline: Instant,
+                ) = read(owner, room, bearer, deadline)
+            }
+        val command =
+            a.groupAccess(DisabledCollaborationMatrixRepository(), providerRoomHistory = history)
+        success(
+            command.roomMessages(
+                token,
+                UUID.randomUUID(),
+                roomId,
+                CollaborationRoomPageRequest(null, null, "b", 10),
+            )
+        )
+        success(command.roomContext(token, UUID.randomUUID(), roomId, "\$original", 0))
+        success(command.roomEvent(token, UUID.randomUUID(), roomId, "\$original"))
+        assertEquals(3, calls)
+        failure(
+            command.roomEvent(token, UUID.randomUUID(), "!foreign:$server", "\$original"),
+            "collaboration_room_not_found",
+        )
+        assertEquals(3, calls)
+        // Original owned metadata does not require a currently receiving or migrated peer.
+        owner.update(
+            "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+            b.account,
+        )
+        owner.update("delete from native_sessions where id=?", b.session)
+        success(command.roomEvent(token, UUID.randomUUID(), roomId, "\$original"))
+        assertEquals(4, calls)
+        var originalLookups = 0
+        var changed = false
+        val tracked =
+            object : CollaborationSpaceConversationRepository by originals {
+                override fun legacyBoundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    companyId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceLegacyConversation?> {
+                    originalLookups++
+                    return originals
+                        .legacyBoundRoom(spaceId, accountId, companyId, serverName, roomId)
+                        .map { value ->
+                            if (changed)
+                                value?.copy(
+                                    conversation = value.conversation.copy(createdBy = b.account)
+                                )
+                            else value
+                        }
+                }
+            }
+        val unavailableRooms =
+            object : CollaborationSpaceRoomRepository by a.roomRepository() {
+                override fun boundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceBoundRoom?> =
+                    Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_group_lookup_failed"))
+            }
+        val unavailable =
+            a.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerRoomHistory = history,
+                rooms = unavailableRooms,
+                conversations = tracked,
+            )
+        failure(
+            unavailable.roomEvent(token, UUID.randomUUID(), roomId, "\$original"),
+            "fixture_group_lookup_failed",
+        )
+        assertEquals(0, originalLookups)
+        assertEquals(4, calls)
+        val changing =
+            a.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerRoomHistory = history,
+                conversations = tracked,
+            )
+        after = { changed = true }
+        failure(
+            changing.roomEvent(token, UUID.randomUUID(), roomId, "\$original"),
+            "collaboration_room_changed",
+        )
+        assertEquals(5, calls)
+        assertTrue(originalLookups >= 2)
+        changed = false
+        after = { throw CancellationException("fictional original history cancellation") }
+        assertThrows(CancellationException::class.java) {
+            command.roomEvent(token, UUID.randomUUID(), roomId, "\$original")
+        }
+        assertEquals(6, calls)
+        assertEquals(prior, a.originalSnapshot())
+        // Current native revocation dominates either provider outcome.
+        providerFailure =
+            if (retained) Failure(FailureKind.UNAVAILABLE, "fixture_provider_failed") else null
+        after = {
+            owner.update(
+                "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                a.session,
+            )
+        }
+        val revoked =
+            command.roomEvent(token, UUID.randomUUID(), roomId, "\$original") as Result.Failed
+        assertEquals(FailureKind.UNAUTHENTICATED, revoked.failure.kind)
+        assertEquals(7, calls)
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_request_leases where device_id=?",
+                Int::class.java,
+                id,
+            ),
+        )
+        val denied =
+            command.roomEvent(token, UUID.randomUUID(), roomId, "\$original") as Result.Failed
+        assertEquals(FailureKind.UNAUTHENTICATED, denied.failure.kind)
+        assertEquals(7, calls)
+    }
+
+    private fun seedOriginalRoom(
+        a: Fixture,
+        b: Fixture,
+        oldB: CollaborationLegacyDevicePosition,
+        roomId: String = "!original-room:$server",
+    ): UUID {
         val pair = listOf(a.account, b.account).sortedBy(UUID::toString)
         val original = UUID.randomUUID()
-        val group = UUID.randomUUID()
         val at = now.minusSeconds(20).toString()
         val job = UUID.randomUUID()
         owner.update(
@@ -2206,14 +2441,27 @@ class CollaborationSpaceWorkerPublicationTest {
             job,
         )
         owner.update(
-            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,?,'!original-room:matrix.example.test',?::timestamptz)",
+            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,?,?,?::timestamptz)",
             b.company,
             original,
             b.account,
             job,
             server,
+            roomId,
             at,
         )
+        return original
+    }
+
+    @Test
+    fun retainedRoomRequestKeepsOriginalCreatorAndBothCompletedDeviceNamespaces() {
+        val a = Fixture(verifiedMfa = true)
+        val b = Fixture(verifiedMfa = true, existingCompany = a.company)
+        val oldA = a.activeLegacy(signed = true)
+        val oldB = b.activeLegacy(signed = true)
+        val pair = listOf(a.account, b.account).sortedBy(UUID::toString)
+        val original = seedOriginalRoom(a, b, oldB)
+        val group = UUID.randomUUID()
         val idA = completeRoomDevice(a, oldA)
         val idB = completeRoomDevice(b, oldB)
         val created = Instant.now().truncatedTo(ChronoUnit.MICROS)
@@ -3834,6 +4082,10 @@ class CollaborationSpaceWorkerPublicationTest {
             providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository =
                 DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
             rooms: CollaborationSpaceRoomRepository = roomRepository(),
+            conversations: CollaborationSpaceConversationRepository =
+                StoredCollaborationSpaceConversationRepository(
+                    PostgresCollaborationSpaceConversationDataSource(sql)
+                ),
         ): AccessNativeCollaborationSpaceMatrixDevice {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
@@ -3877,6 +4129,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 rooms,
                 providerRoomMessage,
                 providerRoomHistory,
+                conversations,
             )
         }
 

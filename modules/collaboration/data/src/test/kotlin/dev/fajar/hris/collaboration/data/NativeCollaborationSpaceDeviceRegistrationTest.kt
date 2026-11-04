@@ -866,6 +866,191 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         f.freezeCounts(1, 1, 1)
     }
 
+    @Test
+    fun drainObservesActualExpiryAndCurrentNativeRefreshWithoutMutatingFrozenWork() {
+        val f = Fixture()
+        val legacy = f.activeLegacy()
+        f.select()
+        val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+        failure(f.drain(target.id), "collaboration_runtime_changed")
+        f.freezeCounts(0, 0, 0)
+        val lease = f.providerLease(legacy, seconds = 2)
+        f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        success(f.freeze(UUID.randomUUID(), target.id))
+        val frozen = f.frozen(legacy)
+        val work = f.work(target.id)
+        val busy = success(f.drain(target.id))
+        assertEquals(1, busy.activeRequests)
+        assertEquals(lease.expiresAt, busy.latestRequestExpiresAt)
+        assertEquals(CollaborationLegacyRuntimeTarget(space, target.id), busy.target)
+        owner.update(
+            "update native_sessions set version=1,rotated_at=?::timestamptz where id=?",
+            f.clock.at.toString(),
+            f.session,
+        )
+        failure(f.drain(target.id), "native_session_invalid")
+        assertEquals(busy, success(f.drain(target.id, nativeVersion = 1)))
+        val remaining =
+            Duration.between(Instant.now(), lease.expiresAt).toMillis().coerceAtLeast(0) + 10
+        assertTrue(remaining <= 2010)
+        Thread.sleep(remaining)
+        f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        val empty = success(f.drain(target.id, nativeVersion = 1))
+        assertEquals(0, empty.activeRequests)
+        assertNull(empty.latestRequestExpiresAt)
+        assertEquals(1, empty.runtimeVersion)
+        assertEquals(frozen, f.frozen(legacy))
+        assertEquals(work, f.work(target.id))
+        assertEquals(CollaborationDeviceState.PROVISIONING, f.device().state)
+        assertEquals(
+            listOf(lease),
+            success(f.transactions.run(f.actor) { f.runtimes.slots(lease.owner) }),
+        )
+        f.freezeCounts(1, 1, 1)
+        f.counts(1, 1, 1)
+    }
+
+    @Test
+    fun drainPreservesReadFailuresAndRejectsLateAuthorityLossWithoutRetryOrWrites() {
+        for (mode in listOf("failure", "cancel", "interrupt", "flag", "budget", "offboard")) {
+            now = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            val f = Fixture()
+            val legacy = f.activeLegacy()
+            f.select()
+            val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+            success(f.freeze(UUID.randomUUID(), target.id))
+            val frozen = f.frozen(legacy)
+            val cancel = CancellationException("Owned drain cancellation")
+            val interrupt = InterruptedException("Owned drain interruption")
+            var reads = 0
+            val hooked =
+                object : CollaborationLegacyRuntimeRepository by f.runtimes {
+                    override fun slots(
+                        owner: CollaborationLegacyRuntimeOwner
+                    ): Result<List<CollaborationLegacyRuntimeLease>> =
+                        f.runtimes.slots(owner).flatMap { slots ->
+                            reads++
+                            when (mode) {
+                                "failure" ->
+                                    Result.Failed(Failure(FailureKind.UNAVAILABLE, "database_busy"))
+                                "cancel" -> throw cancel
+                                "interrupt" -> throw interrupt
+                                else -> {
+                                    when (mode) {
+                                        "flag" -> Thread.currentThread().interrupt()
+                                        "budget" -> f.clock.at = now.plusSeconds(30)
+                                        "offboard" ->
+                                            this@NativeCollaborationSpaceDeviceRegistrationTest
+                                                .owner
+                                                .update(
+                                                    "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+                                                    f.company,
+                                                    f.account,
+                                                )
+                                    }
+                                    Result.Success(slots)
+                                }
+                            }
+                        }
+                }
+            when (mode) {
+                "cancel" ->
+                    assertSame(
+                        cancel,
+                        assertThrows(CancellationException::class.java) {
+                            f.drain(target.id, runtimes = hooked)
+                        },
+                    )
+                "interrupt" ->
+                    assertSame(
+                        interrupt,
+                        assertThrows(InterruptedException::class.java) {
+                            f.drain(target.id, runtimes = hooked)
+                        },
+                    )
+                "flag" ->
+                    try {
+                        assertThrows(InterruptedException::class.java) {
+                            f.drain(target.id, runtimes = hooked)
+                        }
+                        assertTrue(Thread.currentThread().isInterrupted)
+                    } finally {
+                        Thread.interrupted()
+                    }
+                else ->
+                    failure(
+                        f.drain(target.id, runtimes = hooked),
+                        when (mode) {
+                            "failure" -> "database_busy"
+                            "budget" -> "collaboration_admission_changed"
+                            else -> "collaboration_access_denied"
+                        },
+                    )
+            }
+            assertEquals(1, reads)
+            assertEquals(frozen, f.frozen(legacy))
+            f.freezeCounts(1, 1, 1)
+            f.counts(1, 1, 1)
+        }
+    }
+
+    @Test
+    fun drainRejectsSubstitutionAndConcurrentCleanupOnlyReducesTheNextObservation() {
+        val f = Fixture()
+        val legacy = f.activeLegacy()
+        f.select()
+        val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+        val lease = f.providerLease(legacy)
+        f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        success(f.freeze(UUID.randomUUID(), target.id))
+        val foreign = Fixture()
+        for (result in
+            listOf(
+                f.drain(UUID.randomUUID()),
+                f.drain(target.id, request = f.actor.copy(companyId = f.company)),
+                f.drain(target.id, request = foreign.actor, parent = foreign.session),
+                f.drain(target.id, parent = f.parent()),
+                f.drain(target.id, nativeVersion = 1),
+                f.drain(target.id, deviceVersion = 1),
+                f.drain(target.id, requestedSpace = UUID.randomUUID()),
+                f.drain(target.id, build = client.copy(build = 27)),
+                f.drain(target.id, fingerprint = "b".repeat(64)),
+            )) assertInstanceOf(Result.Failed::class.java, result)
+        val pool = Executors.newSingleThreadExecutor()
+        try {
+            val released =
+                object : CollaborationLegacyRuntimeRepository by f.runtimes {
+                    override fun slots(
+                        owner: CollaborationLegacyRuntimeOwner
+                    ): Result<List<CollaborationLegacyRuntimeLease>> =
+                        f.runtimes.slots(owner).map { original ->
+                            assertTrue(
+                                pool
+                                    .submit<Boolean> {
+                                        success(
+                                            f.transactions.run(
+                                                f.actor.copy(companyId = f.company)
+                                            ) {
+                                                f.runtimes.release(lease)
+                                            }
+                                        )
+                                    }
+                                    .get(5, TimeUnit.SECONDS)
+                            )
+                            original
+                        }
+                }
+            assertEquals(1, success(f.drain(target.id, runtimes = released)).activeRequests)
+            f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            assertEquals(0, success(f.drain(target.id)).activeRequests)
+            f.freezeCounts(1, 1, 1)
+            foreign.freezeCounts(0, 0, 0)
+        } finally {
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+        }
+    }
+
     private inner class Fixture {
         val account = UUID.randomUUID()
         val company = UUID.randomUUID()
@@ -1153,6 +1338,62 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     deviceVersion,
                     fingerprint,
                 )
+
+        fun drain(
+            target: UUID,
+            request: Actor = actor,
+            parent: UUID = session,
+            nativeVersion: Long = 0,
+            deviceVersion: Long = 0,
+            requestedSpace: UUID = space,
+            build: ClientVersion? = client,
+            fingerprint: String = "a".repeat(64),
+            runtimes: CollaborationLegacyRuntimeRepository = this.runtimes,
+        ): Result<CollaborationLegacyRuntimeDrainStatus> =
+            GetNativeCollaborationLegacyRuntimeDrain(
+                    registry,
+                    legacyParents,
+                    selections,
+                    runtimes,
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    clock,
+                )
+                .execute(
+                    request,
+                    parent,
+                    nativeVersion,
+                    requestedSpace,
+                    build,
+                    target,
+                    deviceVersion,
+                    fingerprint,
+                )
+
+        fun providerLease(
+            legacy: CollaborationLegacyDevicePosition,
+            seconds: Long = 45,
+        ): CollaborationLegacyRuntimeLease {
+            val original =
+                CollaborationLegacyRuntimeOwner(legacy.companyId, legacy.deviceId, account, session)
+            return requireNotNull(
+                success(
+                    transactions.run(actor.copy(companyId = company)) {
+                        runtimes.ensure(original, now).flatMap {
+                            runtimes.claim(
+                                original,
+                                Instant.now().plusSeconds(seconds).truncatedTo(ChronoUnit.MICROS),
+                            )
+                        }
+                    }
+                )
+            )
+        }
 
         fun frozen(legacy: CollaborationLegacyDevicePosition): CollaborationLegacyRuntime? =
             success(

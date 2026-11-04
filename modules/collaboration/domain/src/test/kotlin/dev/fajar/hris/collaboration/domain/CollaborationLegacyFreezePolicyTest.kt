@@ -176,6 +176,139 @@ class CollaborationLegacyFreezePolicyTest {
             )) assertInstanceOf(Result.Failed::class.java, action(wrong))
     }
 
+    @Test
+    fun drainCountsOnlyLiveUnreleasedRequestsAndReportsTheLastFiniteExpiry() {
+        val frozen =
+            runtime.copy(
+                phase = CollaborationLegacyRuntimePhase.DRAINING,
+                version = 1,
+                frozenAt = at,
+                target = destination,
+            )
+        val live =
+            CollaborationLegacyRuntimeLease(
+                owner,
+                0,
+                0,
+                UUID.randomUUID(),
+                at,
+                at.plusSeconds(30),
+                null,
+            )
+        val later = live.copy(slot = 1, token = UUID.randomUUID(), expiresAt = at.plusSeconds(50))
+        val expired =
+            live.copy(
+                slot = 2,
+                token = UUID.randomUUID(),
+                startedAt = at.minusSeconds(1),
+                expiresAt = at,
+            )
+        val released = live.copy(slot = 3, token = UUID.randomUUID(), releasedAt = at)
+        assertEquals(
+            Result.Success(
+                CollaborationLegacyRuntimeDrainStatus(destination, 1, 2, later.expiresAt, at)
+            ),
+            collaborationLegacyRuntimeDrainStatus(
+                frozen,
+                owner,
+                destination,
+                listOf(live, later, expired, released),
+                at,
+            ),
+        )
+        assertEquals(
+            Result.Success(
+                CollaborationLegacyRuntimeDrainStatus(destination, 1, 0, null, at.plusSeconds(50))
+            ),
+            collaborationLegacyRuntimeDrainStatus(
+                frozen,
+                owner,
+                destination,
+                listOf(live, later, expired, released),
+                at.plusSeconds(50),
+            ),
+        )
+        // Cross-clock ordering at freeze cannot turn a legitimate request into a malformed slot.
+        val afterFreeze = live.copy(startedAt = at.plusMillis(1))
+        assertInstanceOf(
+            Result.Success::class.java,
+            collaborationLegacyRuntimeDrainStatus(
+                frozen,
+                owner,
+                destination,
+                listOf(afterFreeze),
+                at.plusMillis(2),
+            ),
+        )
+        val full = (0..7).map { live.copy(slot = it, token = UUID.randomUUID()) }
+        assertEquals(
+            Result.Success(
+                CollaborationLegacyRuntimeDrainStatus(destination, 1, 8, live.expiresAt, at)
+            ),
+            collaborationLegacyRuntimeDrainStatus(frozen, owner, destination, full, at),
+        )
+    }
+
+    @Test
+    fun drainRejectsUnfrozenForeignDuplicateOrUnboundedSlotMetadata() {
+        val frozen =
+            runtime.copy(
+                phase = CollaborationLegacyRuntimePhase.DRAINING,
+                version = 1,
+                frozenAt = at,
+                target = destination,
+            )
+        val live =
+            CollaborationLegacyRuntimeLease(
+                owner,
+                0,
+                0,
+                UUID.randomUUID(),
+                at,
+                at.plusSeconds(30),
+                null,
+            )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            collaborationLegacyRuntimeDrainStatus(runtime, owner, destination, emptyList(), at),
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            collaborationLegacyRuntimeDrainStatus(
+                frozen,
+                owner,
+                destination.copy(deviceId = UUID.randomUUID()),
+                emptyList(),
+                at,
+            ),
+        )
+        for (wrong in
+            listOf(
+                live.copy(owner = owner.copy(accountId = UUID.randomUUID())),
+                live.copy(runtimeVersion = 1),
+                live.copy(slot = -1),
+                live.copy(slot = 8),
+                live.copy(startedAt = runtime.createdAt.minusNanos(1)),
+                live.copy(startedAt = at.plusNanos(1)),
+                live.copy(expiresAt = at),
+                live.copy(expiresAt = at.plusSeconds(60).plusNanos(1)),
+                live.copy(releasedAt = at.minusNanos(1)),
+                live.copy(releasedAt = at.plusNanos(1)),
+            )) assertInstanceOf(
+            Result.Failed::class.java,
+            collaborationLegacyRuntimeDrainStatus(frozen, owner, destination, listOf(wrong), at),
+        )
+        for (rows in
+            listOf(
+                listOf(live, live.copy(token = UUID.randomUUID())),
+                listOf(live, live.copy(slot = 1)),
+                (0..8).map { live.copy(slot = it, token = UUID.randomUUID()) },
+            )) assertInstanceOf(
+            Result.Failed::class.java,
+            collaborationLegacyRuntimeDrainStatus(frozen, owner, destination, rows, at),
+        )
+    }
+
     private fun action(value: CollaborationLegacyRuntime) =
         collaborationLegacyFreezeAction(value, owner, destination, at)
 

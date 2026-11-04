@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Current native drain observation accepted — 4 November 2026
+
+Based on pushed57b2bee3, GetNativeCollaborationLegacyRuntimeDrain observes the exact
+frozen target and at most eight original server slots under current native/group/
+client/MFA admission and original identity/key continuity. It returns active count,
+latest active expiry and observation time. Shared account/native guards exclude
+ownership changes; concurrent exact cleanup can only lower the next count. No
+runtime, device, queue, receipt or journal is written. No DI/HTTP is exposed yet.
+
+[Evidence](measurements/collaboration-legacy-runtime-drain-2026-11-04.json): first
+run runtime-drain1 PASS69.9s, 23 cases (five pure/eighteen actual database methods),
+8271 unchanged checked inputs, format/architecture PASS. New coverage validates
+actual two-second expiry, native refresh, substituted metadata/admission, original
+read cancellation/interruption, late group/time denial and concurrent separate-
+transaction release. The owned executor terminates. Zero slots is only observed
+server metadata, not local SDK shutdown, transfer authority or remote rollback.
+No failed run and no check/emulator remains active.
+
+Next atomic retained publication/legacy retirement. Review all migrations through
+V123, not isolated earlier versions. Existing hris_worker_capability can authorize
+a narrowly scoped completion function; API runtime should not gain that capability.
+A separate immutable completion mapping can preserve DRAINING runtime semantics
+without inventing a reversible phase. A restricted non-login function owner needs
+fixed search_path, PUBLIC execution revoked, column-only rights and forced RLS;
+no ciphertext/hash SELECT is required merely to clear old credential columns.
+Use-case transaction owns group credential/device/queue/journal plus old retirement
+and completion metadata. No nested transaction owner, old job or old room guard.
+Function must validate exact frozen target, current native/queue proof, actual DB
+time and zero live leases after all waits. Actual provider key readback and durable
+client gating/alias/SDK join remain required before any retained activation.
+These completion choices are review notes, not implemented/accepted capabilities.
+
+Main f26c466c and Mobile33ee26d9 need both this and57b2bee3 recorded. Mobile code
+3d85d569 and all hosted gates remain accepted. Live8b40/schema116 pushON/SMTP OFF,
+normal phone28 and Starter9959c1d remain current; no product build from this unit.
+All54 communications groups and actual Apple runtime remain open. Continue the
+full long run with frequent user updates, atomic Git evidence and immediate pushes.
+
 ## Native legacy freeze accepted — 4 November 2026
 
 Based on pushed 53a86f48, FreezeNativeCollaborationLegacyRuntime now records a

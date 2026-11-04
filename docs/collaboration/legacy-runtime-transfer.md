@@ -193,3 +193,20 @@ account-owned reads. No old company resource permission is added. The command is
 not wired to DI/HTTP and cannot activate the retained device. Public fingerprint
 metadata, including a reserved reference, does not establish private-key possession
 or a drained SDK. Completion and client handover remain separate required work.
+
+
+## Current native drain observation
+
+`GetNativeCollaborationLegacyRuntimeDrain` reads the exact frozen target and no more
+than eight slots under current native/group/client/MFA and identity/key continuity.
+It reports the live unreleased count, latest active expiry and observation time.
+Expired rows stay retained. A concurrent exact release can conservatively leave an
+older positive count; the next observation decreases. No runtime or queue is written.
+Slot start is not required to precede application-side freeze time across clocks.
+
+[Drain evidence](../measurements/collaboration-legacy-runtime-drain-2026-11-04.json)
+records 23 pure/actual database cases passing in69.9s, including real expiry, native
+refresh, current denial, cancellation/interruption and concurrent cleanup. This
+unexposed metadata command provides no polling loop or completion permission.
+Zero server slots establishes neither SDK shutdown nor remote rollback; atomic
+publication must independently check current database time and remaining leases.

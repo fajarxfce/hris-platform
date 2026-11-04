@@ -1,0 +1,48 @@
+{
+  "scope": "Read-only current-native observation of bounded legacy server requests after an exact same-target freeze.",
+  "baseCommit": "57b2bee3",
+  "run": {
+    "startedAt": "2026-11-04T02:23:54.075871+00:00",
+    "elapsedSeconds": 69.9,
+    "exitCode": 0,
+    "sourceFiles": 8271,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyFreezePolicyTest.xml": {
+        "sha256": "eef256a3ca4aa42a30f3a799dc6743f51d5ca4566c19d1fa78d3b82b392f6fd9",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "ecc2adc468c615c242c54290cb00b882a60c453fdc5c71b949f80a3a482d98be",
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceManifestSha256": "bac50ddd07bb94a60d3e54d777b64c7c4ab2dd1dcd8201415a4c2ebc44a9bf49",
+  "currentSourcesMatch": true,
+  "evidence": [
+    "Five pure cases and eighteen actual registration/status/freeze/drain methods pass with 8271 unchanged checked inputs and format/architecture.",
+    "Two new policy cases validate max eight unique exact-owner original-version slots, finite <=60-second lifetimes, release/expiry and coherent frozen target. Latest active expiry is reported without treating zero as transfer authority.",
+    "Cross-clock ordering does not require a lease start to precede application-side frozenAt. Future observation or malformed/foreign/duplicate slot metadata is rejected.",
+    "Three new database methods prove actual two-second lease expiry without rewriting rows, current native refresh, no state/queue/receipt/journal mutations, and invalid scope/target/version/fingerprint denial.",
+    "Actual separate-transaction cleanup after a slot read can make the first count conservative; the following observation is zero. Owned executor terminates.",
+    "Read failures and original cancellation/interruption propagate without retry. Late offboarding, admission budget expiry and an interrupted thread reject the read while preserving the frozen owner."
+  ],
+  "limits": [
+    "No DI/HTTP, polling loop, provider call or completed transfer is enabled. A zero server count proves neither SDK shutdown nor remote rollback; final SQL must recheck actual DB time and live leases.",
+    "Next atomic old-device/provider/gateway retirement with group publication and completed-mapping replay, plus actual provider key readback and durable Mobile ownership handover.",
+    "No new phone APK, live rollout or Starter port; all54 communications groups remain open."
+  ]
+}

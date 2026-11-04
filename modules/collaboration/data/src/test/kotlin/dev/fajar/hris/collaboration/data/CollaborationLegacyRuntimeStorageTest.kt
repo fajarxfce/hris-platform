@@ -426,9 +426,58 @@ class CollaborationLegacyRuntimeStorageTest {
         }
     }
 
+    @Test
+    fun gatewayMetadataPortDistinguishesAbsentWrongParentAndRetiredOwnedHeads() {
+        with(Fixture(completion = true, gatewayMetadata = true)) {
+            migrate()
+            val gateways =
+                StoredCollaborationLegacyGatewayRepository(
+                    PostgresCollaborationLegacyGatewayDataSource(
+                        DSL.using(
+                            TransactionAwareDataSourceProxy(runtimeSource),
+                            SQLDialect.POSTGRES,
+                        )
+                    )
+                )
+            assertNull(success(root { gateways.find(space, key) }))
+            prepareCompletion()
+            val live = requireNotNull(success(root { gateways.find(space, key) }))
+            assertEquals(gatewayId, live.id)
+            assertEquals(0, live.version)
+            assertNull(live.revokedAt)
+            assertNull(success(root { gateways.find(UUID.randomUUID(), key) }))
+            assertNull(success(root { gateways.find(space, key.copy(accountId = peer)) }))
+            assertInstanceOf(
+                Result.Failed::class.java,
+                root { gateways.find(space, key.copy(nativeSessionId = UUID.randomUUID())) },
+            )
+            val completed =
+                success(
+                    root {
+                        publishCompletion()
+                        completions.complete(completionRequest())
+                    }
+                )
+            val retired = requireNotNull(success(root { gateways.find(space, key) }))
+            assertEquals(completed.sourceGateway?.version, retired.version)
+            assertNotNull(retired.revokedAt)
+            assertEquals(live.id, retired.id)
+            assertEquals(live.createdAt, retired.createdAt)
+            assertEquals(live.rotatedAt, retired.rotatedAt)
+            sql.update(
+                "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+                employer,
+                account,
+            )
+            assertNull(success(root { gateways.find(space, key) }))
+            assertEquals(completed, success(root { completions.find(key) }))
+        }
+    }
+
     private inner class Fixture(
         val completion: Boolean = false,
         val workerRole: Boolean = completion,
+        val gatewayMetadata: Boolean = false,
     ) {
         val source = DriverManagerDataSource(postgres.jdbcUrl, postgres.username, postgres.password)
         val sql = JdbcTemplate(source)
@@ -587,7 +636,7 @@ class CollaborationLegacyRuntimeStorageTest {
         fun migrate() {
             Flyway.configure()
                 .dataSource(source)
-                .target(if (completion) "124" else "123")
+                .target(if (gatewayMetadata) "125" else if (completion) "124" else "123")
                 .load()
                 .migrate()
             sql.execute("create role legacy_runtime_fixture login password 'isolated-fixture-only'")

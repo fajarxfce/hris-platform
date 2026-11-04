@@ -58,7 +58,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # Original encrypted envelopes and SDK/provider ownership remain unchanged.
 # V124 records immutable completion metadata and atomically clears retired old
 # credentials. Remaining envelopes retain their existing authenticated purposes.
-MAX_SCHEMA = 124
+# V125 adds owned public-gateway metadata without any credential/envelope change.
+MAX_SCHEMA = 125
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

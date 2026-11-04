@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## V125 original-gateway metadata accepted — 4 November 2026
+
+Based on pushed60b58d3d, V125 adds exactly ten owned public-gateway metadata columns
+through the existing NOLOGIN legacy reader and current group directory, plus a strict
+typed read-only port. No hashes, encrypted replay, token or HR columns are exposed.
+A mismatched native parent fails mapping; it cannot masquerade as an absent head.
+Current caller admission remains required. No DI/retained worker/HTTP/Mobile caller
+is enabled by this increment.
+
+[Evidence](measurements/collaboration-legacy-gateway-metadata-2026-11-04.json): focused18
+cases PASS186.803s; broad database/domain/storage/native151 PASS728.592s;
+same8290 unchanged inputs, format/architecture PASS. Three new actual migration
+methods verify current eligibility, exact rights/projection and owned immutable
+metadata after retirement/parent purge/archive restore. Actual storage and mapping
+checks cover absent/live/wrong-parent/retired heads and error/cancel/interrupt/flag
+behavior. Recovery ceiling125/future126 rejection and15 Python cases pass. No failed
+run; all owned test resources are closed.
+
+Next apply/review ignored retained-worker-next drafts: existing worker currently
+rejects retained origin; draft adds exact frozen/drained original observations,
+existing Matrix key readback, atomic V124 completion, bounded runtime-busy retry,
+DI and actual RLS/Synapse/competing-write/failure tests. They are NOT accepted and
+must be checked after application. Prepared run-retained-worker.py expects23 cases.
+Then explicit completed native replay (see ignored replay-review.md) and durable
+Mobile future-acquisition gate/store/inbox/outbox/read/push ownership. Zero server
+slots is not SDK shutdown; provider public fingerprint is not private key attestation.
+
+Main9de5e1a2/Mobile5d1830db record the prior typed completion port and need this
+accepted commit linked. Mobile code3d85d569/hosted gates, normal phone28, live8b40/
+schema116 pushON/SMTP OFF and Starter9959c1d remain current. All54 groups and actual
+Apple runtime remain open. Continue full long run, frequent user updates, atomic
+Git evidence and immediate pushes.
+
 ## Typed retained completion port accepted — 4 November 2026
 
 Based on pusheda22816d0, the completion repository now reads exact owned immutable

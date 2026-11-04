@@ -450,6 +450,190 @@ class CollaborationLegacyRuntimeCompletionMigrationTest {
         }
     }
 
+    @Test
+    fun gatewayMetadataMigrationPreservesOriginalHeadsAndExposesOnlyOwnedPublicFields() {
+        with(Fixture()) {
+            migrate()
+            prepare()
+            val before = sql.queryForList("select * from collaboration_gateway_sessions")
+            enableGatewayMetadata()
+            assertEquals(before, sql.queryForList("select * from collaboration_gateway_sessions"))
+            val metadata = gatewayHeads().single()
+            assertEquals(
+                setOf(
+                    "space_id",
+                    "account_id",
+                    "legacy_company_id",
+                    "legacy_device_id",
+                    "gateway_id",
+                    "native_session_id",
+                    "version",
+                    "created_at",
+                    "rotated_at",
+                    "revoked_at",
+                ),
+                metadata.keys,
+            )
+            assertEquals(space, metadata["space_id"])
+            assertEquals(account, metadata["account_id"])
+            assertEquals(company, metadata["legacy_company_id"])
+            assertEquals(legacyDevice, metadata["legacy_device_id"])
+            assertEquals(gatewayId, metadata["gateway_id"])
+            assertEquals(parent, metadata["native_session_id"])
+            assertEquals(0L, metadata["version"])
+            assertEquals(listOf(metadata), gatewayHeads(actor.copy(companyId = employer)))
+            assertTrue(gatewayHeads(actor.copy(accountId = peer)).isEmpty())
+            assertTrue(
+                success(
+                        run { runtime.queryForList("select * from collaboration_gateway_sessions") }
+                    )
+                    .isEmpty()
+            )
+            assertEquals(
+                "hris_collaboration_legacy_reader",
+                sql.queryForObject(
+                    "select pg_get_userbyid(relowner) from pg_class where oid='collaboration_space_legacy_gateways'::regclass",
+                    String::class.java,
+                ),
+            )
+            assertTrue(
+                sql.queryForObject(
+                    "select 'security_barrier=true'=any(reloptions) from pg_class where oid='collaboration_space_legacy_gateways'::regclass",
+                    Boolean::class.java,
+                )!!
+            )
+            assertFalse(
+                sql.queryForObject(
+                    "select pg_has_role('legacy_completion_fixture','hris_collaboration_legacy_reader','MEMBER')",
+                    Boolean::class.java,
+                )!!
+            )
+            for (column in
+                listOf(
+                    "access_hash",
+                    "refresh_hash",
+                    "previous_refresh_hash",
+                    "bootstrap_operation_id",
+                    "replay_encrypted",
+                    "replay_kind",
+                    "replay_until",
+                )) assertFalse(
+                sql.queryForObject(
+                    "select has_column_privilege('hris_collaboration_legacy_reader','collaboration_gateway_sessions',?,'SELECT')",
+                    Boolean::class.java,
+                    column,
+                )!!
+            )
+        }
+    }
+
+    @Test
+    fun gatewayMetadataVisibilityTracksGroupEligibilityWithoutGrantingCompanyResources() {
+        with(Fixture()) {
+            migrate()
+            prepare()
+            enableGatewayMetadata()
+            assertEquals(1, gatewayHeads().size)
+            assertTrue(
+                success(
+                        run {
+                            runtime.queryForList("select * from collaboration_provider_sessions")
+                        }
+                    )
+                    .isEmpty()
+            )
+            sql.update(
+                "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+                employer,
+                account,
+            )
+            assertTrue(gatewayHeads().isEmpty())
+            sql.update(
+                "update company_memberships set active=true,version=version+1 where company_id=? and account_id=?",
+                employer,
+                account,
+            )
+            assertEquals(1, gatewayHeads().size)
+            sql.update("update accounts set active=false where id=?", account)
+            assertTrue(gatewayHeads().isEmpty())
+            assertEquals(
+                1,
+                sql.queryForObject(
+                    "select count(*) from collaboration_gateway_sessions",
+                    Int::class.java,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun gatewayMetadataKeepsRetiredParentProvenanceAndPrivacyAfterArchiveRestore() {
+        with(Fixture()) {
+            migrate()
+            prepare()
+            enableGatewayMetadata()
+            val live = gatewayHeads().single()
+            assertTrue(
+                success(
+                    runWorker {
+                        publish()
+                        complete()
+                    }
+                )
+            )
+            val retired = gatewayHeads().single()
+            assertEquals(1L, retired["version"])
+            assertNotNull(retired["revoked_at"])
+            for (column in
+                listOf("gateway_id", "native_session_id", "created_at", "rotated_at")) assertEquals(
+                live[column],
+                retired[column],
+            )
+            sql.update(
+                "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                parent,
+            )
+            sql.update("delete from native_sessions where id=?", parent)
+            assertEquals(listOf(retired), gatewayHeads())
+            val restored = restore()
+            val restoredSource = requireNotNull(restored.dataSource)
+            val restoredTransactions =
+                PostgresTransactionRunner(JdbcTransactionManager(restoredSource), restored)
+            assertEquals(
+                listOf(retired),
+                success(
+                    restoredTransactions.run(actor) {
+                        safeDatabaseCall {
+                            restored.queryForList(
+                                "select * from collaboration_space_legacy_gateways"
+                            )
+                        }
+                    }
+                ),
+            )
+            assertEquals(
+                "hris_collaboration_legacy_reader",
+                restored.queryForObject(
+                    "select pg_get_userbyid(relowner) from pg_class where oid='collaboration_space_legacy_gateways'::regclass",
+                    String::class.java,
+                ),
+            )
+            assertFalse(
+                restored.queryForObject(
+                    "select has_column_privilege('hris_collaboration_legacy_reader','collaboration_gateway_sessions','replay_encrypted','SELECT')",
+                    Boolean::class.java,
+                )!!
+            )
+            assertEquals(
+                "125",
+                restored.queryForObject(
+                    "select version from flyway_schema_history where success order by installed_rank desc limit 1",
+                    String::class.java,
+                ),
+            )
+        }
+    }
+
     private inner class Fixture {
         val source = DriverManagerDataSource(postgres.jdbcUrl, postgres.username, postgres.password)
         val sql = JdbcTemplate(source)
@@ -894,6 +1078,20 @@ class CollaborationLegacyRuntimeCompletionMigrationTest {
                     "collaboration_legacy_runtime_completions",
                 )
                 .associateWith { sql.queryForList("select * from $it") }
+
+        fun enableGatewayMetadata() {
+            Flyway.configure().dataSource(source).target("125").load().migrate()
+            sql.execute(
+                "grant select on collaboration_space_legacy_gateways to legacy_completion_fixture,legacy_completion_worker"
+            )
+        }
+
+        fun gatewayHeads(current: Actor = actor): List<Map<String, Any?>> =
+            success(
+                run(current) {
+                    runtime.queryForList("select * from collaboration_space_legacy_gateways")
+                }
+            )
 
         fun restore(): JdbcTemplate {
             fun command(vararg args: String) {

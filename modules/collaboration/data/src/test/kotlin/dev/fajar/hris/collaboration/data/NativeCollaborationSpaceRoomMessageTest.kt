@@ -359,6 +359,53 @@ class NativeCollaborationSpaceRoomMessageTest {
             )
             assertEquals(provenance, f.provenance())
             assertEquals(0, f.leases())
+            f.revokePeer()
+            val reads =
+                f.command(
+                    dev.fajar.hris.collaboration.data.repositories
+                        .InternalCollaborationMatrixKeyRepository(raw()),
+                    roomHistory =
+                        dev.fajar.hris.collaboration.data.repositories
+                            .InternalCollaborationSpaceMatrixRoomHistoryRepository(
+                                raw(),
+                                collaborationCursorFixture(),
+                            ),
+                )
+            val history =
+                success(
+                    reads.roomMessages(
+                        f.tokens.accessToken,
+                        UUID.randomUUID(),
+                        room.roomId,
+                        CollaborationRoomPageRequest(null, null, "b", 100),
+                    )
+                )
+            assertEquals(
+                1,
+                (history.payload["chunk"] as List<*>).count {
+                    (it as Map<*, *>)["event_id"] == event
+                },
+            )
+            assertEquals(
+                event,
+                success(
+                        reads.roomEvent(f.tokens.accessToken, UUID.randomUUID(), room.roomId, event)
+                    )
+                    .payload["event_id"],
+            )
+            val context =
+                success(
+                    reads.roomContext(
+                        f.tokens.accessToken,
+                        UUID.randomUUID(),
+                        room.roomId,
+                        event,
+                        0,
+                    )
+                )
+            assertEquals(event, (context.payload["event"] as Map<*, *>)["event_id"])
+            assertEquals(provenance, f.provenance())
+            assertEquals(0, f.leases())
             // Actual opaque transport and provider transaction evidence, not SDK Megolm decryption.
         }
     }

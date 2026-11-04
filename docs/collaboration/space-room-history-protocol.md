@@ -5,7 +5,8 @@ and single-event reads with a distinct `CollaborationSpaceHistoryOwner`. The own
 retains the group device ID and original Matrix user/device coordinates; optional
 LEGACY company/device coordinates keep their original meaning. A group UUID is never
 substituted for a company UUID. These are provider protocol contracts, not current
-native, device or room authority. Runtime group dispatch and admission remain required.
+native, device or room authority. The [fixed group history routes](space-room-history-access.md) now supply current
+admission and verified original device/room metadata.
 
 The pure coordinate policy checks the exact bound room, participant, server, creator
 and canonical original device namespace. A LEGACY device can read a newly created
@@ -52,9 +53,8 @@ mapping cases, including actual company and group/LEGACY Synapse history. Qualit
 checks pass on 8,446 unchanged inputs. See the [gate evidence](../measurements/collaboration-space-room-history-protocol-2026-11-04.json).
 
 Actual provider tests use opaque Megolm fixtures. They do not prove SDK encryption,
-decryption or completed-device runtime admission. The next increment must wire fixed
-group messages/context/event operations with current caller admission and immutable
-owned room checks before and after every provider outcome. Peer receiving eligibility
+decryption or completed-device runtime admission. The [fixed group routes](space-room-history-access.md) now enforce current caller
+admission and immutable owned room checks before and after every provider outcome. Peer receiving eligibility
 must not erase owned history. Group sync has separate room-set/filter semantics and
 must not blindly reuse this history bridge. Metadata, push, full Mobile SDK adoption
 and native hard-parent recovery remain required; group rollout remains disabled.

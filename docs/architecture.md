@@ -165,8 +165,10 @@ frame. The [group room-message route](collaboration/space-room-messages.md) now
 uses exact V131 owned room metadata, current confirmed recipients and pinned sender
 keys. Original room event IDs survive measured retry/restart. The [group history protocol](collaboration/space-room-history-protocol.md) now retains
 original identities, separate group cursors and an exact LEGACY history bridge with
-shared bounded company/group projection. Current group history dispatch, sync/
-metadata/push and full Mobile adoption remain separate work.
+shared bounded company/group projection. The [group history routes](collaboration/space-room-history-access.md) now admit
+current native/LEGACY device ownership around every provider outcome while retaining
+owned history after peer offboarding. Group sync/metadata/push and full Mobile adoption
+remain separate work.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

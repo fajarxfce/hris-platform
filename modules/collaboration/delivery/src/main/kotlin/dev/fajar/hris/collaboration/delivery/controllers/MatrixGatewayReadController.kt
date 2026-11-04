@@ -137,19 +137,17 @@ class MatrixGatewayReadController(
                     ?: return@read Result.Failed(
                         Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request")
                     )
-            device
-                .roomMessages(
-                    token,
-                    correlation,
-                    roomId,
-                    CollaborationRoomPageRequest(
-                        request.getParameter("from"),
-                        request.getParameter("to"),
-                        request.getParameter("dir") ?: "",
-                        limit,
-                        filter,
-                    ),
+            val page =
+                CollaborationRoomPageRequest(
+                    request.getParameter("from"),
+                    request.getParameter("to"),
+                    request.getParameter("dir") ?: "",
+                    limit,
+                    filter,
                 )
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.roomMessages(token, correlation, roomId, page)
+                else device.roomMessages(token, correlation, roomId, page))
                 .map { it.payload }
         }
 
@@ -170,9 +168,10 @@ class MatrixGatewayReadController(
                     ?: return@read Result.Failed(
                         Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request")
                     )
-            device.roomContext(token, correlation, roomId, eventId, limit, filter).map {
-                it.payload
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.roomContext(token, correlation, roomId, eventId, limit, filter)
+                else device.roomContext(token, correlation, roomId, eventId, limit, filter))
+                .map { it.payload }
         }
 
     @GetMapping("/_matrix/client/v3/rooms/{roomId}/event/{eventId}")
@@ -182,7 +181,10 @@ class MatrixGatewayReadController(
         request: HttpServletRequest,
     ): ResponseEntity<Any> =
         read(request) { token, correlation ->
-            device.roomEvent(token, correlation, roomId, eventId).map { it.payload }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.roomEvent(token, correlation, roomId, eventId)
+                else device.roomEvent(token, correlation, roomId, eventId))
+                .map { it.payload }
         }
 
     private fun limit(request: HttpServletRequest, default: Int): Int? {

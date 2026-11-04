@@ -66,8 +66,9 @@ Provider transaction behavior must be measured separately from the process-local
 to-device transaction cache. Opaque Megolm fixtures prove transport, not SDK encryption,
 decryption or device-change session rotation.
 
-Group history, sync, metadata, push, native hard-parent recovery and full Mobile SDK
-adoption remain required. Original store, passphrase, keys, history and uncertain
+The [group history routes](space-room-history-access.md) now retain owned reads under
+current admission. Group sync, metadata, push, native hard-parent recovery and full
+Mobile SDK adoption remain required. Original store, passphrase, keys, history and uncertain
 sends must survive that adoption. Group rollout remains disabled and chat product
 acceptance stays open; this backend increment does not justify reinstalling an
 unchanged mobile build.

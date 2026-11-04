@@ -2543,7 +2543,15 @@ class CollaborationSpaceWorkerPublicationTest {
         )
         a.assertRetainedGroupKeyStorage(idA)
         b.assertRetainedGroupKeyStorage(idB)
-        assertRetainedRoomMessage(b, idB, originalRoom.roomId)
+        val token = success(b.groupBootstrap(idB)).tokens.accessToken
+        assertRetainedRoomMessage(b, idB, originalRoom.roomId, gatewayToken = token)
+        assertRetainedGroupRoomHistory(
+            b,
+            idB,
+            originalRoom.roomId,
+            bridge = true,
+            gatewayToken = token,
+        )
         assertEquals(priorA, a.originalSnapshot())
         assertEquals(priorB, b.originalSnapshot())
         assertNotNull(a.completion(oldA))
@@ -2855,6 +2863,7 @@ class CollaborationSpaceWorkerPublicationTest {
         success(command.sendToDevice(token, UUID.randomUUID(), retainedFrame))
         assertEquals(listOf(retainedFrame, retainedFrame), receivedFrames)
         assertRetainedRoomMessage(a, idA, binding.roomId, token)
+        assertRetainedGroupRoomHistory(a, idA, binding.roomId, bridge = false, gatewayToken = token)
         assertEquals(priorA, a.originalSnapshot())
         assertEquals(priorB, b.originalSnapshot())
         owner.update("delete from native_sessions where id=?", b.session)
@@ -2948,6 +2957,191 @@ class CollaborationSpaceWorkerPublicationTest {
             success(command.sendRoomMessage(token, UUID.randomUUID(), roomId, message)),
         )
         assertEquals(listOf(message, message), messages)
+        assertEquals(prior, f.originalSnapshot())
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_request_leases where device_id=?",
+                Int::class.java,
+                deviceId,
+            ),
+        )
+    }
+
+    private fun assertRetainedGroupRoomHistory(
+        f: Fixture,
+        deviceId: UUID,
+        roomId: String,
+        bridge: Boolean,
+        gatewayToken: String? = null,
+    ) {
+        val device = f.device(deviceId)
+        val original = requireNotNull(device.legacy)
+        val material = requireNotNull(f.retainedKeys)
+        assertEquals(material.userId, device.matrixUserId)
+        assertEquals(material.deviceId, device.matrixDeviceId)
+        val credential = f.credential(deviceId)
+        val token = gatewayToken ?: success(f.groupBootstrap(deviceId)).tokens.accessToken
+        val prior = f.originalSnapshot()
+        val crypto = collaborationCursorFixture()
+        val from =
+            if (bridge)
+                sealMatrixRoomCursor(
+                    crypto,
+                    CollaborationSyncOwner(
+                        original.companyId,
+                        f.account,
+                        original.deviceId,
+                        server,
+                    ),
+                    roomId,
+                    "original-private-position",
+                )
+            else null
+        val eventId = "\$original-retained-history"
+        val expectedRoom = roomId
+        val event =
+            mapOf(
+                "type" to "m.room.encrypted",
+                "sender" to material.userId,
+                "room_id" to roomId,
+                "event_id" to eventId,
+                "origin_server_ts" to 1,
+                "content" to
+                    mapOf(
+                        "algorithm" to "m.megolm.v1.aes-sha2",
+                        "ciphertext" to "original-opaque-ciphertext",
+                        "session_id" to "original-session",
+                        "device_id" to material.deviceId,
+                    ),
+            )
+        val json = tools.jackson.databind.json.JsonMapper.builder().build()
+        fun node(value: Any): tools.jackson.databind.JsonNode =
+            json.readTree(json.writeValueAsBytes(value))
+        var calls = 0
+        var pages = 0
+        fun observed(room: String, bearer: String, deadline: Instant) {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            assertEquals(expectedRoom, room)
+            assertEquals(credential.accessToken, bearer)
+            assertTrue(deadline > Instant.now() && deadline <= Instant.now().plusSeconds(30))
+            calls++
+        }
+        val source =
+            object : MatrixRoomHistoryDataSource {
+                override fun messages(
+                    roomId: String,
+                    from: String?,
+                    to: String?,
+                    direction: String,
+                    limit: Int,
+                    token: String,
+                    deadline: Instant,
+                    filter: Map<String, Boolean>,
+                ): tools.jackson.databind.JsonNode {
+                    observed(roomId, token, deadline)
+                    assertEquals("b", direction)
+                    assertNull(to)
+                    return if (pages++ == 0) {
+                        assertEquals(if (bridge) "original-private-position" else null, from)
+                        node(
+                            mapOf(
+                                "start" to "original-private-position",
+                                "end" to "older-private-position",
+                                "chunk" to listOf(event),
+                            )
+                        )
+                    } else {
+                        assertEquals("older-private-position", from)
+                        node(
+                            mapOf("start" to "older-private-position", "chunk" to emptyList<Any>())
+                        )
+                    }
+                }
+
+                override fun context(
+                    roomId: String,
+                    eventId: String,
+                    limit: Int,
+                    token: String,
+                    deadline: Instant,
+                    filter: Map<String, Boolean>,
+                ): tools.jackson.databind.JsonNode {
+                    observed(roomId, token, deadline)
+                    assertEquals(event["event_id"], eventId)
+                    assertEquals(0, limit)
+                    return node(
+                        mapOf(
+                            "event" to event,
+                            "events_before" to emptyList<Any>(),
+                            "events_after" to emptyList<Any>(),
+                            "state" to emptyList<Any>(),
+                        )
+                    )
+                }
+
+                override fun event(
+                    roomId: String,
+                    eventId: String,
+                    token: String,
+                    deadline: Instant,
+                ): tools.jackson.databind.JsonNode {
+                    observed(roomId, token, deadline)
+                    assertEquals(event["event_id"], eventId)
+                    return node(event)
+                }
+            }
+        val command =
+            f.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerRoomHistory =
+                    InternalCollaborationSpaceMatrixRoomHistoryRepository(source, crypto),
+            )
+        val page =
+            success(
+                    command.roomMessages(
+                        token,
+                        UUID.randomUUID(),
+                        roomId,
+                        CollaborationRoomPageRequest(from, null, "b", 10),
+                    )
+                )
+                .payload
+        assertEquals(
+            material.deviceId,
+            (((page["chunk"] as List<*>).single() as Map<*, *>)["content"] as Map<*, *>)[
+                "device_id"],
+        )
+        if (bridge) assertEquals(from, page["start"])
+        val end = page["end"] as String
+        assertFalse(end.contains("private-position"))
+        val last =
+            success(
+                    command.roomMessages(
+                        token,
+                        UUID.randomUUID(),
+                        roomId,
+                        CollaborationRoomPageRequest(end, null, "b", 10),
+                    )
+                )
+                .payload
+        assertFalse(last.containsKey("end"))
+        assertTrue((last["chunk"] as List<*>).isEmpty())
+        assertEquals(
+            eventId,
+            (success(command.roomContext(token, UUID.randomUUID(), roomId, eventId, 0))
+                .payload["event"]
+                as Map<*, *>)["event_id"],
+        )
+        assertEquals(
+            eventId,
+            success(command.roomEvent(token, UUID.randomUUID(), roomId, eventId))
+                .payload["event_id"],
+        )
+        assertEquals(4, calls)
         assertEquals(prior, f.originalSnapshot())
         assertEquals(
             0,
@@ -3510,6 +3704,8 @@ class CollaborationSpaceWorkerPublicationTest {
                 DisabledCollaborationMatrixToDeviceRepository(),
             providerRoomMessage: CollaborationMatrixRoomMessageRepository =
                 DisabledCollaborationMatrixRoomMessageRepository(),
+            providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository =
+                DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
         ): AccessNativeCollaborationSpaceMatrixDevice {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
@@ -3554,6 +3750,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     PostgresCollaborationSpaceRoomDataSource(sql)
                 ),
                 providerRoomMessage,
+                providerRoomHistory,
             )
         }
 

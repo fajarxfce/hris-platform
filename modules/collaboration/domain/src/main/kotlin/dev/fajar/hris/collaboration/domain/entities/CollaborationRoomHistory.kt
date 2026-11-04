@@ -19,6 +19,17 @@ data class CollaborationRoomHistoryFilter(
 fun validCollaborationRoomHistoryFilter(value: CollaborationRoomHistoryFilter) =
     !value.includeRedundantMembers || value.lazyLoadMembers
 
+fun validCollaborationRoomHistoryPage(value: CollaborationRoomPageRequest) =
+    value.direction in setOf("b", "f") &&
+        value.limit in 1..100 &&
+        validCollaborationRoomHistoryFilter(value.filter) &&
+        listOfNotNull(value.from, value.to).all {
+            it.length in 1..4096 && it.all { char -> char.code in 33..126 }
+        }
+
+fun validCollaborationRoomHistoryEventId(value: String) =
+    value.length in 2..255 && value.startsWith('$') && value.all { it.code in 33..126 }
+
 data class CollaborationRoomHistory(val payload: Map<String, Any>) {
     override fun toString() = "CollaborationRoomHistory(redacted)"
 }

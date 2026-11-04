@@ -13,7 +13,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-/** Fixed self, own-key and scoped recipient-key operations under group ownership. */
+/** Fixed Matrix device operations under current group ownership. */
 class AccessNativeCollaborationSpaceMatrixDevice(
     private val gateway: CollaborationSpaceGatewaySessionRepository,
     private val requests: CollaborationSpaceRequestRepository,
@@ -39,6 +39,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val providerToDevice: CollaborationMatrixToDeviceRepository,
     private val rooms: CollaborationSpaceRoomRepository,
     private val providerRoomMessage: CollaborationMatrixRoomMessageRepository,
+    private val providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -57,6 +58,123 @@ class AccessNativeCollaborationSpaceMatrixDevice(
 
     fun capabilities(token: String, correlationId: UUID): Result<Unit> =
         admitted(token, correlationId, decrypt = false) { _, _ -> Result.Success(Unit) }
+
+    fun roomMessages(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        request: CollaborationRoomPageRequest,
+    ): Result<CollaborationRoomHistory> {
+        if (!validCollaborationRoomHistoryPage(request)) return invalidHistory()
+        return roomRead(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomHistory.messages(
+                    prepared.owner,
+                    prepared.room,
+                    request,
+                    bearer,
+                    deadline,
+                )
+            }
+        }
+    }
+
+    fun roomContext(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        eventId: String,
+        limit: Int,
+        filter: CollaborationRoomHistoryFilter = CollaborationRoomHistoryFilter(),
+    ): Result<CollaborationRoomHistory> {
+        if (
+            !validCollaborationRoomHistoryEventId(eventId) ||
+                limit !in 0..100 ||
+                !validCollaborationRoomHistoryFilter(filter)
+        )
+            return invalidHistory()
+        return roomRead(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomHistory.context(
+                    prepared.owner,
+                    prepared.room,
+                    eventId,
+                    limit,
+                    bearer,
+                    deadline,
+                    filter,
+                )
+            }
+        }
+    }
+
+    fun roomEvent(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        eventId: String,
+    ): Result<CollaborationRoomHistory> {
+        if (!validCollaborationRoomHistoryEventId(eventId)) return invalidHistory()
+        return roomRead(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomHistory.event(prepared.owner, prepared.room, eventId, bearer, deadline)
+            }
+        }
+    }
+
+    private fun <T> roomRead(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        operation: (Exchange, RoomReadPreparation) -> Result<T>,
+    ): Result<T> {
+        if (!validCollaborationSpaceRoomId(roomId))
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_room_request")
+            )
+        // Owned room metadata is immutable. Peer receiving eligibility is not history authority.
+        return admitted(
+            token,
+            correlationId,
+            decrypt = true,
+            prepare = { prepareRoomRead(it, roomId) },
+            revalidate = { observed, original ->
+                prepareRoomRead(observed, roomId).flatMap { current ->
+                    if (current == original) Result.Success(Unit)
+                    else Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_room_changed"))
+                }
+            },
+            operation = operation,
+        )
+    }
+
+    private fun prepareRoomRead(
+        observed: Observation,
+        roomId: String,
+    ): Result<RoomReadPreparation> =
+        readBoundRoom(observed.device.spaceId, observed.actor.accountId, roomId).flatMap { room ->
+            val device = observed.device
+            val owner =
+                CollaborationSpaceHistoryOwner(
+                    device.spaceId,
+                    device.accountId,
+                    device.id,
+                    provider.serverName,
+                    device.matrixUserId,
+                    device.matrixDeviceId,
+                    device.legacy,
+                )
+            if (!validCollaborationSpaceHistoryOwner(owner, room)) invalidProvider()
+            else Result.Success(RoomReadPreparation(owner, room))
+        }
+
+    private data class RoomReadPreparation(
+        val owner: CollaborationSpaceHistoryOwner,
+        val room: CollaborationSpaceBoundRoom,
+    )
+
+    private fun invalidHistory() =
+        Result.Failed(Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request"))
 
     fun uploadKeys(
         token: String,

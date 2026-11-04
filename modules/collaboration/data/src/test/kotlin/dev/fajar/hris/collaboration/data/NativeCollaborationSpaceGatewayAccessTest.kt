@@ -436,6 +436,7 @@ class NativeCollaborationSpaceGatewayAccessTest {
                     PostgresCollaborationSpaceRoomDataSource(base.sql)
                 ),
                 DisabledCollaborationMatrixRoomMessageRepository(),
+                DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
             )
 
         fun access(

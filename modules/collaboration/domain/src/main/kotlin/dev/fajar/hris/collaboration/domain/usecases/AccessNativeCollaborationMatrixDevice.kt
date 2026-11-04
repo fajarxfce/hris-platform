@@ -320,15 +320,7 @@ class AccessNativeCollaborationMatrixDevice(
         roomId: String,
         request: CollaborationRoomPageRequest,
     ): Result<CollaborationRoomHistory> {
-        if (
-            request.direction !in setOf("b", "f") ||
-                request.limit !in 1..100 ||
-                !validCollaborationRoomHistoryFilter(request.filter) ||
-                listOfNotNull(request.from, request.to).any {
-                    it.length !in 1..4096 || it.any { char -> char.code !in 33..126 }
-                }
-        )
-            return invalidHistory()
+        if (!validCollaborationRoomHistoryPage(request)) return invalidHistory()
         return roomOperation(token, correlationId, roomId) { exchange, prepared ->
             exchange.exchange { bearer, deadline ->
                 providerRoomHistory.messages(
@@ -385,8 +377,7 @@ class AccessNativeCollaborationMatrixDevice(
         }
     }
 
-    private fun validEventId(value: String) =
-        value.length in 2..255 && value.startsWith('$') && value.all { it.code in 33..126 }
+    private fun validEventId(value: String) = validCollaborationRoomHistoryEventId(value)
 
     private fun invalidHistory() =
         Result.Failed(Failure(FailureKind.VALIDATION, "invalid_collaboration_history_request"))

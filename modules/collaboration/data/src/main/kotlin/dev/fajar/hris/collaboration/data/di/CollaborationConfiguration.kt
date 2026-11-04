@@ -601,6 +601,15 @@ class CollaborationConfiguration {
             ?: DisabledCollaborationMatrixRoomHistoryRepository()
 
     @Bean
+    fun collaborationSpaceMatrixRoomHistory(
+        source: ObjectProvider<MatrixRoomHistoryDataSource>,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationSpaceMatrixRoomHistoryRepository =
+        source.ifAvailable?.let {
+            InternalCollaborationSpaceMatrixRoomHistoryRepository(it, crypto)
+        } ?: DisabledCollaborationSpaceMatrixRoomHistoryRepository()
+
+    @Bean
     fun collaborationMatrixRoomAccess(
         source: ObjectProvider<MatrixRoomAccessDataSource>
     ): CollaborationMatrixRoomAccessRepository =
@@ -953,6 +962,7 @@ class CollaborationConfiguration {
         providerToDevice: CollaborationMatrixToDeviceRepository,
         rooms: CollaborationSpaceRoomRepository,
         providerRoomMessage: CollaborationMatrixRoomMessageRepository,
+        providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -979,6 +989,7 @@ class CollaborationConfiguration {
             providerToDevice,
             rooms,
             providerRoomMessage,
+            providerRoomHistory,
         )
 
     @Bean

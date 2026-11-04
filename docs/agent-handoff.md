@@ -1,56 +1,48 @@
 # Agent continuation — HRIS workspace
 
-## Legacy runtime storage accepted; integration continues — 4 November 2026
+## Legacy gateway fenced; remaining consumers continue — 4 November 2026
 
-Group source in /home/fajar/hris/.worktrees/communication-space is now 8787a0fa (preceded by ad1d7cca, 16420c3e),
-feat/communication-space, pushed. Its handoff and collaboration/legacy-runtime-
-transfer.md are authoritative. V123 adds exact original company/device/account/
-native ownership, one irreversible LEGACY -> DRAINING freeze intent to a retained
-group device, and at most eight reusable <=60-second server request slots. The
-schema is initially empty. It neither moves keys/credentials nor freezes devices
-or supplies a completed transfer. All old provider callers still need integration.
+Implementation continues in /home/fajar/hris/.worktrees/communication-space on
+feat/communication-space, now0bf751e5 pushed. Its latest handoff and
+[measurement](https://github.com/fajarxfce/hris-platform/blob/0bf751e5/docs/measurements/collaboration-legacy-runtime-gateway-2026-11-04.json)
+are authoritative. V117–123 directory/canonical identity/device/credential/queue and
+runtime storage foundations remain accepted. AccessNativeCollaborationMatrixDevice
+now captures one <=60-second original-runtime lease for each fixed gateway request,
+including provider renewal. Current admission plus runtime/exact slot guards apply
+before/after I/O and at publication. Finally cleanup preserves cancellation and
+interruption, capacity is bounded at eight, and old keys/winning tokens are retained.
+No losing Matrix candidate is logged out; expired leases do not prove remote rollback.
 
-Validation: focused5 PASS79.963s, full113 database/policy/storage PASS525.967s,
-format/architecture pass, all checked hashes unchanged. Actual contention, stale
-replacement release, rollback, offboarding/parent purge and pg_dump/pg_restore pass.
-Recovery MAX_SCHEMA123 preserves envelopes;15 tests pass after an old unknown-future
-assertion was corrected to124. Earlier compile/test failures are retained in the
-measurement. No check is left running. Integration notes remain in that branch's ignored runtime-ports-next/contract.md.
-The typed ports and their tests are now accepted at ad1d7cca:26 mapper/actual
-storage/native/worker cases PASS115.242s with8262 unchanged inputs and quality.
-A plain jOOQ timestamp binding caused three initial storage failures; an explicit
-PostgreSQL timestamptz cast fixes the query. Exact stale-release fences, freeze
-continuity, transaction rollback/cancel/interruption and cleanup after parent purge
-pass. Tracked code supersedes those drafts. Pure owner/phase/admission/live-lease validation and exact guarded slot reads now
-pass30 cases in128.584s with8264 unchanged inputs and quality (8787a0fa). Actual
-publication observation serializes with finally cleanup. No failed run in this
-policy/guard unit. Next fence gateway/provisioning/direct-room provider I/O and
-implement admitted atomic group publication/legacy retirement; its ignored
-consumer-integration.md describes the reviewed call sites and frozen test-clock issue.
-Preserve original SDK store/private keys/transaction IDs and explicit room/push/read
-ownership. Never logout losing Matrix candidates.
+Accepted: full native data160 PASS243.562s; API47 PASS152.165s; full worker127 cases
+(126 active/one existing opt-in retention skip) PASS342.882s; actual Android SDK5
+PASS1047.184s. All8264 checked inputs stay unchanged within each run, with format
+and architecture passing. The three worker states each recover176 originals;
+SDK receipt and WorkManager process-death/network restoration pass. All owned
+emulators/tests are stopped. Earlier failed runs are retained, including setup
+refusal to overwrite an owned proof package and later verifier-token expiry. The
+verifier now requests fresh same-identity credentials through normal HTTP after SDK
+cleanup; production token lifetimes remain unchanged. Later fixture-only source
+differences from data/API gates are explicit in the measurement.
 
-Mobile3d85d569 local SDK continuity is accepted; fcf4cd33 records all hosted gates.
-Raw protocol41741297195 passes native/classic with verified artifacts/14 driver
-hashes per mode. Control41741297181 passes3114 portable/1217 Apple plus full Xcode;
-actual-HRIS native41741297183 passes232 Android-host,18 proof-host and5 native cases,
-three worker states retaining176 originals each, notification reply/recovery and
-owned cleanup. Artifact digests/source hashes are verified and three SystemUI PNGs
-viewed. Mobile measurements/collaboration-local-sdk-{control,native}-2026-11-04.json
-and its latest handoff contain the evidence. No hosted jobs remain pending. These
-regressions do not accept product group transfer or actual Apple Matrix runtime.
+Next apply/review six prepared files for bootstrap/refresh and legacy provisioning/
+direct-room worker fences, including shared DI, actual repository factories and six
+new test methods. The focused selection has18 cases, then full native/API/worker/
+current SDK checks. These drafts are not yet accepted. Group worktree handoff and
+ignored runtime-consumer-next notes retain lock ordering, base hashes and exact
+next commands. No public transfer or group runtime is enabled by the gateway unit.
+Follow with admitted atomic group publication/legacy retirement and durable Mobile
+SDK drain/alias/inbox/outbox/read/push ownership. Never acquire old job/room guards
+after account/native guards or change the old company/native SDK directory hash.
 
-The group worktree now has an uncommitted first provider-consumer integration in
-AccessNativeCollaborationMatrixDevice, shared DI and NativeCollaborationRegistrationTest.
-Seven initial actual gateway tests pass94.2s; expanded freeze/busy/cancel/interruption
-checks are running (runtime-gateway4). Do not modify its frozen checked inputs.
-Positive refresh cases use bounded real-time waits, preserving strict database lease
-bounds. Remaining provider/issuance consumers and full API/worker contexts are still
-required before committing/accepting the integration.
+Mobile377d37b4 records this state; implementation remains3d85d569 with all hosted
+gates accepted: protocol41741297195 native/classic, control41741297181 (3114 portable,
+1217 Apple plus full Xcode), native41741297183 (232 Android-host,18 proof-host,5 native
+and three inspected SystemUI PNGs). Actual Apple Matrix/APNs/CallKit and all54
+communications acceptance groups remain open. Normal phone28, live8b40/schema116
+pushON/SMTP OFF and Starter9959c1d remain current. No product installation or live
+migration occurred in this server increment. Continue the full authorized long run,
+frequent user updates, Git evidence and immediate push of every atomic commit.
 
-Live8b40/schema116 pushON/SMTP OFF and installed normal phone28 remain current.
-Starter9959c1d needs no port for these HRIS-specific contracts. Continue the full
-communications long run, frequent user/Git updates and push every atomic commit.
 Older source/running-check notes below are historical.
 
 ## Group graph verified; release 28 remains installed — 3 November 2026

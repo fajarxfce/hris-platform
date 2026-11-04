@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Native group gateway issuance accepted — 4 November 2026
+
+Group branch is pushed through `6b92246a`. Native bootstrap/refresh enforce current
+root-account/native/group/client/MFA, canonical identity, exact device/provider and
+completed retained-transfer provenance. Credential/receipt/journal writes are atomic;
+replay and final response remain subject to fresh authority. No provider token is
+decrypted or exchanged. [Evidence](https://github.com/fajarxfce/hris-platform/blob/6b92246a/docs/measurements/collaboration-space-gateway-issuance-2026-11-04.json):
+14 focused cases PASS167.690s; broader 154 PASS343.118s (92 domain, 62 data including
+all 28 worker-publication cases), 8,321 unchanged final inputs, format/architecture.
+The final retained refresh test passed its actual bounded cooldown and kept the old
+runtime DRAINING. A test-only -Werror correction is recorded; no failing assertion.
+
+NEXT native HTTP needs an atomic bootstrap envelope with original Matrix user/device
+IDs captured with its token pair, plus safe gateway revision metadata in group status
+for recovery after replay expires. Never derive the retained Matrix device ID from
+its new group UUID. Then native bootstrap/Matrix refresh dispatch, strict OpenAPI and
+new DI, with actual API plus FULL worker contexts. No group HTTP/provider/room exchange
+or Mobile adoption is enabled yet. Continue runtime/history/outbox/read/push/deep-link
+ownership and all 54 open communications groups. Mobile a2979db2 remains locally/hosted
+accepted, phone release 28/live 8b40/schema 116 and Starter 9959c1d unchanged. Continue long run,
+updates, atomic Git handoffs and immediate pushes; implementation stays in group worktree.
+
 ## Organization gateway storage and hosted Mobile verification — 4 November 2026
 
 Group branch `feat/communication-space` is pushed as `338915f5`. V126 and typed encrypted

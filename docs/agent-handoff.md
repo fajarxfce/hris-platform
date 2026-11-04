@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Organization gateway storage and hosted Mobile verification — 4 November 2026
+
+Group branch `feat/communication-space` is pushed as `338915f5`. V126 and typed encrypted
+gateway ports preserve separate group/account/native/device ownership, verify exact
+post-write readback, retain immutable provenance and support bounded response recovery.
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/338915f5/docs/measurements/collaboration-space-gateway-storage-2026-11-04.json):
+19 focused cases PASS154.081s; 181 broader cases PASS888.458s (70 database, 26 domain,
+85 data), identical 8,314 inputs, format/architecture and 16 recovery-tool cases. Actual
+PostgreSQL covers scope, concurrent refresh, cancellation rollback, key rotation,
+archive restore and SQL/Kotlin authenticated-context parity. Initial fixture correction
+is recorded; migration SQL stayed unchanged. No group gateway HTTP/DI or deployment.
+
+Mobile `21eca8e6` records all hosted acceptance for code `0b804cb2`:
+[verified evidence](https://github.com/fajarxfce/hris-mobile/blob/21eca8e6/docs/measurements/collaboration-runtime-handover-hosted-2026-11-04.json).
+Control has 3,118 portable and 1,219 Apple-simulator tests and iOS host compilation;
+native-HRIS has 5 actual server/provider/emulator scenarios, 241 Android-host and 18
+proof-host cases. Both Android/web protocol modes pass. Archive digests, exact source
+hashes and SystemUI reply images are checked. Actual Apple Matrix/APNs/CallKit remain
+unfinished; new local handover stage/resume is separately accepted in 67.337s.
+
+NEXT current group gateway/bootstrap/refresh and completed-transfer admission, room
+authority, Mobile provider-key preflight and full group runtime/history/outbox/read/
+push/deep-link ownership. Preserve original SDK namespaces and require successful local
+stage/current admission before permanent freeze. All 54 communications groups remain
+open. Normal phone release 28/live 8b40/schema 116 and Starter 9959c1d unchanged. Continue full long
+run with updates, atomic handoffs and immediate pushes. This main checkout has no
+new product code or deployment; continue implementation in the group worktree.
+
 ## Durable Mobile handover accepted locally; group gateway continues — 4 November 2026
 
 Mobile code is pushed as `0b804cb2`. Local handover reads/stages immutable protected

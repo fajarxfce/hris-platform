@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Original room lookup and verification accepted — 4 November 2026
+
+Based on 6c22caba, exact original company/pair lookup reads at most two rows and
+validates one owned result without scanning inventory pages. Missing, unbound and
+bound results stay distinct. Pure preparation requires both canonical users to match
+the exact original pair and uses V130's actual room creator. Original state must
+already be healthy; absent settings/invitation never authorize repair or replacement.
+Read [the protocol contract](collaboration/space-room-provider.md).
+
+[Evidence](measurements/collaboration-space-legacy-room-policy-2026-11-04.json): all
+99 domain plus 8 PostgreSQL repository and 3 actual Synapse cases PASS 144.409s with
+format/architecture and 8,374 unchanged inputs. The canonical peer joins the original
+room using its own retained user/device after group login. Original creator, room
+state and both signed keys survive restart. No creator impersonation, group alias,
+provider logout or key replacement. This is protocol/public-key evidence, not SDK
+message or durable room-adoption acceptance. No failing gate; test session closed.
+No schema, DI, endpoint or Mobile product caller changed. Applied test drafts in
+ignored group-room-lifecycle are stale; use committed source.
+
+NEXT group-owned request/publication lifecycle with first requester distinct from
+actual Matrix creator, exact canonical users, original native/device proof, finite
+leases/retries and current admission before and after outside-SQL provider work.
+Publish immutable verified binding atomically with request outcome/journal. Generic
+jobs still require company scope. Original unbound conversations and other legacy
+producers need explicit recovery/creation fences before rollout; never silently
+replace history. No V131 or room lifecycle implementation exists yet. Then group
+recipient keys/content/sync/push and full Mobile adoption preserving original SDK
+namespace/passphrase, keys, history and uncertain sends. Offline keys and native
+hard-parent replacement remain required. Group disabled/all 54 groups open; live
+8b40/schema 116 push ON/SMTP OFF, normal phone 28, product/hosted 0b804cb2 and Starter
+9959c1d unchanged. Main 2ab63fd8/Mobile 8e46d8dc hold the V130 peer checkpoint; push
+status must be checked if continuing after transient GitHub failures. Continue long
+run, updates, atomic pushes and validated product feature installs only.
+
 ## Original room creator retained — 4 November 2026
 
 V130 appends the actual original binding creator to the restricted legacy inventory.

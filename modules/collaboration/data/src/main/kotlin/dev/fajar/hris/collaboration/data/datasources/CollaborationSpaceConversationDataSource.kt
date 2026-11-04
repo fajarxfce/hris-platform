@@ -35,6 +35,14 @@ interface CollaborationSpaceConversationDataSource {
         limit: Int,
     ): List<CollaborationSpaceLegacyConversationsRecord>
 
+    fun legacyPair(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        first: UUID,
+        second: UUID,
+    ): List<CollaborationSpaceLegacyConversationsRecord>
+
     fun legacyOne(
         spaceId: UUID,
         accountId: UUID,

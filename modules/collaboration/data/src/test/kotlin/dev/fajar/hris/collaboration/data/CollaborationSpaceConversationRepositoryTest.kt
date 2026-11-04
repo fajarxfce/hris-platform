@@ -3,6 +3,7 @@ package dev.fajar.hris.collaboration.data
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationSpaceConversationRepository
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceConversationRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
@@ -302,6 +303,71 @@ class CollaborationSpaceConversationRepositoryTest {
     }
 
     @Test
+    fun exactOriginalPairLookupRetainsBoundAndUnboundRoomsAndRejectsAmbiguousReadback() {
+        val f = Fixture()
+        val peer = f.peer()
+        val pair = listOf(f.s.account, peer).sortedBy(UUID::toString)
+        val id = UUID.randomUUID()
+        f.seedLegacyRoom(peer, id)
+        val otherPosition = CollaborationLegacyConversationPosition(f.other, UUID.randomUUID())
+        f.legacy(peer, otherPosition)
+        fun read(
+            repo: CollaborationSpaceConversationRepository = f.repo,
+            company: UUID = f.s.company,
+        ) = f.tx { repo.legacyPair(f.s.space, f.s.account, company, pair[0], pair[1]) }
+        val owned = success(read())!!
+        assertEquals(id, owned.conversation.id)
+        assertEquals(f.s.account, owned.room!!.createdBy)
+        assertNull(success(read(company = f.other))!!.room)
+        assertNull(success(read(company = UUID.randomUUID())))
+        assertEquals(
+            owned,
+            success(
+                f.s.tx(f.s.actor.copy(accountId = peer)) {
+                    f.repo.legacyPair(f.s.space, peer, f.s.company, pair[0], pair[1])
+                }
+            ),
+        )
+        assertNull(
+            success(
+                f.s.tx(f.s.actor.copy(accountId = UUID.randomUUID())) {
+                    f.repo.legacyPair(f.s.space, f.s.account, f.s.company, pair[0], pair[1])
+                }
+            )
+        )
+        for (mode in listOf("duplicate", "space", "company", "pair", "partial")) {
+            val repo =
+                StoredCollaborationSpaceConversationRepository(
+                    object : CollaborationSpaceConversationDataSource by f.raw {
+                        override fun legacyPair(
+                            spaceId: UUID,
+                            accountId: UUID,
+                            companyId: UUID,
+                            first: UUID,
+                            second: UUID,
+                        ): List<CollaborationSpaceLegacyConversationsRecord> {
+                            val rows =
+                                f.raw.legacyPair(spaceId, accountId, companyId, first, second)
+                            if (mode == "duplicate") return rows + rows
+                            return rows.also {
+                                when (mode) {
+                                    "space" -> it.single().spaceId = UUID.randomUUID()
+                                    "company" -> it.single().legacyCompanyId = f.other
+                                    "pair" ->
+                                        it.single().secondAccountId = it.single().firstAccountId
+                                    "partial" -> it.single().roomCreatedBy = null
+                                }
+                            }
+                        }
+                    }
+                )
+            assertInstanceOf(Result.Failed::class.java, read(repo), mode)
+        }
+        f.s.owner.update("delete from native_sessions where id=?", f.s.parent)
+        assertEquals(owned, success(read()))
+    }
+
+    @Test
     fun malformedRowsIncludingOverfetchNeverProducePartialPagesOrIdentityAuthority() {
         val f = Fixture()
         val first = f.value(f.peer(), UUID.fromString("00000000-0000-0000-0000-000000000001"))
@@ -531,6 +597,14 @@ class CollaborationSpaceConversationRepositoryTest {
                         limit: Int,
                     ): List<CollaborationSpaceLegacyConversationsRecord> = fail()
 
+                    override fun legacyPair(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        companyId: UUID,
+                        first: UUID,
+                        second: UUID,
+                    ): List<CollaborationSpaceLegacyConversationsRecord> = fail()
+
                     override fun legacyOne(
                         spaceId: UUID,
                         accountId: UUID,
@@ -563,6 +637,33 @@ class CollaborationSpaceConversationRepositoryTest {
                 },
                 { repo.legacy(value.spaceId, f.s.account, null, 51) },
                 {
+                    repo.legacyPair(
+                        value.spaceId,
+                        f.s.account,
+                        zero,
+                        value.firstAccountId,
+                        value.secondAccountId,
+                    )
+                },
+                {
+                    repo.legacyPair(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        value.secondAccountId,
+                        value.firstAccountId,
+                    )
+                },
+                {
+                    repo.legacyPair(
+                        value.spaceId,
+                        UUID.randomUUID(),
+                        f.s.company,
+                        value.firstAccountId,
+                        value.secondAccountId,
+                    )
+                },
+                {
                     repo.legacyOne(
                         value.spaceId,
                         f.s.account,
@@ -581,6 +682,15 @@ class CollaborationSpaceConversationRepositoryTest {
                 { repo.list(value.spaceId, f.s.account, null, 1) },
                 { repo.create(value) },
                 { repo.legacy(value.spaceId, f.s.account, null, 1) },
+                {
+                    repo.legacyPair(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        value.firstAccountId,
+                        value.secondAccountId,
+                    )
+                },
                 {
                     repo.legacyOne(
                         value.spaceId,

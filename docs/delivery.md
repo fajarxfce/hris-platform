@@ -1,5 +1,15 @@
 # Delivery and validation
 
+## Original room lookup and protocol continuity — 4 November 2026
+
+Exact original-pair lookup and pure metadata/state verification now preserve original
+room coordinates and creator. Historical missing settings do not authorize repair.
+[Evidence](measurements/collaboration-space-legacy-room-policy-2026-11-04.json): all
+99 domain, 8 PostgreSQL and 3 actual Synapse cases PASS 144.409s, with quality checks
+and 8,374 unchanged inputs. The retained peer joins with its own identity; original
+room state and signed keys survive provider restart. No failing gate, schema/DI change,
+new endpoint or product rollout. Durable room authority and Mobile adoption remain next.
+
 ## Original Matrix room creator — 4 November 2026
 
 V130 and typed/native inventory preserve the actual original room creator separately

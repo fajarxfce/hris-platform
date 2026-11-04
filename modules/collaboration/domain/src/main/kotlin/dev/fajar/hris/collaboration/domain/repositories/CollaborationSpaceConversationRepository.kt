@@ -39,6 +39,15 @@ interface CollaborationSpaceConversationRepository {
         limit: Int,
     ): Result<CollaborationSpaceLegacyConversationPage>
 
+    /** Exact original pair inventory; no provider adoption or unbounded page scan. */
+    fun legacyPair(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        first: UUID,
+        second: UUID,
+    ): Result<CollaborationSpaceLegacyConversation?>
+
     fun legacyOne(
         spaceId: UUID,
         accountId: UUID,

@@ -91,6 +91,24 @@ class PostgresCollaborationSpaceConversationDataSource(private val sql: DSLConte
             .limit(limit)
             .fetch()
 
+    override fun legacyPair(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        first: UUID,
+        second: UUID,
+    ): List<CollaborationSpaceLegacyConversationsRecord> =
+        sql.selectFrom(L)
+            .where(
+                L.SPACE_ID.eq(spaceId),
+                L.LEGACY_COMPANY_ID.eq(companyId),
+                L.FIRST_ACCOUNT_ID.eq(first),
+                L.SECOND_ACCOUNT_ID.eq(second),
+                L.FIRST_ACCOUNT_ID.eq(accountId).or(L.SECOND_ACCOUNT_ID.eq(accountId)),
+            )
+            .limit(2)
+            .fetch()
+
     override fun legacyOne(
         spaceId: UUID,
         accountId: UUID,

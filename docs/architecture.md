@@ -89,6 +89,11 @@ or recipient grant follows from discovery; native commands and room adoption mus
 separately admit current authority. Original company rows and crypto namespaces stay
 explicit through migration and archive recovery.
 
+Exact original company/pair acquisition is bounded to two rows and validates one
+owned result. Pure original-room preparation matches both canonical users and the
+actual binding creator; historical state must already be complete and healthy.
+Current application admission and durable room publication remain separate work.
+
 V130 appends the original room binding creator to that restricted inventory. It is
 separate from the conversation creator and required in the complete typed room tuple;
 future adoption must use the actual provider creator. Original rows and the view's

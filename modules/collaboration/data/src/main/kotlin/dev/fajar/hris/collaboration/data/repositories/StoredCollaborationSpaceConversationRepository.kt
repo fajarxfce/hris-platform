@@ -95,6 +95,27 @@ class StoredCollaborationSpaceConversationRepository(
         )
     }
 
+    override fun legacyPair(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        first: UUID,
+        second: UUID,
+    ): Result<CollaborationSpaceLegacyConversation?> = safeDatabaseCall {
+        requireSpaceConversationIds(spaceId, accountId)
+        requireSpaceConversationPair(companyId, first, second)
+        require(accountId == first || accountId == second)
+        val rows = source.legacyPair(spaceId, accountId, companyId, first, second)
+        require(rows.size <= 1)
+        rows.singleOrNull()?.toSpaceLegacyConversation(spaceId, accountId)?.also {
+            require(
+                it.conversation.companyId == companyId &&
+                    it.conversation.firstAccountId == first &&
+                    it.conversation.secondAccountId == second
+            )
+        }
+    }
+
     override fun legacyOne(
         spaceId: UUID,
         accountId: UUID,

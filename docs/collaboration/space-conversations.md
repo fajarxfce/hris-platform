@@ -67,6 +67,12 @@ shape, version zero and finite microsecond times. Insert requires exact readback
 the same safe failure boundary. Mapping failure, failed results, cancellation and
 interruption roll back the caller's transaction rather than publish false success.
 
+An internal exact legacy-pair lookup takes the original company and unsigned account
+pair. It reads at most two rows, rejects ambiguity and validates exact owned original
+coordinates, preserving null/unbound/bound distinctions. It does not page through the
+whole inventory or grant provider access. Original room preparation/state verification
+is described in [the protocol contract](space-room-provider.md).
+
 Both inventories accept 1–50 rows with at most one extra row. Group cursors order
 unsigned conversation IDs; legacy cursors order original company then conversation
 IDs. Every fetched row, including overfetch, is validated for scope and strict

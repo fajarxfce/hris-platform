@@ -66,3 +66,29 @@ endpoint after restart. Production/domain sources stayed unchanged. Actual Synap
 covers cross-company retained identities, creation before peer login, join, duplicate/
 lost responses, foreign membership, restart and original signed-key readback. These
 are provider control/key checks, not client SDK message or Mobile adoption acceptance.
+
+## Exact original lookup and verification
+
+The conversation repository now has a bounded original company/unsigned-pair lookup.
+It reads at most two rows and requires at most one exact owned match; foreign scope,
+ambiguous or malformed readback fails. A missing row, unbound conversation and bound
+room remain different outcomes. An unbound original can still have a pending or
+uncertain old room job; this lookup never authorizes a replacement room.
+
+`prepareCollaborationSpaceLegacyRoom` checks the group pair against both exact original
+canonical Matrix users, original metadata/times and actual V130 binding creator. Its
+output retains original company, conversation and room coordinates. It conveys no
+native/group authority. `assessCollaborationSpaceLegacyRoom` applies original immutable
+marker/creator/member/encryption rules and requires every setting/invite to be present.
+Historical repair suggestions are rejected. A caller must still pin these coordinates
+and recheck current native/device/group/peer authority before and after provider work,
+then atomically publish a durable group binding. Other legacy producers and unbound
+original room jobs need a real creation fence before rollout.
+
+[Verification evidence](../measurements/collaboration-space-legacy-room-policy-2026-11-04.json)
+records 110 passing cases in 144.409s: all 99 domain cases, eight actual PostgreSQL
+repository cases and three actual Synapse cases, plus quality checks on 8,374 unchanged
+inputs. The original canonical peer joins using its retained user/device after group
+login; original creator, room state and both signed keys survive restart. No provider
+logout, creator impersonation, key replacement or new group alias occurs. These are
+protocol/public-key checks; no native room grant, SDK message or Mobile rollout follows.

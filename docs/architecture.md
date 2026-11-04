@@ -1,5 +1,7 @@
 # Architecture
 
+[Native organization managed pusher](collaboration/space-pusher-access.md) connects stable group capability reservation and exact publication to current native registration and gateway authority. Strict HTTP dispatch and shared API/worker DI are validated. Group callback delivery and Mobile background ownership remain required.
+
 The [organization Matrix pusher protocol](collaboration/space-pusher-protocol.md) keeps separate company/group capabilities in one fixed event-only application profile and redacts both namespaces in deployable logs. Native group admission and callback delivery remain separate integration.
 
 V136 [organization push capability storage](collaboration/space-push-storage.md) retains separate encrypted identity with exact native/Matrix provenance, immutable publication, root lookup isolation and reviewed recovery projection. It does not register a pusher or authorize callback delivery; native integration remains required.

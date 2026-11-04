@@ -397,6 +397,174 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun groupManagedPusherUsesSeparateStableCapabilityAndSurvivesNativeTokenRotation() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val before = provider.pushes.size
+        val originalCompanyBindings =
+            database()
+                .queryForList(
+                    "select * from collaboration_push_bindings where account_id=? order by company_id,device_id",
+                    n.fixture.account,
+                )
+        assertEquals(503, pusher(n, token).statusCode())
+        assertEquals(before, provider.pushes.size)
+        savePush(n)
+        repeat(2) {
+            val reply = pusher(n, token)
+            assertEquals(200, reply.statusCode(), reply.body())
+            assertEquals("{}", reply.body())
+            assertEquals("no-store", reply.headers().firstValue("Cache-Control").orElse(""))
+        }
+        savePush(n, expected = 0)
+        assertEquals(200, pusher(n, token).statusCode())
+        savePush(n, expected = 1, enabled = false)
+        assertEquals(503, pusher(n, token).statusCode())
+        savePush(n, expected = 2)
+        assertEquals(200, pusher(n, token).statusCode())
+        val sent = provider.pushes.toList().drop(before)
+        assertEquals(4, sent.size)
+        assertEquals(1, sent.map { it["pushkey"].asString() }.toSet().size)
+        assertTrue(sent.all { it["pushkey"].asString().matches(Regex("hrisgp1_[a-f0-9]{64}")) })
+        assertTrue(
+            sent.all {
+                it["app_id"].asString() == "dev.fajar.hris.chat" &&
+                    it["data"]["format"].asString() == "event_id_only" &&
+                    it["data"]["url"].asString() ==
+                        "https://push.example.test/_matrix/push/v1/notify" &&
+                    it["append"].asBoolean()
+            }
+        )
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from collaboration_space_push_bindings where device_id=?",
+                    Long::class.java,
+                    device,
+                ),
+        )
+        assertEquals(
+            originalCompanyBindings,
+            database()
+                .queryForList(
+                    "select * from collaboration_push_bindings where account_id=? order by company_id,device_id",
+                    n.fixture.account,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupPusherRejectsCallerConfigurationAndAmbiguousAuthorityBeforeProviderIo() {
+        val n = native()
+        val (_, token) = enrollGroup(n)
+        savePush(n)
+        val before = provider.pushes.size
+        assertEquals(401, pusher(n).statusCode())
+        assertEquals(401, pusher(n, n.access).statusCode())
+        assertEquals(401, pusher(n, token, duplicate = true).statusCode())
+        assertEquals(400, pusher(n, token, suffix = "?access_token=untrusted").statusCode())
+        for (body in listOf("{}", "{\"pushkey\":\"untrusted\"}")) assertEquals(
+            400,
+            pusher(n, token, body = body).statusCode(),
+        )
+        assertEquals(403, pusher(n, token, method = "GET").statusCode())
+        assertEquals(before, provider.pushes.size)
+    }
+
+    @Test
+    fun groupPusherWithholdsHttpAcknowledgementAfterNativeRegistrationChanges() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        savePush(n)
+        val before = provider.pushes.size
+        provider.onPusher.set { savePush(n, expected = 0) }
+        try {
+            val reply = pusher(n, token)
+            assertEquals(409, reply.statusCode(), reply.body())
+            assertEquals(
+                "collaboration_space_push_changed",
+                json.readTree(reply.body())["org.hris.error_code"].asString(),
+            )
+            assertEquals(
+                0L,
+                database()
+                    .queryForObject(
+                        "select version from collaboration_space_push_bindings where device_id=?",
+                        Long::class.java,
+                        device,
+                    ),
+            )
+            assertEquals(200, pusher(n, token).statusCode())
+            val sent = provider.pushes.toList().drop(before)
+            assertEquals(2, sent.size)
+            assertEquals(sent.first()["pushkey"], sent.last()["pushkey"])
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onPusher.set(null)
+        }
+    }
+
+    @Test
+    fun groupPusherWithholdsHttpAcknowledgementAfterNativeRevocation() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        savePush(n)
+        val before = provider.pushes.size
+        provider.onPusher.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val reply = pusher(n, token)
+            assertEquals(401, reply.statusCode(), reply.body())
+            assertEquals("M_UNKNOWN_TOKEN", json.readTree(reply.body())["errcode"].asString())
+            assertEquals(
+                0L,
+                database()
+                    .queryForObject(
+                        "select version from collaboration_space_push_bindings where device_id=?",
+                        Long::class.java,
+                        device,
+                    ),
+            )
+            assertEquals(401, pusher(n, token).statusCode())
+            assertEquals(before + 1, provider.pushes.size)
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onPusher.set(null)
+        }
+    }
+
+    @Test
     fun groupIdentityHttpRecoversExpiredProviderAndKeepsSelfOperationsInTheGroupNamespace() {
         val n = native()
         val (device, token) = enrollGroup(n)
@@ -3408,6 +3576,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     private class Provider : AutoCloseable {
         val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
         val pushes = ConcurrentLinkedQueue<tools.jackson.databind.JsonNode>()
+        val onPusher = AtomicReference<(() -> Unit)?>(null)
         val keyUploads = AtomicInteger()
         val keyQueries = AtomicInteger()
         val keyClaims = AtomicInteger()
@@ -3490,6 +3659,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                 assertTrue(credentials.containsKey(bearer))
                                 val body = parser.readTree(request.requestBody.readNBytes(8193))
                                 pushes.add(body)
+                                onPusher.getAndSet(null)?.invoke()
                                 emptyMap<String, Any>()
                             }
                             "/_matrix/client/v3/keys/query" -> {

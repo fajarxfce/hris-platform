@@ -6,6 +6,7 @@ import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.entities.NativePushRegistration
 import dev.fajar.hris.identity.domain.policies.nativeAuthenticationRequired
 import dev.fajar.hris.identity.domain.repositories.*
 import java.time.Clock
@@ -44,7 +45,168 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val syncCursors: CollaborationSpaceSyncCursorRepository,
     private val providerSync: CollaborationSpaceMatrixSyncRepository,
     private val providerRoomAccess: CollaborationSpaceMatrixRoomAccessRepository,
+    private val service: CollaborationServicePolicy,
+    private val pushBindings: CollaborationSpacePushBindingRepository,
+    private val providerPush: CollaborationMatrixPusherRepository,
+    private val nativePush: NativePushRegistrationRepository,
 ) {
+    fun ensurePusher(token: String, correlationId: UUID): Result<Unit> {
+        if (!service.enabled || !service.pushEnabled) return pushUnavailable()
+        return admitted(
+            token,
+            correlationId,
+            decrypt = true,
+            prepare = ::preparePusher,
+            revalidate = ::checkPusher,
+        ) { exchange, prepared ->
+            exchange
+                .exchange { bearer, deadline ->
+                    providerPush.set(
+                        prepared.key.value,
+                        bearer,
+                        minOf(deadline, prepared.registration.expiresAt),
+                    )
+                }
+                .flatMap { exchange.publishPusher(prepared.binding) }
+        }
+    }
+
+    private class PusherPreparation(
+        val binding: CollaborationSpacePushBinding,
+        val key: CollaborationSpacePushKey,
+        val registration: NativePushRegistration,
+    )
+
+    private fun preparePusher(observed: Observation): Result<PusherPreparation> {
+        val device = observed.device
+        return nativePush
+            .find(device.accountId, device.originNativeSessionId)
+            .flatMap registrationRead@{ registration ->
+                if (!activePushRegistration(observed, registration))
+                    return@registrationRead pushUnavailable()
+                pushBindings
+                    .lock(device.spaceId, device.id)
+                    .flatMap { pushBindings.find(device.spaceId, device.accountId, device.id) }
+                    .flatMap bindingRead@{ previous ->
+                        val binding =
+                            previous
+                                ?: CollaborationSpacePushBinding(
+                                    device.spaceId,
+                                    device.accountId,
+                                    device.id,
+                                    device.originNativeSessionId,
+                                    device.matrixUserId,
+                                    device.matrixDeviceId,
+                                    0,
+                                    clock.instant().truncatedTo(ChronoUnit.MICROS),
+                                    null,
+                                )
+                        if (!validPushBinding(binding, observed)) return@bindingRead pushChanged()
+                        val reserved =
+                            if (previous != null) Result.Success(Unit)
+                            else
+                                pushBindings.reserve(binding).flatMap {
+                                    journal.record(
+                                        observed.actor,
+                                        ChangeRecord(
+                                            "collaboration_space_device",
+                                            device.id,
+                                            "collaboration.space_push_reserved",
+                                            mapOf(
+                                                "spaceId" to device.spaceId.toString(),
+                                                "version" to "0",
+                                            ),
+                                        ),
+                                    )
+                                }
+                        reserved
+                            .flatMap { pushBindings.key(binding) }
+                            .flatMap { key ->
+                                if (key == null || !validCollaborationSpacePushKey(key.value))
+                                    pushChanged()
+                                else
+                                    Result.Success(
+                                        PusherPreparation(
+                                            binding,
+                                            key,
+                                            requireNotNull(registration),
+                                        )
+                                    )
+                            }
+                    }
+            }
+    }
+
+    private fun activePushRegistration(
+        observed: Observation,
+        value: NativePushRegistration?,
+    ): Boolean {
+        val now = clock.instant()
+        return value != null &&
+            value.accountId == observed.device.accountId &&
+            value.sessionId == observed.device.originNativeSessionId &&
+            value.platform.name == observed.device.platform.name &&
+            value.enabled &&
+            value.version in 0L..9999L &&
+            value.registeredAt <= value.updatedAt &&
+            value.updatedAt <= now &&
+            value.expiresAt > now
+    }
+
+    private fun validPushBinding(
+        value: CollaborationSpacePushBinding,
+        observed: Observation,
+    ): Boolean {
+        val device = observed.device
+        val at = clock.instant()
+        return validCollaborationSpacePushBinding(value) &&
+            value.spaceId == device.spaceId &&
+            value.accountId == device.accountId &&
+            value.deviceId == device.id &&
+            value.nativeSessionId == device.originNativeSessionId &&
+            value.matrixUserId == device.matrixUserId &&
+            value.matrixDeviceId == device.matrixDeviceId &&
+            value.reservedAt >= device.createdAt &&
+            value.reservedAt <= at &&
+            value.publishedAt?.let { it > at } != true
+    }
+
+    private fun checkPusher(observed: Observation, prepared: PusherPreparation): Result<Unit> =
+        nativePush.find(observed.device.accountId, observed.device.originNativeSessionId).flatMap {
+            current ->
+            if (!activePushRegistration(observed, current)) pushUnavailable()
+            else if (current != prepared.registration) pushChanged()
+            else
+                pushBindings
+                    .find(
+                        prepared.binding.spaceId,
+                        prepared.binding.accountId,
+                        prepared.binding.deviceId,
+                    )
+                    .flatMap { binding ->
+                        if (
+                            binding == null ||
+                                !validPushBinding(binding, observed) ||
+                                !samePushReservation(binding, prepared.binding)
+                        )
+                            pushChanged()
+                        else Result.Success(Unit)
+                    }
+        }
+
+    private fun samePushReservation(
+        current: CollaborationSpacePushBinding,
+        retained: CollaborationSpacePushBinding,
+    ): Boolean =
+        if (retained.version == 0L) current.copy(version = 0, publishedAt = null) == retained
+        else current == retained
+
+    private fun pushUnavailable() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_push_unavailable"))
+
+    private fun pushChanged() =
+        Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_space_push_changed"))
+
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
             matrix.whoAmI(requireNotNull(observed.credential).accessToken, until).flatMap {
@@ -969,6 +1131,59 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         val lease: CollaborationSpaceRequestLease,
         private val checkExtra: (() -> Result<Unit>)? = null,
     ) {
+        fun publishPusher(retained: CollaborationSpacePushBinding): Result<Unit> =
+            transactions.run(context.scope) {
+                checkpoint(context, observation, lease, checkExtra)
+                    .flatMap {
+                        pushBindings.find(
+                            context.spaceId,
+                            context.scope.accountId,
+                            context.deviceId,
+                        )
+                    }
+                    .flatMap publication@{ current ->
+                        if (
+                            current == null ||
+                                !validPushBinding(current, observation) ||
+                                !samePushReservation(current, retained)
+                        )
+                            return@publication pushChanged()
+                        if (current.version == 1L)
+                            return@publication checkpoint(context, observation, lease, checkExtra)
+                        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+                        val next = current.copy(version = 1L, publishedAt = at)
+                        pushBindings
+                            .publish(current, at)
+                            .flatMap {
+                                journal.record(
+                                    observation.actor,
+                                    ChangeRecord(
+                                        "collaboration_space_device",
+                                        context.deviceId,
+                                        "collaboration.space_push_published",
+                                        mapOf(
+                                            "spaceId" to context.spaceId.toString(),
+                                            "version" to "1",
+                                        ),
+                                    ),
+                                )
+                            }
+                            .flatMap { checkpoint(context, observation, lease, checkExtra) }
+                            .flatMap {
+                                pushBindings.find(
+                                    context.spaceId,
+                                    context.scope.accountId,
+                                    context.deviceId,
+                                )
+                            }
+                            .flatMap { readback ->
+                                if (readback == next)
+                                    checkpoint(context, observation, lease, checkExtra)
+                                else pushChanged()
+                            }
+                    }
+            }
+
         fun <T> exchange(call: (String, Instant) -> Result<T>): Result<T> {
             val before =
                 transactions.run(context.scope) {

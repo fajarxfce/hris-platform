@@ -142,6 +142,18 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
         StoredCollaborationSpaceRequestRepository(
             PostgresCollaborationSpaceRequestDataSource(base.sql)
         )
+    val pushBindings =
+        EncryptedCollaborationSpacePushBindingRepository(
+            PostgresCollaborationSpacePushBindingDataSource(base.sql),
+            JceIdentityTokenDataSource(s.currentKeys),
+        )
+    val nativePush =
+        dev.fajar.hris.identity.data.repositories.StoredNativePushRegistrationRepository(
+            dev.fajar.hris.identity.data.datasources.PostgresNativePushRegistrationDataSource(
+                base.sql
+            ),
+            JceIdentityTokenDataSource(s.currentKeys),
+        )
     val ownKeys = MatrixKeyFixture(s.user, "HRISG_${compact(s.device)}")
     val peerKeys = MatrixKeyFixture(user(peer), "HRISG_${compact(peerDevice)}")
     val tokens: CollaborationSpaceGatewayTokens
@@ -272,6 +284,13 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
         roomAccess: CollaborationSpaceMatrixRoomAccessRepository =
             DisabledCollaborationSpaceMatrixRoomAccessRepository(),
+        service: CollaborationServicePolicy = CollaborationServicePolicy(),
+        pushBindings: CollaborationSpacePushBindingRepository = this.pushBindings,
+        providerPush: CollaborationMatrixPusherRepository =
+            DisabledCollaborationMatrixPusherRepository(),
+        nativePush: dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository =
+            this.nativePush,
+        journal: ChangeJournalRepository = base.journal,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             s.repo,
@@ -293,7 +312,7 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             clock,
             keys,
             providerKeys,
-            base.journal,
+            journal,
             recipients,
             toDevice,
             rooms,
@@ -305,6 +324,10 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             syncCursors,
             sync,
             roomAccess,
+            service,
+            pushBindings,
+            providerPush,
+            nativePush,
         )
 
     fun queryRequest() =

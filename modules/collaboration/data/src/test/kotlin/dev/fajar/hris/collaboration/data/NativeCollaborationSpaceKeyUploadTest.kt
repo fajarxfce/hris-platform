@@ -612,6 +612,17 @@ class NativeCollaborationSpaceKeyUploadTest {
                 EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
                 DisabledCollaborationSpaceMatrixSyncRepository(),
                 DisabledCollaborationSpaceMatrixRoomAccessRepository(),
+                CollaborationServicePolicy(),
+                EncryptedCollaborationSpacePushBindingRepository(
+                    PostgresCollaborationSpacePushBindingDataSource(base.sql),
+                    JceIdentityTokenDataSource(s.currentKeys),
+                ),
+                DisabledCollaborationMatrixPusherRepository(),
+                dev.fajar.hris.identity.data.repositories.StoredNativePushRegistrationRepository(
+                    dev.fajar.hris.identity.data.datasources
+                        .PostgresNativePushRegistrationDataSource(base.sql),
+                    JceIdentityTokenDataSource(s.currentKeys),
+                ),
             )
 
         fun upload(

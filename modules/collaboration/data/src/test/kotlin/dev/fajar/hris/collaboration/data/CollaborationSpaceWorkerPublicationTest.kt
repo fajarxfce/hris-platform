@@ -18,6 +18,8 @@ import dev.fajar.hris.identity.data.crypto.parseIdentityKeyring
 import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.entities.NativePushRegistration
+import dev.fajar.hris.identity.domain.entities.PushPlatform
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.Base64
@@ -93,6 +95,9 @@ class CollaborationSpaceWorkerPublicationTest {
             "grant insert,update on collaboration_space_room_provisioning to space_advance_command_fixture"
         )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
+        owner.execute(
+            "grant insert,update on collaboration_space_push_bindings,native_push_registrations to space_advance_command_fixture"
+        )
         runtime =
             DriverManagerDataSource(
                 postgres.jdbcUrl,
@@ -150,6 +155,120 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         }
         fixtures.clear()
+    }
+
+    @Test
+    fun groupPusherRetainsCompletedOriginalIdentityAndRejectsLostCompletionBeforeProviderIo() {
+        val f = Fixture(verifiedMfa = true)
+        val original = f.activeLegacy(signed = true)
+        val id = completeRoomDevice(f, original)
+        val bootstrap = success(f.groupBootstrap(id))
+        val old = f.originalSnapshot()
+        val completion = requireNotNull(f.completion(original))
+        val native =
+            StoredNativePushRegistrationRepository(
+                PostgresNativePushRegistrationDataSource(f.sql),
+                f.pushCrypto(),
+            )
+        val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        assertTrue(
+            success(
+                f.transactions.run(f.actor) {
+                    native.save(
+                        NativePushRegistration(
+                            f.session,
+                            f.account,
+                            PushPlatform.ANDROID,
+                            true,
+                            0,
+                            at,
+                            at,
+                            at.plusSeconds(300),
+                        ),
+                        "fictional-retained-native-token",
+                        null,
+                    )
+                }
+            )
+        )
+        val calls = mutableListOf<String>()
+        val provider =
+            object : CollaborationMatrixPusherRepository {
+                override fun set(pushKey: String, bearer: String, deadline: Instant): Result<Unit> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(f.credential(id).accessToken, bearer)
+                    assertTrue(
+                        deadline > Instant.now() && deadline <= Instant.now().plusSeconds(30)
+                    )
+                    assertTrue(pushKey.matches(Regex("hrisgp1_[a-f0-9]{64}")))
+                    calls += pushKey
+                    return Result.Success(Unit)
+                }
+
+                override fun remove(
+                    pushKey: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<Unit> =
+                    error("Retained registration never removes the original provider pusher")
+            }
+        val command =
+            f.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                service = CollaborationServicePolicy(true, true),
+                providerPush = provider,
+            )
+        repeat(2) { success(command.ensurePusher(bootstrap.tokens.accessToken, UUID.randomUUID())) }
+        assertEquals(2, calls.size)
+        assertEquals(1, calls.toSet().size)
+        val binding =
+            owner.queryForMap(
+                "select * from collaboration_space_push_bindings where device_id=?",
+                id,
+            )
+        assertEquals(bootstrap.matrixUserId, binding["matrix_user_id"])
+        assertEquals(bootstrap.matrixDeviceId, binding["matrix_device_id"])
+        assertNotEquals("HRISG_${id.toString().replace("-", "")}", binding["matrix_device_id"])
+        assertEquals(f.session, binding["native_session_id"])
+        assertEquals(1L, (binding["version"] as Number).toLong())
+        assertEquals(old, f.originalSnapshot())
+        assertEquals(completion, f.completion(original))
+        val missing =
+            object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                override fun find(
+                    owner: CollaborationLegacyRuntimeOwner
+                ): Result<CollaborationLegacyRuntimeCompletion?> = Result.Success(null)
+            }
+        val denied =
+            f.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                completions = missing,
+                service = CollaborationServicePolicy(true, true),
+                providerPush = provider,
+            )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            denied.ensurePusher(bootstrap.tokens.accessToken, UUID.randomUUID()),
+        )
+        assertEquals(2, calls.size)
+        assertEquals(
+            binding,
+            owner.queryForMap(
+                "select * from collaboration_space_push_bindings where device_id=?",
+                id,
+            ),
+        )
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_request_leases where device_id=?",
+                Int::class.java,
+                id,
+            ),
+        )
     }
 
     @Test
@@ -4337,6 +4456,9 @@ class CollaborationSpaceWorkerPublicationTest {
                 EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
             providerRoomAccess: CollaborationSpaceMatrixRoomAccessRepository =
                 DisabledCollaborationSpaceMatrixRoomAccessRepository(),
+            service: CollaborationServicePolicy = CollaborationServicePolicy(),
+            providerPush: CollaborationMatrixPusherRepository =
+                DisabledCollaborationMatrixPusherRepository(),
             rooms: CollaborationSpaceRoomRepository = roomRepository(),
             conversations: CollaborationSpaceConversationRepository =
                 StoredCollaborationSpaceConversationRepository(
@@ -4389,8 +4511,26 @@ class CollaborationSpaceWorkerPublicationTest {
                 syncCursors,
                 providerSync,
                 providerRoomAccess,
+                service,
+                EncryptedCollaborationSpacePushBindingRepository(
+                    PostgresCollaborationSpacePushBindingDataSource(sql),
+                    pushCrypto(),
+                ),
+                providerPush,
+                StoredNativePushRegistrationRepository(
+                    PostgresNativePushRegistrationDataSource(sql),
+                    pushCrypto(),
+                ),
             )
         }
+
+        fun pushCrypto() =
+            JceIdentityTokenDataSource(
+                parseIdentityKeyring(
+                    "fixture",
+                    "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 47 }),
+                )
+            )
 
         fun groupRefresh(
             token: String,

@@ -586,6 +586,19 @@ class CollaborationConfiguration {
         EncryptedCollaborationPushBindingRepository(source, crypto)
 
     @Bean
+    fun collaborationSpacePushBindingSource(
+        sql: DSLContext
+    ): CollaborationSpacePushBindingDataSource =
+        PostgresCollaborationSpacePushBindingDataSource(sql)
+
+    @Bean
+    fun collaborationSpacePushBindings(
+        source: CollaborationSpacePushBindingDataSource,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationSpacePushBindingRepository =
+        EncryptedCollaborationSpacePushBindingRepository(source, crypto)
+
+    @Bean
     fun collaborationMatrixRoomMessage(
         source: ObjectProvider<MatrixRoomMessageDataSource>
     ): CollaborationMatrixRoomMessageRepository =
@@ -988,6 +1001,10 @@ class CollaborationConfiguration {
         syncCursors: CollaborationSpaceSyncCursorRepository,
         providerSync: CollaborationSpaceMatrixSyncRepository,
         providerRoomAccess: CollaborationSpaceMatrixRoomAccessRepository,
+        service: CollaborationServicePolicy,
+        pushBindings: CollaborationSpacePushBindingRepository,
+        providerPush: CollaborationMatrixPusherRepository,
+        nativePush: NativePushRegistrationRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -1019,6 +1036,10 @@ class CollaborationConfiguration {
             syncCursors,
             providerSync,
             providerRoomAccess,
+            service,
+            pushBindings,
+            providerPush,
+            nativePush,
         )
 
     @Bean

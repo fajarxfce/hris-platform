@@ -15,6 +15,27 @@ import org.junit.jupiter.api.Test
 
 class MatrixSyncTransportTest {
     @Test
+    fun freshAndOriginalDeviceNamespacesHaveIndependentBoundedOwnership() {
+        Fixture().use { f ->
+            val fresh = "HRISG_${UUID.randomUUID().toString().replace("-", "")}"
+            f.open(fresh).use {
+                assertThrows(MatrixCapacityException::class.java) { f.open(fresh) }
+                assertThrows(MatrixCapacityException::class.java) { f.open() }
+            }
+            f.open().use {}
+            f.open(fresh).use {}
+            for (invalid in
+                listOf(
+                    "HRISGG_" + "a".repeat(32),
+                    "HRISG_" + "A".repeat(32),
+                    "HRISG_" + "a".repeat(31),
+                )) {
+                assertThrows(IllegalArgumentException::class.java) { f.open(invalid) }
+            }
+        }
+    }
+
+    @Test
     fun longPollHasSeparateCapacityAndInterruptedConnectionReleasesItsSingleDeviceSlot() {
         Fixture().use { f ->
             val entered = CountDownLatch(1)

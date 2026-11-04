@@ -14,10 +14,11 @@ class EncryptedCollaborationSyncCursorRepository(private val crypto: IdentityTok
         owner: CollaborationSyncOwner,
         position: CollaborationSyncPosition,
     ): Result<String> = safeCollaborationSyncCursorCall {
-        validate(position)
-        crypto.encrypt(
-            purpose(owner),
-            "${position.scopeDigest}\n${position.providerSince}\n${position.providerFilterId}",
+        validateCollaborationSyncPosition(position)
+        sealCollaborationSyncPosition(
+            crypto,
+            collaborationCompanySyncPurpose(crypto, owner),
+            position,
         )
     }
 
@@ -26,30 +27,59 @@ class EncryptedCollaborationSyncCursorRepository(private val crypto: IdentityTok
         cursor: String,
     ): Result<CollaborationSyncPosition> = safeCollaborationSyncCursorCall {
         require(cursor.length in 1..4096 && cursor.all { it.code in 33..126 })
-        val parts = crypto.decrypt(purpose(owner), cursor).split('\n')
-        require(parts.size == 3)
-        CollaborationSyncPosition(parts[0], parts[1], parts[2]).also(::validate)
-    }
-
-    private fun purpose(owner: CollaborationSyncOwner): String {
-        require(owner.serverName.length in 1..255 && owner.serverName.all { it.code in 33..126 })
-        return "collaboration.sync.v1:" +
-            crypto.hash(
-                "${owner.companyId}\n${owner.accountId}\n${owner.deviceId}\n${owner.serverName}"
-            )
-    }
-
-    private fun validate(position: CollaborationSyncPosition) {
-        require(position.scopeDigest.matches(Regex("[a-f0-9]{64}")))
-        require(
-            position.providerSince.length in 1..1024 &&
-                position.providerSince.all { it.code in 33..126 }
-        )
-        require(
-            position.providerFilterId.length in 1..128 &&
-                position.providerFilterId.all { it.code in 33..126 }
+        openCollaborationSyncPosition(
+            crypto,
+            collaborationCompanySyncPurpose(crypto, owner),
+            cursor,
         )
     }
+}
+
+internal fun collaborationCompanySyncPurpose(
+    crypto: IdentityTokenDataSource,
+    owner: CollaborationSyncOwner,
+): String {
+    require(owner.serverName.length in 1..255 && owner.serverName.all { it.code in 33..126 })
+    return "collaboration.sync.v1:" +
+        crypto.hash(
+            "${owner.companyId}\n${owner.accountId}\n${owner.deviceId}\n${owner.serverName}"
+        )
+}
+
+internal fun sealCollaborationSyncPosition(
+    crypto: IdentityTokenDataSource,
+    purpose: String,
+    position: CollaborationSyncPosition,
+): String {
+    validateCollaborationSyncPosition(position)
+    return crypto.encrypt(
+        purpose,
+        "${position.scopeDigest}\n${position.providerSince}\n${position.providerFilterId}",
+    )
+}
+
+internal fun openCollaborationSyncPosition(
+    crypto: IdentityTokenDataSource,
+    purpose: String,
+    cursor: String,
+): CollaborationSyncPosition {
+    require(cursor.length in 1..4096 && cursor.all { it.code in 33..126 })
+    val parts = crypto.decrypt(purpose, cursor).split('\n')
+    require(parts.size == 3)
+    return CollaborationSyncPosition(parts[0], parts[1], parts[2])
+        .also(::validateCollaborationSyncPosition)
+}
+
+private fun validateCollaborationSyncPosition(position: CollaborationSyncPosition) {
+    require(position.scopeDigest.matches(Regex("[a-f0-9]{64}")))
+    require(
+        position.providerSince.length in 1..1024 &&
+            position.providerSince.all { it.code in 33..126 }
+    )
+    require(
+        position.providerFilterId.length in 1..128 &&
+            position.providerFilterId.all { it.code in 33..126 }
+    )
 }
 
 /**

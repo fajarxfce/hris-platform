@@ -1,5 +1,7 @@
 # Architecture
 
+The [group sync protocol](collaboration/space-sync-protocol.md) shares bounded provider projection over the complete original/published room union, retains original queued frames and isolates encrypted group positions. Exact retained company cursors initialize a new scope; current native sync admission remains separate integration.
+
 [Current original history access](collaboration/space-original-history-access.md) now uses exact original-room lookup only when the published group binding is absent. Native admission and full metadata revalidation cover both provider outcomes; peer offboarding does not erase owned history.
 
 The [original history protocol](collaboration/space-original-history-protocol.md) preserves explicit original room framing and shares group cursor coordinates before/after adoption. Exact retained devices alone bridge old company cursors; native original lookup and current admission remain separate integration.

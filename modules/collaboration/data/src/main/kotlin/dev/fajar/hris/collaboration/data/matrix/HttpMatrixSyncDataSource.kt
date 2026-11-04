@@ -53,7 +53,7 @@ class HttpMatrixSyncDataSource(
         deadline: Instant,
     ): MatrixSyncConnection {
         require(userId.startsWith('@') && userId.length <= 255 && userId.all { it.code in 33..126 })
-        require(deviceId.matches(Regex("HRIS_[a-f0-9]{32}")))
+        require(deviceId.matches(Regex("HRISG?_[a-f0-9]{32}")))
         require(bearer.length in 1..2048 && bearer.all { it.code in 33..126 })
         if (Thread.currentThread().isInterrupted) throw InterruptedException()
         if (clock.instant() >= deadline) throw MatrixDeadlineException()

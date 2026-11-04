@@ -60,8 +60,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # credentials. Remaining envelopes retain their existing authenticated purposes.
 # V125 adds owned public-gateway metadata without any credential/envelope change.
 # V126 adds a separate organization gateway replay namespace and authenticated context.
-# V130 adds original room creator metadata without a new encryption envelope.
-MAX_SCHEMA = 130
+# V131 adds room intent/queue/binding metadata without a new encryption envelope.
+MAX_SCHEMA = 131
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

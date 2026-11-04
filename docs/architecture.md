@@ -99,6 +99,13 @@ separate from the conversation creator and required in the complete typed room t
 future adoption must use the actual provider creator. Original rows and the view's
 existing owner, grants and column order are preserved through upgrade and recovery.
 
+V131 adds [organization room storage](collaboration/space-room-lifecycle.md) with
+immutable canonical/original intent, bounded private queue and peer-safe status.
+Publication requires exact current native/device/provider/lease coordinates and
+binding plus successful request commit atomically. Typed write readback remains
+inside the caller transaction. Storage introduces no DI or provider authority;
+shared original-creation fencing and admitted application lifecycle remain required.
+
 Native group conversation open/read/list and original-inventory routes now own current
 native/group admission in their use cases. Pair creation and opposite-participant
 replay converge under operation/pair/account/native guards with atomic receipt/journal

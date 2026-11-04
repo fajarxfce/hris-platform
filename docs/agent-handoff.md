@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Organization room storage accepted — 4 November 2026
+
+V131 and typed storage retain immutable exact room intent, first requester versus
+actual Matrix creator, bounded request/worker lease and verified binding. Peer status
+has no private native/device/provider proof. Binding and exact request success must
+commit together; missing or malformed readback rolls back writes. Original unbound
+conversations cannot silently create replacement group history. Read the
+[storage contract](collaboration/space-room-lifecycle.md).
+
+[Evidence](measurements/collaboration-space-room-storage-2026-11-04.json): all93
+PostgreSQL database cases PASS797.756s; five typed PostgreSQL cases PASS106.634s;
+format/architecture and19 recovery cases pass. All8,376 full-database inputs remain
+identical in the final8,385-input typed gate; nine typed files were added afterward.
+Concurrent claims/publication, stale/revoked proof, deadline after device-lock wait,
+exhaustion/retry, actual archive restore and readback/cancellation rollback pass.
+Two initial compilation failures are resolved and recorded; all test sessions closed.
+No use case, endpoint, shared DI or product caller changed; no new API/worker claim.
+All SQL/typed drafts in ignored group-room-lifecycle are APPLIED/STALE; use source.
+
+NEXT durable shared original/group creation fence: V131's snapshot check does not
+prevent an original conversation appearing later. Immutable V110 conversations
+precede every old room producer, so arbitrate original-conversation versus SPACE
+intent with a unique persistent route for same-original-company canonical pairs.
+Backfill exact existing routes; conflict must fail for explicit recovery. Test
+both concurrency orders, rollback, repeatable-read snapshots and RLS. Acquire any
+common pair guard before account/native guards; avoid old/new lock inversion.
+Then native room request/status and bounded worker reconciliation with original
+current admission before/after provider work, binding/outcome/journal atomicity,
+stable alias recovery and exact original adoption. Generic jobs remain company-only.
+Recipient keys/content/sync/push, native hard-parent replacement, offline keys and
+full Mobile adoption preserving SDK namespace/passphrase/history remain required.
+Group disabled/all54 groups open; live8b40/schema116 pushON/SMTPOFF, phone28,
+Mobileproduct/hosted0b804cb2 and Starter9959c1d unchanged. Main1ee06e79/Mobilef7e2a5e2
+are pushed original-room handoffs; refresh peer notes after this checkpoint is pushed.
+Continue long run, regular updates, atomic pushes and validated PRODUCT feature installs.
+
 ## Original room lookup and verification accepted — 4 November 2026
 
 Based on 6c22caba, exact original company/pair lookup reads at most two rows and

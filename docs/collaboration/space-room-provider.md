@@ -92,3 +92,11 @@ inputs. The original canonical peer joins using its retained user/device after g
 login; original creator, room state and both signed keys survive restart. No provider
 logout, creator impersonation, key replacement or new group alias occurs. These are
 protocol/public-key checks; no native room grant, SDK message or Mobile rollout follows.
+
+## Durable storage foundation
+
+[V131 storage](space-room-lifecycle.md) now pins the immutable candidate, original
+creator/coordinates, bounded request and binding. Binding and queue success commit
+together. It does not invoke this provider or admit native/group access. The owning
+use case and worker still need current authority around each provider outcome and
+a shared fence against later original conversation creation before product rollout.

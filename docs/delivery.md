@@ -1,5 +1,18 @@
 # Delivery and validation
 
+## Organization room intent and bounded queue — 4 November 2026
+
+V131 plus typed storage preserve exact canonical/original room identity, peer-safe
+status and current native/device/provider lease proof. Binding and queue success
+commit atomically; failed readback/cancellation rolls back actual writes. See the
+[contract](collaboration/space-room-lifecycle.md) and
+[evidence](measurements/collaboration-space-room-storage-2026-11-04.json): database93
+PASS797.756s; typed5 PASS106.634s; format/architecture and recovery19 pass. Shared
+8,376 inputs are identical; final typed run adds nine files. All initial compilation
+failures are resolved. No shared DI, API/worker adapter, product APK or live rollout.
+Next shared original creation fence, admitted room lifecycle and Mobile integration;
+all54 PRD groups remain open.
+
 ## Original room lookup and protocol continuity — 4 November 2026
 
 Exact original-pair lookup and pure metadata/state verification now preserve original

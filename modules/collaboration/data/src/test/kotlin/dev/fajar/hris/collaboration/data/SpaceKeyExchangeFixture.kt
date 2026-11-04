@@ -258,6 +258,12 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
         clock: Clock = Clock.systemUTC(),
         toDevice: CollaborationMatrixToDeviceRepository =
             DisabledCollaborationMatrixToDeviceRepository(),
+        rooms: CollaborationSpaceRoomRepository =
+            StoredCollaborationSpaceRoomRepository(
+                PostgresCollaborationSpaceRoomDataSource(base.sql)
+            ),
+        roomMessages: CollaborationMatrixRoomMessageRepository =
+            DisabledCollaborationMatrixRoomMessageRepository(),
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             s.repo,
@@ -282,6 +288,8 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             base.journal,
             recipients,
             toDevice,
+            rooms,
+            roomMessages,
         )
 
     fun queryRequest() =

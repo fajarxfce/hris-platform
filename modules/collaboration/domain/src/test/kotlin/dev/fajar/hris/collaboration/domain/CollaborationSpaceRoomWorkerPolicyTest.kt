@@ -210,6 +210,13 @@ class CollaborationSpaceRoomWorkerPolicyTest {
             conversationId: UUID,
         ): Result<CollaborationSpaceRoomStatus?> = error("Unexpected claim operation")
 
+        override fun boundRoom(
+            spaceId: UUID,
+            accountId: UUID,
+            serverName: String,
+            roomId: String,
+        ): Result<CollaborationSpaceBoundRoom?> = error("Unexpected claim operation")
+
         override fun provisioning(
             spaceId: UUID,
             accountId: UUID,

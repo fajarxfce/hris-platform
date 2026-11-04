@@ -69,6 +69,7 @@ revocation on provider success and failure, cancellation, original LEGACY migrat
 actual Synapse restart behavior, strict HTTP dispatch and the full worker DI graph.
 See the [accepted gate results](../measurements/collaboration-space-to-device-2026-11-04.json) and source continuity.
 
-Group room content/sync/push, full Mobile SDK adoption and native hard-parent recovery
-remain required. Group rollout stays disabled; this transport alone does not satisfy
+The [group room-message route](space-room-messages.md) now retains exact room and
+transaction identity under current receiving authority. Group history/sync/metadata/
+push, full Mobile SDK adoption and native hard-parent recovery remain required. Group rollout stays disabled; this transport alone does not satisfy
 chat product acceptance or justify installing an unchanged mobile build.

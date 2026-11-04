@@ -55,6 +55,13 @@ interface CollaborationSpaceRoomDataSource {
         conversationId: UUID,
     ): CollaborationSpaceRoomBindingData?
 
+    fun boundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        serverName: String,
+        roomId: String,
+    ): List<CollaborationSpaceRoomBindingData>
+
     fun insertBinding(row: CollaborationSpaceRoomBindingsRecord)
 
     fun status(

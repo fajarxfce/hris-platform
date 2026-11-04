@@ -60,6 +60,25 @@ class PostgresCollaborationSpaceRoomDataSource(private val sql: DSLContext) :
             )
             .fetchOne { CollaborationSpaceRoomBindingData(it.into(I), it.into(B)) }
 
+    override fun boundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        serverName: String,
+        roomId: String,
+    ): List<CollaborationSpaceRoomBindingData> =
+        sql.select(I.asterisk(), B.asterisk())
+            .from(B)
+            .join(I)
+            .on(I.SPACE_ID.eq(B.SPACE_ID), I.CONVERSATION_ID.eq(B.CONVERSATION_ID))
+            .where(
+                B.SPACE_ID.eq(spaceId),
+                B.MATRIX_ROOM_ID.eq(roomId),
+                I.MATRIX_SERVER_NAME.eq(serverName),
+                I.FIRST_ACCOUNT_ID.eq(accountId).or(I.SECOND_ACCOUNT_ID.eq(accountId)),
+            )
+            .limit(2)
+            .fetch { CollaborationSpaceRoomBindingData(it.into(I), it.into(B)) }
+
     override fun insertBinding(row: CollaborationSpaceRoomBindingsRecord) {
         check(sql.insertInto(B).set(row).execute() == 1)
     }

@@ -25,6 +25,14 @@ interface CollaborationSpaceRoomRepository {
         conversationId: UUID,
     ): Result<CollaborationSpaceRoomBinding?>
 
+    /** Bounded exact lookup of owned immutable metadata; current runtime admission is separate. */
+    fun boundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        serverName: String,
+        roomId: String,
+    ): Result<CollaborationSpaceBoundRoom?>
+
     fun status(
         spaceId: UUID,
         accountId: UUID,

@@ -60,9 +60,10 @@ class MatrixGatewayDeviceController(
             { matrixRoomMessageRequest(transactionId, it) },
             reader = envelopeParser,
         ) { token, correlation, message ->
-            device.sendRoomMessage(token, correlation, roomId, message).map {
-                mapOf("event_id" to it)
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.sendRoomMessage(token, correlation, roomId, message)
+                else device.sendRoomMessage(token, correlation, roomId, message))
+                .map { mapOf("event_id" to it) }
         }
 
     @PostMapping("/_matrix/client/v3/rooms/{roomId}/receipt/{receiptType}/{eventId}")

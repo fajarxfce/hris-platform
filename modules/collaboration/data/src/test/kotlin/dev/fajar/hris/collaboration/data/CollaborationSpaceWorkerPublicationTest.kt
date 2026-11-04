@@ -2541,6 +2541,9 @@ class CollaborationSpaceWorkerPublicationTest {
                 b.transactions.run(b.actor) { b.roomRepository().intent(space, b.account, group) }
             ),
         )
+        a.assertRetainedGroupKeyStorage(idA)
+        b.assertRetainedGroupKeyStorage(idB)
+        assertRetainedRoomMessage(b, idB, originalRoom.roomId)
         assertEquals(priorA, a.originalSnapshot())
         assertEquals(priorB, b.originalSnapshot())
         assertNotNull(a.completion(oldA))
@@ -2851,6 +2854,7 @@ class CollaborationSpaceWorkerPublicationTest {
         loseResponse = false
         success(command.sendToDevice(token, UUID.randomUUID(), retainedFrame))
         assertEquals(listOf(retainedFrame, retainedFrame), receivedFrames)
+        assertRetainedRoomMessage(a, idA, binding.roomId, token)
         assertEquals(priorA, a.originalSnapshot())
         assertEquals(priorB, b.originalSnapshot())
         owner.update("delete from native_sessions where id=?", b.session)
@@ -2861,6 +2865,98 @@ class CollaborationSpaceWorkerPublicationTest {
         )
         assertEquals(2, receivedFrames.size)
         assertEquals(priorB, b.originalSnapshot())
+    }
+
+    private fun assertRetainedRoomMessage(
+        f: Fixture,
+        deviceId: UUID,
+        roomId: String,
+        gatewayToken: String? = null,
+    ) {
+        val material = requireNotNull(f.retainedKeys)
+        val credential = f.credential(deviceId)
+        val token = gatewayToken ?: success(f.groupBootstrap(deviceId)).tokens.accessToken
+        val expectedRoom = roomId
+        val prior = f.originalSnapshot()
+        val keys =
+            object :
+                CollaborationMatrixKeyRepository by DisabledCollaborationMatrixKeyRepository() {
+                override fun ownDeviceKeys(
+                    userId: String,
+                    deviceId: String,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixDeviceKeys?> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(material.userId, userId)
+                    assertEquals(material.deviceId, deviceId)
+                    assertEquals(credential.accessToken, token)
+                    assertTrue(deadline > Instant.now())
+                    return Result.Success(material.device)
+                }
+            }
+        val messages = mutableListOf<CollaborationRoomMessage>()
+        var lostResponse = true
+        val sender =
+            object : CollaborationMatrixRoomMessageRepository {
+                override fun send(
+                    roomId: String,
+                    message: CollaborationRoomMessage,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<String> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(credential.accessToken, bearer)
+                    assertTrue(deadline > Instant.now())
+                    assertEquals(expectedRoom, roomId)
+                    messages += message
+                    return if (lostResponse)
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "fixture_room_response_lost")
+                        )
+                    else Result.Success("\$retained-room-event")
+                }
+            }
+        val message =
+            CollaborationRoomMessage(
+                "original-room-uncertain-transaction",
+                "ZmljdGlvbmFsLW9yaWdpbmFsLXJvb20",
+                Base64.getEncoder().withoutPadding().encodeToString(ByteArray(32) { 19 }),
+                material.device.keys.getValue("curve25519:${material.deviceId}"),
+                material.deviceId,
+            )
+        assertNotEquals("HRISG_${compact(deviceId)}", message.deviceId)
+        val command =
+            f.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerKeys = keys,
+                providerRoomMessage = sender,
+            )
+        failure(
+            command.sendRoomMessage(token, UUID.randomUUID(), roomId, message),
+            "fixture_room_response_lost",
+        )
+        lostResponse = false
+        assertEquals(
+            "\$retained-room-event",
+            success(command.sendRoomMessage(token, UUID.randomUUID(), roomId, message)),
+        )
+        assertEquals(listOf(message, message), messages)
+        assertEquals(prior, f.originalSnapshot())
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_request_leases where device_id=?",
+                Int::class.java,
+                deviceId,
+            ),
+        )
     }
 
     private fun completeRoomDevice(f: Fixture, original: CollaborationLegacyDevicePosition): UUID {
@@ -3412,6 +3508,8 @@ class CollaborationSpaceWorkerPublicationTest {
                 DisabledCollaborationMatrixKeyRepository(),
             providerToDevice: CollaborationMatrixToDeviceRepository =
                 DisabledCollaborationMatrixToDeviceRepository(),
+            providerRoomMessage: CollaborationMatrixRoomMessageRepository =
+                DisabledCollaborationMatrixRoomMessageRepository(),
         ): AccessNativeCollaborationSpaceMatrixDevice {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
@@ -3452,6 +3550,10 @@ class CollaborationSpaceWorkerPublicationTest {
                     PostgresCollaborationSpaceRecipientDataSource(sql)
                 ),
                 providerToDevice,
+                StoredCollaborationSpaceRoomRepository(
+                    PostgresCollaborationSpaceRoomDataSource(sql)
+                ),
+                providerRoomMessage,
             )
         }
 

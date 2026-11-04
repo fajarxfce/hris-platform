@@ -37,6 +37,8 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val journal: ChangeJournalRepository,
     private val recipients: CollaborationSpaceRecipientRepository,
     private val providerToDevice: CollaborationMatrixToDeviceRepository,
+    private val rooms: CollaborationSpaceRoomRepository,
+    private val providerRoomMessage: CollaborationMatrixRoomMessageRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -96,6 +98,107 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         }
     }
 
+    fun sendRoomMessage(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        message: CollaborationRoomMessage,
+    ): Result<String> {
+        val valid = validateCollaborationRoomMessage(message)
+        if (valid is Result.Failed) return valid
+        if (!validCollaborationSpaceRoomId(roomId))
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_room_message")
+            )
+        return admitted(
+            token,
+            correlationId,
+            decrypt = true,
+            extraAccounts = { head ->
+                // Discover guard IDs only; the runner must still admit the caller on failure.
+                val lookup = Actor(head.accountId, null, emptySet(), Instant.EPOCH, correlationId)
+                transactions.run(lookup) {
+                    readBoundRoom(head.spaceId, head.accountId, roomId).map {
+                        setOf(it.intent.firstAccountId, it.intent.secondAccountId)
+                    }
+                }
+            },
+            prepare = { observed -> prepareRoomMessage(observed, roomId, requireReceiver = true) },
+            revalidate = { observed, original ->
+                prepareRoomMessage(observed, roomId, requireReceiver = false).flatMap { current ->
+                    if (current == original) Result.Success(Unit)
+                    else collaborationSpaceRecipientsChanged()
+                }
+            },
+        ) { exchange, prepared ->
+            if (
+                message.deviceId != null &&
+                    message.deviceId != exchange.observation.device.matrixDeviceId
+            )
+                return@admitted Result.Failed(
+                    Failure(FailureKind.CONFLICT, "collaboration_encryption_keys_changed")
+                )
+            val own = exchange.readConfirmedKeys(prepared.own)
+            if (own is Result.Failed) return@admitted own
+            if (!collaborationRoomMessageMatchesDevice(message, (own as Result.Success).value))
+                return@admitted Result.Failed(
+                    Failure(FailureKind.CONFLICT, "collaboration_encryption_keys_changed")
+                )
+            exchange.exchange { bearer, deadline ->
+                providerRoomMessage.send(roomId, message, bearer, deadline)
+            }
+        }
+    }
+
+    private fun readBoundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        roomId: String,
+    ): Result<CollaborationSpaceBoundRoom> =
+        rooms.boundRoom(spaceId, accountId, provider.serverName, roomId).flatMap {
+            snapshotCollaborationSpaceBoundRoom(
+                spaceId,
+                accountId,
+                provider.serverName,
+                roomId,
+                it,
+                clock.instant(),
+            )
+        }
+
+    private fun prepareRoomMessage(
+        observed: Observation,
+        roomId: String,
+        requireReceiver: Boolean,
+    ): Result<RoomMessagePreparation> =
+        readBoundRoom(observed.device.spaceId, observed.actor.accountId, roomId).flatMap { room ->
+            val intent = room.intent
+            if (
+                !observed.relatedAccounts.containsAll(
+                    setOf(intent.firstAccountId, intent.secondAccountId)
+                )
+            )
+                return@flatMap invalidProvider()
+            val first = intent.firstAccountId == observed.actor.accountId
+            val ownUser = if (first) intent.firstMatrixUserId else intent.secondMatrixUserId
+            if (ownUser != observed.device.matrixUserId) return@flatMap invalidProvider()
+            val peerUser = if (first) intent.secondMatrixUserId else intent.firstMatrixUserId
+            val query = CollaborationMatrixKeyQuery(mapOf(peerUser to emptyList()))
+            prepareRecipients(observed, query, includeReserved = false).flatMap { selected ->
+                if (requireReceiver && selected.providerRequest().devices.isEmpty())
+                    return@flatMap Result.Failed(
+                        Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
+                    )
+                confirmedOwnKeys(observed).map { RoomMessagePreparation(room, selected, it) }
+            }
+        }
+
+    private data class RoomMessagePreparation(
+        val room: CollaborationSpaceBoundRoom,
+        val recipients: CollaborationSpaceKeySelection,
+        val own: CollaborationSpaceKeyPublication,
+    )
+
     fun sendToDevice(
         token: String,
         correlationId: UUID,
@@ -125,27 +228,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                 }
             },
         ) { exchange, prepared ->
-            // Detach the sender identity inside the provider operation, before completion
-            // callbacks.
-            val own =
-                exchange.exchange { bearer, deadline ->
-                    val device = exchange.observation.device
-                    providerKeys
-                        .ownDeviceKeys(device.matrixUserId, device.matrixDeviceId, bearer, deadline)
-                        .flatMap { keys ->
-                            if (keys == null) return@flatMap invalidProvider()
-                            val snapshot =
-                                snapshotCollaborationKeyUpload(
-                                    CollaborationMatrixKeyUpload(deviceKeys = keys)
-                                )
-                            if (snapshot is Result.Failed) return@flatMap invalidProvider()
-                            val identity =
-                                requireNotNull((snapshot as Result.Success).value.deviceKeys)
-                            validatePublicKeys(exchange.observation, prepared.own, identity).map {
-                                identity
-                            }
-                        }
-                }
+            val own = exchange.readConfirmedKeys(prepared.own)
             if (own is Result.Failed) return@admitted own
             val sender = (own as Result.Success).value
             val selected =
@@ -438,6 +521,24 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             return if (after is Result.Failed) after else response
         }
 
+        fun readConfirmedKeys(
+            retained: CollaborationSpaceKeyPublication
+        ): Result<CollaborationMatrixDeviceKeys> = exchange { bearer, deadline ->
+            val device = observation.device
+            providerKeys
+                .ownDeviceKeys(device.matrixUserId, device.matrixDeviceId, bearer, deadline)
+                .flatMap { keys ->
+                    if (keys == null) return@flatMap invalidProvider()
+                    val snapshot =
+                        snapshotCollaborationKeyUpload(
+                            CollaborationMatrixKeyUpload(deviceKeys = keys)
+                        )
+                    if (snapshot is Result.Failed) return@flatMap invalidProvider()
+                    val identity = requireNotNull((snapshot as Result.Success).value.deviceKeys)
+                    validatePublicKeys(observation, retained, identity).map { identity }
+                }
+        }
+
         fun readKeys(): Result<CollaborationMatrixDeviceKeys?> = exchange { bearer, deadline ->
             providerKeys.ownDeviceKeys(
                 observation.device.matrixUserId,
@@ -546,19 +647,26 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         if (resolved is Result.Failed) return resolved
         val initial = (resolved as Result.Success).value ?: return authenticationRequired()
         val requestedAccounts = extraAccounts(initial)
-        if (requestedAccounts is Result.Failed) return requestedAccounts
-        val peers = (requestedAccounts as Result.Success).value
-        if (peers.size > 100 || UUID(0, 0) in peers) return invalidProvider()
+        val peers = (requestedAccounts as? Result.Success)?.value ?: emptySet()
+        val discoveryFailure =
+            when {
+                requestedAccounts is Result.Failed -> requestedAccounts
+                peers.size > 100 || UUID(0, 0) in peers -> invalidProvider()
+                else -> null
+            }
         val context =
             Context(
                 lookup.copy(accountId = initial.accountId),
                 initial,
                 started,
-                (peers + initial.accountId).sorted(),
+                (if (discoveryFailure == null) peers + initial.accountId
+                    else setOf(initial.accountId))
+                    .sorted(),
             )
         val prepared =
             transactions.run(context.scope) {
                 observe(context, decrypt).flatMap { observed ->
+                    if (discoveryFailure != null) return@flatMap discoveryFailure
                     val until =
                         minOf(
                                 started.plusSeconds(30),
@@ -852,7 +960,15 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                 authenticationRequired()
             else
                 validateCollaborationSpaceGatewaySession(context.initial, final, device, now).map {
-                    Observation(actor, device, identity, state, credential, final)
+                    Observation(
+                        actor,
+                        device,
+                        identity,
+                        state,
+                        credential,
+                        final,
+                        context.accounts.toSet(),
+                    )
                 }
         }
     }
@@ -891,6 +1007,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         val state: CollaborationSpaceProviderState,
         val credential: CollaborationSpaceProviderSession?,
         val admission: CollaborationSpaceAdmission,
+        val relatedAccounts: Set<UUID>,
     )
 
     private class Preparation<S>(

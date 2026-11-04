@@ -237,7 +237,9 @@
         "space-recipient-key-exchange.md",
         "../measurements/collaboration-space-recipient-key-exchange-2026-11-04.json",
         "space-to-device.md",
-        "../measurements/collaboration-space-to-device-2026-11-04.json"
+        "../measurements/collaboration-space-to-device-2026-11-04.json",
+        "space-room-messages.md",
+        "../measurements/collaboration-space-room-messages-2026-11-04.json"
       ]
     },
     {
@@ -309,7 +311,9 @@
         "space-recipient-key-exchange.md",
         "../measurements/collaboration-space-recipient-key-exchange-2026-11-04.json",
         "space-to-device.md",
-        "../measurements/collaboration-space-to-device-2026-11-04.json"
+        "../measurements/collaboration-space-to-device-2026-11-04.json",
+        "space-room-messages.md",
+        "../measurements/collaboration-space-room-messages-2026-11-04.json"
       ]
     },
     {

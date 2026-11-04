@@ -161,7 +161,10 @@ Every provider outcome rechecks the exact selected set and original lease/deadli
 The [group to-device route](collaboration/space-to-device.md) now verifies confirmed
 recipients, detached signed sender/recipient identities and both envelope keys under
 current admission. Original provider transaction IDs remain; restart may replay a
-frame. Room content/sync/push and full Mobile adoption remain separate work.
+frame. The [group room-message route](collaboration/space-room-messages.md) now
+uses exact V131 owned room metadata, current confirmed recipients and pinned sender
+keys. Original room event IDs survive measured retry/restart. History/sync/metadata/
+push and full Mobile adoption remain separate work.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

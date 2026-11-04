@@ -3,6 +3,7 @@ package dev.fajar.hris.collaboration.data.repositories
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.mappers.*
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceRoomRepository
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
@@ -54,6 +55,25 @@ class StoredCollaborationSpaceRoomRepository(private val source: CollaborationSp
         source
             .binding(spaceId, accountId, conversationId)
             ?.toSpaceRoomBinding(spaceId, accountId, conversationId)
+    }
+
+    override fun boundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        serverName: String,
+        roomId: String,
+    ): Result<CollaborationSpaceBoundRoom?> = safeDatabaseCall {
+        requireSpaceRoomIds(spaceId, accountId)
+        require(validCollaborationSpaceServer(serverName) && validCollaborationSpaceRoomId(roomId))
+        val rows = source.boundRoom(spaceId, accountId, serverName, roomId)
+        require(rows.size <= 1)
+        rows.singleOrNull()?.let { row ->
+            val conversation = requireNotNull(row.binding.conversationId)
+            val intent = row.intent.toSpaceRoomIntent(spaceId, accountId, conversation)
+            val binding = row.toSpaceRoomBinding(spaceId, accountId, conversation)
+            require(intent.serverName == serverName && binding.roomId == roomId)
+            CollaborationSpaceBoundRoom(intent, binding)
+        }
     }
 
     override fun status(

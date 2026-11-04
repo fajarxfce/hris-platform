@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Group encrypted room-message send accepted — 4 November 2026
+
+The fixed group send route now uses an exact owned room plus confirmed current peer
+and own-key publication. Original room, user, device, ciphertext, Megolm session and
+transaction IDs remain unchanged. Signed sender keys and all pinned observations are
+checked under current admission; provider I/O stays outside SQL. Offline short peer
+credentials permit receiving, while offboarding blocks new sends. Owned metadata may
+still remain for separately authorized history reads.
+[Protocol](collaboration/space-room-messages.md), [evidence](measurements/collaboration-space-room-messages-2026-11-04.json).
+
+Passed: 125 policy/repository tests (75.939 s), corrected
+room gateway 8 (146.529 s), retained-device 32
+(260.625 s), actual API 141
+(220.003 s), and full worker 138
+(397.325 s; one existing optional skip). Quality checks
+pass. All 38 existing self/key/to-device regressions passed in the initial gateway
+run. New room and HTTP fixture failures plus the initial compile failure were fixed
+without production changes; evidence retains the failed attempts. Final API/worker
+gates share 8,436 identical unchanged inputs; only the HTTP fixture differs from the
+passed room/retained gates. All sessions closed.
+
+Actual Synapse preserved one room event ID through retry and restart. Retained-device
+tests preserve old HRIS_ identities in both original LEGACY and new cross-company
+rooms. These are transport/storage proofs, not valid SDK Megolm decryption or delivery/
+read receipts. A denied late response cannot undo prior remote acceptance.
+
+NEXT: group history, sync, metadata and push with distinct group owner/cursor types,
+then full Mobile SDK adoption and native hard-parent recovery. Preserve original SDK
+store/passphrase/keys/history/uncertain sends. Read scope must retain owned history
+without granting new-send authority to an unavailable peer. Completed LEGACY cursors
+need an explicit proven bridge; never use a group UUID as a company or clear the SDK
+store to bypass recovery. Applied room-message drafts are stale; committed source is
+authoritative. No migration follows V135 in this increment.
+
+Base `302a43ac`, Main `166d12f8` and Mobile `015a0c96` are pushed. Group rollout remains
+disabled and all 54 PRD acceptance groups remain open. Live `8b40` / schema 116 (push
+on, SMTP off), normal phone release 28, Mobile product/hosted `0b804cb2` and Starter
+`9959c1d` remain unchanged. Continue the long run, updates, atomic pushes and validated
+product feature installs.
+
 ## Group encrypted to-device transport accepted — 4 November 2026
 
 The fixed group route now sends original encrypted frames only to confirmed current

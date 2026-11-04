@@ -8,6 +8,8 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceKeyRep
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.domain.Result
 import dev.fajar.hris.core.domain.TransactionRunner
+import dev.fajar.hris.core.domain.flatMap
+import dev.fajar.hris.core.domain.map
 import java.net.InetSocketAddress
 import java.net.URI
 import java.net.http.*
@@ -970,6 +972,297 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 hook.set(null)
             }
         }
+    }
+
+    @Test
+    fun groupRoomCiphertextUsesBoundCrossCompanyRoomAndStrictOpaqueAuthority() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val (peerDevice, peerToken) = enrollGroup(b)
+        val key = groupFixtureKeys(device)
+        val peerKey = groupFixtureKeys(peerDevice)
+        assertEquals(200, uploadKeys(a, token, json.writeValueAsString(key.body())).statusCode())
+        assertEquals(
+            200,
+            uploadKeys(b, peerToken, json.writeValueAsString(peerKey.body())).statusCode(),
+        )
+        val room = publishedGroupRoom(a, device, b)
+        val body = groupRoomCiphertext(key)
+        val before = provider.roomSends.get()
+        fun send(
+            value: String = body,
+            auth: String? = token,
+            suffix: String = "",
+            duplicate: Boolean = false,
+            target: String = room,
+        ) =
+            uploadKeys(
+                a,
+                auth,
+                value,
+                chunked = true,
+                suffix = suffix,
+                duplicate = duplicate,
+                route = "rooms/$target/send/m.room.encrypted/fixture-txn",
+                method = "PUT",
+            )
+        for (auth in listOf(null, a.access, "fictional-provider-token")) assertEquals(
+            401,
+            send(auth = auth).statusCode(),
+        )
+        assertEquals(401, send(duplicate = true).statusCode())
+        assertEquals(400, send(suffix = "?access_token=forbidden").statusCode())
+        for (invalid in
+            listOf(
+                "{}",
+                body + "{}",
+                body.replace("m.megolm.v1.aes-sha2", "plaintext"),
+                body.replace("ZmljdGlvbmFs", "plaintext!"),
+            )) assertEquals(400, send(invalid).statusCode())
+        assertEquals(413, send(" ".repeat(65537)).statusCode())
+        assertEquals(404, send(target = "!unrelated:matrix.example.test").statusCode())
+        assertEquals(before, provider.roomSends.get())
+        database()
+            .update(
+                "update native_sessions set access_expires_at=clock_timestamp()-interval '1 second' where id=?",
+                b.session,
+            )
+        repeat(2) {
+            val response = send()
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("\$fixture-sent", json.readTree(response.body())["event_id"].asString())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(json.readTree(body), provider.lastRoomCiphertext.get())
+        }
+        assertEquals(before + 2, provider.roomSends.get())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupRoomSendWithholdsProviderEventWhenReceiverIsRevokedAfterAcceptance() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val (peerDevice, peerToken) = enrollGroup(b)
+        val key = groupFixtureKeys(device)
+        val peerKey = groupFixtureKeys(peerDevice)
+        assertEquals(200, uploadKeys(a, token, json.writeValueAsString(key.body())).statusCode())
+        assertEquals(
+            200,
+            uploadKeys(b, peerToken, json.writeValueAsString(peerKey.body())).statusCode(),
+        )
+        val room = publishedGroupRoom(a, device, b)
+        val before = provider.roomSends.get()
+        provider.onRoomSend.set {
+            database()
+                .update(
+                    "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                    b.fixture.account,
+                )
+        }
+        try {
+            val response =
+                uploadKeys(
+                    a,
+                    token,
+                    groupRoomCiphertext(key),
+                    route = "rooms/$room/send/m.room.encrypted/fixture-txn",
+                    method = "PUT",
+                )
+            assertEquals(503, response.statusCode(), response.body())
+            assertFalse(response.body().contains("event_id"))
+            assertFalse(response.body().contains(token))
+            assertEquals(before + 1, provider.roomSends.get())
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onRoomSend.set(null)
+        }
+    }
+
+    private fun groupEmployee(): Native {
+        val admin = fixture()
+        val account = UUID.randomUUID()
+        val email = "$account@example.test"
+        database()
+            .update(
+                "insert into accounts(id,email,display_name,password_hash) select ?,?,'Room HTTP employee',password_hash from accounts where email='admin@example.test'",
+                account,
+                email,
+            )
+        database()
+            .update(
+                "insert into company_memberships(company_id,account_id) values(?,?)",
+                admin.company,
+                account,
+            )
+        database()
+            .update(
+                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+                admin.company,
+                account,
+            )
+        val browser = client()
+        val csrf = login(browser, email)
+        val exchanged =
+            command(
+                browser,
+                "/api/v1/auth/native/exchange",
+                """{"deviceName":"Room HTTP employee fixture"}""",
+                csrf,
+                UUID.randomUUID(),
+            )
+        assertEquals(200, exchanged.statusCode(), exchanged.body())
+        val data = json.readTree(exchanged.body())
+        return Native(
+            Fixture(
+                browser,
+                csrf,
+                admin.company,
+                account,
+                Actor(
+                    account,
+                    admin.company,
+                    setOf("collaboration.chat"),
+                    clock.instant(),
+                    UUID.randomUUID(),
+                    credentialVersion = 0,
+                ),
+            ),
+            UUID.fromString(data["sessionId"].asString()),
+            data["accessToken"].asString(),
+        )
+    }
+
+    private fun groupRoomCiphertext(key: KeyPayload): String {
+        val curve =
+            json
+                .valueToTree<tools.jackson.databind.JsonNode>(key.body())["device_keys"]["keys"][
+                    "curve25519:${key.device}"]
+                .asString()
+        return json.writeValueAsString(
+            mapOf(
+                "algorithm" to "m.megolm.v1.aes-sha2",
+                "ciphertext" to "ZmljdGlvbmFs",
+                "session_id" to
+                    Base64.getEncoder().withoutPadding().encodeToString(ByteArray(32) { 7 }),
+                "sender_key" to curve,
+                "device_id" to key.device,
+            )
+        )
+    }
+
+    private fun publishedGroupRoom(a: Native, device: UUID, peer: Native): String {
+        assertNotEquals(a.fixture.account, peer.fixture.account)
+        assertNotEquals(a.fixture.company, peer.fixture.company)
+        val db = database()
+        val space =
+            requireNotNull(
+                db.queryForObject("select id from collaboration_spaces", UUID::class.java)
+            )
+        val base = "/api/v1/collaboration/spaces/$space"
+        val opened =
+            groupNativeCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to peer.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = UUID.fromString(json.readTree(opened.body())["id"].asString())
+        val version =
+            requireNotNull(
+                db.queryForObject(
+                    "select version from collaboration_space_devices where id=?",
+                    Long::class.java,
+                    device,
+                )
+            )
+        val requested =
+            groupNativeCall(
+                a,
+                "$base/direct-conversations/$conversation/room",
+                mapOf("deviceId" to device.toString(), "expectedDeviceVersion" to version),
+            )
+        assertEquals(200, requested.statusCode(), requested.body())
+
+        // Owned worker storage fixture. Provider reconciliation has separate actual Synapse tests;
+        // the HTTP request itself runs through the ordinary application role and current admission.
+        val source = requireNotNull(db.dataSource)
+        val transactions =
+            dev.fajar.hris.core.database.PostgresTransactionRunner(
+                org.springframework.jdbc.support.JdbcTransactionManager(source),
+                db,
+            )
+        val repository =
+            dev.fajar.hris.collaboration.data.repositories.StoredCollaborationSpaceRoomRepository(
+                dev.fajar.hris.collaboration.data.datasources
+                    .PostgresCollaborationSpaceRoomDataSource(
+                        org.jooq.impl.DSL.using(
+                            org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy(
+                                source
+                            ),
+                            org.jooq.SQLDialect.POSTGRES,
+                        )
+                    )
+            )
+        val claim =
+            transactions.run(
+                Actor(UUID(0, 0), null, emptySet(), java.time.Instant.EPOCH, UUID.randomUUID())
+            ) {
+                repository.claim(UUID.randomUUID(), 8, 60)
+            }
+        assertInstanceOf(Result.Success::class.java, claim)
+        val leases = (claim as Result.Success).value
+        assertEquals(1, leases.size)
+        val lease = requireNotNull(leases.single().lease)
+        assertEquals(conversation, lease.request.conversationId)
+        val room = "!group-fixture-${UUID.randomUUID()}:matrix.example.test"
+        val actor =
+            Actor(
+                a.fixture.account,
+                null,
+                emptySet(),
+                lease.request.authenticatedAt,
+                UUID.randomUUID(),
+                mfaVerifiedAt = lease.request.mfaVerifiedAt,
+                credentialVersion = lease.request.credentialVersion,
+            )
+        val published =
+            transactions.run(actor) {
+                repository
+                    .publish(
+                        dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomBinding(
+                            space,
+                            conversation,
+                            a.fixture.account,
+                            lease.request.revision,
+                            lease.token,
+                            room,
+                            clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS),
+                            a.fixture.account,
+                        )
+                    )
+                    .flatMap { repository.finish(lease).map { assertTrue(it) } }
+            }
+        assertEquals(Result.Success(Unit), published)
+        provider.roomStates[room] = emptyList()
+        return room
     }
 
     private fun groupFixtureKeys(device: UUID): KeyPayload {

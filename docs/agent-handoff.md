@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Legacy runtime storage accepted; integration continues — 4 November 2026
+
+Group source in /home/fajar/hris/.worktrees/communication-space is now16420c3e,
+feat/communication-space, pushed. Its handoff and collaboration/legacy-runtime-
+transfer.md are authoritative. V123 adds exact original company/device/account/
+native ownership, one irreversible LEGACY -> DRAINING freeze intent to a retained
+group device, and at most eight reusable <=60-second server request slots. The
+schema is initially empty. It neither moves keys/credentials nor freezes devices
+or supplies a completed transfer. All old provider callers still need integration.
+
+Validation: focused5 PASS79.963s, full113 database/policy/storage PASS525.967s,
+format/architecture pass, all checked hashes unchanged. Actual contention, stale
+replacement release, rollback, offboarding/parent purge and pg_dump/pg_restore pass.
+Recovery MAX_SCHEMA123 preserves envelopes;15 tests pass after an old unknown-future
+assertion was corrected to124. Earlier compile/test failures are retained in the
+measurement. No check is left running. Eight untested formatted runtime-port and
+mapping/storage-test drafts are isolated in that branch's ignored runtime-ports-next.
+Review/integrate them next, then fence gateway/provisioning/direct-room provider
+I/O and implement the admitted atomic group publication/legacy retirement command.
+Preserve original SDK store/private keys/transaction IDs and explicit room/push/read
+ownership. Never logout losing Matrix candidates.
+
+Mobile3d85d569 local SDK continuity is accepted;1ae13d74 records raw protocol CI
+41741297195 native/classic success with verified artifacts/14 driver hashes per mode.
+Control/Apple41741297181 and actual-HRIS native41741297183 are still running; retargeted
+audit scripts are under Mobile .work/local-sdk-identity-2026-11-03/hosted. Raw fixture
+success does not accept cross-company product transfer or Apple SDK behavior.
+
+Live8b40/schema116 pushON/SMTP OFF and installed normal phone28 remain current.
+Starter9959c1d needs no port for these HRIS-specific contracts. Continue the full
+communications long run, frequent user/Git updates and push every atomic commit.
+Older source/running-check notes below are historical.
+
 ## Group graph verified; release 28 remains installed — 3 November 2026
 
 Continue implementation in /home/fajar/hris/.worktrees/communication-space on

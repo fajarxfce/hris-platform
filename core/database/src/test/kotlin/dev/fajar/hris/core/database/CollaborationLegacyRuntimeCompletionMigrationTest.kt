@@ -634,6 +634,184 @@ class CollaborationLegacyRuntimeCompletionMigrationTest {
         }
     }
 
+    @Test
+    fun completedRetainedDeviceKeepsOriginalRecipientIdentityAcrossCompanyScope() {
+        val f = Fixture()
+        f.migrate()
+        Flyway.configure().dataSource(f.source).target("135").load().migrate()
+        f.sql.execute(
+            "grant select,insert,update,delete on all tables in schema public to legacy_completion_fixture,legacy_completion_worker"
+        )
+        f.prepare()
+        val target = requireNotNull(f.targetId)
+        fun reserve(sql: JdbcTemplate) =
+            sql.update(
+                "insert into collaboration_space_key_publications(space_id,account_id,device_id,native_session_id,matrix_user_id,matrix_device_id,fingerprint,version,reserved_at) values(?,?,?,?,?,?,?,0,statement_timestamp())",
+                f.space,
+                f.account,
+                target,
+                f.parent,
+                f.legacyUser,
+                "HRIS_${compact(f.legacyDevice)}",
+                f.fingerprint,
+            )
+        val before = f.snapshot()
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.runWorker {
+                f.publish()
+                reserve(
+                    f.worker
+                ) // An ACTIVE target without completed transfer cannot publish keys.
+            },
+        )
+        assertEquals(before, f.snapshot())
+        assertTrue(
+            f.sql.queryForList("select * from collaboration_space_key_publications").isEmpty()
+        )
+        assertTrue(
+            success(
+                f.runWorker {
+                    f.publish()
+                    f.complete()
+                }
+            )
+        )
+        success(f.run { reserve(f.runtime) })
+        val original = f.sql.queryForList("select * from collaboration_device_key_publications")
+        val selected = f.sql.queryForList("select * from collaboration_space_key_publications")
+        assertNotEquals(f.legacyDevice, target)
+
+        // The peer has a new organization identity; receiving retains the other
+        // participant's original company identity without access to its HR resources.
+        val peerUser = "@hrisg_${compact(f.space)}_${compact(f.peer)}:matrix.example.test"
+        success(
+            f.run(f.actor.copy(accountId = f.peer)) {
+                f.runtime.update(
+                    "insert into collaboration_space_identities(space_id,account_id,matrix_server_name,matrix_user_id,origin,created_at) values(?,?,'matrix.example.test',?,'SPACE',statement_timestamp())",
+                    f.space,
+                    f.peer,
+                    peerUser,
+                )
+            }
+        )
+        val pair = listOf(f.account, f.peer).sortedBy(UUID::toString)
+        val conversation = UUID.randomUUID()
+        fun user(id: UUID) = if (id == f.account) f.legacyUser else peerUser
+        success(
+            f.run {
+                f.runtime.update(
+                    "insert into collaboration_space_direct_conversations(space_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,statement_timestamp())",
+                    f.space,
+                    conversation,
+                    pair[0],
+                    pair[1],
+                    f.account,
+                )
+                f.runtime.update(
+                    "insert into collaboration_space_room_intents(space_id,conversation_id,first_account_id,second_account_id,requested_by,matrix_creator_account_id,matrix_server_name,first_matrix_user_id,second_matrix_user_id,origin,created_at) values(?,?,?,?,?,?,'matrix.example.test',?,?,'SPACE',statement_timestamp())",
+                    f.space,
+                    conversation,
+                    pair[0],
+                    pair[1],
+                    f.account,
+                    f.account,
+                    user(pair[0]),
+                    user(pair[1]),
+                )
+                f.runtime.update(
+                    "insert into collaboration_space_room_provisioning(space_id,conversation_id,device_id,device_version,provider_generation,account_id,native_session_id,revision,native_session_version,credential_version,authenticated_at,correlation_id,client_platform,client_build,created_at,requested_at,expires_at,available_at,state,attempts) values(?,?,?,1,0,?,?,0,0,0,?::timestamptz,?,'ANDROID',28,statement_timestamp(),statement_timestamp(),statement_timestamp()+interval '60 seconds',statement_timestamp(),'QUEUED',0)",
+                    f.space,
+                    conversation,
+                    target,
+                    f.account,
+                    f.parent,
+                    f.actor.authenticatedAt.toString(),
+                    UUID.randomUUID(),
+                )
+            }
+        )
+        fun candidates(actor: Actor = f.actor) =
+            success(
+                f.run(actor) {
+                    f.runtime.queryForList(
+                        "select * from collaboration_space_recipient_devices order by account_id,device_id"
+                    )
+                }
+            )
+        assertTrue(candidates(f.actor.copy(accountId = f.peer)).isEmpty())
+        val lease =
+            success(
+                f.runWorker {
+                    f.worker
+                        .queryForList(
+                            "select * from claim_collaboration_space_room_provisioning(?,1,30)",
+                            UUID.randomUUID(),
+                        )
+                        .single()
+                }
+            )
+        success(
+            f.runWorker {
+                f.worker.update(
+                    "insert into collaboration_space_room_bindings(space_id,conversation_id,published_by,request_revision,lease_token,matrix_room_id,created_at,matrix_creator_account_id) values(?,?,?,?,?,'!retained-recipient',statement_timestamp(),?)",
+                    f.space,
+                    conversation,
+                    f.account,
+                    lease["revision"],
+                    lease["lease_token"],
+                    f.account,
+                )
+                f.worker.update(
+                    "update collaboration_space_room_provisioning set state='SUCCEEDED',completed_at=statement_timestamp(),last_outcome_revision=revision,last_outcome_state='SUCCEEDED',last_outcome_at=statement_timestamp(),failure_code=null,last_failure_code=null,lease_owner=null,lease_token=null,lease_until=null where space_id=? and conversation_id=? and lease_token=?",
+                    f.space,
+                    conversation,
+                    lease["lease_token"],
+                )
+            }
+        )
+        val recipient = candidates(f.actor.copy(accountId = f.peer)).single()
+        assertEquals(target, recipient["device_id"])
+        assertEquals(f.legacyUser, recipient["matrix_user_id"])
+        assertEquals("HRIS_${compact(f.legacyDevice)}", recipient["matrix_device_id"])
+        assertEquals(f.fingerprint, recipient["fingerprint"])
+        assertEquals(false, recipient["publication_confirmed"])
+        f.sql.update("update companies set active=false,version=version+1 where id=?", f.company)
+        f.sql.update(
+            "update native_sessions set access_expires_at=clock_timestamp()-interval '1 second' where id=?",
+            f.parent,
+        )
+        assertEquals(recipient, candidates(f.actor.copy(accountId = f.peer)).single())
+        assertTrue(candidates(f.actor.copy(accountId = f.peer, companyId = f.company)).isEmpty())
+        assertTrue(
+            success(
+                    f.run(f.actor.copy(accountId = f.peer)) {
+                        f.runtime.queryForList("select * from collaboration_space_key_publications")
+                    }
+                )
+                .isEmpty()
+        )
+        f.sql.update("delete from native_sessions where id=?", f.parent)
+        assertTrue(candidates(f.actor.copy(accountId = f.peer)).isEmpty())
+        assertEquals(
+            original,
+            f.sql.queryForList("select * from collaboration_device_key_publications"),
+        )
+        assertEquals(
+            selected,
+            f.sql.queryForList("select * from collaboration_space_key_publications"),
+        )
+        val restored = f.restore()
+        assertEquals(
+            original,
+            restored.queryForList("select * from collaboration_device_key_publications"),
+        )
+        assertEquals(
+            selected,
+            restored.queryForList("select * from collaboration_space_key_publications"),
+        )
+    }
+
     private inner class Fixture {
         val source = DriverManagerDataSource(postgres.jdbcUrl, postgres.username, postgres.password)
         val sql = JdbcTemplate(source)

@@ -1,0 +1,383 @@
+{
+  "recordedAt": "2026-11-04T14:12:01.518136+00:00",
+  "baseCommit": "3284aaf7135c3f51df8c8fa72bfcd11bc01e6e35",
+  "scope": "V135 minimal current public-key receiving projection and bounded typed storage; no key endpoint or product rollout",
+  "fullDatabaseGate": {
+    "startedAt": "2026-11-04T13:53:41.215372+00:00",
+    "elapsedSeconds": 1091.125,
+    "exitCode": 0,
+    "sourceFiles": 8423,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": {
+        "sha256": "3f0e4a0dc8e18ba290fdef84aa0dea4ebb8d2d1c13bb2e993c984c7498851360",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": {
+        "sha256": "c2e205d783b258019b80ad9fe977c915c69b37d5e221da1f1e10b8376552c09f",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": {
+        "sha256": "1c192a148b714f94a2d13b8639f370054062ed4d9aa2d7244919d9699bb74056",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": {
+        "sha256": "6da0c53bcca5246fd802fc9ebf61dbfc3df93a0307a659870bc011acfac032f9",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyIdentityMigrationTest.xml": {
+        "sha256": "e7719ce3b4ecfffc3e1132cd4822b017c257ebfce0f36d070500b85c5d56b24f",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyRuntimeCompletionMigrationTest.xml": {
+        "sha256": "64e6e545abe1f539cce6da845447e1932f902eee50043f70057d00c8003aad19",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyRuntimeMigrationTest.xml": {
+        "sha256": "4b1815a1fe68dac3e162175df19b77460284fa7842fad93f7ea26b551637942b",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationOriginalPairRouteMigrationTest.xml": {
+        "sha256": "49a27480bd0ea94a7eacefc07af501895926c9bd114381652f0a14aa806bac6b",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceConversationMigrationTest.xml": {
+        "sha256": "fe07822c2047020e4bcc4f6b531044721b0c6d80b372b9aa55c7c86ff155f0b8",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceCredentialMigrationTest.xml": {
+        "sha256": "1dbb243aec262e145c327fe8fc36f192ac3ef6f171c95a00c9ef420c02aa1dab",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceDeviceMigrationTest.xml": {
+        "sha256": "ac59430157f639f7cd79a2f47188cf2e25c283ab76576a6b3f6160e16cea8e32",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceDirectoryMigrationTest.xml": {
+        "sha256": "74846ffaef87e412e56bd84dad3b1338f77a3fb9a70aa577feca9ce0d4fc1393",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceGatewayMigrationTest.xml": {
+        "sha256": "399c53b24ca027164124eb025cc6bcfadc1a890aee160da84948788b0ef39bf6",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceIdentityMigrationTest.xml": {
+        "sha256": "3125954eec71fa2d27db98e07630515ea76ab7763a56de26ef8955483ca953cf",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceKeyMigrationTest.xml": {
+        "sha256": "cd510caca9971d9d4232690c4cc5319756ff31f69d6269b9ad3f72124e161abc",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceProvisioningMigrationTest.xml": {
+        "sha256": "f466100b75a4038f3ccdaab6a140ff758af2429278b7007d6b6c29c079f40d28",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRecipientMigrationTest.xml": {
+        "sha256": "e7dd25a318747b2715539277b639ad71c7fed58ca051693e6b8355b7c2a20003",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRequestLeaseMigrationTest.xml": {
+        "sha256": "0a36ae4876ac325a68b13b74d3b6d83946ff8130f5c9c8e43f8bb6afc8e44cf8",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRoomMigrationTest.xml": {
+        "sha256": "bf05811578e846fa9d2987c81d291df5e6994e1e81948e5114f4fb2b488633f8",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRoomPeerRecoveryMigrationTest.xml": {
+        "sha256": "0fbef9539679c7d34eeadf15b7c007e2b1efc3cf019a5237f3a8634abda474ae",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRoomRequestSlotMigrationTest.xml": {
+        "sha256": "904cceb5715249cf11dcf7108a06929fe7680320275f7e4d5ce8cd94b69fb0c0",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": {
+        "sha256": "903f67b9c9742eefc830ed736a0a2de3818143cb60886448da64af8628e9db20",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": {
+        "sha256": "94dda0a418260990dbb7b3c7834fea68d29c413d4ef1379a980a17b949a7a756",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": {
+        "sha256": "3b3d0337d9045018e5f5ec10fe9e0de3de95b1541694de2179cb6103b9a7c59c",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": {
+        "sha256": "5b9a3ae42372d85614ea1b432cfe4cf6a4bf8a8b9a5e5c1e8d1450628a13c952",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": {
+        "sha256": "eeb9572b0e29319463308bab5a758881b28c9d18f337757dd3353040cb08f57a",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": {
+        "sha256": "60fff76f1a752b29c22cab750ac8daaa1c0fb9307e739aac495289b743984547",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": {
+        "sha256": "3f3075fc27a869f5ca12f72fa59b0f8daedfa3f62189ddfe564748b514d0ddc2",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": {
+        "sha256": "6e0c5f6de8040e577e09fbcb20ad6c1b47078d6cb2be27c866697fed5c5be341",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+        "sha256": "ef373a291210a0dd9bd121bf29cdc60c27a8c680599c6a34e7f09c8d8bbe5391",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": {
+        "sha256": "e3a24e61b99584004347efcba46d578b640efcc0be0c6441a64eb62783a9180b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": {
+        "sha256": "d421b4fc90b3b35033125b9fb4ff1a43a5e3be2d9a5b433bae567286cd2aaa8e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "focusedRetainedAndStorageGate": {
+    "startedAt": "2026-11-04T13:50:36.862022+00:00",
+    "elapsedSeconds": 118.536,
+    "exitCode": 0,
+    "sourceFiles": 8423,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRecipientMigrationTest.xml": {
+        "sha256": "0a6d870d36cf19d2614bad046e3fb551be7ee3e9752b3e5810a51ae31828b899",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.core.database.CollaborationLegacyRuntimeCompletionMigrationTest.xml": {
+        "sha256": "72ebda63329fd872de4abd9d65cd66820164a81d15f1a3ecab505009df432f4a",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceRecipientRepositoryTest.xml": {
+        "sha256": "4798f0cbf00aa6840e961d0a1d5548416ec3b0d7ccd66f1fcb18d4d95b216b3b",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceRecipientPostgresTest.xml": {
+        "sha256": "8751b3963776b43aad19b8d1f9f8ae32aa0e36684818de70b923410bfb0b3a03",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "earlierStorageGate": {
+    "startedAt": "2026-11-04T13:47:25.035723+00:00",
+    "elapsedSeconds": 107.52,
+    "exitCode": 0,
+    "sourceFiles": 8423,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRecipientMigrationTest.xml": {
+        "sha256": "f8d115c44f4495f2d72e9daa3e222d111d4574fbea762f73464438387ba41816",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceRecipientRepositoryTest.xml": {
+        "sha256": "2a02351e3583f72799deb337dac2d2232f68f2dd88b4b4d4e91fe17b853606c6",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceRecipientPostgresTest.xml": {
+        "sha256": "4e0b6519a2778551d8fffdc6886ea9d1853587c642ee070ee8623f941a3d9955",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "initialProjectionGate": {
+    "startedAt": "2026-11-04T13:42:13.208641+00:00",
+    "elapsedSeconds": 123.638,
+    "exitCode": 0,
+    "sourceFiles": 8415,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceRecipientMigrationTest.xml": {
+        "sha256": "e6a2ec7561615ec558fb189ba76c4f7f58efdb113753fb1a5bd4c9fc4586d433",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "changedSourceSha256": {
+    "core/database/src/main/resources/db/migration/V135__collaboration_space_recipient_devices.sql": "8acbe33d980af9a9f28e45ccaa72a706a5e1b75b329a6de485a2230f99892e65",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationLegacyRuntimeCompletionMigrationTest.kt": "b701016dce16d00ff78bafde9709c8ca40323abcea3daead70070e558ced5dcd",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRecipientMigrationTest.kt": "3275e66c5d5c07a85ddeb253380a114eb6e7971d741335d8925c2e691aca29e7",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationSpaceRecipientDataSource.kt": "f74911c6e5f5b84378780ceaa21711d0a04d53b2ec9a798065c631e56afbb780",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationSpaceRecipientDataSource.kt": "713ba339a200479c537e03c0f5e05376455ed9268d9e7206bf4b1d66cfc5c727",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationSpaceRecipientRepository.kt": "8e604e9e5779ee92bf8b84be9e4e07f714669e3df29b8f6a1a87d31a0d8f0608",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceRecipientPostgresTest.kt": "153d49b3726787f88399efe6eee1c46a2a1ae72431e0bcb2e85c5b715121b0e6",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceRecipientRepositoryTest.kt": "06fc6223c59be6bd692259789689983997fe4c17749874a6cd8f2ed106b53a6d",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceRecipientDevice.kt": "db7318e1093b3f6586a465bf502e2950dcecd44f927bcfa817ed7c1fd87f960b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceRecipientPolicy.kt": "130e60bb4ff0c798c7c1e8e46609bdc3a561baacb26624e78bb9b5a59c34c38b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceRecipientRepository.kt": "1f8029b50d4821f4c7bfe6671ffa745f5d8c853dd00a6eba83af6a9ddf163f3b",
+    "tool/recovery_set.py": "9d46ffdf469084c514fb1745b0eaee68b6a377665412d1b677e66de766566624",
+    "tool/test_recovery_set.py": "39d77feca4de6e82a46d4ebe83092d5df71d893f24f0fc72a7561671bf360164"
+  },
+  "continuity": "8,423 unchanged inputs in both final gates. Only the two recovery tools differ between focused13 and full115; all seven typed cases carry on identical source. No shared DI change; API96/FULLworker138 from3284aaf7 remain the last graph acceptance.",
+  "recovery": {
+    "command": "python3 -m unittest test_recovery_set.py from tool/",
+    "tests": 19,
+    "failures": 0,
+    "elapsedSeconds": 0.012,
+    "maximumSchema": 135,
+    "unknownSchemaRejected": 136,
+    "projection": "V126 encrypted projection unchanged at schema134/135."
+  },
+  "evidence": [
+    "Ordinary runtime/root view exposes exactly nine public metadata columns. Minimal NOLOGIN/NOINHERIT/NOBYPASSRLS/NOCREATEDB view owner is not assumable; private tokens/hashes/ciphertexts and peer key rows remain inaccessible. Security barrier and readonly behavior are asserted.",
+    "Cross-company peer requires an immutable verified canonical room pair. Unbound/directory-only peers, company-scoped callers and ineligible callers see no peer candidates. Own candidates need no room.",
+    "Reservation0 and confirmation1 survive natural short provider/access expiry while current native hard parent remains valid. Current eligibility/security/device/native revocation and hard expiry remove candidates.",
+    "Actual completed LEGACY transfer rejects premature key reservation atomically, preserves original Matrix user/device/fingerprint, receives through a new SPACE peer with an inactive original company, and retains provenance after native purge and actual archive restore.",
+    "Typed source snapshots at most100 accounts, reads501 rows to detect overflow, validates at most500 devices/five per account, exact stored coordinates, hard deadline, fingerprints and both identity uniqueness keys. Errors are sanitized and cancellation/interruption propagate.",
+    "Actual PostgreSQL typed publication0\u21921, offline credentials and parent-purge behavior pass; malformed/foreign/mutable/overflow readback is rejected."
+  ],
+  "remaining": [
+    "Wire fixed group key query/claim with signed-UUID account guards, one scoped recipient projection, current recipient/native/slot checks around each provider outcome, detached signed response verification and original stored Matrix device IDs.",
+    "Exercise actual native API/FULLworker after new DI; to-device/content/sync/push and Mobile SDK adoption preserving original store/passphrase/keys/history and uncertain sends remain. Two-LEGACY-device cross-company SDK acceptance is not claimed by the mixed SPACE/LEGACY storage case.",
+    "Group disabled and all54 PRD groups open. Live8b40/schema116 pushON/SMTPOFF, normal phone28, Mobileproduct/hosted0b804cb2 and Starter9959c1d unchanged."
+  ]
+}

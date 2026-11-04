@@ -61,8 +61,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V125 adds owned public-gateway metadata without any credential/envelope change.
 # V126 adds a separate organization gateway replay namespace and authenticated context.
 # V133 retains per-participant room recovery metadata without a new encryption envelope.
-# V134 adds bounded room-control slots without changing encrypted recovery purposes.
-MAX_SCHEMA = 134
+# V135 adds public recipient metadata without changing encrypted recovery purposes.
+MAX_SCHEMA = 135
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

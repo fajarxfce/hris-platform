@@ -146,6 +146,15 @@ using its own native/device proof and no invented gateway coordinates. Renewal k
 reserved slot zero. Same-owner expired purpose changes require new tokens; exact
 release and post-lock lifetime checks preserve bounded operational ownership.
 
+The [V135 receiving projection](collaboration/space-key-recipients.md) exposes only
+public identity/fingerprint/deadline/confirmation metadata through a minimal,
+non-assumable read-only view owner. Current group eligibility and exact canonical
+verified room pairs gate peers; native hard authority gates receiving independently
+of short provider/access expiry. Completed LEGACY devices retain their original
+Matrix coordinates and fingerprint. Typed acquisition is bounded to 100 accounts,
+500 devices and five per account, with overflow rejection and safe error mapping.
+Key endpoint consumers still own current admission and signed provider verification.
+
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 
 Workforce owns schedules and factual attendance; leave owns absence decisions. Reporting and payroll combine those facts. Identity uses stable company/person identifiers without depending on their implementation. These directions prevent cycles. Payroll owns scoped read projections for immutable workforce evidence. Its datasources read raw records; repositories map them into payroll domain references. The originating module retains write ownership. This permits payroll to consume factual snapshots without importing another module’s data implementation or moving permission/period policy into a datasource.

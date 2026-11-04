@@ -72,7 +72,9 @@ two distinct companies and lets the actual scheduled room worker publish one enc
 room. Both native views and replays retain that room and original provider identities.
 These checks do not establish an SDK encrypted-message round trip.
 
-Recipient keys, room content/sync/push and full Mobile adoption remain required.
+The [receiving projection](space-key-recipients.md) now supplies bounded public-key
+candidates. Key query/claim endpoints, room content/sync/push and full Mobile adoption
+remain required.
 Preserve offline receiving and the original SDK store, passphrase, keys, history and
 uncertain sends, including native hard-parent replacement. Group rollout remains
 disabled and all communications acceptance groups remain open.

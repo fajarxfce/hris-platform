@@ -1,5 +1,38 @@
 # Delivery and validation
 
+## Current receiving-device projection accepted — 4 November 2026
+
+V135 provides a minimal read-only public-key candidate view for current organization
+members. A peer must share an immutable verified room with the caller; HR company
+selection or directory visibility grants no access. Canonical stored Matrix identities,
+completed LEGACY transfer, original fingerprint and native hard lifetime remain
+required. Short access/provider expiry permits offline receiving. Revocation or native
+purge removes eligibility while retaining original key/device provenance.
+[Protocol](collaboration/space-key-recipients.md), [evidence](measurements/collaboration-space-key-recipients-2026-11-04.json).
+
+All 115 database cases pass in 1091.125s; focused 13 cases pass in
+118.536s, plus format/architecture checks. Both gates use 8,423
+unchanged inputs; only two recovery tools differ, so all seven typed cases carry on
+identical source. Recovery19 passes (schema135/unknown136; encrypted projection
+unchanged). Ordinary-role scope/column privileges, cross-company binding, pending keys,
+actual LEGACY completion, offline expiry, purge, archive restore, bounds/malformed
+metadata and cancellation are exercised. All test sessions closed. No shared DI change.
+
+NEXT fixed group key query/claim, then to-device/content/sync/push and full Mobile SDK
+adoption. Query drafts in ignored group-room-lifecycle are UNAPPLIED/UNCOMPILED:
+recipient-query-next.md, CollaborationSpaceKeyQueryPolicy.kt and query-runtime/AccessNativeCollaborationSpaceMatrixDevice.kt.
+Use bounded single-projection reads and sorted account guards before native/device
+locks; revalidate selected recipients and caller around both provider outcomes. Keep
+requested aliases separate even when they map to one account; return only exact stored
+Matrix IDs and detached signature-verified keys. API/FULLworker required after DI.
+Earlier recipient SQL/test assembly drafts are APPLIED/STALE. Preserve SDK namespace,
+passphrase, keys/history and uncertain sends; native hard-parent replacement remains.
+
+Group3284aaf7/Main578e3262/Mobiledc6de1ab were pushed before this checkpoint. Group stays
+disabled; all 54 PRD groups remain open. Live8b40/schema116, pushON/SMTPOFF, normal phone28,
+Mobileproduct/hosted0b804cb2 and Starter9959c1d unchanged. Continue long run, updates,
+atomic pushes and validated product feature installs only.
+
 ## Admitted room worker accepted — 4 November 2026
 
 The [room worker](collaboration/space-room-worker.md) now claims participant-owned

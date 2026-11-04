@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Native provider recovery and group maintenance accepted — 4 November 2026
+
+Group branch is pushed through [b2dee963](https://github.com/fajarxfce/hris-platform/commit/b2dee963).
+Explicit native renewal uses slot0, current admission and exact retained provenance,
+outside-SQL login/key readback and atomic provider-generation/receipt/journal writes.
+Original Matrix identity/creation time/keys remain intact. Native HTTP exposes a safe
+versioned receipt. Group replay/request cleanup shares the existing owned worker timer
+with bounded atomic batches and cancellation on stop.
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/b2dee963/docs/measurements/collaboration-space-provider-renewal-2026-11-04.json):
+focused8 PASS150.027s, actual retained provider/restart35.204s; final coverage domain93,
+data41, API94 and worker128 (127 active/one existing retention skip). Final data6/API94
+PASS226.232s and full worker PASS352.928s, identical8,338 inputs and quality gates.
+All preliminary test-only corrections, exact hashes and reproduction commands are recorded.
+
+NEXT current group gateway exchange, key/room/member authority and original-room
+inventory, then Mobile preflight/handover/atomic adoption across history/outbox/read/
+push/deep links. Preserve original SDK namespaces and uncertain sends. Availability
+remains disabled; no Mobile group caller, rollout or new product APK. All54 groups
+remain open. Phone28/live8b40/schema116 pushON/SMTPOFF, Mobile7fdb55e6/hosted0b804cb2
+and Starter9959c1d unchanged. Continue full long run, updates, atomic immediate pushes
+and validated product feature installs. Implementation stays in the group worktree.
+
+Read-only Starter PR audit: PR2 (enterprise foundations) is a stale Draft targeting
+feat/platform-foundations. Freshly fetched origin/main dc14934c contains its entire
+head594c3fb0 (main...head63/0, merge-base=head); all six PR checks pass. No missing
+PR commit, conflict or CI failure explains its open status. No close/retarget/merge
+was requested or performed. The user's question was answered while work continued.
+
 ## Group request ownership accepted — 4 November 2026
 
 Group branch is pushed through [88d20851](https://github.com/fajarxfce/hris-platform/commit/88d20851).

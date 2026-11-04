@@ -392,6 +392,80 @@ class CollaborationSpaceRequestRepositoryTest {
         assertEquals(1, f.count())
     }
 
+    @Test
+    fun roomControlUsesOwnCoordinatesAndExactReleaseAcrossExpiredPurposeReplacement() {
+        val f = Fixture()
+        val position =
+            CollaborationSpaceRequestPosition(
+                f.owner,
+                CollaborationSpaceRequestKind.ROOM_PREPARATION,
+            )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.claim(position.copy(gatewayId = f.storage.session.id, gatewayVersion = 0)),
+        )
+        assertEquals(0, f.count())
+        val control = requireNotNull(success(f.claim(position, until(2))))
+        assertEquals(position, control.position)
+        assertEquals(1, control.slot)
+        assertNull(control.position.gatewayId)
+        assertNull(control.position.gatewayVersion)
+        assertFalse(success(f.storage.tx { f.repo.release(control.copy(position = f.position)) }))
+        assertEquals(control, success(f.storage.tx { f.repo.find(f.owner, control.slot) }))
+        val remaining = java.time.Duration.between(Instant.now(), control.expiresAt).toNanos()
+        if (remaining > 0) TimeUnit.NANOSECONDS.sleep(remaining + 20_000_000)
+        val gateway = requireNotNull(success(f.claim()))
+        assertEquals(control.slot, gateway.slot)
+        assertEquals(f.position, gateway.position)
+        assertNotEquals(control.token, gateway.token)
+        assertFalse(success(f.storage.tx { f.repo.release(control) }))
+        assertEquals(gateway, success(f.storage.tx { f.repo.find(f.owner, gateway.slot) }))
+    }
+
+    @Test
+    fun malformedRoomClaimReadbackAndCancellationRollbackTheActualNewSlot() {
+        val f = Fixture()
+        val position =
+            CollaborationSpaceRequestPosition(
+                f.owner,
+                CollaborationSpaceRequestKind.ROOM_PREPARATION,
+            )
+        for (mode in listOf("kind", "gateway", "slot", "cancel", "interrupt")) {
+            var observed = false
+            val raw =
+                object : CollaborationSpaceRequestDataSource by f.source {
+                    override fun find(
+                        owner: CollaborationSpaceRequestCoordinatesData,
+                        slot: Int,
+                        lock: Boolean,
+                    ): CollaborationSpaceRequestLeasesRecord? {
+                        val value = f.source.find(owner, slot, lock) ?: return null
+                        observed = true
+                        when (mode) {
+                            "kind" -> value.kind = "UNKNOWN"
+                            "gateway" -> value.gatewayId = f.storage.session.id
+                            "slot" -> value.slot = 0
+                            "cancel" ->
+                                throw CancellationException("fixture room slot cancellation")
+                            "interrupt" ->
+                                throw InterruptedException("fixture room slot interruption")
+                        }
+                        return value
+                    }
+                }
+            val run = {
+                f.claim(position, repository = StoredCollaborationSpaceRequestRepository(raw))
+            }
+            when (mode) {
+                "cancel" -> assertThrows(CancellationException::class.java) { run() }
+                "interrupt" -> assertThrows(InterruptedException::class.java) { run() }
+                else -> assertInstanceOf(Result.Failed::class.java, run(), mode)
+            }
+            assertTrue(observed, mode)
+            assertEquals(0, f.count(), mode)
+        }
+    }
+
     private inner class Fixture(replaySeconds: Long = 30) {
         val storage = SpaceGatewayPostgresFixture(postgres).also { it.migrate() }
         val owner =
@@ -423,7 +497,7 @@ class CollaborationSpaceRequestRepositoryTest {
                     )
                 }
             )
-            Flyway.configure().dataSource(storage.source).target("127").load().migrate()
+            Flyway.configure().dataSource(storage.source).target("134").load().migrate()
             storage.owner.execute(
                 "grant select,insert,update,delete on collaboration_space_request_leases to space_gateway_fixture,space_gateway_worker"
             )

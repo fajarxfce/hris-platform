@@ -139,6 +139,10 @@ canonical creator and requires the caller to have joined. Only the actual creato
 may repair absent initial settings. Actual own-peer recovery, same alias and original
 keys survive Synapse restart. No durable room grant follows from provider success:
 the bounded room worker must still perform current admission and atomic publication.
+V134 room control shares seven ordinary provider-operation slots with the gateway,
+using its own native/device proof and no invented gateway coordinates. Renewal keeps
+reserved slot zero. Same-owner expired purpose changes require new tokens; exact
+release and post-lock lifetime checks preserve bounded operational ownership.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

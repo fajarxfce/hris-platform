@@ -12,6 +12,7 @@ data class CollaborationSpaceRequestOwner(
 
 enum class CollaborationSpaceRequestKind {
     GATEWAY,
+    ROOM_PREPARATION,
     PROVIDER_RENEWAL,
 }
 

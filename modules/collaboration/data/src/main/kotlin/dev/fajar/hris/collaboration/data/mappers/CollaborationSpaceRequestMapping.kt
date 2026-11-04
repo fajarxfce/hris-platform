@@ -15,7 +15,8 @@ fun CollaborationSpaceRequestOwner.toSpaceRequestCoordinates():
 fun validateSpaceRequestPosition(position: CollaborationSpaceRequestPosition) {
     position.owner.toSpaceRequestCoordinates()
     when (position.kind) {
-        CollaborationSpaceRequestKind.PROVIDER_RENEWAL ->
+        CollaborationSpaceRequestKind.PROVIDER_RENEWAL,
+        CollaborationSpaceRequestKind.ROOM_PREPARATION ->
             require(position.gatewayId == null && position.gatewayVersion == null)
         CollaborationSpaceRequestKind.GATEWAY ->
             require(

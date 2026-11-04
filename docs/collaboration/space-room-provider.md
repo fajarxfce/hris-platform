@@ -21,9 +21,10 @@ These are protocol/key checks; encrypted SDK-message acceptance remains separate
 [V131–V133 storage](space-room-lifecycle.md), [V132 routing](original-pair-routing.md)
 and [native HTTP](native-space-room.md) now pin both participants, exact original or
 SPACE intent and atomic binding/success. The room worker is still required to admit
-current authority around every provider outcome. V127 has no room-control slot kind;
-add a bounded kind sharing slots 1..7 without fabricating gateway coordinates or using
-renewal slot zero. Recipient content/sync/push and Mobile integration remain disabled.
+current authority around every provider outcome. V134 now provides a room-control kind
+sharing slots 1..7 without gateway coordinates; renewal slot zero remains reserved.
+[Capacity evidence](../measurements/collaboration-space-room-request-slots-2026-11-04.json)
+covers upgrade, concurrency, exact cleanup and deadline after device-lock waiting. Recipient content/sync/push and Mobile integration remain disabled.
 Earlier sections below record the original adapter and verification checkpoints.
 
 Group rooms carry an explicit organization space, conversation, creator/peer account

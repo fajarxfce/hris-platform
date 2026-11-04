@@ -25,6 +25,15 @@ leases globally. Claim and expiry joins include the exact account key. The claim
 transaction commits before application account/native/device guards are acquired.
 No repository creates a transaction, silently refreshes authority or retries forever.
 
+V134 adds `ROOM_PREPARATION` to the existing finite provider request pool. It shares
+slots 1–7 with gateway requests while slot 0 stays reserved for renewal. Room control
+uses its own current native/device coordinates without a gateway ID or version.
+Expired slots may change purpose only with the same owner and a new token; exact
+release cannot remove a successor. Lifetime is rechecked after a device-guard wait.
+No credential, key, RLS or encrypted recovery purpose changes. See the
+[capacity evidence](../measurements/collaboration-space-room-request-slots-2026-11-04.json).
+The bounded room worker still owns admission, provider I/O and atomic publication.
+
 Account-only RLS protects full private heads. The restricted non-login status-view
 owner has column privileges for safe operational metadata, including public account
 and revision, but none for native/device/provider proof. The view selects the

@@ -1,5 +1,37 @@
 # Delivery and validation
 
+## Bounded provider room-control capacity accepted — 4 November 2026
+
+V134 adds ROOM_PREPARATION to the seven ordinary provider-operation slots without
+gateway coordinates; provider renewal retains reserved slot zero. Only expired slots
+may change purpose with the same owner and a new token. Exact release cannot delete
+a successor. Current native/device admission, lifetime constraints, account-only RLS
+and finite cleanup remain. A device-guard wait cannot extend the captured deadline.
+[Evidence](measurements/collaboration-space-room-request-slots-2026-11-04.json): all 109
+database cases pass in 1012.632 seconds; focused six database/eight typed
+cases pass in 236.801 seconds with quality checks and 8,400 identical
+unchanged inputs. Recovery 19 passes, maximum schema 134/unknown 135. Mixed concurrent
+capacity, expired purpose replacement, malformed readback/cancellation rollback, own
+cleanup after purge, real archive restore and actual lock-wait expiry pass. Initial
+unnamed-constraint selection error is resolved and documented. All sessions closed.
+
+NEXT apply/review worker-review/*.kt in ignored group-room-lifecycle: claim, advance,
+settle, pure outcome policy, three pure tests and eleven actual-PG tests are drafted
+and parser/formatted only, UNCOMPILED/UNAPPLIED. Those review files are authoritative;
+older assembly fragments are stale. Worker test fixture uses legitimate typed JCE
+provider rotation and worker capability; do not assert ordinary RLS from it. Read
+worker-room-test-notes.md for missing adversarial/LEGACY/real-Synapse tests. No new
+worker/DI/public endpoint exists from this storage increment. Current admission around
+every provider outcome, exact binding/success/journal/final admission and bounded
+physical worker/cancellation remain required. Shared DI needs actual API and FULL
+worker gates. Then recipient keys/content/sync/push and full Mobile SDK adoption,
+including offline keys/native hard-parent replacement and original store/history.
+
+Provider5493a8e1, Main dee4e2d5 and Mobile13c089ef handoffs are pushed. Group disabled;
+all 54 PRD groups open. Live8b40/schema116 push ON/SMTP OFF, normal phone28,
+Mobileproduct/hosted0b804cb2 and Starter9959c1d unchanged. Continue long run, updates,
+atomic pushes and validated product feature installs only.
+
 ## Provider peer recovery accepted — 4 November 2026
 
 Typed join requires exact room-ID readback. Recovered SPACE room assessment retains

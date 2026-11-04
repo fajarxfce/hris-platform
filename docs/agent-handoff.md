@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Group conversation metadata accepted — 4 November 2026
+
+Group branch is pushed through [4dd2fa96](https://github.com/fajarxfce/hris-platform/commit/4dd2fa96).
+V129 and typed ports retain immutable group pairs, deduplicated current public members
+and explicit owned original-company room inventory. [Evidence](https://github.com/fajarxfce/hris-platform/blob/4dd2fa96/docs/measurements/collaboration-space-conversation-storage-2026-11-04.json):
+86 database plus6 typed PostgreSQL cases PASS838.663s, 8,360 unchanged inputs,
+format/architecture and19 recovery cases. Concurrent openers, rollback/cancellation,
+finite overfetch, private-column restrictions and actual bound-room archive restore
+pass. Recovery accepts129/rejects130 with V126 encryption unchanged. No Gradle failure;
+an initial recovery import error was fixed by running from tool, without code changes.
+
+NEXT native group open/get/list and original inventory with current session/group/peer
+checks, atomic receipts/journal and actual API/FULL worker validation. Drafts in the
+worktree's ignored group-rooms directory are unapplied; review/format/test before use.
+Then explicit room adoption/provisioning, recipient key/content/push authority and
+Mobile adoption preserving original SDK keys/history/uncertain sends. Discovery grants
+no room authority. Offline keys must not need short native/provider tokens; native
+hard-parent replacement remains required recovery. Group disabled, all54 groups open.
+Mobile4678042f/hosted0b804cb2, phone28/live8b40/schema116 push ON/SMTP OFF and
+Starter9959c1d unchanged. Continue long run, updates, atomic pushes and validated
+product feature installs only; never proof APKs or unchanged28.
+
 ## Signed group own-key exchange accepted — 4 November 2026
 
 Group branch is pushed through [a65a8170](https://github.com/fajarxfce/hris-platform/commit/a65a8170).

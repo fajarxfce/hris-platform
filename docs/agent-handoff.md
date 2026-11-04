@@ -1,5 +1,30 @@
 # Agent continuation — HRIS workspace
 
+## Signed group own-key exchange accepted — 4 November 2026
+
+Group branch is pushed through [a65a8170](https://github.com/fajarxfce/hris-platform/commit/a65a8170).
+Fixed group upload snapshots bounded signed input, commits immutable reservation before
+provider I/O, verifies existing/readback keys and acknowledges atomically under current
+native/group/device/provider/request authority. Counts never acknowledge pending keys;
+lost or cancelled outcomes retain original identity. Same-identity competitors publish
+once, and exact final release preserves successor requests. Upload-only dispatch and
+shared DI are wired. [Evidence](https://github.com/fajarxfce/hris-platform/blob/a65a8170/docs/measurements/collaboration-space-key-exchange-2026-11-04.json):
+focused18 PASS268.626s; final data20/API132 PASS455.786s; full worker128 PASS343.980s
+(127 active/one existing retention skip), 8,351 identical final inputs and quality gates.
+Actual PostgreSQL/Synapse restart, retained keys, immutable input, races, revocation,
+generation changes and HTTP protocol pass. Two fencing cases and a strict version1
+metadata comparison followed initial success; no failing gate.
+
+NEXT explicit group room/member/original-room authority before recipient query/claim/
+to-device and content. Include committed version0 with publicationConfirmed in future
+recipient keys, verify every returned key, and preserve offline receiving independently
+of short native/provider credentials. Directory membership alone grants no room access.
+Native hard-parent replacement and full Mobile group adoption remain required, keeping
+original SDK namespace/passphrase, history and uncertain sends. Group stays disabled;
+no product caller/APK/rollout. All54 groups stay open. Mobile41a6a68c/hosted code0b804cb2,
+phone28/live8b40/schema116 push ON/SMTP OFF and Starter9959c1d unchanged. Continue long
+run, updates, immediate atomic pushes and validated product feature installs.
+
 ## Group public-key identity storage accepted — 4 November 2026
 
 Group branch is pushed through [88f5fc20](https://github.com/fajarxfce/hris-platform/commit/88f5fc20).

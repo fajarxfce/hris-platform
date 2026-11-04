@@ -18,6 +18,8 @@ class GetNativeCollaborationLegacyRuntimeDrain(
     private val legacyParents: CollaborationLegacyParentRepository,
     private val selections: CollaborationSpaceIdentityRepository,
     private val runtimes: CollaborationLegacyRuntimeRepository,
+    private val provisioning: CollaborationSpaceProvisioningRepository,
+    private val completions: CollaborationLegacyRuntimeCompletionRepository,
     private val spaces: CollaborationSpaceRepository,
     private val sessions: NativeSessionRepository,
     private val identities: IdentityRepository,
@@ -104,6 +106,35 @@ class GetNativeCollaborationLegacyRuntimeDrain(
                 current: CollaborationSpaceAdmission
             ): Result<CollaborationLegacyRuntimeOwner> =
                 legacyParents.find(spaceId, actor.accountId, sessionId, legacy).flatMap { source ->
+                    if (target.state == CollaborationDeviceState.ACTIVE) {
+                        val owner =
+                            CollaborationLegacyRuntimeOwner(
+                                legacy.companyId,
+                                legacy.deviceId,
+                                actor.accountId,
+                                sessionId,
+                            )
+                        val completed = completions.find(owner)
+                        if (completed is Result.Failed) return@flatMap completed
+                        val done = (completed as Result.Success).value ?: return@flatMap changed()
+                        if (
+                            done.targetDeviceVersion != expectedDeviceVersion + 1 ||
+                                done.fingerprint != fingerprint
+                        )
+                            return@flatMap changed()
+                        val head = provisioning.metadata(spaceId, actor.accountId, target.id)
+                        if (head is Result.Failed) return@flatMap head
+                        return@flatMap validateCompletedCollaborationLegacyDevice(
+                                identity,
+                                target,
+                                source,
+                                done,
+                                (head as Result.Success).value,
+                                current,
+                                clock.instant(),
+                            )
+                            .map { owner }
+                    }
                     collaborationLegacyFreezeOwner(
                         identity,
                         target,

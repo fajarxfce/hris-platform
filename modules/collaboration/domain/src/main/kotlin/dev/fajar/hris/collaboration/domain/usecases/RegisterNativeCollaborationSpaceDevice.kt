@@ -16,6 +16,7 @@ class RegisterNativeCollaborationSpaceDevice(
     private val registry: CollaborationSpaceDeviceRepository,
     private val provisioning: CollaborationSpaceProvisioningRepository,
     private val legacyParents: CollaborationLegacyParentRepository,
+    private val completions: CollaborationLegacyRuntimeCompletionRepository,
     private val selections: CollaborationSpaceIdentityRepository,
     private val spaces: CollaborationSpaceRepository,
     private val sessions: NativeSessionRepository,
@@ -136,10 +137,36 @@ class RegisterNativeCollaborationSpaceDevice(
                 )
             if (selected is Result.Failed) return@run selected
             val identity = (selected as Result.Success).value
-            fun continuity(): Result<Unit> {
+            val found = registry.findBound(spaceId, actor.accountId, nativeSessionId)
+            if (found is Result.Failed) return@run found
+            val existing = (found as Result.Success).value
+            fun continuity(current: CollaborationSpaceAdmission): Result<Unit> {
                 if (legacy == null) return Result.Success(Unit)
                 val source = legacyParents.find(spaceId, actor.accountId, nativeSessionId, legacy)
                 if (source is Result.Failed) return source
+                if (existing?.state == CollaborationDeviceState.ACTIVE) {
+                    val completed =
+                        completions.find(
+                            CollaborationLegacyRuntimeOwner(
+                                legacy.companyId,
+                                legacy.deviceId,
+                                actor.accountId,
+                                nativeSessionId,
+                            )
+                        )
+                    if (completed is Result.Failed) return completed
+                    val head = provisioning.metadata(spaceId, actor.accountId, existing.id)
+                    if (head is Result.Failed) return head
+                    return validateCompletedCollaborationLegacyDevice(
+                        identity,
+                        existing,
+                        (source as Result.Success).value,
+                        (completed as Result.Success).value,
+                        (head as Result.Success).value,
+                        current,
+                        clock.instant(),
+                    )
+                }
                 return validateCollaborationSpaceLegacyDevice(
                     identity,
                     (source as Result.Success).value,
@@ -151,12 +178,9 @@ class RegisterNativeCollaborationSpaceDevice(
                 )
             }
             fun completion(): Result<Unit> =
-                admission().flatMap { continuity() }.flatMap { admission().map { Unit } }
-            val retained = continuity()
+                admission().flatMap { continuity(it) }.flatMap { admission().map { Unit } }
+            val retained = continuity((admitted as Result.Success).value)
             if (retained is Result.Failed) return@run retained
-            val found = registry.findBound(spaceId, actor.accountId, nativeSessionId)
-            if (found is Result.Failed) return@run found
-            val existing = (found as Result.Success).value
             val previous = (replay as Result.Success).value
             if (existing != null) {
                 val same =

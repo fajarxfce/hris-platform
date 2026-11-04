@@ -413,6 +413,10 @@ class NativeCollaborationSpaceRetryTest {
             )
         val clock = MutableClock(baseAt)
         val sql = DSL.using(TransactionAwareDataSourceProxy(runtime), SQLDialect.POSTGRES)
+        val completions =
+            StoredCollaborationLegacyRuntimeCompletionRepository(
+                PostgresCollaborationLegacyRuntimeCompletionDataSource(sql)
+            )
         val transactions =
             PostgresTransactionRunner(JdbcTransactionManager(runtime), JdbcTemplate(runtime))
         val selections =
@@ -654,6 +658,7 @@ class NativeCollaborationSpaceRetryTest {
                     registry,
                     provisioning,
                     legacyParents,
+                    completions,
                     selections,
                     spaces,
                     sessions,

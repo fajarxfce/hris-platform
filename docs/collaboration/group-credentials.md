@@ -39,8 +39,10 @@ ten-minute deadline and bounded ASCII content. No token or provider owner enters
 entity string diagnostics.
 
 `tool/recovery_set.py` adds this projection only at schema121. Earlier schema
-projections are unchanged. V122 adds only provisioning metadata and keeps the V121
-encryption projection unchanged; schema123 remains rejected until reviewed. The existing
+projections are unchanged. V122–V125 add provisioning, original-runtime/completion
+and gateway metadata while keeping the V121 encryption projection unchanged.
+[Recovery125 evidence](../measurements/collaboration-legacy-gateway-metadata-2026-11-04.json)
+includes actual archive restore and rejection of unknown schema126. The existing
 offline `RecoveryKeyVerifier` already decrypts arbitrary bounded purposes using
 the application cipher, so no whitelist or alternate cipher is needed. Keep its
 256-byte purpose limit: the canonical context is hashed, not pasted into the AAD.
@@ -76,11 +78,13 @@ journal; native replay preserves the original work. The fresh-device worker now
 prepares and publishes under current account/native/device authority,
 exact generation/revision and a still-current lease, with all business writes and
 journal atomic. Provider I/O runs outside SQL transactions. Failed/deferred attempts
-now have atomic safe-reason journals and finite retry budgets. Scheduling and
-retained-device runtime transfer are still required before public wiring. A lost/late/losing provider candidate expires naturally: **Synapse
-logout removes the device's other tokens and E2EE keys**, so it cannot clean up a
-losing candidate safely. Retained legacy promotion still needs the explicit
-transfer fence described in [group provisioning](group-provisioning.md).
+now have atomic safe-reason journals and finite retry budgets. Scheduling and admitted
+retained activation are wired behind disabled opt-in flags; actual API/full-worker
+and Synapse checks pass. Group HTTP/rooms/gateway and Mobile ownership remain required
+before product activation. A lost/late/losing provider candidate expires naturally:
+**Synapse logout removes the device's other tokens and E2EE keys**, so it cannot clean
+up a losing candidate safely. See [group provisioning](group-provisioning.md) for the
+implemented server transfer fence and remaining client ownership requirements.
 
 [Validation evidence](../measurements/collaboration-space-provider-credentials-2026-11-03.json):
 98 regression cases pass in395.199s with3650 unchanged input hashes; focused12 cases

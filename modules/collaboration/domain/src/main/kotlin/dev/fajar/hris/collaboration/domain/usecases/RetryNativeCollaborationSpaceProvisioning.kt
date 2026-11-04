@@ -17,6 +17,7 @@ class RetryNativeCollaborationSpaceProvisioning(
     private val registry: CollaborationSpaceDeviceRepository,
     private val provisioning: CollaborationSpaceProvisioningRepository,
     private val legacyParents: CollaborationLegacyParentRepository,
+    private val completions: CollaborationLegacyRuntimeCompletionRepository,
     private val selections: CollaborationSpaceIdentityRepository,
     private val spaces: CollaborationSpaceRepository,
     private val sessions: NativeSessionRepository,
@@ -115,7 +116,10 @@ class RetryNativeCollaborationSpaceProvisioning(
             val readDevice = registry.metadata(spaceId, actor.accountId, deviceId, lock = true)
             if (readDevice is Result.Failed) return@run readDevice
             val device = (readDevice as Result.Success).value ?: return@run denied()
-            fun continuity(): Result<Unit> {
+            val readHead = provisioning.metadata(spaceId, actor.accountId, deviceId, lock = true)
+            if (readHead is Result.Failed) return@run readHead
+            val head = (readHead as Result.Success).value ?: return@run changed()
+            fun continuity(current: CollaborationSpaceAdmission): Result<Unit> {
                 val found = registry.findBound(spaceId, actor.accountId, nativeSessionId)
                 if (found is Result.Failed) return found
                 if ((found as Result.Success).value != device) return changed()
@@ -135,6 +139,27 @@ class RetryNativeCollaborationSpaceProvisioning(
                 val legacy = device.legacy ?: return Result.Success(Unit)
                 val source = legacyParents.find(spaceId, actor.accountId, nativeSessionId, legacy)
                 if (source is Result.Failed) return source
+                if (device.state == CollaborationDeviceState.ACTIVE) {
+                    val completed =
+                        completions.find(
+                            CollaborationLegacyRuntimeOwner(
+                                legacy.companyId,
+                                legacy.deviceId,
+                                actor.accountId,
+                                nativeSessionId,
+                            )
+                        )
+                    if (completed is Result.Failed) return completed
+                    return validateCompletedCollaborationLegacyDevice(
+                        identity,
+                        device,
+                        (source as Result.Success).value,
+                        (completed as Result.Success).value,
+                        head,
+                        current,
+                        clock.instant(),
+                    )
+                }
                 return validateCollaborationSpaceLegacyDevice(
                     identity,
                     (source as Result.Success).value,
@@ -146,12 +171,9 @@ class RetryNativeCollaborationSpaceProvisioning(
                 )
             }
             fun completion(): Result<Unit> =
-                admission().flatMap { continuity() }.flatMap { admission().map { Unit } }
-            val retained = continuity()
+                admission().flatMap { continuity(it) }.flatMap { admission().map { Unit } }
+            val retained = continuity((admitted as Result.Success).value)
             if (retained is Result.Failed) return@run retained
-            val readHead = provisioning.metadata(spaceId, actor.accountId, deviceId, lock = true)
-            if (readHead is Result.Failed) return@run readHead
-            val head = (readHead as Result.Success).value ?: return@run changed()
             val priorRequest = head.request
             if (
                 priorRequest.nativeSessionId != nativeSessionId ||

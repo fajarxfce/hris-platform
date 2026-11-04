@@ -1,5 +1,13 @@
 # Organization device provisioning
 
+Completed retained activation now supports current-native receipt recovery for
+registration, retry, freeze and drain. Exact immutable completion, original retirement
+and succeeded queue provenance must match the ACTIVE target. An ordinary native
+refresh can recover the original outcome; it cannot restart successful work or
+rebind a device. Drain reads retained slots rather than inferring SDK shutdown.
+[Recovery evidence](../measurements/collaboration-completed-native-replay-2026-11-04.json)
+records 27 actual database cases plus API and worker context validation.
+
 The native selection and registration commands commit identity intent, current
 binding and journal/receipt. Fresh device registration now also enqueues bounded
 provider work atomically. They are bound in shared module DI, with group availability
@@ -93,10 +101,16 @@ requires unchanged observations and current authority, then commits encrypted
 credential, ACTIVE device, completed head and journal together. Final authority,
 lease/observation deadline and candidate expiry checks also run after the journal.
 
-Retained DEVICE activation is explicitly rejected until old/new gateway and SDK
-ownership transfer is implemented. Public-key continuity alone cannot authorize
-two runtimes for the same E2EE device. Failed publication leaves its current lease
-for the bounded outcome command; no logout or hidden retry occurs.
+Retained DEVICE activation is now implemented in the admitted worker. It requires
+exact active original device/provider/key/gateway metadata, the same DRAINING target
+and zero live original server slots. Signed provider-key readback runs outside SQL;
+current authority and exact observations are rechecked after success/failure and at
+publication. V124 original retirement/completion and group publication share one
+transaction. [Actual worker/Synapse evidence](../measurements/collaboration-retained-worker-activation-2026-11-04.json)
+includes restart, rollback, competing workers and bounded busy recovery. Public-key
+continuity still does not prove local private-key ownership or SDK shutdown; group
+HTTP and Mobile handover remain unexposed. Failed publication leaves its current
+lease for the bounded outcome command; no logout or hidden retry occurs.
 
 `SettleCollaborationSpaceProvisioningFailure` runs after the failed publication
 transaction has released its guards. It locks account then queue, checks the exact
@@ -152,11 +166,14 @@ do not call logout to clean it up. Participant E2EE private keys stay on the cli
 
 Retained-device promotion requires an explicit transfer/mapping fence that stops
 competing old/new runtime ownership without replacing Matrix user/device/key IDs.
-Current registration requires an active/unretired source at completion. Do not
-retire that source and then bypass this rule implicitly; completed transfer needs
-its own reviewed admission and immutable key/store references. Recheck old gateway
+Initial registration requires an active/unretired source. V124 completion records
+immutable original/target provenance and irreversible old retirement; subsequent
+native replay must explicitly validate that mapping under current admission instead
+of treating arbitrary retired sources as active. Recheck old gateway
 requests in flight when authority changes. A public fingerprint is not private-key
-possession: the client must reopen and verify the exact retained SDK store.
+possession: the client must reopen and verify the exact retained SDK store. Before
+permanent freeze, confirm the old SDK identity-key upload and matching provider
+readback; a reserved fingerprint alone does not prove that upload succeeded.
 
 Preserve pending message transaction identities and original owners. Inspect the
 existing MatrixTransactionInteropTest and durable worker recovery before redirecting

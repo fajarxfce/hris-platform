@@ -20,6 +20,8 @@ class FreezeNativeCollaborationLegacyRuntime(
     private val legacyParents: CollaborationLegacyParentRepository,
     private val selections: CollaborationSpaceIdentityRepository,
     private val runtimes: CollaborationLegacyRuntimeRepository,
+    private val provisioning: CollaborationSpaceProvisioningRepository,
+    private val completions: CollaborationLegacyRuntimeCompletionRepository,
     private val spaces: CollaborationSpaceRepository,
     private val sessions: NativeSessionRepository,
     private val identities: IdentityRepository,
@@ -127,6 +129,36 @@ class FreezeNativeCollaborationLegacyRuntime(
             ): Result<CollaborationLegacyRuntimeOwner> {
                 val source = legacyParents.find(spaceId, actor.accountId, nativeSessionId, legacy)
                 if (source is Result.Failed) return source
+                if (target.state == CollaborationDeviceState.ACTIVE) {
+                    val owner =
+                        CollaborationLegacyRuntimeOwner(
+                            legacy.companyId,
+                            legacy.deviceId,
+                            actor.accountId,
+                            nativeSessionId,
+                        )
+                    val completed = completions.find(owner)
+                    if (completed is Result.Failed) return completed
+                    val done = (completed as Result.Success).value ?: return changed()
+                    if (
+                        done.targetDeviceVersion != expectedDeviceVersion + 1 ||
+                            done.fingerprint != fingerprint
+                    )
+                        return changed()
+                    val head =
+                        provisioning.metadata(spaceId, actor.accountId, target.id, lock = true)
+                    if (head is Result.Failed) return head
+                    return validateCompletedCollaborationLegacyDevice(
+                            identity,
+                            target,
+                            (source as Result.Success).value,
+                            done,
+                            (head as Result.Success).value,
+                            current,
+                            clock.instant(),
+                        )
+                        .map { owner }
+                }
                 return collaborationLegacyFreezeOwner(
                     identity,
                     target,
@@ -141,7 +173,12 @@ class FreezeNativeCollaborationLegacyRuntime(
             if (matched is Result.Failed) return@run matched
             val owner = (matched as Result.Success).value
             val destination = CollaborationLegacyRuntimeTarget(spaceId, target.id)
-            val acquired = runtimes.ensure(owner, clock.instant().truncatedTo(ChronoUnit.MICROS))
+            val acquired =
+                if (target.state == CollaborationDeviceState.ACTIVE) {
+                    runtimes.find(owner, lock = true).flatMap {
+                        if (it == null) changed() else Result.Success(it)
+                    }
+                } else runtimes.ensure(owner, clock.instant().truncatedTo(ChronoUnit.MICROS))
             if (acquired is Result.Failed) return@run acquired
             val runtime = (acquired as Result.Success).value
             val decision =

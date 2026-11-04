@@ -26,8 +26,8 @@ legacy-row preservation and archive restoration. Full39 core cases in18 suites
 pass in237.316s, with12 recovery-tool cases and unchanged envelope formats.
 Live remains schema116; no group migration has been deployed.
 
-The selection-input repository and pure policy are now implemented without DI or
-HTTP wiring. One query distinguishes unavailable scope from admitted absence and
+The selection-input repository and pure policy are implemented and wired into
+shared DI; group HTTP remains unexposed. One query distinguishes unavailable scope from admitted absence and
 returns the current selection or earliest retained identity on the configured
 server. Mapping shares the validated legacy mapper; it never acquires provider
 tokens. Actual PostgreSQL checks cover retirement, timestamp-before-UUID preference,
@@ -51,10 +51,11 @@ checks. Six new command cases include actual lock contention from two native
 parents, duplicate/lost responses, new and retired legacy identities, rollback
 following each write, late committed offboarding/MFA changes, expiry, cancellation,
 interruption and denied replay. The earlier container/grant fixture failures remain
-recorded. No DI/controller is wired and no device/provider grant is implied.
+recorded. The selection command is now wired into shared DI; no group controller
+is exposed and selection implies no device/provider grant.
 
-The following device/runtime migration is **not implemented**. Keep these command
-invariants when wiring and integrating it:
+The following invariants govern the implemented server registry/runtime commands.
+Client SDK/store ownership and public group runtime integration remain incomplete:
 Take the operation receipt guard, exclusive account guard, then native-parent
 guard. Recheck current account, credentials, parent version/proof, MFA, group
 eligibility, client policy and configured Matrix service before work and at
@@ -108,7 +109,8 @@ prove that the client possesses private keys; reopening and matching the retaine
 SDK store is mandatory before client adoption. Other historical identities remain
 explicit, with no silent merge or re-encryption.
 
-The exact parent metadata repository is now implemented too, still unwired. Its
+The exact parent metadata repository is implemented and consumed by the native
+commands and admitted worker. Its
 single bounded lookup correlates space/account/native parent/company/device and
 maps the optional key tuple inside the same failure boundary as acquisition.
 Missing or inconsistent metadata cannot authorize adoption. [Repository evidence](../measurements/collaboration-legacy-parent-metadata-2026-11-03.json)
@@ -126,7 +128,8 @@ records five cases in42.411s with3628 unchanged source hashes and quality checks
 including actual duplicate-binding rollback, parent purge, cross-account reads and
 quota/credential/membership transitions. The failed future-version fixture is retained.
 
-`RegisterNativeCollaborationSpaceDevice` is now implemented without DI/HTTP wiring.
+`RegisterNativeCollaborationSpaceDevice` is implemented and wired into shared DI;
+its group HTTP controller remains unexposed.
 It requires a committed canonical selection, explicit new/retained origin and exact
 current native admission under operation/account/parent guards. The shared quota
 prevents a sixth device. Device, binding, bounded provisioning request, receipt and
@@ -164,16 +167,19 @@ outcomes. Typed queue ports now validate exact proof/lease fences and atomic
 credential/device/queue rollback against actual PostgreSQL, including archive
 restoration. Native enqueue, revisioned retry and admitted worker publication for
 fresh group devices are integrated, including bounded failure/defer handling.
-Bounded scheduling classes are tested but unwired. Retained-device runtime transfer,
-DI activation, group gateway/rooms and local-store adoption remain unfinished.
+Bounded scheduling and retained-device activation are wired behind disabled opt-in
+flags. [Worker acceptance](../measurements/collaboration-retained-worker-activation-2026-11-04.json)
+includes actual provider-key readback, atomic V124 retirement/publication and API/full
+worker contexts. Group HTTP/gateway/rooms and local SDK/store adoption remain unfinished.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 
 V123 now supplies the [bounded legacy runtime storage](legacy-runtime-transfer.md):
 exact original owner, one irreversible freeze intent and eight reusable in-flight
-slots. Actual contention, rollback and archive recovery are tested. All legacy
-provider callers must still be integrated before any transfer can be exposed;
-atomic completed ownership and Mobile aliases remain pending.
+slots. Actual contention, rollback and archive recovery are tested. All fixed legacy
+provider consumers now honor that fence. V124 completion and V125 original gateway
+metadata support admitted retained activation; Mobile aliases, durable acquisition
+gates and product handover remain pending.
 
 ## Device and local-store continuity
 

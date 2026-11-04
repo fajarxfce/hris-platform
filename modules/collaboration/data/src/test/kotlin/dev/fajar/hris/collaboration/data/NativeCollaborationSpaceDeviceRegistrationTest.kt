@@ -1065,6 +1065,10 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
             )
         val clock = MutableClock(now)
         val sql = DSL.using(TransactionAwareDataSourceProxy(runtime), SQLDialect.POSTGRES)
+        val completions =
+            StoredCollaborationLegacyRuntimeCompletionRepository(
+                PostgresCollaborationLegacyRuntimeCompletionDataSource(sql)
+            )
         val transactions =
             PostgresTransactionRunner(JdbcTransactionManager(runtime), JdbcTemplate(runtime))
         val selections =
@@ -1270,6 +1274,7 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     registry,
                     provisioning,
                     legacyParents,
+                    completions,
                     selections,
                     spaces,
                     sessions,
@@ -1316,6 +1321,8 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     legacyParents,
                     selections,
                     runtimes,
+                    provisioning,
+                    completions,
                     spaces,
                     sessions,
                     identities,
@@ -1355,6 +1362,8 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     legacyParents,
                     selections,
                     runtimes,
+                    provisioning,
+                    completions,
                     spaces,
                     sessions,
                     identities,

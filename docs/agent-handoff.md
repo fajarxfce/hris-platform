@@ -1,5 +1,46 @@
 # Agent continuation — HRIS workspace
 
+## Completed native recovery accepted — 4 November 2026
+
+Based on pushed5b66e661, current native registration/retry/freeze/drain explicitly
+validate immutable completion for an exact ACTIVE retained target. Original provider
+identity, key, native owner, retirement and succeeded queue provenance must match;
+current native/group/client/MFA admission remains required. Ordinary native refresh
+and later valid terminal metadata changes preserve legitimate receipt recovery.
+Old receipts replay; new registration/freeze IDs can record the original outcome
+without new work. Fresh retry of an ACTIVE device stays denied. Drain observes real
+remaining slots and never reopens the old runtime.
+
+[Evidence](measurements/collaboration-completed-native-replay-2026-11-04.json): focused27
+PASS124.865s, API47 PASS168.496s, full worker127 PASS370.67s
+(126 active/one existing opt-in retention skip); same8291 unchanged source inputs,
+format/architecture PASS. Five new actual PostgreSQL methods cover real worker
+completion, replay/native refresh, missing/foreign/incoherent mappings, offboarding,
+revocation and post-receipt rollback/late admission/read failure/cancel/interruption/
+thread flag. Existing22 registration/freeze/drain/retry cases remain passing.
+Initial fixture failure and its test-only correction are retained in the measurement.
+
+NEXT group HTTP discovery/contacts/selection/device/status/retry/freeze/drain with
+native transport and client/observed-version/idempotency contracts; validate actual
+HTTP, generated OpenAPI and shared API/full worker DI. No HTTP/Mobile caller or
+deployment is enabled by the recovery increment. Continue group rooms/gateway and
+durable Mobile handover without substituting space IDs for old company store IDs.
+Mobile review: strict protected SDK record and serialized session persistence can
+retain intent across callbacks; registry closeOtherOwners gates only current entries.
+Pending reservations without attached resources must also drain. Confirm old provider
+key publication before permanent freeze; never treat public fingerprints or zero
+server slots as private-key ownership/SDK shutdown. No Mobile code changed yet.
+
+Main e6601aa3/Mobile a6faf7c1 need this accepted commit linked. Normal phone28,
+live8b40/schema116 pushON/SMTP OFF, Mobile3d85d569/hosted gates and Starter9959c1d
+remain current. All54 groups and actual Apple runtime remain open. Continue full
+long run, frequent updates, atomic Git handoffs and immediate pushes.
+
+User asked about Starter PR2: read-only audit found Draft against the old
+feat/platform-foundations branch, all checks SUCCESS. Head594c3fb0 is already an
+ancestor of main dc14934c (63 behind/0 ahead). Explained stale PR status, no missing
+PR commits. No close/retarget/merge requested or performed; long run continued.
+
 ## Retained worker activation accepted — 4 November 2026
 
 Based on pushed612d8279, the existing group worker now supports an exact retained

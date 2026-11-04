@@ -135,6 +135,307 @@ class CollaborationSpaceWorkerPublicationTest {
     }
 
     @Test
+    fun completedNativeRegistrationFreezeAndDrainRetainReceiptsAcrossRefreshAndMetadataUpdates() {
+        val f = Fixture(verifiedMfa = true)
+        val original = f.activeLegacy(signed = true)
+        f.gateway(original)
+        f.select()
+        val registration = UUID.randomUUID()
+        val registered = success(f.registrationCommand(original, registration))
+        val id = registered.id
+        val freeze = UUID.randomUUID()
+        val frozen = success(f.freezeCommand(id, freeze))
+        success(f.advance(f.claim(id), f.provider(id)))
+        val completed = requireNotNull(f.completion(original))
+        val head = f.work(id)
+        val credential = f.credential(id)
+        val old = f.originalSnapshot()
+        assertEquals(
+            registered.copy(replayed = true),
+            success(f.registrationCommand(original, registration)),
+        )
+        assertEquals(
+            MutationReceipt(id, 1),
+            success(f.registrationCommand(original, UUID.randomUUID())),
+        )
+        assertEquals(frozen.copy(replayed = true), success(f.freezeCommand(id, freeze)))
+        assertEquals(frozen, success(f.freezeCommand(id, UUID.randomUUID())))
+        assertEquals(0, success(f.drainCommand(id)).activeRequests)
+        owner.update(
+            "update native_sessions set version=version+1,rotated_at=clock_timestamp() where id=?",
+            f.session,
+        )
+        assertEquals(
+            registered.copy(replayed = true),
+            success(f.registrationCommand(original, registration, nativeVersion = 1)),
+        )
+        assertEquals(
+            frozen.copy(replayed = true),
+            success(f.freezeCommand(id, freeze, nativeVersion = 1)),
+        )
+        assertEquals(0, success(f.drainCommand(id, nativeVersion = 1)).activeRequests)
+        assertEquals(old, f.originalSnapshot())
+        assertEquals(head, f.work(id))
+        assertEquals(credential, f.credential(id))
+        assertEquals(completed, f.completion(original))
+        // Existing terminal device rules allow later metadata versions but preserve revokedAt.
+        owner.update(
+            "update collaboration_devices set version=version+1,label='Renamed old device',updated_at=clock_timestamp() where company_id=? and id=?",
+            f.company,
+            original.deviceId,
+        )
+        owner.update(
+            "update collaboration_space_devices set version=version+1,label='Renamed group device',updated_at=clock_timestamp() where id=?",
+            id,
+        )
+        assertEquals(
+            registered.copy(replayed = true),
+            success(f.registrationCommand(original, registration, nativeVersion = 1)),
+        )
+        assertEquals(
+            MutationReceipt(id, 2),
+            success(f.registrationCommand(original, UUID.randomUUID(), nativeVersion = 1)),
+        )
+        assertEquals(
+            frozen.copy(replayed = true),
+            success(f.freezeCommand(id, freeze, nativeVersion = 1)),
+        )
+        assertEquals(0, success(f.drainCommand(id, nativeVersion = 1)).activeRequests)
+        assertEquals(completed, f.completion(original))
+        f.activatedCount(1)
+        assertEquals(
+            1,
+            owner.queryForObject(
+                "select count(*) from audit_entries where actor_id=? and action='collaboration.legacy_runtime_frozen'",
+                Int::class.java,
+                f.account,
+            ),
+        )
+    }
+
+    @Test
+    fun completedRetryReturnsItsOriginalReceiptButNeverQueuesAnotherActivation() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        val seeded = f.seed(legacy = original)
+        val id = seeded.request.deviceId
+        assertTrue(f.cancel(id))
+        val operation = UUID.randomUUID()
+        val receipt = success(f.retryCommand(id, operation))
+        assertEquals(1L, receipt.version)
+        f.freeze(id)
+        success(f.advance(f.claim(id), f.provider(id)))
+        val head = f.work(id)
+        val credential = f.credential(id)
+        assertEquals(receipt.copy(replayed = true), success(f.retryCommand(id, operation)))
+        owner.update(
+            "update native_sessions set version=version+1,rotated_at=clock_timestamp() where id=?",
+            f.session,
+        )
+        assertEquals(
+            receipt.copy(replayed = true),
+            success(f.retryCommand(id, operation, nativeVersion = 1)),
+        )
+        failure(
+            f.retryCommand(id, UUID.randomUUID(), nativeVersion = 1, revision = 1),
+            "collaboration_provisioning_changed",
+        )
+        assertEquals(head, f.work(id))
+        assertEquals(credential, f.credential(id))
+        assertEquals(1L, requireNotNull(f.completion(original)).provisioningRevision)
+        f.activatedCount(1)
+    }
+
+    @Test
+    fun completedReplayRejectsMissingForeignAndIncoherentCompletionWithoutCreatingReceipts() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        val id = f.register(original)
+        f.freeze(id)
+        success(f.advance(f.claim(id), f.provider(id)))
+        val done = requireNotNull(f.completion(original))
+        val count = f.receiptCount()
+        val old = f.originalSnapshot()
+        for (invalid in
+            listOf(
+                null,
+                done.copy(owner = done.owner.copy(accountId = UUID.randomUUID())),
+                done.copy(owner = done.owner.copy(companyId = UUID.randomUUID())),
+                done.copy(owner = done.owner.copy(nativeSessionId = UUID.randomUUID())),
+                done.copy(target = done.target.copy(deviceId = UUID.randomUUID())),
+                done.copy(target = done.target.copy(spaceId = UUID.randomUUID())),
+                done.copy(fingerprint = "b".repeat(64)),
+                done.copy(matrixUserId = "@other:$server"),
+                done.copy(matrixDeviceId = "HRIS_other"),
+                done.copy(nativeSessionVersion = 1),
+                done.copy(targetDeviceVersion = 999999),
+                done.copy(sourceDeviceVersion = done.sourceDeviceVersion + 1),
+                done.copy(sourceProviderGeneration = done.sourceProviderGeneration + 1),
+                done.copy(provisioningRevision = done.provisioningRevision + 1),
+                done.copy(completedAt = done.completedAt.minusNanos(1000)),
+            )) {
+            val substituted =
+                object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                    override fun find(
+                        owner: CollaborationLegacyRuntimeOwner
+                    ): Result<CollaborationLegacyRuntimeCompletion?> = Result.Success(invalid)
+                }
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.registrationCommand(original, UUID.randomUUID(), completions = substituted),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.freezeCommand(id, UUID.randomUUID(), completions = substituted),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.drainCommand(id, completions = substituted),
+            )
+            assertEquals(count, f.receiptCount())
+            assertEquals(old, f.originalSnapshot())
+        }
+        f.activatedCount(1)
+    }
+
+    @Test
+    fun completedReplayStillRequiresCurrentMembershipAndUnrevokedTarget() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        f.select()
+        val registration = UUID.randomUUID()
+        val id = success(f.registrationCommand(original, registration)).id
+        val freeze = UUID.randomUUID()
+        success(f.freezeCommand(id, freeze))
+        success(f.advance(f.claim(id), f.provider(id)))
+        val receipts = f.receiptCount()
+        owner.update(
+            "update company_memberships set active=false,version=version+1 where account_id=?",
+            f.account,
+        )
+        for (result in
+            listOf(
+                f.registrationCommand(original, registration),
+                f.freezeCommand(id, freeze),
+                f.drainCommand(id),
+            )) failure(result, "collaboration_access_denied")
+        owner.update(
+            "update company_memberships set active=true,version=version+1 where account_id=?",
+            f.account,
+        )
+        owner.update(
+            "update collaboration_space_devices set state='REVOKED',version=version+1,revoked_at=clock_timestamp(),updated_at=clock_timestamp() where id=?",
+            id,
+        )
+        for (result in
+            listOf(
+                f.registrationCommand(original, registration),
+                f.freezeCommand(id, freeze),
+                f.drainCommand(id),
+            )) assertInstanceOf(Result.Failed::class.java, result)
+        assertEquals(receipts, f.receiptCount())
+        assertNotNull(f.completion(original))
+    }
+
+    @Test
+    fun completedReplayReceiptRollsBackOnLateAdmissionReadFailureCancellationAndInterruption() {
+        for (command in listOf("register", "freeze")) for (mode in
+            listOf("late", "failure", "cancel", "interrupt", "flag")) {
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            val id = f.register(original)
+            f.freeze(id)
+            success(f.advance(f.claim(id), f.provider(id)))
+            val count = f.receiptCount()
+            val old = f.originalSnapshot()
+            val operation = UUID.randomUUID()
+            val clock = MutableClock(Instant.now())
+            val cancellation = CancellationException("fixture replay cancellation")
+            val interruption = InterruptedException("fixture replay interruption")
+            val operations =
+                object : OperationRepository by f.operations {
+                    override fun record(
+                        actor: Actor,
+                        key: OperationKey,
+                        receipt: MutationReceipt,
+                    ): Result<Unit> =
+                        f.operations.record(actor, key, receipt).flatMap {
+                            when (mode) {
+                                "late" -> {
+                                    clock.at = clock.at.plusSeconds(31)
+                                    Result.Success(Unit)
+                                }
+                                "cancel" -> throw cancellation
+                                "interrupt" -> throw interruption
+                                "flag" -> {
+                                    Thread.currentThread().interrupt()
+                                    Result.Success(Unit)
+                                }
+                                else -> Result.Success(Unit)
+                            }
+                        }
+                }
+            val reads = AtomicInteger()
+            val completions =
+                object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                    override fun find(
+                        owner: CollaborationLegacyRuntimeOwner
+                    ): Result<CollaborationLegacyRuntimeCompletion?> {
+                        if (reads.incrementAndGet() == 2 && mode == "failure")
+                            return Result.Failed(
+                                Failure(FailureKind.UNAVAILABLE, "fixture_completion_unavailable")
+                            )
+                        return f.completions.find(owner)
+                    }
+                }
+            fun run() =
+                if (command == "register")
+                    f.registrationCommand(
+                        original,
+                        operation,
+                        completions = completions,
+                        operations = operations,
+                        clock = clock,
+                    )
+                else
+                    f.freezeCommand(
+                        id,
+                        operation,
+                        completions = completions,
+                        operations = operations,
+                        clock = clock,
+                    )
+            try {
+                when (mode) {
+                    "cancel" ->
+                        assertSame(
+                            cancellation,
+                            assertThrows(CancellationException::class.java) { run() },
+                        )
+                    "interrupt" ->
+                        assertSame(
+                            interruption,
+                            assertThrows(InterruptedException::class.java) { run() },
+                        )
+                    "flag" -> {
+                        assertThrows(InterruptedException::class.java) { run() }
+                        assertTrue(Thread.currentThread().isInterrupted)
+                    }
+                    else -> assertInstanceOf(Result.Failed::class.java, run())
+                }
+            } finally {
+                Thread.interrupted()
+            }
+            assertEquals(count, f.receiptCount())
+            assertEquals(old, f.originalSnapshot())
+            if (command == "register") success(f.registrationCommand(original, operation))
+            else success(f.freezeCommand(id, operation))
+            assertEquals(count + 1, f.receiptCount())
+            f.activatedCount(1)
+        }
+    }
+
+    @Test
     fun retainedActivationMatchesActualSignedReadbackAndRetiresOnlyItsOriginalGateway() {
         for (withGateway in listOf(false, true)) {
             val f = Fixture(verifiedMfa = true)
@@ -1564,6 +1865,8 @@ class CollaborationSpaceWorkerPublicationTest {
                         legacyParents,
                         selections,
                         runtimes,
+                        provisioning,
+                        completions,
                         spaces,
                         sessions,
                         identities,
@@ -1690,7 +1993,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     if (legacy == null) CollaborationSpaceDeviceOrigin.SPACE
                     else CollaborationSpaceDeviceOrigin.LEGACY,
                     legacy,
-                    if (legacy == null) null else "a".repeat(64),
+                    if (legacy == null) null else fingerprint(),
                     session,
                     CollaborationPlatform.ANDROID,
                     "Fictional",
@@ -1726,6 +2029,140 @@ class CollaborationSpaceWorkerPublicationTest {
             return work(id)
         }
 
+        fun registrationCommand(
+            original: CollaborationLegacyDevicePosition,
+            operation: UUID,
+            nativeVersion: Long = 0,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+            operations: OperationRepository = this.operations,
+            clock: Clock = Clock.systemUTC(),
+        ): Result<MutationReceipt> =
+            RegisterNativeCollaborationSpaceDevice(
+                    registry,
+                    provisioning,
+                    legacyParents,
+                    completions,
+                    selections,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    clock,
+                )
+                .execute(
+                    actor,
+                    session,
+                    nativeVersion,
+                    space,
+                    client,
+                    operation,
+                    CollaborationPlatform.ANDROID,
+                    "Fictional",
+                    CollaborationSpaceDeviceOrigin.LEGACY,
+                    original,
+                    fingerprint(),
+                )
+
+        fun freezeCommand(
+            id: UUID,
+            operation: UUID,
+            nativeVersion: Long = 0,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+            operations: OperationRepository = this.operations,
+            clock: Clock = Clock.systemUTC(),
+        ): Result<MutationReceipt> =
+            FreezeNativeCollaborationLegacyRuntime(
+                    registry,
+                    legacyParents,
+                    selections,
+                    runtimes,
+                    provisioning,
+                    completions,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    clock,
+                )
+                .execute(
+                    actor,
+                    session,
+                    nativeVersion,
+                    space,
+                    client,
+                    operation,
+                    id,
+                    0,
+                    fingerprint(),
+                )
+
+        fun drainCommand(
+            id: UUID,
+            nativeVersion: Long = 0,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+        ): Result<CollaborationLegacyRuntimeDrainStatus> =
+            GetNativeCollaborationLegacyRuntimeDrain(
+                    registry,
+                    legacyParents,
+                    selections,
+                    runtimes,
+                    provisioning,
+                    completions,
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    Clock.systemUTC(),
+                )
+                .execute(actor, session, nativeVersion, space, client, id, 0, fingerprint())
+
+        fun retryCommand(
+            id: UUID,
+            operation: UUID,
+            nativeVersion: Long = 0,
+            revision: Long = 0,
+        ): Result<MutationReceipt> =
+            RetryNativeCollaborationSpaceProvisioning(
+                    registry,
+                    provisioning,
+                    legacyParents,
+                    completions,
+                    selections,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    Clock.systemUTC(),
+                )
+                .execute(actor, session, nativeVersion, space, client, operation, id, 0, revision)
+
+        fun receiptCount(): Int =
+            requireNotNull(
+                owner.queryForObject(
+                    "select count(*) from operation_receipts where actor_id=?",
+                    Int::class.java,
+                    account,
+                )
+            )
+
         fun register(retained: CollaborationLegacyDevicePosition? = null): UUID {
             select()
             return success(
@@ -1733,6 +2170,7 @@ class CollaborationSpaceWorkerPublicationTest {
                             registry,
                             provisioning,
                             legacyParents,
+                            completions,
                             selections,
                             spaces,
                             sessions,

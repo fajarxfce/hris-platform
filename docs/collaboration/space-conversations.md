@@ -71,9 +71,11 @@ Recovery schema 129 retains the V126 encrypted-envelope projection unchanged and
 rejects unknown schema 130. Archive restoration must preserve group pairs, original
 bound rooms, restricted view ownership, RLS and immutable triggers together.
 
-Native open/read/list commands are now wired for API/worker validation as described
+Native open/read/list commands passed API/worker validation as described
 below. Explicit room adoption/provisioning, recipient key query/claim/to-device access
 and content/push routing remain required integration.
+The [group provider adapter](space-room-provider.md) separately verifies explicit
+canonical users and its immutable alias/marker; it supplies no durable room grant.
 An offline recipient must not require an unexpired short native/provider token to
 retain its public-key availability. Group remains disabled with no Mobile product
 caller or live rollout from this storage increment.

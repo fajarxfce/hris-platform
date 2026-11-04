@@ -1,0 +1,294 @@
+{
+  "scope": "Explicit canonical group Matrix room protocol, distinct alias/immutable marker, strict provider state assessment and original signed-key continuity. No durable room grant, DI, schema or product caller.",
+  "baseCommit": "b478f77642bb6c8cfc698fc9cdd93eecb6225894",
+  "initialDomainAndData": {
+    "startedAt": "2026-11-04T09:31:20.555675+00:00",
+    "elapsedSeconds": 41.723,
+    "exitCode": 1,
+    "sourceFiles": 8371,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 102,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": {
+        "sha256": "8f41f61f970416221a804c08146f4fe916c9dd2b2e47c92b3286f2c4579474a4",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": {
+        "sha256": "8d0e9aeecb09fcd258d1493bacc3483b440e5906ee078fd29d59ba37022dcc71",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": {
+        "sha256": "eb01ed661786c6be5be199f14600839adabb7b469c52298d19ba9d1721be115a",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": {
+        "sha256": "2d2d5fa61f8941f8ec412294a60d4dbb535f8346fef167a3b4c8a86441212ced",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyFreezePolicyTest.xml": {
+        "sha256": "8f865c01859c110840cb1ddd55c3c6d04b5e4b371aa05f45653500bae89387e7",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyRuntimePolicyTest.xml": {
+        "sha256": "319c5cb2b259ffc0c0b5a385be636ad956edc3f376fe55e004ec3330e87b8d15",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": {
+        "sha256": "aab96a70d67d9afb96e7c5088c84d2c12bb34326c32d122e5b3195baa9637e48",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": {
+        "sha256": "3e4f3c34c2e021c357cb159dfe0475d0c0497c2103eec795ffb9a26978fb394f",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": {
+        "sha256": "29ad59da4ff93860c8a80b87e4c15bd0889424b152e93142d9b0130fdd3a5509",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": {
+        "sha256": "d526d79cf4a3258ed4229ca30b72346774a8d8d43cf74c39860a424373727837",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest.xml": {
+        "sha256": "e49d8e27322efb405518d232560a7865144234787a2a9c91e3b6d359f67d9006",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationPushDeliveryPolicyTest.xml": {
+        "sha256": "05dee1aae613a47907c7ee1fddbf49e9ffa51a1742c9c11d5e5832a19af93412",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+        "sha256": "4fcd7e8e296fb8437c5b5f8a29118e445c07d910ea9baf5120a9a7f70e677397",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": {
+        "sha256": "9b483ba77ab8fe93da20feccfa4c0f284c0e0161c01d7d32376d2726b6f7bf5e",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceAdmissionTest.xml": {
+        "sha256": "a52637bde12f5682aaa6fd4dcd96d445905f680e2641f9dd4f75414d50159560",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDevicePolicyTest.xml": {
+        "sha256": "0199a3a8214019fc0d8cdaf270454a531c5d4e63f91f3ae9f0e7acd8b7f3f56c",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDeviceStatusPolicyTest.xml": {
+        "sha256": "672602ec204f15a7f6551d1e0d67126b34fffb550b19e1fb03fd97308e52d92e",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceIdentityPolicyTest.xml": {
+        "sha256": "2efc34159080eef55a78c3f580e3e518138d23d8ce62167ff6f15a77a2095ba0",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceMatrixRoomPolicyTest.xml": {
+        "sha256": "c9dadcd380be227469b5b22852714cf7aef05ce9632260d6b614021a834fba40",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceProvisioningOutcomePolicyTest.xml": {
+        "sha256": "60eda0ef94e71d5a0d4f117b74372b8d133390febe62724b0c8b49d862c053e4",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": {
+        "sha256": "e40d182ffa746ca66847734a5782f569c3ff2ef5c70943529012f94ecf7e05ea",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.ClaimCollaborationSpaceProvisioningTest.xml": {
+        "sha256": "d98b7e4d72398f4c21ed6ad807cde468daca02940ee073a1c8faaad6d7041850",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRoomRepositoryTest.xml": {
+        "sha256": "d65742f6a08f532e79d21e868e3a35c487dc21d853590228633b10caa97e62db",
+        "tests": 4,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRoomInteropTest.xml": {
+        "sha256": "af0b313e2d00be2d5aa6b4a6a6be8f7d3397f13b82f99cddcd37aff5ba832a14",
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "acceptedData": {
+    "startedAt": "2026-11-04T09:33:28.764386+00:00",
+    "elapsedSeconds": 50.407,
+    "exitCode": 0,
+    "sourceFiles": 8371,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRoomRepositoryTest.xml": {
+        "sha256": "f12b96613a78a32a44af91a26e88b4d1a62ab3c89b4cb8e64667d02a86836cc6",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRoomInteropTest.xml": {
+        "sha256": "e556f87e782880396aa39fd6294ec89bf4df26e59db35982289dc77e2d710590",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "acceptedDomainTests": 96,
+  "uniqueAcceptedTests": 102,
+  "sourceFiles": 8371,
+  "sourceManifestSha256": "2c548ee3347f712b06f30caa10ba82c2aa7b319364636bf74e8dc123dd328c76",
+  "sourceSha256": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationSpaceMatrixRoomRepository.kt": "33e4091143909cda8aaa604bbbbc2f413e06b794b6677180b47bd44350180f89",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceMatrixRoomInteropTest.kt": "d1c2f22135371856a9cc4c2aaa3c8d0dbab94d1220b28904e07981c28c1965d9",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceMatrixRoomRepositoryTest.kt": "114eec72e8595d649f29a5236b959ead9108ab79ea9eeb614a4bbce136240b43",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceMatrixRoom.kt": "989517fbece8076e5514df95dab6753e7cb89212e13e4eb5a74aee1ec4ed401a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceMatrixRoomPolicy.kt": "b52d37af9f74086a9690725c15ef60b576143a7eeb0d8ab48c25305db661a973",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceMatrixRoomRepository.kt": "6d6feb590d2db071e49b855336b74896bff7b2c600dc6eab4c5b5621ea97f60a",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationSpaceMatrixRoomPolicyTest.kt": "d4f0bc1ea0560e74cb07e2a3b03edea70687ef5fb7512f2c85d51323b7071a28"
+  },
+  "caseSeconds": {
+    "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceMatrixRoomPolicyTest.xml": {
+      "onlyMissingInitialSettingsAndInviteCanBeProposedForRepair()": 0.003,
+      "canonicalUsersFromDifferentLegacyCompaniesKeepTheirIdentityInOneGroupRoom()": 0.002,
+      "foreignAccountSpaceAndServerCoordinatesNeverBecomeCanonicalByShapeAlone()": 0.002
+    },
+    "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRoomRepositoryTest.xml": {
+      "rawRoomReadbackAndAcquisitionFailuresShareTheSafeBoundary()": 0.011,
+      "creationUsesExplicitCanonicalUsersAndASeparateImmutableGroupMarker()": 0.018,
+      "invalidCanonicalRequestsAndRoomPathsAreRejectedBeforeRawIo()": 0.003,
+      "duplicateOversizedOrMalformedStateNeverBecomesARepairableObservation()": 0.005
+    },
+    "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceMatrixRoomInteropTest.xml": {
+      "retainedCanonicalUsersFromDifferentCompaniesShareOneGroupRoomAcrossRestart()": 10.913,
+      "lostCreationResponseRecoversTheSameGroupAliasAndAlienMembershipIsNeverAdopted()": 9.24
+    }
+  },
+  "correctedSourceFiles": [
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceMatrixRoomInteropTest.kt",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceMatrixRoomRepositoryTest.kt"
+  ],
+  "initialFailure": "All96 domain cases and two raw adapter cases passed. Two JSON fixture cases called Jackson JsonNode.map (which maps the node itself) instead of iterating array children. Both actual Synapse cases passed creation/admission/key checks but retained a pre-restart HTTP configuration after the owned container changed its mapped port. Corrected only the two test files: explicit child iteration and reacquisition of the current fixture endpoint without replacing provider identity/keys. Production code was unchanged. The final six data cases and quality checks passed; unchanged96 domain cases were not rerun.",
+  "reproduction": {
+    "initial": [
+      ":modules:collaboration:domain:test",
+      "--rerun",
+      ":modules:collaboration:data:test",
+      "--rerun",
+      "--tests",
+      "*CollaborationSpaceMatrixRoomRepositoryTest",
+      "--tests",
+      "*CollaborationSpaceMatrixRoomInteropTest"
+    ],
+    "final": [
+      ":modules:collaboration:data:test",
+      "--rerun",
+      "--tests",
+      "*CollaborationSpaceMatrixRoomRepositoryTest",
+      "--tests",
+      "*CollaborationSpaceMatrixRoomInteropTest"
+    ],
+    "common": [
+      "formatCheck",
+      "architectureCheck",
+      "--no-daemon",
+      "--no-parallel",
+      "--max-workers=1",
+      "-Dorg.gradle.jvmargs=-Xmx1536m",
+      "-Pkotlin.compiler.execution.strategy=in-process"
+    ]
+  },
+  "evidence": [
+    "Separate group request/marker/observation types preserve explicit canonical Matrix users from different historical companies or fresh organization identities; no space-to-company alias or peer identity derivation.",
+    "Stable hrisg_dm alias and immutable org.hris.space_conversation creation marker, version12/private/nonfederated/Megolm/invited history/forbidden guests and restricted direct power settings; only exact canonical participants accepted.",
+    "Pure assessment permits only absent initial settings or invite on an otherwise matching candidate. Foreign audience, identity/marker/server, conflicting state, tombstones, other creators and invalid membership are rejected.",
+    "Raw acquisition and room-ID/state mapping share safe provider failure handling; invalid requests fail before I/O, malformed/duplicate/oversized state fails, and cancellation/interruption propagates. No hidden retry or repository-to-repository call.",
+    "Actual Synapse creates a group room for retained users from different companies before peer login, admits peer join, retains both original signed key sets and same alias/state through restart, and never creates the corresponding company alias.",
+    "A lost response after actual successful creation is recovered through the same alias; duplicate create returns AliasInUse. Direct fixture injection of a foreign invite is rejected before and after restart without replacing the room. Only owned providers/resources are stopped."
+  ],
+  "limits": [
+    "These provider-control and public-key checks are not SDK encrypted-message or Mobile group-adoption acceptance. No room content, delivery status, offline recipient claim or capability is granted by provider creation alone.",
+    "No DI, endpoint or schema changed; actual API/full-worker evidence remains accepted from b478f776 and was not repeated. Next add group-owned request/queue/publication and original-room adoption with current admission before/after bounded provider work.",
+    "Generic background_jobs still requires company_id. Never supply a space as company. Exact canonical participants and original provenance must precede room grants, recipient key query/claim/to-device, content/sync/push and Mobile adoption.",
+    "Group disabled, all54 acceptance groups open. Main1fb7fe77/Mobile33eb35b2/hosted0b804cb2, normal phone28/live8b40/schema116 pushON/SMTPOFF and Starter9959c1d unchanged. No product APK, phone interaction or live rollout."
+  ]
+}

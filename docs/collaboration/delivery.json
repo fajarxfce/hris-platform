@@ -227,7 +227,9 @@
         "../measurements/collaboration-space-key-exchange-2026-11-04.json",
         "space-conversations.md",
         "../measurements/collaboration-space-conversation-storage-2026-11-04.json",
-        "../measurements/collaboration-space-conversation-native-2026-11-04.json"
+        "../measurements/collaboration-space-conversation-native-2026-11-04.json",
+        "space-room-provider.md",
+        "../measurements/collaboration-space-room-provider-2026-11-04.json"
       ]
     },
     {

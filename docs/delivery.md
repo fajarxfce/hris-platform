@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Explicit group Matrix room protocol — 4 November 2026
+
+Canonical user IDs, distinct group alias/immutable marker and strict provider state
+assessment now support separate group room control. [Contract](collaboration/space-room-provider.md)
+and [evidence](measurements/collaboration-space-room-provider-2026-11-04.json): 96 domain
+cases pass in the initial41.723s run; corrected six data cases pass50.407s with quality
+checks and8,371 unchanged inputs. Four initial failures were isolated JSON iteration/
+post-restart endpoint fixtures; only tests changed. Actual Synapse preserves original
+cross-company signed keys/room identity, recovers lost responses and rejects foreign
+members. Durable room authority, original adoption and Mobile integration remain next;
+no DI/schema, APK, rollout or completed PRD group.
+
 ## Native group conversation access — 4 November 2026
 
 Group open/list/detail and original-company inventory now enforce current native,

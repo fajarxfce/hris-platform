@@ -94,7 +94,16 @@ native/group admission in their use cases. Pair creation and opposite-participan
 replay converge under operation/pair/account/native guards with atomic receipt/journal
 publication and final peer/session checks. Reads recheck current authority on either
 acquisition outcome; retained intent does not grant provider room content. Shared DI
-adds the conversation datasource/repository and two use cases. Actual API and full-worker validation pass; group product adoption remains disabled.
+adds the conversation datasource/repository and two use cases. Actual API and full-worker
+validation pass; group product adoption remains disabled.
+
+The separate [group room protocol adapter](collaboration/space-room-provider.md) uses
+explicit canonical Matrix users and a distinct immutable organization alias/marker.
+It shares raw provider I/O and fixed settings, while preserving separate company/group
+request and observation types. Provider state assessment rejects foreign membership
+or conflicting state and permits only missing initial settings on a matching candidate.
+No durable room grant follows from resolution or creation alone; current group-owned
+request/publication and original-room adoption remain required integration.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Group Matrix room protocol accepted — 4 November 2026
+
+Based onb478f776, separate group room request/marker/observation types and an internal
+provider repository preserve explicit canonical users from different historical
+companies or fresh group identities. A distinct hrisg_dm alias and immutable
+org.hris.space_conversation marker prevent company-scope substitution. State assessment
+verifies exact creator/participants, version12/private nonfederated encryption/settings,
+and permits only absent initial settings/invite on an otherwise matching candidate.
+Resolved/created IDs and bounded unique state are validated; no implicit retry, database
+or application authority is introduced. Read [the contract](collaboration/space-room-provider.md).
+
+[Evidence](measurements/collaboration-space-room-provider-2026-11-04.json): all96 domain
+cases passed in the first102-case run41.723s, which had four data-fixture failures.
+Two fixtures used JsonNode.map instead of child iteration; both Synapse restart cases
+retained the old mapped-port configuration. Only those two test files changed. Final
+six data cases PASS50.407s with format/architecture and8,371 unchanged inputs; all
+production/domain sources match the earlier pass. Actual Synapse proves cross-company
+retained IDs and signed keys, peer first login/join, unchanged aliases/state through
+restart, lost response recovery and foreign-member rejection. This is provider control/
+public-key evidence, not SDK E2EE message acceptance. All test sessions are closed.
+All applied group-rooms/provider/*.kt.txt drafts are now stale; use committed source.
+
+NEXT separate group-owned room request/queue/publication and original-room adoption.
+Generic background_jobs still requires company_id. Pin first creator/canonical users
+and original native/device proof; admit current caller/peer/security before and after
+bounded outside-SQL work. Resolve the stable alias after uncertainty, verify exact
+state, and atomically publish one immutable room binding. Original adoption requires
+exact owned original coordinates and both canonical users matching original participants;
+never rewrite old markers/history or silently adopt conflicting/partial state. Existing
+neutral raw legacy observation may inspect original markers under explicit current
+admission; group creation policy must not reinterpret them.
+
+Then recipient key query/claim/to-device/content/sync/push and full Mobile adoption,
+preserving original SDK namespace/passphrase, history and uncertain sends. Offline keys
+must not need short native/provider tokens; hard-parent replacement remains required.
+No DI/schema/endpoint/product caller changed here. Group disabled/all54 groups open.
+Main1fb7fe77/Mobile33eb35b2/hosted0b804cb2, normal phone28/live8b40/schema116 push ON/
+SMTP OFF and Starter9959c1d unchanged. Continue long run, updates, atomic pushes and
+validated product feature installs only.
+
 ## Native group conversations accepted — 4 November 2026
 
 Based on4dd2fa96, native group open/list/get and original-company conversation/room

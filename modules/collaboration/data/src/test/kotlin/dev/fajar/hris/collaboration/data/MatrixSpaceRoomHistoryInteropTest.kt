@@ -205,6 +205,97 @@ class MatrixSpaceRoomHistoryInteropTest {
             )
             val creation = seen.values.single { it["type"] == "m.room.create" }
             assertEquals(creator.userId, creation["sender"])
+            val freshId = UUID.randomUUID()
+            val issued = Instant.now()
+            val fresh =
+                success(
+                    InternalCollaborationSpaceMatrixRepository(
+                            HmacMatrixJwtDataSource(provider.config),
+                            raw(),
+                            provider.clock,
+                        )
+                        .login(
+                            CollaborationSpaceMatrixLogin(
+                                f.space,
+                                f.pair[0],
+                                freshId,
+                                if (legacy) f.company else null,
+                                null,
+                                issued,
+                                issued.plusSeconds(30),
+                            )
+                        )
+                )
+            val freshOwner =
+                f.owner.copy(
+                    deviceId = freshId,
+                    matrixDeviceId = "HRISG_${freshId.toString().replace("-", "")}",
+                    legacy = null,
+                )
+            assertEquals(own.userId, fresh.userId)
+            assertEquals(freshOwner.matrixDeviceId, fresh.deviceId)
+            assertNotEquals(own.deviceId, fresh.deviceId)
+            val freshPage =
+                success(
+                        history()
+                            .messages(freshOwner, bound, request, fresh.accessToken, deadline())
+                    )
+                    .payload
+            val freshEvents = freshPage["chunk"] as List<*>
+            assertTrue(freshEvents.any { sent.containsKey((it as Map<*, *>)["event_id"]) })
+            for (value in freshEvents) {
+                val observed = value as Map<*, *>
+                val original = sent[observed["event_id"]] ?: continue
+                val content = observed["content"] as Map<*, *>
+                assertEquals(original.first.userId, observed["sender"])
+                assertEquals(original.second.ciphertext, content["ciphertext"])
+                assertEquals(original.second.deviceId, content["device_id"])
+                assertNotEquals(fresh.deviceId, content["device_id"])
+            }
+            val freshCursor = freshPage["end"] as String
+            assertInstanceOf(
+                Result.Failed::class.java,
+                history()
+                    .messages(
+                        freshOwner,
+                        bound,
+                        request.copy(from = first.payload["end"] as String),
+                        fresh.accessToken,
+                        deadline(),
+                    ),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                history()
+                    .messages(
+                        f.owner,
+                        bound,
+                        request.copy(from = freshCursor),
+                        own.accessToken,
+                        deadline(),
+                    ),
+            )
+            // Transaction acknowledgements in unsigned data can be device-specific.
+            assertEquals(
+                event.filterKeys { it != "unsigned" },
+                success(history().event(freshOwner, bound, target, fresh.accessToken, deadline()))
+                    .payload
+                    .filterKeys { it != "unsigned" },
+            )
+            assertEquals(
+                target,
+                (success(
+                        history()
+                            .context(freshOwner, bound, target, 0, fresh.accessToken, deadline())
+                    )
+                    .payload["event"]
+                    as Map<*, *>)["event_id"],
+            )
+            assertEquals(
+                event,
+                success(history().event(f.owner, bound, target, own.accessToken, deadline()))
+                    .payload,
+            )
             // Opaque provider transport and original namespace proof, not SDK Megolm decryption.
         }
     }

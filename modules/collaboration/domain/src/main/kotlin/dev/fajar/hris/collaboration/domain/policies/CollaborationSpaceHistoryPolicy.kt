@@ -43,12 +43,9 @@ fun validCollaborationSpaceHistoryOwner(
     if (owner.matrixUserId != originalUser) return false
     val legacy = owner.legacy
     if (legacy == null) {
-        if (
-            owner.matrixUserId !=
-                "@hrisg_${compact(owner.spaceId)}_${compact(owner.accountId)}:${owner.serverName}" ||
-                owner.matrixDeviceId != "HRISG_${compact(owner.deviceId)}"
-        )
-            return false
+        // A fresh device may use an already selected original user. The exact room member
+        // above proves its canonical user; device origin determines only its device namespace.
+        if (owner.matrixDeviceId != "HRISG_${compact(owner.deviceId)}") return false
     } else if (
         legacy.companyId == UUID(0, 0) ||
             legacy.deviceId == UUID(0, 0) ||
@@ -61,8 +58,8 @@ fun validCollaborationSpaceHistoryOwner(
         CollaborationSpaceRoomOrigin.SPACE -> intent.original == null
         CollaborationSpaceRoomOrigin.LEGACY -> {
             val original = intent.original ?: return false
-            legacy != null &&
-                original.companyId == legacy.companyId &&
+            original.companyId != UUID(0, 0) &&
+                (legacy == null || original.companyId == legacy.companyId) &&
                 original.conversationId != UUID(0, 0) &&
                 original.roomId == binding.roomId &&
                 intent.firstMatrixUserId ==

@@ -120,6 +120,57 @@ class MatrixSpaceRoomCursorTest {
     }
 
     @Test
+    fun freshDeviceForOriginalUserReadsOwnedRoomsWithoutInheritingOldDeviceCursors() {
+        val f = SpaceRoomHistoryFixture(legacy = true)
+        val id = UUID.randomUUID()
+        val fresh =
+            f.owner.copy(
+                deviceId = id,
+                matrixDeviceId = "HRISG_${id.toString().replace("-", "")}",
+                legacy = null,
+            )
+        val oldOwner = requireNotNull(collaborationSpaceLegacyHistoryOwner(f.owner, f.room))
+        val oldCompany = sealMatrixRoomCursor(crypto, oldOwner, f.roomId, "original")
+        val oldGroup = sealMatrixSpaceRoomCursor(crypto, f.owner, f.room, "original")
+        val mixed =
+            f.room.copy(
+                intent =
+                    f.room.intent.copy(origin = CollaborationSpaceRoomOrigin.SPACE, original = null)
+            )
+        for (room in listOf(f.room, mixed)) {
+            assertTrue(validCollaborationSpaceHistoryOwner(fresh, room))
+            assertNull(collaborationSpaceLegacyHistoryOwner(fresh, room))
+            val cursor = sealMatrixSpaceRoomCursor(crypto, fresh, room, "fresh")
+            assertEquals("fresh", openMatrixSpaceRoomCursor(crypto, fresh, room, cursor))
+            invalid { openMatrixSpaceRoomCursor(crypto, fresh, room, oldCompany) }
+            invalid { openMatrixSpaceRoomCursor(crypto, fresh, room, oldGroup) }
+            invalid { openMatrixSpaceRoomCursor(crypto, f.owner, room, cursor) }
+        }
+        assertFalse(
+            validCollaborationSpaceHistoryOwner(
+                fresh.copy(
+                    matrixUserId =
+                        f.owner.matrixUserId.replace(
+                            f.company.toString().replace("-", ""),
+                            UUID.randomUUID().toString().replace("-", ""),
+                        )
+                ),
+                f.room,
+            )
+        )
+        assertFalse(validCollaborationSpaceHistoryOwner(fresh.copy(accountId = f.pair[1]), f.room))
+        assertFalse(
+            validCollaborationSpaceHistoryOwner(
+                fresh.copy(matrixDeviceId = f.owner.matrixDeviceId),
+                f.room,
+            )
+        )
+        assertFalse(
+            validCollaborationSpaceHistoryOwner(fresh.copy(legacy = f.owner.legacy), f.room)
+        )
+    }
+
+    @Test
     fun missingKeysAndCancellationDoNotTriggerLegacyFallbackOrLoseClassification() {
         val f = SpaceRoomHistoryFixture(legacy = true)
         var calls = 0

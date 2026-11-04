@@ -15,6 +15,8 @@ with matching original company/device metadata can expose the old company cursor
 namespace. The eventual use case must prove completed transfer and current admission
 before constructing this metadata; possession of the metadata grants no access.
 
+A [fresh group device on an original canonical user](space-history-device-identity.md) can also read its owned SPACE/LEGACY rooms. Its HRISG_ identity has separate cursors and never inherits an old device/company cursor namespace. User origin and device origin are distinct; exact room membership remains mandatory.
+
 ## Cursors and retained history
 
 New cursors use the separate `collaboration.space.room.history.v1` encryption purpose,

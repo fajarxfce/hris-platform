@@ -1,0 +1,318 @@
+{
+  "recordedAt": "2026-11-04T17:27:12.116389+00:00",
+  "baseCommit": "3681619df313d6e27d4d276e1e841bc7e01c0637",
+  "scope": "Fresh group device on original canonical Matrix user can read owned history without inheriting old device cursor authority",
+  "initialGate": {
+    "startedAt": "2026-11-04T17:21:47.765485+00:00",
+    "elapsedSeconds": 23.031,
+    "exitCode": 1,
+    "sourceFiles": 8451,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 127,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationAdmissionPolicyTest.xml": {
+        "sha256": "f1bcbc47f39fd0fb7ea0f9da5a78434fa4bbfe78f38f62c7a7c240b5c4f82224",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectMetadataPolicyTest.xml": {
+        "sha256": "5211c71c74fea91586b65903ab84464b8399287b11fb10f1ef1b2d6dddbfa9da",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationDirectRoomRequestTest.xml": {
+        "sha256": "276d0c4b10fb76a0b30a8c8971e8a62f9bbac8585be7871d5eeca843c77c20c6",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationGatewayPolicyTest.xml": {
+        "sha256": "66b0c5fd78b6f33d492cd1da1ba675fc2501118f2986b1ec45d32ff90111dcb1",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyFreezePolicyTest.xml": {
+        "sha256": "fb827713d7961f0771769eca40e9dd2553c83839cd8d149fc2f1f75b988710e8",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyRuntimePolicyTest.xml": {
+        "sha256": "e98998b477d81152403ddacbb9b9b2cd903a0fd775480012e5e5cd606f560dcc",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyClaimPolicyTest.xml": {
+        "sha256": "119d4d31ed4023038011f10940308636054b5bbc396135afb4ebba761142dd6a",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyPolicyTest.xml": {
+        "sha256": "2c341d14006d5c50d6c622c63c810fd1aa8a36f7e44ae264b54b7a5cbd25d893",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixKeyQueryPolicyTest.xml": {
+        "sha256": "5af9d092d3ef3620f4dd30405711390fdf14fe0f6301ef51eddfcaf755f32b14",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationMatrixRoomPolicyTest.xml": {
+        "sha256": "a0f9a364273e5cbab50b58e3aa3c280149f81ef2fd672fb2067b4e3f45a54d10",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationPushAdmissionPolicyTest.xml": {
+        "sha256": "f95c5d56a9da1b1bef89f14504e537253e8d25ce961b3561fc12172b56477032",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationPushDeliveryPolicyTest.xml": {
+        "sha256": "5694b4a0e0898995ddd42bed7bb50073680d43472b5a38f8354959edee0b8afa",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+        "sha256": "cc976db0722b150e3a58b4670890315bc45a0b5ac1db2f73836269b849aeb0ee",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomScopePolicyTest.xml": {
+        "sha256": "456ef78942d51b77b71240f632a8a8e98dd1529d72cacbdd132b2e1c1df54944",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceAdmissionTest.xml": {
+        "sha256": "cb12d4bc1ba06e7c2f517366ba2822cf4bfc104014e4305ceff2836c7464ef2d",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceBoundRoomPolicyTest.xml": {
+        "sha256": "28366169e1b7a7000bdb5130dd1d9f80ee966e9e054dfd9f34e3db38e429613d",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDevicePolicyTest.xml": {
+        "sha256": "a3b648bb3848f474e47af0bb663a318a393aa22c627f769f638dfe38aaf96d5e",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceDeviceStatusPolicyTest.xml": {
+        "sha256": "fd8e72f2a6e5efe76036076d0e9e4a6e684c3363359d2762b42c8ff5cf9051bf",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceIdentityPolicyTest.xml": {
+        "sha256": "4ae312650996d7f31e8cc0a8156f3f7cb065f57e4382b22a0bec1d8ff8fc2744",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceKeyQueryPolicyTest.xml": {
+        "sha256": "9a52a05755d47627cec49e8bc30ee5d25dddcc6efa729317cbe8d7df6c5a1867",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceLegacyRoomPolicyTest.xml": {
+        "sha256": "622dd828e040643683b6455fc6f900ae4e221f889166ebeb597065122b3c59a0",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceMatrixRoomPolicyTest.xml": {
+        "sha256": "bf49ca96245186f701084515e1988b3744c4789092b71e46d2dee54283d309de",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceProvisioningOutcomePolicyTest.xml": {
+        "sha256": "caacd6d138bebfca304130291a7011277d3410d2aaf29ffc8b136e01208cdab7",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceRoomPreparationTest.xml": {
+        "sha256": "ef07bf51185a91738f9e0e181020f43af78f5a360b304dd56dd028a01265b9f8",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceRoomScopePolicyTest.xml": {
+        "sha256": "4c40aeebc37958d6eaaa637f2549a29e0ef7a8c977dc5006412a276888114955",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceRoomWorkerPolicyTest.xml": {
+        "sha256": "b775100f0a7d689adac96ab04813c8fd9151177d453594a3ce28959b6612eace",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationSpaceToDevicePolicyTest.xml": {
+        "sha256": "a0ecd2964e5d86bdd193a41702fbf6e488ff393ddc719e8d081779b58ee4462e",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationToDevicePolicyTest.xml": {
+        "sha256": "ce052969ecb73bd61346fbde0f4875399938b2c6e1746a20b2ca98c3cecfb160",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.domain.ClaimCollaborationSpaceProvisioningTest.xml": {
+        "sha256": "db9989f970b06debaf211f9ce68a476aad21cba640f02d0513abd71168b887bd",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "providerGate": {
+    "startedAt": "2026-11-04T17:23:22.886193+00:00",
+    "elapsedSeconds": 169.466,
+    "exitCode": 0,
+    "sourceFiles": 8451,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.MatrixRoomCursorTest.xml": {
+        "sha256": "1ae7688f3d8c52949158057329da38264e8248850d2073e96d615372e9c9773d",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixRoomHistoryInteropTest.xml": {
+        "sha256": "3f50517095c1b6282f9832e8c2bb5fece4f1de78b5be95c6bfee065ef27ea7a0",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixRoomHistoryMappingTest.xml": {
+        "sha256": "3c79b21a00510af4c26a7f120f25d3f97e530e12a7b2c74ce744ee496933a44b",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixSpaceRoomCursorTest.xml": {
+        "sha256": "daab58b3e2e30791f705e9874097f9525bb5341a3d1f593f161c35a4b3bf3670",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixSpaceRoomHistoryInteropTest.xml": {
+        "sha256": "f448116d0a99a7a3a56c9b910cea67c8032784e390ff3b4737c5e74901827c90",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixSpaceRoomHistoryMappingTest.xml": {
+        "sha256": "6b0e278a5e37861723e0beaf902f7f6c411025495ce47c4f1a4ff6df271de8a1",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRoomHistoryTest.xml": {
+        "sha256": "5cf83fa6966b00641a6ba9a81fe15ac2c640758e2c29cff5fde722582eda38a7",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "339b3a3696e46bd408b1d659e5e7a50ed968ff234f9c072201d0d776505ef54a",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "commands": {
+    "initial": ":modules:collaboration:domain:test --rerun :modules:collaboration:data:test --rerun --tests *MatrixRoomCursorTest --tests *MatrixRoomHistoryMappingTest --tests *MatrixRoomHistoryInteropTest --tests *MatrixSpaceRoomCursorTest --tests *MatrixSpaceRoomHistoryMappingTest --tests *MatrixSpaceRoomHistoryInteropTest --tests *NativeCollaborationSpaceRoomHistoryTest --tests *CollaborationSpaceWorkerPublicationTest.nativeRegistrationPublishesOneEncryptedCredentialWithoutHoldingSqlDuringProviderIo formatCheck architectureCheck",
+    "final": "Same data selection without repeating already passed domain tests; formatCheck architectureCheck",
+    "environment": "JDK21/Docker; --no-daemon --no-parallel --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1536m -Pkotlin.compiler.execution.strategy=in-process"
+  },
+  "changedSourceSha256": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceWorkerPublicationTest.kt": "8910fecf81bf335be78534eaae6b93f8e6d8b592368a6d32bfe63d46d3f12227",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSpaceRoomCursorTest.kt": "56e726276a1c8755fea420bfce1770708fb737155ca6140e70522b17b2f280c4",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSpaceRoomHistoryInteropTest.kt": "1944f68d14737fef836c8a2751ab07f2f4fa8f436eededb33f3b72cc8b3f36ab",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceHistoryPolicy.kt": "be681700a01b74bc909820210edc853e830599aa6be3ca7b6fa7cdcac2738fce"
+  },
+  "continuity": "All 127 domain cases passed before the initial data compilation stopped on a new fixture parameter-name warning under -Werror. Production source is unchanged between gates. Only two test files differ: matching the overridden roomId parameter and excluding device-specific unsigned acknowledgements from fresh/old event equality while asserting actual ciphertext events. All 27 selected data/provider/native cases and quality checks pass on 8451 unchanged final inputs.",
+  "evidence": [
+    "Existing room policy still validates exact canonical own Matrix member, account, space, server and creator. Fresh devices now require only their own HRISG_ namespace, allowing an admitted original canonical user. Retained HRIS_ devices keep exact legacy tuple validation.",
+    "Four group cursor tests include fresh devices in SPACE/LEGACY rooms, bidirectional old-company/old-group cursor replay rejection and mismatched user/account/device/legacy metadata.",
+    "Actual Synapse tests retain original room events after restart and register fresh devices on new and original users. Original sender/ciphertext/device IDs remain, event/context reads succeed, cursor replay fails, and old-device access still works. Existing company/group projection regressions pass.",
+    "Actual native registration, activation, bootstrap and admitted history event run for both fresh canonical-user kinds, with exact provider credential and outside-SQL I/O plus zero request leases. Its room/provider values are explicit fixtures; eight unchanged native history tests separately exercise real PostgreSQL room access and revocation."
+  ],
+  "limits": [
+    "No fresh-device SDK Megolm recovery/decryption is claimed. Original event identity excludes device-specific unsigned transaction acknowledgement differences.",
+    "No schema, application DI graph or HTTP parser changes. Group rollout remains disabled and all 54 PRD acceptance groups remain open.",
+    "Combined original/group read scope, old queued key identity lookup, sync/metadata/push, Mobile SDK adoption and native hard-parent recovery remain required.",
+    "Live8b40/schema116 push on/SMTP off, normal phone28, Mobile product/hosted0b804cb2 and Starter9959c1d unchanged."
+  ]
+}

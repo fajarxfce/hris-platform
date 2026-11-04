@@ -1580,6 +1580,7 @@ class CollaborationSpaceWorkerPublicationTest {
             f.activatedCount(1)
             assertInstanceOf(Result.Failed::class.java, f.advance(lease, matrix))
             assertEquals(1, matrix.calls.get())
+            assertFreshRegisteredHistory(f, id, retainedUser)
             assertEquals(
                 originalLegacy,
                 owner.queryForList(
@@ -2876,6 +2877,132 @@ class CollaborationSpaceWorkerPublicationTest {
         assertEquals(priorB, b.originalSnapshot())
     }
 
+    private fun assertFreshRegisteredHistory(f: Fixture, id: UUID, originalUser: Boolean) {
+        val device = f.device(id)
+        assertNull(device.legacy)
+        assertEquals("HRISG_${id.toString().replace("-", "")}", device.matrixDeviceId)
+        val other = UUID.randomUUID()
+        val pair = listOf(f.account, other).sortedBy(UUID::toString)
+        val roomId = "!fresh-device-history:$server"
+        val conversation = UUID.randomUUID()
+        val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        fun user(account: UUID) =
+            if (account == f.account) device.matrixUserId
+            else if (originalUser)
+                "@hris_${f.company.toString().replace("-", "")}_${account.toString().replace("-", "")}:$server"
+            else
+                "@hrisg_${space.toString().replace("-", "")}_${account.toString().replace("-", "")}:$server"
+        val bound =
+            CollaborationSpaceBoundRoom(
+                CollaborationSpaceRoomIntent(
+                    space,
+                    conversation,
+                    pair[0],
+                    pair[1],
+                    f.account,
+                    f.account,
+                    server,
+                    user(pair[0]),
+                    user(pair[1]),
+                    if (originalUser) CollaborationSpaceRoomOrigin.LEGACY
+                    else CollaborationSpaceRoomOrigin.SPACE,
+                    if (originalUser)
+                        CollaborationSpaceOriginalRoom(
+                            f.company,
+                            UUID.randomUUID(),
+                            roomId,
+                            at.minusSeconds(2),
+                        )
+                    else null,
+                    at.minusSeconds(1),
+                ),
+                CollaborationSpaceRoomBinding(
+                    space,
+                    conversation,
+                    f.account,
+                    0,
+                    UUID.randomUUID(),
+                    roomId,
+                    at,
+                    f.account,
+                ),
+            )
+        val rooms =
+            object : CollaborationSpaceRoomRepository by f.roomRepository() {
+                override fun boundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceBoundRoom?> {
+                    assertTrue(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(
+                        listOf(space, f.account, server, bound.binding.roomId),
+                        listOf(spaceId, accountId, serverName, roomId),
+                    )
+                    return Result.Success(bound)
+                }
+            }
+        val credential = f.credential(id)
+        var calls = 0
+        val history =
+            object :
+                CollaborationSpaceMatrixRoomHistoryRepository by DisabledCollaborationSpaceMatrixRoomHistoryRepository() {
+                override fun event(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceBoundRoom,
+                    eventId: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationRoomHistory> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(bound, room)
+                    assertEquals(
+                        CollaborationSpaceHistoryOwner(
+                            space,
+                            f.account,
+                            id,
+                            server,
+                            device.matrixUserId,
+                            device.matrixDeviceId,
+                        ),
+                        owner,
+                    )
+                    assertEquals(credential.accessToken, bearer)
+                    assertTrue(deadline > Instant.now())
+                    calls++
+                    return Result.Success(CollaborationRoomHistory(mapOf("event_id" to eventId)))
+                }
+            }
+        val token = success(f.groupBootstrap(id)).tokens.accessToken
+        val result =
+            success(
+                f.groupAccess(
+                        DisabledCollaborationMatrixRepository(),
+                        providerRoomHistory = history,
+                        rooms = rooms,
+                    )
+                    .roomEvent(token, UUID.randomUUID(), roomId, "\$original")
+            )
+        assertEquals(mapOf("event_id" to "\$original"), result.payload)
+        assertEquals(1, calls)
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_request_leases where space_id=? and device_id=?",
+                Int::class.java,
+                space,
+                id,
+            ),
+        )
+    }
+
     private fun assertRetainedRoomMessage(
         f: Fixture,
         deviceId: UUID,
@@ -3706,6 +3833,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 DisabledCollaborationMatrixRoomMessageRepository(),
             providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository =
                 DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
+            rooms: CollaborationSpaceRoomRepository = roomRepository(),
         ): AccessNativeCollaborationSpaceMatrixDevice {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
@@ -3746,9 +3874,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     PostgresCollaborationSpaceRecipientDataSource(sql)
                 ),
                 providerToDevice,
-                StoredCollaborationSpaceRoomRepository(
-                    PostgresCollaborationSpaceRoomDataSource(sql)
-                ),
+                rooms,
                 providerRoomMessage,
                 providerRoomHistory,
             )

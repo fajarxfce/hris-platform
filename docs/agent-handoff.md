@@ -2,7 +2,7 @@
 
 ## Legacy runtime storage accepted; integration continues — 4 November 2026
 
-Group source in /home/fajar/hris/.worktrees/communication-space is now16420c3e,
+Group source in /home/fajar/hris/.worktrees/communication-space is now ad1d7cca (preceded by 16420c3e),
 feat/communication-space, pushed. Its handoff and collaboration/legacy-runtime-
 transfer.md are authoritative. V123 adds exact original company/device/account/
 native ownership, one irreversible LEGACY -> DRAINING freeze intent to a retained
@@ -15,10 +15,14 @@ format/architecture pass, all checked hashes unchanged. Actual contention, stale
 replacement release, rollback, offboarding/parent purge and pg_dump/pg_restore pass.
 Recovery MAX_SCHEMA123 preserves envelopes;15 tests pass after an old unknown-future
 assertion was corrected to124. Earlier compile/test failures are retained in the
-measurement. No check is left running. Eight untested formatted runtime-port and
-mapping/storage-test drafts are isolated in that branch's ignored runtime-ports-next.
-Review/integrate them next, then fence gateway/provisioning/direct-room provider
-I/O and implement the admitted atomic group publication/legacy retirement command.
+measurement. No check is left running. Integration notes remain in that branch's ignored runtime-ports-next/contract.md.
+The typed ports and their tests are now accepted at ad1d7cca:26 mapper/actual
+storage/native/worker cases PASS115.242s with8262 unchanged inputs and quality.
+A plain jOOQ timestamp binding caused three initial storage failures; an explicit
+PostgreSQL timestamptz cast fixes the query. Exact stale-release fences, freeze
+continuity, transaction rollback/cancel/interruption and cleanup after parent purge
+pass. Tracked code supersedes those drafts. Next fence gateway/provisioning/direct-
+room provider I/O and implement admitted atomic group publication/legacy retirement.
 Preserve original SDK store/private keys/transaction IDs and explicit room/push/read
 ownership. Never logout losing Matrix candidates.
 

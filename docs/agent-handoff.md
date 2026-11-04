@@ -30,11 +30,23 @@ consumer-integration.md describes the reviewed call sites and frozen test-clock 
 Preserve original SDK store/private keys/transaction IDs and explicit room/push/read
 ownership. Never logout losing Matrix candidates.
 
-Mobile3d85d569 local SDK continuity is accepted;1ae13d74 records raw protocol CI
-41741297195 native/classic success with verified artifacts/14 driver hashes per mode.
-Control/Apple41741297181 and actual-HRIS native41741297183 are still running; retargeted
-audit scripts are under Mobile .work/local-sdk-identity-2026-11-03/hosted. Raw fixture
-success does not accept cross-company product transfer or Apple SDK behavior.
+Mobile3d85d569 local SDK continuity is accepted; fcf4cd33 records all hosted gates.
+Raw protocol41741297195 passes native/classic with verified artifacts/14 driver
+hashes per mode. Control41741297181 passes3114 portable/1217 Apple plus full Xcode;
+actual-HRIS native41741297183 passes232 Android-host,18 proof-host and5 native cases,
+three worker states retaining176 originals each, notification reply/recovery and
+owned cleanup. Artifact digests/source hashes are verified and three SystemUI PNGs
+viewed. Mobile measurements/collaboration-local-sdk-{control,native}-2026-11-04.json
+and its latest handoff contain the evidence. No hosted jobs remain pending. These
+regressions do not accept product group transfer or actual Apple Matrix runtime.
+
+The group worktree now has an uncommitted first provider-consumer integration in
+AccessNativeCollaborationMatrixDevice, shared DI and NativeCollaborationRegistrationTest.
+Seven initial actual gateway tests pass94.2s; expanded freeze/busy/cancel/interruption
+checks are running (runtime-gateway4). Do not modify its frozen checked inputs.
+Positive refresh cases use bounded real-time waits, preserving strict database lease
+bounds. Remaining provider/issuance consumers and full API/worker contexts are still
+required before committing/accepting the integration.
 
 Live8b40/schema116 pushON/SMTP OFF and installed normal phone28 remain current.
 Starter9959c1d needs no port for these HRIS-specific contracts. Continue the full

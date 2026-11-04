@@ -64,7 +64,9 @@
         "../measurements/chat-read-receipt-rollout-2026-11-02.json",
         "../measurements/product-chat-fcm-session-admission-2026-11-03.json",
         "space-sdk-history.md",
-        "../measurements/collaboration-space-sdk-history-2026-11-04.json"
+        "../measurements/collaboration-space-sdk-history-2026-11-04.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/1da6b5d00f906e220d6d7b472164d11487541616/docs/collaboration-space-discovery.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/1da6b5d00f906e220d6d7b472164d11487541616/docs/measurements/collaboration-space-discovery-2026-11-04.json"
       ]
     },
     {
@@ -385,7 +387,9 @@
         "space-push-delivery.md",
         "../measurements/collaboration-space-push-delivery-2026-11-04.json",
         "space-sdk-history.md",
-        "../measurements/collaboration-space-sdk-history-2026-11-04.json"
+        "../measurements/collaboration-space-sdk-history-2026-11-04.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/1da6b5d00f906e220d6d7b472164d11487541616/docs/collaboration-space-discovery.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/1da6b5d00f906e220d6d7b472164d11487541616/docs/measurements/collaboration-space-discovery-2026-11-04.json"
       ]
     },
     {
@@ -787,6 +791,7 @@
     "Actual isolated product FCM run16 passes with Mobilec770a83f immutable product6/peer6: ordinary process death, Firebase-caused restart, real SystemUI notification/inline reply and encrypted peer receipt. One fresh JUnit pass, all owned cleanup and five inspected PNGs. Session-authentication chronology fix verified with325 passed/one optional skipped backend cases and a fresh worker JAR. See product-fcm-acceptance.md and ../measurements/product-chat-fcm-current-ui-2026-11-03.json. Current native history also passes both previously failing process-death cases with 176 saved originals and exhausted paging.",
     "Mobile product0b804cb2 passed hosted control41775492328, native41775492365 and protocol41775492415; accepted source/evidence hashes are in Mobile collaboration-runtime-handover-hosted-2026-11-04.json. Original SDK namespace/keys and staged handover survive the exercised Android process-death cases. Apple build/host checks do not establish actual Apple Matrix SDK/APNs/CallKit behavior. Group adoption still has no product caller.",
     "Actual original queued SDK history now passes both known/unknown-peer group gateway scenarios with two process deaths, exact queued-frame replay and one local event before sync. See space-sdk-history.md. This fixture does not adopt the product runtime. Next integrate typed group foreground/background/push/reply ownership over retained physical SDK stores, native hard-parent recovery and actual FCM one-visible-notification handover. Strict shields remain Red; do not equate decryption with verified sender trust.",
+    "Mobile 1da6b5d0 adds typed native group discovery and bounded contact-page transport with current parent/clock/cursor checks. Root2463 fresh, repeated946 domain and focused2 actual container cases pass; production is unchanged across gates. See https://github.com/fajarxfce/hris-mobile/blob/1da6b5d00f906e220d6d7b472164d11487541616/docs/collaboration-space-discovery.md. No group UI/cache/device/SDK adoption yet. Continue encrypted local group directory and retained denial policy, durable native device commands and product group runtime/push/reply cutover.",
     "Complete actual recipient durable-delivery/read ACKs, pending-outbox previews/unread/recent ordering, group cross-company identity/admission/migration, native/web encrypted adapters, cross-family key continuity, group conversations, media/stickers/voice notes, edit/forward/delete and opt-in encrypted Drive/iCloud backups. Four fictional SAMPLE accounts now fix same-company demo directory eligibility; no cross-company or Firebase-login acceptance follows from that seed.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle, then LiveKit meetings and remaining P2\u2013P8. Voice/video/meeting UI is still absent. Physical iPhone testing is waived; provider and capacity acceptance remain separate.",
     "Continue all54 feature groups; none closes from this bounded Android scenario. Keep the user updated, push every atomic commit and retain exact test/source evidence plus current continuation in Git."

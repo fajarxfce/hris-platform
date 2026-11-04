@@ -91,6 +91,69 @@ class WorkerConfiguration {
         )
 
     @Bean
+    fun collaborationSpaceRoomSettings() =
+        dev.fajar.hris.worker.collaboration.CollaborationSpaceRoomWorkerSettings()
+
+    @Bean
+    fun collaborationSpaceRoomTasks(
+        settings: dev.fajar.hris.worker.collaboration.CollaborationSpaceRoomWorkerSettings
+    ) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-space-room-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(20)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun collaborationSpaceRoomTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-space-room-control-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_SPACE_ROOM_PROVISIONING_ENABLED",
+                "HRIS_COLLABORATION_SPACE_ENABLED",
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun collaborationSpaceRoomWorker(
+        claim: ClaimCollaborationSpaceRooms,
+        advance: AdvanceCollaborationSpaceRoom,
+        settle: SettleCollaborationSpaceRoomFailure,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationSpaceRoomTasks")
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationSpaceRoomTimers")
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.collaboration.CollaborationSpaceRoomWorkerSettings,
+    ) =
+        dev.fajar.hris.worker.collaboration.CollaborationSpaceRoomWorker(
+            { owner, limit -> claim.execute(owner, limit) },
+            advance::execute,
+            settle::execute,
+            tasks,
+            timers,
+            settings,
+        )
+
+    @Bean
     @ConditionalOnProperty(
         name = ["HRIS_COLLABORATION_ENABLED", "HRIS_MATRIX_ENABLED"],
         havingValue = "true",

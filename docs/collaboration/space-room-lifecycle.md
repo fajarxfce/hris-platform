@@ -32,7 +32,8 @@ Expired slots may change purpose only with the same owner and a new token; exact
 release cannot remove a successor. Lifetime is rechecked after a device-guard wait.
 No credential, key, RLS or encrypted recovery purpose changes. See the
 [capacity evidence](../measurements/collaboration-space-room-request-slots-2026-11-04.json).
-The bounded room worker still owns admission, provider I/O and atomic publication.
+The [admitted room worker](space-room-worker.md) now owns current admission,
+provider I/O and atomic publication; see its separate runtime evidence.
 
 Account-only RLS protects full private heads. The restricted non-login status-view
 owner has column privileges for safe operational metadata, including public account
@@ -55,8 +56,9 @@ Strict mappers reject malformed ownership, finite-time/state/outcome tuples and
 readback. Failed results roll back; cancellation and interruption propagate.
 
 See [native request/status](native-space-room.md) for current admission and HTTP
-semantics. Room provider reconciliation, recipient content/sync/push and Mobile SDK
-adoption remain separate work. Group chat stays disabled until that path is complete.
+semantics. The room worker reconciles provider state; recipient content/sync/push
+and Mobile SDK adoption remain separate work. Group chat stays disabled until that
+path is complete.
 The accepted V131 foundation evidence is retained in its
 [measurement](../measurements/collaboration-space-room-storage-2026-11-04.json);
 [V133 evidence](../measurements/collaboration-space-room-peer-recovery-2026-11-04.json):
@@ -65,4 +67,5 @@ cases PASS375.998s with one existing opt-in skip, and all31 retained
 publication cases PASS265.182s. Quality checks pass. Prior103
 domain and typed5/native5 passing evidence carries only with the recorded source
 continuity. Recovery19 passes, MAX133/unknown134. Initial fixture/compilation failures
-are resolved and recorded; all test sessions closed. No room worker/SDK rollout claim.
+are resolved and recorded; all test sessions closed. These earlier storage gates
+do not imply SDK rollout.

@@ -2,8 +2,10 @@ package dev.fajar.hris.collaboration.data
 
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.collaboration.data.datasources.*
+import dev.fajar.hris.collaboration.data.matrix.*
 import dev.fajar.hris.collaboration.data.repositories.*
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
 import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -2165,7 +2167,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 )
                 .single { it.request.conversationId == group && it.request.accountId == b.account }
                 .lease!!
-        val bound =
+        var bound =
             CollaborationSpaceRoomBinding(
                 space,
                 group,
@@ -2190,18 +2192,171 @@ class CollaborationSpaceWorkerPublicationTest {
                 },
             )
         }
-        success(
-            b.transactions.run(b.actor) {
-                b.roomRepository().publish(bound).flatMap {
-                    b.roomRepository().finish(roomLease).flatMap { finished ->
-                        if (finished) Result.Success(Unit)
-                        else
-                            Result.Failed(
-                                Failure(FailureKind.CONFLICT, "fixture_room_publication_changed")
-                            )
-                    }
+        val expectedProvider =
+            success(b.transactions.run(b.actor) { b.credentials.metadata(space, b.account, idB) })!!
+        val expectedToken =
+            success(b.transactions.run(b.actor) { b.credentials.credential(expectedProvider) })
+                .accessToken
+        val protocolCalls = mutableListOf<String>()
+        val json = ObjectMapper()
+        fun observedEvent(type: String, content: Map<String, Any>, key: String = "") =
+            MatrixRoomStateEventData(
+                type,
+                key,
+                b.device(idB).matrixUserId,
+                json.valueToTree(content),
+            )
+        val power = collaborationDirectRoomPower()
+        val state =
+            listOf(
+                observedEvent(
+                    "m.room.create",
+                    mapOf(
+                        "room_version" to "12",
+                        "m.federate" to false,
+                        "org.hris.conversation" to
+                            mapOf(
+                                "company_id" to b.company.toString(),
+                                "conversation_id" to original.toString(),
+                                "kind" to "DIRECT",
+                            ),
+                    ),
+                ),
+                observedEvent(
+                    "m.room.power_levels",
+                    mapOf(
+                        "users" to power.users,
+                        "events" to power.events,
+                        "users_default" to power.usersDefault,
+                        "events_default" to power.eventsDefault,
+                        "state_default" to power.stateDefault,
+                        "invite" to power.invite,
+                        "kick" to power.kick,
+                        "ban" to power.ban,
+                        "redact" to power.redact,
+                    ),
+                ),
+                observedEvent("m.room.encryption", mapOf("algorithm" to "m.megolm.v1.aes-sha2")),
+                observedEvent("m.room.join_rules", mapOf("join_rule" to "invite")),
+                observedEvent(
+                    "m.room.history_visibility",
+                    mapOf("history_visibility" to "invited"),
+                ),
+                observedEvent("m.room.guest_access", mapOf("guest_access" to "forbidden")),
+                observedEvent(
+                    "m.room.member",
+                    mapOf("membership" to "join"),
+                    a.device(idA).matrixUserId,
+                ),
+                observedEvent(
+                    "m.room.member",
+                    mapOf("membership" to "join"),
+                    b.device(idB).matrixUserId,
+                ),
+            )
+        fun admissionCall(kind: String, roomId: String, token: String, deadline: Instant) {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            assertEquals(originalRoom.roomId, roomId)
+            assertEquals(expectedToken, token)
+            assertTrue(deadline > Instant.now())
+            protocolCalls += kind
+        }
+        val raw =
+            object : MatrixRoomDataSource {
+                override fun resolveAlias(
+                    alias: String,
+                    token: String,
+                    deadline: Instant,
+                ): String? = error("Original room cannot resolve a new alias")
+
+                override fun createRoom(
+                    body: Map<String, Any>,
+                    token: String,
+                    deadline: Instant,
+                ): MatrixRoomCreateData = error("Original room cannot be replaced")
+
+                override fun join(
+                    roomId: String,
+                    token: String,
+                    deadline: Instant,
+                ): tools.jackson.databind.JsonNode {
+                    admissionCall("join", roomId, token, deadline)
+                    return json.createObjectNode().put("room_id", roomId)
                 }
+
+                override fun roomState(
+                    roomId: String,
+                    token: String,
+                    deadline: Instant,
+                ): List<MatrixRoomStateEventData> {
+                    admissionCall("state", roomId, token, deadline)
+                    return state
+                }
+
+                override fun putRoomState(
+                    roomId: String,
+                    type: MatrixRoomStateType,
+                    content: Map<String, Any>,
+                    token: String,
+                    deadline: Instant,
+                ): Unit = error("Original state cannot be repaired")
+
+                override fun invite(
+                    roomId: String,
+                    userId: String,
+                    token: String,
+                    deadline: Instant,
+                ): Unit = error("Original membership cannot be repaired")
             }
+        val roomAdvance =
+            AdvanceCollaborationSpaceRoom(
+                b.roomRepository(),
+                StoredCollaborationSpaceConversationRepository(
+                    PostgresCollaborationSpaceConversationDataSource(b.sql)
+                ),
+                b.registry,
+                b.credentials,
+                b.selections,
+                b.legacyParents,
+                b.completions,
+                b.provisioning,
+                StoredCollaborationSpaceRequestRepository(
+                    PostgresCollaborationSpaceRequestDataSource(b.sql)
+                ),
+                InternalCollaborationSpaceMatrixRoomRepository(raw, server),
+                InternalCollaborationMatrixRoomRepository(raw, server),
+                b.spaces,
+                b.sessions,
+                b.identities,
+                b.journal,
+                b.transactions,
+                IdentitySecurityPolicy(),
+                CollaborationSpacePolicy(true, 28, 28),
+                CollaborationMatrixPolicy(true, server),
+                Clock.systemUTC(),
+            )
+        success(roomAdvance.execute(roomLease))
+        assertEquals(listOf("join", "state"), protocolCalls)
+        val published =
+            success(
+                b.transactions.run(b.actor) { b.roomRepository().binding(space, b.account, group) }
+            )!!
+        bound = bound.copy(createdAt = published.createdAt)
+        assertEquals(
+            expectedProvider,
+            success(b.transactions.run(b.actor) { b.credentials.metadata(space, b.account, idB) }),
+        )
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_request_leases where space_id=? and device_id=?",
+                Int::class.java,
+                space,
+                idB,
+            ),
         )
         assertEquals(
             bound,

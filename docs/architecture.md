@@ -119,7 +119,8 @@ Public account+revision identifies retry observation; current caller uses its ow
 native/device/provider proof. One immutable binding records actual canonical creator
 and publisher separately, with exact LEGACY room/creator and atomic success/journal.
 GET/POST setup/status is wired and validated in actual API and full worker contexts;
-provider reconciliation, room worker and recipient content authority remain separate.
+the admitted room worker now reconciles provider state; recipient content authority
+remains separate.
 
 Native group conversation open/read/list and original-inventory routes now own current
 native/group admission in their use cases. Pair creation and opposite-participant
@@ -138,7 +139,8 @@ Typed join requires exact room readback; recovered-room assessment retains the a
 canonical creator and requires the caller to have joined. Only the actual creator
 may repair absent initial settings. Actual own-peer recovery, same alias and original
 keys survive Synapse restart. No durable room grant follows from provider success:
-the bounded room worker must still perform current admission and atomic publication.
+the [bounded room worker](collaboration/space-room-worker.md) performs current
+admission around provider work and publishes binding/success/journal atomically.
 V134 room control shares seven ordinary provider-operation slots with the gateway,
 using its own native/device proof and no invented gateway coordinates. Renewal keeps
 reserved slot zero. Same-owner expired purpose changes require new tokens; exact

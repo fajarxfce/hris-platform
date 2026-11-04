@@ -229,7 +229,9 @@
         "../measurements/collaboration-space-conversation-storage-2026-11-04.json",
         "../measurements/collaboration-space-conversation-native-2026-11-04.json",
         "space-room-provider.md",
-        "../measurements/collaboration-space-room-provider-2026-11-04.json"
+        "../measurements/collaboration-space-room-provider-2026-11-04.json",
+        "space-room-worker.md",
+        "../measurements/collaboration-space-room-worker-2026-11-04.json"
       ]
     },
     {
@@ -293,7 +295,9 @@
         "../measurements/collaboration-direct-room-provisioning-2026-10-31.json",
         "../measurements/collaboration-local-list-2026-11-01.json",
         "../measurements/collaboration-runtime-reuse-2026-11-01.json",
-        "../measurements/collaboration-message-intents-2026-11-01.json"
+        "../measurements/collaboration-message-intents-2026-11-01.json",
+        "space-room-worker.md",
+        "../measurements/collaboration-space-room-worker-2026-11-04.json"
       ]
     },
     {
@@ -691,7 +695,7 @@
   },
   "next": [
     "Normal Mobile release28 remains installed and pull-back verified on 10.77.77.3:5555 from product8273ae8d. Signer/app ID/first install and user data are preserved; no phone UI driven. Validated product features only for the next install, with notice immediately before install-only; never install proof APKs or reinstall unchanged28. Current Mobile continuation: https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md.",
-    "Platform live8b40bd0f/schema116 has chat push ON and SMTP OFF, with retained TLS/CA/provider callback allowlists and an isolated verified recovery set. Preserve Google/native/document state, original Matrix identities/keys and distinct HRIS/Matrix databases. Group worktree schema130 metadata passed local database/typed/API/recovery checks and group remains disabled; it is not deployed. See current docs/agent-handoff.md for the exact accepted local and live boundaries.",
+    "Platform live8b40bd0f/schema116 has chat push ON and SMTP OFF, with retained TLS/CA/provider callback allowlists and an isolated verified recovery set. Preserve Google/native/document state, original Matrix identities/keys and distinct HRIS/Matrix databases. Group worktree schema134 metadata and admitted room worker passed local database/provider/API/FULLworker/recovery checks and group remains disabled; it is not deployed. See current docs/agent-handoff.md for the exact accepted local and live boundaries.",
     "Actual isolated product FCM run16 passes with Mobilec770a83f immutable product6/peer6: ordinary process death, Firebase-caused restart, real SystemUI notification/inline reply and encrypted peer receipt. One fresh JUnit pass, all owned cleanup and five inspected PNGs. Session-authentication chronology fix verified with325 passed/one optional skipped backend cases and a fresh worker JAR. See product-fcm-acceptance.md and ../measurements/product-chat-fcm-current-ui-2026-11-03.json. Current native history also passes both previously failing process-death cases with 176 saved originals and exhausted paging.",
     "Mobile product0b804cb2 passed hosted control41775492328, native41775492365 and protocol41775492415; accepted source/evidence hashes are in Mobile collaboration-runtime-handover-hosted-2026-11-04.json. Original SDK namespace/keys and staged handover survive the exercised Android process-death cases. Apple build/host checks do not establish actual Apple Matrix SDK/APNs/CallKit behavior. Group adoption still has no product caller.",
     "Complete actual recipient durable-delivery/read ACKs, pending-outbox previews/unread/recent ordering, group cross-company identity/admission/migration, native/web encrypted adapters, cross-family key continuity, group conversations, media/stickers/voice notes, edit/forward/delete and opt-in encrypted Drive/iCloud backups. Four fictional SAMPLE accounts now fix same-company demo directory eligibility; no cross-company or Firebase-login acceptance follows from that seed.",

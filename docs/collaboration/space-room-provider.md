@@ -20,8 +20,9 @@ These are protocol/key checks; encrypted SDK-message acceptance remains separate
 
 [V131–V133 storage](space-room-lifecycle.md), [V132 routing](original-pair-routing.md)
 and [native HTTP](native-space-room.md) now pin both participants, exact original or
-SPACE intent and atomic binding/success. The room worker is still required to admit
-current authority around every provider outcome. V134 now provides a room-control kind
+SPACE intent and atomic binding/success. The [room worker](space-room-worker.md)
+now admits current authority around every provider outcome and publishes atomically.
+V134 now provides a room-control kind
 sharing slots 1..7 without gateway coordinates; renewal slot zero remains reserved.
 [Capacity evidence](../measurements/collaboration-space-room-request-slots-2026-11-04.json)
 covers upgrade, concurrency, exact cleanup and deadline after device-lock waiting. Recipient content/sync/push and Mobile integration remain disabled.
@@ -65,14 +66,16 @@ Acquisition and mapping share the technical provider failure boundary; cancellat
 and interruption propagate. The raw HTTP client owns bounded exchanges and the caller
 supplies the original deadline. There is no database or use-case policy in the port.
 
-## Integration boundary
+## Original adapter integration boundary
 
 The typed group request, marker, observation and policy are separate from company
 types. The repository reuses only raw `MatrixRoomDataSource`, fixed protocol settings
 and technical error mapping; it does not invoke another repository. No new DI,
 controller, SQL schema, worker queue or product caller is introduced by this adapter.
 
-Next, a group-owned request/publication lifecycle must pin the first creator and exact
+The following requirements describe the original adapter checkpoint; the linked
+room worker now implements request/publication. That lifecycle must pin the actual
+creator and exact
 canonical users, admit current native/group/device/request authority before and after
 outside-SQL work, and publish one immutable verified binding. Generic `background_jobs`
 still requires an HR company, so space IDs cannot be used there. Follow the bounded

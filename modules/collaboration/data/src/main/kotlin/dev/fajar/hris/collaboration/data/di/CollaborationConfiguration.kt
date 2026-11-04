@@ -871,6 +871,15 @@ class CollaborationConfiguration {
         } ?: DisabledCollaborationMatrixRoomRepository()
 
     @Bean
+    fun collaborationSpaceMatrixRooms(
+        clients: ObjectProvider<MatrixRoomDataSource>,
+        provider: CollaborationMatrixPolicy,
+    ): CollaborationSpaceMatrixRoomRepository =
+        clients.getIfAvailable()?.let {
+            InternalCollaborationSpaceMatrixRoomRepository(it, provider.serverName)
+        } ?: DisabledCollaborationSpaceMatrixRoomRepository()
+
+    @Bean
     fun collaborationSpaceGatewaySource(
         sql: DSLContext
     ): CollaborationSpaceGatewaySessionDataSource =
@@ -1623,6 +1632,68 @@ class CollaborationConfiguration {
             policy,
             provider,
             security,
+            clock,
+        )
+
+    @Bean
+    fun claimCollaborationSpaceRooms(
+        rooms: CollaborationSpaceRoomRepository,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+    ) = ClaimCollaborationSpaceRooms(rooms, policy, provider)
+
+    @Bean
+    fun settleCollaborationSpaceRoomFailure(
+        rooms: CollaborationSpaceRoomRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = SettleCollaborationSpaceRoomFailure(rooms, identities, journal, transactions, clock)
+
+    @Bean
+    fun advanceCollaborationSpaceRoom(
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        requests: CollaborationSpaceRequestRepository,
+        matrix: CollaborationSpaceMatrixRoomRepository,
+        originalRooms: CollaborationMatrixRoomRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        AdvanceCollaborationSpaceRoom(
+            rooms,
+            conversations,
+            registry,
+            providers,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            requests,
+            matrix,
+            originalRooms,
+            spaces,
+            sessions,
+            identities,
+            journal,
+            transactions,
+            security,
+            policy,
+            provider,
             clock,
         )
 }

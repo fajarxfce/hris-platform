@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Admitted room worker accepted — 4 November 2026
+
+The [room worker](collaboration/space-room-worker.md) now claims participant-owned
+work, reconciles exactly one immutable SPACE alias or retained LEGACY room using the
+current participant's credentials, and commits binding/success/journal atomically.
+Fresh native/device/provider/peer/request admission surrounds every external outcome.
+Actual creator and current publisher remain distinct; missing-state repair is
+creator-only. Original device identities, keys and history namespaces are preserved.
+
+[Evidence](measurements/collaboration-space-room-worker-2026-11-04.json): 108 domain and initial 11 PostgreSQL cases pass in
+155.778s; final 43 PostgreSQL/Synapse/retained cases pass in 394.504s.
+Full worker suite (138 cases) passes in 402.151s with one existing opt-in skip;
+96 actual API cases passes in 149.641s, plus quality checks. Final API/worker
+share 8,413 identical unchanged inputs. The scheduled test's wrong cleanup
+table name is corrected and its initial failed gate is retained. All sessions closed.
+
+The worker defaults off behind HRIS_COLLABORATION_SPACE_ROOM_PROVISIONING_ENABLED and
+the existing group/collaboration/Matrix/worker flags. Two tasks by default, no waiting
+executor queue, physical capacity after cancellation, bounded claim/lease/retries,
+owned shutdown and no restart are exercised. Actual scheduled native and room workers
+connect two fictional companies to one encrypted Synapse room with stable replays.
+This proves room preparation, not an SDK encrypted-message conversation.
+
+NEXT recipient projection/query/claim/to-device, room content/sync/push and full Mobile
+adoption including offline keys/native hard-parent replacement. Preserve original SDK
+namespace/passphrase/keys/history and uncertain sends. The ignored recipient-next.md,
+V135 SQL and five-case recipient test drafts are uncompiled/unapplied. LEGACY and
+bounded typed mapping coverage remain required; no V135 production source exists. All previous worker/runtime drafts are
+APPLIED/STALE; use committed source. Shared DI changes still need actual API/FULLworker.
+
+Base12020f6b and peer Main1cb9cf96/Mobiled82aa9be were pushed before this checkpoint.
+Group disabled; all 54 PRD groups open. Live 8b40/schema 116, push ON/SMTP OFF, phone 28,
+Mobile product/hosted 0b804cb2 and Starter 9959c1d unchanged. Continue the long run with
+updates, atomic pushes and validated product feature APK installs only.
+
 ## Bounded provider room-control capacity accepted — 4 November 2026
 
 V134 adds ROOM_PREPARATION to the seven ordinary provider-operation slots without

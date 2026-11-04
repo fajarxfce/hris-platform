@@ -54,7 +54,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # including immutable native/provider ownership, generation and all live timestamps.
 # V122 adds bounded organization provisioning metadata/leases and prior outcomes;
 # no new encrypted purpose or change to existing authenticated context.
-MAX_SCHEMA = 122
+# V123 retains runtime freeze ownership and bounded reusable lease slots only.
+# Original encrypted envelopes and SDK/provider ownership remain unchanged.
+MAX_SCHEMA = 123
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

@@ -1,5 +1,49 @@
 # Agent continuation — HRIS workspace
 
+## V123 bounded legacy runtime storage accepted — 4 November 2026
+
+V123 retains one exact company/device/account/original-native runtime owner and
+at most eight reusable request slots per device. LEGACY version 0 can freeze once
+to DRAINING version 1 with an exact retained PROVISIONING group target. Ownership/
+target cannot be reset or deleted. Each <=60-second claim locks the head, checks
+current bound parent/access/device, and commits before any future provider work.
+No ninth slot, live extension or stale-token cleanup of a replacement is possible.
+Cleanup works after freeze/offboarding/parent purge. There is no completed-transfer
+state or production caller integration yet. See [contract](collaboration/legacy-runtime-transfer.md)
+and [evidence](measurements/collaboration-legacy-runtime-fences-2026-11-04.json).
+
+Focused 5 PASS 79.963s/8254 unchanged source/build/resource files. Full regression 113
+PASS 525.967s/3676 unchanged Kotlin/SQL/build/recovery inputs: all core database,
+selected group admission/identity/device/native/storage cases, format/architecture.
+Actual 16 competing claims, freeze contention, wrong origin/scope, immutable owner,
+reused-slot cleanup, failure/cancel rollback, revoked parent and pg_dump/pg_restore
+pass. Recovery MAX_SCHEMA 123 adds no encrypted envelope; 15 tool cases pass in 0.178s.
+Only its corrected test file differs after the full gate. Earlier checks stopped
+49.683s on nullable JDBC map values and 14.102s on cancellation generic inference;
+an old future-schema assertion initially failed before its 123 -> 124 correction.
+All sessions/checks are complete. The full test worker exited normally; no diagnostic
+thread dump or process kill was needed. No live migration or phone installation.
+
+Next integrate typed runtime ports, then fence every old provider/gateway path and
+implement admitted atomic transfer publication. Eight UNTESTED formatted drafts
+(entities/port/raw source/jOOQ/mapper/repository/mapping+actual storage tests) are in
+.work/communication-space-2026-11-03/runtime-ports-next. Review the contracts and tests before copying; none of these draft ports
+or their tests has compiled or run. Preserve old SDK store/keys and pending transaction IDs.
+Do not reuse an old prepared full-check wrapper count without reviewing the suites.
+No provider caller may run during/after transfer merely because a slot expired.
+Never logout a losing Matrix candidate. Old SDK API-inspection-only notes below are
+superseded by Mobile's accepted local probe.
+
+Mobile 3d85d569 local identity/clean-close/restart proof is accepted; 1ae13d74 records
+hosted raw protocol 41741297195 native/classic passing with verified artifacts and
+14 provider source hashes per mode. Control/Apple 41741297181 and actual-HRIS
+native 41741297183 remain running; audit scripts are in Mobile's .work/local-sdk-
+identity-2026-11-03/hosted. The normal phone release 28 remains installed, and actual
+Apple SDK handover remains open. Main checkout ac31d731 currently points to earlier
+group source and needs this new commit recorded. Live 8b40/schema116 pushON/SMTP OFF,
+Starter 9959c1d and all 54 open acceptance groups remain. Continue full long run,
+frequent user/Git updates and push every atomic commit.
+
 ## Bounded native group setup status accepted — 3 November 2026
 
 GetNativeCollaborationSpaceDeviceStatus reads under current root/native/group/

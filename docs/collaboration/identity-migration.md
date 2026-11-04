@@ -169,6 +169,12 @@ DI activation, group gateway/rooms and local-store adoption remain unfinished.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 
+V123 now supplies the [bounded legacy runtime storage](legacy-runtime-transfer.md):
+exact original owner, one irreversible freeze intent and eight reusable in-flight
+slots. Actual contention, rollback and archive recovery are tested. All legacy
+provider callers must still be integrated before any transfer can be exposed;
+atomic completed ownership and Mobile aliases remain pending.
+
 ## Device and local-store continuity
 
 The new organization owner needs an explicit persisted reference to each retained

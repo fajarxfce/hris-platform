@@ -1,5 +1,37 @@
 # Delivery and validation
 
+## Organization directory local reads and finite refresh — 4 November 2026
+
+Mobile [243bdcc0](https://github.com/fajarxfce/hris-mobile/commit/243bdcc070fb1fe24782ad671d208769ce36ba4f) is pushed.
+
+Local observation now keeps owned directory facts readable through ordinary credential
+expiry while cancelling facts on account/admission changes. One explicit refresh
+acquires at most one page of 50; durable terminal cursors stop extra requests,
+interrupted refresh resumes, and only admitted publication clears the captured
+access revision. Original native lifetime and a 15-second total deadline bound
+acquisition, including mutex waits. A separate bounded 2-second path retains a
+received denial at cancellation. [Contract](https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/collaboration-space-directory-usecases.md),
+[evidence](https://github.com/fajarxfce/hris-mobile/blob/243bdcc070fb1fe24782ad671d208769ce36ba4f/docs/measurements/collaboration-space-directory-usecases-2026-11-04.json).
+
+22 focused behavioral cases pass. A slow-consumer denial regression initially
+failed and is now fixed by switching guarded access before observing facts.
+Root/Android-host/Android dev compile pass 419.463 s /
+2,503 fresh cases; browser domain pass 81.676 s /
+968 cases, identical 3,917 inputs. Real application DI resolves
+the observer and singleton refresh. Format, architecture and detekt pass.
+All sessions closed; no new product/provider/FCM/Apple runtime acceptance.
+
+NEXT: reproduce/fix the same nested-flow boundary in the current company-chat list,
+then durable group identity/device commands, SDK store adoption and hard-parent
+recovery, organization UI and typed group push/background/replies. Draft regression
+and transport trace are in `.work/company-chat-observation-2026-11-04/` and
+`.work/space-directory-usecases-2026-11-04/`. Product still uses company chat;
+all 54 PRD groups remain open. Live backend 8b40/schema 116 is unchanged.
+Release 29 remains verified but uninstalled: three 15-second phone connection
+attempts timed out. Existing availability question remains pending; release 28 is
+the last confirmed installation. Continue long run, updates, atomic pushes and
+validated install-only product delivery when the phone returns.
+
 ## Product release 29 verified; phone connection pending — 4 November 2026
 
 Mobile evidence [cc87bc29](https://github.com/fajarxfce/hris-mobile/commit/cc87bc297046bcbb7819c055b534a450ebaddf33) is pushed.

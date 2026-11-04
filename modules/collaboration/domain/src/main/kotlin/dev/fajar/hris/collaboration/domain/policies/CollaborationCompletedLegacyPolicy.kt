@@ -3,6 +3,7 @@ package dev.fajar.hris.collaboration.domain.policies
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.domain.*
 import java.time.Instant
+import java.util.UUID
 
 /** Immutable completion is provenance, never a replacement for current native/group admission. */
 fun validateCompletedCollaborationLegacyDevice(
@@ -12,6 +13,41 @@ fun validateCompletedCollaborationLegacyDevice(
     completion: CollaborationLegacyRuntimeCompletion?,
     provisioning: CollaborationSpaceProvisioning?,
     admission: CollaborationSpaceAdmission,
+    at: Instant,
+): Result<Unit> {
+    if (
+        at < admission.admittedAt ||
+            at >= admission.expiresAt ||
+            identity.spaceId != admission.spaceId ||
+            identity.accountId != admission.accountId
+    )
+        return changed()
+    return validateCollaborationLegacyCompletionProvenance(
+        identity,
+        device,
+        source,
+        completion,
+        provisioning,
+        admission.nativeSessionId,
+        admission.nativeSessionVersion,
+        CollaborationPlatform.valueOf(admission.client.platform.name),
+        at,
+    )
+}
+
+/**
+ * Exact retained completion metadata only. The caller must independently admit its operation; this
+ * check supplies neither interactive assurance nor permission to deliver a background wake.
+ */
+fun validateCollaborationLegacyCompletionProvenance(
+    identity: CollaborationSpaceIdentity,
+    device: CollaborationSpaceDevice,
+    source: CollaborationLegacyParent?,
+    completion: CollaborationLegacyRuntimeCompletion?,
+    provisioning: CollaborationSpaceProvisioning?,
+    nativeSessionId: UUID,
+    nativeSessionVersion: Long,
+    platform: CollaborationPlatform,
     at: Instant,
 ): Result<Unit> {
     val legacy = device.legacy ?: return changed()
@@ -25,31 +61,28 @@ fun validateCompletedCollaborationLegacyDevice(
         CollaborationLegacyRuntimeOwner(
             legacy.companyId,
             legacy.deviceId,
-            admission.accountId,
-            admission.nativeSessionId,
+            identity.accountId,
+            nativeSessionId,
         )
     if (
-        at < admission.admittedAt ||
-            at >= admission.expiresAt ||
-            identity.spaceId != admission.spaceId ||
-            identity.accountId != admission.accountId ||
+        nativeSessionVersion < 0 ||
             device.origin != CollaborationSpaceDeviceOrigin.LEGACY ||
             device.state != CollaborationDeviceState.ACTIVE ||
-            device.platform.name != admission.client.platform.name ||
+            device.platform.name != platform.name ||
             done.owner != owner ||
-            done.target != CollaborationLegacyRuntimeTarget(admission.spaceId, device.id) ||
+            done.target != CollaborationLegacyRuntimeTarget(identity.spaceId, device.id) ||
             done.matrixUserId != device.matrixUserId ||
             done.matrixDeviceId != device.matrixDeviceId ||
             done.fingerprint != fingerprint ||
-            done.nativeSessionVersion > admission.nativeSessionVersion ||
+            done.nativeSessionVersion > nativeSessionVersion ||
             device.version < done.targetDeviceVersion ||
             device.createdAt > done.frozenAt ||
             done.completedAt > at ||
             done.keysObservedAt < done.frozenAt ||
             done.keysObservedAt > done.completedAt ||
             original.position != legacy ||
-            original.accountId != admission.accountId ||
-            source.nativeSessionId != admission.nativeSessionId ||
+            original.accountId != identity.accountId ||
+            source.nativeSessionId != nativeSessionId ||
             original.matrixUserId != device.matrixUserId ||
             original.matrixDeviceId != device.matrixDeviceId ||
             original.platform != device.platform ||
@@ -68,10 +101,10 @@ fun validateCompletedCollaborationLegacyDevice(
             key.version !in 0..1 ||
             (key.version == 1L) != (key.publishedAt != null) ||
             key.publishedAt?.let { it < key.reservedAt || it > at } == true ||
-            head.request.spaceId != admission.spaceId ||
-            head.request.accountId != admission.accountId ||
+            head.request.spaceId != identity.spaceId ||
+            head.request.accountId != identity.accountId ||
             head.request.deviceId != device.id ||
-            head.request.nativeSessionId != admission.nativeSessionId ||
+            head.request.nativeSessionId != nativeSessionId ||
             head.request.nativeSessionVersion != done.nativeSessionVersion ||
             head.request.revision != done.provisioningRevision ||
             head.state != CollaborationSpaceProvisioningState.SUCCEEDED ||
@@ -86,7 +119,7 @@ fun validateCompletedCollaborationLegacyDevice(
     return validateExistingCollaborationSpaceDevice(
         identity,
         device,
-        admission.nativeSessionId,
+        nativeSessionId,
         device.platform,
         CollaborationSpaceDeviceOrigin.LEGACY,
         legacy,

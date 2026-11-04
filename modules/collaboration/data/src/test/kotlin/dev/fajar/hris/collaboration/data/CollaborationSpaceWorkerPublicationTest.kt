@@ -8,6 +8,8 @@ import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
 import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
+import dev.fajar.hris.collaboration.domain.policies.validateCollaborationLegacyCompletionProvenance
+import dev.fajar.hris.collaboration.domain.policies.validateCompletedCollaborationLegacyDevice
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
@@ -96,7 +98,7 @@ class CollaborationSpaceWorkerPublicationTest {
         )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
         owner.execute(
-            "grant insert,update on collaboration_space_push_bindings,native_push_registrations to space_advance_command_fixture"
+            "grant insert,update on collaboration_space_push_bindings,collaboration_space_push_hints,native_push_registrations to space_advance_command_fixture"
         )
         runtime =
             DriverManagerDataSource(
@@ -155,6 +157,196 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         }
         fixtures.clear()
+    }
+
+    @Test
+    fun groupWakeUsesExactCompletedOriginalRoomWithoutShortInteractiveAuthorityOrPeerEligibility() {
+        val f = Fixture(verifiedMfa = true)
+        val peer = Fixture(verifiedMfa = true, existingCompany = f.company)
+        val original = f.activeLegacy(signed = true)
+        val oldPeer = peer.activeLegacy(signed = true)
+        val roomId = "!original-wake-$space:$server"
+        seedOriginalRoom(f, peer, oldPeer, roomId)
+        val id = completeRoomDevice(f, original)
+        success(f.groupBootstrap(id))
+        val before = f.originalSnapshot()
+        val device = f.device(id)
+        val bindings =
+            EncryptedCollaborationSpacePushBindingRepository(
+                PostgresCollaborationSpacePushBindingDataSource(f.sql),
+                f.pushCrypto(),
+            )
+        val queue =
+            StoredCollaborationSpacePushQueueRepository(
+                PostgresCollaborationSpacePushQueueDataSource(f.sql)
+            )
+        val binding =
+            CollaborationSpacePushBinding(
+                space,
+                f.account,
+                id,
+                f.session,
+                device.matrixUserId,
+                device.matrixDeviceId,
+                0,
+                Instant.now().truncatedTo(ChronoUnit.MICROS),
+                null,
+            )
+        success(f.transactions.run(f.actor) { bindings.reserve(binding) })
+        val key = requireNotNull(success(f.transactions.run(f.actor) { bindings.key(binding) }))
+        val native =
+            StoredNativePushRegistrationRepository(
+                PostgresNativePushRegistrationDataSource(f.sql),
+                f.pushCrypto(),
+            )
+        val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        assertTrue(
+            success(
+                f.transactions.run(f.actor) {
+                    native.save(
+                        NativePushRegistration(
+                            f.session,
+                            f.account,
+                            PushPlatform.ANDROID,
+                            true,
+                            0,
+                            at,
+                            at,
+                            at.plusSeconds(3000),
+                        ),
+                        "fictional-unused-token",
+                        null,
+                    )
+                }
+            )
+        )
+        val metadataOnly =
+            object :
+                dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository by native {
+                override fun token(
+                    accountId: UUID,
+                    sessionId: UUID,
+                    expectedVersion: Long,
+                ): Result<String?> = error("Original wake must never acquire a native token")
+            }
+        val wakeClock = MutableClock(Instant.now().plusSeconds(1000))
+        fun command(completed: CollaborationLegacyRuntimeCompletionRepository = f.completions) =
+            HandleCollaborationSpacePush(
+                bindings,
+                queue,
+                EncryptedCollaborationSpaceGatewaySessionRepository(
+                    PostgresCollaborationSpaceGatewaySessionDataSource(f.sql),
+                    f.pushCrypto(),
+                ),
+                f.registry,
+                f.credentials,
+                f.selections,
+                f.legacyParents,
+                completed,
+                f.provisioning,
+                f.spaces,
+                f.roomRepository(),
+                StoredCollaborationSpaceConversationRepository(
+                    PostgresCollaborationSpaceConversationDataSource(f.sql)
+                ),
+                f.sessions,
+                metadataOnly,
+                f.identities,
+                f.transactions,
+                CollaborationServicePolicy(true, true),
+                CollaborationSpacePolicy(true, 28, 28),
+                CollaborationMatrixPolicy(true, server),
+                wakeClock,
+            )
+        val hint =
+            CollaborationSpacePushHint(
+                CollaborationPushEvent(roomId, "$" + "queued-original"),
+                listOf(key),
+            )
+        fun accept(cmd: HandleCollaborationSpacePush = command()) =
+            success(cmd.accept(hint, UUID.randomUUID(), wakeClock.instant().plusSeconds(10)))
+        owner.update("update company_memberships set active=false where account_id=?", peer.account)
+        val source =
+            success(
+                f.transactions.run(f.actor) {
+                    f.legacyParents.find(space, f.account, f.session, original)
+                }
+            )
+        val identity =
+            requireNotNull(
+                success(
+                        f.transactions.run(f.actor) {
+                            f.selections.selection(space, f.account, server)
+                        }
+                    )
+                    ?.selected
+            )
+        val completion = requireNotNull(f.completion(original))
+        val provisioning = f.work(id)
+        val parent =
+            requireNotNull(
+                success(f.transactions.run(f.actor) { f.sessions.lock(f.session, f.account) })
+            )
+        assertTrue(parent.accessExpiresAt < wakeClock.instant())
+        val interactive =
+            CollaborationSpaceAdmission(
+                space,
+                f.account,
+                f.session,
+                parent.version,
+                parent.credentialVersion,
+                client,
+                at.minusSeconds(1),
+                at.plusSeconds(60),
+            )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            validateCompletedCollaborationLegacyDevice(
+                identity,
+                device,
+                source,
+                completion,
+                provisioning,
+                interactive,
+                wakeClock.instant(),
+            ),
+        )
+        assertInstanceOf(
+            Result.Success::class.java,
+            validateCollaborationLegacyCompletionProvenance(
+                identity,
+                device,
+                source,
+                completion,
+                provisioning,
+                f.session,
+                parent.version,
+                device.platform,
+                wakeClock.instant(),
+            ),
+        )
+        for (replacement in
+            listOf<CollaborationLegacyRuntimeCompletion?>(
+                null,
+                completion.copy(fingerprint = "f".repeat(64)),
+                completion.copy(nativeSessionVersion = parent.version + 1),
+            )) {
+            val missing =
+                object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                    override fun find(
+                        owner: CollaborationLegacyRuntimeOwner
+                    ): Result<CollaborationLegacyRuntimeCompletion?> = Result.Success(replacement)
+                }
+            assertTrue(accept(command(missing)).rejected.isEmpty())
+            assertNull(success(f.transactions.run(f.actor) { queue.find(space, f.account, id) }))
+        }
+        assertTrue(accept().rejected.isEmpty())
+        assertEquals(
+            hint.event,
+            success(f.transactions.run(f.actor) { queue.find(space, f.account, id) })!!.event,
+        )
+        assertEquals(before, f.originalSnapshot())
+        assertEquals(completion, f.completion(original))
     }
 
     @Test

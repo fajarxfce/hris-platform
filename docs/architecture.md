@@ -1,5 +1,7 @@
 # Architecture
 
+[Organization callback admission](collaboration/space-push-admission.md) validates current background ownership and exact retained completion separately from interactive assurance. Opaque append and final eligibility checks are transactional; HTTP/worker/Mobile integration remains required.
+
 V137 [organization push wake storage](collaboration/space-push-queue.md) retains separate coalesced heads, bounded group leases and exact transactional readback. Root/worker isolation and isolated archive recovery are verified; current callback/delivery admission and Mobile routing remain separate integration.
 
 [Native organization managed pusher](collaboration/space-pusher-access.md) connects stable group capability reservation and exact publication to current native registration and gateway authority. Strict HTTP dispatch and shared API/worker DI are validated. Group callback delivery and Mobile background ownership remain required.

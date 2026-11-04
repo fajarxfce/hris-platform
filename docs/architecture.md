@@ -106,6 +106,13 @@ binding plus successful request commit atomically. Typed write readback remains
 inside the caller transaction. Storage introduces no DI or provider authority;
 shared original-creation fencing and admitted application lifecycle remain required.
 
+V132 uses an [immutable unique original-pair route](collaboration/original-pair-routing.md)
+to arbitrate original conversation versus same-original-company group room intent,
+including concurrent fixed-snapshot inserts. Deferred references/selected-row checks
+commit route and selected history together. Participant root/exact-company RLS exposes
+only routing metadata; original adoption keeps its route. Application lock ordering
+and current provider admission remain separate integration obligations.
+
 Native group conversation open/read/list and original-inventory routes now own current
 native/group admission in their use cases. Pair creation and opposite-participant
 replay converge under operation/pair/account/native guards with atomic receipt/journal

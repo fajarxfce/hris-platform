@@ -45,3 +45,11 @@ rejecting132. Initial storage/test compilation and typed smart-cast failures are
 retained in the evidence; all are resolved. No test session remains running.
 Storage alone does not enable room endpoints, provider authority, SDK adoption,
 recipient keys, encrypted content, sync or push. No shared DI changed in this stage.
+
+## Shared original creation fence
+
+[V132 routing](original-pair-routing.md) now closes the late-original creation race
+for canonical pairs retaining the same original company. Both insert paths reserve
+one immutable unique route in their transaction; rollback releases it. Existing
+original unbound history still requires explicit recovery. Native application lock
+ordering, admitted requests/provider reconciliation and recipient access remain next.

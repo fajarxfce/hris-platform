@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## One original/group history per canonical pair — 4 November 2026
+
+V132's immutable unique route closes the late-original creation race. Original/group
+inserts arbitrate one history in the same transaction; rollback frees the reservation.
+[Contract](collaboration/original-pair-routing.md) and
+[evidence](measurements/collaboration-original-pair-routing-2026-11-04.json): focused5
+PASS99.972s; full database98/API25 PASS967.86s with quality checks on8,387 unchanged
+inputs; recovery19 passes. Both winner orders, fixed snapshots, failed upgrade,
+owned metadata and actual restore pass. Initial DDL/backfill ordering failure resolved.
+No DI or product rollout. Admitted native room lifecycle and full Mobile integration
+remain next; all54 PRD groups open.
+
 ## Organization room intent and bounded queue — 4 November 2026
 
 V131 plus typed storage preserve exact canonical/original room identity, peer-safe

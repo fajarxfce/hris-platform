@@ -1,5 +1,46 @@
 # Agent continuation — HRIS workspace
 
+## Original/group history routing accepted — 4 November 2026
+
+V132 adds one immutable unique route per same-original-company canonical pair.
+Original conversation and SPACE room-intent inserts reserve that key in the same
+transaction. This closes the late-original creation race left by V131's snapshot
+check. Deferred references require the exact selected row; failed writes release
+the reservation. Original bound adoption retains its LEGACY route. Read the
+[routing contract](collaboration/original-pair-routing.md).
+
+[Evidence](measurements/collaboration-original-pair-routing-2026-11-04.json): focused5
+PASS99.972s, full database98 plus existing native API25 PASS967.86s with quality
+checks and8,387 unchanged inputs. Both concurrent winner orders, commit/rollback,
+READ COMMITTED/REPEATABLE READ, scoped metadata, actual archive restore and parent
+purge pass. Conflicting preexisting histories abort upgrade without selecting a
+winner. Initial backfill-before-ALTER deferred FK failure is resolved and retained;
+recovery19 passes (MAX132/unknown133), encryption projection unchanged. All test
+sessions closed. After the gate, one redundant trailing blank line was removed
+from V132; tested and committed hashes are recorded. No SQL statement changed.
+No shared DI/new endpoint/worker adapter; no fresh worker claim.
+
+NEXT native room request/status and bounded worker reconciliation. Acquire group
+room and optional original pair guards before signed shared account/native/device
+guards; keep current admission around every provider outcome. Publish exact binding,
+request success and journal atomically. Stable alias recovery and original creator/
+room coordinates remain mandatory. Current account/group must be read again after
+peer acquisition; deadlines alone are insufficient. No repository-to-repository or
+use-case-to-use-case calls. Generic jobs remain company-scoped.
+
+Ignored group-room-lifecycle/native-room-*.kt.txt are UNAPPLIED/UNCOMPILED policy,
+request, safe-view/status and test drafts. Native-room-test-notes.md records fixture
+and missing original retained-device/opposite initialized-requester coverage. Add
+lockOriginalPair to room port/raw/stored wrapper, then actual data/HTTP and FULL worker
+validation on DI changes. Formatted copies may be stale after draft review fixes;
+read current .kt.txt inputs. No native room capability is accepted by these drafts.
+Then recipient keys/content/sync/push and Mobile adoption preserving SDK namespace/
+passphrase, keys, history and uncertain sends; offline keys/hard-parent replacement
+remain required. Group disabled/all54 groups open. Live8b40/schema116 pushON/SMTPOFF,
+normal phone28, product/hosted0b804cb2 and Starter9959c1d unchanged. Main3747f417/
+Mobile9469e5e2 V131 peer handoffs are pushed; refresh after this checkpoint is pushed.
+Continue long run, regular updates, atomic pushes and validated PRODUCT feature installs.
+
 ## Organization room storage accepted — 4 November 2026
 
 V131 and typed storage retain immutable exact room intent, first requester versus

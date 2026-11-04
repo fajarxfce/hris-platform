@@ -84,7 +84,7 @@ class CollaborationSpaceWorkerPublicationTest {
             "grant insert,update on collaboration_space_key_publications to space_advance_command_fixture"
         )
         owner.execute(
-            "grant insert on collaboration_space_direct_conversations,collaboration_space_room_intents,collaboration_original_pair_routes to space_advance_command_fixture"
+            "grant insert on collaboration_space_direct_conversations,collaboration_space_room_intents,collaboration_space_room_bindings,collaboration_original_pair_routes to space_advance_command_fixture"
         )
         owner.execute(
             "grant insert,update on collaboration_space_room_provisioning to space_advance_command_fixture"
@@ -490,7 +490,7 @@ class CollaborationSpaceWorkerPublicationTest {
             f.account,
         )
         owner.update(
-            "update collaboration_space_devices set state='REVOKED',version=version+1,revoked_at=clock_timestamp(),updated_at=clock_timestamp() where id=?",
+            "update collaboration_space_devices set state='REVOKED',version=version+1,revoked_at=statement_timestamp(),updated_at=statement_timestamp() where id=?",
             id,
         )
         for (result in
@@ -2081,7 +2081,7 @@ class CollaborationSpaceWorkerPublicationTest {
         assertEquals("!original-room:matrix.example.test", originalRoom.roomId)
         // The other fully initialized participant observes this request, never steals it.
         assertEquals(receipt, success(b.requestRoom(group, idB)))
-        failure(b.requestRoom(group, idB, revision = 0), "collaboration_room_creator_required")
+        failure(b.requestRoom(group, idB, revision = 0), "collaboration_room_provisioning_changed")
         assertEquals(
             a.account,
             success(
@@ -2091,6 +2091,142 @@ class CollaborationSpaceWorkerPublicationTest {
                 )!!
                 .request
                 .accountId,
+        )
+        assertEquals(priorA, a.originalSnapshot())
+        assertEquals(priorB, b.originalSnapshot())
+        val firstRequest =
+            success(
+                    a.transactions.run(a.actor) {
+                        a.roomRepository().provisioning(space, a.account, group)
+                    }
+                )!!
+                .request
+        success(
+            a.transactions.run(a.actor) { a.roomRepository().cancel(space, a.account, group, 0) }
+        )
+        val waitMillis =
+            java.time.Duration.between(Instant.now(), firstRequest.requestedAt.plusSeconds(60))
+                .toMillis()
+        if (waitMillis >= 0) Thread.sleep(waitMillis + 25)
+        val recovery = UUID.randomUUID()
+        val recovered =
+            success(
+                b.requestRoom(
+                    group,
+                    idB,
+                    revision = 0,
+                    expectedAccount = a.account,
+                    operation = recovery,
+                )
+            )
+        assertEquals(MutationReceipt(group, 0), recovered)
+        assertEquals(
+            recovered.copy(replayed = true),
+            success(
+                b.requestRoom(
+                    group,
+                    idB,
+                    revision = 0,
+                    expectedAccount = a.account,
+                    operation = recovery,
+                )
+            ),
+        )
+        val peerRequest =
+            success(
+                b.transactions.run(b.actor) {
+                    b.roomRepository().provisioning(space, b.account, group)
+                }
+            )!!
+        assertEquals(b.session, peerRequest.request.nativeSessionId)
+        assertEquals(idB, peerRequest.request.deviceId)
+        assertEquals(
+            b.account,
+            success(
+                    a.transactions.run(a.actor) {
+                        a.roomRepository().status(space, a.account, group)
+                    }
+                )!!
+                .accountId,
+        )
+        val retainedRequest =
+            success(
+                a.transactions.run(a.actor) {
+                    a.roomRepository().provisioning(space, a.account, group)
+                }
+            )!!
+        assertEquals(firstRequest, retainedRequest.request)
+        assertEquals(CollaborationSpaceProvisioningState.CANCELLED, retainedRequest.state)
+        val roomLease =
+            success(
+                    b.transactions.run(b.actor.copy(accountId = UUID(0, 0))) {
+                        b.roomRepository().claim(UUID.randomUUID(), 8, 60)
+                    }
+                )
+                .single { it.request.conversationId == group && it.request.accountId == b.account }
+                .lease!!
+        val bound =
+            CollaborationSpaceRoomBinding(
+                space,
+                group,
+                b.account,
+                roomLease.request.revision,
+                roomLease.token,
+                originalRoom.roomId,
+                Instant.now().truncatedTo(ChronoUnit.MICROS),
+                b.account,
+            )
+        for (invalid in
+            listOf(
+                bound.copy(roomId = "!replacement:matrix.example.test"),
+                bound.copy(matrixCreatorAccountId = a.account),
+            )) {
+            assertInstanceOf(
+                Result.Failed::class.java,
+                b.transactions.run(b.actor) {
+                    b.roomRepository().publish(invalid).flatMap {
+                        b.roomRepository().finish(roomLease)
+                    }
+                },
+            )
+        }
+        success(
+            b.transactions.run(b.actor) {
+                b.roomRepository().publish(bound).flatMap {
+                    b.roomRepository().finish(roomLease).flatMap { finished ->
+                        if (finished) Result.Success(Unit)
+                        else
+                            Result.Failed(
+                                Failure(FailureKind.CONFLICT, "fixture_room_publication_changed")
+                            )
+                    }
+                }
+            }
+        )
+        assertEquals(
+            bound,
+            success(
+                a.transactions.run(a.actor) { a.roomRepository().binding(space, a.account, group) }
+            ),
+        )
+        val view = success(a.readRoom(group))
+        val publicStatus = requireNotNull(view.provisioning)
+        assertEquals(b.account, publicStatus.accountId)
+        assertEquals(CollaborationSpaceProvisioningState.SUCCEEDED, publicStatus.state)
+        assertEquals(
+            CollaborationSpacePublishedRoom(
+                originalRoom.roomId,
+                server,
+                CollaborationSpaceRoomOrigin.LEGACY,
+                bound.createdAt,
+            ),
+            view.room,
+        )
+        assertEquals(
+            intent,
+            success(
+                b.transactions.run(b.actor) { b.roomRepository().intent(space, b.account, group) }
+            ),
         )
         assertEquals(priorA, a.originalSnapshot())
         assertEquals(priorB, b.originalSnapshot())
@@ -2306,10 +2442,29 @@ class CollaborationSpaceWorkerPublicationTest {
         fun roomRepository() =
             StoredCollaborationSpaceRoomRepository(PostgresCollaborationSpaceRoomDataSource(sql))
 
+        fun readRoom(conversation: UUID) =
+            ReadNativeCollaborationSpaceRoom(
+                    roomRepository(),
+                    StoredCollaborationSpaceConversationRepository(
+                        PostgresCollaborationSpaceConversationDataSource(sql)
+                    ),
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    Clock.systemUTC(),
+                )
+                .execute(actor, session, 0, space, conversation, client)
+
         fun requestRoom(
             conversation: UUID,
             device: UUID,
             revision: Long? = null,
+            expectedAccount: UUID = account,
+            operation: UUID = UUID.randomUUID(),
         ): Result<MutationReceipt> =
             RequestNativeCollaborationSpaceRoom(
                     roomRepository(),
@@ -2338,12 +2493,13 @@ class CollaborationSpaceWorkerPublicationTest {
                     session,
                     0,
                     space,
-                    UUID.randomUUID(),
+                    operation,
                     conversation,
                     device,
                     device(device).version,
                     revision,
                     client,
+                    revision?.let { expectedAccount },
                 )
 
         fun parent(): UUID {

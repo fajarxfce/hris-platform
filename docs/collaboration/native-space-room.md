@@ -1,50 +1,57 @@
 # Native organization room request and status
 
-This is an unexposed application layer on V131/V132. RequestNativeCollaborationSpaceRoom
-and ReadNativeCollaborationSpaceRoom coordinate repositories; no provider I/O, HTTP
-route, shared DI or worker adapter is installed by this checkpoint.
+GET and POST `/api/v1/collaboration/spaces/{spaceId}/direct-conversations/{conversationId}/room`
+use root native authentication, the supported client headers and current organization
+membership. POST requires `Idempotency-Key`, `deviceId` and `expectedDeviceVersion`.
+The group feature remains disabled for product rollout while its provider worker,
+recipient access and Mobile SDK integration are unfinished.
 
-Request admission requires current root native authentication, supported client,
-current group, exact bound ACTIVE device and live provider metadata. Retained devices
-must have completed their original-runtime transfer. Both canonical participants
-are acquired again after shared account/native guards; current native/group admission
-is repeated after peer acquisition and immediately before returning either outcome.
-The optional original unsigned-pair advisory guard precedes account/native/device
-guards and uses the same key as original conversation creation.
+Request admission checks current native/security/group/client state, the exact bound
+ACTIVE device and live owned provider metadata. Retained devices require completed
+original-runtime transfer. Group-room and optional original unsigned-pair guards
+precede signed-order shared account/native/device guards. Both canonical participants
+and current native/group admission are re-read around dependent acquisition and before
+returning. A repository wait cannot extend the captured request deadline.
 
-First intent selects an exact bound original room when available, preserving its
-actual creator independently of the requester. Existing unbound original history
-requires explicit recovery. Otherwise one immutable group intent is created. Queue,
-operation receipt and change journal commit together. Native/provider deadlines do
-not slide during repository waits. Failed results, cancellation and interruption
-roll back all writes. Initial/replayed requests do not requeue active work.
+An initial request creates one immutable intent and private queue entry, or observes
+existing work without requeueing it. The intent chooses an exact bound original room
+when present, independently preserving its actual creator. Existing unbound original
+history requires explicit original recovery; a replacement group room is not created.
+Intent, private queue, idempotency receipt and change journal commit together.
 
-Safe peer status and published room projections omit native/device/provider proof
-and private lease tokens. Reads require both current participants and fresh native
-admission after successful or failed aggregate acquisition. Owned retained metadata
-alone does not authorize a read.
+For terminal recovery, POST supplies **both** `expectedRequestAccountId` and
+`expectedRequestRevision` from the public status. The pair must still identify the
+current terminal attempt and its sixty-second retry cooldown must have elapsed.
+Either current participant may then continue using its own native/provider proof.
+The caller's own private head starts at zero or increments its own previous revision;
+it never rewrites the other participant's private proof. Active work cannot be stolen.
+Completed bound rooms cannot be retried. Old operation replay returns its original
+receipt after fresh admission, even if another participant now owns the public head.
 
-## Recovery limitation before rollout
+A mutation receipt identifies the conversation and the observed/created request
+revision; that number is not a global cross-participant version. Read status for the
+current **account plus revision**, state and published room. Clients must not order
+attempts from different accounts by the revision number alone.
 
-The current V131 queue belongs to its first requester. Only that requester can
-explicitly retry a terminal unbound request, using its observed revision and the
-60-second cooldown. If that requester is offline, the peer cannot yet recover it.
-This is not accepted product behavior and the group feature remains disabled.
+The safe status includes operational timing/outcome and public request owner. A
+published room exposes room ID, server, origin and publication time. Neither exposes
+native authentication, device/provider proof or private lease tokens. The successful
+binding must match the status publisher/revision; LEGACY keeps its exact original
+creator and room. Reads require both current participants and fresh native admission
+after successful or failed aggregate acquisition. Retained metadata alone grants no
+HTTP or Matrix content access.
 
-The next implementation must let the other currently admitted participant recover
-the same stable alias with its own native/provider proof. Do not expose or reuse
-the first participant's private queue. A lost provider response may have created
-the room already: SPACE binding must retain the observed canonical participant
-creator, while LEGACY remains pinned to its exact original room and creator.
-Immutable history, current admission around external outcomes, exact lease fences
-and binding/success/journal atomicity must survive competing workers and restarts.
+The setup endpoints perform no external provider I/O and grant no content capability.
+The bounded worker must still resolve/create/join the SAME alias or original room,
+verify actual canonical creator/state under current admission, then atomically publish
+binding, request success and journal. Provider results after lost responses or expired
+authority must never create replacement history. No SDK sync cursor/key material is
+changed by these request/status endpoints.
 
-## Evidence
-
-[Measurement](../measurements/collaboration-native-space-room-2026-11-04.json):
-41 PostgreSQL cases pass in316.012s on8,393 unchanged inputs with format/architecture:
-storage5, native5 and complete worker-publication31. The latter includes two new
-retained-device/opposite-requester cases; it is not the worker application suite.
-All103 domain cases passed in an earlier mixed run; all production and domain inputs
-are identical to the final data gate. Three initial failing runs and their fixes
-are recorded. There is no new API/full-worker/SDK acceptance in this checkpoint.
+[V133 evidence](../measurements/collaboration-space-room-peer-recovery-2026-11-04.json):
+all103 database plus96 actual API cases PASS1120.114s, full128 worker
+cases PASS375.998s with one existing opt-in skip, and all31 retained
+publication cases PASS265.182s. Quality checks pass. Prior103
+domain and typed5/native5 passing evidence carries only with the recorded source
+continuity. Recovery19 passes, MAX133/unknown134. Initial fixture/compilation failures
+are resolved and recorded; all test sessions closed. No room worker/SDK rollout claim.

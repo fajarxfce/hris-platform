@@ -45,6 +45,7 @@ class RequestNativeCollaborationSpaceRoom(
         expectedDeviceVersion: Long,
         expectedRequestRevision: Long?,
         client: ClientVersion?,
+        expectedRequestAccountId: UUID? = null,
     ): Result<MutationReceipt> {
         if (actor.companyId != null)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_scope_required"))
@@ -58,7 +59,9 @@ class RequestNativeCollaborationSpaceRoom(
             } ||
                 parentVersion < 0 ||
                 expectedDeviceVersion !in 0..999999 ||
-                expectedRequestRevision?.let { it !in 0..999998 } == true
+                expectedRequestRevision?.let { it !in 0..999999 } == true ||
+                ((expectedRequestRevision == null) != (expectedRequestAccountId == null)) ||
+                expectedRequestAccountId == UUID(0, 0)
         )
             return changed()
         val currentClient = requireNotNull(client)
@@ -75,6 +78,7 @@ class RequestNativeCollaborationSpaceRoom(
                     deviceId.toString(),
                     expectedDeviceVersion.toString(),
                     expectedRequestRevision?.toString() ?: "initial",
+                    expectedRequestAccountId?.toString() ?: "initial",
                     currentClient.platform.name,
                     currentClient.build.toString(),
                 ),
@@ -286,25 +290,20 @@ class RequestNativeCollaborationSpaceRoom(
             val readStatus = rooms.status(spaceId, actor.accountId, conversationId)
             if (readStatus is Result.Failed) return@run readStatus
             val status = (readStatus as Result.Success).value
+            if (
+                status != null &&
+                    (status.spaceId != spaceId ||
+                        status.conversationId != conversationId ||
+                        status.accountId !in
+                            setOf(conversation.firstAccountId, conversation.secondAccountId))
+            )
+                return@run changed()
             val previous = (replay as Result.Success).value
             if (previous != null) {
-                if (
-                    intent == null ||
-                        status == null ||
-                        previous.id != conversationId ||
-                        previous.version > status.revision
-                )
+                if (intent == null || status == null || previous.id != conversationId)
                     return@run changed()
                 return@run finalAdmission().map { previous }
             }
-            if (
-                expectedRequestRevision != null &&
-                    intent != null &&
-                    intent.requestedBy != actor.accountId
-            )
-                return@run Result.Failed(
-                    Failure(FailureKind.FORBIDDEN, "collaboration_room_creator_required")
-                )
             if (status != null && expectedRequestRevision == null) {
                 if (intent == null) return@run changed()
                 val receipt = MutationReceipt(conversationId, status.revision)
@@ -316,6 +315,7 @@ class RequestNativeCollaborationSpaceRoom(
             if (
                 expectedRequestRevision != null &&
                     (status == null ||
+                        status.accountId != expectedRequestAccountId ||
                         status.revision != expectedRequestRevision ||
                         status.state !in
                             setOf(
@@ -327,6 +327,22 @@ class RequestNativeCollaborationSpaceRoom(
             val bound = rooms.binding(spaceId, actor.accountId, conversationId)
             if (bound is Result.Failed) return@run bound
             if ((bound as Result.Success).value != null) return@run changed()
+            val owned = rooms.provisioning(spaceId, actor.accountId, conversationId, lock = true)
+            if (owned is Result.Failed) return@run owned
+            val own = (owned as Result.Success).value
+            if (
+                own != null &&
+                    (own.request.accountId != actor.accountId ||
+                        own.request.spaceId != spaceId ||
+                        own.request.conversationId != conversationId ||
+                        own.request.revision >= 999999 ||
+                        own.state !in
+                            setOf(
+                                CollaborationSpaceProvisioningState.FAILED,
+                                CollaborationSpaceProvisioningState.CANCELLED,
+                            ))
+            )
+                return@run changed()
             if (status != null) {
                 val earliest =
                     status.requestedAt.plusSeconds(COLLABORATION_PROVISIONING_RETRY_SECONDS)
@@ -389,7 +405,7 @@ class RequestNativeCollaborationSpaceRoom(
                     device.version,
                     observed.provider.generation,
                     parentId,
-                    (status?.revision ?: -1) + 1,
+                    (own?.request?.revision ?: -1) + 1,
                     observed.scope.nativeSessionVersion,
                     observed.scope.credentialVersion,
                     actor.authenticatedAt,
@@ -401,8 +417,8 @@ class RequestNativeCollaborationSpaceRoom(
                 )
             val receipt = MutationReceipt(conversationId, request.revision)
             val written =
-                if (status == null) rooms.enqueue(request)
-                else rooms.retry(request, status.revision)
+                if (own == null) rooms.enqueue(request)
+                else rooms.retry(request, own.request.revision)
             written
                 .flatMap { operations.record(actor, key, receipt) }
                 .flatMap {
@@ -411,7 +427,7 @@ class RequestNativeCollaborationSpaceRoom(
                         ChangeRecord(
                             "collaboration_space_room",
                             conversationId,
-                            if (status == null) "collaboration.space_room_requested"
+                            if (own == null) "collaboration.space_room_requested"
                             else "collaboration.space_room_retried",
                             mapOf(
                                 "spaceId" to spaceId.toString(),

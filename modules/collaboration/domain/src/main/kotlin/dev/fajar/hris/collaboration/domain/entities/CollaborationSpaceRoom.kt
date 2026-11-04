@@ -43,6 +43,7 @@ data class CollaborationSpaceRoomBinding(
     val leaseToken: UUID,
     val roomId: String,
     val createdAt: Instant,
+    val matrixCreatorAccountId: UUID,
 ) {
     override fun toString() = "CollaborationSpaceRoomBinding(<metadata>)"
 }
@@ -122,4 +123,5 @@ data class CollaborationSpaceRoomStatus(
     val completedAt: Instant?,
     val failure: CollaborationSpaceRoomFailure?,
     val lastOutcome: CollaborationSpaceRoomOutcome?,
+    val accountId: UUID,
 )

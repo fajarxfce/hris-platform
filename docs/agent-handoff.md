@@ -1,5 +1,42 @@
 # Agent continuation — HRIS workspace
 
+## Participant-owned room preparation and native API accepted — 4 November 2026
+
+V133 retains separate private preparation heads for the exact two participants and
+one active request per conversation. Either current participant can recover terminal
+work using its own proof and the observed public account+revision. One immutable
+binding records actual Matrix creator independently of initial requester/publisher;
+LEGACY remains pinned to its original room and creator. Read the current
+[storage](collaboration/space-room-lifecycle.md) and [native HTTP](collaboration/native-space-room.md) contracts.
+
+[Evidence](measurements/collaboration-space-room-peer-recovery-2026-11-04.json): full
+core103/API96 PASS1120.114s; FULL apps:worker128 PASS375.998s
+with one existing opt-in skip; retained31 PASS265.182s. API/worker
+use8,397 identical unchanged inputs. Earlierdomain103/typed5/native5 carry only with
+recorded input continuity. Real retained-device peer recovery, exact original creator/
+binding/native read, SQL races/RLS and actual restore pass. Recovery19 MAX133/unknown134
+and quality checks pass. Four initial compile/fixture failures are resolved; no
+production authority/time checks were weakened. All test sessions closed.
+
+GET/POST /api/v1/collaboration/spaces/{spaceId}/direct-conversations/{conversationId}/room
+are now wired through the single module DI entry point. No provider I/O or content
+access is granted by setup/status. Current request owner+revision must be used together;
+a numeric request revision alone does not order work across participants.
+
+NEXT actual provider room reconciliation and bounded worker: resolve only immutable
+intent alias/original room, join with current own credentials, verify actual canonical
+creator and strict room state, publish binding/success/journal atomically under fresh
+admission. Do not touch SDK sync cursors or to-device acknowledgments for room control.
+Provider/pure-assessment/join and worker drafts remain UNAPPLIED; HTTP/DI/test drafts
+are now APPLIED/STALE. Read source. Then recipient keys/content/sync/push, offline keys/
+native hard-parent replacement and full Mobile adoption preserving original SDK store,
+passphrase, keys/history and uncertain sends. No use-case-to-use-case or repository-to-
+repository dependencies. Any further shared DI change needs actual API/FULLworker gates.
+Group disabled/all54 groups open. Live8b40/schema116pushON/SMTPOFF, normalphone28,
+Mobileproduct/hosted0b804cb2 and Starter9959c1d unchanged. Main e86d1670/Mobile a619a2a2
+previous handoffs pushed; refresh after this checkpoint. Continue long run, updates,
+atomic pushes and validated PRODUCT feature installs only.
+
 ## Native room request/status foundation accepted — 4 November 2026
 
 Current native/group/client/device/provider admission now wraps room request and

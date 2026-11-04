@@ -1,5 +1,16 @@
 # Delivery and validation
 
+## Peer-owned room preparation HTTP — 4 November 2026
+
+V133 and native GET/POST room setup/status let either current participant request
+terminal recovery with its own proof and preserve exact original history/creator.
+[Contract](collaboration/native-space-room.md), [evidence](measurements/collaboration-space-room-peer-recovery-2026-11-04.json):
+core103/API96 PASS1120.114s; fullworker128 PASS375.998s (one
+existing opt-in skip); retained31 PASS265.182s; domain103/typed5/native5
+with recorded input continuity, recovery19 and quality checks pass. Initial fixture
+failures resolved. Group room worker/provider and Mobile integration remain unfinished;
+all54 PRD groups open. No live/phone rollout in this checkpoint.
+
 ## Native room admission foundation — 4 November 2026
 
 Native room request/status now enforce current authority and atomic request/receipt/

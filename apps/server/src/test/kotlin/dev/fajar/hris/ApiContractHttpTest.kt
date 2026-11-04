@@ -36,6 +36,8 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations" to "get",
                 "$base/direct-conversations" to "post",
                 "$base/direct-conversations/{conversationId}" to "get",
+                "$base/direct-conversations/{conversationId}/room" to "get",
+                "$base/direct-conversations/{conversationId}/room" to "post",
                 "$base/legacy-conversations" to "get",
                 "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
@@ -64,6 +66,52 @@ class ApiContractHttpTest : PeopleApiFixture() {
             if (method == "post") assertTrue(operation["x-hris-idempotency-key"].asBoolean())
         }
         val schemas = api["components"]["schemas"]
+        val roomRequest = schemas["RequestCollaborationSpaceRoomRequest"]
+        assertEquals(
+            setOf(
+                "deviceId",
+                "expectedDeviceVersion",
+                "expectedRequestRevision",
+                "expectedRequestAccountId",
+            ),
+            roomRequest["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("deviceId", "expectedDeviceVersion"),
+            roomRequest["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(
+            999999L,
+            roomRequest["properties"]["expectedDeviceVersion"]["maximum"].asLong(),
+        )
+        assertEquals(
+            setOf("spaceId", "conversationId", "provisioning", "room"),
+            schemas["CollaborationSpaceRoomView"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("roomId", "serverName", "origin", "publishedAt"),
+            schemas["CollaborationSpacePublishedRoom"]["properties"].propertyNames().toSet(),
+        )
+        val roomStatus =
+            schemas["CollaborationSpaceRoomStatus"]["properties"].propertyNames().toSet()
+        assertTrue(roomStatus.containsAll(setOf("accountId", "revision", "state")))
+        assertTrue(
+            roomStatus
+                .intersect(
+                    setOf(
+                        "nativeSessionId",
+                        "nativeSessionVersion",
+                        "authenticatedAt",
+                        "credentialVersion",
+                        "mfaVerifiedAt",
+                        "providerGeneration",
+                        "deviceId",
+                        "leaseToken",
+                    )
+                )
+                .isEmpty()
+        )
+
         val parameters =
             api["paths"]["$base/contacts"]["get"]["parameters"].associateBy {
                 it["name"].asString()

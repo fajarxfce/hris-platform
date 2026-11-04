@@ -131,6 +131,8 @@ class ReadNativeCollaborationSpaceRoom(
                     status != null &&
                         (status.spaceId != spaceId ||
                             status.conversationId != conversationId ||
+                            status.accountId !in
+                                setOf(conversation.firstAccountId, conversation.secondAccountId) ||
                             status.requestedAt > clock.instant() ||
                             status.completedAt?.let { it > clock.instant() } == true)
                 )
@@ -146,7 +148,11 @@ class ReadNativeCollaborationSpaceRoom(
                             status == null ||
                             binding.spaceId != spaceId ||
                             binding.conversationId != conversationId ||
-                            binding.publishedBy != intent.requestedBy ||
+                            binding.publishedBy != status.accountId ||
+                            binding.matrixCreatorAccountId !in
+                                setOf(intent.firstAccountId, intent.secondAccountId) ||
+                            (intent.origin == CollaborationSpaceRoomOrigin.LEGACY &&
+                                binding.matrixCreatorAccountId != intent.matrixCreatorAccountId) ||
                             binding.requestRevision != status.revision ||
                             binding.createdAt > clock.instant() ||
                             binding.createdAt < intent.createdAt)

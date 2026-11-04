@@ -116,7 +116,13 @@ fun CollaborationSpaceRoomIntentsRecord.toSpaceRoomIntent(
 fun spaceRoomBindingRow(
     value: CollaborationSpaceRoomBinding
 ): CollaborationSpaceRoomBindingsRecord {
-    requireSpaceRoomIds(value.spaceId, value.conversationId, value.publishedBy, value.leaseToken)
+    requireSpaceRoomIds(
+        value.spaceId,
+        value.conversationId,
+        value.publishedBy,
+        value.leaseToken,
+        value.matrixCreatorAccountId,
+    )
     require(value.requestRevision in 0..999999 && validCollaborationSpaceRoomId(value.roomId))
     requireSpaceRoomTime(value.createdAt)
     return CollaborationSpaceRoomBindingsRecord().also {
@@ -127,6 +133,7 @@ fun spaceRoomBindingRow(
         it.leaseToken = value.leaseToken
         it.matrixRoomId = value.roomId
         it.createdAt = value.createdAt.atOffset(UTC)
+        it.matrixCreatorAccountId = value.matrixCreatorAccountId
     }
 }
 
@@ -147,10 +154,20 @@ fun CollaborationSpaceRoomBindingData.toSpaceRoomBinding(
             requireNotNull(row.leaseToken),
             requireNotNull(row.matrixRoomId),
             requireNotNull(row.createdAt).toInstant(),
+            requireNotNull(row.matrixCreatorAccountId),
         )
     spaceRoomBindingRow(value)
-    require(value.publishedBy == owner.requestedBy && value.createdAt >= owner.createdAt)
+    val pair = setOf(owner.firstAccountId, owner.secondAccountId)
+    require(
+        value.publishedBy in pair &&
+            value.matrixCreatorAccountId in pair &&
+            value.createdAt >= owner.createdAt
+    )
     val original = owner.original
-    require(original == null || original.roomId == value.roomId)
+    require(
+        original == null ||
+            (original.roomId == value.roomId &&
+                value.matrixCreatorAccountId == owner.matrixCreatorAccountId)
+    )
     return value
 }

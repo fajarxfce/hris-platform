@@ -57,6 +57,114 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     @Autowired private lateinit var policy: CollaborationSpacePolicy
 
     @Test
+    fun admittedNativeRoomSetupAndPeerStatusNeverExposeThePrivateRequest() {
+        val a = groupNative()
+        val b = groupNative()
+        val outsider = groupNative()
+        val base = groupBase(a)
+        val first = activeGroupFixture(a, base)
+        val second = activeGroupFixture(b, base)
+        val opened =
+            groupCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = json.readTree(opened.body())["id"].asString()
+        val path = "$base/direct-conversations/$conversation/room"
+        val empty = groupCall(a, path)
+        assertEquals(200, empty.statusCode(), empty.body())
+        assertTrue(json.readTree(empty.body())["provisioning"].isNull)
+        assertTrue(json.readTree(empty.body())["room"].isNull)
+        val operation = UUID.randomUUID()
+        val body = mapOf("deviceId" to first.toString(), "expectedDeviceVersion" to 1)
+        val prepared = groupCall(a, path, body, operation = operation)
+        assertEquals(200, prepared.statusCode(), prepared.body())
+        assertEquals(
+            json.readTree(prepared.body()),
+            json.readTree(groupCall(a, path, body, operation = operation).body()),
+        )
+        val observed = groupCall(b, path)
+        assertEquals(200, observed.statusCode(), observed.body())
+        assertEquals("no-store", observed.headers().firstValue("Cache-Control").orElse(""))
+        val status = json.readTree(observed.body())["provisioning"]
+        assertEquals(a.fixture.account.toString(), status["accountId"].asString())
+        assertEquals("QUEUED", status["state"].asString())
+        assertEquals(0L, status["revision"].asLong())
+        for (field in
+            listOf(
+                "nativeSessionId",
+                "nativeSessionVersion",
+                "authenticatedAt",
+                "mfaVerifiedAt",
+                "credentialVersion",
+                "providerGeneration",
+                "deviceId",
+                "leaseToken",
+            )) {
+            assertFalse(status.has(field), field)
+        }
+        assertEquals(
+            200,
+            groupCall(b, path, mapOf("deviceId" to second.toString(), "expectedDeviceVersion" to 1))
+                .statusCode(),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
+                ),
+        )
+        failure(groupCall(outsider, path), 404, "collaboration_conversation_not_found")
+        failure(
+            groupCall(a, path, body + mapOf("expectedRequestRevision" to 0)),
+            409,
+            "collaboration_room_provisioning_changed",
+        )
+        failure(
+            groupCall(
+                a,
+                path,
+                body + mapOf("expectedRequestAccountId" to b.fixture.account.toString()),
+            ),
+            409,
+            "collaboration_room_provisioning_changed",
+        )
+        failure(
+            groupCall(
+                a,
+                path,
+                body +
+                    mapOf(
+                        "expectedRequestRevision" to 0,
+                        "expectedRequestAccountId" to b.fixture.account.toString(),
+                    ),
+            ),
+            409,
+            "collaboration_room_provisioning_changed",
+        )
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        failure(groupCall(a, path), 403, "collaboration_peer_unavailable")
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
+                ),
+        )
+    }
+
+    @Test
     fun actualApiGraphEnqueuesUnderCurrentNativeProofWithoutGrantingWorkerCapability() {
         clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
         assertTrue(policy.enabled)

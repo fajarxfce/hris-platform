@@ -10,6 +10,8 @@ fun CollaborationSpaceRoomStatusRecord.toSpaceRoomStatus(
 ): CollaborationSpaceRoomStatus {
     requireSpaceRoomIds(space, conversation)
     require(spaceId == space && conversationId == conversation)
+    val account = requireNotNull(accountId)
+    requireSpaceRoomIds(account)
     val revision = requireNotNull(this.revision)
     val state = CollaborationSpaceProvisioningState.valueOf(requireNotNull(this.state))
     val attempts = requireNotNull(this.attempts)
@@ -96,5 +98,6 @@ fun CollaborationSpaceRoomStatusRecord.toSpaceRoomStatus(
         completed,
         failure,
         last,
+        account,
     )
 }

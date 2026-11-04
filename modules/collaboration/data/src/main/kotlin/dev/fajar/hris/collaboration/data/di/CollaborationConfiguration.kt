@@ -1548,4 +1548,81 @@ class CollaborationConfiguration {
             clock,
             service,
         )
+
+    @Bean
+    fun collaborationSpaceRoomSource(sql: DSLContext): CollaborationSpaceRoomDataSource =
+        PostgresCollaborationSpaceRoomDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceRoomRepository(
+        source: CollaborationSpaceRoomDataSource
+    ): CollaborationSpaceRoomRepository = StoredCollaborationSpaceRoomRepository(source)
+
+    @Bean
+    fun requestNativeCollaborationSpaceRoom(
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        RequestNativeCollaborationSpaceRoom(
+            rooms,
+            conversations,
+            registry,
+            providers,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            policy,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun readNativeCollaborationSpaceRoom(
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReadNativeCollaborationSpaceRoom(
+            rooms,
+            conversations,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
 }

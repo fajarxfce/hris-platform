@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Group gateway self access accepted — 4 November 2026
+
+Group branch is pushed through [941fa2f5](https://github.com/fajarxfce/hris-platform/commit/941fa2f5).
+Fixed Matrix identity and capabilities now use exact group gateway ownership, seven
+bounded request slots, current native/group/client/MFA and completed retained-device
+provenance. Provider and native generations stay pinned across I/O; current denial
+withholds either provider outcome. Capabilities requires no provider exchange.
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/941fa2f5/docs/measurements/collaboration-space-gateway-access-2026-11-04.json):
+focused 7 PASS 114.736s; data 9/API 130 PASS 331.029s; full worker 128 PASS 347.237s
+(127 active and one existing retention skip), with 8,340 unchanged inputs and quality
+gates. Actual PostgreSQL, Synapse restart, native HTTP renewal/bootstrap/self access,
+competing requests, cancellation, replacement and post-provider revocation are covered.
+
+NEXT group immutable public-key reservation/publication, pre-ack recipient key behavior
+and room/member/original-room authority, then Mobile adoption preserving original SDK
+namespace, keys, local history and uncertain sends. Receiving keys must not depend on
+an offline recipient's short native/provider token. Native hard-parent replacement
+still requires explicit recovery. Group availability remains disabled; no content
+caller, product APK or live rollout. Mobile b84f5ce5/hosted code 0b804cb2, phone 28,
+live 8b40/schema 116 push ON/SMTP OFF and Starter 9959c1d unchanged. All 54 groups remain
+open. Continue long run, frequent updates, immediate pushes and validated feature installs.
+
 ## Native provider recovery and group maintenance accepted — 4 November 2026
 
 Group branch is pushed through [b2dee963](https://github.com/fajarxfce/hris-platform/commit/b2dee963).

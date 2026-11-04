@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Original room peer verification accepted — 4 November 2026
+
+Group worktree [6415de9c](https://github.com/fajarxfce/hris-platform/commit/6415de9c) adds
+bounded original-pair lookup and pure validation of original canonical members/creator
+and healthy room state. [Evidence](https://github.com/fajarxfce/hris-platform/blob/6415de9c/docs/measurements/collaboration-space-legacy-room-policy-2026-11-04.json):
+99 domain/8 PostgreSQL/3 actual Synapse cases PASS 144.409s with quality checks and
+8,374 unchanged inputs. The original peer joins with its own retained user/device;
+original room, creator and signed keys survive restart. No original repair, new group
+alias, impersonation, logout or key replacement. No SDK-message or product claim.
+Commit push succeeded after a transient GitHub failure. V130 remains accepted 6c22caba.
+
+Current uncommitted group worktree: V131 room intent/request queue/binding/status
+storage and its migration tests. First gate compiled the migration but failed test
+helper nullable Map types before running cases; those were corrected. A second gate
+is running with stronger atomic binding/success constraints. No V131 acceptance or
+new native/worker command is claimed yet. Queue captures current native/device/provider
+proof, retains original requester/creator and gives the peer safe status only.
+Continue real PostgreSQL races, expiry, rollback and recovery, then typed storage,
+native/worker integration, original-producer fences and full Mobile adoption.
+
+Group disabled/all 54 groups open. Live 8b40/schema 116 push ON/SMTP OFF, normal phone
+28, product/hosted 0b804cb2 and Starter 9959c1d unchanged. Preserve original SDK keys,
+namespace/passphrase, history and uncertain sends. Offline receiving/hard-parent
+replacement remain open. Continue long run, updates, atomic pushes and validated
+product feature installs only.
+
 ## Original room creator accepted — 4 November 2026
 
 Group worktree [6c22caba](https://github.com/fajarxfce/hris-platform/commit/6c22caba) adds

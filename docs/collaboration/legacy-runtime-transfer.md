@@ -172,3 +172,24 @@ implemented by this increment.
 Preserve V121's existing terminal revision reservation: only REVOKED may reach
 1000000. Current mappers and actual database tests already cover that boundary;
 new transfer activation must retain room for later revocation.
+
+
+## Current native freeze command
+
+`FreezeNativeCollaborationLegacyRuntime` now admits current root/native/group/
+client/MFA authority, canonical identity and exact retained source/target/key
+metadata before freezing. Account, native, target then runtime guards preserve the
+original order. Runtime initialization, one transition, receipt and journal commit
+atomically. Same-target repeated operations preserve the transition; changed payloads
+and revoked admission fail. A refreshed native proof can replay the same intent.
+Live original provider slots remain retained until exact release or finite expiry.
+No slot is claimed by this metadata command.
+
+[Freeze evidence](../measurements/collaboration-legacy-runtime-freeze-2026-11-04.json)
+records 18 pure and actual database cases passing in64.356s, including competing
+operations, each write-stage rollback, interruption and post-write authority loss.
+The actual restricted role initializes root-owned runtime metadata through existing
+account-owned reads. No old company resource permission is added. The command is
+not wired to DI/HTTP and cannot activate the retained device. Public fingerprint
+metadata, including a reserved reference, does not establish private-key possession
+or a drained SDK. Completion and client handover remain separate required work.

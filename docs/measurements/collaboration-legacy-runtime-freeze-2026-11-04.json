@@ -1,0 +1,50 @@
+{
+  "scope": "Current native metadata-only same-target legacy runtime freeze and replay; no provider or completed transfer.",
+  "baseCommit": "53a86f48",
+  "run": {
+    "startedAt": "2026-11-04T02:19:01.491900+00:00",
+    "elapsedSeconds": 64.356,
+    "exitCode": 0,
+    "sourceFiles": 8268,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyFreezePolicyTest.xml": {
+        "sha256": "2312bc2ef8c522ae7251b9f92facfc89543742d397c9161e39cef60b229bc68a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "e62d8750b462f7161569f5e7c0438e6b15d3d2c7f8e9c6d29b4386f89599a49e",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceManifestSha256": "64e6065827da4d6a67935b0096b7e10e3835e536e7e2f785fd0fe4ead6d84b50",
+  "currentSourcesMatch": true,
+  "evidence": [
+    "Three pure policies cover exact original owner, reserved or published public-key metadata, current time/target/native/platform/version and coherent same-target replay.",
+    "Fifteen actual PostgreSQL registration/status/freeze methods include six new freeze methods. Runtime-role root initialization uses existing V123 account-owned bindings without old company resource grants.",
+    "Lost responses, distinct operation IDs and native refresh retain one immutable target and one journal event. Revoked or substituted admission and modified operation payloads are rejected.",
+    "Failures, original cancellation and interruption after actual ensure/freeze/receipt/journal writes roll the transaction back; identical retry then succeeds.",
+    "Post-write offboarding, MFA requirement, source retirement, expiry, backward clock, bounded request budget and thread interruption all reject publication without partial metadata.",
+    "Competing same and distinct operation IDs serialize to one transition. Live provider leases survive metadata freeze, new claims fail, exact old cleanup succeeds, and group device/queue remain PROVISIONING/QUEUED.",
+    "Format and architecture checks pass with 8268 unchanged source/build/resource inputs."
+  ],
+  "limits": [
+    "Command remains unexposed: no DI/HTTP or live migration; no provider I/O, SDK drain, private-key attestation, group activation or completed ownership transfer.",
+    "Existing terminal revision reservation is unchanged: target version <=999998 leaves activation <=999999 and revocation <=1000000.",
+    "Next bounded drain metadata, atomic original-device/provider/gateway retirement plus group publication, completed replay continuity and durable Mobile handover.",
+    "No new product APK or phone installation; live8b40/schema116, phone28 and Starter9959c1d remain current."
+  ]
+}

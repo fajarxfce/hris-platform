@@ -65,6 +65,9 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         owner.execute(
             "grant insert on collaboration_space_provisioning,collaboration_space_identities,collaboration_space_devices,collaboration_space_device_sessions,operation_receipts,audit_entries,platform_audit_metadata,outbox_events to space_device_command_fixture"
         )
+        owner.execute(
+            "grant insert,update on collaboration_legacy_runtime,collaboration_legacy_runtime_leases to space_device_command_fixture"
+        )
         runtime =
             DriverManagerDataSource(
                 postgres.jdbcUrl,
@@ -531,6 +534,338 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         f.counts(1, 1, 1)
     }
 
+    @Test
+    fun freezeInitializesRootOwnedMetadataAndLostResponsesRetainOneTargetAcrossNativeRefresh() {
+        val f = Fixture()
+        val legacy = f.activeLegacy()
+        f.select()
+        val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+        val device = f.device()
+        val work = f.work(target.id)
+        val operation = UUID.randomUUID()
+        assertNull(f.frozen(legacy))
+        val receipt = success(f.freeze(operation, target.id))
+        assertEquals(MutationReceipt(legacy.deviceId, 1), receipt)
+        val frozen = requireNotNull(f.frozen(legacy))
+        assertEquals(CollaborationLegacyRuntimePhase.DRAINING, frozen.phase)
+        assertEquals(CollaborationLegacyRuntimeTarget(space, target.id), frozen.target)
+        assertEquals(f.session, frozen.owner.nativeSessionId)
+        f.freezeCounts(1, 1, 1)
+        assertEquals(receipt.copy(replayed = true), success(f.freeze(operation, target.id)))
+        assertEquals(receipt, success(f.freeze(UUID.randomUUID(), target.id)))
+        owner.update(
+            "update native_sessions set version=1,rotated_at=?::timestamptz where id=?",
+            now.toString(),
+            f.session,
+        )
+        failure(f.freeze(operation, target.id), "native_session_invalid")
+        assertEquals(
+            receipt.copy(replayed = true),
+            success(f.freeze(operation, target.id, nativeVersion = 1)),
+        )
+        assertEquals(frozen, f.frozen(legacy))
+        assertEquals(device, f.device())
+        assertEquals(work, f.work(target.id))
+        assertEquals(
+            "ACTIVE",
+            owner.queryForObject(
+                "select state from collaboration_devices where company_id=? and id=?",
+                String::class.java,
+                legacy.companyId,
+                legacy.deviceId,
+            ),
+        )
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_provider_sessions where account_id=?",
+                Int::class.java,
+                f.account,
+            ),
+        )
+        f.freezeCounts(1, 2, 1)
+        f.counts(1, 1, 1)
+    }
+
+    @Test
+    fun freezeRejectsSubstitutedScopeTargetVersionFingerprintAndRevokedReplay() {
+        val f = Fixture()
+        val legacy = f.activeLegacy()
+        f.select()
+        val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+        val operation = UUID.randomUUID()
+        val foreign = Fixture()
+        for (result in
+            listOf(
+                f.freeze(operation, UUID.randomUUID()),
+                f.freeze(operation, target.id, request = f.actor.copy(companyId = f.company)),
+                f.freeze(operation, target.id, request = foreign.actor, parent = foreign.session),
+                f.freeze(operation, target.id, parent = f.parent()),
+                f.freeze(operation, target.id, nativeVersion = 1),
+                f.freeze(operation, target.id, deviceVersion = 1),
+                f.freeze(operation, target.id, requestedSpace = UUID.randomUUID()),
+                f.freeze(operation, target.id, build = client.copy(build = 27)),
+                f.freeze(operation, target.id, fingerprint = "b".repeat(64)),
+                f.freeze(operation, target.id, fingerprint = "a".repeat(63)),
+            )) assertInstanceOf(Result.Failed::class.java, result)
+        f.freezeCounts(0, 0, 0)
+        foreign.freezeCounts(0, 0, 0)
+        success(f.freeze(operation, target.id))
+        val frozen = f.frozen(legacy)
+        failure(
+            f.freeze(operation, target.id, fingerprint = "b".repeat(64)),
+            "operation_payload_mismatch",
+        )
+        owner.update(
+            "update native_sessions set revoked_at=?::timestamptz,version=1 where id=?",
+            now.toString(),
+            f.session,
+        )
+        failure(f.freeze(operation, target.id), "native_session_invalid")
+        failure(f.freeze(UUID.randomUUID(), target.id), "native_session_invalid")
+        assertEquals(frozen, f.frozen(legacy))
+        f.freezeCounts(1, 1, 1)
+        val fresh = Fixture()
+        fresh.select()
+        val newDevice = success(fresh.register(UUID.randomUUID()))
+        failure(fresh.freeze(UUID.randomUUID(), newDevice.id), "collaboration_runtime_changed")
+        fresh.freezeCounts(0, 0, 0)
+    }
+
+    @Test
+    fun freezeFailuresAndCancellationAfterEveryWriteRollBackRuntimeReceiptAndJournal() {
+        for (stage in listOf("ensure", "freeze", "receipt", "journal")) for (mode in
+            listOf("failure", "cancel", "interrupt")) {
+            now = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            val f = Fixture()
+            val legacy = f.activeLegacy()
+            f.select()
+            val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+            val operation = UUID.randomUUID()
+            val cancel = CancellationException("Owned freeze cancellation")
+            val interrupt = InterruptedException("Owned freeze interruption")
+            fun injected(): Result<Unit> =
+                when (mode) {
+                    "cancel" -> throw cancel
+                    "interrupt" -> throw interrupt
+                    else -> Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_write_failed"))
+                }
+            val runtimes =
+                object : CollaborationLegacyRuntimeRepository by f.runtimes {
+                    override fun ensure(
+                        owner: CollaborationLegacyRuntimeOwner,
+                        at: Instant,
+                    ): Result<CollaborationLegacyRuntime> =
+                        f.runtimes.ensure(owner, at).flatMap { row ->
+                            if (stage == "ensure") injected().map { row } else Result.Success(row)
+                        }
+
+                    override fun freeze(
+                        owner: CollaborationLegacyRuntimeOwner,
+                        target: CollaborationLegacyRuntimeTarget,
+                        expectedVersion: Long,
+                        at: Instant,
+                    ): Result<Boolean> =
+                        f.runtimes.freeze(owner, target, expectedVersion, at).flatMap { changed ->
+                            if (stage == "freeze") injected().map { changed }
+                            else Result.Success(changed)
+                        }
+                }
+            val operations =
+                object : OperationRepository by f.operations {
+                    override fun record(
+                        actor: Actor,
+                        key: OperationKey,
+                        receipt: MutationReceipt,
+                    ): Result<Unit> =
+                        f.operations.record(actor, key, receipt).flatMap {
+                            if (stage == "receipt") injected() else Result.Success(Unit)
+                        }
+                }
+            val journal = hookJournal { actor, change ->
+                f.journal.record(actor, change).flatMap {
+                    if (stage == "journal") injected() else Result.Success(Unit)
+                }
+            }
+            fun run() =
+                f.freeze(
+                    operation,
+                    target.id,
+                    runtimes = runtimes,
+                    operations = operations,
+                    journal = journal,
+                )
+            when (mode) {
+                "cancel" ->
+                    assertSame(cancel, assertThrows(CancellationException::class.java) { run() })
+                "interrupt" ->
+                    assertSame(interrupt, assertThrows(InterruptedException::class.java) { run() })
+                else -> failure(run(), "fixture_write_failed")
+            }
+            f.freezeCounts(0, 0, 0)
+            assertNull(f.frozen(legacy))
+            assertFalse(success(f.freeze(operation, target.id)).replayed)
+            f.freezeCounts(1, 1, 1)
+            f.counts(1, 1, 1)
+        }
+    }
+
+    @Test
+    fun freezeCompletionRechecksCurrentGroupMfaSourceTimeAndInterruptionAfterWrites() {
+        for (change in
+            listOf("offboard", "mfa", "legacy", "expiry", "backward", "budget", "interrupt")) {
+            now = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            val f = Fixture()
+            val legacy = f.activeLegacy()
+            f.select()
+            val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+            if (change == "expiry")
+                owner.update(
+                    "update native_sessions set access_expires_at=?::timestamptz where id=?",
+                    now.plusSeconds(1).toString(),
+                    f.session,
+                )
+            val journal = hookJournal { actor, record ->
+                f.journal.record(actor, record).map {
+                    when (change) {
+                        "offboard" ->
+                            owner.update(
+                                "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+                                f.company,
+                                f.account,
+                            )
+                        "mfa" ->
+                            owner.update(
+                                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'identity.manage')",
+                                f.company,
+                                f.account,
+                            )
+                        "legacy" ->
+                            owner.update(
+                                "update collaboration_devices set state='REVOKED',version=2,revoked_at=?::timestamptz,updated_at=?::timestamptz where company_id=? and id=?",
+                                now.toString(),
+                                now.toString(),
+                                legacy.companyId,
+                                legacy.deviceId,
+                            )
+                        "expiry" -> f.clock.at = now.plusSeconds(1)
+                        "backward" -> f.clock.at = now.minusSeconds(1)
+                        "budget" -> f.clock.at = now.plusSeconds(30)
+                        "interrupt" -> Thread.currentThread().interrupt()
+                    }
+                    Unit
+                }
+            }
+            if (change == "interrupt") {
+                try {
+                    assertThrows(InterruptedException::class.java) {
+                        f.freeze(UUID.randomUUID(), target.id, journal = journal)
+                    }
+                    assertTrue(Thread.currentThread().isInterrupted)
+                } finally {
+                    Thread.interrupted()
+                }
+            } else {
+                val code =
+                    when (change) {
+                        "offboard" -> "collaboration_access_denied"
+                        "mfa" -> "mfa_setup_required"
+                        "legacy" -> "collaboration_device_migration_required"
+                        "expiry" -> "native_session_invalid"
+                        else -> "collaboration_admission_expired"
+                    }
+                failure(f.freeze(UUID.randomUUID(), target.id, journal = journal), code)
+            }
+            f.freezeCounts(0, 0, 0)
+            f.counts(1, 1, 1)
+        }
+    }
+
+    @Test
+    fun competingFreezeCommandsSerializeOneRuntimeTransitionAndRetainReplayReceipts() {
+        for (sameOperation in listOf(true, false)) {
+            val f = Fixture()
+            val legacy = f.activeLegacy()
+            f.select()
+            val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+            val operation = UUID.randomUUID()
+            val barrier = CyclicBarrier(2)
+            val pool = Executors.newFixedThreadPool(2)
+            try {
+                val results =
+                    (0..1)
+                        .map { index ->
+                            pool.submit<MutationReceipt> {
+                                barrier.await(5, TimeUnit.SECONDS)
+                                success(
+                                    f.freeze(
+                                        if (index == 0 || sameOperation) operation
+                                        else UUID.randomUUID(),
+                                        target.id,
+                                    )
+                                )
+                            }
+                        }
+                        .map { it.get(15, TimeUnit.SECONDS) }
+                assertTrue(results.all { it.id == legacy.deviceId && it.version == 1L })
+                assertEquals(if (sameOperation) 1 else 0, results.count { it.replayed })
+                f.freezeCounts(1, if (sameOperation) 1 else 2, 1)
+                assertEquals(
+                    CollaborationLegacyRuntimeTarget(space, target.id),
+                    f.frozen(legacy)?.target,
+                )
+            } finally {
+                pool.shutdownNow()
+                assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+            }
+        }
+    }
+
+    @Test
+    fun freezeRetainsLiveProviderSlotsWithoutTreatingMetadataAsCompletedTransfer() {
+        val f = Fixture()
+        val legacy = f.activeLegacy()
+        f.select()
+        val target = success(f.register(UUID.randomUUID(), legacy = legacy))
+        val runtimeOwner =
+            CollaborationLegacyRuntimeOwner(legacy.companyId, legacy.deviceId, f.account, f.session)
+        val companyActor = f.actor.copy(companyId = f.company)
+        val lease =
+            success(
+                f.transactions.run(companyActor) {
+                    f.runtimes.ensure(runtimeOwner, now).flatMap {
+                        f.runtimes.claim(
+                            runtimeOwner,
+                            Instant.now().plusSeconds(45).truncatedTo(ChronoUnit.MICROS),
+                        )
+                    }
+                }
+            )
+        assertNotNull(lease)
+        f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        success(f.freeze(UUID.randomUUID(), target.id))
+        assertEquals(
+            listOf(lease),
+            success(f.transactions.run(f.actor) { f.runtimes.slots(runtimeOwner) }),
+        )
+        assertNull(
+            success(
+                f.transactions.run(companyActor) {
+                    f.runtimes.claim(
+                        runtimeOwner,
+                        Instant.now().plusSeconds(45).truncatedTo(ChronoUnit.MICROS),
+                    )
+                }
+            )
+        )
+        assertTrue(
+            success(f.transactions.run(companyActor) { f.runtimes.release(requireNotNull(lease)) })
+        )
+        assertEquals(CollaborationDeviceState.PROVISIONING, f.device().state)
+        assertEquals(CollaborationSpaceProvisioningState.QUEUED, f.work(target.id).state)
+        f.freezeCounts(1, 1, 1)
+    }
+
     private inner class Fixture {
         val account = UUID.randomUUID()
         val company = UUID.randomUUID()
@@ -595,6 +930,10 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         val legacyParents =
             StoredCollaborationLegacyParentRepository(
                 PostgresCollaborationLegacyParentDataSource(sql)
+            )
+        val runtimes =
+            StoredCollaborationLegacyRuntimeRepository(
+                PostgresCollaborationLegacyRuntimeDataSource(sql)
             )
         val session: UUID
 
@@ -772,6 +1111,98 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                     legacy,
                     fingerprint,
                 )
+
+        fun freeze(
+            operation: UUID,
+            target: UUID,
+            request: Actor = actor,
+            parent: UUID = session,
+            nativeVersion: Long = 0,
+            deviceVersion: Long = 0,
+            requestedSpace: UUID = space,
+            build: ClientVersion? = client,
+            fingerprint: String = "a".repeat(64),
+            runtimes: CollaborationLegacyRuntimeRepository = this.runtimes,
+            operations: OperationRepository = this.operations,
+            journal: ChangeJournalRepository = this.journal,
+        ): Result<MutationReceipt> =
+            FreezeNativeCollaborationLegacyRuntime(
+                    registry,
+                    legacyParents,
+                    selections,
+                    runtimes,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    clock,
+                )
+                .execute(
+                    request,
+                    parent,
+                    nativeVersion,
+                    requestedSpace,
+                    build,
+                    operation,
+                    target,
+                    deviceVersion,
+                    fingerprint,
+                )
+
+        fun frozen(legacy: CollaborationLegacyDevicePosition): CollaborationLegacyRuntime? =
+            success(
+                transactions.run(actor) {
+                    runtimes.find(
+                        CollaborationLegacyRuntimeOwner(
+                            legacy.companyId,
+                            legacy.deviceId,
+                            account,
+                            session,
+                        ),
+                        lock = false,
+                    )
+                }
+            )
+
+        fun freezeCounts(runtimes: Int, receipts: Int, events: Int) {
+            assertEquals(
+                runtimes,
+                owner.queryForObject(
+                    "select count(*) from collaboration_legacy_runtime where account_id=?",
+                    Int::class.java,
+                    account,
+                ),
+            )
+            assertEquals(
+                receipts,
+                owner.queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.legacy_runtime_freeze'",
+                    Int::class.java,
+                    account,
+                ),
+            )
+            for (table in listOf("audit_entries", "platform_audit_metadata")) assertEquals(
+                events,
+                owner.queryForObject(
+                    "select count(*) from $table where actor_id=? and action='collaboration.legacy_runtime_frozen'",
+                    Int::class.java,
+                    account,
+                ),
+            )
+            assertEquals(
+                events,
+                owner.queryForObject(
+                    "select count(*) from outbox_events where actor_id=? and event_type='collaboration.legacy_runtime_frozen'",
+                    Int::class.java,
+                    account,
+                ),
+            )
+        }
 
         fun device(parent: UUID = session): CollaborationSpaceDevice =
             requireNotNull(

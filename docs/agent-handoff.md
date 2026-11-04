@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Native legacy freeze accepted — 4 November 2026
+
+Based on pushed 53a86f48, FreezeNativeCollaborationLegacyRuntime now records a
+metadata-only irreversible same-target intent under current root/native/group/
+client/MFA admission. Pure policies match canonical identity, exact original
+parent/device/key reference, target PROVISIONING version and coherent runtime.
+Operation/account/native/target/runtime guards retain existing order; initialization,
+freeze, receipt and journal commit atomically. Same and new operation IDs preserve
+the one frozen target. Native refresh permits current replay; revocation does not.
+The command is not exposed through DI/HTTP and performs no provider work.
+
+[Evidence](measurements/collaboration-legacy-runtime-freeze-2026-11-04.json): first
+run runtime-freeze1 PASS 64.356s, 18 cases (three pure plus fifteen actual database
+registration/status/freeze methods), 8268 unchanged checked inputs and passing
+format/architecture. Six new database methods prove root initialization under the
+actual restricted role, lost-response/native-refresh replay, substituted/revoked
+admission, rollback after all four write stages, original cancellation/interruption,
+late authority/time changes, competing calls and retained live provider leases.
+No failed run. No emulator or other owned test remains running.
+
+Next implement bounded current-admission drain metadata. Zero live server slots is
+only an observation, not proof of remote rollback or SDK shutdown. Then complete
+atomic group publication/old credential retirement, completed-mapping replay and
+durable Mobile SDK/namespace/inbox/outbox/read/push handover. V121 already reserves
+terminal device revision 1000000; freeze caps target at999998 to leave activation
+and revocation room. No new boundary migration is needed. All fixed legacy
+consumers already fence ownership at53a86f48. Preserve the contract below.
+
+Main f26c466c and Mobile 33ee26d9 record the prior consumer milestone and need this
+new freeze commit recorded. Mobile code3d85d569/hosted gates remain accepted. Live
+8b40/schema116 push ON/SMTP OFF, installed normal phone28 and Starter9959c1d are
+unchanged. No product APK here; all54 communications groups and actual Apple
+runtime remain open. Continue the full long run, user updates, Git evidence and
+immediate push of each atomic commit.
+
 ## All legacy runtime consumers fenced — 4 November 2026
 
 Based on 0bf751e5, BootstrapNativeCollaborationGateway and RefreshNativeCollaborationGateway

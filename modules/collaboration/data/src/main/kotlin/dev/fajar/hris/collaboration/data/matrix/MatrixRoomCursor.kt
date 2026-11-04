@@ -24,7 +24,26 @@ fun sealMatrixRoomCursor(
 ): String {
     if (!validPosition(position)) throw MatrixResponseException()
     interrupted()
-    val purpose = purpose(crypto, owner, roomId)
+    return sealMatrixRoomCursorForPurpose(crypto, purpose(crypto, owner, roomId), position)
+}
+
+fun openMatrixRoomCursor(
+    crypto: IdentityTokenDataSource,
+    owner: CollaborationSyncOwner,
+    roomId: String,
+    cursor: String,
+): String {
+    interrupted()
+    return openMatrixRoomCursorForPurpose(crypto, purpose(crypto, owner, roomId), cursor)
+}
+
+internal fun sealMatrixRoomCursorForPurpose(
+    crypto: IdentityTokenDataSource,
+    purpose: String,
+    position: String,
+): String {
+    if (!validPosition(position)) throw MatrixResponseException()
+    interrupted()
     val sealed =
         try {
             crypto.encrypt(purpose, position)
@@ -35,14 +54,12 @@ fun sealMatrixRoomCursor(
     return sealed
 }
 
-fun openMatrixRoomCursor(
+internal fun openMatrixRoomCursorForPurpose(
     crypto: IdentityTokenDataSource,
-    owner: CollaborationSyncOwner,
-    roomId: String,
+    purpose: String,
     cursor: String,
 ): String {
     interrupted()
-    val purpose = purpose(crypto, owner, roomId)
     val position =
         try {
             require(cursor.length in 1..4096 && cursor.all { it.code in 33..126 })

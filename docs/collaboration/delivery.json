@@ -239,7 +239,9 @@
         "space-to-device.md",
         "../measurements/collaboration-space-to-device-2026-11-04.json",
         "space-room-messages.md",
-        "../measurements/collaboration-space-room-messages-2026-11-04.json"
+        "../measurements/collaboration-space-room-messages-2026-11-04.json",
+        "space-room-history-protocol.md",
+        "../measurements/collaboration-space-room-history-protocol-2026-11-04.json"
       ]
     },
     {
@@ -313,7 +315,9 @@
         "space-to-device.md",
         "../measurements/collaboration-space-to-device-2026-11-04.json",
         "space-room-messages.md",
-        "../measurements/collaboration-space-room-messages-2026-11-04.json"
+        "../measurements/collaboration-space-room-messages-2026-11-04.json",
+        "space-room-history-protocol.md",
+        "../measurements/collaboration-space-room-history-protocol-2026-11-04.json"
       ]
     },
     {

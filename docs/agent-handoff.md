@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Durable Mobile handover accepted locally; group gateway continues — 4 November 2026
+
+Mobile code is pushed as `0b804cb2`. Local handover reads/stages immutable protected
+schema2 intent after exact observed-client pinning, acquisition exclusion and full
+old SDK drain. It preserves the original namespace/passphrase and blocks legacy
+restore/install across restart. It grants no server authority and has no product caller.
+
+[Evidence](https://github.com/fajarxfce/hris-mobile/blob/0b804cb2/docs/measurements/collaboration-runtime-handover-2026-11-04.json):
+root/Android/proof PASS160.404s (4044 desktop,241 Android-host,18 proof,10 build-logic;
+18 fresh finally,1958 fresh in preceding run), browser463 PASS98.262s, same3880 inputs.
+Actual SDK/Keystore fault/cancel/stage/process-restart/key-continuity PASS67.337s.
+One ignored-draft format failure and one older proof-adapter compilation fix are recorded;
+no failing test assertion. Owned proof app cleared and emulator3731489/5562 stopped.
+No user phone interaction. Debug proof APK must never be installed on the phone.
+
+Hosted runs on exact0b804cb2 are still in progress: control41775492328,
+native-HRIS41775492365, protocol41775492415. Collect outcomes/artifacts/source hashes;
+local acceptance does not replace those hosted checks or actual Apple runtime work.
+Group backend remains c9bf7762 (eight native metadata/setup operations,127 full worker
+and137 domain/API/OpenAPI checks); main805c181f records its acceptance.
+
+NEXT group gateway/room authority and current admission, then Mobile provider-key
+publication/readback preflight and group store/inbox/outbox/history/read/push/deep-link
+ownership. No permanent server freeze before successful local stage/current admission;
+never replace an old company ID with a space ID in its SDK namespace. Cross-company
+end-to-end acceptance and all54 communications groups remain open. Normal phone28,
+live8b40/schema116 pushON/SMTP OFF and Starter9959c1d unchanged. Continue full long run,
+frequent updates, atomic commits and immediate pushes.
+
 ## Native group HTTP accepted; durable Mobile handover underway — 4 November 2026
 
 Group branch is pushed through `c9bf7762`. Eight native-only routes expose current

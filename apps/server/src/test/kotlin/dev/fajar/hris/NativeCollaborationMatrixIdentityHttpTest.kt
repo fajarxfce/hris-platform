@@ -849,6 +849,129 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         }
     }
 
+    @Test
+    fun groupEncryptedToDevicePreservesOriginalFramesAndStrictOpaqueHttpAuthority() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val key = groupFixtureKeys(device)
+        val body = encryptedBody(key)
+        val before = provider.encryptedSends.get()
+        fun send(
+            value: String = body,
+            auth: String? = token,
+            duplicate: Boolean = false,
+            suffix: String = "",
+        ) =
+            uploadKeys(
+                n,
+                auth,
+                value,
+                chunked = true,
+                duplicate = duplicate,
+                suffix = suffix,
+                route = "sendToDevice/m.room.encrypted/fixture-txn",
+                method = "PUT",
+            )
+        // Invalid credentials enter company dispatch, so isolate auth using a shared device shape.
+        val credentialBody =
+            body.replace(key.device, "HRIS_" + UUID.randomUUID().toString().replace("-", ""))
+        for (auth in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+            401,
+            send(credentialBody, auth).statusCode(),
+        )
+        assertEquals(400, send(auth = n.access).statusCode())
+        assertEquals(401, send(duplicate = true).statusCode())
+        assertEquals(400, send(suffix = "?access_token=forbidden").statusCode())
+        for (invalid in
+            listOf(
+                "{}",
+                "{\"messages\":{},\"messages\":{}}",
+                body + "{}",
+                body.replace("m.olm.v1.curve25519-aes-sha2", "plaintext"),
+                body.replace("ZmljdGlvbmFs", "plaintext!"),
+                body.replace(key.device, "*"),
+            )) assertEquals(400, send(invalid).statusCode())
+        assertEquals(413, send(" ".repeat(1_048_577)).statusCode())
+        assertEquals(before, provider.encryptedSends.get())
+        assertEquals(403, send().statusCode()) // No confirmed recipient publication yet.
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        val unknown =
+            "@hrisg_${UUID.randomUUID().toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test"
+        assertEquals(400, send(body.replace(key.user, unknown)).statusCode()) // Foreign space.
+        val stale =
+            "@hris_${UUID.randomUUID().toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test"
+        assertEquals(403, send(body.replace(key.user, stale)).statusCode())
+        assertEquals(before, provider.encryptedSends.get())
+        repeat(2) {
+            val response = send()
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("{}", response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(json.readTree(body), provider.lastEnvelope.get())
+        }
+        assertEquals(before + 2, provider.encryptedSends.get())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupEncryptedToDeviceWithholdsResponsesAfterKeyReadOrSendRevocation() {
+        for (duringSend in listOf(false, true)) {
+            val n = native()
+            val (device, token) = enrollGroup(n)
+            val key = groupFixtureKeys(device)
+            assertEquals(
+                200,
+                uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode(),
+            )
+            val before = provider.encryptedSends.get()
+            val hook = if (duringSend) provider.onEncryptedSend else provider.onKeyQuery
+            hook.set {
+                database()
+                    .update(
+                        "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                        n.session,
+                    )
+            }
+            try {
+                val response =
+                    uploadKeys(
+                        n,
+                        token,
+                        encryptedBody(key),
+                        route = "sendToDevice/m.room.encrypted/fixture-txn",
+                        method = "PUT",
+                    )
+                assertEquals(401, response.statusCode(), response.body())
+                assertEquals(
+                    "M_UNKNOWN_TOKEN",
+                    json.readTree(response.body())["errcode"].asString(),
+                )
+                assertFalse(response.body().contains(key.user))
+                assertFalse(response.body().contains(token))
+                assertEquals(before + if (duringSend) 1 else 0, provider.encryptedSends.get())
+                assertEquals(
+                    0,
+                    database()
+                        .queryForObject(
+                            "select count(*) from collaboration_space_request_leases where device_id=?",
+                            Int::class.java,
+                            device,
+                        ),
+                )
+            } finally {
+                hook.set(null)
+            }
+        }
+    }
+
     private fun groupFixtureKeys(device: UUID): KeyPayload {
         val row =
             database()

@@ -36,6 +36,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val providerKeys: CollaborationMatrixKeyRepository,
     private val journal: ChangeJournalRepository,
     private val recipients: CollaborationSpaceRecipientRepository,
+    private val providerToDevice: CollaborationMatrixToDeviceRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -94,6 +95,112 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             }
         }
     }
+
+    fun sendToDevice(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationToDevice,
+    ): Result<Unit> {
+        val captured = snapshotCollaborationSpaceToDevice(request)
+        if (captured is Result.Failed) return captured
+        val send = (captured as Result.Success).value
+        val query = CollaborationMatrixKeyQuery(send.messages.mapValues { it.value.keys.toList() })
+        return admitted(
+            token,
+            correlationId,
+            decrypt = true,
+            prepare = { observed -> prepareToDevice(observed, query) },
+            extraAccounts = { head ->
+                collaborationSpaceKeyQueryAccounts(query, head.spaceId, provider.serverName).map {
+                    it.values.toSet()
+                }
+            },
+            revalidate = { observed, original ->
+                prepareRecipients(observed, query, includeReserved = false).flatMap { current ->
+                    if (current != original.recipients)
+                        return@flatMap collaborationSpaceRecipientsChanged()
+                    confirmedOwnKeys(observed).flatMap { own ->
+                        if (own == original.own) Result.Success(Unit) else keysChanged()
+                    }
+                }
+            },
+        ) { exchange, prepared ->
+            // Detach the sender identity inside the provider operation, before completion
+            // callbacks.
+            val own =
+                exchange.exchange { bearer, deadline ->
+                    val device = exchange.observation.device
+                    providerKeys
+                        .ownDeviceKeys(device.matrixUserId, device.matrixDeviceId, bearer, deadline)
+                        .flatMap { keys ->
+                            if (keys == null) return@flatMap invalidProvider()
+                            val snapshot =
+                                snapshotCollaborationKeyUpload(
+                                    CollaborationMatrixKeyUpload(deviceKeys = keys)
+                                )
+                            if (snapshot is Result.Failed) return@flatMap invalidProvider()
+                            val identity =
+                                requireNotNull((snapshot as Result.Success).value.deviceKeys)
+                            validatePublicKeys(exchange.observation, prepared.own, identity).map {
+                                identity
+                            }
+                        }
+                }
+            if (own is Result.Failed) return@admitted own
+            val sender = (own as Result.Success).value
+            val selected =
+                exchange.exchange { bearer, deadline ->
+                    providerKeys
+                        .deviceKeys(prepared.recipients.providerRequest(), bearer, deadline)
+                        .flatMap { verifyCollaborationSpaceKeyQuery(prepared.recipients, it) }
+                }
+            if (selected is Result.Failed) return@admitted selected
+            val identities = (selected as Result.Success).value.deviceKeys
+            for ((user, devices) in send.messages) for ((device, envelope) in devices) {
+                val receiver =
+                    identities[user]?.get(device)
+                        ?: return@admitted collaborationSpaceRecipientsChanged()
+                if (!collaborationEnvelopeMatchesKeys(envelope, sender, receiver))
+                    return@admitted Result.Failed(
+                        Failure(FailureKind.CONFLICT, "collaboration_encryption_keys_changed")
+                    )
+            }
+            exchange.exchange { bearer, deadline -> providerToDevice.send(send, bearer, deadline) }
+        }
+    }
+
+    private fun prepareToDevice(
+        observed: Observation,
+        query: CollaborationMatrixKeyQuery,
+    ): Result<ToDevicePreparation> =
+        prepareRecipients(observed, query, includeReserved = false).flatMap { selected ->
+            if (
+                selected.providerRequest().devices.mapValues { it.value.toSet() } !=
+                    query.devices.mapValues { it.value.toSet() }
+            )
+                return@flatMap Result.Failed(
+                    Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
+                )
+            confirmedOwnKeys(observed).map { ToDevicePreparation(selected, it) }
+        }
+
+    private fun confirmedOwnKeys(observed: Observation): Result<CollaborationSpaceKeyPublication> {
+        val device = observed.device
+        return keys.find(device.spaceId, device.accountId, device.id).flatMap { own ->
+            if (own == null) return@flatMap keysRequired()
+            if (!validPublication(own, observed, clock.instant())) return@flatMap invalidProvider()
+            if (own.version == 0L)
+                return@flatMap Result.Failed(
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_device_keys_pending")
+                )
+            Result.Success(own)
+        }
+    }
+
+    private data class ToDevicePreparation(
+        val recipients: CollaborationSpaceKeySelection,
+        val own: CollaborationSpaceKeyPublication,
+    )
 
     fun queryKeys(
         token: String,

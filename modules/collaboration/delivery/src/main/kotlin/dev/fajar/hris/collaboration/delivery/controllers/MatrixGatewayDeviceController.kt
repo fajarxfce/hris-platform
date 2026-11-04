@@ -183,7 +183,10 @@ class MatrixGatewayDeviceController(
             1_048_576,
             envelopeParser,
         ) { token, correlation, envelope ->
-            device.sendToDevice(token, correlation, envelope).map { emptyMap<String, Any>() }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.sendToDevice(token, correlation, envelope)
+                else device.sendToDevice(token, correlation, envelope))
+                .map { emptyMap<String, Any>() }
         }
 
     private fun <T> keyRequest(

@@ -1,5 +1,42 @@
 # Delivery and validation
 
+## Group encrypted to-device transport accepted — 4 November 2026
+
+The fixed group route now sends original encrypted frames only to confirmed current
+recipients. Sender and recipient signed keys are detached and checked against both
+envelope curve keys. Exact publications, recipients and native/gateway/request access
+are revalidated around every provider outcome. Unknown or unavailable targets reject
+the whole request; short receiving-side credentials can expire without blocking an
+otherwise eligible offline device. Original LEGACY device and transaction IDs remain.
+[Protocol](collaboration/space-to-device.md), [evidence](measurements/collaboration-space-to-device-2026-11-04.json).
+
+Passed: 124 policy tests (48.001 s), 38 gateway tests (487.809 s),
+32 retained-device tests (281.174 s), 139 actual API tests (202.139 s), and the full
+worker suite (138 tests, 387.685 s; one existing optional skip). Quality checks pass. Final retained/API/worker gates share 8,431 identical unchanged inputs.
+Only the two integration test files changed after policy/gateway acceptance.
+The initial API run had HTTP timeouts during observed host memory/I/O pressure;
+the complete retry passed on unchanged source without increasing timeouts. Exact
+initial failures and host diagnostics are recorded. All sessions closed.
+Actual Synapse covers original SPACE and LEGACY frames through restart; PostgreSQL
+and HTTP cover access changes, failures and cancellation.
+
+Synapse may replay an identical to-device frame after restart. Preserve original SDK
+transaction/message IDs and uncertain sends; valid Olm decryption and SDK duplicate
+handling remain required. A late denial cannot undo prior remote acceptance.
+
+NEXT: group room content/sync/push and full Mobile SDK adoption, including native
+hard-parent recovery and original store/passphrase/keys/history retention. Existing
+V131 room bindings already support bounded exact provider-room lookup with participant
+RLS and unique room IDs; no new migration is implied. Keep group scope and cursor types
+distinct from company semantics. See ignored space-room-content-next.md for design;
+all applied to-device source/test drafts are stale, committed source is authoritative.
+
+Base `dd789d0f`, Main `b1748d20` and Mobile `5b9cf2ec` are pushed. Group rollout stays
+disabled; all 54 PRD acceptance groups remain open. Live `8b40` / schema 116 (push on,
+SMTP off), normal phone release 28, Mobile product/hosted checks `0b804cb2` and Starter
+`9959c1d` remain unchanged. Continue the long run, regular updates, atomic pushes and
+validated product feature installs.
+
 ## Scoped recipient query and claim accepted — 4 November 2026
 
 Group Matrix key query and claim now enforce current native, device and gateway

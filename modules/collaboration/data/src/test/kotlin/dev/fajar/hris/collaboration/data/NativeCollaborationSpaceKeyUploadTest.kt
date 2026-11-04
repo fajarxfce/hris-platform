@@ -600,6 +600,7 @@ class NativeCollaborationSpaceKeyUploadTest {
                 StoredCollaborationSpaceRecipientRepository(
                     PostgresCollaborationSpaceRecipientDataSource(base.sql)
                 ),
+                DisabledCollaborationMatrixToDeviceRepository(),
             )
 
         fun upload(

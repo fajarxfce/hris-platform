@@ -1275,6 +1275,36 @@ class CollaborationSpaceWorkerPublicationTest {
                         Instant.now().plusSeconds(20),
                     )
             )
+            val originalKey = requireNotNull(f.retainedKeys)
+            val curve = originalKey.device.keys.getValue("curve25519:${originalKey.deviceId}")
+            val uncertainFrame =
+                CollaborationToDevice(
+                    "original-legacy-uncertain-transaction",
+                    mapOf(
+                        originalKey.userId to
+                            mapOf(
+                                originalKey.deviceId to
+                                    CollaborationOlmEnvelope(
+                                        curve,
+                                        curve,
+                                        "ZmljdGlvbmFsLXJldGFpbmVkLWZyYW1l",
+                                        0,
+                                        "original-legacy-message",
+                                    )
+                            )
+                    ),
+                )
+            success(
+                InternalCollaborationMatrixToDeviceRepository(
+                        HttpMatrixClientDataSource(
+                            provider.client,
+                            provider.config,
+                            Clock.systemUTC(),
+                        )
+                    )
+                    .send(uncertainFrame, oldCredential.accessToken, Instant.now().plusSeconds(20))
+            )
+            // Retain an unread original-device frame across completion and provider restarts.
             // Synapse's normal per-account login limiter remains enabled in this fixture.
             Thread.sleep(11000)
             val id = f.register(original)
@@ -1361,7 +1391,19 @@ class CollaborationSpaceWorkerPublicationTest {
                     mapOf("signed_curve25519:group-one" to retainedKey.signed()),
                     mapOf("signed_curve25519:group-fallback" to retainedKey.signed(true)),
                 )
-            fun uploadCommand() = f.groupAccess(provider.repository, providerKeys = keyRepository())
+            fun uploadCommand() =
+                f.groupAccess(
+                    provider.repository,
+                    providerKeys = keyRepository(),
+                    providerToDevice =
+                        InternalCollaborationMatrixToDeviceRepository(
+                            HttpMatrixClientDataSource(
+                                provider.client,
+                                provider.config,
+                                Clock.systemUTC(),
+                            )
+                        ),
+                )
             success(uploadCommand().uploadKeys(groupTokens.accessToken, UUID.randomUUID(), upload))
             val published =
                 owner.queryForList(
@@ -1437,6 +1479,73 @@ class CollaborationSpaceWorkerPublicationTest {
                     .single()
                     .fallback,
             )
+            fun retainedSync(since: String? = null): tools.jackson.databind.JsonNode {
+                val suffix =
+                    since?.let {
+                        "&since=" +
+                            java.net.URLEncoder.encode(it, java.nio.charset.StandardCharsets.UTF_8)
+                    } ?: ""
+                val response =
+                    provider.client.send(
+                        java.net.http.HttpRequest.newBuilder(
+                                provider.config.origin.resolve(
+                                    "/_matrix/client/v3/sync?timeout=0$suffix"
+                                )
+                            )
+                            .timeout(Duration.ofSeconds(5))
+                            .header("Authorization", "Bearer ${recovered.accessToken}")
+                            .GET()
+                            .build(),
+                        java.net.http.HttpResponse.BodyHandler {
+                            dev.fajar.hris.collaboration.data.matrix.BoundedMatrixBodySubscriber()
+                        },
+                    )
+                assertEquals(200, response.statusCode())
+                return provider.json.readTree(response.body())
+            }
+            val migratedQueue = retainedSync()
+            val originalEvents = migratedQueue.path("to_device").path("events")
+            assertEquals(1, originalEvents.size())
+            assertEquals(originalKey.userId, originalEvents[0].path("sender").asString())
+            assertEquals(
+                "original-legacy-message",
+                originalEvents[0].path("content").path("org.matrix.msgid").asString(),
+            )
+            val cursor = migratedQueue.path("next_batch").asString()
+            repeat(2) {
+                success(
+                    uploadCommand()
+                        .sendToDevice(groupTokens.accessToken, UUID.randomUUID(), uncertainFrame)
+                )
+            }
+            val delivered = retainedSync(cursor)
+            val events = delivered.path("to_device").path("events")
+            assertEquals(1, events.size())
+            assertEquals(retainedKey.userId, events[0].path("sender").asString())
+            val content = events[0].path("content")
+            assertEquals(originalEvents[0].path("content"), content)
+            assertEquals("original-legacy-message", content.path("org.matrix.msgid").asString())
+            assertEquals(
+                "ZmljdGlvbmFsLXJldGFpbmVkLWZyYW1l",
+                content.path("ciphertext").path(curve).path("body").asString(),
+            )
+            val acknowledged = retainedSync(delivered.path("next_batch").asString())
+            assertTrue(acknowledged.path("to_device").path("events").isEmpty)
+            provider.restart()
+            success(
+                uploadCommand()
+                    .sendToDevice(groupTokens.accessToken, UUID.randomUUID(), uncertainFrame)
+            )
+            val replay =
+                retainedSync(acknowledged.path("next_batch").asString())
+                    .path("to_device")
+                    .path("events")
+            assertEquals(1, replay.size())
+            assertEquals(content, replay[0].path("content"))
+            // Process-local transaction deduplication permits an identical replay after restart;
+            // these opaque frames prove original namespace retention, not successful SDK
+            // decryption.
+
             checkKeys(recovered.accessToken)
             assertEquals(originalRows, f.originalSnapshot())
             f.activatedCount(1)
@@ -2574,6 +2683,23 @@ class CollaborationSpaceWorkerPublicationTest {
         val provider =
             object :
                 CollaborationMatrixKeyRepository by DisabledCollaborationMatrixKeyRepository() {
+                override fun ownDeviceKeys(
+                    userId: String,
+                    deviceId: String,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixDeviceKeys?> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(first.userId, userId)
+                    assertEquals(first.deviceId, deviceId)
+                    assertEquals(stored.accessToken, token)
+                    assertTrue(deadline > Instant.now())
+                    return Result.Success(first.device)
+                }
+
                 override fun deviceKeys(
                     request: CollaborationMatrixKeyQuery,
                     token: String,
@@ -2626,8 +2752,53 @@ class CollaborationSpaceWorkerPublicationTest {
                     )
                 }
             }
+        val receivedFrames = mutableListOf<CollaborationToDevice>()
+        var loseResponse = true
+        val sender =
+            object : CollaborationMatrixToDeviceRepository {
+                override fun send(
+                    request: CollaborationToDevice,
+                    token: String,
+                    deadline: Instant,
+                ): Result<Unit> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(stored.accessToken, token)
+                    assertTrue(deadline > Instant.now())
+                    receivedFrames += request
+                    return if (loseResponse)
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "fixture_send_response_lost")
+                        )
+                    else Result.Success(Unit)
+                }
+            }
+        val retainedFrame =
+            CollaborationToDevice(
+                "original-sdk-uncertain-transaction",
+                mapOf(
+                    second.userId to
+                        mapOf(
+                            second.deviceId to
+                                CollaborationOlmEnvelope(
+                                    first.device.keys.getValue("curve25519:${first.deviceId}"),
+                                    second.device.keys.getValue("curve25519:${second.deviceId}"),
+                                    "ZmljdGlvbmFsLWVuY3J5cHRlZC1wYXlsb2Fk",
+                                    0,
+                                    "original-sdk-message",
+                                )
+                        )
+                ),
+            )
+
         val command =
-            a.groupAccess(DisabledCollaborationMatrixRepository(), providerKeys = provider)
+            a.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerKeys = provider,
+                providerToDevice = sender,
+            )
         val wrongAlias = "@hrisg_${compact(space)}_${compact(b.account)}:$server"
         val query =
             CollaborationMatrixKeyQuery(
@@ -2673,10 +2844,22 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         assertEquals(1, claim.oneTimeKeys.getValue(second.userId).getValue(second.deviceId).size)
         assertEquals(1, consumed)
+        failure(
+            command.sendToDevice(token, UUID.randomUUID(), retainedFrame),
+            "fixture_send_response_lost",
+        )
+        loseResponse = false
+        success(command.sendToDevice(token, UUID.randomUUID(), retainedFrame))
+        assertEquals(listOf(retainedFrame, retainedFrame), receivedFrames)
         assertEquals(priorA, a.originalSnapshot())
         assertEquals(priorB, b.originalSnapshot())
         owner.update("delete from native_sessions where id=?", b.session)
         assertTrue(read().deviceKeys.getValue(second.userId).isEmpty())
+        failure(
+            command.sendToDevice(token, UUID.randomUUID(), retainedFrame),
+            "collaboration_recipient_unavailable",
+        )
+        assertEquals(2, receivedFrames.size)
         assertEquals(priorB, b.originalSnapshot())
     }
 
@@ -3227,6 +3410,8 @@ class CollaborationSpaceWorkerPublicationTest {
             completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
             providerKeys: CollaborationMatrixKeyRepository =
                 DisabledCollaborationMatrixKeyRepository(),
+            providerToDevice: CollaborationMatrixToDeviceRepository =
+                DisabledCollaborationMatrixToDeviceRepository(),
         ): AccessNativeCollaborationSpaceMatrixDevice {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
@@ -3266,6 +3451,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 StoredCollaborationSpaceRecipientRepository(
                     PostgresCollaborationSpaceRecipientDataSource(sql)
                 ),
+                providerToDevice,
             )
         }
 

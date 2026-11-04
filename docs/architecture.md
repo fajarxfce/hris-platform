@@ -158,7 +158,10 @@ own current caller/recipient admission and detached signed provider verification
 Sorted account guards precede native/device/gateway/request locks. Queries preserve
 pending publication races; claims verify confirmed identities before OTK consumption.
 Every provider outcome rechecks the exact selected set and original lease/deadline.
-To-device/content/sync/push and full Mobile adoption remain separate work.
+The [group to-device route](collaboration/space-to-device.md) now verifies confirmed
+recipients, detached signed sender/recipient identities and both envelope keys under
+current admission. Original provider transaction IDs remain; restart may replay a
+frame. Room content/sync/push and full Mobile adoption remain separate work.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

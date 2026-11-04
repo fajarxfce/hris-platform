@@ -3,8 +3,9 @@
 The fixed group `POST /_matrix/client/v3/keys/upload` operation uses the original
 Matrix user/device IDs and separate organization gateway authority. The controller
 shares existing strict header, body, stream-size and signed-key parsing. The [group query and claim endpoints](space-recipient-key-exchange.md) now provide
-separate current recipient admission. Room content and to-device integration remain
-required; group availability remains disabled.
+separate current recipient admission. The [encrypted to-device route](space-to-device.md) now verifies confirmed recipients
+and sender identity. Room content integration remains required; group availability
+remains disabled.
 
 ## Preparation and provider work
 
@@ -60,6 +61,7 @@ identities across restart. Strict native HTTP and both application contexts pass
 Recipient key availability must include unacknowledged reservations with the V114
 confirmation flag, verify all returned keys, and preserve offline receiving independently
 of short native/provider token expiry. The linked query/claim endpoints now enforce
-current peer/room authority; encrypted to-device transport still requires integration. Original-room inventory and native hard-parent
+current peer/room authority; encrypted to-device transport now consumes confirmed
+keys through its linked fixed operation. Original-room inventory and native hard-parent
 recovery remain required before Mobile group adoption. No end-to-end cross-company
 conversation, product APK or rollout is implied by own-key exchange alone.

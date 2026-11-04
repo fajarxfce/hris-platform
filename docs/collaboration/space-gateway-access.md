@@ -62,7 +62,8 @@ records exact outcomes, source/report hashes, actual provider/HTTP cases and
 reproduction commands.
 
 Room preparation and [recipient query/claim](space-recipient-key-exchange.md) are now
-implemented separately. Next complete encrypted to-device/content/sync/push and Mobile
-adoption.
+implemented separately. [Encrypted to-device transport](space-to-device.md) now adds
+confirmed recipient and sender verification. Room content/sync/push and Mobile
+adoption remain required.
 Keep original SDK namespaces, passphrases, owned history and uncertain sends. All54
 communications acceptance groups remain open; no product rollout is implied here.

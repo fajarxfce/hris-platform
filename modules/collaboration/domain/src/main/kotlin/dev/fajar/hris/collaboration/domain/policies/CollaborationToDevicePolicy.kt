@@ -4,7 +4,17 @@ import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.domain.*
 import java.util.Base64
 
-fun snapshotCollaborationToDevice(request: CollaborationToDevice): Result<CollaborationToDevice> {
+fun snapshotCollaborationToDevice(request: CollaborationToDevice): Result<CollaborationToDevice> =
+    snapshotEnvelope(request, ::snapshotCollaborationKeyQuery)
+
+fun snapshotCollaborationSpaceToDevice(
+    request: CollaborationToDevice
+): Result<CollaborationToDevice> = snapshotEnvelope(request, ::snapshotCollaborationSpaceKeyQuery)
+
+private fun snapshotEnvelope(
+    request: CollaborationToDevice,
+    captureDevices: (CollaborationMatrixKeyQuery) -> Result<CollaborationMatrixKeyQuery>,
+): Result<CollaborationToDevice> {
     if (
         !Regex("[A-Za-z0-9._~-]{1,128}").matches(request.transactionId) ||
             request.messages.size !in 1..100 ||
@@ -28,7 +38,7 @@ fun snapshotCollaborationToDevice(request: CollaborationToDevice): Result<Collab
             return invalidEnvelope()
     }
     val captured = request.messages.mapValues { it.value.toMap() }
-    return snapshotCollaborationKeyQuery(
+    return captureDevices(
             CollaborationMatrixKeyQuery(captured.mapValues { it.value.keys.toList() })
         )
         .map { request.copy(messages = captured) }

@@ -52,5 +52,6 @@ acquisition and cancellation tests. Exact results and source continuity are reco
 The [fixed key query/claim consumers](space-recipient-key-exchange.md) now lock required
 accounts before native/device guards and revalidate current caller, selected recipients
 and exact slot around every provider outcome. They verify detached signed identities;
-claims require acknowledgement before consumption. To-device/content/sync/push and
-full Mobile SDK adoption remain required; group rollout stays disabled.
+claims require acknowledgement before consumption. [Encrypted to-device transport](space-to-device.md)
+requires every recipient to be confirmed and current. Room content/sync/push and full
+Mobile SDK adoption remain required; group rollout stays disabled.

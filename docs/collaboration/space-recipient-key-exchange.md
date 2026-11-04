@@ -60,7 +60,8 @@ publication races, cancellation/exact cleanup, completed retained identities, ac
 Synapse query/claim/restart, real HTTP dispatch and the complete worker graph. See the
 [accepted gate results](../measurements/collaboration-space-recipient-key-exchange-2026-11-04.json) and unchanged source hashes.
 
-This is device-key exchange. To-device envelopes, group room content/sync/push and
-full Mobile SDK adoption remain required. Preserve the original SDK namespace,
+The [encrypted to-device route](space-to-device.md) now consumes these confirmed
+recipients with detached sender verification and current admission. Group room
+content/sync/push and full Mobile SDK adoption remain required. Preserve the original SDK namespace,
 passphrase, keys/history and uncertain sends, including native hard-parent recovery.
 Group rollout remains disabled and communications acceptance groups remain open.

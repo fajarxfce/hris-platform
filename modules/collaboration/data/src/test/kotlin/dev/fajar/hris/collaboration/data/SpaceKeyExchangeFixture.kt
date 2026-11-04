@@ -256,6 +256,8 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
         recipients: CollaborationSpaceRecipientRepository = this.recipients,
         identities: IdentityRepository = base.identities,
         clock: Clock = Clock.systemUTC(),
+        toDevice: CollaborationMatrixToDeviceRepository =
+            DisabledCollaborationMatrixToDeviceRepository(),
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             s.repo,
@@ -279,6 +281,7 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             providerKeys,
             base.journal,
             recipients,
+            toDevice,
         )
 
     fun queryRequest() =
@@ -426,6 +429,8 @@ internal class SpaceKeyProvider(val f: SpaceKeyExchangeFixture) :
     val queries = AtomicInteger()
     val claims = AtomicInteger()
     val materials = linkedMapOf(f.ownKeys.userId to f.ownKeys, f.peerKeys.userId to f.peerKeys)
+    val ownReads = AtomicInteger()
+    var onOwn: () -> Unit = {}
     var onQuery: () -> Unit = {}
     var onClaim: () -> Unit = {}
     var queryFailure: Failure? = null
@@ -437,6 +442,21 @@ internal class SpaceKeyProvider(val f: SpaceKeyExchangeFixture) :
         assertEquals("fixture-owned-query-token", token)
         assertTrue(f.leases() in 1..7)
         assertTrue(deadline <= Instant.now().plusSeconds(30))
+    }
+
+    override fun ownDeviceKeys(
+        userId: String,
+        deviceId: String,
+        token: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixDeviceKeys?> {
+        validate(token, deadline)
+        ownReads.incrementAndGet()
+        assertEquals(f.ownKeys.userId, userId)
+        assertEquals(f.ownKeys.deviceId, deviceId)
+        val identity = materials[userId]?.device
+        onOwn()
+        return Result.Success(identity)
     }
 
     override fun deviceKeys(

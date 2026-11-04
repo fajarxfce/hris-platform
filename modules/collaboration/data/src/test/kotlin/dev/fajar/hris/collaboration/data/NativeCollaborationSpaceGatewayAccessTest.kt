@@ -431,6 +431,7 @@ class NativeCollaborationSpaceGatewayAccessTest {
                 StoredCollaborationSpaceRecipientRepository(
                     PostgresCollaborationSpaceRecipientDataSource(base.sql)
                 ),
+                DisabledCollaborationMatrixToDeviceRepository(),
             )
 
         fun access(

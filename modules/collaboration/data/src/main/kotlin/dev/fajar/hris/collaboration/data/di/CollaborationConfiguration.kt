@@ -950,6 +950,7 @@ class CollaborationConfiguration {
         providerKeys: CollaborationMatrixKeyRepository,
         journal: ChangeJournalRepository,
         recipients: CollaborationSpaceRecipientRepository,
+        providerToDevice: CollaborationMatrixToDeviceRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -973,6 +974,7 @@ class CollaborationConfiguration {
             providerKeys,
             journal,
             recipients,
+            providerToDevice,
         )
 
     @Bean

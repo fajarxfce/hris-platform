@@ -74,8 +74,8 @@ These checks do not establish an SDK encrypted-message round trip.
 
 The [receiving projection](space-key-recipients.md) now supplies bounded public-key
 candidates. [Key query/claim endpoints](space-recipient-key-exchange.md) now enforce current
-receiving authority. To-device, room content/sync/push and full Mobile adoption remain
-required.
+receiving authority; [encrypted to-device transport](space-to-device.md) consumes
+confirmed keys. Room content/sync/push and full Mobile adoption remain required.
 Preserve offline receiving and the original SDK store, passphrase, keys, history and
 uncertain sends, including native hard-parent replacement. Group rollout remains
 disabled and all communications acceptance groups remain open.

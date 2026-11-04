@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Native group conversation access — 4 November 2026
+
+Group open/list/detail and original-company inventory now enforce current native,
+group and peer authority through the actual API. Opposite openers share one immutable
+pair; replay and final authority preserve atomic receipt/journal behavior. Original
+metadata retains both cursor coordinates and grants no provider room access.
+[Contract](collaboration/space-conversations.md#native-conversation-api) and
+[evidence](measurements/collaboration-space-conversation-native-2026-11-04.json):
+data5/API97 PASS222.896s and full worker128 PASS348.067s (one existing retention skip),
+8,364 identical inputs and quality gates. No failing gate. Room/recipient/content
+authority and Mobile adoption remain next; all54 groups stay open with no APK/rollout.
+
 ## Organization conversation metadata — 4 November 2026
 
 V129 adds a separate immutable group pair, deduplicated public members and explicit

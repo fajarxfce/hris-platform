@@ -51,6 +51,66 @@ class CollaborationConfiguration {
     ): CollaborationSpaceRepository = StoredCollaborationSpaceRepository(source)
 
     @Bean
+    fun collaborationSpaceConversationSource(
+        sql: DSLContext
+    ): CollaborationSpaceConversationDataSource =
+        PostgresCollaborationSpaceConversationDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceConversationRepository(
+        source: CollaborationSpaceConversationDataSource
+    ): CollaborationSpaceConversationRepository =
+        StoredCollaborationSpaceConversationRepository(source)
+
+    @Bean
+    fun openNativeCollaborationSpaceDirect(
+        conversations: CollaborationSpaceConversationRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        OpenNativeCollaborationSpaceDirect(
+            conversations,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun readNativeCollaborationSpaceDirect(
+        conversations: CollaborationSpaceConversationRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReadNativeCollaborationSpaceDirect(
+            conversations,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
     fun collaborationLegacyDeviceSource(sql: DSLContext): CollaborationLegacyDeviceDataSource =
         PostgresCollaborationLegacyDeviceDataSource(sql)
 

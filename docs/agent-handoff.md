@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Native group conversations accepted — 4 November 2026
+
+Based on4dd2fa96, native group open/list/get and original-company conversation/room
+inventory are wired through two use cases and one controller. Open owns operation,
+pair, ordered-account and native guards; current caller/peer admission and final native
+recheck commit pair/receipt/journal atomically. Lost-response replay returns the same
+receipt only with current authority. Opposite participants converge without selecting
+peer Matrix identity. Reads check current admission on either acquisition outcome;
+owned intent remains readable to an eligible owner when the peer becomes unavailable.
+Legacy cursors require both original company and conversation IDs. Read [the contract](collaboration/space-conversations.md#native-conversation-api).
+
+[Evidence](measurements/collaboration-space-conversation-native-2026-11-04.json):
+data5/API97 PASS222.896s, full worker128 PASS348.067s (127 active/one existing retention skip),
+8,364 identical inputs and quality checks. Actual PostgreSQL and HTTP cover opposite
+company openers, same receipts, scope/transport/client denial, current peer revocation,
+native expiry during member/page acquisition, journal/rollback/cancellation and finite
+original metadata pages. Group API class now16 cases; all prior13 and the legacy/
+default-disabled/OpenAPI gates pass. No failing gate or schema change. Test sessions
+are closed; recorder/finalizer and all previously applied group-rooms drafts are stale.
+
+NEXT explicit group Matrix room adoption/provisioning and canonical participant/room
+authority before recipient query/claim/to-device/content/sync/push. Original inventory
+is not adoption. Generic background_jobs still requires company_id; never alias space
+into company scope. Existing Matrix room request/marker/identity derivation is company-
+specific, so group requests need explicit canonical users and a distinct alias/marker.
+Use bounded outside-SQL work and exact current admission, stable alias recovery after
+lost responses and verified encryption/membership. Original rooms may be adopted only
+when both canonical users match; other identities/history remain explicit. See ignored
+group-rooms/next.md and tracked cross-company/key/room contracts.
+Four new provider/*.kt.txt drafts are UNAPPLIED and untested; they separate group
+Matrix room request/marker/observation and explicit canonical users from company types.
+
+Then full Mobile group preflight/stage/freeze/completion/atomic adoption preserving SDK
+namespace/passphrase, keys, history and uncertain sends. Offline receiving must not
+need short native/provider tokens; native hard-parent replacement remains required.
+Group disabled/no product caller or rollout; all54 groups and actual Apple Matrix/
+APNs/CallKit stay open. Main d4df8767/Mobilebbba53ea/hosted0b804cb2, phone28,
+live8b40/schema116 push ON/SMTP OFF and Starter9959c1d unchanged. Continue long run,
+updates, immediate atomic pushes and validated product feature installs only.
+
 ## Group conversation storage accepted — 4 November 2026
 
 Based on a65a8170, V129 retains a separate immutable space/account pair, deduplicated

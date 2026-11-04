@@ -71,11 +71,52 @@ Recovery schema 129 retains the V126 encrypted-envelope projection unchanged and
 rejects unknown schema 130. Archive restoration must preserve group pairs, original
 bound rooms, restricted view ownership, RLS and immutable triggers together.
 
-Native open/read/list commands, explicit room adoption/provisioning, recipient key
-query/claim/to-device access and content/push routing remain required integration.
+Native open/read/list commands are now wired for API/worker validation as described
+below. Explicit room adoption/provisioning, recipient key query/claim/to-device access
+and content/push routing remain required integration.
 An offline recipient must not require an unexpired short native/provider token to
 retain its public-key availability. Group remains disabled with no Mobile product
 caller or live rollout from this storage increment.
+
+## Native conversation API
+
+All routes use `/api/v1/collaboration/spaces/{spaceId}` with a native bearer and
+current Android/iOS client headers. Group availability remains disabled by default.
+No selected HR company is required or accepted as authority for a group conversation.
+
+| Method | Suffix | Result |
+| --- | --- | --- |
+| POST | `/direct-conversations` | Immutable pair receipt (`id`, `version: 0`) |
+| GET | `/direct-conversations` | Owned group intents, `after` UUID and `limit` 1–50 |
+| GET | `/direct-conversations/{conversationId}` | One owned group intent |
+| GET | `/legacy-conversations` | Original owned metadata, composite continuation and `limit` 1–50 |
+| GET | `/legacy-conversations/{legacyCompanyId}/{conversationId}` | One original conversation and optional bound room |
+
+Open takes `peerAccountId` and an `Idempotency-Key`. Persist the operation, space and
+peer together. The same operation with a different payload conflicts; a lost response
+replays the original receipt after current native/group/peer admission. Opposite
+participants converge on one unsigned-sorted pair. Opening an already existing pair
+records its caller's receipt without another creation audit/outbox event. A peer
+without a canonical Matrix selection can retain intent; no identity is created on
+that peer's behalf and no message delivery is implied.
+
+The open use case owns operation/pair/account/native guards and commits pair, receipt
+and journal atomically. Final admission checks both current participants and then
+native authority again, including expiry during member acquisition. Read methods
+recheck current admission on either repository outcome before returning. A currently
+eligible owner can still read an existing intent whose peer has become unavailable;
+opening or replaying that pair requires the peer's current eligibility.
+
+Legacy continuation returns `next: {companyId, conversationId}` only when another
+page exists. Supply both as `afterCompanyId` and `afterConversationId`; supplying only
+one is invalid. This endpoint reads original metadata without adopting the room or
+creating a corresponding group intent. Reads return no private native/provider data.
+[Native integration evidence](../measurements/collaboration-space-conversation-native-2026-11-04.json)
+records data5/API97 PASS222.896s and full worker128 PASS348.067s, with one existing retention
+skip, 8,364 identical inputs and quality gates. Both application contexts pass.
+Opposite company employees, native/client/scope denial, current peer revocation, atomic
+rollback/cancellation and composite inventory cursors pass through actual PostgreSQL
+and HTTP. No provider room or Mobile product acceptance follows from these checks.
 
 
 [Accepted evidence](../measurements/collaboration-space-conversation-storage-2026-11-04.json)

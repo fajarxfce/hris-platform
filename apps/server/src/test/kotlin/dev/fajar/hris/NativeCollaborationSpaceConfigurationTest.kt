@@ -907,6 +907,229 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             )
         }
 
+    @Test
+    fun oppositeCompanyEmployeesOpenOneOwnedGroupConversationWithoutSelectingPeerKeys() {
+        val a = groupNative()
+        val b = groupNative()
+        val unrelated = groupNative()
+        val base = groupBase(a)
+        val path = "$base/direct-conversations"
+        val operation = UUID.randomUUID()
+        val pool = java.util.concurrent.Executors.newFixedThreadPool(2)
+        val ready = java.util.concurrent.CountDownLatch(2)
+        val start = java.util.concurrent.CountDownLatch(1)
+        val outcomes =
+            try {
+                val requests =
+                    listOf(a to b, b to a).map { (caller, peer) ->
+                        pool.submit<java.net.http.HttpResponse<String>> {
+                            ready.countDown()
+                            assertTrue(start.await(10, java.util.concurrent.TimeUnit.SECONDS))
+                            groupCall(
+                                caller,
+                                path,
+                                mapOf("peerAccountId" to peer.fixture.account.toString()),
+                                operation = operation,
+                            )
+                        }
+                    }
+                assertTrue(ready.await(10, java.util.concurrent.TimeUnit.SECONDS))
+                start.countDown()
+                requests.map { it.get(20, java.util.concurrent.TimeUnit.SECONDS) }
+            } finally {
+                pool.shutdownNow()
+                assertTrue(pool.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS))
+            }
+        outcomes.forEach { assertEquals(200, it.statusCode(), it.body()) }
+        assertEquals(json.readTree(outcomes[0].body()), json.readTree(outcomes[1].body()))
+        val receipt = json.readTree(outcomes[0].body())
+        assertEquals(0L, receipt["version"].asLong())
+        val id = receipt["id"].asString()
+        val replay =
+            groupCall(
+                a,
+                path,
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+                operation = operation,
+            )
+        assertEquals(200, replay.statusCode(), replay.body())
+        assertEquals(receipt, json.readTree(replay.body()))
+        val detail = groupCall(a, "$path/$id")
+        assertEquals(200, detail.statusCode(), detail.body())
+        assertEquals("no-store", detail.headers().firstValue("Cache-Control").orElse(""))
+        val value = json.readTree(detail.body())
+        assertEquals(
+            setOf(
+                "id",
+                "spaceId",
+                "firstAccountId",
+                "secondAccountId",
+                "createdBy",
+                "createdAt",
+                "version",
+            ),
+            value.propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(a.fixture.account.toString(), b.fixture.account.toString()),
+            setOf(value["firstAccountId"].asString(), value["secondAccountId"].asString()),
+        )
+        assertEquals(value, json.readTree(groupCall(b, "$path/$id").body()))
+        val page = json.readTree(groupCall(a, "$path?limit=1").body())
+        assertEquals(value, page["items"][0])
+        assertTrue(page["nextCursor"].isNull)
+        val end = json.readTree(groupCall(a, "$path?after=$id&limit=1").body())
+        assertTrue(end["items"].isEmpty)
+        assertTrue(end["nextCursor"].isNull)
+        failure(groupCall(unrelated, "$path/$id"), 404, "collaboration_conversation_not_found")
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_identities where account_id in (?,?)",
+                    Int::class.java,
+                    a.fixture.account,
+                    b.fixture.account,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_direct_conversations where id=?",
+                    Int::class.java,
+                    UUID.fromString(id),
+                ),
+        )
+    }
+
+    @Test
+    fun groupOpenRechecksPeerAndClientWhileOwnedReadRetainsUnavailableConversation() {
+        val a = groupNative()
+        val b = groupNative()
+        val path = "${groupBase(a)}/direct-conversations"
+        val input = mapOf("peerAccountId" to b.fixture.account.toString())
+        failure(
+            groupCall(a, path, mapOf("peerAccountId" to a.fixture.account.toString())),
+            422,
+            "invalid_collaboration_peer",
+        )
+        failure(groupCall(a, path, input, build = "27"), 403, "client_update_required")
+        assertEquals(400, groupCall(a, path, input, operation = null).statusCode())
+        failure(groupCall(a, "$path?limit=51"), 422, "invalid_collaboration_conversation_query")
+        assertEquals(400, groupCall(a, "$path?after=invalid").statusCode())
+        val operation = UUID.randomUUID()
+        val opened = groupCall(a, path, input, operation = operation)
+        assertEquals(200, opened.statusCode(), opened.body())
+        val id = json.readTree(opened.body())["id"].asString()
+        failure(
+            groupCall(
+                a,
+                path,
+                mapOf("peerAccountId" to UUID.randomUUID().toString()),
+                operation = operation,
+            ),
+            409,
+            "operation_payload_mismatch",
+        )
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        failure(
+            groupCall(a, path, input, operation = operation),
+            403,
+            "collaboration_peer_unavailable",
+        )
+        assertEquals(200, groupCall(a, "$path/$id").statusCode())
+        failure(groupCall(b, "$path/$id"), 403, "collaboration_access_denied")
+        assertEquals(403, groupCall(a, path, input, token = null).statusCode())
+        assertEquals(401, groupCall(a, path, token = null, cookies = false).statusCode())
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_direct_conversations where id=?",
+                    Int::class.java,
+                    UUID.fromString(id),
+                ),
+        )
+    }
+
+    @Test
+    fun originalConversationInventoryRequiresBothCursorCoordinatesAndCurrentNativeOwnership() {
+        val a = groupNative()
+        val b = groupNative()
+        val unrelated = groupNative()
+        val base = groupBase(a)
+        val path = "$base/legacy-conversations"
+        val pair = listOf(a.fixture.account, b.fixture.account).sortedBy(UUID::toString)
+        val companies = listOf(a.fixture.company, b.fixture.company).sortedBy(UUID::toString)
+        val originalId = UUID.randomUUID()
+        for (company in companies) database()
+            .update(
+                "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?::timestamptz)",
+                company,
+                originalId,
+                pair[0],
+                pair[1],
+                a.fixture.account,
+                clock.instant().minusSeconds(1).toString(),
+            )
+        val response = groupCall(a, "$path?limit=1")
+        assertEquals(200, response.statusCode(), response.body())
+        val first = json.readTree(response.body())
+        assertEquals(
+            companies[0].toString(),
+            first["items"][0]["conversation"]["companyId"].asString(),
+        )
+        assertTrue(first["items"][0]["room"].isNull)
+        assertEquals(companies[0].toString(), first["next"]["companyId"].asString())
+        assertEquals(originalId.toString(), first["next"]["conversationId"].asString())
+        val last =
+            json.readTree(
+                groupCall(
+                        a,
+                        "$path?afterCompanyId=${companies[0]}&afterConversationId=$originalId&limit=1",
+                    )
+                    .body()
+            )
+        assertEquals(
+            companies[1].toString(),
+            last["items"][0]["conversation"]["companyId"].asString(),
+        )
+        assertTrue(last["next"].isNull)
+        val detail = groupCall(a, "$path/${companies[1]}/$originalId")
+        assertEquals(200, detail.statusCode(), detail.body())
+        assertEquals(last["items"][0], json.readTree(detail.body()))
+        failure(
+            groupCall(unrelated, "$path/${companies[1]}/$originalId"),
+            404,
+            "collaboration_conversation_not_found",
+        )
+        failure(
+            groupCall(a, "$path?afterCompanyId=${companies[0]}"),
+            422,
+            "invalid_collaboration_conversation_query",
+        )
+        failure(
+            groupCall(a, "$path?afterConversationId=$originalId"),
+            422,
+            "invalid_collaboration_conversation_query",
+        )
+        failure(groupCall(a, "$path?limit=0"), 422, "invalid_collaboration_conversation_query")
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_direct_conversations where created_by=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+    }
+
     private fun groupNative(grant: Boolean = true): Native {
         clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
         val admin = fixture()

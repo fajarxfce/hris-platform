@@ -33,6 +33,11 @@ class ApiContractHttpTest : PeopleApiFixture() {
             listOf(
                 "$root/current" to "get",
                 "$base/contacts" to "get",
+                "$base/direct-conversations" to "get",
+                "$base/direct-conversations" to "post",
+                "$base/direct-conversations/{conversationId}" to "get",
+                "$base/legacy-conversations" to "get",
+                "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
                 "$base/native-device" to "get",
                 "$base/native-device" to "post",

@@ -34,6 +34,11 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
             listOf(
                 "$root/current" to null,
                 "$base/contacts" to null,
+                "$base/direct-conversations" to null,
+                "$base/direct-conversations/${UUID.randomUUID()}" to null,
+                "$base/direct-conversations" to "{\"peerAccountId\":\"${UUID.randomUUID()}\"}",
+                "$base/legacy-conversations" to null,
+                "$base/legacy-conversations/${UUID.randomUUID()}/${UUID.randomUUID()}" to null,
                 "$base/native-device" to null,
                 "$base/identity" to "{}",
                 "$base/native-device" to

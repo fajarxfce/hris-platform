@@ -89,6 +89,13 @@ or recipient grant follows from discovery; native commands and room adoption mus
 separately admit current authority. Original company rows and crypto namespaces stay
 explicit through migration and archive recovery.
 
+Native group conversation open/read/list and original-inventory routes now own current
+native/group admission in their use cases. Pair creation and opposite-participant
+replay converge under operation/pair/account/native guards with atomic receipt/journal
+publication and final peer/session checks. Reads recheck current authority on either
+acquisition outcome; retained intent does not grant provider room content. Shared DI
+adds the conversation datasource/repository and two use cases. Actual API and full-worker validation pass; group product adoption remains disabled.
+
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 
 Workforce owns schedules and factual attendance; leave owns absence decisions. Reporting and payroll combine those facts. Identity uses stable company/person identifiers without depending on their implementation. These directions prevent cycles. Payroll owns scoped read projections for immutable workforce evidence. Its datasources read raw records; repositories map them into payroll domain references. The originating module retains write ownership. This permits payroll to consume factual snapshots without importing another module’s data implementation or moving permission/period policy into a datasource.

@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Native group conversations accepted — 4 November 2026
+
+Group branch [b478f776](https://github.com/fajarxfce/hris-platform/commit/b478f776) adds
+native open/list/detail and original-company conversation/room inventory. Current
+session/group/peer checks and operation/pair/account/native guards preserve one pair,
+atomic receipts/journal and original metadata. [Evidence](https://github.com/fajarxfce/hris-platform/blob/b478f776/docs/measurements/collaboration-space-conversation-native-2026-11-04.json):
+data5/API97 PASS222.896s and full worker128 PASS348.067s (127 active/one existing
+retention skip), 8,364 identical inputs and quality gates. Opposite company employees,
+replay, current revocation/expiry, rollback/cancellation, composite cursors, native
+transport and both application contexts pass. No failing gate or schema change.
+
+NEXT explicit group Matrix room provisioning/adoption and canonical participant
+verification, then recipient keys/content/sync/push and Mobile adoption. Generic
+background_jobs and existing Matrix room request/marker remain company-scoped; never
+alias a space into company_id. Four ignored group-rooms/provider drafts are unapplied
+and untested. Other applied integration drafts/recorders are stale. Preserve original
+SDK namespace/keys/history/uncertain sends; offline keys cannot depend on short native/
+provider tokens. Hard-parent replacement remains required recovery. Group disabled,
+all54 groups open. Mobilebbba53ea/hosted0b804cb2, phone28/live8b40/schema116 push ON/
+SMTP OFF and Starter9959c1d unchanged. Continue long run, updates, atomic pushes and
+validated product feature installs only.
+
 ## Group conversation metadata accepted — 4 November 2026
 
 Group branch is pushed through [4dd2fa96](https://github.com/fajarxfce/hris-platform/commit/4dd2fa96).

@@ -62,7 +62,9 @@
         "../measurements/chat-read-receipt-replay-native-2026-11-02.json",
         "https://github.com/fajarxfce/hris-mobile/blob/ae4a1b270d50b7edd7761903a316e033dec70972/docs/measurements/chat-read-receipt-replay-2026-11-02.json",
         "../measurements/chat-read-receipt-rollout-2026-11-02.json",
-        "../measurements/product-chat-fcm-session-admission-2026-11-03.json"
+        "../measurements/product-chat-fcm-session-admission-2026-11-03.json",
+        "space-sdk-history.md",
+        "../measurements/collaboration-space-sdk-history-2026-11-04.json"
       ]
     },
     {
@@ -381,7 +383,9 @@
         "space-push-admission.md",
         "../measurements/collaboration-space-push-admission-2026-11-04.json",
         "space-push-delivery.md",
-        "../measurements/collaboration-space-push-delivery-2026-11-04.json"
+        "../measurements/collaboration-space-push-delivery-2026-11-04.json",
+        "space-sdk-history.md",
+        "../measurements/collaboration-space-sdk-history-2026-11-04.json"
       ]
     },
     {
@@ -779,9 +783,10 @@
   },
   "next": [
     "Normal Mobile release28 remains installed and pull-back verified on 10.77.77.3:5555 from product8273ae8d. Signer/app ID/first install and user data are preserved; no phone UI driven. Validated product features only for the next install, with notice immediately before install-only; never install proof APKs or reinstall unchanged28. Current Mobile continuation: https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md.",
-    "Platform live8b40bd0f/schema116 has chat push ON and SMTP OFF, with retained TLS/CA/provider callback allowlists and an isolated verified recovery set. Preserve Google/native/document state, original Matrix identities/keys and distinct HRIS/Matrix databases. Group worktree schema135 recipient metadata and admitted room worker passed local database/provider/API/FULLworker/recovery checks and group remains disabled; it is not deployed. See current docs/agent-handoff.md for the exact accepted local and live boundaries.",
+    "Platform live8b40bd0f/schema116 has chat push ON and SMTP OFF, with retained TLS/CA/provider callback allowlists and an isolated verified recovery set. Preserve Google/native/document state, original Matrix identities/keys and distinct HRIS/Matrix databases. Group worktree schema137 group history, managed pusher, callback and bounded delivery worker passed local database/provider/API/FULLworker/recovery checks and group remains disabled; it is not deployed. See current docs/agent-handoff.md for the exact accepted local and live boundaries.",
     "Actual isolated product FCM run16 passes with Mobilec770a83f immutable product6/peer6: ordinary process death, Firebase-caused restart, real SystemUI notification/inline reply and encrypted peer receipt. One fresh JUnit pass, all owned cleanup and five inspected PNGs. Session-authentication chronology fix verified with325 passed/one optional skipped backend cases and a fresh worker JAR. See product-fcm-acceptance.md and ../measurements/product-chat-fcm-current-ui-2026-11-03.json. Current native history also passes both previously failing process-death cases with 176 saved originals and exhausted paging.",
     "Mobile product0b804cb2 passed hosted control41775492328, native41775492365 and protocol41775492415; accepted source/evidence hashes are in Mobile collaboration-runtime-handover-hosted-2026-11-04.json. Original SDK namespace/keys and staged handover survive the exercised Android process-death cases. Apple build/host checks do not establish actual Apple Matrix SDK/APNs/CallKit behavior. Group adoption still has no product caller.",
+    "Actual original queued SDK history now passes both known/unknown-peer group gateway scenarios with two process deaths, exact queued-frame replay and one local event before sync. See space-sdk-history.md. This fixture does not adopt the product runtime. Next integrate typed group foreground/background/push/reply ownership over retained physical SDK stores, native hard-parent recovery and actual FCM one-visible-notification handover. Strict shields remain Red; do not equate decryption with verified sender trust.",
     "Complete actual recipient durable-delivery/read ACKs, pending-outbox previews/unread/recent ordering, group cross-company identity/admission/migration, native/web encrypted adapters, cross-family key continuity, group conversations, media/stickers/voice notes, edit/forward/delete and opt-in encrypted Drive/iCloud backups. Four fictional SAMPLE accounts now fix same-company demo directory eligibility; no cross-company or Firebase-login acceptance follows from that seed.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle, then LiveKit meetings and remaining P2\u2013P8. Voice/video/meeting UI is still absent. Physical iPhone testing is waived; provider and capacity acceptance remain separate.",
     "Continue all54 feature groups; none closes from this bounded Android scenario. Keep the user updated, push every atomic commit and retain exact test/source evidence plus current continuation in Git."

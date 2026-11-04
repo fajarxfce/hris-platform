@@ -1,5 +1,10 @@
 # Architecture
 
+[Original queued SDK history](collaboration/space-sdk-history.md) now survives the
+native group gateway transition, response loss and real Android process deaths with
+original keys and local history. The fixture establishes decryption continuity;
+product runtime adoption and push/reply ownership remain required.
+
 [Organization push callback and worker](collaboration/space-push-delivery.md) integrate typed mixed callbacks, bounded group delivery and exact token/queue outcome fencing. Shared API and FULL worker graphs are validated; Mobile owner adoption and actual group FCM acceptance remain required.
 
 [Organization callback admission](collaboration/space-push-admission.md) validates current background ownership and exact retained completion separately from interactive assurance. Opaque append and final eligibility checks are transactional; HTTP/worker/Mobile integration remains required.

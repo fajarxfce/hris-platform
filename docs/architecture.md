@@ -1,5 +1,7 @@
 # Architecture
 
+V137 [organization push wake storage](collaboration/space-push-queue.md) retains separate coalesced heads, bounded group leases and exact transactional readback. Root/worker isolation and isolated archive recovery are verified; current callback/delivery admission and Mobile routing remain separate integration.
+
 [Native organization managed pusher](collaboration/space-pusher-access.md) connects stable group capability reservation and exact publication to current native registration and gateway authority. Strict HTTP dispatch and shared API/worker DI are validated. Group callback delivery and Mobile background ownership remain required.
 
 The [organization Matrix pusher protocol](collaboration/space-pusher-protocol.md) keeps separate company/group capabilities in one fixed event-only application profile and redacts both namespaces in deployable logs. Native group admission and callback delivery remain separate integration.

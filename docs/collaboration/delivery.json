@@ -267,7 +267,9 @@
         "space-pusher-protocol.md",
         "../measurements/collaboration-space-pusher-protocol-2026-11-04.json",
         "space-pusher-access.md",
-        "../measurements/collaboration-space-pusher-access-2026-11-04.json"
+        "../measurements/collaboration-space-pusher-access-2026-11-04.json",
+        "space-push-queue.md",
+        "../measurements/collaboration-space-push-queue-2026-11-04.json"
       ]
     },
     {
@@ -369,7 +371,9 @@
         "space-pusher-protocol.md",
         "../measurements/collaboration-space-pusher-protocol-2026-11-04.json",
         "space-pusher-access.md",
-        "../measurements/collaboration-space-pusher-access-2026-11-04.json"
+        "../measurements/collaboration-space-pusher-access-2026-11-04.json",
+        "space-push-queue.md",
+        "../measurements/collaboration-space-push-queue-2026-11-04.json"
       ]
     },
     {

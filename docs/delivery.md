@@ -1,5 +1,33 @@
 # Delivery and validation
 
+## Organization push wake storage accepted — 4 November 2026
+
+V137 stores separate group wake heads with exact account/device/native provenance,
+root/worker isolation, bounded deduplication, finite attempts and global group capacity8.
+Captured-revision acknowledgments preserve newer callbacks; expired/replaced leases
+cannot consume successors. Strict mapping and transactional readback reject foreign,
+malformed or missing rows. TTL uses elapsed seconds, including DST session boundaries.
+[Protocol](collaboration/space-push-queue.md), [evidence](measurements/collaboration-space-push-queue-2026-11-04.json).
+
+All 139 domain cases pass initially (58.469 s); data test compilation
+then finds ambiguous JUnit imports. Those test imports are corrected. Review also
+changes the new SQL TTL constraint to exact elapsed seconds and adds a DST case.
+All 28 data cases pass (136.263 s): 15 new PostgreSQL queue cases,
+11 original company queue regressions and two native/retained pusher cases. Recovery:
+21 pass (0.068 s). Format/architecture checks pass on
+8,495 unchanged final inputs. Actual isolated PostgreSQL archive/restore preserves
+pending work, lease and encrypted capability. All sessions closed. No shared DI changes.
+
+NEXT: current group callback/background admission, mixed company/group callback dispatch,
+worker delivery with token-rotation fencing, and Mobile background/reply ownership.
+Queue metadata is not authority or a delivered/read chat receipt. Prove one visible
+notification across ownership handover using actual FCM. Actual SDK original queued-key
+decryption, group store transition and native hard-parent recovery remain required.
+
+Base `7b81b8e8` pushed. All 54 PRD groups open; rollout disabled. Live8b40/schema116
+(push on, SMTP off), normal phone28, Mobile product/hosted0b804cb2 and Starter9959c1d unchanged.
+Continue long run, updates, atomic pushes and validated product installs.
+
 ## Native organization managed pusher accepted — 4 November 2026
 
 The empty-body managed pusher route now accepts current group gateway ownership.

@@ -24,7 +24,10 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.testcontainers.postgresql.PostgreSQLContainer
 
 /** Two pre-queue native devices upgraded to V135; requests use an ordinary runtime role. */
-internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
+internal class SpaceKeyExchangeFixture(
+    postgres: PostgreSQLContainer,
+    beforeQueue: (SpaceGatewayPostgresFixture) -> Unit = {},
+) {
     val s = SpaceGatewayPostgresFixture(postgres, ageSeconds = 120)
     val peer = UUID.randomUUID()
     val peerCompany = UUID.randomUUID()
@@ -113,6 +116,7 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
                 "update collaboration_space_devices set state='ACTIVE',version=1 where id=?",
                 peerDevice,
             )
+            beforeQueue(s)
         }
         Flyway.configure().dataSource(s.source).target("135").load().migrate()
         s.owner.execute(

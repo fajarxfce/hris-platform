@@ -1,5 +1,73 @@
 # Agent continuation — HRIS workspace
 
+## All legacy runtime consumers fenced — 4 November 2026
+
+Based on 0bf751e5, BootstrapNativeCollaborationGateway and RefreshNativeCollaborationGateway
+now retain exact original runtime ownership/phase guards through issuance and replay.
+They perform no provider I/O and consume no request slot. Provisioning/direct-room
+workers now claim a bounded runtime slot before I/O, revalidate authority and exact
+runtime/lease before/after results and at publication, then release exact ownership
+in finally without masking original cancellation or clearing interruption. All four
+shared beans and actual database factories are wired. Together with 0bf751e5, all
+fixed legacy Matrix consumers are fenced. No public group transfer is enabled.
+
+[Evidence](measurements/collaboration-legacy-runtime-consumers-2026-11-04.json): focused 19
+PASS 97.312s; full native 166 PASS 258.738s; API 47 PASS 156.066s; full worker 127 cases
+(126 active/one existing opt-in retention skip) PASS 362.195s; actual Android SDK 5
+PASS 1035.238s. All five gates have identical 8264-input source snapshots and
+pass format/architecture. Worker includes six actual legacy provisioning/direct-room
+cases and scheduled group Synapse activation. Android includes SDK receipt recovery,
+automatic WorkManager after process death/network restore, and three 176-original-
+message recovery states with fresh same-identity ciphertext verification. Owned
+emulator 2478004/transport is stopped; all checks/sessions and owned resources are closed.
+
+Six new data methods cover frozen issuance replay, refresh at full provider capacity,
+provisioning cancellation/interruption/real expiry and direct-room late freeze/cleanup
+failure. Exact original/winning identities remain; no Matrix logout of losing tokens.
+Consumer 1 stopped after 17.858s on an unnecessary Kotlin cast. Consumer 2 passed 18/19 in 77.188s;
+an old initial-bootstrap rollback fixture inserted runtime metadata eleven fake
+seconds ahead of DB time. Initial bootstrap now uses real time; refresh waits its
+real 11s cooldown, retaining deliberate post-write expiry and proving runtime/slot
+rollback. One negative unfinished-provisioning retry commits no future rows before
+its positive continuation restores real time. Production deadlines were not relaxed.
+The wildcard selection included one additional existing issuance case, hence 19.
+
+Next implement current native Begin/freeze/replay and bounded drain status, then
+admitted atomic group credential publication/old device-provider-public-gateway
+retirement and explicit completed-mapping replay continuity. Existing V123 allows
+root metadata initialization from account-owned original bindings; prove that with
+actual runtime-role tests without inventing company-resource grants. Existing
+retained registration requires original ACTIVE/unretired source even on replay;
+the later completed mapping must explicitly preserve valid replay after retirement.
+Group status requires ACTIVE plus SUCCEEDED queue. The existing group worker still
+rejects retained origins. No completed-transfer state or runtime grant exists yet.
+Ignored runtime-freeze-next contains formatted but uncompiled freeze command,
+policy/action drafts and three pure tests. Actual database cases remain to be written. Its cap 999998 preserves activation 999999 then terminal
+revocation 1000000, already reserved/tested in V121. An isolated-V120 review initially
+missed that later migration; the corrected review explicitly requires no schema fix.
+
+Follow docs/collaboration/legacy-runtime-transfer.md and ignored runtime-consumer-next/
+transfer-publication-review.md and begin-freeze-review.md. Candidate six-file drafts
+and apply-reviewed.py are now stale: current tracked code supersedes them. Never
+recopy those files or the old Access draft. Run history remains supplementary there.
+Do not acquire old job/room guards after account/native. Completion needs a narrow
+reviewed atomic RLS capability, not nested transaction owners or broad company writes.
+
+Mobile must persist a recoverable exact old SDK namespace/passphrase alias and gate
+all future foreground/background acquisitions, then stop/join queues/sync/client/file
+ownership before adoption. closeOtherOwners drains current reservations only.
+Validate the retained Matrix user/device/fingerprint using the actual SDK. Reserved
+key references need actual provider readback before publication; fingerprint alone
+is not private-key attestation. Preserve uncertain Matrix transaction IDs, other
+legacy identities/history and coherent inbox/outbox/read/push/deep-link ownership.
+
+Main 2a830eb0 and Mobile 377d37b4 need this new accepted group commit recorded. Mobile
+source 3d85d569 and all hosted protocol/control/native gates remain accepted; no new
+product APK is made here. Live 8b40/schema116 pushON/SMTP OFF, installed normal phone 28
+and Starter 9959c1d are unchanged. Actual Apple Matrix/APNs/CallKit and all 54
+communications groups remain open. Continue the full authorized long run, frequent
+user/Git updates and immediate push of each atomic commit.
+
 ## Legacy Matrix gateway runtime fence accepted — 4 November 2026
 
 This increment (based on8787a0fa) gives AccessNativeCollaborationMatrixDevice one

@@ -34,6 +34,7 @@ class AdvanceNativeCollaborationDirectRoom(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val runtimes: CollaborationLegacyRuntimeRepository,
 ) {
     fun execute(lease: JobLease): Result<JobStep> {
         if (!service.enabled || !provider.enabled)
@@ -51,9 +52,41 @@ class AdvanceNativeCollaborationDirectRoom(
                 job.correlationId,
                 credentialVersion = job.credentialVersion,
             )
-        val acquired = transactions.run(scope) { observe(scope, lease, input) }
+        val acquired =
+            transactions.run(scope) {
+                observe(scope, lease, input).flatMap { observed ->
+                    claimRuntime(observed.admission).map { Preparation(observed, it) }
+                }
+            }
         if (acquired is Result.Failed) return acquired
         val prepared = (acquired as Result.Success).value
+        var originalFailure: Throwable? = null
+        try {
+            return advancePrepared(scope, lease, input, prepared.observation, prepared.lease)
+        } catch (failure: Throwable) {
+            originalFailure = failure
+            throw failure
+        } finally {
+            if (!Thread.currentThread().isInterrupted) {
+                try {
+                    transactions.run(scope) { runtimes.release(prepared.lease) }
+                } catch (cleanup: Throwable) {
+                    val original = originalFailure
+                    if (original == null) throw cleanup
+                    if (original !== cleanup) original.addSuppressed(cleanup)
+                }
+            }
+        }
+    }
+
+    private fun advancePrepared(
+        scope: Actor,
+        lease: JobLease,
+        input: NativeCollaborationDirectRoomRequest,
+        prepared: Observation,
+        runtimeLease: CollaborationLegacyRuntimeLease,
+    ): Result<JobStep> {
+        val job = lease.job.request
         fun current(): Result<Observation> =
             transactions.run(scope) {
                 observe(scope, lease, input).flatMap { observation ->
@@ -68,7 +101,8 @@ class AdvanceNativeCollaborationDirectRoom(
                             observation.admission,
                             clock.instant(),
                         )
-                    if (valid is Result.Failed) changed() else Result.Success(observation)
+                    if (valid is Result.Failed) changed()
+                    else checkRuntime(observation.admission, runtimeLease).map { observation }
                 }
             }
         // Each exchange repeats current authority before and after I/O, including
@@ -102,7 +136,7 @@ class AdvanceNativeCollaborationDirectRoom(
                             job.actorId,
                             input.deviceId,
                             prepared.admission.admittedAt,
-                            prepared.admission.expiresAt,
+                            minOf(prepared.admission.expiresAt, runtimeLease.expiresAt),
                         )
                     )
                 }
@@ -118,7 +152,8 @@ class AdvanceNativeCollaborationDirectRoom(
             return Result.Failed(
                 Failure(FailureKind.UNAVAILABLE, "collaboration_provider_invalid_response")
             )
-        val deadline = minOf(prepared.admission.expiresAt, credential.expiresAt)
+        val deadline =
+            minOf(prepared.admission.expiresAt, credential.expiresAt, runtimeLease.expiresAt)
         fun <T> call(action: (Instant) -> Result<T>): Result<T> = exchange {
             if (clock.instant() >= deadline) changed()
             else {
@@ -190,6 +225,8 @@ class AdvanceNativeCollaborationDirectRoom(
                         clock.instant(),
                     )
                 if (valid is Result.Failed || clock.instant() >= deadline) return@flatMap changed()
+                val runtime = checkRuntime(latest.admission, runtimeLease)
+                if (runtime is Result.Failed) return@flatMap runtime
                 val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
                 rooms
                     .publish(
@@ -243,6 +280,60 @@ class AdvanceNativeCollaborationDirectRoom(
             }
         }
     }
+
+    private fun claimRuntime(
+        admission: CollaborationAdmission
+    ): Result<CollaborationLegacyRuntimeLease> {
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+        return runtimes.ensure(owner, at).flatMap { runtime ->
+            admitCollaborationLegacyRuntime(runtime, admission, clock.instant()).flatMap {
+                val until =
+                    minOf(admission.expiresAt, at.plusSeconds(60)).truncatedTo(ChronoUnit.MICROS)
+                runtimes.claim(owner, until).flatMap { lease ->
+                    if (lease == null)
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_busy")
+                        )
+                    else
+                        validateCollaborationLegacyRuntimeLease(
+                                runtime,
+                                lease,
+                                lease,
+                                admission,
+                                clock.instant(),
+                            )
+                            .map { lease }
+                }
+            }
+        }
+    }
+
+    private fun checkRuntime(
+        admission: CollaborationAdmission,
+        lease: CollaborationLegacyRuntimeLease,
+    ): Result<Unit> {
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        return runtimes.find(owner, lock = true).flatMap { runtime ->
+            if (runtime == null)
+                Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_changed"))
+            else
+                runtimes.lease(owner, lease.slot, lock = true).flatMap { current ->
+                    validateCollaborationLegacyRuntimeLease(
+                        runtime,
+                        lease,
+                        current,
+                        admission,
+                        clock.instant(),
+                    )
+                }
+        }
+    }
+
+    private class Preparation(
+        val observation: Observation,
+        val lease: CollaborationLegacyRuntimeLease,
+    )
 
     private fun observe(
         scope: Actor,

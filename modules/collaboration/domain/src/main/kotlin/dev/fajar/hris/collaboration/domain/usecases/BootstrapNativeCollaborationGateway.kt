@@ -30,6 +30,7 @@ class BootstrapNativeCollaborationGateway(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val runtimes: CollaborationLegacyRuntimeRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -137,6 +138,16 @@ class BootstrapNativeCollaborationGateway(
                     )
                 if (valid is Result.Failed) return@run valid
             }
+            val captured = captureRuntime((admitted as Result.Success).value)
+            if (captured is Result.Failed) return@run captured
+            val runtime = (captured as Result.Success).value
+            // The exact runtime row stays guarded through replay or credential publication.
+            fun currentAdmission(): Result<CollaborationAdmission> =
+                admission().flatMap { current ->
+                    admitCollaborationLegacyRuntime(runtime, current, clock.instant()).map {
+                        current
+                    }
+                }
             val receipt = (replay as Result.Success).value
             if (receipt != null) {
                 if (old == null || receipt.id != old.id || receipt.version != old.version)
@@ -144,7 +155,7 @@ class BootstrapNativeCollaborationGateway(
                 val recovered = gateway.replayBootstrap(old, operationId)
                 if (recovered is Result.Failed) return@run recovered
                 val tokens = (recovered as Result.Success).value ?: return@run changed()
-                return@run admission().flatMap {
+                return@run currentAdmission().flatMap {
                     validateCollaborationGatewayResponse(
                             old,
                             tokens,
@@ -198,7 +209,7 @@ class BootstrapNativeCollaborationGateway(
                             ),
                         )
                     }
-                    .flatMap { admission() }
+                    .flatMap { currentAdmission() }
                     .flatMap {
                         validateCollaborationGatewayResponse(
                             next,
@@ -218,4 +229,18 @@ class BootstrapNativeCollaborationGateway(
 
     private fun denied() =
         Result.Failed(Failure(FailureKind.FORBIDDEN, "collaboration_access_denied"))
+
+    private fun captureRuntime(
+        admission: CollaborationAdmission
+    ): Result<CollaborationLegacyRuntime> {
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        return runtimes.find(owner, lock = true).flatMap { found ->
+            val acquired =
+                if (found != null) Result.Success(found)
+                else runtimes.ensure(owner, clock.instant().truncatedTo(ChronoUnit.MICROS))
+            acquired.flatMap { runtime ->
+                admitCollaborationLegacyRuntime(runtime, admission, clock.instant()).map { runtime }
+            }
+        }
+    }
 }

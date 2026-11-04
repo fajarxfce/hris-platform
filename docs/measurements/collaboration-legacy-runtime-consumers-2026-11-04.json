@@ -1,0 +1,671 @@
+{
+  "scope": "Fence remaining legacy gateway issuance and native provisioning/direct-room provider workers; all fixed legacy Matrix consumers now use original-runtime phase/lease guards.",
+  "baseCommit": "0bf751e5c846010bc519ca32eafb2daa9e5c220d",
+  "acceptedRuns": {
+    "runtime-consumers3": {
+      "startedAt": "2026-11-04T01:41:21.511648+00:00",
+      "elapsedSeconds": 97.312,
+      "exitCode": 0,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": {
+          "sha256": "8753123beca07862c99e7c16d356176ecbfc5886967fd62a7a583f1779c7e4df",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "resultSha256": "53b60962d4d0d887cad039ab36bbb00d71c589efe1edb5d7380ae77d96ce66f4",
+      "sourceManifestSha256": "9fd0f1c1f5ff99c9fd876069bcaacb35c140ec0604ec7cdc0898fb3eb681aba4"
+    },
+    "runtime-consumers-full1": {
+      "startedAt": "2026-11-04T01:43:36.947997+00:00",
+      "elapsedSeconds": 258.738,
+      "exitCode": 0,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 166,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": {
+          "sha256": "2bad853a9f6711981c04118f64abf66e025541d56a4c99e3f5c2bbee23bad821",
+          "tests": 166,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "resultSha256": "173d4b30128b45bc7c591bc1aa79726c0fecbcb68dcb82b898b6f6b0c89d294b",
+      "sourceManifestSha256": "9fd0f1c1f5ff99c9fd876069bcaacb35c140ec0604ec7cdc0898fb3eb681aba4"
+    },
+    "runtime-consumers-api1": {
+      "startedAt": "2026-11-04T01:48:11.602034+00:00",
+      "elapsedSeconds": 156.066,
+      "exitCode": 0,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.NativeCollaborationMatrixConfigurationTest.xml": {
+          "sha256": "66ab0f7fa6c0d12e8bf79d3702b4f7cef4c5fa7686912246398c7bbbf477dad8",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+          "sha256": "77ce99b6d533df0ff78dcd95a0f90ca81676553653a638f04f4640daaa869b8e",
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationPushProviderHttpTest.xml": {
+          "sha256": "c26d8aba5be7d4510f223e5393669d9fc3cf560c7434fe67d791a8017e6521e9",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+          "sha256": "07fb4e5132f41e073be5bdec6dcd2b482e757d23c1c09f2a642bdb08c624df32",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationSpaceDisabledConfigurationTest.xml": {
+          "sha256": "e45e4a0f69078b549af00f606cc3b7da8fc600b88340354726a3d904bd587eff",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationDisabledHttpTest.xml": {
+          "sha256": "1cc311642cb4d275ec5a9fb12efee2aeb2edb7851efca63f3fd5eca976e11b5f",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "resultSha256": "a38076d8d52325ac7faa1ee4fd4339d1c021ec7261ca8934cba92bd9e0fa8976",
+      "sourceManifestSha256": "9fd0f1c1f5ff99c9fd876069bcaacb35c140ec0604ec7cdc0898fb3eb681aba4"
+    },
+    "runtime-consumers-worker1": {
+      "startedAt": "2026-11-04T01:50:56.552739+00:00",
+      "elapsedSeconds": 362.195,
+      "exitCode": 0,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 127,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": {
+          "sha256": "16641eeb246b1c54ef33dd2b90413f059c6dadf266ccb163e9a2049f6a62f6c6",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.CollaborationPushContextTest.xml": {
+          "sha256": "e5cb67129a25b7c00805c07ec4b9faba7b3753f14daf4171ee3b380ac5925969",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.CollaborationPushLoopTest.xml": {
+          "sha256": "d7e81d872bee21a61f08cef6bd5a391c6339dae017ab7c1f46e5671e1e9ce7ac",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.CollaborationSpaceProvisioningContextTest.xml": {
+          "sha256": "f9d29811a2cd657e19a2aef259ccfc8f95297b856123d3e465ae9e2d78c1275d",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.CollaborationSpaceProvisioningLoopTest.xml": {
+          "sha256": "ab2bb7a010865d19142ff38a6e6b01be663d2c6fc33026354ce1650527687315",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.CollaborationSpaceScheduledInteropTest.xml": {
+          "sha256": "63344b0f4d74b3093f7d2f5c531d42366b81fc48bd4c6c1220879a904070eaa0",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.DirectoryProjectionWorkerTest.xml": {
+          "sha256": "97cb7606eca4e5234e2643c796c3e82a396fbbad4a8cd7fc3f6288301a7bf0de",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.DocumentValidationWorkerTest.xml": {
+          "sha256": "92ed6d8df34eb02618d9d65bfff9cea85e0ab89a02d2617049d712ee844e83ce",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.EmployeeImportWorkerTest.xml": {
+          "sha256": "616da3fb6e46fd814933b6cad2894739c2c4eb772ac9c7a051b49816b08a8292",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.IdentityMailWorkerTest.xml": {
+          "sha256": "0ae42fffd31ffd844920f695d46da1f8461dd8dacf51d0f8e8e8076bbbbde942",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.InboxEmailWorkerTest.xml": {
+          "sha256": "ff9b7283dba37fe9c2e77ad1d0f3ebbda8a3de1271f953f87d59a28c953d916d",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.InboxPushWorkerTest.xml": {
+          "sha256": "84cab9a6a8fbe0214584fb7f208bb40ad671d9fa020e97bd57ac8bb6157c13cf",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.LeaveBatchWorkerTest.xml": {
+          "sha256": "e5580a3be3946c2ad497ac7b2f5195407ff4b7016da2ed0926e4511af8e7c89e",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest.xml": {
+          "sha256": "a8a2fc07f1dfc517789045df6fb712c5ad88dccdbd941121f24f484b152d30ed",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.MobileSyncWorkerTest.xml": {
+          "sha256": "afa2c217330dd2d4b3157e71cc72572f9d04ea98d866e3a8b5878b7717e11f63",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.NativeSessionCleanupWorkerTest.xml": {
+          "sha256": "a353ef7831cc3524e0e8926e9acf548c5f1d58326b36b1b66608015424e38436",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.ObjectCleanupWorkerTest.xml": {
+          "sha256": "fe7cc2c522bb85003664adabbe071f530686d8cce07338f4570c2ca708f5adbb",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.OffboardingScheduleWorkerTest.xml": {
+          "sha256": "a09e432cdb0fbd559248f1f1037b71589fabe6d630aa6a21bd64acfbf7efb310",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.OnboardingScheduleWorkerTest.xml": {
+          "sha256": "66b0d5bfc9ba80e6c6892bb01d6b6d3bcf7c533962458040562bf5ffedbb2590",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.PayrollCalculationWorkerTest.xml": {
+          "sha256": "aeb074943e5b62de53c6be7fadb7c30ecb839d0af21475fe5c02b847f431d434",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.ReportExportElapsedRetentionTest.xml": {
+          "sha256": "dec2abddbf6ed86d09677a59d123fc9aac23b00eb5b69bf0abd11163d62b5b36",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        },
+        "TEST-dev.fajar.hris.worker.ReportExportRetentionWorkerTest.xml": {
+          "sha256": "df34ddaa2fb358ca3e1f1e8b5f2e39491e0af45e4c561b70f06948a1820f2df1",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.ReportExportWorkerTest.xml": {
+          "sha256": "f9fec00ebafb54ebffe6e113fdfe04a25191436c4316994f0117180d16639123",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.SelfProfileProjectionWorkerTest.xml": {
+          "sha256": "52fb3450bf3f0359f9fb6d47ee0bad3bb4e968ceca03ba535b3db752bbe2d8cb",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.WorkerIntegrationObservationTest.xml": {
+          "sha256": "76cc85db478cd3980bc1a188c051b353ee01916fafaa49745a45f5da041cb606",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.WorkerIntegrationTest.xml": {
+          "sha256": "4f76e0fd914b053460317dd5286bc1433bce99878d074a5c52d0f4636e6ff643",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.worker.AnnouncementPublicationWorkerTest.xml": {
+          "sha256": "22ed7b0cceab1d7e3dc68bbc8b95a3bcbc3e7944493c58b1412ad944e6c7f4d3",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "resultSha256": "5771d6bcdcb3c887fea76fe2084b05ce54768d27101ae80000a7f80233c48ff5",
+      "sourceManifestSha256": "9fd0f1c1f5ff99c9fd876069bcaacb35c140ec0604ec7cdc0898fb3eb681aba4"
+    },
+    "runtime-consumers-sdk1": {
+      "startedAt": "2026-11-04T01:57:59.171873+00:00",
+      "elapsedSeconds": 1035.238,
+      "exitCode": 0,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.NativeCollaborationSdkInteropTest.xml": {
+          "sha256": "bd7d19c7b5101c17d3f2a95014b9e547731d7115d933b8c6c805ad57d9d2e989",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationWorkerInteropTest.xml": {
+          "sha256": "b72789b6fad4515051fd29b87d8615d5e4f3799abfd4178b623561318b53329f",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "TEST-dev.fajar.hris.NativeCollaborationScheduledInteropTest.xml": {
+          "sha256": "12440a0cd24188eb399c13e85c6901c8e5131e45c33aed1ff65150c0930aa7a0",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "resultSha256": "4b66f6c3827a1c0b01a55c6b5f5de55d2518397c0e2b75e847facfbef0da1cec",
+      "sourceManifestSha256": "9fd0f1c1f5ff99c9fd876069bcaacb35c140ec0604ec7cdc0898fb3eb681aba4"
+    }
+  },
+  "priorFailedRuns": {
+    "runtime-consumers1": {
+      "startedAt": "2026-11-04T01:38:16.880173+00:00",
+      "elapsedSeconds": 17.858,
+      "exitCode": 1,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {},
+      "resultSha256": "3e9847f64cbe8a5cee3ad9edb578f423bb0d8eaf3047906df1e077c3227cff35",
+      "sourceManifestSha256": "d2309275deb288778c9b33c1b06b7a7b18ad73999f0f5ca79a6ce9da6538d9bc",
+      "diagnosis": "Compilation stopped on an unnecessary smart cast in RefreshNativeCollaborationGateway; removed without changing policy."
+    },
+    "runtime-consumers2": {
+      "startedAt": "2026-11-04T01:39:19.913998+00:00",
+      "elapsedSeconds": 77.188,
+      "exitCode": 1,
+      "sourceFiles": 8264,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 19,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "reports": {
+        "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationRegistrationTest.xml": {
+          "sha256": "03d60ab41fad18c7505694273cc14dd6160669f58e910e44064436d2b92875b4",
+          "tests": 19,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "resultSha256": "2a91f0a6107045c47534eb31a11c7272a97d456f80466e5b443bfb3f72750dbc",
+      "sourceManifestSha256": "d02b1b343c2c357d3c718c616f0bb31c93757107b6efd34c78cdd01d3be8a373",
+      "diagnosis": "18 of 19 cases passed. An old initial-bootstrap rollback fixture advanced its frozen clock eleven seconds before inserting real runtime metadata. Initial bootstrap now uses real time; refresh waits the actual cooldown. Post-write expiry remains deliberate and rollback now includes runtime/slots. The focused wildcard also includes an existing issuance method, correcting the expected count from18 to19."
+    }
+  },
+  "sourceRelationship": {
+    "checkedFiles": 8264,
+    "allAcceptedRunSnapshotsIdentical": true,
+    "currentFilesMatchSnapshots": true
+  },
+  "android": {
+    "mobile": {
+      "codeCommit": "3d85d569412f8eb5ed735403362a4cdb175aef70",
+      "documentationHead": "377d37b4",
+      "apkBytes": 291101880,
+      "apkSha256": "0ccc4c12e654e6a9cc4f113a7f33b995fad4bc547fac3c109e83262c1704af36",
+      "localSourceManifestSha256": "54ff68afaa9edbefd46bc231a5ab16da47cdd7f20377fcd4465aa3b4fb3e7e4e",
+      "reason": "Unchanged accepted Mobile3d85d569 SDK fixture; validate current server gateway/issuance fences after provider-worker integration.",
+      "phoneTouched": false
+    },
+    "scenarios": [
+      {
+        "directory": ".work/collaboration/1f5b0057f9514da884a5bc56051d5ddf",
+        "passed": true,
+        "cleanup": true,
+        "evidenceSha256": {
+          "result.json": "98a91c372ce054879c5dcde21a9765f926f80792ac669a34203191f3b00e47f2",
+          "verified.json": "91f1ce1373e08468549efd874324bc5e31764dc5fb1e2c27496301a5edd5cb28",
+          "gateway-trace.json": "b2a37bf6643f1222c5bd73c112f8ec3d88dbb4e0d351f1f6ea5fd74598465dac"
+        },
+        "kind": "nativeSdk",
+        "encryptedSends": 3,
+        "receiptPosts": 7,
+        "verifiedClaims": {
+          "passed": true,
+          "encryptedBothDirections": true,
+          "logicalIdsPreserved": true,
+          "cleanup": true,
+          "protectedStoreReopened": true,
+          "missingRecordPreserved": true,
+          "wrongPassphrasePreserved": true,
+          "exclusiveOwner": true,
+          "processRestarted": true,
+          "queueRestored": true,
+          "transactionReused": true,
+          "identityAfterRestart": true,
+          "messageIntentRestored": true,
+          "queueMappingRecovered": true,
+          "queueWriterExclusive": true,
+          "perRoomDeliveryIsolated": true,
+          "heldQueueRestored": true,
+          "nativeDeliveryOwned": true,
+          "commonSenderOwned": true,
+          "receiptJournalRecovered": true,
+          "projectionInterrupted": true,
+          "originalHistoryWindowOwned": true,
+          "historyBodiesRestored": true,
+          "nativeReadReceiptsExchanged": true,
+          "nativePrivateReceiptIsolated": true,
+          "nativeReadReceiptStoreRestored": true,
+          "nativeLocalReadIntentPrepared": true,
+          "nativeLocalReadIntentStoreRestored": true,
+          "nativeReadReceiptReplayAdmitted": true,
+          "nativeReadReceiptAckUncertaintyRecovered": true,
+          "commonHistoryAcquisitionOwned": true,
+          "latestHistoryHeadOwned": true,
+          "admittedHistoryHeads": true,
+          "providerHistoryPageOwned": true,
+          "commonProviderHistoryAcquisitionOwned": true,
+          "providerHistoryReferencesRestored": true,
+          "providerHistoryReferencesReconciled": true,
+          "providerHistoryRestartPreserved": true,
+          "historyRuntimeReopened": true,
+          "ackBeforeJournalRecovered": true,
+          "processRestartedAfterAck": true,
+          "completionCleanupRecovered": true,
+          "processRestartedAfterCompletion": true,
+          "admittedProviderPages": true,
+          "applicationAdmittedBeforeSend": true,
+          "applicationAdmittedAroundHistory": true,
+          "heldRoomNeverSent": true,
+          "pausedAcrossRestart": true,
+          "syncInterruptedAfterRestart": true,
+          "syncRetriedWithRetainedCursor": true
+        },
+        "applicationAdmissions": {
+          "device": 26,
+          "conversation": 26,
+          "room": 26,
+          "failures": 0
+        }
+      },
+      {
+        "directory": ".work/collaboration-worker/734be94716e8455fab50752a1e7e0b32",
+        "passed": true,
+        "cleanup": true,
+        "evidenceSha256": {
+          "result.json": "5df5b262140b87db4e4e36dcdb2a7918333a38be0ad0f27b82925f4a0b6f8a53",
+          "gateway-trace.json": "a2f9bbb4b6b362fa8cd361ecdff0fbb269e450c222a5b3ebe71c435524abc875",
+          "acceptance.json": "e1c4e4e8ceb924b2057881a0afd690f61c4dbada54d880083d0e30d370a516a2"
+        },
+        "kind": "androidWorkManager",
+        "ordinaryProcessDeaths": 1,
+        "automaticJobStart": true,
+        "networkRestored": true
+      },
+      {
+        "directory": ".work/collaboration-worker/28caba686be94204bd5ac200851cf08c",
+        "passed": true,
+        "cleanup": true,
+        "evidenceSha256": {
+          "native-worker-queued.json": "c8b7353e12cb377fecf23d5299e3cde1762bf89251c90de1158554610908509c",
+          "native-worker-restored.json": "2ea90884e13da3a9cc20589f543f29447187eea7ed23ca2d284d18802cf84dd9",
+          "result.json": "f1ca474f89489724e55d445f97ead24568a5295b84de74e51400b5652d26886b",
+          "gateway-trace.json": "248efe6110c7514f599015a51d5cffe0d643b196112b4afcba003e8d36e72f38",
+          "acceptance.json": "c449440b25bc4a2291aa7b4a7ee0fd5911be885663e5353f09a363d2fcc63eaa"
+        },
+        "kind": "applicationWorker",
+        "initialState": "CANCELLED_DRAFT",
+        "encryptedSends": 176,
+        "seededPeerEncryptedSends": 175,
+        "forcedProcessDeaths": 1,
+        "incoming": {
+          "incomingWithoutOutbox": true,
+          "incomingWithoutSelection": true,
+          "incomingFreshNativeAdmission": true,
+          "incomingOriginalAfterOfflineSeed": true,
+          "incomingHistoryRetainedAfterReopen": true,
+          "incomingRuntimeReleased": true,
+          "incomingAllOriginalsRecovered": true,
+          "incomingTraversalRetainedAfterReopen": true,
+          "incomingBrowseUnchanged": true,
+          "incomingPasses": 11,
+          "incomingSavedOriginals": 176,
+          "incomingContainerReopens": 11
+        },
+        "priority": {
+          "priorityWithoutOutbox": true,
+          "priorityWithoutSelection": true,
+          "priorityQueueRetainedAfterReopen": true,
+          "priorityOriginalRetainedAfterReopen": true,
+          "priorityOldestOfflineEventRecovered": true,
+          "priorityRuntimeReleased": true,
+          "priorityTraversalUnchanged": true,
+          "priorityGlobalWakeRetained": true,
+          "priorityHintCompleted": true,
+          "priorityPasses": 1,
+          "prioritySavedOriginals": 12
+        }
+      },
+      {
+        "directory": ".work/collaboration-worker/863574df2d1e4a229b5c67665381d74f",
+        "passed": true,
+        "cleanup": true,
+        "evidenceSha256": {
+          "native-worker-queued.json": "5b30c5b584497118e12e095045e5ac84a6a23fee5794622232514e8dd9f12b73",
+          "native-worker-restored.json": "14511bdd7dc84ce12714607860d56b22445e9f24a6c67448778ae001e871c0ed",
+          "result.json": "62832285704427055888d009f36fc737d4326866745efc36d321c6605e2899ed",
+          "gateway-trace.json": "621fb86cc27d4c3663ff8728b2577406541f2d9c95ba6b2cce2a0f55e419df3d",
+          "acceptance.json": "7d647c13c654fc8d531897dd7b69dd10d01ffedcc13520334d293956e7d04bc7"
+        },
+        "kind": "applicationWorker",
+        "initialState": "QUEUED",
+        "encryptedSends": 176,
+        "seededPeerEncryptedSends": 175,
+        "forcedProcessDeaths": 1,
+        "incoming": {
+          "incomingWithoutOutbox": true,
+          "incomingWithoutSelection": true,
+          "incomingFreshNativeAdmission": true,
+          "incomingOriginalAfterOfflineSeed": true,
+          "incomingHistoryRetainedAfterReopen": true,
+          "incomingRuntimeReleased": true,
+          "incomingAllOriginalsRecovered": true,
+          "incomingTraversalRetainedAfterReopen": true,
+          "incomingBrowseUnchanged": true,
+          "incomingPasses": 11,
+          "incomingSavedOriginals": 176,
+          "incomingContainerReopens": 11
+        },
+        "priority": {
+          "priorityWithoutOutbox": true,
+          "priorityWithoutSelection": true,
+          "priorityQueueRetainedAfterReopen": true,
+          "priorityOriginalRetainedAfterReopen": true,
+          "priorityOldestOfflineEventRecovered": true,
+          "priorityRuntimeReleased": true,
+          "priorityTraversalUnchanged": true,
+          "priorityGlobalWakeRetained": true,
+          "priorityHintCompleted": true,
+          "priorityPasses": 1,
+          "prioritySavedOriginals": 12
+        }
+      },
+      {
+        "directory": ".work/collaboration-worker/5591541b337c42319c56ad24dbcbd456",
+        "passed": true,
+        "cleanup": true,
+        "evidenceSha256": {
+          "native-worker-queued.json": "4094a43c2532a94ac4c16cbf44fbb1ba1f7b180aed55e490d36581d677bc67a5",
+          "native-worker-restored.json": "efdfdd5ada5576c611c771e8030fc888717fe771c775add425c7e0090377ac70",
+          "result.json": "699cd4799ca742f6e4ed6d6aed65bd9dba660461745ff0f487c74b3d7a52e9b5",
+          "gateway-trace.json": "8cc67be3488ec66f7400b48e17161222f8efd3dbe11de4ac2a0cdd1ab139e398",
+          "acceptance.json": "7461d46fc44c4927ed9f1f8789ef850db5f260beeff48a48ef93317f7227389e"
+        },
+        "kind": "applicationWorker",
+        "initialState": "FROZEN_DRAFT",
+        "encryptedSends": 176,
+        "seededPeerEncryptedSends": 175,
+        "forcedProcessDeaths": 1,
+        "incoming": {
+          "incomingWithoutOutbox": true,
+          "incomingWithoutSelection": true,
+          "incomingFreshNativeAdmission": true,
+          "incomingOriginalAfterOfflineSeed": true,
+          "incomingHistoryRetainedAfterReopen": true,
+          "incomingRuntimeReleased": true,
+          "incomingAllOriginalsRecovered": true,
+          "incomingTraversalRetainedAfterReopen": true,
+          "incomingBrowseUnchanged": true,
+          "incomingPasses": 11,
+          "incomingSavedOriginals": 176,
+          "incomingContainerReopens": 11
+        },
+        "priority": {
+          "priorityWithoutOutbox": true,
+          "priorityWithoutSelection": true,
+          "priorityQueueRetainedAfterReopen": true,
+          "priorityOriginalRetainedAfterReopen": true,
+          "priorityOldestOfflineEventRecovered": true,
+          "priorityRuntimeReleased": true,
+          "priorityTraversalUnchanged": true,
+          "priorityGlobalWakeRetained": true,
+          "priorityHintCompleted": true,
+          "priorityPasses": 1,
+          "prioritySavedOriginals": 12
+        }
+      }
+    ],
+    "auditSha256": "f4b2e400c9448fae9c6806fe99b3441e8500929c539671215225d7cfc15cf455",
+    "ownedEmulator": {
+      "start": {
+        "pid": 2478004,
+        "serial": "emulator-5562",
+        "startTicks": "143412645",
+        "bootSeconds": 24.229
+      },
+      "stop": {
+        "pid": 2478004,
+        "serial": "emulator-5562",
+        "stopped": true,
+        "signalSent": true,
+        "transportAbsent": true,
+        "seconds": 2.005
+      }
+    }
+  },
+  "evidence": [
+    "Bootstrap/refresh capture and retain the exact original runtime row guard through current admission, replay, token/receipt and journal publication; a frozen owner cannot reissue authority.",
+    "Issuance performs no provider I/O and consumes no runtime slot. Refresh remains possible with all eight provider slots occupied. Failed initial issuance rolls runtime metadata back with tokens, receipts and journal.",
+    "Provisioning and direct-room workers capture one real <=60-second lease under their original job/current authority guards, commit before network I/O, revalidate before/after success or failure and hold runtime then exact slot at publication.",
+    "Every post-capture worker path releases its exact lease in finally. Original/same cancellation exceptions survive cleanup failure; interrupted threads preserve their flag and start no cleanup SQL. Actual short expiry and exact slot reuse recover abandoned provisioning.",
+    "Freeze during direct-room creation withholds both late provider success and failure while preserving the original identity and job state. No losing Matrix candidate is logged out.",
+    "Six new actual-data methods and existing native regression pass, including real Synapse room publication. Full worker contains six actual legacy provisioning/direct-room cases plus scheduled group Synapse activation and all other contexts.",
+    "The five current-source Android tests pass SDK receipt continuity, real automatic WorkManager after process death/network restoration, and three176-original-message worker states. All owned resources clean up.",
+    "Positive fixture steps use real time. The old issuance rollback still expires authority after writes, now also proving runtime/slot rollback. A negative unfinished-provisioning retry commits no future metadata before its positive provider continuation restores real time.",
+    "All accepted gates also pass formatCheck and architectureCheck. One existing elapsed-retention worker test is opt-in and remains skipped in this ordinary suite."
+  ],
+  "limits": [
+    "Runtime metadata and expired server leases do not prove local SDK quiescence or remote provider rollback. No public group transfer, retained activation or new client runtime is enabled by this increment.",
+    "Next: current native Begin/freeze/replay and bounded drain observation, admitted atomic old-device/provider/public-gateway retirement plus group publication, explicit completed-mapping replay continuity, and durable Mobile SDK gate/alias/inbox/outbox/read/push ownership.",
+    "Original account-owned metadata reads support root runtime initialization without granting old company resources. Completion still needs a narrowly reviewed atomic RLS capability; no nested transaction owners or broad cross-company bypass.",
+    "Actual Apple Matrix/APNs/CallKit, cross-company product acceptance and all54 communications groups remain open. This is neither another FCM/phone acceptance nor a product APK release.",
+    "Live8b40/schema116 pushON/SMTP OFF, installed normal phone28 and Starter9959c1d are unchanged."
+  ]
+}

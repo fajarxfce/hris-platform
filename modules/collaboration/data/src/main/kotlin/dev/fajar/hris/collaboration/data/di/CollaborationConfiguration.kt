@@ -563,6 +563,7 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        runtimes: CollaborationLegacyRuntimeRepository,
     ) =
         AdvanceNativeCollaborationDirectRoom(
             conversations,
@@ -583,6 +584,7 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            runtimes,
         )
 
     @Bean
@@ -694,6 +696,7 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        runtimes: CollaborationLegacyRuntimeRepository,
     ) =
         BootstrapNativeCollaborationGateway(
             gateway,
@@ -710,6 +713,7 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            runtimes,
         )
 
     @Bean
@@ -898,6 +902,7 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        runtimes: CollaborationLegacyRuntimeRepository,
     ) =
         RefreshNativeCollaborationGateway(
             gateway,
@@ -913,6 +918,7 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            runtimes,
         )
 
     @Bean
@@ -945,6 +951,7 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        runtimes: CollaborationLegacyRuntimeRepository,
     ) =
         AdvanceNativeCollaborationProvisioning(
             registry,
@@ -963,6 +970,7 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            runtimes,
         )
 
     @Bean

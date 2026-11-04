@@ -33,6 +33,7 @@ class AdvanceNativeCollaborationProvisioning(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val runtimes: CollaborationLegacyRuntimeRepository,
 ) {
     fun execute(lease: JobLease): Result<JobStep> {
         if (!service.enabled || !provider.enabled) return unavailable()
@@ -49,9 +50,58 @@ class AdvanceNativeCollaborationProvisioning(
                 request.correlationId,
                 credentialVersion = request.credentialVersion,
             )
-        val preparation = transactions.run(scope) { observe(scope, lease, input) }
+        val preparation =
+            transactions.run(scope) {
+                observe(scope, lease, input).flatMap { observed ->
+                    claimRuntime(observed.admission).map { Preparation(observed, it) }
+                }
+            }
         if (preparation is Result.Failed) return retryObservation(preparation)
         val prepared = (preparation as Result.Success).value
+        var originalFailure: Throwable? = null
+        try {
+            return advancePrepared(scope, lease, input, prepared.observation, prepared.lease)
+        } catch (failure: Throwable) {
+            originalFailure = failure
+            throw failure
+        } finally {
+            if (!Thread.currentThread().isInterrupted) {
+                try {
+                    transactions.run(scope) { runtimes.release(prepared.lease) }
+                } catch (cleanup: Throwable) {
+                    val original = originalFailure
+                    if (original == null) throw cleanup
+                    if (original !== cleanup) original.addSuppressed(cleanup)
+                }
+            }
+        }
+    }
+
+    private fun advancePrepared(
+        scope: Actor,
+        lease: JobLease,
+        input: NativeCollaborationProvisioningRequest,
+        prepared: Observation,
+        runtimeLease: CollaborationLegacyRuntimeLease,
+    ): Result<JobStep> {
+        val request = lease.job.request
+        val before =
+            transactions.run(scope) {
+                observe(scope, lease, input).flatMap { current ->
+                    if (
+                        current.pointer != prepared.pointer ||
+                            current.credential?.generation != prepared.credential?.generation
+                    )
+                        return@flatMap changed()
+                    validateCollaborationExchange(
+                            prepared.admission,
+                            current.admission,
+                            clock.instant(),
+                        )
+                        .flatMap { checkRuntime(current.admission, runtimeLease) }
+                }
+            }
+        if (before is Result.Failed) return retryObservation(before)
         val existing = prepared.credential
         val candidate =
             if (
@@ -73,20 +123,9 @@ class AdvanceNativeCollaborationProvisioning(
                         request.actorId,
                         input.deviceId,
                         prepared.admission.admittedAt,
-                        prepared.admission.expiresAt,
+                        minOf(prepared.admission.expiresAt, runtimeLease.expiresAt),
                     )
                 )
-        if (candidate is Result.Failed)
-            return if (candidate.failure.code == "collaboration_admission_changed") changed()
-            else candidate
-        val value = (candidate as Result.Success).value
-        if (
-            value.userId != expectedUser(scope) ||
-                value.deviceId != collaborationMatrixDeviceId(input.deviceId)
-        )
-            return Result.Failed(
-                Failure(FailureKind.UNAVAILABLE, "collaboration_provider_invalid_response")
-            )
         // A losing token is never published. Its bounded private-provider lifetime retires it;
         // Matrix logout would destroy the winning device and must not be used here.
         val publication =
@@ -105,6 +144,20 @@ class AdvanceNativeCollaborationProvisioning(
                             clock.instant(),
                         )
                     if (valid is Result.Failed) return@flatMap changed()
+                    val runtime = checkRuntime(current.admission, runtimeLease)
+                    if (runtime is Result.Failed) return@flatMap runtime
+                    if (candidate is Result.Failed) return@flatMap retryObservation(candidate)
+                    val value = (candidate as Result.Success).value
+                    if (
+                        value.userId != expectedUser(scope) ||
+                            value.deviceId != collaborationMatrixDeviceId(input.deviceId)
+                    )
+                        return@flatMap Result.Failed(
+                            Failure(
+                                FailureKind.UNAVAILABLE,
+                                "collaboration_provider_invalid_response",
+                            )
+                        )
                     if (
                         value.expiresAt <= clock.instant() || value.expiresAt > now.plusSeconds(600)
                     )
@@ -175,7 +228,11 @@ class AdvanceNativeCollaborationProvisioning(
                             if (finalProof is Result.Failed) changed() else finalProof
                         }
                         .flatMap {
-                            if (value.expiresAt <= clock.instant()) changed()
+                            if (
+                                value.expiresAt <= clock.instant() ||
+                                    runtimeLease.expiresAt <= clock.instant()
+                            )
+                                changed()
                             else Result.Success(JobStep(1, true))
                         }
                 }
@@ -319,6 +376,60 @@ class AdvanceNativeCollaborationProvisioning(
                     }
             }
     }
+
+    private fun claimRuntime(
+        admission: CollaborationAdmission
+    ): Result<CollaborationLegacyRuntimeLease> {
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+        return runtimes.ensure(owner, at).flatMap { runtime ->
+            admitCollaborationLegacyRuntime(runtime, admission, clock.instant()).flatMap {
+                val until =
+                    minOf(admission.expiresAt, at.plusSeconds(60)).truncatedTo(ChronoUnit.MICROS)
+                runtimes.claim(owner, until).flatMap { lease ->
+                    if (lease == null)
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_busy")
+                        )
+                    else
+                        validateCollaborationLegacyRuntimeLease(
+                                runtime,
+                                lease,
+                                lease,
+                                admission,
+                                clock.instant(),
+                            )
+                            .map { lease }
+                }
+            }
+        }
+    }
+
+    private fun checkRuntime(
+        admission: CollaborationAdmission,
+        lease: CollaborationLegacyRuntimeLease,
+    ): Result<Unit> {
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        return runtimes.find(owner, lock = true).flatMap { runtime ->
+            if (runtime == null)
+                Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_changed"))
+            else
+                runtimes.lease(owner, lease.slot, lock = true).flatMap { current ->
+                    validateCollaborationLegacyRuntimeLease(
+                        runtime,
+                        lease,
+                        current,
+                        admission,
+                        clock.instant(),
+                    )
+                }
+        }
+    }
+
+    private class Preparation(
+        val observation: Observation,
+        val lease: CollaborationLegacyRuntimeLease,
+    )
 
     private fun expectedUser(actor: Actor) =
         "@${collaborationMatrixLocalpart(requireNotNull(actor.companyId), actor.accountId)}:${provider.serverName}"

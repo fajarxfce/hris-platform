@@ -29,6 +29,7 @@ class RefreshNativeCollaborationGateway(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val runtimes: CollaborationLegacyRuntimeRepository,
 ) {
     fun execute(token: String, correlationId: UUID): Result<CollaborationGatewayTokens> {
         if (!service.enabled || !provider.enabled)
@@ -124,13 +125,23 @@ class RefreshNativeCollaborationGateway(
                     clock.instant(),
                 )
             if (valid is Result.Failed) return@run valid
+            val captured = captureRuntime(admitted.value)
+            if (captured is Result.Failed) return@run captured
+            val runtime = (captured as Result.Success).value
+            // The exact runtime row stays guarded through replay or credential publication.
+            fun currentAdmission(): Result<CollaborationAdmission> =
+                admission().flatMap { current ->
+                    admitCollaborationLegacyRuntime(runtime, current, clock.instant()).map {
+                        current
+                    }
+                }
             // Re-read the replay under the locked head: another request may have rotated since
             // the isolated lookup. It may recover only this winner, never overwrite/revoke it.
             val recovered = gateway.replayRefresh(head, token)
             if (recovered is Result.Failed) return@run recovered
             val replay = (recovered as Result.Success).value
             if (replay != null)
-                return@run admission().flatMap {
+                return@run currentAdmission().flatMap {
                     validateCollaborationGatewayResponse(
                             head,
                             replay,
@@ -165,7 +176,7 @@ class RefreshNativeCollaborationGateway(
                             mapOf("gatewayVersion" to next.version.toString()),
                         ),
                     )
-                    .flatMap { admission() }
+                    .flatMap { currentAdmission() }
                     .flatMap {
                         validateCollaborationGatewayResponse(
                             next,
@@ -176,6 +187,20 @@ class RefreshNativeCollaborationGateway(
                         )
                     }
                     .map { tokens }
+            }
+        }
+    }
+
+    private fun captureRuntime(
+        admission: CollaborationAdmission
+    ): Result<CollaborationLegacyRuntime> {
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        return runtimes.find(owner, lock = true).flatMap { found ->
+            val acquired =
+                if (found != null) Result.Success(found)
+                else runtimes.ensure(owner, clock.instant().truncatedTo(ChronoUnit.MICROS))
+            acquired.flatMap { runtime ->
+                admitCollaborationLegacyRuntime(runtime, admission, clock.instant()).map { runtime }
             }
         }
     }

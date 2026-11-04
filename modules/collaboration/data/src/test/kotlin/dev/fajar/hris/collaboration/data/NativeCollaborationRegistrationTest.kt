@@ -1257,6 +1257,9 @@ class NativeCollaborationRegistrationTest {
             "collaboration_provisioning_changed",
             failed(f.retry().execute(f.actor, parent, 0, UUID.randomUUID(), device, 0, 0, client)),
         )
+        // Both future-clock retry attempts failed without writing future-dated metadata.
+        // Resume the positive provider operation against the actual database clock.
+        f.clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
         success(f.advance(RecordingMatrix(f.clock)).execute(leased))
         val active = requireNotNull(success(f.status().execute(f.actor, parent, 0, client)))
         assertEquals(CollaborationDeviceState.ACTIVE, active.state)
@@ -1655,9 +1658,11 @@ class NativeCollaborationRegistrationTest {
                     "audit_entries",
                     "outbox_events",
                     "collaboration_gateway_sessions",
+                    "collaboration_legacy_runtime",
+                    "collaboration_legacy_runtime_leases",
                 )
             val before = tables.associateWith { g.f.rows(it) }
-            g.f.clock.at = g.f.clock.at.plusSeconds(11)
+            if (refresh) g.f.awaitRealTime(g.f.clock.at.plusSeconds(11))
             val journal =
                 object : ChangeJournalRepository {
                     override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
@@ -1761,6 +1766,306 @@ class NativeCollaborationRegistrationTest {
         )
         assertEquals(0, g.f.rows("collaboration_gateway_sessions"))
         assertEquals(1, g.f.rows("operation_receipts"))
+    }
+
+    @Test
+    fun gatewayIssuanceCannotReplayOrRotateAfterOriginalRuntimeFreeze() {
+        val k = KeyUploadFixture()
+        success(k.upload())
+        val head = k.g.f.gatewayHead(k.g.device)
+        val tables = listOf("audit_entries", "outbox_events", "operation_receipts")
+        val counts = tables.associateWith(k.g.f::rows)
+        k.g.f.freezeRuntime(k.g.owner, requireNotNull(k.publication()).fingerprint)
+        assertEquals("collaboration_runtime_transferring", failed(k.g.bootstrap()))
+        assertEquals(
+            "collaboration_runtime_transferring",
+            failed(k.g.refresh(k.tokens.refreshToken)),
+        )
+        assertEquals(head, k.g.f.gatewayHead(k.g.device))
+        assertEquals(counts, tables.associateWith(k.g.f::rows))
+        assertTrue(k.g.runtimeSlots().all { it.releasedAt != null })
+        assertEquals(0, k.matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayIssuanceRefreshDoesNotConsumeAnOccupiedProviderSlot() {
+        val k = KeyUploadFixture()
+        success(k.upload())
+        k.g.f.awaitRealTime(k.g.f.clock.at.plusSeconds(11))
+        val occupied =
+            (0 until 8).map {
+                requireNotNull(
+                    success(
+                        k.g.f.transactions.run(k.g.f.actor) {
+                            k.g.f.legacyRuntimes.claim(
+                                k.g.owner,
+                                Instant.now().plusSeconds(30).truncatedTo(ChronoUnit.MICROS),
+                            )
+                        }
+                    )
+                )
+            }
+        val refreshed = success(k.g.refresh(k.tokens.refreshToken))
+        assertEquals(k.tokens.version + 1, refreshed.version)
+        assertEquals(occupied.toSet(), k.g.runtimeSlots().toSet())
+        for (lease in occupied) assertTrue(
+            success(k.g.f.transactions.run(k.g.f.actor) { k.g.f.legacyRuntimes.release(lease) })
+        )
+        success(k.command.uploadKeys(refreshed.accessToken, UUID.randomUUID(), k.request))
+        assertEquals(1L, k.publication()?.version)
+        assertEquals(0, k.matrix.logouts.get())
+    }
+
+    @Test
+    fun provisioningRuntimeCapacityAndCancellationCannotLeakAProviderSlot() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val job = f.claim(device)
+        val owner =
+            CollaborationLegacyRuntimeOwner(
+                requireNotNull(f.actor.companyId),
+                device,
+                f.account,
+                parent,
+            )
+        success(f.transactions.run(f.actor) { f.legacyRuntimes.ensure(owner, f.clock.at) })
+        val occupied =
+            (0 until 8).map {
+                requireNotNull(
+                    success(
+                        f.transactions.run(f.actor) {
+                            f.legacyRuntimes.claim(
+                                owner,
+                                Instant.now().plusSeconds(30).truncatedTo(ChronoUnit.MICROS),
+                            )
+                        }
+                    )
+                )
+            }
+        val matrix = RecordingMatrix(f.clock)
+        assertEquals("collaboration_runtime_busy", failed(f.advance(matrix).execute(job)))
+        assertEquals(0, matrix.logins.get())
+        assertEquals(JobStatus.RUNNING, f.job(job).status)
+        for (lease in occupied) assertTrue(
+            success(f.transactions.run(f.actor) { f.legacyRuntimes.release(lease) })
+        )
+        val cancelled = CancellationException("owned provisioning fixture")
+        matrix.onLogin = { throw cancelled }
+        assertSame(
+            cancelled,
+            assertThrows(CancellationException::class.java) { f.advance(matrix).execute(job) },
+        )
+        assertNull(f.credential(device))
+        assertTrue(
+            success(f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) }).all {
+                it.releasedAt != null
+            }
+        )
+        matrix.onLogin = matrix::issue
+        success(f.advance(matrix).execute(job))
+        assertEquals(JobStatus.SUCCEEDED, f.job(job).status)
+        assertTrue(
+            success(f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) }).all {
+                it.releasedAt != null
+            }
+        )
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun directRoomRuntimeFreezeWithholdsLateCreationAndRetainsItsIdentity() {
+        for (providerFails in listOf(false, true)) {
+            val room = DirectRoomFixture()
+            val f = room.f
+            val tokens =
+                success(
+                    f.bootstrap()
+                        .execute(
+                            f.actor,
+                            room.parent,
+                            0,
+                            UUID.randomUUID(),
+                            room.device,
+                            1,
+                            null,
+                            room.client,
+                        )
+                )
+            val owner =
+                CollaborationLegacyRuntimeOwner(
+                    requireNotNull(f.actor.companyId),
+                    room.device,
+                    f.account,
+                    room.parent,
+                )
+            val matrix = RecordingMatrix(f.clock)
+            val keys =
+                MatrixKeyFixture(
+                    "@${collaborationMatrixLocalpart(owner.companyId, owner.accountId)}:proof.invalid",
+                    collaborationMatrixDeviceId(owner.deviceId),
+                )
+            success(
+                f.matrixIdentity(matrix, providerKeys = RecordingKeys())
+                    .uploadKeys(
+                        tokens.accessToken,
+                        UUID.randomUUID(),
+                        CollaborationMatrixKeyUpload(keys.device, emptyMap(), emptyMap()),
+                    )
+            )
+            val published =
+                requireNotNull(
+                    success(
+                        f.transactions.run(f.actor) {
+                            f.deviceKeys.find(owner.companyId, owner.accountId, owner.deviceId)
+                        }
+                    )
+                )
+            success(room.request())
+            val job = f.claimRoom(room.conversation)
+            val rooms = RecordingRooms(room)
+            rooms.onCall = { name ->
+                if (name == "create") {
+                    f.freezeRuntime(owner, published.fingerprint)
+                    if (providerFails)
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+                    else Result.Success(Unit)
+                } else Result.Success(Unit)
+            }
+            assertEquals(
+                "collaboration_runtime_transferring",
+                failed(f.advanceRoom(matrix, rooms).execute(job)),
+            )
+            assertEquals(listOf("resolve", "create"), rooms.calls)
+            assertEquals(JobStatus.RUNNING, f.job(job).status)
+            assertEquals(0, f.rows("collaboration_direct_room_bindings"))
+            assertTrue(
+                success(f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) }).all {
+                    it.releasedAt != null
+                }
+            )
+            assertEquals(0, matrix.logouts.get())
+        }
+    }
+
+    @Test
+    fun provisioningRuntimeInterruptionKeepsItsFlagAndRecoversOnlyAfterActualExpiry() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val job = f.claim(device)
+        val owner =
+            CollaborationLegacyRuntimeOwner(
+                requireNotNull(f.actor.companyId),
+                device,
+                f.account,
+                parent,
+            )
+        val releases = AtomicInteger()
+        val runtimes =
+            object : CollaborationLegacyRuntimeRepository by f.legacyRuntimes {
+                override fun claim(
+                    owner: CollaborationLegacyRuntimeOwner,
+                    until: Instant,
+                ): Result<CollaborationLegacyRuntimeLease?> =
+                    f.legacyRuntimes.claim(
+                        owner,
+                        minOf(until, Instant.now().plusSeconds(1)).truncatedTo(ChronoUnit.MICROS),
+                    )
+
+                override fun release(lease: CollaborationLegacyRuntimeLease): Result<Boolean> {
+                    releases.incrementAndGet()
+                    return f.legacyRuntimes.release(lease)
+                }
+            }
+        val matrix = RecordingMatrix(f.clock)
+        val interrupted = InterruptedException("owned provisioning runtime fixture")
+        matrix.onLogin = {
+            Thread.currentThread().interrupt()
+            throw interrupted
+        }
+        val command = f.advance(matrix, runtimes = runtimes)
+        try {
+            assertSame(
+                interrupted,
+                assertThrows(InterruptedException::class.java) { command.execute(job) },
+            )
+            assertTrue(Thread.currentThread().isInterrupted)
+            assertEquals(0, releases.get())
+        } finally {
+            Thread.interrupted()
+        }
+        val abandoned =
+            success(f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) }).single()
+        assertNull(abandoned.releasedAt)
+        assertNull(f.credential(device))
+        assertEquals(JobStatus.RUNNING, f.job(job).status)
+        f.awaitRealTime(abandoned.expiresAt.plusMillis(1))
+        matrix.onLogin = matrix::issue
+        success(command.execute(job))
+        val reclaimed =
+            success(f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) }).single()
+        assertNotEquals(abandoned.token, reclaimed.token)
+        assertNotNull(reclaimed.releasedAt)
+        assertEquals(1, releases.get())
+        assertEquals(JobStatus.SUCCEEDED, f.job(job).status)
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun directRoomRuntimeCleanupFailurePreservesCancellationWithoutAnotherProviderAttempt() {
+        for (mode in listOf("failed", "throws", "same_exception")) {
+            val room = DirectRoomFixture()
+            val f = room.f
+            success(room.request())
+            val job = f.claimRoom(room.conversation)
+            val owner =
+                CollaborationLegacyRuntimeOwner(
+                    requireNotNull(f.actor.companyId),
+                    room.device,
+                    f.account,
+                    room.parent,
+                )
+            val cancelled = CancellationException("owned direct-room runtime fixture")
+            val cleanup = IllegalStateException("owned direct-room cleanup fixture")
+            val releases = AtomicInteger()
+            val runtimes =
+                object : CollaborationLegacyRuntimeRepository by f.legacyRuntimes {
+                    override fun release(lease: CollaborationLegacyRuntimeLease): Result<Boolean> {
+                        releases.incrementAndGet()
+                        if (mode == "throws") throw cleanup
+                        if (mode == "same_exception") throw cancelled
+                        return Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "fixture_cleanup_failed")
+                        )
+                    }
+                }
+            val matrix = RecordingMatrix(f.clock)
+            matrix.onLogin = { throw cancelled }
+            val provider = RecordingRooms(room)
+            val command = f.advanceRoom(matrix, provider, runtimes = runtimes)
+            assertSame(
+                cancelled,
+                assertThrows(CancellationException::class.java) { command.execute(job) },
+            )
+            assertEquals(
+                if (mode == "throws") listOf(cleanup) else emptyList(),
+                cancelled.suppressed.toList(),
+            )
+            assertEquals(1, releases.get())
+            assertEquals(1, matrix.logins.get())
+            assertTrue(provider.calls.isEmpty())
+            assertEquals(JobStatus.RUNNING, f.job(job).status)
+            assertEquals(0, f.rows("collaboration_direct_room_bindings"))
+            val abandoned =
+                success(f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) }).single()
+            assertNull(abandoned.releasedAt)
+            assertTrue(
+                Duration.between(abandoned.startedAt, abandoned.expiresAt) <= Duration.ofSeconds(60)
+            )
+            assertTrue(success(f.transactions.run(f.actor) { f.legacyRuntimes.release(abandoned) }))
+            assertEquals(0, matrix.logouts.get())
+        }
     }
 
     @Test
@@ -7310,6 +7615,7 @@ class NativeCollaborationRegistrationTest {
             providerRooms: CollaborationMatrixRoomRepository,
             journal: ChangeJournalRepository = this.journal,
             serverName: String = "proof.invalid",
+            runtimes: CollaborationLegacyRuntimeRepository = this.legacyRuntimes,
         ) =
             AdvanceNativeCollaborationDirectRoom(
                 direct,
@@ -7330,6 +7636,7 @@ class NativeCollaborationRegistrationTest {
                 CollaborationServicePolicy(true),
                 CollaborationMatrixPolicy(true, serverName),
                 clock,
+                runtimes,
             )
 
         fun claimRoom(conversation: UUID): JobLease {
@@ -7532,6 +7839,7 @@ class NativeCollaborationRegistrationTest {
                 CollaborationServicePolicy(true),
                 provider,
                 clock,
+                legacyRuntimes,
             )
 
         fun gatewayRefresh(
@@ -7552,6 +7860,7 @@ class NativeCollaborationRegistrationTest {
                 CollaborationServicePolicy(true),
                 CollaborationMatrixPolicy(true, "fixture.test"),
                 clock,
+                legacyRuntimes,
             )
 
         val legacyRuntimes: CollaborationLegacyRuntimeRepository by lazy {
@@ -7800,6 +8109,7 @@ class NativeCollaborationRegistrationTest {
             matrix: CollaborationMatrixRepository,
             journal: ChangeJournalRepository = this.journal,
             policies: CompanyClientPolicyRepository = this.policies,
+            runtimes: CollaborationLegacyRuntimeRepository = this.legacyRuntimes,
         ) =
             AdvanceNativeCollaborationProvisioning(
                 registry,
@@ -7818,6 +8128,7 @@ class NativeCollaborationRegistrationTest {
                 CollaborationServicePolicy(enabled = true),
                 CollaborationMatrixPolicy(true, "proof.invalid"),
                 clock,
+                runtimes,
             )
 
         fun abort() = AbortCollaborationProvisioning(jobs, journal, transactions)

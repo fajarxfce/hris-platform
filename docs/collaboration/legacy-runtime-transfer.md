@@ -3,8 +3,9 @@
 V123 adds storage for one immutable original company/device/account/native owner
 and at most eight reusable in-flight request slots per device. Both tables start
 empty. The schema does not freeze existing devices, move provider credentials,
-change SDK directories, or grant group access. The gateway integration is now accepted; provisioning/direct-room workers and
-gateway issuance still require these fences before transfer can be exposed.
+change SDK directories, or grant group access. All fixed legacy provider consumers and gateway issuance now fence original
+runtime ownership. Admitted atomic transfer publication and client ownership
+handover remain required before transfer can be exposed.
 
 A runtime starts in LEGACY at version 0. A root-scoped operation can freeze it to
 DRAINING at version 1, naming an exact PROVISIONING group device with matching
@@ -124,3 +125,50 @@ records the source relationship and all failed attempts, including the expired-t
 verifier correction without relaxing production lifetimes. No group completion or
 public transfer endpoint is exposed. Keep the remaining worker, issuance and Mobile
 ownership requirements above.
+
+
+## Remaining legacy consumers integrated
+
+Bootstrap and refresh now hold the original runtime row through normal/replayed
+credential publication and current admission. They claim no provider slot because
+they perform no provider I/O. Refresh succeeds even with all eight provider slots
+occupied. Failed initial issuance rolls runtime metadata back with credentials,
+operation receipt and journal.
+
+Native provisioning and direct-room workers retain their original job/company/
+account/native guard order. They capture one bounded lease before network I/O,
+check current authority and exact runtime/lease before and after success or failure,
+and hold runtime then slot guards through final publication. All post-capture
+paths release exact ownership in finally; interruption keeps its flag and finite
+expiry permits recovery. A cleanup failure preserves original/same cancellation
+without another provider attempt. No losing Matrix credential is logged out.
+
+[Consumer evidence](../measurements/collaboration-legacy-runtime-consumers-2026-11-04.json)
+records 19 focused, 166 full native, 47 API, 126 active full worker plus one existing
+opt-in skip, and 5 actual Android SDK cases. All share 8264 unchanged inputs and pass
+quality gates. Android gate takes 1035.238s and retains all three 176-message
+process-death recovery states; its exact emulator is stopped. Earlier compilation
+and old fixture-clock failures are retained, without weakening production deadlines.
+This completes consumer fencing, not group runtime adoption.
+
+The next native freeze command can initialize owned runtime metadata under root
+scope: original device/binding SELECT policies are account-owned, and V123 explicitly
+permits root initialization. It must still prove current group/native/client/MFA,
+canonical user, exact original parent/device/fingerprint and PROVISIONING target.
+Metadata authority grants no old company resource access. Freeze/replay and journal
+must be atomic and cannot retarget or unfreeze an owner. Bounded drain observations
+are not final publication authority; completion must check actual DB time/remaining
+leases after waiting. Expiry does not establish remote rollback.
+
+Completion must also handle retained registration replay explicitly: its current
+continuity policy requires an ACTIVE/unretired original source even for an existing
+group record. A legitimate completed mapping needs its own exact continuity proof
+with current admission; arbitrary existing records cannot waive those checks.
+Group ACTIVE status requires a SUCCEEDED provisioning head. Reserved key references
+must receive actual provider-key readback before publication. Keep the atomic RLS
+and durable Mobile SDK/room/push/read requirements above; no public handover is
+implemented by this increment.
+
+Preserve V121's existing terminal revision reservation: only REVOKED may reach
+1000000. Current mappers and actual database tests already cover that boundary;
+new transfer activation must retain room for later revocation.

@@ -1,5 +1,19 @@
 # Delivery and validation
 
+## Group signed own-key upload — 4 November 2026
+
+The fixed group upload endpoint now commits immutable reservation before bounded
+outside-SQL provider work and acknowledges matching signed readback only under current
+exact authority. Counts, uncertain outcomes, concurrent publication and retained keys
+keep their original identity; upload-only dispatch and shared DI are wired.
+[Contract](collaboration/space-key-exchange.md) and [evidence](measurements/collaboration-space-key-exchange-2026-11-04.json):
+focused18 PASS 268.626s, final data20/API132 PASS 455.786s and full worker128 PASS 343.98s
+(one existing retention skip), identical8,351 final inputs and quality checks. An
+additional strict acknowledgement comparison and two fencing cases followed the first
+pass; no failing gate. Actual group/retained Synapse restart, transaction races and
+HTTP revocation pass. Recipient/room authority and Mobile adoption remain next; all54
+groups are open with no product APK or live rollout.
+
 ## Retained group public-key storage — 4 November 2026
 
 V128 and typed ports preserve exact group/device/native/Matrix public identity through

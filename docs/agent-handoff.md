@@ -1,5 +1,58 @@
 # Agent continuation — HRIS workspace
 
+## Group signed own-key exchange accepted — 4 November 2026
+
+Based on 88f5fc20, AccessNativeCollaborationSpaceMatrixDevice now owns fixed signed
+key upload through the original Matrix user/device. It captures bounded immutable
+input, validates and commits exact key reservation/journal before provider work,
+checks existing signed keys, verifies one-time/fallback signatures, uploads and reads
+back before acknowledgement. Every provider step stays outside SQL and rechecks
+current account/native/group/client/MFA/canonical device/provider generation and exact
+request token on both outcomes under the original clipped 30-second budget. Counts
+create/acknowledge no identity. Signed keys without supplied device identity require
+an acknowledged identity. Retained LEGACY replacement is rejected before provider I/O.
+Read [the exchange contract](collaboration/space-key-exchange.md).
+
+Matching readback acknowledges the exact reservation and journals atomically, with
+stored readback and final authority. Same-identity competitors can observe one
+acknowledgement, while already acknowledged metadata must remain exactly unchanged.
+Failed/lost/cancelled upload leaves the committed reservation for recovery. Post-write
+or journal failure rolls acknowledgement back. A replaced request survives the old
+request's final release. No private key, original namespace/history or company
+runtime is reset, and no provider device is logged out.
+
+Two key-storage beans, expanded group access DI and upload-only group controller
+prefix dispatch are wired. Other key query/claim/to-device/content routes still have
+no group authority. [Evidence](measurements/collaboration-space-key-exchange-2026-11-04.json):
+focused 18 PASS 268.626s; final data20/API132 PASS 455.786s; full worker128 PASS 343.98s
+(127 active/one existing retention skip), 8,351 identical final inputs, format and
+architecture. After initial success, one strict acknowledged-metadata comparison and
+two publication-fencing cases were added. No failing gate. Actual PostgreSQL/Synapse
+covers group/retained identity across replay/restart, races, lost responses, caller
+mutation, publication rollback, replaced leases, native/provider generation changes
+and purge. HTTP strict upload/replay and native revocation pass alongside all 36 prior
+cases in the 38-case identity class. Test/proof sessions are closed; recorder ran and
+is stale after this commit. Ignored draft generators are stale: do not reapply them.
+
+NEXT explicit group room/member authority and original-room inventory before recipient
+key query/claim/to-device and content. Read ignored group-rooms/next.md plus tracked
+cross-company and key contracts. Keep separate group pairs, current eligibility,
+canonical Matrix identity and bounded public projections. Do not impersonate peers,
+route space IDs into HR company scope, reopen DRAINING company runtime, or silently
+merge other historical identities. Directory visibility alone grants no provider room
+or key authority. Group recipient keys must include committed version-0 reservations
+with publicationConfirmed and verify every returned provider key; absent keys are
+allowed only while unconfirmed. An offline receiver must not need a live short native
+or provider token. Native hard-parent replacement remains explicit required recovery.
+
+Then Mobile group preflight/stage/freeze/completion/atomic adoption with original SDK
+namespace/passphrase and owned history/uncertain sends across inbox/outbox/drafts/read/
+push/deep links. Group remains disabled with no product caller or rollout. All 54 groups
+and actual Apple Matrix/APNs/CallKit remain open. Main peer fe0f3c5f/Mobile41a6a68c/hosted
+code0b804cb2, normal phone28/live8b40/schema116 push ON/SMTP OFF and Starter9959c1d
+unchanged. Continue full long run, frequent updates, immediate atomic pushes and
+validated product feature installs only. Never install proof APKs on the user phone.
+
 ## Group public-key storage accepted — 4 November 2026
 
 Based on 941fa2f5, V128 and typed ports retain immutable group public-key identity:

@@ -841,6 +841,15 @@ class CollaborationConfiguration {
     ) = MaintainCollaborationSpaceTransientState(gateway, requests, transactions, clock)
 
     @Bean
+    fun collaborationSpaceKeySource(sql: DSLContext): CollaborationSpaceKeyDataSource =
+        PostgresCollaborationSpaceKeyDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceKeys(
+        source: CollaborationSpaceKeyDataSource
+    ): CollaborationSpaceKeyRepository = StoredCollaborationSpaceKeyRepository(source)
+
+    @Bean
     fun accessNativeCollaborationSpaceMatrixDevice(
         gateway: CollaborationSpaceGatewaySessionRepository,
         requests: CollaborationSpaceRequestRepository,
@@ -859,6 +868,9 @@ class CollaborationConfiguration {
         policy: CollaborationSpacePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        keys: CollaborationSpaceKeyRepository,
+        providerKeys: CollaborationMatrixKeyRepository,
+        journal: ChangeJournalRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -878,6 +890,9 @@ class CollaborationConfiguration {
             policy,
             provider,
             clock,
+            keys,
+            providerKeys,
+            journal,
         )
 
     @Bean

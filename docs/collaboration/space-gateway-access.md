@@ -4,9 +4,11 @@ Group gateway access currently exposes two fixed self operations: Matrix `whoami
 and `capabilities`. Identity/capability controllers dispatch only correctly shaped
 `hris_mxg_a_` credentials to group authority. Existing company tokens keep their
 separate path. Shared strict header/query/body parsing still applies. The group
-feature remains disabled pending key, room and Mobile integration.
+feature remains disabled pending recipient/room authority and Mobile integration.
+Fixed [own-key upload](space-key-exchange.md) now uses the same private admission
+runner, with transaction-owned reservation and per-provider-step checks.
 
-This increment grants no sync, room membership, key upload/query/claim, media, send,
+The self operations grant no sync, room membership, key query/claim, media, send,
 read receipt or push authority. Each later operation needs its own scoped domain
 rules before receiving group token dispatch. In particular, the canonical Matrix
 user and organization directory never authorize every room visible to a provider.
@@ -59,7 +61,7 @@ protocol dispatch. Shared module DI requires actual API and full worker validati
 records exact outcomes, source/report hashes, actual provider/HTTP cases and
 reproduction commands.
 
-Next implement group device-key publication/reservation, room/member authority and
-original-room inventory before content/sync exchange and Mobile handover/adoption.
+Next complete group room/member authority and original-room inventory, then
+recipient queries/content/sync and Mobile adoption.
 Keep original SDK namespaces, passphrases, owned history and uncertain sends. All54
 communications acceptance groups remain open; no product rollout is implied here.

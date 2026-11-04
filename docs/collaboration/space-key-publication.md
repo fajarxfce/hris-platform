@@ -3,8 +3,8 @@
 V128 reserves a group's device public-key fingerprint before provider upload and
 acknowledges only an exact, signed provider readback. It stores public metadata;
 private keys remain in the original client SDK store. The table and typed repository
-are separate from company publications. No group key endpoint or recipient projection
-is enabled by storage alone.
+are separate from company publications. Storage alone enables no group key endpoint or recipient projection. The subsequent
+[own-key exchange](space-key-exchange.md) supplies the fixed upload integration.
 
 ## Retained identity and transactions
 
@@ -36,9 +36,9 @@ Acknowledgement requires a matching signed provider proof and current exact requ
 admission, then commits under the same guards. A lost acknowledgement response is
 recovered by reading version 1. No upload or logout is part of the storage adapter.
 
-## Required gateway and recipient integration
+## Gateway integration and required recipient authority
 
-The next fixed gateway operation must snapshot bounded Matrix input before admission.
+The fixed own-key gateway operation snapshots bounded Matrix input before admission.
 A counts-only request creates or acknowledges no reservation. First publication needs
 validated signed device keys; signed one-time/fallback keys without an identity need
 an already published identity. Read existing provider keys before upload and reject

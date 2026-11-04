@@ -8,7 +8,9 @@ import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixRoomMessageRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixToDeviceRequest
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
+import dev.fajar.hris.collaboration.domain.policies.validCollaborationSpaceGatewayAccess
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
+import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationSpaceMatrixDevice
 import dev.fajar.hris.core.domain.Result
 import dev.fajar.hris.core.domain.map
 import dev.fajar.hris.core.http.*
@@ -28,7 +30,10 @@ import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
 
 @RestController
-class MatrixGatewayDeviceController(private val device: AccessNativeCollaborationMatrixDevice) {
+class MatrixGatewayDeviceController(
+    private val device: AccessNativeCollaborationMatrixDevice,
+    private val group: AccessNativeCollaborationSpaceMatrixDevice,
+) {
     private val parser = parser(512)
     private val envelopeParser = parser(65536)
 
@@ -111,9 +116,10 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
     @PostMapping("/_matrix/client/v3/keys/upload")
     fun upload(request: HttpServletRequest): ResponseEntity<Any> =
         keyRequest(request, ::matrixKeyUploadRequest) { token, correlation, upload ->
-            device.uploadKeys(token, correlation, upload).map {
-                mapOf("one_time_key_counts" to it.oneTimeKeyCounts)
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.uploadKeys(token, correlation, upload)
+                else device.uploadKeys(token, correlation, upload))
+                .map { mapOf("one_time_key_counts" to it.oneTimeKeyCounts) }
         }
 
     @PostMapping("/_matrix/client/v3/keys/query")

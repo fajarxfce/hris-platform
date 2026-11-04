@@ -1346,6 +1346,40 @@ class CollaborationSpaceWorkerPublicationTest {
                 success(f.groupIdentity(groupTokens.accessToken, provider.repository)),
             )
             f.assertRetainedGroupKeyStorage(id)
+            val retainedKey = requireNotNull(f.retainedKeys)
+            val upload =
+                CollaborationMatrixKeyUpload(
+                    retainedKey.device,
+                    mapOf("signed_curve25519:group-one" to retainedKey.signed()),
+                    mapOf("signed_curve25519:group-fallback" to retainedKey.signed(true)),
+                )
+            fun uploadCommand() = f.groupAccess(provider.repository, providerKeys = keyRepository())
+            success(uploadCommand().uploadKeys(groupTokens.accessToken, UUID.randomUUID(), upload))
+            val published =
+                owner.queryForList(
+                    "select * from collaboration_space_key_publications where device_id=?",
+                    id,
+                )
+            provider.restart()
+            success(uploadCommand().uploadKeys(groupTokens.accessToken, UUID.randomUUID(), upload))
+            assertEquals(
+                published,
+                owner.queryForList(
+                    "select * from collaboration_space_key_publications where device_id=?",
+                    id,
+                ),
+            )
+            failure(
+                uploadCommand()
+                    .uploadKeys(
+                        groupTokens.accessToken,
+                        UUID.randomUUID(),
+                        CollaborationMatrixKeyUpload(
+                            MatrixKeyFixture(retainedKey.userId, retainedKey.deviceId).device
+                        ),
+                    ),
+                "collaboration_space_device_keys_changed",
+            )
             checkKeys(recovered.accessToken)
             assertEquals(originalRows, f.originalSnapshot())
             f.activatedCount(1)
@@ -2423,7 +2457,15 @@ class CollaborationSpaceWorkerPublicationTest {
             token: String,
             matrix: CollaborationMatrixRepository,
             completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
-        ): Result<CollaborationMatrixIdentity> {
+        ): Result<CollaborationMatrixIdentity> =
+            groupAccess(matrix, completions).identity(token, UUID.randomUUID())
+
+        fun groupAccess(
+            matrix: CollaborationMatrixRepository,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+            providerKeys: CollaborationMatrixKeyRepository =
+                DisabledCollaborationMatrixKeyRepository(),
+        ): AccessNativeCollaborationSpaceMatrixDevice {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
                     PostgresCollaborationSpaceGatewaySessionDataSource(sql),
@@ -2439,25 +2481,27 @@ class CollaborationSpaceWorkerPublicationTest {
                     PostgresCollaborationSpaceRequestDataSource(sql)
                 )
             return AccessNativeCollaborationSpaceMatrixDevice(
-                    gateway,
-                    requests,
-                    registry,
-                    credentials,
-                    matrix,
-                    selections,
-                    legacyParents,
-                    completions,
-                    provisioning,
-                    spaces,
-                    sessions,
-                    identities,
-                    transactions,
-                    IdentitySecurityPolicy(),
-                    CollaborationSpacePolicy(true, 28, 28),
-                    CollaborationMatrixPolicy(true, server),
-                    Clock.systemUTC(),
-                )
-                .identity(token, UUID.randomUUID())
+                gateway,
+                requests,
+                registry,
+                credentials,
+                matrix,
+                selections,
+                legacyParents,
+                completions,
+                provisioning,
+                spaces,
+                sessions,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationSpacePolicy(true, 28, 28),
+                CollaborationMatrixPolicy(true, server),
+                Clock.systemUTC(),
+                StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(sql)),
+                providerKeys,
+                journal,
+            )
         }
 
         fun groupRefresh(

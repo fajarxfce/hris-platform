@@ -13,7 +13,9 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-/** Fixed self operations under group ownership. This grants no room, key or content access. */
+/**
+ * Fixed self and own-key operations under group ownership. Room/recipient authority is separate.
+ */
 class AccessNativeCollaborationSpaceMatrixDevice(
     private val gateway: CollaborationSpaceGatewaySessionRepository,
     private val requests: CollaborationSpaceRequestRepository,
@@ -32,6 +34,9 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val policy: CollaborationSpacePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val keys: CollaborationSpaceKeyRepository,
+    private val providerKeys: CollaborationMatrixKeyRepository,
+    private val journal: ChangeJournalRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -51,13 +56,249 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     fun capabilities(token: String, correlationId: UUID): Result<Unit> =
         admitted(token, correlationId, decrypt = false) { _, _ -> Result.Success(Unit) }
 
-    // Only the two fixed public operations can use this runner; no caller-controlled
-    // provider path, token, request body or network callback crosses its public API.
+    fun uploadKeys(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationMatrixKeyUpload,
+    ): Result<CollaborationMatrixKeyCounts> {
+        val captured = snapshotCollaborationKeyUpload(request)
+        if (captured is Result.Failed) return captured
+        val upload = (captured as Result.Success).value
+        return admitted(token, correlationId, true, { reserveKeys(it, upload) }) {
+            exchange,
+            reservation ->
+            if (upload.deviceKeys == null && !upload.hasSignedKeys)
+                return@admitted exchange.exchange { bearer, deadline ->
+                    providerKeys.upload(upload, bearer, deadline)
+                }
+            val retained = reservation ?: return@admitted keysRequired()
+            val existing = exchange.readKeys()
+            if (existing is Result.Failed) return@admitted existing
+            val prior = (existing as Result.Success).value
+            if (prior != null) {
+                val validated = validatePublicKeys(exchange.observation, retained, prior)
+                if (validated is Result.Failed) return@admitted validated
+            }
+            val identity = upload.deviceKeys ?: prior ?: return@admitted keysRequired()
+            val proof = validateCollaborationSignedKeys(upload, identity)
+            if (proof is Result.Failed) return@admitted proof
+            val response =
+                exchange.exchange { bearer, deadline ->
+                    providerKeys.upload(upload, bearer, deadline)
+                }
+            if (response is Result.Failed) return@admitted response
+            val readback = exchange.readKeys()
+            if (readback is Result.Failed) return@admitted readback
+            val published = (readback as Result.Success).value ?: return@admitted invalidProvider()
+            validatePublicKeys(exchange.observation, retained, published).flatMap {
+                exchange.publishKeys(retained).flatMap { response }
+            }
+        }
+    }
+
+    private fun reserveKeys(
+        observed: Observation,
+        upload: CollaborationMatrixKeyUpload,
+    ): Result<CollaborationSpaceKeyPublication?> {
+        if (upload.deviceKeys == null && !upload.hasSignedKeys) return Result.Success(null)
+        val device = observed.device
+        val fingerprint =
+            upload.deviceKeys?.let {
+                validateCollaborationDeviceKeys(it, device.matrixUserId, device.matrixDeviceId)
+            }
+        if (fingerprint is Result.Failed) return fingerprint
+        val candidateFingerprint = (fingerprint as? Result.Success)?.value
+        if (
+            candidateFingerprint != null &&
+                device.legacyKeyFingerprint?.let { it != candidateFingerprint } == true
+        )
+            return keysChanged()
+        val found = keys.find(device.spaceId, device.accountId, device.id)
+        if (found is Result.Failed) return found
+        val existing = (found as Result.Success).value
+        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+        if (existing != null) {
+            if (
+                !validPublication(existing, observed, at) ||
+                    candidateFingerprint?.let { it != existing.fingerprint } == true
+            )
+                return keysChanged()
+            if (existing.version == 0L && upload.deviceKeys == null && upload.hasSignedKeys)
+                return keysRequired()
+            return Result.Success(existing)
+        }
+        if (candidateFingerprint == null) return keysRequired()
+        val value =
+            CollaborationSpaceKeyPublication(
+                device.spaceId,
+                device.accountId,
+                device.id,
+                device.originNativeSessionId,
+                device.matrixUserId,
+                device.matrixDeviceId,
+                candidateFingerprint,
+                0,
+                at,
+            )
+        return keys
+            .reserve(value)
+            .flatMap {
+                journal.record(
+                    observed.actor,
+                    ChangeRecord(
+                        "collaboration_space_device",
+                        device.id,
+                        "collaboration.space_device_keys_reserved",
+                        mapOf("spaceId" to device.spaceId.toString(), "version" to "0"),
+                    ),
+                )
+            }
+            .flatMap { keys.find(device.spaceId, device.accountId, device.id) }
+            .flatMap { if (it == value) Result.Success(value) else keysChanged() }
+    }
+
+    private fun validPublication(
+        value: CollaborationSpaceKeyPublication,
+        observed: Observation,
+        at: Instant,
+    ): Boolean {
+        val d = observed.device
+        return validCollaborationSpaceKey(value) &&
+            value.spaceId == d.spaceId &&
+            value.accountId == d.accountId &&
+            value.deviceId == d.id &&
+            value.nativeSessionId == d.originNativeSessionId &&
+            value.matrixUserId == d.matrixUserId &&
+            value.matrixDeviceId == d.matrixDeviceId &&
+            value.reservedAt >= d.createdAt &&
+            value.reservedAt <= at &&
+            value.publishedAt?.let { it > at } != true &&
+            d.legacyKeyFingerprint?.let { it != value.fingerprint } != true
+    }
+
+    private fun validatePublicKeys(
+        observed: Observation,
+        retained: CollaborationSpaceKeyPublication,
+        value: CollaborationMatrixDeviceKeys,
+    ): Result<Unit> =
+        when (
+            val proof =
+                validateCollaborationDeviceKeys(
+                    value,
+                    observed.device.matrixUserId,
+                    observed.device.matrixDeviceId,
+                )
+        ) {
+            is Result.Failed -> invalidProvider()
+            is Result.Success ->
+                if (proof.value == retained.fingerprint) Result.Success(Unit) else keysChanged()
+        }
+
+    private inner class Exchange(
+        private val context: Context,
+        val observation: Observation,
+        val lease: CollaborationSpaceRequestLease,
+    ) {
+        fun <T> exchange(call: (String, Instant) -> Result<T>): Result<T> {
+            val before = transactions.run(context.scope) { confirm(context, observation, lease) }
+            if (before is Result.Failed) return before
+            val response = call(requireNotNull(observation.credential).accessToken, lease.expiresAt)
+            if (Thread.currentThread().isInterrupted)
+                throw InterruptedException("Group key request interrupted")
+            val after = transactions.run(context.scope) { confirm(context, observation, lease) }
+            return if (after is Result.Failed) after else response
+        }
+
+        fun readKeys(): Result<CollaborationMatrixDeviceKeys?> = exchange { bearer, deadline ->
+            providerKeys.ownDeviceKeys(
+                observation.device.matrixUserId,
+                observation.device.matrixDeviceId,
+                bearer,
+                deadline,
+            )
+        }
+
+        fun publishKeys(retained: CollaborationSpaceKeyPublication): Result<Unit> =
+            transactions.run(context.scope) {
+                confirm(context, observation, lease)
+                    .flatMap {
+                        keys.find(context.spaceId, context.scope.accountId, context.deviceId)
+                    }
+                    .flatMap publish@{ current ->
+                        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+                        if (
+                            current == null ||
+                                !validPublication(current, observation, at) ||
+                                current.version < retained.version ||
+                                (retained.version == 1L && current != retained) ||
+                                current.copy(
+                                    version = retained.version,
+                                    publishedAt = retained.publishedAt,
+                                ) != retained
+                        )
+                            return@publish keysChanged()
+                        if (current.version == 1L)
+                            return@publish confirm(context, observation, lease)
+                        val next = retained.copy(version = 1, publishedAt = at)
+                        keys
+                            .publish(current, at)
+                            .flatMap {
+                                journal.record(
+                                    observation.actor,
+                                    ChangeRecord(
+                                        "collaboration_space_device",
+                                        context.deviceId,
+                                        "collaboration.space_device_keys_published",
+                                        mapOf(
+                                            "spaceId" to context.spaceId.toString(),
+                                            "version" to "1",
+                                        ),
+                                    ),
+                                )
+                            }
+                            .flatMap { confirm(context, observation, lease) }
+                            .flatMap {
+                                keys.find(
+                                    context.spaceId,
+                                    context.scope.accountId,
+                                    context.deviceId,
+                                )
+                            }
+                            .flatMap {
+                                if (it == next) confirm(context, observation, lease)
+                                else keysChanged()
+                            }
+                    }
+            }
+    }
+
+    private fun keysChanged() =
+        Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_space_device_keys_changed"))
+
+    private fun keysRequired() =
+        Result.Failed(Failure(FailureKind.VALIDATION, "collaboration_device_keys_required"))
+
+    private fun invalidProvider() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_provider_invalid_response"))
+
+    // Only fixed public operations may enter these private runners. No public arbitrary provider
+    // callback.
     private fun <T> admitted(
         token: String,
         correlationId: UUID,
         decrypt: Boolean,
         exchange: (Observation, Instant) -> Result<T>,
+    ): Result<T> =
+        admitted(token, correlationId, decrypt, { Result.Success(Unit) }) { request, _ ->
+            exchange(request.observation, request.lease.expiresAt)
+        }
+
+    private fun <S, T> admitted(
+        token: String,
+        correlationId: UUID,
+        decrypt: Boolean,
+        prepare: (Observation) -> Result<S>,
+        operation: (Exchange, S) -> Result<T>,
     ): Result<T> {
         if (
             !policy.enabled ||
@@ -93,7 +334,13 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                                     parameters = mapOf("retryAfterSeconds" to "1"),
                                 )
                             )
-                        confirm(context, observed, lease).map { Preparation(observed, lease) }
+                        confirm(context, observed, lease).flatMap {
+                            prepare(observed).flatMap { extra ->
+                                confirm(context, observed, lease).map {
+                                    Preparation(observed, lease, extra)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -104,7 +351,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             val before =
                 transactions.run(context.scope) { confirm(context, value.observation, value.lease) }
             if (before is Result.Failed) return before
-            val response = exchange(value.observation, value.lease.expiresAt)
+            val response = operation(Exchange(context, value.observation, value.lease), value.extra)
             if (Thread.currentThread().isInterrupted)
                 throw InterruptedException("Group request interrupted")
             val after =
@@ -375,8 +622,9 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         val admission: CollaborationSpaceAdmission,
     )
 
-    private class Preparation(
+    private class Preparation<S>(
         val observation: Observation,
         val lease: CollaborationSpaceRequestLease,
+        val extra: S,
     )
 }

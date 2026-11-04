@@ -49,7 +49,10 @@ refresh dispatches the distinct group prefix to its own use case. The owning mod
 binds group storage and issuance while availability remains disabled by default.
 Fixed [group self access](collaboration/space-gateway-access.md) now admits Matrix
 identity and metadata-only capabilities under exact group gateway/request ownership.
-Key/room/content authority and group runtime adoption remain unfinished.
+[Own-key upload](collaboration/space-key-exchange.md) shares current admission and
+bounded request ownership, with immutable reservation before provider work and exact
+signed readback before acknowledgement. Recipient/room/content authority and group
+runtime adoption remain unfinished.
 [Native provider renewal](collaboration/space-provider-renewal.md) recovers an expired
 head through current admission, bounded outside-SQL login and exact-generation
 publication. It preserves original identity/key provenance and requires a separate
@@ -64,15 +67,16 @@ Operational cleanup preserves device/key provenance and never reopens original c
 runtime slots. Native renewal uses the reserved slot within its original request
 budget; the shared cleanup worker timer also runs an atomic bounded group replay/
 request cleanup pass. Identity/capability access uses ordinary slots1–7 and preserves
-the reserved renewal slot. Group key/room/content authority remains next.
+the reserved renewal slot. Group recipient/room/content authority remains next.
 
 V128 retains separate [group public-key identity](collaboration/space-key-publication.md)
 reservations with original native/Matrix provenance. Only the exact initial reservation
 can advance to acknowledged publication; replacement/reset/deletion are forbidden.
 Root-owned reads survive offboarding and parent purge, while writes require current
 native/group/device authority and retained LEGACY completion. Typed storage verifies
-write readback inside the caller's transaction. Gateway signed-key exchange, recipient
-room authority and offline key availability remain separate required integration.
+write readback inside the caller's transaction. The fixed signed-key upload operation
+now owns reservation/readback/acknowledgement and journal publication. Recipient room
+authority and offline key availability remain separate required integration.
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 

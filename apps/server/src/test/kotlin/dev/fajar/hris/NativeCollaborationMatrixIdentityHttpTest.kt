@@ -478,6 +478,134 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         )
     }
 
+    @Test
+    fun groupKeyUploadUsesOriginalIdentityAndStrictUploadOnlyDispatch() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val row =
+            database()
+                .queryForMap(
+                    "select matrix_user_id,matrix_device_id from collaboration_space_devices where id=?",
+                    device,
+                )
+        val key = KeyPayload(row["matrix_user_id"] as String, row["matrix_device_id"] as String)
+        val before = provider.keyUploads.get()
+        assertEquals(401, uploadKeys(n, n.access).statusCode())
+        assertEquals(401, uploadKeys(n, token, duplicate = true).statusCode())
+        assertEquals(400, uploadKeys(n, token, suffix = "?access_token=forbidden").statusCode())
+        assertEquals(400, uploadKeys(n, token, "{\"private_key\":\"forbidden\"}").statusCode())
+        assertEquals(413, uploadKeys(n, token, " ".repeat(65537), chunked = true).statusCode())
+        assertEquals(before, provider.keyUploads.get())
+        assertEquals(200, uploadKeys(n, token).statusCode())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_key_publications where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+        repeat(2) { index ->
+            val result =
+                uploadKeys(n, token, json.writeValueAsString(key.body()), chunked = index == 1)
+            assertEquals(200, result.statusCode(), result.body())
+            assertEquals("no-store", result.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(
+                setOf("one_time_key_counts"),
+                json.readTree(result.body()).propertyNames().toSet(),
+            )
+        }
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from collaboration_space_key_publications where device_id=?",
+                    Long::class.java,
+                    device,
+                ),
+        )
+        val replacement = KeyPayload(key.user, key.device)
+        val count = provider.keyUploads.get()
+        val denied = uploadKeys(n, token, json.writeValueAsString(replacement.body()))
+        assertEquals(409, denied.statusCode(), denied.body())
+        assertEquals(
+            "collaboration_space_device_keys_changed",
+            json.readTree(denied.body())["org.hris.error_code"].asString(),
+        )
+        assertEquals(count, provider.keyUploads.get())
+        val query =
+            uploadKeys(
+                n,
+                token,
+                json.writeValueAsString(
+                    mapOf("device_keys" to mapOf(key.user to emptyList<String>()))
+                ),
+                path = "query",
+            )
+        assertEquals(401, query.statusCode(), query.body())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupUploadWithholdsReplyAfterNativeRevocationAndKeepsUncertainIdentity() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val row =
+            database()
+                .queryForMap(
+                    "select matrix_user_id,matrix_device_id from collaboration_space_devices where id=?",
+                    device,
+                )
+        val key = KeyPayload(row["matrix_user_id"] as String, row["matrix_device_id"] as String)
+        provider.onKeyUpload.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val reply = uploadKeys(n, token, json.writeValueAsString(key.body()))
+            assertEquals(401, reply.statusCode(), reply.body())
+            assertEquals("no-store", reply.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(
+                0L,
+                database()
+                    .queryForObject(
+                        "select version from collaboration_space_key_publications where device_id=?",
+                        Long::class.java,
+                        device,
+                    ),
+            )
+            val count = provider.keyUploads.get()
+            assertEquals(
+                401,
+                uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode(),
+            )
+            assertEquals(count, provider.keyUploads.get())
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onKeyUpload.set(null)
+        }
+    }
+
     private fun groupNativeCall(
         n: Native,
         path: String,

@@ -423,6 +423,11 @@ class NativeCollaborationSpaceGatewayAccessTest {
                 policy,
                 CollaborationMatrixPolicy(true, "matrix.example.test"),
                 clock,
+                StoredCollaborationSpaceKeyRepository(
+                    PostgresCollaborationSpaceKeyDataSource(base.sql)
+                ),
+                DisabledCollaborationMatrixKeyRepository(),
+                base.journal,
             )
 
         fun access(

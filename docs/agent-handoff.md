@@ -1,5 +1,53 @@
 # Agent continuation — HRIS workspace
 
+## V124 retained completion storage accepted — 4 November 2026
+
+Based on pushed9d3c8a99, V124 records immutable original/target completion provenance
+while leaving legacy runtime DRAINING. Its fixed worker-callable function atomically
+retires the old device/provider/optional public gateway and records exact successor
+versions. Group credential/ACTIVE device/SUCCEEDED queue and journal belong to the
+caller's same transaction. Current native/queue/target/source proof, actual DB time
+after waits, recent matching key readback metadata and zero live slots are required.
+No old job/room lock, nested transaction, provider logout or key deletion is used.
+
+The non-login owner has fixed search_path, forced RLS and column grants. PUBLIC/API
+execution is revoked; only existing hris_worker_capability executes. Ciphertext/hash/
+email/native refresh SELECT is denied. UPDATE(id) rights exist solely for PostgreSQL
+row locking; the fixed function does not change those identifiers. No application
+port, retained worker, HTTP or client caller invokes this capability yet.
+
+[Evidence](measurements/collaboration-legacy-runtime-completion-2026-11-04.json): six
+focused actual cases PASS128.582s with8273 unchanged inputs; full database plus
+selected domain/storage/native regression133 PASS603.054s with8275 unchanged inputs,
+all format/architecture passing. Shared snapshots match; broad adds only two recovery
+tool inputs. Recovery ceiling124 and15 Python cases pass. Actual tests include role
+rights, same-transaction rollback/cancellation/interruption, missing gateway, stale
+proof, real two-second slot expiry, native expiry while blocked and pg_dump/restore
+after parent purge. No failed run. All owned test resources are closed.
+
+Next apply/review ignored runtime-completion-port-next drafts after recording this
+commit. Six implementation files plus four mapping cases and four new actual storage
+cases are formatted only, not compiled/tested. Final storage candidate extends the
+existing fixture conditionally to V124/worker capability; default old cases stay123.
+README.json pins the existing storage source and inventories drafts. Intermediate
+storage-fixture-draft.kt/storage-methods.kt are not final files. Typed completion must
+fail/roll back if exact post-write mapping is absent, foreign or unreadable; an
+interrupted completion skips another SQL readback. No DI until an actual use case
+consumes it; shared wiring later requires actual API and full worker contexts.
+
+Follow runtime-completion-next/port-and-worker-review.md. Existing key repository
+already reads exact provider device keys; validateCollaborationDeviceKeys verifies
+signature/identity/canonical fingerprint. Do not duplicate that port. DB tests use
+synthetic key/credential metadata and do not prove provider readback, local SDK
+shutdown, remote rollback or E2EE transfer. Worker fresh proof, completed replay and
+durable Mobile gate/old namespace/inbox/outbox/read/push ownership remain required.
+
+Main46c61443/Mobile7ac87c7c need this accepted commit recorded. Mobile code3d85d569 and
+hosted gates, live8b40/schema116 pushON/SMTP OFF, normal phone28 and Starter9959c1d
+remain current. No new product build here; all54 groups and actual Apple runtime
+remain open. Continue the full long run with frequent user updates and immediate
+push of every atomic code/tests/docs commit.
+
 ## Current native drain observation accepted — 4 November 2026
 
 Based on pushed57b2bee3, GetNativeCollaborationLegacyRuntimeDrain observes the exact

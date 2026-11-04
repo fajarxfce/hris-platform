@@ -210,3 +210,27 @@ refresh, current denial, cancellation/interruption and concurrent cleanup. This
 unexposed metadata command provides no polling loop or completion permission.
 Zero server slots establishes neither SDK shutdown nor remote rollback; atomic
 publication must independently check current database time and remaining leases.
+
+
+## Immutable completion storage capability (V124)
+
+V124 retains an immutable exact original/target mapping without reopening DRAINING.
+The fixed worker-only function checks current root/native/queue proof, activated
+target/provider generations, observed old device/provider/optional gateway versions,
+matching recent public-key readback metadata and live slots after all blocking guards.
+It retires the old device, clears old provider/gateway authority and records successor
+versions. Caller owns the same transaction as group credential/device/SUCCEEDED queue
+and journal publication; any later failure must roll all of it back. No old job or
+room guard is acquired and no provider token is logged out.
+
+Its restricted non-login owner uses fixed search_path, forced RLS and column grants;
+PUBLIC/API cannot execute and applications cannot become that owner. Ciphertext,
+hashes and native refresh material are not readable. ID update grants only support
+PostgreSQL row locks. Actual migration tests also verify immutable owned metadata
+through native-parent purge and archive restore. [Evidence](../measurements/collaboration-legacy-runtime-completion-2026-11-04.json)
+records six focused cases/128.582s,133 broad cases/603.054s and15 recovery-tool
+cases, all passing with unchanged checked inputs. Recovery now recognizes124.
+
+This function has no application/worker/HTTP/client caller yet. Database fixtures use
+synthetic key/credential metadata; actual provider readback, retained activation,
+completed-mapping replay continuity and durable Mobile ownership remain required.

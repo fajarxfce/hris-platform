@@ -1,5 +1,18 @@
 # Delivery and validation
 
+## Organization conversation metadata — 4 November 2026
+
+V129 adds a separate immutable group pair, deduplicated public members and explicit
+original-company room inventory. Typed storage verifies exact readback and finite
+keyset progress, including overfetch; discovery grants no provider room authority.
+[Contract](collaboration/space-conversations.md) and
+[evidence](measurements/collaboration-space-conversation-storage-2026-11-04.json):
+all86 database plus6 typed PostgreSQL cases PASS 838.663s on 8,360 unchanged inputs,
+format/architecture and19 recovery cases. Concurrent openers, rollback/cancellation,
+exhaustion and actual archive restoration of original bound rooms pass. Native commands,
+room/recipient/content authority and Mobile adoption remain next. All54 groups stay
+open; no new APK or live rollout.
+
 ## Group signed own-key upload — 4 November 2026
 
 The fixed group upload endpoint now commits immutable reservation before bounded

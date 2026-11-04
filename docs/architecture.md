@@ -80,6 +80,15 @@ authority and offline key availability remain separate required integration.
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
+V129 gives [organization conversations](collaboration/space-conversations.md) a
+separate immutable pair identity, deduplicated current public member metadata and
+owned original-company room inventory. Restricted view owners gain column-only
+metadata privileges. Typed acquisition validates every row and finite cursor
+progress, including overfetch, and requires exact insert readback. No provider room
+or recipient grant follows from discovery; native commands and room adoption must
+separately admit current authority. Original company rows and crypto namespaces stay
+explicit through migration and archive recovery.
+
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 
 Workforce owns schedules and factual attendance; leave owns absence decisions. Reporting and payroll combine those facts. Identity uses stable company/person identifiers without depending on their implementation. These directions prevent cycles. Payroll owns scoped read projections for immutable workforce evidence. Its datasources read raw records; repositories map them into payroll domain references. The originating module retains write ownership. This permits payroll to consume factual snapshots without importing another module’s data implementation or moving permission/period policy into a datasource.

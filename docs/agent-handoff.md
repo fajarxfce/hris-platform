@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Group conversation storage accepted — 4 November 2026
+
+Based on a65a8170, V129 retains a separate immutable space/account pair, deduplicated
+current public members with optional canonical identity, and owned original-company
+conversation/room inventory. Restricted non-login view owners get only public columns;
+source company rows and crypto namespaces are unchanged. Typed acquisition validates
+exact ownership, immutable shapes, nullable tuples and finite microsecond times.
+Insert readback shares the caller's rollback boundary; bounded unsigned/composite
+keyset pages validate overfetch and return no cursor at exhaustion.
+Read [the contract](collaboration/space-conversations.md).
+
+[Evidence](measurements/collaboration-space-conversation-storage-2026-11-04.json):
+all86 database and6 typed PostgreSQL cases PASS 838.663s, 8,360 unchanged inputs,
+format/architecture and19 recovery checks PASS. Opposite participants converge under
+the pair guard; failed results, cancellation/interruption and malformed readback roll
+back. Real original bound rooms pass old job/device/provisioning guards, survive parent
+purge and pg_dump/pg_restore, and preserve restricted views/forced RLS. No Gradle gate
+failed. An initial recovery unittest invocation used the wrong working directory;
+the correct tool-directory command passed without a code change. Recovery accepts129,
+rejects130 and retains V126's encrypted projection unchanged. Sessions are closed;
+record-storage.py and finish-storage-docs.py have run and are stale after this commit.
+
+NEXT native group open/get/list plus bounded original inventory, with current native,
+group and peer rechecks, atomic receipts/journal and actual API/FULL worker validation.
+Reviewed but UNAPPLIED drafts are ignored group-rooms/*kt.txt and apply-native.py;
+review/format/test before use. Then exact room adoption/provisioning and recipient
+key query/claim/to-device/content/push. Metadata discovery grants no provider authority;
+do not impersonate peers, alias space to company, merge historical identities or reopen
+DRAINING old runtimes. Offline receiving must not require short native/provider tokens.
+Native hard-parent replacement and full Mobile preflight/stage/freeze/completion/adoption
+remain required, preserving original SDK namespace, keys, history and uncertain sends.
+
+Group is disabled with no product caller/rollout. All54 groups and actual Apple Matrix/
+APNs/CallKit remain open. Main e090e7e3/Mobile4678042f/hosted0b804cb2, phone28,
+live8b40/schema116 push ON/SMTP OFF and Starter9959c1d unchanged. Manifest continuation
+now reflects these accepted checkpoints instead of stale release26/push-OFF entries.
+Continue full long run, frequent updates, atomic pushes and validated product feature
+installs only; never install proof APKs or reinstall unchanged28.
+
 ## Group signed own-key exchange accepted — 4 November 2026
 
 Based on 88f5fc20, AccessNativeCollaborationSpaceMatrixDevice now owns fixed signed

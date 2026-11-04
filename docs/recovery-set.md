@@ -8,7 +8,7 @@ It has no live restore destination and never stops or restarts the source servic
 Use Linux, Python 3.11+, Java 21, Docker and curl with SigV4 support. Build the
 current API JAR first; its offline key-verification entry point reuses the actual
 application cipher without starting Spring, an HTTP server, workers or providers.
-The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–128
+The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–129
 are supported by the current verifier. New encryption contracts require reviewing
 the schema bound. V121 adds a distinct authenticated organization Matrix credential
 projection; [its recovery contract](collaboration/group-credentials.md) retains
@@ -19,8 +19,10 @@ are exercised through an actual PostgreSQL archive restore.
 V123–V125 add retained handover metadata. V126 adds the distinct authenticated
 [group gateway replay](collaboration/space-gateway.md) projection. V127 request leases
 and V128 [public-key reservations](collaboration/space-key-publication.md) add no new
-encrypted envelope; their projection remains byte-identical to V126. Unknown future
-schema 129 is rejected. Public-key metadata and forced RLS survive database restore.
+encrypted envelope. V129 adds [group conversations and original-room metadata](collaboration/space-conversations.md)
+without changing that projection; it remains byte-identical to V126. Unknown future
+schema 130 is rejected. Public identity, original bound rooms, restricted views and
+forced RLS survive database restore.
 
 ## Capture a checkpoint
 

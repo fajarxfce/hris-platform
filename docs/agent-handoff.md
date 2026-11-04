@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Original room creator accepted — 4 November 2026
+
+Group worktree [6c22caba](https://github.com/fajarxfce/hris-platform/commit/6c22caba) adds
+V130 and exposes the original binding creator as room.createdBy, separately from the
+conversation creator. Both participants retain correct attribution through upgrade,
+native-parent purge and archive restore. [Evidence](https://github.com/fajarxfce/hris-platform/blob/6c22caba/docs/measurements/collaboration-original-room-creator-2026-11-04.json):
+database 4/data 12/API 97 PASS 363.765s with format/architecture and 8,372 unchanged
+inputs. One stale recovery future-schema test sentinel was corrected after the gate;
+all 19 recovery cases then passed in 0.011s. Encryption projection unchanged from V126.
+No DI change or fresh worker claim. The push eventually succeeded after GitHub
+commit_refs/500 failures using existing gh HTTPS authentication.
+
+NEXT group-owned room request/publication and original adoption, preserving actual
+creator, canonical users, original coordinates and current admission around bounded
+provider I/O. A group worktree follow-up currently adds exact original-pair lookup,
+pure original-state validation and actual peer join/key-retention/restart proof;
+these follow-up changes are uncommitted and not yet accepted. Resolve other legacy
+producers/unbound old jobs before rollout; never silently replace old history. Then
+recipient keys/content/sync/push and Mobile full adoption preserving SDK namespace,
+passphrase, keys and uncertain sends. Offline receiving and hard-parent replacement
+remain open. Live 8b40/schema 116 push ON/SMTP OFF, normal phone 28, product/hosted
+0b804cb2 and Starter 9959c1d unchanged. Group disabled; all 54 groups open. Continue
+long run, frequent updates, atomic pushes and validated product feature installs only.
+
 ## Group Matrix room protocol accepted — 4 November 2026
 
 Group branch [0a6ad2b2](https://github.com/fajarxfce/hris-platform/commit/0a6ad2b2) preserves

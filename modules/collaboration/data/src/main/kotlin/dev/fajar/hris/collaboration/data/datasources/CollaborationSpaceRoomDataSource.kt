@@ -36,6 +36,9 @@ data class CollaborationSpaceRoomBindingData(
 )
 
 interface CollaborationSpaceRoomDataSource {
+    /** Original unsigned pair guard must precede account/native guards. */
+    fun lockOriginalPair(companyId: UUID, first: UUID, second: UUID)
+
     fun lock(spaceId: UUID, conversationId: UUID)
 
     fun intent(

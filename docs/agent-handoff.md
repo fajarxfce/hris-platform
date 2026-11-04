@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Native room request/status foundation accepted — 4 November 2026
+
+Current native/group/client/device/provider admission now wraps room request and
+safe status use cases. Original pair guard precedes account/native/device guards;
+both canonical peers and current native/group authority are checked again before
+returning. Intent, private request, receipt and journal are atomic. Retained room
+adoption keeps its actual creator independently of the first requester.
+[Contract](collaboration/native-space-room.md),
+[evidence](measurements/collaboration-native-space-room-2026-11-04.json): final41
+PostgreSQL cases PASS316.012s with quality checks on8,393 unchanged inputs. All103
+domain cases pass in the earlier mixed run with verified production/domain input
+continuity. Initial compile/fixture/replay assertion failures are resolved and
+recorded. Actual retained transfers, both original namespaces, opposite completed
+requesters, rollback and original-pair lock waiting pass. All test sessions closed.
+
+IMPORTANT next: first-requester-only V131 retry can strand an uncertain room if
+that requester is offline. Before rollout, support the other participant using its
+own current native/provider proof, without reading/reusing the first private queue.
+Recover the SAME stable alias/history, retain actual observed canonical SPACE creator
+or exact LEGACY creator, and fence competing publication atomically. See the contract.
+Per-participant bounded queues are a design candidate, not yet implemented.
+
+No HTTP/shared DI/room worker/product caller exists for these use cases. Actual native
+HTTP and FULL apps:worker:test are required when DI is connected. Then worker/provider
+reconciliation, recipient keys/content/sync/push and full Mobile adoption preserving
+SDK namespace/passphrase, keys/history and uncertain sends. Offline keys/hard-parent
+replacement remain required. Applied native policy/request/read/test .kt.txt drafts
+are STALE; use source. Only HTTP/DTO/DI drafts remain unapplied/unverified.
+Group disabled/all54 groups open. Live8b40/schema116 pushON/SMTPOFF, normal phone28,
+Mobile product/hosted0b804cb2 and Starter9959c1d unchanged. Main3284eee0 and Mobileca09e34a
+V132 peer handoffs pushed. Continue long run, updates, atomic pushes and validated
+PRODUCT feature installs only. StarterPR2 remains stale Draft targeting the old
+foundation branch; every PR commit is already in main. No PR mutation was requested.
+
 ## Original/group history routing accepted — 4 November 2026
 
 V132 adds one immutable unique route per same-original-company canonical pair.

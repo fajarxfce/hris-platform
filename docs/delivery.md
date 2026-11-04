@@ -1,5 +1,15 @@
 # Delivery and validation
 
+## Native room admission foundation — 4 November 2026
+
+Native room request/status now enforce current authority and atomic request/receipt/
+journal, including completed original-device transfers. [Contract](collaboration/native-space-room.md)
+and [evidence](measurements/collaboration-native-space-room-2026-11-04.json): data41
+PASS316.012s with quality checks; domain103 pass with verified source continuity.
+No HTTP/DI/worker or product rollout. Peer recovery while the first requester is
+offline remains required before enabling group rooms; never replace history or use
+another participant's private native proof. All54 PRD groups remain open.
+
 ## One original/group history per canonical pair — 4 November 2026
 
 V132's immutable unique route closes the late-original creation race. Original/group

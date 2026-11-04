@@ -6,6 +6,9 @@ import java.util.UUID
 
 /** Caller owns current admission, guard order, receipt/journal and transaction boundaries. */
 interface CollaborationSpaceRoomRepository {
+    /** Original unsigned pair guard must precede account/native guards. */
+    fun lockOriginalPair(companyId: UUID, first: UUID, second: UUID): Result<Unit>
+
     fun lock(spaceId: UUID, conversationId: UUID): Result<Unit>
 
     fun intent(

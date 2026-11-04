@@ -11,6 +11,13 @@ import java.util.UUID
 
 class StoredCollaborationSpaceRoomRepository(private val source: CollaborationSpaceRoomDataSource) :
     CollaborationSpaceRoomRepository {
+    override fun lockOriginalPair(companyId: UUID, first: UUID, second: UUID): Result<Unit> =
+        safeDatabaseCall {
+            requireSpaceRoomIds(companyId, first, second)
+            require(first.toString() < second.toString())
+            source.lockOriginalPair(companyId, first, second)
+        }
+
     override fun lock(spaceId: UUID, conversationId: UUID): Result<Unit> = safeDatabaseCall {
         requireSpaceRoomIds(spaceId, conversationId)
         source.lock(spaceId, conversationId)

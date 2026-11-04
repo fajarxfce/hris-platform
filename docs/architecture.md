@@ -113,6 +113,13 @@ commit route and selected history together. Participant root/exact-company RLS e
 only routing metadata; original adoption keeps its route. Application lock ordering
 and current provider admission remain separate integration obligations.
 
+Native room request/status [application use cases](collaboration/native-space-room.md)
+coordinate current root native/group/device/provider and both canonical participant
+admission around repository outcomes. Intent/request/receipt/journal commit atomically;
+optional original pair guards precede account/native/device locks. Safe status exposes
+no private proof. No endpoint/shared DI/room worker is wired yet. V131 first-requester
+retry remains insufficient for offline-peer recovery and must evolve before rollout.
+
 Native group conversation open/read/list and original-inventory routes now own current
 native/group admission in their use cases. Pair creation and opposite-participant
 replay converge under operation/pair/account/native guards with atomic receipt/journal

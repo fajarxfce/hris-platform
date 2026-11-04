@@ -13,6 +13,13 @@ import org.jooq.impl.DSL
 
 class PostgresCollaborationSpaceRoomDataSource(private val sql: DSLContext) :
     CollaborationSpaceRoomDataSource {
+    override fun lockOriginalPair(companyId: UUID, first: UUID, second: UUID) {
+        sql.execute(
+            "select pg_advisory_xact_lock(hashtextextended(?,0))",
+            "collaboration.direct:$companyId:$first:$second",
+        )
+    }
+
     override fun lock(spaceId: UUID, conversationId: UUID) {
         sql.execute(
             "select pg_advisory_xact_lock(hashtextextended(?,0))",

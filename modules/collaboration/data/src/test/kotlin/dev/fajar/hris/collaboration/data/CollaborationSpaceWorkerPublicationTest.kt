@@ -83,6 +83,12 @@ class CollaborationSpaceWorkerPublicationTest {
         owner.execute(
             "grant insert,update on collaboration_space_key_publications to space_advance_command_fixture"
         )
+        owner.execute(
+            "grant insert on collaboration_space_direct_conversations,collaboration_space_room_intents,collaboration_original_pair_routes to space_advance_command_fixture"
+        )
+        owner.execute(
+            "grant insert,update on collaboration_space_room_provisioning to space_advance_command_fixture"
+        )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
         runtime =
             DriverManagerDataSource(
@@ -1991,10 +1997,196 @@ class CollaborationSpaceWorkerPublicationTest {
         }
     }
 
-    private inner class Fixture(verifiedMfa: Boolean = false) {
+    @Test
+    fun retainedRoomRequestKeepsOriginalCreatorAndBothCompletedDeviceNamespaces() {
+        val a = Fixture(verifiedMfa = true)
+        val b = Fixture(verifiedMfa = true, existingCompany = a.company)
+        val oldA = a.activeLegacy(signed = true)
+        val oldB = b.activeLegacy(signed = true)
+        val pair = listOf(a.account, b.account).sortedBy(UUID::toString)
+        val original = UUID.randomUUID()
+        val group = UUID.randomUUID()
+        val at = now.minusSeconds(20).toString()
+        val job = UUID.randomUUID()
+        owner.update(
+            "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?::timestamptz)",
+            a.company,
+            original,
+            pair[0],
+            pair[1],
+            a.account,
+            at,
+        )
+        owner.update(
+            """insert into background_jobs(id,company_id,actor_id,kind,operation_id,request,authenticated_at,credential_version,correlation_id,created_at,total_items) values(?,?,?,'COLLABORATION_DIRECT_PROVISION',?,jsonb_build_object('conversationId',?::text,'deviceId',?::text,'nativeSessionId',?::text,'platform','ANDROID','clientBuild','28'),?::timestamptz,0,?,?::timestamptz,1)""",
+            job,
+            b.company,
+            b.account,
+            UUID.randomUUID(),
+            original,
+            oldB.deviceId,
+            b.session,
+            b.actor.authenticatedAt.toString(),
+            UUID.randomUUID(),
+            at,
+        )
+        owner.update(
+            "insert into collaboration_direct_room_provisioning(company_id,conversation_id,account_id,device_id,job_id,version,created_at,updated_at) values(?,?,?,?,?,0,?::timestamptz,?::timestamptz)",
+            b.company,
+            original,
+            b.account,
+            oldB.deviceId,
+            job,
+            at,
+            at,
+        )
+        owner.update(
+            "update background_jobs set status='RUNNING',attempts=1,lease_owner=gen_random_uuid(),lease_token=gen_random_uuid(),lease_until=clock_timestamp()+interval '1 minute' where id=?",
+            job,
+        )
+        owner.update(
+            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,?,'!original-room:matrix.example.test',?::timestamptz)",
+            b.company,
+            original,
+            b.account,
+            job,
+            server,
+            at,
+        )
+        val idA = completeRoomDevice(a, oldA)
+        val idB = completeRoomDevice(b, oldB)
+        val created = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        owner.update(
+            "insert into collaboration_space_direct_conversations(space_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?::timestamptz)",
+            space,
+            group,
+            pair[0],
+            pair[1],
+            b.account,
+            created.toString(),
+        )
+        val priorA = a.originalSnapshot()
+        val priorB = b.originalSnapshot()
+        val receipt = success(a.requestRoom(group, idA))
+        assertEquals(MutationReceipt(group, 0), receipt)
+        val intent =
+            success(
+                a.transactions.run(a.actor) { a.roomRepository().intent(space, a.account, group) }
+            )!!
+        assertEquals(a.account, intent.requestedBy)
+        assertEquals(b.account, intent.matrixCreatorAccountId)
+        assertEquals(CollaborationSpaceRoomOrigin.LEGACY, intent.origin)
+        val originalRoom = requireNotNull(intent.original)
+        assertEquals(original, originalRoom.conversationId)
+        assertEquals("!original-room:matrix.example.test", originalRoom.roomId)
+        // The other fully initialized participant observes this request, never steals it.
+        assertEquals(receipt, success(b.requestRoom(group, idB)))
+        failure(b.requestRoom(group, idB, revision = 0), "collaboration_room_creator_required")
+        assertEquals(
+            a.account,
+            success(
+                    a.transactions.run(a.actor) {
+                        a.roomRepository().provisioning(space, a.account, group)
+                    }
+                )!!
+                .request
+                .accountId,
+        )
+        assertEquals(priorA, a.originalSnapshot())
+        assertEquals(priorB, b.originalSnapshot())
+        assertNotNull(a.completion(oldA))
+        assertNotNull(b.completion(oldB))
+    }
+
+    @Test
+    fun oppositeCompletedRequestersCreateOneSpaceRoomIntentWithoutChangingLegacyKeys() {
+        val a = Fixture(verifiedMfa = true)
+        val b = Fixture(verifiedMfa = true)
+        val oldA = a.activeLegacy(signed = true)
+        val oldB = b.activeLegacy(signed = true)
+        val idA = completeRoomDevice(a, oldA)
+        val idB = completeRoomDevice(b, oldB)
+        val group = UUID.randomUUID()
+        val pair = listOf(a.account, b.account).sortedBy(UUID::toString)
+        owner.update(
+            "insert into collaboration_space_direct_conversations(space_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,clock_timestamp())",
+            space,
+            group,
+            pair[0],
+            pair[1],
+            a.account,
+        )
+        val priorA = a.originalSnapshot()
+        val priorB = b.originalSnapshot()
+        val start = CountDownLatch(1)
+        val pool = Executors.newFixedThreadPool(2)
+        try {
+            val first =
+                pool.submit<Result<MutationReceipt>> {
+                    check(start.await(10, TimeUnit.SECONDS))
+                    a.requestRoom(group, idA)
+                }
+            val second =
+                pool.submit<Result<MutationReceipt>> {
+                    check(start.await(10, TimeUnit.SECONDS))
+                    b.requestRoom(group, idB)
+                }
+            start.countDown()
+            assertEquals(MutationReceipt(group, 0), success(first.get(20, TimeUnit.SECONDS)))
+            assertEquals(MutationReceipt(group, 0), success(second.get(20, TimeUnit.SECONDS)))
+        } finally {
+            start.countDown()
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+        }
+        val intent =
+            success(
+                a.transactions.run(a.actor) { a.roomRepository().intent(space, a.account, group) }
+            )!!
+        assertEquals(CollaborationSpaceRoomOrigin.SPACE, intent.origin)
+        assertTrue(intent.requestedBy in pair)
+        assertEquals(intent.requestedBy, intent.matrixCreatorAccountId)
+        assertEquals(
+            1,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_room_provisioning where conversation_id=?",
+                Int::class.java,
+                group,
+            ),
+        )
+        assertEquals(
+            intent.requestedBy,
+            owner.queryForObject(
+                "select account_id from collaboration_space_room_provisioning where conversation_id=?",
+                UUID::class.java,
+                group,
+            ),
+        )
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_original_pair_routes where space_conversation_id=?",
+                Int::class.java,
+                group,
+            ),
+        )
+        assertEquals(priorA, a.originalSnapshot())
+        assertEquals(priorB, b.originalSnapshot())
+    }
+
+    private fun completeRoomDevice(f: Fixture, original: CollaborationLegacyDevicePosition): UUID {
+        f.gateway(original)
+        val id = f.register(original)
+        f.freeze(id)
+        success(f.advance(f.claim(id), f.provider(id)))
+        assertEquals(CollaborationDeviceState.ACTIVE, f.device(id).state)
+        return id
+    }
+
+    private inner class Fixture(verifiedMfa: Boolean = false, existingCompany: UUID? = null) {
         val baseAt = now.minusSeconds(120)
         val account = UUID.randomUUID()
-        val company = UUID.randomUUID()
+        val company = existingCompany ?: UUID.randomUUID()
         val actor =
             Actor(
                 account,
@@ -2085,12 +2277,13 @@ class CollaborationSpaceWorkerPublicationTest {
 
         init {
             fixtures.add(this)
-            owner.update(
-                "insert into companies(id,code,name,timezone) values(?,?,?,'UTC')",
-                company,
-                compact(company).take(20),
-                "Fictional company",
-            )
+            if (existingCompany == null)
+                owner.update(
+                    "insert into companies(id,code,name,timezone) values(?,?,?,'UTC')",
+                    company,
+                    compact(company).take(20),
+                    "Fictional company",
+                )
             owner.update(
                 "insert into accounts(id,email,display_name) values(?,?,?)",
                 account,
@@ -2109,6 +2302,49 @@ class CollaborationSpaceWorkerPublicationTest {
             )
             session = parent()
         }
+
+        fun roomRepository() =
+            StoredCollaborationSpaceRoomRepository(PostgresCollaborationSpaceRoomDataSource(sql))
+
+        fun requestRoom(
+            conversation: UUID,
+            device: UUID,
+            revision: Long? = null,
+        ): Result<MutationReceipt> =
+            RequestNativeCollaborationSpaceRoom(
+                    roomRepository(),
+                    StoredCollaborationSpaceConversationRepository(
+                        PostgresCollaborationSpaceConversationDataSource(sql)
+                    ),
+                    registry,
+                    credentials,
+                    selections,
+                    legacyParents,
+                    completions,
+                    provisioning,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    IdentitySecurityPolicy(),
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    Clock.systemUTC(),
+                )
+                .execute(
+                    actor,
+                    session,
+                    0,
+                    space,
+                    UUID.randomUUID(),
+                    conversation,
+                    device,
+                    device(device).version,
+                    revision,
+                    client,
+                )
 
         fun parent(): UUID {
             val id = UUID.randomUUID()

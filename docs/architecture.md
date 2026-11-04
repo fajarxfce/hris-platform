@@ -89,6 +89,11 @@ or recipient grant follows from discovery; native commands and room adoption mus
 separately admit current authority. Original company rows and crypto namespaces stay
 explicit through migration and archive recovery.
 
+V130 appends the original room binding creator to that restricted inventory. It is
+separate from the conversation creator and required in the complete typed room tuple;
+future adoption must use the actual provider creator. Original rows and the view's
+existing owner, grants and column order are preserved through upgrade and recovery.
+
 Native group conversation open/read/list and original-inventory routes now own current
 native/group admission in their use cases. Pair creation and opposite-participant
 replay converge under operation/pair/account/native guards with atomic receipt/journal

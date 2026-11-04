@@ -267,6 +267,41 @@ class CollaborationSpaceConversationRepositoryTest {
     }
 
     @Test
+    fun originalBoundRoomKeepsItsActualCreatorForBothParticipantsAfterParentPurge() {
+        val f = Fixture()
+        val peer = f.peer()
+        val conversation = UUID.randomUUID()
+        f.seedLegacyRoom(peer, conversation)
+        val position = CollaborationLegacyConversationPosition(f.s.company, conversation)
+        val item = success(f.tx { f.repo.legacyOne(f.s.space, f.s.account, position) })!!
+        assertEquals(peer, item.conversation.createdBy)
+        assertEquals(
+            CollaborationLegacyRoomMetadata(
+                "matrix.example.test",
+                "!owned:matrix.example.test",
+                f.s.at,
+                f.s.account,
+            ),
+            item.room,
+        )
+        assertEquals(
+            item,
+            success(f.tx { f.repo.legacy(f.s.space, f.s.account, null, 1) }).items.single(),
+        )
+        assertEquals(
+            item,
+            success(
+                f.s.tx(f.s.actor.copy(accountId = peer)) {
+                    f.repo.legacyOne(f.s.space, peer, position)
+                }
+            ),
+        )
+        f.s.owner.update("delete from native_sessions where id=?", f.s.parent)
+        assertEquals(item, success(f.tx { f.repo.legacyOne(f.s.space, f.s.account, position) }))
+        assertNull(success(f.tx { f.repo.legacyOne(f.s.space, UUID.randomUUID(), position) }))
+    }
+
+    @Test
     fun malformedRowsIncludingOverfetchNeverProducePartialPagesOrIdentityAuthority() {
         val f = Fixture()
         val first = f.value(f.peer(), UUID.fromString("00000000-0000-0000-0000-000000000001"))
@@ -371,6 +406,10 @@ class CollaborationSpaceConversationRepositoryTest {
                 "owner",
                 "version",
                 "partialRoom",
+                "creatorOnly",
+                "missingCreator",
+                "foreignCreator",
+                "zeroCreator",
                 "badRoom",
                 "earlyRoom",
                 "duplicate",
@@ -398,8 +437,19 @@ class CollaborationSpaceConversationRepositoryTest {
                                     "owner" -> row.firstAccountId = row.secondAccountId
                                     "version" -> row.version = 1
                                     "partialRoom" -> row.matrixServerName = "matrix.example.test"
+                                    "creatorOnly" -> row.roomCreatedBy = row.createdBy
                                     "badRoom",
+                                    "missingCreator",
+                                    "foreignCreator",
+                                    "zeroCreator",
                                     "earlyRoom" -> {
+                                        row.roomCreatedBy =
+                                            when (mode) {
+                                                "missingCreator" -> null
+                                                "foreignCreator" -> UUID.randomUUID()
+                                                "zeroCreator" -> UUID(0, 0)
+                                                else -> row.createdBy
+                                            }
                                         row.matrixServerName = "matrix.example.test"
                                         row.matrixRoomId =
                                             if (mode == "badRoom") "!has space" else "!original"
@@ -558,7 +608,7 @@ class CollaborationSpaceConversationRepositoryTest {
 
         init {
             s.migrate()
-            Flyway.configure().dataSource(s.source).target("129").load().migrate()
+            Flyway.configure().dataSource(s.source).target("130").load().migrate()
             s.owner.execute(
                 "grant select,insert,update,delete on collaboration_space_direct_conversations to space_gateway_fixture"
             )
@@ -608,6 +658,78 @@ class CollaborationSpaceConversationRepositoryTest {
                 pair[1],
                 s.account,
                 s.at,
+            )
+        }
+
+        fun seedLegacyRoom(peer: UUID, conversation: UUID) {
+            val pair = listOf(s.account, peer).sortedBy(UUID::toString)
+            val device = UUID.randomUUID()
+            val job = UUID.randomUUID()
+            val at = java.sql.Timestamp.from(s.at)
+            s.owner.update(
+                "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?)",
+                s.company,
+                conversation,
+                pair[0],
+                pair[1],
+                peer,
+                at,
+            )
+            s.owner.update(
+                "insert into collaboration_devices(company_id,id,account_id,platform,label,state,version,created_at,updated_at) values(?,?,?,'ANDROID','Fictional retained device','PROVISIONING',0,?,?)",
+                s.company,
+                device,
+                s.account,
+                at,
+                at,
+            )
+            s.owner.update(
+                "insert into collaboration_device_sessions(company_id,device_id,account_id,native_session_id,bound_at) values(?,?,?,?,?)",
+                s.company,
+                device,
+                s.account,
+                s.parent,
+                at,
+            )
+            s.owner.update(
+                "update collaboration_devices set state='ACTIVE',version=1 where id=?",
+                device,
+            )
+            s.owner.update(
+                """insert into background_jobs(id,company_id,actor_id,kind,operation_id,request,authenticated_at,credential_version,correlation_id,created_at,total_items)
+                values(?,?,?,'COLLABORATION_DIRECT_PROVISION',?,jsonb_build_object('conversationId',?::text,'deviceId',?::text,'nativeSessionId',?::text,'platform','ANDROID','clientBuild','5'),?,0,?,?,1)""",
+                job,
+                s.company,
+                s.account,
+                UUID.randomUUID(),
+                conversation,
+                device,
+                s.parent,
+                at,
+                UUID.randomUUID(),
+                at,
+            )
+            s.owner.update(
+                "insert into collaboration_direct_room_provisioning(company_id,conversation_id,account_id,device_id,job_id,version,created_at,updated_at) values(?,?,?,?,?,0,?,?)",
+                s.company,
+                conversation,
+                s.account,
+                device,
+                job,
+                at,
+                at,
+            )
+            s.owner.update(
+                "update background_jobs set status='RUNNING',attempts=1,lease_owner=gen_random_uuid(),lease_token=gen_random_uuid(),lease_until=now()+interval '1 minute' where id=?",
+                job,
+            )
+            s.owner.update(
+                "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test','!owned:matrix.example.test',?)",
+                s.company,
+                conversation,
+                s.account,
+                job,
+                at,
             )
         }
 

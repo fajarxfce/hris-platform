@@ -34,6 +34,7 @@ data class CollaborationLegacyRoomMetadata(
     val serverName: String,
     val roomId: String,
     val boundAt: Instant,
+    val createdBy: UUID,
 )
 
 /** The original company conversation remains explicit; this is not an adopted group room. */

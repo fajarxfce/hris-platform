@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Original Matrix room creator — 4 November 2026
+
+V130 and typed/native inventory preserve the actual original room creator separately
+from the conversation creator. [Contract](collaboration/space-conversations.md) and
+[evidence](measurements/collaboration-original-room-creator-2026-11-04.json): database 4,
+data 12 and API 97 passed in 363.765s with quality checks and 8,372 unchanged inputs.
+Upgrade, archive restore, parent purge, malformed tuples and both participants through
+HTTP pass. One stale recovery test boundary was corrected afterward; all 19 cases
+pass and the encryption projection is unchanged. No room adoption, DI change, product
+APK, live rollout or completed PRD group. Group room lifecycle and Mobile integration
+remain next.
+
 ## Explicit group Matrix room protocol — 4 November 2026
 
 Canonical user IDs, distinct group alias/immutable marker and strict provider state

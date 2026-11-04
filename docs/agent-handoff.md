@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Original room creator retained — 4 November 2026
+
+V130 appends the actual original binding creator to the restricted legacy inventory.
+A conversation can be opened by one employee and its Matrix room created by the other;
+`room.createdBy` now preserves that distinction. Typed mapping requires the complete
+room tuple and a creator from the original pair. Original rows, existing view columns,
+owner and privileges stay intact. Read [the contract](collaboration/space-conversations.md).
+
+[Evidence](measurements/collaboration-original-room-creator-2026-11-04.json): 113 cases
+passed in 363.765s (database 4, typed/native data 12, API 97), plus format/architecture,
+on 8,372 unchanged inputs. PostgreSQL upgrade, actual archive restore, parent purge,
+malformed tuples, opposite creators and both participants through HTTP are covered.
+Recovery initially had one stale future-schema sentinel; after the Gradle gate only
+that test changed from 130 to 131. All 19 recovery cases then passed in 0.011s. V130
+uses the unchanged V126 encrypted-envelope projection. No shared DI changed and no
+fresh worker result is claimed. All test sessions are closed.
+
+NEXT separate group room request/queue/publication and original room adoption. Pin
+first requester separately from actual Matrix creator, exact canonical users and
+original native/device proof. Use finite leases/retries and current admission before
+and after outside-SQL provider work; stable alias recovery precedes immutable binding.
+An original unbound conversation can still have an uncertain old room job: do not
+silently create replacement history. Other legacy producers/partitions need a real
+creation fence before rollout. See ignored group-room-lifecycle/design.md for reviewed
+continuation details; no V131 or lifecycle implementation exists yet. Then recipient
+keys/content/sync/push and Mobile adoption preserving SDK namespace/passphrase, keys,
+history and uncertain sends. Offline receiving and native hard-parent replacement
+remain required. Group disabled/all 54 groups open; normal phone 28/live 8b40/schema 116
+push ON/SMTP OFF, product/hosted 0b804cb2 and Starter 9959c1d unchanged. Main bc24e5e2/
+Mobile 103ac2b0 provider handoffs were pushed after transient GitHub 500s using existing
+gh HTTPS authentication. Continue long run, updates, atomic pushes and validated
+product feature installs only.
+
 ## Group Matrix room protocol accepted — 4 November 2026
 
 Based onb478f776, separate group room request/marker/observation types and an internal

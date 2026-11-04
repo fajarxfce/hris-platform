@@ -251,6 +251,17 @@ class CollaborationSpaceConversationMigrationTest {
         val conversation = UUID.randomUUID()
         seedLegacyRoom(f, peer, conversation)
         val original = f.owner.queryForList("select * from collaboration_direct_room_bindings")
+        Flyway.configure().dataSource(f.source).target("129").load().migrate()
+        f.owner.execute(
+            "grant select on collaboration_space_legacy_conversations to space_gateway_fixture"
+        )
+        val before =
+            success(
+                f.run {
+                    f.runtime.queryForList("select * from collaboration_space_legacy_conversations")
+                }
+            )
+        assertFalse(before.single().containsKey("room_created_by"))
         migrate(f)
         success(f.run { insert(f, peer, UUID.randomUUID()) })
         assertEquals(
@@ -264,6 +275,24 @@ class CollaborationSpaceConversationMigrationTest {
                 }
             )
         assertEquals(1, inventory.size)
+        assertEquals(before, inventory.map { it.filterKeys { key -> key != "room_created_by" } })
+        assertEquals(peer, inventory.single()["created_by"])
+        assertEquals(f.account, inventory.single()["room_created_by"])
+        assertEquals(
+            "hris_collaboration_legacy_reader",
+            f.owner.queryForObject(
+                "select pg_get_userbyid(relowner) from pg_class where oid='collaboration_space_legacy_conversations'::regclass",
+                String::class.java,
+            ),
+        )
+        assertTrue(
+            requireNotNull(
+                f.owner.queryForObject(
+                    "select 'security_barrier=true'=any(reloptions) from pg_class where oid='collaboration_space_legacy_conversations'::regclass",
+                    Boolean::class.java,
+                )
+            )
+        )
         assertEquals(f.company, inventory.single()["legacy_company_id"])
         assertEquals(conversation, inventory.single()["legacy_conversation_id"])
         assertEquals("!owned:matrix.example.test", inventory.single()["matrix_room_id"])
@@ -358,7 +387,7 @@ class CollaborationSpaceConversationMigrationTest {
     private fun base() = SpaceGatewayMigrationFixture(postgres).also { it.migrate() }
 
     private fun migrate(f: SpaceGatewayMigrationFixture) {
-        Flyway.configure().dataSource(f.source).target("129").load().migrate()
+        Flyway.configure().dataSource(f.source).target("130").load().migrate()
         f.owner.execute(
             "grant select,insert,update,delete on collaboration_space_direct_conversations to space_gateway_fixture,space_gateway_worker"
         )
@@ -440,7 +469,7 @@ class CollaborationSpaceConversationMigrationTest {
             conversation,
             pair[0],
             pair[1],
-            f.account,
+            peer,
             at,
         )
         f.owner.update(

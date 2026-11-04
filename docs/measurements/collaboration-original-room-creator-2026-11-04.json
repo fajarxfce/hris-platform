@@ -1,0 +1,110 @@
+{
+  "recordedAt": "2026-11-04T09:55:31.250094+00:00",
+  "baseCommit": "0a6ad2b27209207902b2d1679490ab0fa7f19da9",
+  "scope": "Original bound room creator metadata; no room adoption or provider authority",
+  "migration": 130,
+  "behavior": [
+    "Append original binding account_id to the restricted legacy view without changing original rows, prior column order, view owner or existing privileges.",
+    "A present room tuple includes a creator from the exact original pair. Missing, foreign, zero or creator-only tuples fail typed mapping.",
+    "Native inventory exposes room.createdBy separately from conversation.createdBy. Both original participants see the actual room creator; foreign accounts do not.",
+    "Original room metadata survives native parent purge and pg_dump/pg_restore."
+  ],
+  "gradleGate": {
+    "startedAt": "2026-11-04T09:46:42.208929+00:00",
+    "elapsedSeconds": 363.765,
+    "exitCode": 0,
+    "sourceFiles": 8372,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 113,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.core.database.CollaborationSpaceConversationMigrationTest.xml": {
+        "sha256": "1a4b00bd3d5976d0df7e637ff6c905888e6ea1b1de0b7c89dbdbd3e24249c630",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDirectTest.xml": {
+        "sha256": "c090e9292e7d4ac0fb6f9d2fed2149e369803c3d71ec501b5b893d11ea1a0e4f",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceConversationRepositoryTest.xml": {
+        "sha256": "cf2f228059d8603359c0bdca48b61e549d75bc91ad6c5bb176bfbbaac22ae59d",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.NativeCollaborationMatrixConfigurationTest.xml": {
+        "sha256": "f0c149b699b7055b9cd5c436644eeb2ae62a08a5d8f1243824885ebd9707ca44",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+        "sha256": "a8ae407f7cbc630c2083a08a843222c6278ed510887b440e1152307aa837dcc5",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.NativeCollaborationSpaceDisabledConfigurationTest.xml": {
+        "sha256": "13aaf0bbe2ff48783a9201ce7ddded49c7e9362d3b77988a47e06c2787f71efe",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.ApiContractHttpTest.xml": {
+        "sha256": "da6ebe68e758613064e452c6b86f0057a88dccce3522dfed93d71fadcfe8d3ca",
+        "tests": 70,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceManifestSha256": "ecfeb15d43234ae309a27d44920b90dc0e868971fb7847d14aede857f0a11973",
+  "postGateChanges": {
+    "files": [
+      "tool/test_recovery_set.py"
+    ],
+    "reason": "The recovery test had a second future-schema sentinel still set to130. Only that test sentinel changed to131 after Gradle finished; all Kotlin, SQL and production Python inputs remain identical."
+  },
+  "recovery": {
+    "command": "cd tool && python3 -m unittest test_recovery_set.py",
+    "tests": 19,
+    "failures": 0,
+    "elapsedSeconds": 0.011,
+    "earlierFailure": "One of19 cases still expected envelope_query(130) to reject. Updated this remaining future-schema sentinel to131 after the frozen Gradle gate; all19 then passed.",
+    "acceptsThrough": 130,
+    "rejectsFrom": 131,
+    "encryptedProjection": "Unchanged from V126"
+  },
+  "changedSourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt": "91f4b4f894a4dc48065586438ce84c30c555b5cdd17bf62a17115e6eda93a9ed",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceConversationMigrationTest.kt": "b90c66e06558bd1ce6619f51f83d0195a5afe1ca1b496c1f3e37a3805bc345d8",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/mappers/CollaborationSpaceConversationMapping.kt": "68a4b3d27ffa01a883b669f85aa835ee6e93fecb71fee676a9abcdeadb159ba5",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceConversationRepositoryTest.kt": "12ee0d386a395c96cca496326492f70f646156d8bcfa3a40a4114c829839c56e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceDirectTest.kt": "63a076d4b9d42ec1bbc728fb18a458cd137e2d0895da0991c0bc9201e655ef85",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceConversation.kt": "953443e12a0fe383333ca31c5234bd5cf0335c878496eb813b48d74a591b9112",
+    "tool/recovery_set.py": "12f82ccba45aaee07daab1c755fd44430793faa97f64e09d68e340194b5555c5",
+    "tool/test_recovery_set.py": "3ac005ed60ef316b07c0a5a000676cf7383ae82ebe35be8d554ca52285aacbad",
+    "core/database/src/main/resources/db/migration/V130__collaboration_original_room_creator.sql": "45072baf28793d6cdf6d1714416ecb57acb28876fd3256fa98d628ba42d91f16"
+  },
+  "limits": [
+    "Group feature remains disabled and live schema stays116. No product caller or APK changed.",
+    "No provider adoption, SDK encrypted message, receiving-key authority or full PRD completion is claimed.",
+    "Shared DI did not change. Existing full-worker acceptance is not rerun or represented as a fresh result."
+  ],
+  "continuation": "Implement a separate bounded group room lifecycle, pin actual creator/canonical users, preserve original coordinates, verify provider state and publish atomically after current admission. Address other legacy producers and an unbound original room before rollout; then group recipient keys/content/sync/push and Mobile atomic adoption."
+}

@@ -44,6 +44,14 @@ with actor-owned RLS. It gains no job payload, native-session credential, provid
 token or encryption-key access. Ordinary application roles cannot assume either
 view-owner role. Original tables keep their company-scoped application authority.
 
+V130 appends `room_created_by` from the original binding's `account_id`. Native
+inventory returns it as `room.createdBy`, independently of `conversation.createdBy`.
+The employee who opens a conversation need not be the employee whose provider token
+creates the room. Never infer the actual Matrix creator from the conversation creator.
+All four room fields (`serverName`, `roomId`, `boundAt`, `createdBy`) are either absent
+with no binding or present together, and the creator must belong to the original pair.
+The view retains its previous column order, owner, security barrier and grants.
+
 A missing binding is retained as an unbound conversation. A present binding is
 historical metadata, not an adopted room grant. Future adoption must verify the
 exact original provider identities against both canonical participants, current
@@ -67,8 +75,8 @@ is returned only when the extra row exists; the final and empty pages have none.
 These are metadata discovery pages, not Matrix timeline or recent-chat ordering.
 Newly inserted IDs before an existing cursor appear on a new traversal.
 
-Recovery schema 129 retains the V126 encrypted-envelope projection unchanged and
-rejects unknown schema 130. Archive restoration must preserve group pairs, original
+Recovery schema 130 retains the V126 encrypted-envelope projection unchanged and
+rejects unknown schema 131. Archive restoration must preserve group pairs, original
 bound rooms, restricted view ownership, RLS and immutable triggers together.
 
 Native open/read/list commands passed API/worker validation as described
@@ -127,3 +135,10 @@ unchanged inputs with format/architecture and19 recovery checks. Actual concurre
 openers, transaction rollback, finite pages, view privileges, original bound-room
 publication guards, parent purge and archive restoration are covered. No API, provider
 room adoption or product rollout is claimed by these storage checks.
+
+[Original creator evidence](../measurements/collaboration-original-room-creator-2026-11-04.json)
+records 113 passing database/data/API cases in 363.765s with quality checks. A real
+original room created by the other participant remains correctly attributed through
+upgrade, parent purge, archive restoration, typed pages/details and both participants'
+HTTP inventory. All 19 recovery cases pass after correcting one stale future-schema
+sentinel. This change supplies original provenance; it does not adopt a provider room.

@@ -106,11 +106,19 @@ fun CollaborationSpaceLegacyConversationsRecord.toSpaceLegacyConversation(
     require(revision == 0L)
     requireConversationTime(at)
     val room =
-        if (matrixServerName == null && matrixRoomId == null && roomBoundAt == null) null
+        if (
+            matrixServerName == null &&
+                matrixRoomId == null &&
+                roomBoundAt == null &&
+                roomCreatedBy == null
+        )
+            null
         else {
             val server = requireNotNull(matrixServerName)
             val roomId = requireNotNull(matrixRoomId)
             val bound = requireNotNull(roomBoundAt).toInstant()
+            val roomCreator = requireNotNull(roomCreatedBy)
+            require(roomCreator == first || roomCreator == second)
             require(validCollaborationSpaceServer(server))
             require(
                 roomId.length in 2..255 &&
@@ -119,7 +127,7 @@ fun CollaborationSpaceLegacyConversationsRecord.toSpaceLegacyConversation(
             )
             requireConversationTime(bound)
             require(bound >= at)
-            CollaborationLegacyRoomMetadata(server, roomId, bound)
+            CollaborationLegacyRoomMetadata(server, roomId, bound, roomCreator)
         }
     return CollaborationSpaceLegacyConversation(
         space,

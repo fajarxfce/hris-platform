@@ -1077,6 +1077,7 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
                 a.fixture.account,
                 clock.instant().minusSeconds(1).toString(),
             )
+        seedGroupLegacyRoom(b, originalId)
         val response = groupCall(a, "$path?limit=1")
         assertEquals(200, response.statusCode(), response.body())
         val first = json.readTree(response.body())
@@ -1084,7 +1085,18 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             companies[0].toString(),
             first["items"][0]["conversation"]["companyId"].asString(),
         )
-        assertTrue(first["items"][0]["room"].isNull)
+        fun assertOriginalRoom(item: tools.jackson.databind.JsonNode) {
+            assertEquals(a.fixture.account.toString(), item["conversation"]["createdBy"].asString())
+            if (item["conversation"]["companyId"].asString() == b.fixture.company.toString()) {
+                assertEquals(b.fixture.account.toString(), item["room"]["createdBy"].asString())
+                assertEquals("!original:matrix.example.test", item["room"]["roomId"].asString())
+                assertEquals(
+                    setOf("serverName", "roomId", "boundAt", "createdBy"),
+                    item["room"].propertyNames().toSet(),
+                )
+            } else assertTrue(item["room"].isNull)
+        }
+        assertOriginalRoom(first["items"][0])
         assertEquals(companies[0].toString(), first["next"]["companyId"].asString())
         assertEquals(originalId.toString(), first["next"]["conversationId"].asString())
         val last =
@@ -1100,6 +1112,10 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             last["items"][0]["conversation"]["companyId"].asString(),
         )
         assertTrue(last["next"].isNull)
+        assertOriginalRoom(last["items"][0])
+        val peerDetail = groupCall(b, "$path/${b.fixture.company}/$originalId")
+        assertEquals(200, peerDetail.statusCode(), peerDetail.body())
+        assertOriginalRoom(json.readTree(peerDetail.body()))
         val detail = groupCall(a, "$path/${companies[1]}/$originalId")
         assertEquals(200, detail.statusCode(), detail.body())
         assertEquals(last["items"][0], json.readTree(detail.body()))
@@ -1227,6 +1243,49 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             java.net.http.HttpClient.newHttpClient().use {
                 it.send(request.build(), java.net.http.HttpResponse.BodyHandlers.ofString())
             }
+    }
+
+    private fun seedGroupLegacyRoom(n: Native, conversation: UUID) {
+        val device = seedGroupLegacy(n)
+        val job = UUID.randomUUID()
+        val db = database()
+        val at = clock.instant().minusSeconds(1).toString()
+        db.update(
+            """insert into background_jobs(id,company_id,actor_id,kind,operation_id,request,authenticated_at,credential_version,correlation_id,created_at,total_items)
+            values(?,?,?,'COLLABORATION_DIRECT_PROVISION',?,jsonb_build_object('conversationId',?::text,'deviceId',?::text,'nativeSessionId',?::text,'platform','ANDROID','clientBuild','28'),?::timestamptz,0,?,?::timestamptz,1)""",
+            job,
+            n.fixture.company,
+            n.fixture.account,
+            UUID.randomUUID(),
+            conversation,
+            device,
+            n.session,
+            at,
+            UUID.randomUUID(),
+            at,
+        )
+        db.update(
+            "insert into collaboration_direct_room_provisioning(company_id,conversation_id,account_id,device_id,job_id,version,created_at,updated_at) values(?,?,?,?,?,0,?::timestamptz,?::timestamptz)",
+            n.fixture.company,
+            conversation,
+            n.fixture.account,
+            device,
+            job,
+            at,
+            at,
+        )
+        db.update(
+            "update background_jobs set status='RUNNING',attempts=1,lease_owner=gen_random_uuid(),lease_token=gen_random_uuid(),lease_until=now()+interval '1 minute' where id=?",
+            job,
+        )
+        db.update(
+            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test','!original:matrix.example.test',?::timestamptz)",
+            n.fixture.company,
+            conversation,
+            n.fixture.account,
+            job,
+            at,
+        )
     }
 
     private fun seedGroupLegacy(n: Native): UUID {

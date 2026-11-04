@@ -209,7 +209,7 @@ class NativeCollaborationSpaceDirectTest {
         val other = UUID.randomUUID()
 
         init {
-            Flyway.configure().dataSource(s.source).target("129").load().migrate()
+            Flyway.configure().dataSource(s.source).target("130").load().migrate()
             s.owner.execute(
                 "grant select,insert,update,delete on collaboration_space_direct_conversations to space_gateway_fixture"
             )

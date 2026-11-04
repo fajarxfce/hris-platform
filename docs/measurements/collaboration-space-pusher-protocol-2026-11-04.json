@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-11-04T19:15:46.911407+00:00",
+  "baseCommit": "892d34973b31a51b15288e891a8e2f1b2d6899dc",
+  "scope": "Shared fixed Matrix pusher profile for distinct company/group capabilities and deployable redaction for both namespaces",
+  "providerGate": {
+    "startedAt": "2026-11-04T19:13:48.801525+00:00",
+    "elapsedSeconds": 63.677,
+    "exitCode": 0,
+    "sourceFiles": 8486,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.MatrixPusherTransportTest.xml": {
+        "sha256": "6580f83c5ebaaf84890d62d45f62ec3dbd813cc9496dbe89ced885af152ff8a8",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.MatrixPusherInteropTest.xml": {
+        "sha256": "ab7da96ffccf3815aad371d5dc5691387a9954e54cb325ecbddf7e76c0eed653",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "loggingGate": {
+    "startedAt": "2026-11-04T19:13:47.061672+00:00",
+    "elapsedSeconds": 0.101,
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "sourceSha256": {
+      "deploy/synapse/hris_push_logging.py": "a2d94723210c4184af516547b00842a7c7472e31871d1762102614778c969bfd",
+      "tool/test_collaboration_push_logging.py": "b1e2cfcddcfaeef90eeac0b4bd359d1a05282cb4c46e3988f3734702369ec2c1"
+    },
+    "sourcesUnchanged": true
+  },
+  "commands": {
+    "provider": ":modules:collaboration:data:test --rerun --tests *MatrixPusherTransportTest --tests *MatrixPusherInteropTest formatCheck architectureCheck",
+    "logging": "Python unittest default loader for tool/test_collaboration_push_logging.py, both original and group suites",
+    "environment": "JDK21/Docker; --no-daemon --no-parallel --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1536m -Pkotlin.compiler.execution.strategy=in-process"
+  },
+  "changedSourceSha256": {
+    "deploy/synapse/hris_push_logging.py": "a2d94723210c4184af516547b00842a7c7472e31871d1762102614778c969bfd",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixPusherRepository.kt": "8f62760d22a68d356f305861e38de7fd31b7b8ab7e2ffd151622c76d1de7b107",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderFixture.kt": "928827bf6d4523739e97a87b70ee07d1dbf361cbbe7ca6c760c8c1bb2fb5eed4",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixPusherInteropTest.kt": "e74dbc112c8ae14a203e55ba7ab4dc1d173e5c39e7e297c765aaaf1e06a43b5b",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixPusherTransportTest.kt": "25c51839f8a509d3e82f8610043bdab18b6d7e77c73b2912649fca4b037c5124",
+    "tool/test_collaboration_push_logging.py": "b1e2cfcddcfaeef90eeac0b4bd359d1a05282cb4c46e3988f3734702369ec2c1"
+  },
+  "evidence": [
+    "Five transport cases preserve fixed endpoint/application identity/event-only payload, malformed key rejection before I/O, bounded failures/cancellation and no automatic provider retry or redirect. Both capability profiles have explicit registration/removal coverage.",
+    "Three actual Synapse cases include original behavior/credential expiry and new same-device company/group capability coexistence, stable retry/restart, independent removal and actual provider log redaction.",
+    "Fourteen formatter cases exercise both key namespaces, substitutions, chained exceptions, cached/partial keys, byte bounds, formatting failure, termination propagation and actual deployment configuration in a fresh process."
+  ],
+  "limits": [
+    "No schema/DI/native admission/callback/queue changes. Existing native company callers only generate company capabilities; group managed pusher integration remains required.",
+    "This protocol fixture is not actual FCM delivery or Mobile group ownership acceptance. All 54 PRD groups remain open and rollout disabled.",
+    "Live8b40/schema116 push on/SMTP off, normal phone28, Mobile product/hosted0b804cb2 and Starter9959c1d unchanged."
+  ]
+}

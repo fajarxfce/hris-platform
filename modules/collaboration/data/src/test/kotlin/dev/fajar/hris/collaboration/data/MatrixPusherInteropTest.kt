@@ -130,6 +130,67 @@ class MatrixPusherInteropTest {
         }
     }
 
+    @Test
+    fun originalAndGroupCapabilitiesCoexistOnTheSameDeviceAndRetireIndependentlyAfterRestart() {
+        MatrixProviderFixture("10m", pushLogging = true).use { f ->
+            f.start()
+            val original = f.login()
+            val groupKey = "hrisgp1_" + "c".repeat(64)
+            fun repo() =
+                InternalCollaborationMatrixPusherRepository(
+                    HttpMatrixClientDataSource(f.client, f.config, f.clock),
+                    gateway,
+                )
+            repeat(2) {
+                assertEquals(
+                    Result.Success(Unit),
+                    repo().set(first, original.accessToken, f.clock.instant().plusSeconds(10)),
+                )
+                assertEquals(
+                    Result.Success(Unit),
+                    repo().set(groupKey, original.accessToken, f.clock.instant().plusSeconds(10)),
+                )
+            }
+            val expected = setOf(first, groupKey)
+            assertEquals(
+                expected,
+                pushers(f, original.accessToken).map { it["pushkey"].asString() }.toSet(),
+            )
+            f.restart()
+            val renewed = f.login()
+            assertEquals(original.userId, renewed.userId)
+            assertEquals(original.deviceId, renewed.deviceId)
+            val restored = pushers(f, renewed.accessToken)
+            assertEquals(expected, restored.map { it["pushkey"].asString() }.toSet())
+            for (value in restored) {
+                assertEquals("dev.fajar.hris.chat", value["app_id"].asString())
+                assertEquals("event_id_only", value["data"]["format"].asString())
+                assertEquals(gateway.endpoint.toASCIIString(), value["data"]["url"].asString())
+            }
+            repeat(2) {
+                assertEquals(
+                    Result.Success(Unit),
+                    repo().remove(first, renewed.accessToken, f.clock.instant().plusSeconds(10)),
+                )
+            }
+            assertEquals(
+                listOf(groupKey),
+                pushers(f, renewed.accessToken).map { it["pushkey"].asString() },
+            )
+            assertEquals(
+                Result.Success(Unit),
+                repo().set(groupKey, renewed.accessToken, f.clock.instant().plusSeconds(10)),
+            )
+            assertEquals(1, pushers(f, renewed.accessToken).size)
+            assertEquals(
+                Result.Success(Unit),
+                repo().remove(groupKey, renewed.accessToken, f.clock.instant().plusSeconds(10)),
+            )
+            assertTrue(pushers(f, renewed.accessToken).isEmpty())
+            f.assertPushLogsRedacted(expectRemoval = true)
+        }
+    }
+
     private fun pushers(f: MatrixProviderFixture, token: String): List<JsonNode> {
         val request =
             HttpRequest.newBuilder(f.config.origin.resolve("/_matrix/client/v3/pushers"))

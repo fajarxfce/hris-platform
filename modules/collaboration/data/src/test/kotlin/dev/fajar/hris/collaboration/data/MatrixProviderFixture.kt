@@ -170,7 +170,7 @@ class MatrixProviderFixture(
                         return
                     }
                     val text = suffix + frame.payload.toString(Charsets.UTF_8)
-                    leaked = leaked || text.contains("hriscp1_")
+                    leaked = leaked || (text.contains("hriscp1_") || text.contains("hrisgp1_"))
                     redacted = redacted || text.contains("<hris-push-key>")
                     started = started || text.contains("Starting pusher")
                     stopped = stopped || text.contains("Stopping pusher")

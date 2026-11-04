@@ -28,6 +28,7 @@ class PushLoggingTest(unittest.TestCase):
         record = self.record("Failed pusher %s and %s", (self.key, "hriscp1_" + "b" * 64))
         output = self.formatter.format(record)
         self.assertNotIn("hriscp1_", output)
+        self.assertNotIn("hrisgp1_", output)
         self.assertEqual(2, output.count("<hris-push-key>"))
         self.assertEqual(self.key, record.args[0])
         self.assertIsNone(record.exc_text)
@@ -44,6 +45,7 @@ class PushLoggingTest(unittest.TestCase):
         record.stack_info = "Fixture stack " + self.key
         output = self.formatter.format(record)
         self.assertNotIn("hriscp1_", output)
+        self.assertNotIn("hrisgp1_", output)
         self.assertIn("ValueError", output)
         self.assertIn("RuntimeError", output)
         self.assertIn("Fixture stack <hris-push-key>", output)
@@ -53,6 +55,7 @@ class PushLoggingTest(unittest.TestCase):
         record = self.record("push hriscp1_abc and hriscp1_")
         record.exc_text = "Cached error " + self.key
         self.assertNotIn("hriscp1_", self.formatter.format(record))
+        self.assertNotIn("hrisgp1_", self.formatter.format(record))
         self.assertIn(self.key, record.exc_text)
 
     def test_bad_formatting_never_invokes_logging_raw_argument_fallback(self):
@@ -76,8 +79,10 @@ class PushLoggingTest(unittest.TestCase):
         self.assertLessEqual(len(output.encode("utf-8")), 16384)
         self.assertTrue(output.endswith(" [truncated]"))
         self.assertNotIn("hriscp1_", output)
+        self.assertNotIn("hrisgp1_", output)
         output = self.formatter.format(self.record("a" * 16360 + self.key))
         self.assertNotIn("hriscp1_", output)
+        self.assertNotIn("hrisgp1_", output)
 
     def test_exact_deployment_configuration_loads_in_a_fresh_python_process(self):
         program = """
@@ -92,14 +97,22 @@ try:
 except RuntimeError:
     logging.getLogger('twisted').exception('Delivery failed')
 """
+        program = program.replace("hriscp1_", self.key[:8])
         result = subprocess.run([sys.executable, "-c", program, str(MODULE.parent)],
                                 capture_output=True, text=True, timeout=5, check=True)
         self.assertNotIn("hriscp1_", result.stdout + result.stderr)
+        self.assertNotIn("hrisgp1_", result.stdout + result.stderr)
         self.assertIn("Pusher <hris-push-key>", result.stdout)
         self.assertIn("RuntimeError: <hris-push-key>", result.stdout)
         self.assertEqual("", result.stderr)
         config = json.loads((MODULE.parent / "logging.json").read_text())
         self.assertEqual({"safe"}, {handler["formatter"] for handler in config["handlers"].values()})
+
+
+class GroupPushLoggingTest(PushLoggingTest):
+    def setUp(self):
+        super().setUp()
+        self.key = "hrisgp1_" + "a" * 64
 
 
 if __name__ == "__main__":

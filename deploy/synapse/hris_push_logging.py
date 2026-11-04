@@ -9,7 +9,7 @@ import re
 import time
 
 
-_PUSH_KEY = re.compile(r"hriscp1_[A-Za-z0-9_-]*")
+_PUSH_KEY = re.compile(r"hris(?:cp|gp)1_[A-Za-z0-9_-]*")
 _MAXIMUM_BYTES = 16384
 _TRUNCATED = b" [truncated]"
 

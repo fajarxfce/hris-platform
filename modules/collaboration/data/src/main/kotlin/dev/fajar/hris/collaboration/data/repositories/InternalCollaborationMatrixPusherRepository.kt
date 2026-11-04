@@ -1,6 +1,7 @@
 package dev.fajar.hris.collaboration.data.repositories
 
 import dev.fajar.hris.collaboration.data.matrix.*
+import dev.fajar.hris.collaboration.domain.policies.validCollaborationSpacePushKey
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixPusherRepository
 import dev.fajar.hris.core.domain.Result
 import java.time.Instant
@@ -22,7 +23,10 @@ class InternalCollaborationMatrixPusherRepository(
         deadline: Instant,
         enabled: Boolean,
     ): Result<Unit> = safeMatrixProviderCall {
-        require(pushKey.matches(Regex("hriscp1_[a-f0-9]{64}")))
+        require(
+            pushKey.matches(Regex("hriscp1_[a-f0-9]{64}")) ||
+                validCollaborationSpacePushKey(pushKey)
+        )
         val body =
             buildMap<String, Any?> {
                 put("app_id", "dev.fajar.hris.chat")

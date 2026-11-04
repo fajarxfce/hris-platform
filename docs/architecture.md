@@ -1,5 +1,7 @@
 # Architecture
 
+The [organization Matrix pusher protocol](collaboration/space-pusher-protocol.md) keeps separate company/group capabilities in one fixed event-only application profile and redacts both namespaces in deployable logs. Native group admission and callback delivery remain separate integration.
+
 V136 [organization push capability storage](collaboration/space-push-storage.md) retains separate encrypted identity with exact native/Matrix provenance, immutable publication, root lookup isolation and reviewed recovery projection. It does not register a pusher or authorize callback delivery; native integration remains required.
 
 [Native group metadata and receipts](collaboration/space-metadata-access.md) expose managed direct hints, join/state/membership and event-proven public/private receipts under current original/published room ownership. The shared provider reader preserves original creator and historical membership semantics; group push and actual SDK ownership transition remain required.

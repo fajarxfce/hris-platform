@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Organization Matrix pusher protocol accepted — 4 November 2026
+
+The fixed Matrix pusher adapter now accepts separate original/group capabilities with
+the same event-only application profile. Both survive retry/restart on the same device
+and can be removed independently. Deployable log formatting redacts both namespaces,
+including partial keys and exception paths. No native FCM/APNs token enters Matrix.
+[Protocol](collaboration/space-pusher-protocol.md), [evidence](measurements/collaboration-space-pusher-protocol-2026-11-04.json).
+
+Eight transport/actual Synapse cases pass (63.677 s). Fourteen formatter
+cases pass (0.101 s), including actual deployment configuration in a
+fresh process. Format/architecture checks pass on 8,486 unchanged inputs. All
+sessions closed. No schema or DI change; no actual product FCM delivery claim.
+
+NEXT: native group managed pusher admission/reservation/publication, API and FULL worker
+DI validation, then callback admission/group queue/worker and Mobile background/reply
+ownership. Actual SDK queued-key decryption, group store transition and native hard-parent
+recovery remain required. Existing native callers still only generate company capabilities.
+
+Base `892d3497` pushed. All 54 PRD groups open; rollout disabled. Live8b40/schema116
+(push on, SMTP off), normal phone28, Mobile product/hosted0b804cb2 and Starter9959c1d unchanged.
+Continue long run, updates, atomic pushes and validated product installs.
+
 ## Organization push capability storage accepted — 4 November 2026
 
 V136 retains separate encrypted group push capabilities, bound to exact space/account/

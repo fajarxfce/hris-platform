@@ -20,7 +20,13 @@ class MatrixPusherTransportTest {
     private val key = "hriscp1_" + "a".repeat(64)
 
     @Test
-    fun registrationAndRemovalKeepFixedRoutesOpaqueKeysAndEventOnlyPayloads() {
+    fun registrationAndRemovalKeepFixedRoutesOpaqueKeysAndEventOnlyPayloads() = assertProfile(key)
+
+    @Test
+    fun groupCapabilityUsesTheSameFixedApplicationProfileWithAnIndependentKey() =
+        assertProfile("hrisgp1_" + "b".repeat(64))
+
+    private fun assertProfile(key: String) {
         Fixture().use { f ->
             val bodies = CopyOnWriteArrayList<String>()
             f.handler.set {
@@ -100,6 +106,10 @@ class MatrixPusherTransportTest {
                 listOf(
                     "",
                     "native-fcm-token",
+                    "hrisgp1_" + "A".repeat(64),
+                    "hrisgp1_" + "a".repeat(65),
+                    "hrisgp1_" + "a".repeat(63),
+                    "hrisgp2_" + "a".repeat(64),
                     key + "0",
                     key.dropLast(1),
                     key.replace('a', 'A'),

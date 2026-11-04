@@ -74,6 +74,9 @@ class CollaborationSpaceWorkerPublicationTest {
         owner.execute(
             "grant insert on collaboration_space_provider_sessions,collaboration_space_provisioning,collaboration_space_identities,collaboration_space_devices,collaboration_space_device_sessions,collaboration_legacy_runtime,collaboration_legacy_runtime_leases,operation_receipts,audit_entries,platform_audit_metadata,outbox_events to space_advance_command_fixture"
         )
+        owner.execute(
+            "grant insert,update on collaboration_space_gateway_sessions to space_advance_command_fixture"
+        )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
         runtime =
             DriverManagerDataSource(
@@ -132,6 +135,149 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         }
         fixtures.clear()
+    }
+
+    @Test
+    fun groupGatewayUsesCompletedRetainedProvenanceWithoutReopeningTheOriginalRuntime() {
+        val f = Fixture(verifiedMfa = true)
+        val original = f.activeLegacy(signed = true)
+        f.gateway(original)
+        val id = f.register(original)
+        f.freeze(id)
+        assertInstanceOf(Result.Failed::class.java, f.groupBootstrap(id))
+        success(f.advance(f.claim(id), f.provider(id)))
+        val done = f.completion(original)
+        val before = f.originalSnapshot()
+        val provider = f.state(id)
+        val operation = UUID.randomUUID()
+        val first = success(f.groupBootstrap(id, operation))
+        val replay = success(f.groupBootstrap(id, operation))
+        assertEquals(first.accessToken, replay.accessToken)
+        assertEquals(first.refreshToken, replay.refreshToken)
+        assertEquals(first.replayUntil, replay.replayUntil)
+        assertEquals(done, f.completion(original))
+        assertEquals(before, f.originalSnapshot())
+        assertEquals(provider, f.state(id))
+        assertEquals(
+            CollaborationLegacyRuntimePhase.DRAINING,
+            success(
+                    f.transactions.run(f.actor) {
+                        f.runtimes.find(f.runtimeOwner(original), lock = false)
+                    }
+                )!!
+                .phase,
+        )
+        owner.update(
+            "update native_sessions set version=version+1,rotated_at=clock_timestamp() where id=?",
+            f.session,
+        )
+        assertEquals(
+            first.accessToken,
+            success(f.groupBootstrap(id, operation, nativeVersion = 1)).accessToken,
+        )
+    }
+
+    @Test
+    fun groupGatewayRefreshAfterRealCooldownPreservesCompletedTransferAndRechecksItsProvenance() {
+        val f = Fixture(verifiedMfa = true)
+        val original = f.activeLegacy(signed = true)
+        f.gateway(original)
+        val id = f.register(original)
+        f.freeze(id)
+        success(f.advance(f.claim(id), f.provider(id)))
+        val first = success(f.groupBootstrap(id))
+        val old = f.originalSnapshot()
+        val completed = f.completion(original)
+        // The database also checks wall-clock publication. A future injected application
+        // clock cannot prove rotation of a just-completed retained device. Bound the wait.
+        val readyAt = first.replayUntil.minusSeconds(20)
+        val remaining = Duration.between(Instant.now(), readyAt).toNanos()
+        if (remaining > 0)
+            TimeUnit.NANOSECONDS.sleep(minOf(remaining + 25_000_000, TimeUnit.SECONDS.toNanos(11)))
+        val refreshed = success(f.groupRefresh(first.refreshToken))
+        assertEquals(1L, refreshed.version)
+        assertEquals(first.expiresAt, refreshed.expiresAt)
+        val replay = success(f.groupRefresh(first.refreshToken))
+        assertEquals(refreshed.accessToken, replay.accessToken)
+        assertEquals(refreshed.refreshToken, replay.refreshToken)
+        val receipts =
+            owner.queryForObject("select count(*) from operation_receipts", Int::class.java)
+        val journal = owner.queryForObject("select count(*) from audit_entries", Int::class.java)
+        val missing =
+            object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                override fun find(
+                    owner: CollaborationLegacyRuntimeOwner
+                ): Result<CollaborationLegacyRuntimeCompletion?> = Result.Success(null)
+            }
+        for (token in listOf(first.refreshToken, refreshed.refreshToken)) assertInstanceOf(
+            Result.Failed::class.java,
+            f.groupRefresh(token, completions = missing),
+        )
+        assertEquals(
+            receipts,
+            owner.queryForObject("select count(*) from operation_receipts", Int::class.java),
+        )
+        assertEquals(
+            journal,
+            owner.queryForObject("select count(*) from audit_entries", Int::class.java),
+        )
+        assertEquals(old, f.originalSnapshot())
+        assertEquals(completed, f.completion(original))
+        assertEquals(
+            CollaborationLegacyRuntimePhase.DRAINING,
+            success(
+                    f.transactions.run(f.actor) {
+                        f.runtimes.find(f.runtimeOwner(original), lock = false)
+                    }
+                )!!
+                .phase,
+        )
+    }
+
+    @Test
+    fun groupGatewayRejectsMissingForeignOrIncoherentCompletedRetainedMapping() {
+        val f = Fixture(verifiedMfa = true)
+        val original = f.activeLegacy(signed = true)
+        val id = f.register(original)
+        f.freeze(id)
+        success(f.advance(f.claim(id), f.provider(id)))
+        val done = requireNotNull(f.completion(original))
+        val receipts =
+            owner.queryForObject("select count(*) from operation_receipts", Int::class.java)
+        val before = f.originalSnapshot()
+        val variants =
+            listOf(
+                null,
+                done.copy(owner = done.owner.copy(accountId = UUID.randomUUID())),
+                done.copy(target = done.target.copy(deviceId = UUID.randomUUID())),
+                done.copy(fingerprint = "b".repeat(64)),
+                done.copy(targetProviderGeneration = done.targetProviderGeneration + 1),
+            )
+        for (value in variants) {
+            val completions =
+                object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                    override fun find(
+                        owner: CollaborationLegacyRuntimeOwner
+                    ): Result<CollaborationLegacyRuntimeCompletion?> = Result.Success(value)
+                }
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.groupBootstrap(id, completions = completions),
+            )
+        }
+        assertEquals(
+            receipts,
+            owner.queryForObject("select count(*) from operation_receipts", Int::class.java),
+        )
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_gateway_sessions where account_id=?",
+                Int::class.java,
+                f.account,
+            ),
+        )
+        assertEquals(before, f.originalSnapshot())
     }
 
     @Test
@@ -2027,6 +2173,89 @@ class CollaborationSpaceWorkerPublicationTest {
                 }
             )
             return work(id)
+        }
+
+        fun groupRefresh(
+            token: String,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+        ): Result<CollaborationSpaceGatewayTokens> {
+            val gateway =
+                EncryptedCollaborationSpaceGatewaySessionRepository(
+                    PostgresCollaborationSpaceGatewaySessionDataSource(sql),
+                    JceIdentityTokenDataSource(
+                        parseIdentityKeyring(
+                            "fixture",
+                            "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 47 }),
+                        )
+                    ),
+                )
+            return RefreshNativeCollaborationSpaceGateway(
+                    gateway,
+                    registry,
+                    credentials,
+                    selections,
+                    legacyParents,
+                    completions,
+                    provisioning,
+                    spaces,
+                    sessions,
+                    identities,
+                    journal,
+                    transactions,
+                    IdentitySecurityPolicy(),
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    Clock.systemUTC(),
+                )
+                .execute(token, UUID.randomUUID())
+        }
+
+        fun groupBootstrap(
+            id: UUID,
+            operation: UUID = UUID.randomUUID(),
+            nativeVersion: Long = 0,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+        ): Result<CollaborationSpaceGatewayTokens> {
+            val gateway =
+                EncryptedCollaborationSpaceGatewaySessionRepository(
+                    PostgresCollaborationSpaceGatewaySessionDataSource(sql),
+                    JceIdentityTokenDataSource(
+                        parseIdentityKeyring(
+                            "fixture",
+                            "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 47 }),
+                        )
+                    ),
+                )
+            return BootstrapNativeCollaborationSpaceGateway(
+                    gateway,
+                    registry,
+                    credentials,
+                    selections,
+                    legacyParents,
+                    completions,
+                    provisioning,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    IdentitySecurityPolicy(),
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    Clock.systemUTC(),
+                )
+                .execute(
+                    actor,
+                    session,
+                    nativeVersion,
+                    space,
+                    operation,
+                    id,
+                    device(id).version,
+                    null,
+                    client,
+                )
         }
 
         fun registrationCommand(

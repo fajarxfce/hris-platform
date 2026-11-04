@@ -4,7 +4,36 @@ V126 introduces one retained credential head per organization device. Its table,
 domain types, opaque token prefixes and authenticated replay context are distinct
 from the existing company gateway. It does not create credentials during migration,
 enable an HTTP route, exchange a provider bearer or move a Mobile SDK store.
-[Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Current application admission and Mobile adoption remain unfinished.
+[Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Native issuance use cases are separately validated below. Current gateway request/provider/room authority and Mobile adoption remain unfinished.
+
+## Native issuance use cases
+
+`BootstrapNativeCollaborationSpaceGateway` and `RefreshNativeCollaborationSpaceGateway`
+now require current native/account/group/client/MFA, canonical identity, exact active
+bound device and live provider metadata. A retained device also requires its immutable
+completed-transfer, original retired-key/credential and succeeded-queue provenance.
+The operation budget is 30 seconds. Application defaults are 300-second access,
+30-second encrypted replay and a 10-second rotation cooldown; the native hard deadline
+and current authority remain mandatory. Bootstrap requires an operation UUID and
+observed device/gateway versions; refresh reacquires the locked head after anonymous
+lookup and can recover only the latest committed response. Neither decrypts provider
+bearers or performs network I/O.
+
+[Issuance evidence](../measurements/collaboration-space-gateway-issuance-2026-11-04.json)
+records 14 focused and 154 broader domain/data cases, including 15 new acceptance
+methods after adding actual retained-device refresh under the real cooldown. Receipt,
+journal and credential writes roll back after failed final admission or malformed
+returned tokens. Current and previous tokens require the same live checks; refreshing
+an expired access token is allowed only inside the remaining native/provider/hard
+lifetimes. The original completed runtime stays DRAINING and its keys/retired facts
+remain unchanged.
+
+These use cases have no HTTP or DI binding yet. Before transport, bootstrap must return
+original Matrix user/device IDs from the same guarded observation as its tokens.
+A retained Matrix device ID cannot be derived from the new group UUID. Native group
+status also needs safe gateway revision/deadline metadata so a lost initial response
+can recover after the encrypted replay expires. Then validate strict transport/OpenAPI
+and both API/full-worker contexts before a Mobile caller is enabled.
 
 ## Ownership and authority
 
@@ -70,6 +99,6 @@ alongside the unchanged legacy envelope formats. Unknown future schemas are reje
 Recovery acceptance must exercise the generated SQL projection against actual
 encrypted bootstrap and refresh rows, key rotation and restored PostgreSQL data.
 
-The next increment must implement current group gateway admission and room authority,
+The next increment must implement coherent native transport, current group gateway request admission and room authority,
 then join these to the durable Mobile handover. An accepted storage adapter alone
 does not satisfy cross-company chat or authorize freezing the old client runtime.

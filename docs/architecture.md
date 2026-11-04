@@ -41,8 +41,10 @@ transition remains unfinished; see [identity migration](collaboration/identity-m
 V126 stores separate [organization gateway credentials](collaboration/space-gateway.md).
 Typed ports use distinct token/replay namespaces and verify exact post-write readback.
 Retained metadata, anonymous opaque identification and encrypted replay do not grant
-current application authority. Gateway admission, HTTP and group runtime adoption
-remain unfinished; no new DI binding is enabled by the storage increment.
+current application authority. Native bootstrap/refresh now revalidate current canonical device/provider/completed-transfer
+admission and commit credential/receipt/journal changes atomically. Coherent HTTP
+transport, gateway request/room authority and group runtime adoption remain unfinished;
+no new DI binding is enabled by these increments.
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 

@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Group gateway issuance accepted — 4 November 2026
+
+Based on 338915f5, four production files add pure group session/response/provider
+policies and native bootstrap/refresh use cases. Each requires current root-account
+native/group/client/MFA admission, canonical selection, exact active bound device,
+live provider metadata and immutable completed LEGACY provenance where applicable.
+Receipt/journal writes and opaque credential rotation commit atomically; late failure
+or cancellation rolls them back. Current and previous refreshes can recover only the
+bounded committed winner. No provider bearer is decrypted and no network I/O occurs.
+
+[Evidence](measurements/collaboration-space-gateway-issuance-2026-11-04.json): initial
+bootstrap 5 PASS85.305s; combined 14 PASS167.690s; final broader 154 PASS343.118s (all domain 92,
+data 62 including all 28 worker-publication cases), 8,321 unchanged final inputs and
+format/architecture PASS. The only change after the 14-case gate added one retained
+refresh/replay test and helper; it verifies the real bounded 10-second cooldown under
+SQL's wall-clock check. New acceptance comprises bootstrap 6, refresh 6 and retained 3.
+The initial combined compile failed on an unnecessary second non-null assertion under
+-Werror; one checked test variable fixed it without changing production behavior.
+Races, lost responses, native refresh, malformed token responses, current revocation,
+receipt/journal/late-admission failures, cancellation and old-state preservation pass.
+All local sessions have finished; the evidence recorder has run and is now stale.
+
+NEXT before native HTTP: return an atomic bootstrap envelope with the validated
+original Matrix user/device IDs and exact space/account/group-device/native parent.
+Do not derive a LEGACY Matrix device ID from its new group UUID or reread identity
+outside the guarded transaction. Add safe nullable gateway revision/deadline metadata
+to native group status so a lost response beyond replay expiry can be recovered with
+a new bootstrap operation. Existing company status already supplies that metadata.
+Then expose native bootstrap, dispatch the distinct group prefix at standard Matrix
+refresh, bind DI, update strict OpenAPI and run actual API plus FULL worker contexts.
+The ignored `space-gateway-http-next/contract.md` records those concrete requirements.
+
+No current group HTTP/DI, provider renewal, room authority or Mobile product adoption
+is enabled. Continue group runtime/history/outbox/read/push/deep-link ownership after
+transport; preserve original SDK namespaces and require local stage/current admission
+before permanent server freeze. All 54 communications groups remain open. Mobile
+a2979db2/hosted code 0b804cb2, main 2a0b9d74, normal phone release 28/live 8b40/schema 116 and Starter 9959c1d
+remain current. Continue long run, frequent updates, atomic handoffs and immediate pushes.
+
 ## Organization gateway storage accepted — 4 November 2026
 
 V126 and eight typed domain/data files now provide a distinct organization gateway

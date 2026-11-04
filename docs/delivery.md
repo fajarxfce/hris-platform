@@ -1,5 +1,16 @@
 # Delivery and validation
 
+## Native organization gateway issuance — 4 November 2026
+
+Bootstrap/refresh use cases pass 14 focused and 154 broader domain/data cases with
+format/architecture, including current admission, exact response recovery, competing
+writes, cancellation rollback and completed retained-device refresh under the real
+cooldown. [Evidence](measurements/collaboration-space-gateway-issuance-2026-11-04.json)
+records the test-only compiler correction and the final additional retained case.
+No HTTP, DI or provider exchange is enabled. Before transport, return original Matrix
+identity atomically with bootstrap credentials and expose safe gateway revisions for
+recovery beyond replay expiry; then run actual API and full worker contexts.
+
 ## Organization gateway storage — 4 November 2026
 
 Separate V126 storage and typed encrypted ports pass 19 focused and 181 broader

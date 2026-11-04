@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Group public-key identity storage accepted — 4 November 2026
+
+Group branch is pushed through [88f5fc20](https://github.com/fajarxfce/hris-platform/commit/88f5fc20).
+V128 and typed ports retain original group/account/device/native/Matrix identity and
+one immutable key fingerprint through uncertain uploads and native purge. Only exact
+reservation-to-acknowledgement is allowed; current group/native/device scope and
+completed LEGACY continuity govern writes. [Evidence](https://github.com/fajarxfce/hris-platform/blob/88f5fc20/docs/measurements/collaboration-space-key-storage-2026-11-04.json):
+all 82 database plus 6 data/retained-provider cases PASS 792.520s, 8,350 unchanged
+inputs, format/architecture and 18 recovery cases. Initial focused 12 passed database
+6/data4 but missed two retained fixture table grants; only that test-role grant changed
+before final acceptance. Actual race/expiry/rollback/archive and retained Synapse keys
+through restart pass. Recovery accepts 128/rejects 129 without a new encryption purpose.
+
+NEXT fixed group key upload with current request ownership, committed reservation,
+signed prior/readback checks and atomic acknowledgement, then recipient pre-ack
+availability, explicit room/member authority and Mobile adoption. Concrete unapplied
+drafts are in the group's ignored key-storage notes; tracked contract defines the
+requirements independently. New DI must validate actual API and full worker contexts.
+Offline recipients must not need live short native/provider tokens to expose eligible
+keys; native hard-parent replacement remains explicit recovery work. No group endpoint
+or product caller is enabled by storage. All 54 groups remain open. Mobile 08b0cecf,
+phone28/live8b40/schema116 push ON/SMTP OFF and Starter9959c1d unchanged. Continue long
+run, frequent updates, immediate pushes and validated product feature installs only.
+
 ## Group gateway self access accepted — 4 November 2026
 
 Group branch is pushed through [941fa2f5](https://github.com/fajarxfce/hris-platform/commit/941fa2f5).

@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Native group HTTP accepted; durable Mobile handover underway — 4 November 2026
+
+Group branch is pushed through `c9bf7762`. Eight native-only routes expose current
+organization chat space, bounded cross-company contacts, identity selection, device
+registration/status/retry and retained-runtime freeze/drain. Fresh native admission
+is distinct from HR company admission; defaults remain disabled. HTTP/OpenAPI tests
+cover current credentials, revocation, cross-company labels and retained replay.
+
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/c9bf7762/docs/measurements/collaboration-space-native-http-2026-11-04.json):
+137 domain/API/OpenAPI checks PASS188.105s; full worker/context127 PASS377.895s
+(126 active/one existing retention skip), same8299 inputs and quality checks. Two
+initial failures, shared primitive schema fix and fixture corrections are recorded.
+No deployment or product caller is enabled. Normal phone28/live8b40/schema116 unchanged.
+
+Mobile WIP adds durable exact-target SDK intent read/stage, exclusive acquisition gates,
+full client drain before protected schema2 write, legacy restore/install rejection,
+and record/registry/metadata cancellation tests. Focused validation is running; actual
+Android encrypted-store proof and required full gates remain. Do not ship WIP. Then
+provider publication preflight, group room/gateway and full inbox/outbox/read/push/
+deep-link ownership, with cross-company end-to-end acceptance. All54 groups remain open.
+Continue the full authorized long run, frequent updates, atomic commits and pushes.
+
+
 ## Completed native recovery accepted; group HTTP continues — 4 November 2026
 
 Group branch is pushed through `631a2d3d`. Current native registration/retry/freeze/

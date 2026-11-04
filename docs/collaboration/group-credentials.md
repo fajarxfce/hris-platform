@@ -1,9 +1,10 @@
 # Organization provider credentials
 
 V121 and `CollaborationSpaceProviderSessionRepository` persist internal Matrix
-credentials for the organization device registry. These ports are unwired. Native
-admission, provisioning leases, final publication, gateway/room authority and
-client SDK ownership still need integration before cross-company chat is accepted.
+credentials for the organization device registry. Native registration/retry and the
+admitted provisioning worker consume these ports through shared DI; retained-device
+publication is atomic with original retirement. Gateway/room authority and client
+SDK ownership still need integration before cross-company chat is accepted.
 
 The credential references the exact space/device/account/native-parent/Matrix-user/
 Matrix-device tuple. Its parent UUID is durable provenance, not a cascading native

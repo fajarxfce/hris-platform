@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Group native HTTP accepted — 4 November 2026
+
+Based on pushed631a2d3d, eight native-only operations expose current eligible-space
+discovery, bounded cross-company contacts, canonical selection and device registration/
+status/retry/freeze/drain. Four new DI bindings include the discovery use case and
+existing status/freeze/drain commands. Native/account/group/client/MFA admission and
+observed-version/idempotency contracts remain mandatory. No provider credential or
+internal provisioning lease proof appears in these responses. HR company access stays
+separate from contact labels.
+
+[Evidence](measurements/collaboration-space-native-http-2026-11-04.json):137 checks
+PASS188.105s (13 domain,54 API,70 OpenAPI), full worker127 PASS377.895s
+(126 active/one existing opt-in retention skip), same8299 unchanged source inputs,
+format/architecture PASS. Ordinary employee fixtures verify cross-company labels with
+denied HR access, current revocation/offboarding, native/build/shape admission, original
+receipts, safe queue metadata and retained freeze/drain. Default-disabled deployment
+denies every route. The generated contract passes parser, controller coverage and
+existing requirements; chat query/limit schemas cannot mutate unrelated endpoints.
+Two failed runs and all corrections are retained in the measurement. They changed
+OpenAPI metadata, explicit request annotations and fixture assumptions, without
+relaxing native admission/use-case/controller behavior.
+
+NEXT group room/gateway authority and durable Mobile transition. Read
+[Mobile runtime handover](collaboration/mobile-runtime-handover.md): preflight actual
+local/provider keys; exclude all future SDK acquisition; fully drain even pending
+constructors; persist exact-target protected intent before server freeze. A possible
+post-drain exclusive write avoids racing old credential callbacks. Preserve original
+company/native store IDs, passphrase and uncertain sends. Mobile schema2 protected intent, temporary registry gate, local identity child and
+read/stage repository implementation are now WIP without checks; read the Mobile
+handoff before continuing. Local identity reader3d85d569 remains the latest accepted
+product source. Cross-company end-to-end acceptance remains required.
+
+Main873deecb/Mobileed4e87fd need this accepted commit linked. Normal phone28,
+live8b40/schema116 pushON/SMTP OFF and Starter9959c1d remain current. No live flag,
+deployment, Mobile caller or feature APK is enabled here. All54 groups and actual
+Apple runtime remain open. Continue full long run, frequent updates, atomic Git
+handoffs and immediate pushes. Ignored native-space-http-next drafts are stale;
+do not apply them over the accepted sources.
+
 ## Completed native recovery accepted — 4 November 2026
 
 Based on pushed5b66e661, current native registration/retry/freeze/drain explicitly

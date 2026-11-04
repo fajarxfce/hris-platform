@@ -4,6 +4,15 @@ The user requested this amendment on3 November2026. It is required work under
 CHAT-01, not accepted implementation. The deployment serves one organization
 group, so contact discovery spans its companies; guests remain meeting-only.
 
+## Native setup transport — 4 November 2026
+
+[Native group HTTP](native-space-http.md) now exposes current discovery, bounded
+contacts and device setup/recovery. Actual ordinary employees can read cross-company
+contact labels while access to the peer HR company stays denied.137 domain/API/OpenAPI
+checks and full worker127 pass; the exact evidence and earlier failures are linked
+from that contract. Group rooms/gateway and Mobile ownership still remain, so this
+is not yet acceptance of cross-company encrypted conversation or CHAT-01.
+
 ## Current mismatch
 
 `ListNativeCollaborationParticipants` reads active company memberships with

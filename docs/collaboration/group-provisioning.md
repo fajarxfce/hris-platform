@@ -11,7 +11,9 @@ records 27 actual database cases plus API and worker context validation.
 The native selection and registration commands commit identity intent, current
 binding and journal/receipt. Fresh device registration now also enqueues bounded
 provider work atomically. They are bound in shared module DI, with group availability
-disabled by default and no public group HTTP endpoints. The typed internal Matrix
+disabled by default. [Native setup HTTP](native-space-http.md) now exposes discovery,
+contacts, selection, registration/status/retry and freeze/drain under current admission.
+The typed internal Matrix
 candidate port is implemented and tested against an owned Synapse process; it does
 not supply a public login endpoint or activate an HRIS group device.
 
@@ -87,8 +89,9 @@ attempts, prior outcome, deadline and explicit retry timing. It never acquires a
 provider credential or changes work. Current account/group/client/MFA admission is
 rechecked after metadata reads; an ordinary refresh may observe older queued proof
 without adopting it. A revoked device can show recovery state under current native
-access. Missing or inconsistent heads fail closed. This command is not yet exposed
-through DI/HTTP. [Status evidence](../measurements/collaboration-space-native-status-2026-11-03.json)
+access. Missing or inconsistent heads fail closed. This command is exposed
+only as a setup observation through shared DI and native HTTP.
+[Status evidence](../measurements/collaboration-space-native-status-2026-11-03.json)
 records26 passing policy/actual-database regression cases in119.361s.
 
 `AdvanceCollaborationSpaceProvisioning` now implements admitted preparation and

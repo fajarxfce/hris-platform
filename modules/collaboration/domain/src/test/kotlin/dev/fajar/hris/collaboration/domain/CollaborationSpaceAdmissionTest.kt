@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceRepository
+import dev.fajar.hris.collaboration.domain.usecases.AcquireNativeCollaborationSpaceAdmission
 import dev.fajar.hris.collaboration.domain.usecases.ListNativeCollaborationSpaceContacts
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.*
@@ -241,6 +242,8 @@ class CollaborationSpaceAdmissionTest {
         var eligible: UUID? = space
         val calls = mutableListOf<String>()
         var beforePage: () -> Unit = {}
+        var beforeCurrent: () -> Unit = {}
+        var spaceFailure: Result.Failed? = null
         var accountLock: () -> Unit = {}
         var pageResult: Result<Page<CollaborationSpaceContact>> =
             Result.Success(
@@ -288,7 +291,8 @@ class CollaborationSpaceAdmissionTest {
             object : CollaborationSpaceRepository {
                 override fun current(): Result<UUID?> {
                     calls += "space"
-                    return Result.Success(eligible)
+                    beforeCurrent()
+                    return spaceFailure ?: Result.Success(eligible)
                 }
 
                 override fun contacts(
@@ -344,6 +348,69 @@ class CollaborationSpaceAdmissionTest {
             query: String = " Peer ",
             limit: Int = 30,
         ) = useCase.execute(request, parent.id, parent.version, target, client, query, null, limit)
+
+        fun acquire(request: Actor = actor, version: ClientVersion? = client) =
+            AcquireNativeCollaborationSpaceAdmission(
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    policy,
+                    security,
+                    clock,
+                )
+                .execute(request, parent.id, parent.version, version)
+    }
+
+    @Test
+    fun discoveryRequiresOnlyCurrentNativeEligibilityWithoutLoadingContactsOrIdentity() {
+        val f = Fixture()
+        val result = success(f.acquire())
+        assertEquals(space, result.spaceId)
+        assertEquals(parent.id, result.nativeSessionId)
+        assertEquals(now.plusSeconds(60), result.expiresAt)
+        assertEquals(listOf("begin", "account", "session", "access", "space", "end"), f.calls)
+        for (run in
+            listOf<(Fixture) -> Result<*>>(
+                { it.acquire(request = actor.copy(companyId = UUID.randomUUID())) },
+                { it.acquire(version = null) },
+                { it.acquire(version = client.copy(build = 26)) },
+            )) {
+            val denied = Fixture()
+            failure(run(denied))
+            assertTrue(denied.calls.isEmpty())
+        }
+    }
+
+    @Test
+    fun discoveryWithholdsLateOrFailedObservationsAndDoesNotRetryInterruptedReads() {
+        for (change in
+            listOf<(Fixture) -> Unit>(
+                { it.eligible = null },
+                { it.at = now.plusSeconds(30) },
+                { it.at = now.minusSeconds(1) },
+                {
+                    it.spaceFailure =
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "database_unavailable"))
+                },
+            )) {
+            val f = Fixture()
+            f.beforeCurrent = { change(f) }
+            failure(f.acquire())
+            assertTrue(f.endedWithFailure)
+            assertEquals(1, f.calls.count { it == "space" })
+            assertFalse("page" in f.calls)
+        }
+        val revoked = Fixture()
+        revoked.session = parent.copy(revokedAt = now)
+        failure(revoked.acquire(), "native_session_invalid")
+        for (error in
+            listOf(InterruptedException(), java.util.concurrent.CancellationException())) {
+            val f = Fixture()
+            f.beforeCurrent = { throw error }
+            assertSame(error, assertThrows(error.javaClass) { f.acquire() })
+            assertEquals(1, f.calls.count { it == "space" })
+        }
     }
 
     @Test

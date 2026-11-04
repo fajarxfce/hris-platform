@@ -140,29 +140,49 @@ fun completeApiContract(api: OpenAPI) {
                     else -> listOf(SecurityRequirement().addList("nativeBearer"), cookie)
                 }
             operation.addExtension("x-hris-authentication-required", path !in publicPaths)
+            val collaborationSpace = path.startsWith("/api/v1/collaboration/spaces/")
             val companyAdmission =
-                ("{companyId}" in path &&
-                    operation.extensions?.get("x-hris-company-admission") == true) ||
-                    operation.extensions?.get("x-hris-group-admission") == true
+                !collaborationSpace &&
+                    (("{companyId}" in path &&
+                        operation.extensions?.get("x-hris-company-admission") == true) ||
+                        operation.extensions?.get("x-hris-group-admission") == true)
             operation.addExtension("x-hris-company-admission", companyAdmission)
-            if (companyAdmission) {
+            if (collaborationSpace) {
+                operation.addExtension("x-hris-collaboration-space-admission", true)
+                operation.description =
+                    "Requires a current native account session, client build and active chat eligibility in the organization. Company labels grant no HR resource access. Setup metadata and drain observations grant no provider or device authority."
+            }
+            if (companyAdmission || collaborationSpace) {
                 operation.addParametersItem(
                     Parameter()
                         .name("X-HRIS-Client-Platform")
                         .`in`("header")
-                        .required(false)
-                        .schema(StringSchema().pattern("^(ANDROID|IOS|WEB)$"))
+                        .required(collaborationSpace)
+                        .schema(
+                            StringSchema()
+                                .pattern(
+                                    if (collaborationSpace) "^(ANDROID|IOS)$"
+                                    else "^(ANDROID|IOS|WEB)$"
+                                )
+                        )
                         .description(
-                            "Send with X-HRIS-Client-Build. Native sessions use ANDROID/IOS; browser sessions use WEB. Company client policy can require these headers."
+                            if (collaborationSpace)
+                                "Native platform, paired with X-HRIS-Client-Build. Organization chat applies its own minimum build."
+                            else
+                                "Send with X-HRIS-Client-Build. Native sessions use ANDROID/IOS; browser sessions use WEB. Company client policy can require these headers."
                         )
                 )
                 operation.addParametersItem(
                     Parameter()
                         .name("X-HRIS-Client-Build")
                         .`in`("header")
-                        .required(false)
+                        .required(collaborationSpace)
                         .schema(
-                            IntegerSchema().minimum(BigDecimal.ZERO).maximum(BigDecimal(999999999))
+                            IntegerSchema()
+                                .minimum(
+                                    if (collaborationSpace) BigDecimal.ONE else BigDecimal.ZERO
+                                )
+                                .maximum(BigDecimal(999999999))
                         )
                         .description(
                             "Monotonic client build number, paired with X-HRIS-Client-Platform. Version gates never replace permission or payload validation."
@@ -205,10 +225,17 @@ fun completeApiContract(api: OpenAPI) {
                         operation.addExtension("x-hris-idempotency-key", true)
                     }
                     "limit" -> {
-                        parameter.schema?.let { schema ->
-                            if (schema.minimum == null) schema.minimum = BigDecimal.ONE
-                            if (schema.maximum == null) schema.maximum = BigDecimal(200)
-                        }
+                        if (collaborationSpace)
+                            parameter.schema =
+                                IntegerSchema()
+                                    ._default(30)
+                                    .minimum(BigDecimal.ONE)
+                                    .maximum(BigDecimal(50))
+                        else
+                            parameter.schema?.let { schema ->
+                                if (schema.minimum == null) schema.minimum = BigDecimal.ONE
+                                if (schema.maximum == null) schema.maximum = BigDecimal(200)
+                            }
                     }
                     "size" ->
                         if (path.endsWith("/reports/exports")) {
@@ -249,7 +276,12 @@ fun completeApiContract(api: OpenAPI) {
                                 "Resolve up to 50 selected references, including inactive definitions. Cannot be combined with query or after. Missing or foreign IDs are omitted. This lookup does not authorize saving or publication."
                         }
                     "query" ->
-                        if (path.endsWith("/communications/audience-references")) {
+                        if (collaborationSpace) {
+                            // Springdoc can share a primitive schema with unrelated operations.
+                            parameter.schema = StringSchema()._default("").maxLength(80)
+                            parameter.description =
+                                "Literal display-name search among currently eligible accounts. Login email and private employee fields are excluded."
+                        } else if (path.endsWith("/communications/audience-references")) {
                             parameter.schema?.maxLength = 120
                             parameter.description =
                                 "Literal case-insensitive name or code search within the selected company. Employee results expose only an employment ID, employee number, name, and resource version."

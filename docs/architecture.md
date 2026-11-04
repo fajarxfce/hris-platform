@@ -12,11 +12,16 @@ permission rows, independently of selected HR company. This is a database founda
 not native session, device or room authority. Existing Matrix ownership remains
 unchanged until the [cross-company migration](collaboration/cross-company-chat.md).
 
+The [native group setup API](collaboration/native-space-http.md) now supplies admitted
+discovery, contacts, selection and device setup/recovery; the group feature remains
+disabled by default. Room/gateway authority and Mobile ownership transition remain
+unfinished.
+
 The contact datasource pages distinct accounts before joining a bounded lateral
 company-label selection in one SQL snapshot. The repository owns typed mapping,
-finite overfetch and acquisition failures; the future use case must separately
-admit native security/session/client policy. No group endpoint or provider authority
-is supplied by this read projection.
+finite overfetch and acquisition failures; the native use case separately admits
+current security/session/client policy. The read projection grants no provider or HR
+resource authority.
 
 V118 provides a separate account-owned legacy Matrix metadata view. Its non-login
 owner receives column-only privileges, including no token ciphertext, native access
@@ -30,8 +35,8 @@ receipt, audit and outbox under operation/account/parent guards. V120 adds separ
 organization device IDs and immutable legacy user/device/key references. Parent
 cleanup removes live bindings but preserves original parent provenance and crypto
 identity; a new parent cannot silently reuse a retained device. Public metadata is
-not private-key possession or provider authority. Group registration and runtime
-remain unwired; see [identity migration](collaboration/identity-migration.md).
+not private-key possession or provider authority. Native setup and the admitted provisioning worker are wired; product runtime
+transition remains unfinished; see [identity migration](collaboration/identity-migration.md).
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 

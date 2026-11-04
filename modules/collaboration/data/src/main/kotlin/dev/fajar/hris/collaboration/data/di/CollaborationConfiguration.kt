@@ -138,6 +138,122 @@ class CollaborationConfiguration {
         } ?: DisabledCollaborationSpaceMatrixRepository()
 
     @Bean
+    fun acquireNativeCollaborationSpaceAdmission(
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        AcquireNativeCollaborationSpaceAdmission(
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getNativeCollaborationSpaceDeviceStatus(
+        registry: CollaborationSpaceDeviceRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetNativeCollaborationSpaceDeviceStatus(
+            registry,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun freezeNativeCollaborationLegacyRuntime(
+        registry: CollaborationSpaceDeviceRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        runtimes: CollaborationLegacyRuntimeRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        FreezeNativeCollaborationLegacyRuntime(
+            registry,
+            legacyParents,
+            selections,
+            runtimes,
+            provisioning,
+            completions,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getNativeCollaborationLegacyRuntimeDrain(
+        registry: CollaborationSpaceDeviceRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        runtimes: CollaborationLegacyRuntimeRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetNativeCollaborationLegacyRuntimeDrain(
+            registry,
+            legacyParents,
+            selections,
+            runtimes,
+            provisioning,
+            completions,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
     fun listNativeCollaborationSpaceContacts(
         spaces: CollaborationSpaceRepository,
         sessions: NativeSessionRepository,

@@ -6,4 +6,5 @@ dependencies {
     implementation(projects.modules.identity.delivery)
     implementation(projects.core.http)
     implementation(libs.spring.security)
+    implementation(libs.swagger.annotations)
 }

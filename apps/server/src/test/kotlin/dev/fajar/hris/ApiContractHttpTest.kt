@@ -25,6 +25,92 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun groupChatSetupUsesNativeAccountScopeAndExcludesInternalProvisioningProof() {
+        val api = contract()
+        val root = "/api/v1/collaboration/spaces"
+        val base = "$root/{spaceId}"
+        val routes =
+            listOf(
+                "$root/current" to "get",
+                "$base/contacts" to "get",
+                "$base/identity" to "post",
+                "$base/native-device" to "get",
+                "$base/native-device" to "post",
+                "$base/native-device/retry" to "post",
+                "$base/native-device/legacy-runtime/freeze" to "post",
+                "$base/native-device/legacy-runtime/drain" to "get",
+            )
+        for ((path, method) in routes) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertFalse(operation["x-hris-company-admission"].asBoolean())
+            assertTrue(operation["x-hris-collaboration-space-admission"].asBoolean())
+            assertEquals("NATIVE", operation["x-hris-session-transport"].asString())
+            assertEquals(
+                setOf(setOf("nativeBearer")),
+                operation["security"]
+                    .iterator()
+                    .asSequence()
+                    .map { it.propertyNames().toSet() }
+                    .toSet(),
+            )
+            if (method == "post") assertTrue(operation["x-hris-idempotency-key"].asBoolean())
+        }
+        val schemas = api["components"]["schemas"]
+        val parameters =
+            api["paths"]["$base/contacts"]["get"]["parameters"].associateBy {
+                it["name"].asString()
+            }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(80, parameters.getValue("query")["schema"]["maxLength"].asInt())
+        assertTrue(parameters.getValue("X-HRIS-Client-Build")["required"].asBoolean())
+        assertEquals(
+            setOf(
+                "spaceId",
+                "accountId",
+                "nativeSessionId",
+                "nativeSessionVersion",
+                "credentialVersion",
+                "admittedAt",
+                "expiresAt",
+            ),
+            schemas["NativeCollaborationSpaceAdmissionResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+        assertEquals(
+            setOf("revision", "state", "attempts", "expiresAt", "lastOutcome", "retryNotBefore"),
+            schemas["CollaborationSpaceProvisioningStatus"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "target",
+                "runtimeVersion",
+                "activeRequests",
+                "latestRequestExpiresAt",
+                "observedAt",
+            ),
+            schemas["CollaborationLegacyRuntimeDrainStatus"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("deviceId", "expectedDeviceVersion", "expectedProvisioningRevision"),
+            schemas["RetryCollaborationSpaceProvisioningRequest"]["required"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("deviceId", "expectedDeviceVersion", "fingerprint"),
+            schemas["FreezeCollaborationLegacyRuntimeRequest"]["required"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+    }
+
+    @Test
     fun approvalHistoryDescribesBoundedVersionedReadAndOnlyRetainedFacts() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/approvals/{id}/history"]["get"]

@@ -27,7 +27,7 @@ pass in237.316s, with12 recovery-tool cases and unchanged envelope formats.
 Live remains schema116; no group migration has been deployed.
 
 The selection-input repository and pure policy are implemented and wired into
-shared DI; group HTTP remains unexposed. One query distinguishes unavailable scope from admitted absence and
+shared DI; [native setup HTTP](native-space-http.md) now supplies current admitted transport. One query distinguishes unavailable scope from admitted absence and
 returns the current selection or earliest retained identity on the configured
 server. Mapping shares the validated legacy mapper; it never acquires provider
 tokens. Actual PostgreSQL checks cover retirement, timestamp-before-UUID preference,
@@ -170,7 +170,7 @@ fresh group devices are integrated, including bounded failure/defer handling.
 Bounded scheduling and retained-device activation are wired behind disabled opt-in
 flags. [Worker acceptance](../measurements/collaboration-retained-worker-activation-2026-11-04.json)
 includes actual provider-key readback, atomic V124 retirement/publication and API/full
-worker contexts. Group HTTP/gateway/rooms and local SDK/store adoption remain unfinished.
+worker contexts. Native setup HTTP is implemented; group gateway/rooms and local SDK/store adoption remain unfinished.
 [Registry evidence](../measurements/collaboration-space-device-registry-2026-11-03.json)
 records validation and its exact limits.
 

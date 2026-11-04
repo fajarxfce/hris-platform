@@ -43,6 +43,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val conversations: CollaborationSpaceConversationRepository,
     private val syncCursors: CollaborationSpaceSyncCursorRepository,
     private val providerSync: CollaborationSpaceMatrixSyncRepository,
+    private val providerRoomAccess: CollaborationSpaceMatrixRoomAccessRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -62,6 +63,148 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     fun capabilities(token: String, correlationId: UUID): Result<Unit> =
         admitted(token, correlationId, decrypt = false) { _, _ -> Result.Success(Unit) }
 
+    fun directMetadata(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+    ): Result<Map<String, List<String>>> = directMetadata(token, correlationId, userId, null)
+
+    fun confirmDirectMetadata(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+        content: Map<String, List<String>>,
+    ): Result<Unit> =
+        normalizeCollaborationDirectMetadata(content).flatMap {
+            directMetadata(token, correlationId, userId, it).map { Unit }
+        }
+
+    private fun directMetadata(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+        confirmation: Map<String, List<String>>?,
+    ): Result<Map<String, List<String>>> =
+        admitted(
+            token,
+            correlationId,
+            decrypt = false,
+            prepare = { observed ->
+                if (userId != observed.device.matrixUserId)
+                    Result.Failed(
+                        Failure(FailureKind.FORBIDDEN, "collaboration_direct_metadata_unavailable")
+                    )
+                else
+                    prepareReadScope(observed).flatMap { prepared ->
+                        val current =
+                            collaborationSpaceDirectMetadata(prepared.owner, prepared.rooms)
+                        if (confirmation != null && confirmation != current)
+                            Result.Failed(
+                                Failure(
+                                    FailureKind.CONFLICT,
+                                    "collaboration_direct_metadata_managed",
+                                )
+                            )
+                        else Result.Success(prepared)
+                    }
+            },
+            revalidate = { observed, original ->
+                prepareReadScope(observed).flatMap { current ->
+                    if (current == original) Result.Success(Unit)
+                    else
+                        Result.Failed(
+                            Failure(FailureKind.CONFLICT, "collaboration_direct_metadata_changed")
+                        )
+                }
+            },
+        ) { _, prepared ->
+            Result.Success(collaborationSpaceDirectMetadata(prepared.owner, prepared.rooms))
+        }
+
+    fun joinRoom(token: String, correlationId: UUID, roomId: String): Result<String> =
+        roomRead(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomAccess.join(prepared.owner, prepared.room, bearer, deadline)
+            }
+        }
+
+    fun roomState(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+    ): Result<CollaborationRoomEvents> =
+        roomRead(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomAccess.state(prepared.owner, prepared.room, bearer, deadline)
+            }
+        }
+
+    fun roomMembers(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        at: String?,
+    ): Result<CollaborationRoomEvents> {
+        if (
+            at?.let {
+                it.length !in 1..4096 || it.any { character -> character.code !in 33..126 }
+            } == true
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_room_request")
+            )
+        return roomRead(token, correlationId, roomId) { exchange, prepared ->
+            val opened = at?.let { syncCursors.open(prepared.owner, it) } ?: Result.Success(null)
+            opened.flatMap { position ->
+                // A bridged company cursor needs fresh group sync, not a different membership time.
+                if (at != null && position == null)
+                    Result.Failed(
+                        Failure(FailureKind.CONFLICT, "collaboration_sync_reset_required")
+                    )
+                else
+                    exchange.exchange { bearer, deadline ->
+                        providerRoomAccess.members(
+                            prepared.owner,
+                            prepared.room,
+                            position?.providerSince,
+                            bearer,
+                            deadline,
+                        )
+                    }
+            }
+        }
+    }
+
+    fun sendReadReceipt(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        receiptType: String,
+        eventId: String,
+    ): Result<Unit> {
+        if (
+            receiptType !in setOf("m.read", "m.read.private") ||
+                !validCollaborationRoomHistoryEventId(eventId)
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_read_receipt")
+            )
+        return roomRead(token, correlationId, roomId) { exchange, prepared ->
+            readEvent(exchange, prepared, eventId).flatMap {
+                exchange.exchange { bearer, deadline ->
+                    providerRoomAccess.receipt(
+                        prepared.owner,
+                        prepared.room,
+                        receiptType,
+                        eventId,
+                        bearer,
+                        deadline,
+                    )
+                }
+            }
+        }
+    }
+
     fun sync(
         token: String,
         correlationId: UUID,
@@ -80,9 +223,9 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             token,
             correlationId,
             decrypt = true,
-            prepare = { prepareSync(it) },
+            prepare = { prepareReadScope(it) },
             revalidate = { observed, prepared ->
-                prepareSync(observed).flatMap { current ->
+                prepareReadScope(observed).flatMap { current ->
                     if (current == prepared) Result.Success(Unit)
                     else
                         Result.Failed(
@@ -124,7 +267,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         }
     }
 
-    private fun prepareSync(observed: Observation): Result<SyncPreparation> {
+    private fun prepareReadScope(observed: Observation): Result<ReadScopePreparation> {
         val device = observed.device
         val owner =
             CollaborationSpaceHistoryOwner(
@@ -158,12 +301,12 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                         )
                 originals.flatMap { original ->
                     snapshotCollaborationSpaceReadScope(owner, published, original, clock.instant())
-                        .map { SyncPreparation(owner, it) }
+                        .map { ReadScopePreparation(owner, it) }
                 }
             }
     }
 
-    private data class SyncPreparation(
+    private data class ReadScopePreparation(
         val owner: CollaborationSpaceHistoryOwner,
         val rooms: CollaborationSpaceReadScope,
     )
@@ -249,28 +392,23 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     ): Result<CollaborationRoomHistory> {
         if (!validCollaborationRoomHistoryEventId(eventId)) return invalidHistory()
         return roomRead(token, correlationId, roomId) { exchange, prepared ->
-            exchange.exchange { bearer, deadline ->
-                when (val room = prepared.room) {
-                    is CollaborationSpaceReadRoom.Published ->
-                        providerRoomHistory.event(
-                            prepared.owner,
-                            room.value,
-                            eventId,
-                            bearer,
-                            deadline,
-                        )
-                    is CollaborationSpaceReadRoom.Original ->
-                        providerRoomHistory.event(
-                            prepared.owner,
-                            room.value,
-                            eventId,
-                            bearer,
-                            deadline,
-                        )
-                }
-            }
+            readEvent(exchange, prepared, eventId)
         }
     }
+
+    private fun readEvent(
+        exchange: Exchange,
+        prepared: RoomReadPreparation,
+        eventId: String,
+    ): Result<CollaborationRoomHistory> =
+        exchange.exchange { bearer, deadline ->
+            when (val room = prepared.room) {
+                is CollaborationSpaceReadRoom.Published ->
+                    providerRoomHistory.event(prepared.owner, room.value, eventId, bearer, deadline)
+                is CollaborationSpaceReadRoom.Original ->
+                    providerRoomHistory.event(prepared.owner, room.value, eventId, bearer, deadline)
+            }
+        }
 
     private fun <T> roomRead(
         token: String,

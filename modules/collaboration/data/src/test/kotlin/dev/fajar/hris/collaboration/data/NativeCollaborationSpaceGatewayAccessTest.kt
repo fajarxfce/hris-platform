@@ -442,6 +442,7 @@ class NativeCollaborationSpaceGatewayAccessTest {
                 ),
                 EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
                 DisabledCollaborationSpaceMatrixSyncRepository(),
+                DisabledCollaborationSpaceMatrixRoomAccessRepository(),
             )
 
         fun access(

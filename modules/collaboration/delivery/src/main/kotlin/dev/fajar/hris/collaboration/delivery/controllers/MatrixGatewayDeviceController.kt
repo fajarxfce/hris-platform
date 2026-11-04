@@ -44,9 +44,10 @@ class MatrixGatewayDeviceController(
     ): ResponseEntity<Any> =
         keyRequest(request, ::matrixDirectMetadataRequest, 1_048_576) { token, correlation, content
             ->
-            device.confirmDirectMetadata(token, correlation, userId, content).map {
-                emptyMap<String, Any>()
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.confirmDirectMetadata(token, correlation, userId, content)
+                else device.confirmDirectMetadata(token, correlation, userId, content))
+                .map { emptyMap<String, Any>() }
         }
 
     @PutMapping("/_matrix/client/v3/rooms/{roomId}/send/m.room.encrypted/{transactionId}")
@@ -81,9 +82,10 @@ class MatrixGatewayDeviceController(
             },
             maximumBytes = 256,
         ) { token, correlation, _ ->
-            device.sendReadReceipt(token, correlation, roomId, receiptType, eventId).map {
-                emptyMap<String, Any>()
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.sendReadReceipt(token, correlation, roomId, receiptType, eventId)
+                else device.sendReadReceipt(token, correlation, roomId, receiptType, eventId))
+                .map { emptyMap<String, Any>() }
         }
 
     @PostMapping("/_matrix/client/v3/rooms/{roomId}/join", "/_matrix/client/v3/join/{roomId}")
@@ -95,7 +97,10 @@ class MatrixGatewayDeviceController(
                 Unit
             },
         ) { token, correlation, _ ->
-            device.joinRoom(token, correlation, roomId).map { mapOf("room_id" to it) }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.joinRoom(token, correlation, roomId)
+                else device.joinRoom(token, correlation, roomId))
+                .map { mapOf("room_id" to it) }
         }
 
     private fun parser(maximumStringLength: Int) =

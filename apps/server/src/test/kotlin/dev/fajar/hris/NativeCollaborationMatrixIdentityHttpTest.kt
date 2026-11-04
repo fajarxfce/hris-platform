@@ -2175,6 +2175,195 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         assertEquals(before, provider.syncs.get())
     }
 
+    private fun groupMetadataEvents(
+        room: String,
+        device: UUID,
+        peer: UUID,
+    ): List<Map<String, Any>> {
+        val history = groupHistoryEvents(room, device, peer)
+        val own = history.first().getValue("sender")
+        fun state(type: String, content: Map<String, Any>) =
+            mapOf(
+                "type" to type,
+                "sender" to own,
+                "state_key" to "",
+                "room_id" to room,
+                "event_id" to "\$metadata-$type-$device",
+                "origin_server_ts" to 0,
+                "content" to content,
+            )
+        return listOf(
+            state("m.room.create", mapOf("room_version" to "12", "m.federate" to false)),
+            state("m.room.encryption", mapOf("algorithm" to "m.megolm.v1.aes-sha2")),
+        ) + history
+    }
+
+    @Test
+    fun groupMetadataReadsAndJoinKeepOriginalOwnershipAndManagedDirectHintsAfterPeerOffboarding() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val (peer, _) = enrollGroup(b)
+        val room = publishedGroupRoom(a, device, b)
+        val events = groupMetadataEvents(room, device, peer)
+        provider.roomStates[room] = events
+        val user = events.first().getValue("sender") as String
+        val other = events.last().getValue("sender") as String
+        val expected = json.writeValueAsString(mapOf(other to listOf(room)))
+        val hints = directMetadata(a, token, user)
+        assertEquals(200, hints.statusCode(), hints.body())
+        assertEquals(json.readTree(expected), json.readTree(hints.body()))
+        assertEquals("no-store", hints.headers().firstValue("Cache-Control").orElse(""))
+        assertEquals(200, directMetadata(a, token, user, expected).statusCode())
+        assertEquals(409, directMetadata(a, token, user, "{}").statusCode())
+        assertEquals(403, directMetadata(a, token, other).statusCode())
+        for (route in listOf("v3/join/$room", "v3/rooms/$room/join")) {
+            val response = matrixRoom(a, token, route, "{}")
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals(room, json.readTree(response.body()).path("room_id").asString())
+        }
+        val state = matrixRoom(a, token, "v3/rooms/$room/state")
+        assertEquals(200, state.statusCode(), state.body())
+        assertEquals(4, json.readTree(state.body()).size())
+        val encryption = matrixRoom(a, token, "v3/rooms/$room/state/m.room.encryption")
+        assertEquals(200, encryption.statusCode(), encryption.body())
+        assertEquals(
+            "m.megolm.v1.aes-sha2",
+            json.readTree(encryption.body()).path("algorithm").asString(),
+        )
+        val synced = sync(a, token, "?timeout=0")
+        assertEquals(200, synced.statusCode(), synced.body())
+        val cursor =
+            java.net.URLEncoder.encode(
+                json.readTree(synced.body()).path("next_batch").asString(),
+                java.nio.charset.StandardCharsets.UTF_8,
+            )
+        val members = matrixRoom(a, token, "v3/rooms/$room/members?at=$cursor")
+        assertEquals(200, members.statusCode(), members.body())
+        assertEquals(2, json.readTree(members.body()).path("chunk").size())
+        assertEquals("at=fixture-private-since", provider.lastMemberQuery.get())
+        val before = provider.roomCalls.get()
+        assertEquals(
+            400,
+            matrixRoom(a, token, "v3/rooms/$room/members?at=raw-position").statusCode(),
+        )
+        assertEquals(400, matrixRoom(a, token, "v3/rooms/$room/members?at=a&at=b").statusCode())
+        assertEquals(401, matrixRoom(a, a.access, "v3/rooms/$room/state").statusCode())
+        assertEquals(404, matrixRoom(a, token, "v3/rooms/!foreign/state").statusCode())
+        assertEquals(
+            400,
+            matrixRoom(a, token, "v3/rooms/$room/join", "{\"third_party_signed\":{}}").statusCode(),
+        )
+        assertEquals(before, provider.roomCalls.get())
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        database().update("delete from native_sessions where id=?", b.session)
+        assertEquals(json.readTree(expected), json.readTree(directMetadata(a, token, user).body()))
+        assertEquals(200, matrixRoom(a, token, "v3/rooms/$room/state").statusCode())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupReadReceiptRequiresOriginalEventAndCannotWriteAfterNativeRevocationDuringProof() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val (peer, _) = enrollGroup(b)
+        val room = publishedGroupRoom(a, device, b)
+        val events = groupMetadataEvents(room, device, peer)
+        provider.roomStates[room] = events
+        val event =
+            events.single { it["type"] == "m.room.encrypted" }.getValue("event_id") as String
+        fun route(type: String = "m.read.private") = "v3/rooms/$room/receipt/$type/$event"
+        val before = provider.roomReceipts.get()
+        for (type in listOf("m.read.private", "m.read")) {
+            val response = matrixRoom(a, token, route(type), "{}")
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("{}", response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        }
+        for (body in listOf("[]", "{} {}", "{\"ts\":1}", "{\"thread_id\":\"main\"}")) assertEquals(
+            400,
+            matrixRoom(a, token, route(), body).statusCode(),
+        )
+        assertEquals(403, matrixRoom(a, token, route("m.fully_read"), "{}").statusCode())
+        assertEquals(401, matrixRoom(a, a.access, route(), "{}").statusCode())
+        assertEquals(400, matrixRoom(a, token, route() + "?extra=1", "{}").statusCode())
+        assertEquals(before + 2, provider.roomReceipts.get())
+        provider.onRoomHistory.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                    a.session,
+                )
+        }
+        try {
+            val denied = matrixRoom(a, token, route(), "{}")
+            assertEquals(401, denied.statusCode(), denied.body())
+            assertEquals(before + 2, provider.roomReceipts.get())
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onRoomHistory.set(null)
+        }
+    }
+
+    @Test
+    fun groupRoomMetadataWithholdsContentAfterNativeParentRevocation() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val (peer, _) = enrollGroup(b)
+        val room = publishedGroupRoom(a, device, b)
+        provider.roomStates[room] = groupMetadataEvents(room, device, peer)
+        val before = provider.roomCalls.get()
+        provider.onRoomMetadata.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                    a.session,
+                )
+        }
+        try {
+            val denied = matrixRoom(a, token, "v3/rooms/$room/state")
+            assertEquals(401, denied.statusCode(), denied.body())
+            assertFalse(denied.body().contains("m.room.create"))
+            assertFalse(denied.body().contains(room))
+            assertEquals(before + 1, provider.roomCalls.get())
+            assertEquals(401, matrixRoom(a, token, "v3/rooms/$room/state").statusCode())
+            assertEquals(before + 1, provider.roomCalls.get())
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onRoomMetadata.set(null)
+        }
+    }
+
     private fun sync(
         n: Native,
         token: String? = null,
@@ -3259,6 +3448,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val lastHistoryQuery = AtomicReference<String>()
         val lastContextQuery = AtomicReference<String>()
         val onRoomHistory = AtomicReference<(() -> Unit)?>(null)
+        val onRoomMetadata = AtomicReference<(() -> Unit)?>(null)
         val onQuery = AtomicReference<(() -> Unit)?>(null)
         private val credentials = ConcurrentHashMap<String, Map<String, Any>>()
         private val executor = Executors.newFixedThreadPool(2)
@@ -3462,6 +3652,11 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                     val room = relative.substringBefore('/')
                                     val events = requireNotNull(roomStates[room])
                                     roomCalls.incrementAndGet()
+                                    if (
+                                        relative.substringAfter('/') in
+                                            setOf("state", "members", "join")
+                                    )
+                                        onRoomMetadata.getAndSet(null)?.invoke()
                                     when (relative.substringAfter('/')) {
                                         "send/m.room.encrypted/fixture-txn" -> {
                                             assertEquals("PUT", request.requestMethod)
@@ -3475,7 +3670,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                             mapOf("event_id" to "\$fixture-sent")
                                         }
                                         "join" -> mapOf("room_id" to room)
-                                        "state" -> events
+                                        "state" -> events.filter { it.containsKey("state_key") }
                                         "members" -> {
                                             lastMemberQuery.set(request.requestURI.query)
                                             mapOf(

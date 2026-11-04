@@ -63,11 +63,7 @@ class InternalCollaborationSpaceMatrixSyncRepository(
                     }
                 }
             }
-        val direct =
-            frames.entries
-                .groupBy { (it.value.users - owner.matrixUserId).single() }
-                .mapValues { (_, entries) -> entries.map { it.key }.sorted() }
-                .toSortedMap()
+        val direct = collaborationSpaceDirectMetadata(owner, scope)
         val frame =
             MatrixSyncFrame(owner.matrixUserId, owner.matrixDeviceId, frames, direct) {
                 id,

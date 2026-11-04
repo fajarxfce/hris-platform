@@ -29,7 +29,11 @@ class MatrixGatewayReadController(
         @PathVariable userId: String,
         request: HttpServletRequest,
     ): ResponseEntity<Any> =
-        read(request) { token, correlation -> device.directMetadata(token, correlation, userId) }
+        read(request) { token, correlation ->
+            (if (validCollaborationSpaceGatewayAccess(token))
+                group.directMetadata(token, correlation, userId)
+            else device.directMetadata(token, correlation, userId))
+        }
 
     @GetMapping("/_matrix/client/versions")
     fun versions(request: HttpServletRequest): ResponseEntity<Any> {
@@ -78,7 +82,10 @@ class MatrixGatewayReadController(
     @GetMapping("/_matrix/client/v3/rooms/{roomId}/state")
     fun state(@PathVariable roomId: String, request: HttpServletRequest): ResponseEntity<Any> =
         read(request) { token, correlation ->
-            device.roomState(token, correlation, roomId).map { it.events }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.roomState(token, correlation, roomId)
+                else device.roomState(token, correlation, roomId))
+                .map { it.events }
         }
 
     @GetMapping(
@@ -106,22 +113,28 @@ class MatrixGatewayReadController(
                     Failure(FailureKind.FORBIDDEN, "collaboration_room_state_unavailable")
                 )
             else
-                device.roomState(token, correlation, roomId).flatMap { events ->
-                    val found =
-                        events.events.singleOrNull { it["type"] == type && it["state_key"] == "" }
-                    found?.get("content")?.let { Result.Success(it) }
-                        ?: Result.Failed(
-                            Failure(FailureKind.NOT_FOUND, "collaboration_room_state_not_found")
-                        )
-                }
+                (if (validCollaborationSpaceGatewayAccess(token))
+                        group.roomState(token, correlation, roomId)
+                    else device.roomState(token, correlation, roomId))
+                    .flatMap { events ->
+                        val found =
+                            events.events.singleOrNull {
+                                it["type"] == type && it["state_key"] == ""
+                            }
+                        found?.get("content")?.let { Result.Success(it) }
+                            ?: Result.Failed(
+                                Failure(FailureKind.NOT_FOUND, "collaboration_room_state_not_found")
+                            )
+                    }
         }
 
     @GetMapping("/_matrix/client/v3/rooms/{roomId}/members")
     fun members(@PathVariable roomId: String, request: HttpServletRequest): ResponseEntity<Any> =
         read(request, setOf("at")) { token, correlation ->
-            device.roomMembers(token, correlation, roomId, request.getParameter("at")).map {
-                mapOf("chunk" to it.events)
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.roomMembers(token, correlation, roomId, request.getParameter("at"))
+                else device.roomMembers(token, correlation, roomId, request.getParameter("at")))
+                .map { mapOf("chunk" to it.events) }
         }
 
     @GetMapping("/_matrix/client/v3/rooms/{roomId}/messages")

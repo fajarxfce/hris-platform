@@ -259,7 +259,9 @@
         "space-sync-protocol.md",
         "../measurements/collaboration-space-sync-protocol-2026-11-04.json",
         "space-sync-access.md",
-        "../measurements/collaboration-space-sync-access-2026-11-04.json"
+        "../measurements/collaboration-space-sync-access-2026-11-04.json",
+        "space-metadata-access.md",
+        "../measurements/collaboration-space-metadata-access-2026-11-04.json"
       ]
     },
     {
@@ -353,7 +355,9 @@
         "space-sync-protocol.md",
         "../measurements/collaboration-space-sync-protocol-2026-11-04.json",
         "space-sync-access.md",
-        "../measurements/collaboration-space-sync-access-2026-11-04.json"
+        "../measurements/collaboration-space-sync-access-2026-11-04.json",
+        "space-metadata-access.md",
+        "../measurements/collaboration-space-metadata-access-2026-11-04.json"
       ]
     },
     {

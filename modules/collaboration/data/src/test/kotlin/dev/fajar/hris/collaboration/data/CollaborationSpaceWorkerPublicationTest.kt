@@ -6,6 +6,7 @@ import dev.fajar.hris.collaboration.data.matrix.*
 import dev.fajar.hris.collaboration.data.repositories.*
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
+import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
 import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -2328,6 +2329,139 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         )
         assertEquals(saved, syncPositions.last())
+        val metadataCalls = mutableListOf<String>()
+        var metadataProofs = 0
+        val metadata =
+            object : CollaborationSpaceMatrixRoomAccessRepository {
+                fun read(
+                    kind: String,
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceReadRoom,
+                    bearer: String,
+                    deadline: Instant,
+                ) {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(expectedOwner, owner)
+                    assertEquals(CollaborationSpaceReadRoom.Original(original), room)
+                    assertEquals(credential.accessToken, bearer)
+                    assertTrue(
+                        deadline > Instant.now() && deadline <= Instant.now().plusSeconds(30)
+                    )
+                    metadataCalls += kind
+                }
+
+                override fun join(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceReadRoom,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<String> {
+                    read("join", owner, room, bearer, deadline)
+                    return Result.Success(room.roomId)
+                }
+
+                override fun state(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceReadRoom,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationRoomEvents> {
+                    read("state", owner, room, bearer, deadline)
+                    return Result.Success(CollaborationRoomEvents(emptyList()))
+                }
+
+                override fun members(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceReadRoom,
+                    at: String?,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationRoomEvents> {
+                    read("members", owner, room, bearer, deadline)
+                    assertEquals("s-original", at)
+                    return Result.Success(CollaborationRoomEvents(emptyList()))
+                }
+
+                override fun receipt(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceReadRoom,
+                    receiptType: String,
+                    eventId: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<Unit> {
+                    read("receipt", owner, room, bearer, deadline)
+                    assertEquals(1, metadataProofs)
+                    assertEquals("m.read.private", receiptType)
+                    assertEquals("\$original", eventId)
+                    return Result.Success(Unit)
+                }
+            }
+        val metadataHistory =
+            object :
+                CollaborationSpaceMatrixRoomHistoryRepository by DisabledCollaborationSpaceMatrixRoomHistoryRepository() {
+                override fun event(
+                    owner: CollaborationSpaceHistoryOwner,
+                    room: CollaborationSpaceLegacyConversation,
+                    eventId: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationRoomHistory> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(expectedOwner, owner)
+                    assertEquals(original, room)
+                    assertEquals(credential.accessToken, bearer)
+                    assertTrue(
+                        deadline > Instant.now() && deadline <= Instant.now().plusSeconds(30)
+                    )
+                    metadataProofs++
+                    return Result.Success(CollaborationRoomHistory(mapOf("event_id" to eventId)))
+                }
+            }
+        val metadataCommand =
+            a.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerRoomAccess = metadata,
+                providerRoomHistory = metadataHistory,
+                syncCursors = syncCursors,
+            )
+        val hints =
+            success(
+                metadataCommand.directMetadata(token, UUID.randomUUID(), expectedOwner.matrixUserId)
+            )
+        assertEquals(
+            mapOf(
+                "@${collaborationMatrixLocalpart(a.company, b.account)}:$server" to listOf(roomId)
+            ),
+            hints,
+        )
+        success(
+            metadataCommand.confirmDirectMetadata(
+                token,
+                UUID.randomUUID(),
+                expectedOwner.matrixUserId,
+                hints,
+            )
+        )
+        assertEquals(roomId, success(metadataCommand.joinRoom(token, UUID.randomUUID(), roomId)))
+        success(metadataCommand.roomState(token, UUID.randomUUID(), roomId))
+        success(metadataCommand.roomMembers(token, UUID.randomUUID(), roomId, firstSync.nextBatch))
+        success(
+            metadataCommand.sendReadReceipt(
+                token,
+                UUID.randomUUID(),
+                roomId,
+                "m.read.private",
+                "\$original",
+            )
+        )
+        assertEquals(listOf("join", "state", "members", "receipt"), metadataCalls)
         val oldCursor =
             success(
                 EncryptedCollaborationSyncCursorRepository(syncCrypto)
@@ -2346,6 +2480,13 @@ class CollaborationSpaceWorkerPublicationTest {
             failure(oldResult, "invalid_collaboration_sync_cursor")
             assertEquals(2, syncPositions.size)
         }
+        val priorMetadataCalls = metadataCalls.size
+        failure(
+            metadataCommand.roomMembers(token, UUID.randomUUID(), roomId, oldCursor),
+            if (retained) "collaboration_sync_reset_required"
+            else "invalid_collaboration_sync_cursor",
+        )
+        assertEquals(priorMetadataCalls, metadataCalls.size)
         success(
             command.roomMessages(
                 token,
@@ -2378,6 +2519,14 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         )
         assertEquals(saved, syncPositions.last())
+        assertEquals(
+            hints,
+            success(
+                metadataCommand.directMetadata(token, UUID.randomUUID(), expectedOwner.matrixUserId)
+            ),
+        )
+        success(metadataCommand.roomState(token, UUID.randomUUID(), roomId))
+        assertEquals(5, metadataCalls.size)
         var originalLookups = 0
         var changed = false
         val tracked =
@@ -2489,6 +2638,10 @@ class CollaborationSpaceWorkerPublicationTest {
             ) as Result.Failed
         assertEquals(FailureKind.UNAUTHENTICATED, deniedSync.failure.kind)
         assertEquals(beforeDeniedSync, syncPositions.size)
+        val deniedMetadata =
+            metadataCommand.roomState(token, UUID.randomUUID(), roomId) as Result.Failed
+        assertEquals(FailureKind.UNAUTHENTICATED, deniedMetadata.failure.kind)
+        assertEquals(5, metadataCalls.size)
     }
 
     private fun seedOriginalRoom(
@@ -4182,6 +4335,8 @@ class CollaborationSpaceWorkerPublicationTest {
                 DisabledCollaborationSpaceMatrixSyncRepository(),
             syncCursors: CollaborationSpaceSyncCursorRepository =
                 EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
+            providerRoomAccess: CollaborationSpaceMatrixRoomAccessRepository =
+                DisabledCollaborationSpaceMatrixRoomAccessRepository(),
             rooms: CollaborationSpaceRoomRepository = roomRepository(),
             conversations: CollaborationSpaceConversationRepository =
                 StoredCollaborationSpaceConversationRepository(
@@ -4233,6 +4388,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 conversations,
                 syncCursors,
                 providerSync,
+                providerRoomAccess,
             )
         }
 

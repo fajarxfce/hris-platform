@@ -112,6 +112,57 @@ class CollaborationSpaceReadScopePolicyTest {
     }
 
     @Test
+    fun directHintsRetainOriginalPeerAliasesThroughAdoptionAndKeepNewAliasesDistinct() {
+        val old = original()
+        val oldRoomId = requireNotNull(old.room).roomId
+        val adopted = published(old)
+        val separate =
+            published().let {
+                it.copy(
+                    intent =
+                        it.intent.copy(
+                            secondMatrixUserId =
+                                "@${collaborationSpaceMatrixLocalpart(space, peer)}:$server"
+                        )
+                )
+            }
+        for (current in listOf(owner, retained)) {
+            val originalHints =
+                collaborationSpaceDirectMetadata(
+                    current,
+                    success(read(emptyList(), listOf(old), current)),
+                )
+            assertEquals(mapOf(user(peer) to listOf(oldRoomId)), originalHints)
+            assertEquals(
+                originalHints,
+                collaborationSpaceDirectMetadata(
+                    current,
+                    success(read(listOf(adopted), listOf(old), current)),
+                ),
+            )
+            val combined =
+                collaborationSpaceDirectMetadata(
+                    current,
+                    success(read(listOf(separate), listOf(old), current)),
+                )
+            assertEquals(setOf(user(peer), separate.intent.secondMatrixUserId), combined.keys)
+            assertEquals(listOf(oldRoomId), combined[user(peer)])
+            assertEquals(
+                listOf(separate.binding.roomId),
+                combined[separate.intent.secondMatrixUserId],
+            )
+            assertEquals(Result.Success(combined), normalizeCollaborationDirectMetadata(combined))
+            assertTrue(
+                collaborationSpaceDirectMetadata(
+                        current,
+                        success(read(emptyList(), emptyList(), current)),
+                    )
+                    .isEmpty()
+            )
+        }
+    }
+
+    @Test
     fun emptyScopesStillRequireCanonicalFreshOrRetainedDeviceCoordinates() {
         val freshGroup =
             owner.copy(

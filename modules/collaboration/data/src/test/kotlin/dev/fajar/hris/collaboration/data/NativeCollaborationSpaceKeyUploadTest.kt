@@ -611,6 +611,7 @@ class NativeCollaborationSpaceKeyUploadTest {
                 ),
                 EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
                 DisabledCollaborationSpaceMatrixSyncRepository(),
+                DisabledCollaborationSpaceMatrixRoomAccessRepository(),
             )
 
         fun upload(

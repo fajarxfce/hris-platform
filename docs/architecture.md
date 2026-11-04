@@ -1,5 +1,7 @@
 # Architecture
 
+[Native group metadata and receipts](collaboration/space-metadata-access.md) expose managed direct hints, join/state/membership and event-proven public/private receipts under current original/published room ownership. The shared provider reader preserves original creator and historical membership semantics; group push and actual SDK ownership transition remain required.
+
 [Current native group sync](collaboration/space-sync-access.md) admits the complete original/published inventory, rechecks both provider outcomes and final cursor sealing, and dispatches strict group HTTP tokens through shared API/worker DI. Room metadata/push and actual SDK ownership transition remain required.
 
 The [group sync protocol](collaboration/space-sync-protocol.md) shares bounded provider projection over the complete original/published room union, retains original queued frames and isolates encrypted group positions. Exact retained company cursors initialize a new scope; current native sync admission remains separate integration.

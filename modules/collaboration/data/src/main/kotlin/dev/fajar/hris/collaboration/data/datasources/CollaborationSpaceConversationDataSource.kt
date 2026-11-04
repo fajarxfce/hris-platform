@@ -49,4 +49,20 @@ interface CollaborationSpaceConversationDataSource {
         companyId: UUID,
         conversationId: UUID,
     ): CollaborationSpaceLegacyConversationsRecord?
+
+    fun ownedLegacyRooms(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        limit: Int,
+    ): List<CollaborationSpaceLegacyConversationsRecord>
+
+    fun legacyBoundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        roomId: String,
+    ): List<CollaborationSpaceLegacyConversationsRecord>
 }

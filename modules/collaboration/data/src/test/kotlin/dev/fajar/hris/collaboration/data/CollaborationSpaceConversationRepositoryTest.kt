@@ -268,6 +268,197 @@ class CollaborationSpaceConversationRepositoryTest {
     }
 
     @Test
+    fun originalRoomScopePreservesUnsignedOrderAndExactNamespaceBeforeGroupAdoption() {
+        val f = Fixture()
+        val ids =
+            listOf(
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+            )
+        val peers = listOf(f.peer(), f.peer())
+        fun room(index: Int) = "!original-$index:matrix.example.test"
+        for (index in ids.indices.reversed()) f.seedLegacyRoom(
+            peers[index],
+            ids[index],
+            room(index),
+        )
+        f.legacy(f.peer(), CollaborationLegacyConversationPosition(f.s.company, UUID.randomUUID()))
+        f.s.owner.update(
+            "insert into company_memberships(company_id,account_id) values(?,?)",
+            f.other,
+            f.s.account,
+        )
+        f.seedLegacyRoom(f.peer(), UUID.randomUUID(), "!other:matrix.example.test", f.other)
+        fun scope(
+            actor: Actor = f.s.actor,
+            account: UUID = actor.accountId,
+            company: UUID = f.s.company,
+            space: UUID = f.s.space,
+            server: String = "matrix.example.test",
+            limit: Int = 10001,
+        ) =
+            success(
+                f.s.tx(actor) { f.repo.ownedLegacyRooms(space, account, company, server, limit) }
+            )
+        fun read(id: String, company: UUID = f.s.company, actor: Actor = f.s.actor) =
+            success(
+                f.s.tx(actor) {
+                    f.repo.legacyBoundRoom(
+                        f.s.space,
+                        actor.accountId,
+                        company,
+                        "matrix.example.test",
+                        id,
+                    )
+                }
+            )
+        val original = scope()
+        assertEquals(ids, original.map { it.conversation.id })
+        assertEquals(ids.indices.map(::room), original.map { it.room!!.roomId })
+        assertTrue(original.all { it.room!!.createdBy == f.s.account })
+        assertEquals(peers, original.map { it.conversation.createdBy })
+        assertEquals(original.take(1), scope(limit = 1))
+        assertEquals(
+            listOf("!other:matrix.example.test"),
+            scope(company = f.other).map { it.room!!.roomId },
+        )
+        assertEquals(original, scope(actor = f.s.actor.copy(companyId = f.other)))
+        assertTrue(scope(company = UUID.randomUUID()).isEmpty())
+        assertTrue(scope(space = UUID.randomUUID()).isEmpty())
+        assertTrue(scope(server = "other.example.test").isEmpty())
+        assertTrue(
+            scope(actor = f.s.actor.copy(accountId = UUID.randomUUID()), account = f.s.account)
+                .isEmpty()
+        )
+        for (index in ids.indices) {
+            assertEquals(original[index], read(room(index)))
+            val peer = f.s.actor.copy(accountId = peers[index])
+            assertEquals(listOf(original[index]), scope(actor = peer))
+            assertEquals(original[index], read(room(index), actor = peer))
+        }
+        assertNull(read(room(0), company = f.other))
+        assertNull(read("!unowned:matrix.example.test"))
+        assertNull(read(room(0), actor = f.s.actor.copy(accountId = UUID.randomUUID())))
+        for (peer in peers) f.s.owner.update(
+            "delete from membership_permissions where account_id=?",
+            peer,
+        )
+        f.s.owner.update("delete from native_sessions where id=?", f.s.parent)
+        assertEquals(original, scope())
+        assertEquals(original[0], read(room(0)))
+    }
+
+    @Test
+    fun originalBoundScopeRejectsOverboundReorderedForeignAndPartialAcquisition() {
+        val f = Fixture()
+        f.seedLegacyRoom(f.peer(), UUID(0, 1), "!first:matrix.example.test")
+        f.seedLegacyRoom(f.peer(), UUID(-1, -1), "!last:matrix.example.test")
+        for (mode in
+            listOf(
+                "oversize",
+                "reverse",
+                "duplicate",
+                "company",
+                "space",
+                "owner",
+                "server",
+                "partial",
+                "roomDuplicate",
+            )) {
+            val repo =
+                StoredCollaborationSpaceConversationRepository(
+                    object : CollaborationSpaceConversationDataSource by f.raw {
+                        override fun ownedLegacyRooms(
+                            spaceId: UUID,
+                            accountId: UUID,
+                            companyId: UUID,
+                            serverName: String,
+                            limit: Int,
+                        ): List<CollaborationSpaceLegacyConversationsRecord> {
+                            val rows =
+                                f.raw.ownedLegacyRooms(
+                                    spaceId,
+                                    accountId,
+                                    companyId,
+                                    serverName,
+                                    10001,
+                                )
+                            when (mode) {
+                                "reverse" -> return rows.reversed()
+                                "duplicate" -> return listOf(rows[0], rows[0])
+                                "company" -> rows[1].legacyCompanyId = f.other
+                                "space" -> rows[1].spaceId = UUID.randomUUID()
+                                "owner" -> rows[1].firstAccountId = rows[1].secondAccountId
+                                "server" -> rows[1].matrixServerName = "other.example.test"
+                                "partial" -> rows[1].roomCreatedBy = null
+                                "roomDuplicate" -> rows[1].matrixRoomId = rows[0].matrixRoomId
+                            }
+                            return rows
+                        }
+                    }
+                )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.tx {
+                    repo.ownedLegacyRooms(
+                        f.s.space,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        if (mode == "oversize") 1 else 10001,
+                    )
+                },
+                mode,
+            )
+        }
+        for (mode in listOf("duplicate", "room", "company", "server", "partial")) {
+            val repo =
+                StoredCollaborationSpaceConversationRepository(
+                    object : CollaborationSpaceConversationDataSource by f.raw {
+                        override fun legacyBoundRoom(
+                            spaceId: UUID,
+                            accountId: UUID,
+                            companyId: UUID,
+                            serverName: String,
+                            roomId: String,
+                        ): List<CollaborationSpaceLegacyConversationsRecord> {
+                            val rows =
+                                f.raw.legacyBoundRoom(
+                                    spaceId,
+                                    accountId,
+                                    companyId,
+                                    serverName,
+                                    roomId,
+                                )
+                            if (mode == "duplicate") return rows + rows
+                            when (mode) {
+                                "room" ->
+                                    rows.single().matrixRoomId = "!different:matrix.example.test"
+                                "company" -> rows.single().legacyCompanyId = f.other
+                                "server" -> rows.single().matrixServerName = "other.example.test"
+                                "partial" -> rows.single().roomCreatedBy = null
+                            }
+                            return rows
+                        }
+                    }
+                )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.tx {
+                    repo.legacyBoundRoom(
+                        f.s.space,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        "!first:matrix.example.test",
+                    )
+                },
+                mode,
+            )
+        }
+    }
+
+    @Test
     fun originalBoundRoomKeepsItsActualCreatorForBothParticipantsAfterParentPurge() {
         val f = Fixture()
         val peer = f.peer()
@@ -611,6 +802,22 @@ class CollaborationSpaceConversationRepositoryTest {
                         companyId: UUID,
                         conversationId: UUID,
                     ): CollaborationSpaceLegacyConversationsRecord? = fail()
+
+                    override fun ownedLegacyRooms(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        companyId: UUID,
+                        serverName: String,
+                        limit: Int,
+                    ): List<CollaborationSpaceLegacyConversationsRecord> = fail()
+
+                    override fun legacyBoundRoom(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        companyId: UUID,
+                        serverName: String,
+                        roomId: String,
+                    ): List<CollaborationSpaceLegacyConversationsRecord> = fail()
                 }
             )
         val value = f.value(f.peer())
@@ -636,6 +843,70 @@ class CollaborationSpaceConversationRepositoryTest {
                     )
                 },
                 { repo.legacy(value.spaceId, f.s.account, null, 51) },
+                { repo.ownedLegacyRooms(zero, f.s.account, f.s.company, "matrix.example.test", 1) },
+                {
+                    repo.ownedLegacyRooms(
+                        value.spaceId,
+                        f.s.account,
+                        zero,
+                        "matrix.example.test",
+                        1,
+                    )
+                },
+                {
+                    repo.ownedLegacyRooms(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        "invalid server",
+                        1,
+                    )
+                },
+                {
+                    repo.ownedLegacyRooms(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        0,
+                    )
+                },
+                {
+                    repo.ownedLegacyRooms(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        10002,
+                    )
+                },
+                {
+                    repo.legacyBoundRoom(
+                        value.spaceId,
+                        zero,
+                        f.s.company,
+                        "matrix.example.test",
+                        "!owned",
+                    )
+                },
+                {
+                    repo.legacyBoundRoom(
+                        value.spaceId,
+                        f.s.account,
+                        zero,
+                        "matrix.example.test",
+                        "!owned",
+                    )
+                },
+                {
+                    repo.legacyBoundRoom(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        "raw",
+                    )
+                },
                 {
                     repo.legacyPair(
                         value.spaceId,
@@ -682,6 +953,24 @@ class CollaborationSpaceConversationRepositoryTest {
                 { repo.list(value.spaceId, f.s.account, null, 1) },
                 { repo.create(value) },
                 { repo.legacy(value.spaceId, f.s.account, null, 1) },
+                {
+                    repo.ownedLegacyRooms(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        10001,
+                    )
+                },
+                {
+                    repo.legacyBoundRoom(
+                        value.spaceId,
+                        f.s.account,
+                        f.s.company,
+                        "matrix.example.test",
+                        "!owned",
+                    )
+                },
                 {
                     repo.legacyPair(
                         value.spaceId,
@@ -771,45 +1060,61 @@ class CollaborationSpaceConversationRepositoryTest {
             )
         }
 
-        fun seedLegacyRoom(peer: UUID, conversation: UUID) {
+        fun seedLegacyRoom(
+            peer: UUID,
+            conversation: UUID,
+            roomId: String = "!owned:matrix.example.test",
+            companyId: UUID = s.company,
+        ) {
             val pair = listOf(s.account, peer).sortedBy(UUID::toString)
-            val device = UUID.randomUUID()
+            val existingDevice =
+                s.owner
+                    .queryForList(
+                        "select device_id from collaboration_device_sessions where company_id=? and native_session_id=?",
+                        UUID::class.java,
+                        companyId,
+                        s.parent,
+                    )
+                    .singleOrNull()
+            val device = existingDevice ?: UUID.randomUUID()
             val job = UUID.randomUUID()
             val at = java.sql.Timestamp.from(s.at)
             s.owner.update(
                 "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?)",
-                s.company,
+                companyId,
                 conversation,
                 pair[0],
                 pair[1],
                 peer,
                 at,
             )
-            s.owner.update(
-                "insert into collaboration_devices(company_id,id,account_id,platform,label,state,version,created_at,updated_at) values(?,?,?,'ANDROID','Fictional retained device','PROVISIONING',0,?,?)",
-                s.company,
-                device,
-                s.account,
-                at,
-                at,
-            )
-            s.owner.update(
-                "insert into collaboration_device_sessions(company_id,device_id,account_id,native_session_id,bound_at) values(?,?,?,?,?)",
-                s.company,
-                device,
-                s.account,
-                s.parent,
-                at,
-            )
-            s.owner.update(
-                "update collaboration_devices set state='ACTIVE',version=1 where id=?",
-                device,
-            )
+            if (existingDevice == null) {
+                s.owner.update(
+                    "insert into collaboration_devices(company_id,id,account_id,platform,label,state,version,created_at,updated_at) values(?,?,?,'ANDROID','Fictional retained device','PROVISIONING',0,?,?)",
+                    companyId,
+                    device,
+                    s.account,
+                    at,
+                    at,
+                )
+                s.owner.update(
+                    "insert into collaboration_device_sessions(company_id,device_id,account_id,native_session_id,bound_at) values(?,?,?,?,?)",
+                    companyId,
+                    device,
+                    s.account,
+                    s.parent,
+                    at,
+                )
+                s.owner.update(
+                    "update collaboration_devices set state='ACTIVE',version=1 where id=?",
+                    device,
+                )
+            }
             s.owner.update(
                 """insert into background_jobs(id,company_id,actor_id,kind,operation_id,request,authenticated_at,credential_version,correlation_id,created_at,total_items)
                 values(?,?,?,'COLLABORATION_DIRECT_PROVISION',?,jsonb_build_object('conversationId',?::text,'deviceId',?::text,'nativeSessionId',?::text,'platform','ANDROID','clientBuild','5'),?,0,?,?,1)""",
                 job,
-                s.company,
+                companyId,
                 s.account,
                 UUID.randomUUID(),
                 conversation,
@@ -821,7 +1126,7 @@ class CollaborationSpaceConversationRepositoryTest {
             )
             s.owner.update(
                 "insert into collaboration_direct_room_provisioning(company_id,conversation_id,account_id,device_id,job_id,version,created_at,updated_at) values(?,?,?,?,?,0,?,?)",
-                s.company,
+                companyId,
                 conversation,
                 s.account,
                 device,
@@ -834,11 +1139,12 @@ class CollaborationSpaceConversationRepositoryTest {
                 job,
             )
             s.owner.update(
-                "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test','!owned:matrix.example.test',?)",
-                s.company,
+                "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test',?,?)",
+                companyId,
                 conversation,
                 s.account,
                 job,
+                roomId,
                 at,
             )
         }

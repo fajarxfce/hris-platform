@@ -53,4 +53,21 @@ interface CollaborationSpaceConversationRepository {
         accountId: UUID,
         position: CollaborationLegacyConversationPosition,
     ): Result<CollaborationSpaceLegacyConversation?>
+
+    /** Original owned bindings only; completed device and current caller admission are separate. */
+    fun ownedLegacyRooms(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        limit: Int,
+    ): Result<List<CollaborationSpaceLegacyConversation>>
+
+    fun legacyBoundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        roomId: String,
+    ): Result<CollaborationSpaceLegacyConversation?>
 }

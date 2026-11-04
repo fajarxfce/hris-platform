@@ -3,6 +3,7 @@ package dev.fajar.hris.collaboration.data.repositories
 import dev.fajar.hris.collaboration.data.datasources.CollaborationSpaceConversationDataSource
 import dev.fajar.hris.collaboration.data.mappers.*
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceConversationRepository
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.Page
@@ -131,5 +132,55 @@ class StoredCollaborationSpaceConversationRepository(
     private fun requireForwardPage(keys: List<String>, after: String?) {
         require(keys.zipWithNext().all { (a, b) -> a < b })
         require(after == null || keys.all { it > after })
+    }
+
+    override fun ownedLegacyRooms(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        limit: Int,
+    ): Result<List<CollaborationSpaceLegacyConversation>> = safeDatabaseCall {
+        requireSpaceConversationIds(spaceId, accountId, companyId)
+        require(validCollaborationSpaceServer(serverName))
+        require(limit in 1..COLLABORATION_SYNC_ROOM_LIMIT + 1)
+        val rows = source.ownedLegacyRooms(spaceId, accountId, companyId, serverName, limit)
+        require(rows.size <= limit)
+        val values =
+            rows.map {
+                it.toSpaceLegacyConversation(spaceId, accountId).also { value ->
+                    requireOriginalRoom(value, companyId, serverName)
+                }
+            }
+        requireForwardPage(values.map { it.conversation.id.toString() }, null)
+        require(values.map { requireNotNull(it.room).roomId }.toSet().size == values.size)
+        values
+    }
+
+    override fun legacyBoundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        roomId: String,
+    ): Result<CollaborationSpaceLegacyConversation?> = safeDatabaseCall {
+        requireSpaceConversationIds(spaceId, accountId, companyId)
+        require(validCollaborationSpaceServer(serverName) && validCollaborationSpaceRoomId(roomId))
+        val rows = source.legacyBoundRoom(spaceId, accountId, companyId, serverName, roomId)
+        require(rows.size <= 1)
+        rows.singleOrNull()?.toSpaceLegacyConversation(spaceId, accountId)?.also {
+            requireOriginalRoom(it, companyId, serverName)
+            require(it.room?.roomId == roomId)
+        }
+    }
+
+    private fun requireOriginalRoom(
+        value: CollaborationSpaceLegacyConversation,
+        companyId: UUID,
+        serverName: String,
+    ) {
+        require(value.conversation.companyId == companyId)
+        val room = requireNotNull(value.room)
+        require(room.serverName == serverName && validCollaborationSpaceRoomId(room.roomId))
     }
 }

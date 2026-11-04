@@ -123,4 +123,41 @@ class PostgresCollaborationSpaceConversationDataSource(private val sql: DSLConte
                 L.FIRST_ACCOUNT_ID.eq(accountId).or(L.SECOND_ACCOUNT_ID.eq(accountId)),
             )
             .fetchOne()
+
+    override fun ownedLegacyRooms(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        limit: Int,
+    ): List<CollaborationSpaceLegacyConversationsRecord> =
+        sql.selectFrom(L)
+            .where(
+                L.SPACE_ID.eq(spaceId),
+                L.LEGACY_COMPANY_ID.eq(companyId),
+                L.MATRIX_SERVER_NAME.eq(serverName),
+                L.MATRIX_ROOM_ID.isNotNull,
+                L.FIRST_ACCOUNT_ID.eq(accountId).or(L.SECOND_ACCOUNT_ID.eq(accountId)),
+            )
+            .orderBy(L.LEGACY_CONVERSATION_ID)
+            .limit(limit)
+            .fetch()
+
+    override fun legacyBoundRoom(
+        spaceId: UUID,
+        accountId: UUID,
+        companyId: UUID,
+        serverName: String,
+        roomId: String,
+    ): List<CollaborationSpaceLegacyConversationsRecord> =
+        sql.selectFrom(L)
+            .where(
+                L.SPACE_ID.eq(spaceId),
+                L.LEGACY_COMPANY_ID.eq(companyId),
+                L.MATRIX_SERVER_NAME.eq(serverName),
+                L.MATRIX_ROOM_ID.eq(roomId),
+                L.FIRST_ACCOUNT_ID.eq(accountId).or(L.SECOND_ACCOUNT_ID.eq(accountId)),
+            )
+            .limit(2)
+            .fetch()
 }

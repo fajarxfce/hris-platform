@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Typed legacy runtime ports accepted — 4 November 2026
+
+Domain owner/runtime/lease entities and repository contract, raw DTO/jOOQ source,
+strict mapping and stored repository are now implemented. Exact owner ensure/read/
+row guards, <=8 unique slots, one bounded claim, exact release and versioned freeze
+pass. Existing freeze survives ensure; late or changed owner/slot/token/timestamps
+cannot release a replacement. Caller rollback/cancellation/interruption leaves
+no claim/freeze and does not lose a live lease. Metadata/release survive parent
+purge without granting new acquisition. Lease toString is redacted.
+
+[Evidence](measurements/collaboration-legacy-runtime-ports-2026-11-04.json):26 cases
+PASS115.242s,8262 unchanged source/build/resource files, format/architecture PASS.
+Three mapper/three actual PostgreSQL storage plus9 native-registration/status and
+11 group worker publication/outcome cases. First run105.632s had3 storage failures
+(PostgreSQL42883: plain jOOQ timestamp argument bound as text); explicit timestamptz
+cast fixes the actual query. All checks complete; no DI/provider caller wired.
+Tracked sources/tests supersede the old ignored runtime-ports-next Kotlin drafts;
+do not recopy the stale query. Its contract.md remains useful integration notes.
+
+Next current runtime/lease policy and all old gateway/provisioning/direct-room
+provider callers, including credential renewal and final publication. Six concrete
+constructors need injection: three shared module beans and three factories in
+NativeCollaborationRegistrationTest. Shared graph edits require actual API and full
+worker contexts. Use the real repository in existing database fixtures. Several
+fixtures advance a mutable clock; real SQL lease time must not be weakened to fit
+an inconsistent future test clock. Preserve test intent using current time/expired
+stored credentials where needed. Claim commits before I/O; finally cleanup uses
+exact lease only and cannot clear thread interruption or re-admit revoked access.
+No group transfer may expose two runtimes for one SDK device. Lease expiry does not
+prove provider rollback. Preserve old keys/store/transaction IDs and room/push/read
+ownership; never logout a losing candidate.
+
+V123 is accepted at16420c3e; main86afc82b records it and needs this port commit next.
+Mobile1ae13d74 records3d85d569 local SDK continuity and protocol41741297195 success.
+Control41741297181 portable succeeded; Apple still runs. Native41741297183 has moved
+to compiling the HRIS fixture; audit scripts remain prepared under Mobile .work/
+local-sdk-identity-2026-11-03/hosted. No audit process is running. Live8b40/schema116
+pushON/SMTP OFF, normal installed phone28, Starter9959c1d and all54 open acceptance
+groups remain. Continue full long run, frequent user/Git updates and atomic pushes.
+
 ## V123 bounded legacy runtime storage accepted — 4 November 2026
 
 V123 retains one exact company/device/account/original-native runtime owner and

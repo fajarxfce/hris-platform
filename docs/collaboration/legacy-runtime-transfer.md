@@ -62,3 +62,16 @@ regression cases in 525.967s, with unchanged checked inputs and quality gates.
 Fifteen recovery-tool tests pass after correcting the old unknown-future-version
 assertion. Earlier compilation failures are recorded separately. No live schema,
 product phone build, public transfer endpoint or group runtime is enabled here.
+
+The typed repository now supports exact-owner initialization/read/row guards, a
+bounded slot list, one claim, exact-token release and versioned freeze. Its raw
+jOOQ source supplies explicit PostgreSQL timestamp typing; acquisition and mapping
+share the safe database boundary. Repeating initialization returns an existing
+freeze unchanged. Malformed or foreign rows fail mapping, and a reclaimed slot
+cannot be released by an old token or altered ownership/timestamps.
+[Port evidence](../measurements/collaboration-legacy-runtime-ports-2026-11-04.json)
+records 26 passing mapping/actual-storage/native/worker cases in 115.242s with
+8262 unchanged checked inputs and quality gates. Caller rollback, cancellation,
+interruption and exact cleanup after native-parent purge pass. An earlier run
+failed three actual-storage cases because the plain SQL timestamp argument required
+an explicit cast; the corrected query passes. No DI or provider caller is wired yet.

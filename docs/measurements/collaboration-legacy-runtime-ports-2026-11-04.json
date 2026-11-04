@@ -1,0 +1,71 @@
+{
+  "scope": "Typed original runtime ownership, bounded claim/slot mapping, exact release and freeze repository; still no provider caller or DI binding",
+  "baseCommit": "16420c3e",
+  "validation": {
+    "startedAt": "2026-11-04T00:05:48.292992+00:00",
+    "elapsedSeconds": 115.242,
+    "exitCode": 0,
+    "sourceFiles": 8262,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyRuntimeStorageTest.xml": {
+        "sha256": "dcba95ff9745ed00315b05d7442a0fc3ba33997aa8f07b33a684e773e95f292b",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "05b81d1559720a5d4f88e45633052bfb10549d77bb08c9e8e0dfac27c8df69f2",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "b81f34f5666f4e4d2e3e9270db050f06571ec34203e064d3c8360a7b340c1cd4",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyRuntimeMappingTest.xml": {
+        "sha256": "3cffc5ca027811539c42de48f2bc522885d22831bb35c940967073b208cf86a0",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "earlierRun": {
+    "run": "runtime-ports1",
+    "seconds": 105.632,
+    "tests": 26,
+    "failures": 3,
+    "accepted": false,
+    "reason": "Plain jOOQ binding supplied the deadline as text; PostgreSQL could not resolve the claim function (42883). Added an explicit timestamptz cast. Ownership creation and all23 other cases passed."
+  },
+  "evidence": [
+    "Typed mappings retain exact original owner/freeze target and reject unknown states, inconsistent timestamps, nullable/malformed/foreign records and oversized/duplicate slot collections",
+    "Claim maps at most one unreleased lease ending at the exact requested deadline; release preserves every owner/slot/version/token/start/expiry coordinate",
+    "Actual PostgreSQL typed repository rejects all altered release coordinates and stale replacement tokens, preserves frozen state on repeated ensure, and enforces owner/company scope",
+    "Caller failed results, cancellation and interruption roll back claims; release/freeze rollback preserves the original lease/head",
+    "After offboarding/native-parent purge, owned metadata and exact release remain available while acquisition stays fenced; ensure cannot recreate an invalid parent",
+    "Acquisition and row mapping share safeDatabaseCall; database failures map while cancellation/interruption propagate",
+    "Three mapping,three actual-storage,nine native-registration/status and11 group worker publication/outcome cases all pass; format/architecture pass"
+  ],
+  "limits": [
+    "These ports are not wired to DI, provider callers, gateway bootstrap/refresh or a public transfer endpoint",
+    "The existing V123 database tests separately prove bounded competing claims and actual archive restoration; this increment does not repeat that archive",
+    "Next implement current runtime/lease policy and integrate all legacy provider paths with owned finally cleanup, then atomic group publication/legacy credential retirement",
+    "Lease expiry is not remote provider rollback or SDK stop; original private keys/store alias/pending transaction IDs/room/push/read ownership remain required",
+    "Live8b40/schema116 pushON, phone28 and Starter9959c1d remain unchanged"
+  ]
+}

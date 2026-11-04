@@ -31,4 +31,31 @@ interface CollaborationSpaceMatrixRoomHistoryRepository {
         bearer: String,
         deadline: Instant,
     ): Result<CollaborationRoomHistory>
+
+    /** Separately proven original owned metadata, before a group binding exists. */
+    fun messages(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        request: CollaborationRoomPageRequest,
+        bearer: String,
+        deadline: Instant,
+    ): Result<CollaborationRoomHistory>
+
+    fun context(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        eventId: String,
+        limit: Int,
+        bearer: String,
+        deadline: Instant,
+        filter: CollaborationRoomHistoryFilter = CollaborationRoomHistoryFilter(),
+    ): Result<CollaborationRoomHistory>
+
+    fun event(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        eventId: String,
+        bearer: String,
+        deadline: Instant,
+    ): Result<CollaborationRoomHistory>
 }

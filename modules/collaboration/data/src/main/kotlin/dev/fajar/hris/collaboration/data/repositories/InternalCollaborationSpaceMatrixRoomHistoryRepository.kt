@@ -46,6 +46,38 @@ class InternalCollaborationSpaceMatrixRoomHistoryRepository(
         reader.event(frame(owner, room), eventId, bearer, deadline)
     }
 
+    override fun messages(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        request: CollaborationRoomPageRequest,
+        bearer: String,
+        deadline: Instant,
+    ): Result<CollaborationRoomHistory> = safeMatrixProviderCall {
+        reader.messages(frame(owner, room, deadline), request, bearer, deadline)
+    }
+
+    override fun context(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        eventId: String,
+        limit: Int,
+        bearer: String,
+        deadline: Instant,
+        filter: CollaborationRoomHistoryFilter,
+    ): Result<CollaborationRoomHistory> = safeMatrixProviderCall {
+        reader.context(frame(owner, room, deadline), eventId, limit, bearer, deadline, filter)
+    }
+
+    override fun event(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        eventId: String,
+        bearer: String,
+        deadline: Instant,
+    ): Result<CollaborationRoomHistory> = safeMatrixProviderCall {
+        reader.event(frame(owner, room, deadline), eventId, bearer, deadline)
+    }
+
     private fun frame(
         owner: CollaborationSpaceHistoryOwner,
         room: CollaborationSpaceBoundRoom,
@@ -58,6 +90,32 @@ class InternalCollaborationSpaceMatrixRoomHistoryRepository(
             owner.matrixUserId,
             if (intent.matrixCreatorAccountId == intent.firstAccountId) intent.firstMatrixUserId
             else intent.secondMatrixUserId,
+            object : MatrixRoomHistoryCursors {
+                override fun open(cursor: String) =
+                    openMatrixSpaceRoomCursor(crypto, owner, room, cursor)
+
+                override fun seal(position: String) =
+                    sealMatrixSpaceRoomCursor(crypto, owner, room, position)
+            },
+        )
+    }
+
+    private fun frame(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        deadline: Instant,
+    ): MatrixRoomHistoryFrame {
+        if (snapshotCollaborationSpaceOriginalReadRoom(owner, room, deadline) is Result.Failed)
+            throw MatrixResponseException()
+        val conversation = room.conversation
+        val binding = requireNotNull(room.room)
+        fun user(account: java.util.UUID) =
+            "@${collaborationMatrixLocalpart(conversation.companyId, account)}:${owner.serverName}"
+        return MatrixRoomHistoryFrame(
+            binding.roomId,
+            setOf(user(conversation.firstAccountId), user(conversation.secondAccountId)),
+            owner.matrixUserId,
+            user(binding.createdBy),
             object : MatrixRoomHistoryCursors {
                 override fun open(cursor: String) =
                     openMatrixSpaceRoomCursor(crypto, owner, room, cursor)

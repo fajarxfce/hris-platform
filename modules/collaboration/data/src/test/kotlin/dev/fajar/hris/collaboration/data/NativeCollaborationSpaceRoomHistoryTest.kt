@@ -292,7 +292,9 @@ class NativeCollaborationSpaceRoomHistoryTest {
     private fun ready() = SpaceKeyExchangeFixture(postgres).also { it.bind() }
 
     private class History(val f: SpaceKeyExchangeFixture) :
-        CollaborationSpaceMatrixRoomHistoryRepository {
+        CollaborationSpaceMatrixRoomHistoryRepository by dev.fajar.hris.collaboration.data
+            .repositories
+            .DisabledCollaborationSpaceMatrixRoomHistoryRepository() {
         val calls = mutableListOf<String>()
         var page: CollaborationRoomPageRequest? = null
         var eventId: String? = null

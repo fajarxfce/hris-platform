@@ -162,16 +162,28 @@ class MatrixSpaceRoomHistoryInteropTest {
             var pages = 1
             while (cursor != null && pages < 32) {
                 val next =
-                    success(
-                        history()
-                            .messages(
-                                f.owner,
-                                bound,
-                                request.copy(from = cursor),
-                                own.accessToken,
-                                deadline(),
-                            )
-                    )
+                    if (legacy && pages % 2 == 1)
+                        success(
+                            history()
+                                .messages(
+                                    f.owner,
+                                    f.original(bound),
+                                    request.copy(from = cursor),
+                                    own.accessToken,
+                                    deadline(),
+                                )
+                        )
+                    else
+                        success(
+                            history()
+                                .messages(
+                                    f.owner,
+                                    bound,
+                                    request.copy(from = cursor),
+                                    own.accessToken,
+                                    deadline(),
+                                )
+                        )
                 record(next)
                 cursor = next.payload["end"] as? String
                 pages++
@@ -236,10 +248,22 @@ class MatrixSpaceRoomHistoryInteropTest {
             assertEquals(freshOwner.matrixDeviceId, fresh.deviceId)
             assertNotEquals(own.deviceId, fresh.deviceId)
             val freshPage =
-                success(
-                        history()
-                            .messages(freshOwner, bound, request, fresh.accessToken, deadline())
-                    )
+                (if (legacy)
+                        success(
+                            history()
+                                .messages(
+                                    freshOwner,
+                                    f.original(bound),
+                                    request,
+                                    fresh.accessToken,
+                                    deadline(),
+                                )
+                        )
+                    else
+                        success(
+                            history()
+                                .messages(freshOwner, bound, request, fresh.accessToken, deadline())
+                        ))
                     .payload
             val freshEvents = freshPage["chunk"] as List<*>
             assertTrue(freshEvents.any { sent.containsKey((it as Map<*, *>)["event_id"]) })
@@ -296,6 +320,45 @@ class MatrixSpaceRoomHistoryInteropTest {
                 success(history().event(f.owner, bound, target, own.accessToken, deadline()))
                     .payload,
             )
+            if (legacy) {
+                val original = f.original(bound)
+                assertNotEquals(
+                    original.conversation.createdBy,
+                    requireNotNull(original.room).createdBy,
+                )
+                assertEquals(
+                    event,
+                    success(history().event(f.owner, original, target, own.accessToken, deadline()))
+                        .payload,
+                )
+                assertEquals(
+                    target,
+                    (success(
+                            history()
+                                .context(
+                                    freshOwner,
+                                    original,
+                                    target,
+                                    0,
+                                    fresh.accessToken,
+                                    deadline(),
+                                )
+                        )
+                        .payload["event"]
+                        as Map<*, *>)["event_id"],
+                )
+                // A fresh original-room cursor also continues after exact group adoption.
+                success(
+                    history()
+                        .messages(
+                            freshOwner,
+                            bound,
+                            request.copy(from = freshCursor),
+                            fresh.accessToken,
+                            deadline(),
+                        )
+                )
+            }
             // Opaque provider transport and original namespace proof, not SDK Megolm decryption.
         }
     }

@@ -67,5 +67,26 @@ internal class SpaceRoomHistoryFixture(private val legacy: Boolean = false) {
             ),
         )
 
+    fun original(bound: CollaborationSpaceBoundRoom = room): CollaborationSpaceLegacyConversation {
+        val reference = requireNotNull(bound.intent.original)
+        return CollaborationSpaceLegacyConversation(
+            space,
+            CollaborationDirectConversation(
+                reference.conversationId,
+                company,
+                pair[0],
+                pair[1],
+                pair[0],
+                reference.boundAt.minusSeconds(60),
+            ),
+            CollaborationLegacyRoomMetadata(
+                server,
+                bound.binding.roomId,
+                reference.boundAt,
+                pair[1],
+            ),
+        )
+    }
+
     private fun compact(id: UUID) = id.toString().replace("-", "")
 }

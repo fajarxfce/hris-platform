@@ -33,6 +33,32 @@ class DisabledCollaborationSpaceMatrixRoomHistoryRepository :
         deadline: Instant,
     ): Result<CollaborationRoomHistory> = unavailable()
 
+    override fun messages(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        request: CollaborationRoomPageRequest,
+        bearer: String,
+        deadline: Instant,
+    ): Result<CollaborationRoomHistory> = unavailable()
+
+    override fun context(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        eventId: String,
+        limit: Int,
+        bearer: String,
+        deadline: Instant,
+        filter: CollaborationRoomHistoryFilter,
+    ): Result<CollaborationRoomHistory> = unavailable()
+
+    override fun event(
+        owner: CollaborationSpaceHistoryOwner,
+        room: CollaborationSpaceLegacyConversation,
+        eventId: String,
+        bearer: String,
+        deadline: Instant,
+    ): Result<CollaborationRoomHistory> = unavailable()
+
     private fun unavailable() =
         Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_unavailable"))
 }

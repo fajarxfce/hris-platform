@@ -42,6 +42,7 @@ fun resolveCollaborationSpaceProvisioningFailure(
                 "collaboration_provider_busy",
                 "database_busy",
                 "collaboration_admission_changed",
+                "collaboration_runtime_busy",
             ) &&
             failure.kind in
                 setOf(FailureKind.UNAVAILABLE, FailureKind.RATE_LIMITED, FailureKind.CONFLICT)

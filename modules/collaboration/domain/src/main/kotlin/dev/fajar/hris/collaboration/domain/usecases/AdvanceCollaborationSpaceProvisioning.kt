@@ -20,6 +20,11 @@ class AdvanceCollaborationSpaceProvisioning(
     private val provisioning: CollaborationSpaceProvisioningRepository,
     private val credentials: CollaborationSpaceProviderSessionRepository,
     private val matrix: CollaborationSpaceMatrixRepository,
+    private val keys: CollaborationMatrixKeyRepository,
+    private val legacyParents: CollaborationLegacyParentRepository,
+    private val runtimes: CollaborationLegacyRuntimeRepository,
+    private val gateways: CollaborationLegacyGatewayRepository,
+    private val completions: CollaborationLegacyRuntimeCompletionRepository,
     private val selections: CollaborationSpaceIdentityRepository,
     private val spaces: CollaborationSpaceRepository,
     private val sessions: NativeSessionRepository,
@@ -60,7 +65,7 @@ class AdvanceCollaborationSpaceProvisioning(
                         request.accountId,
                         request.deviceId,
                         prepared.identity.legacy?.companyId,
-                        null,
+                        prepared.device.legacy,
                         prepared.admission.admittedAt,
                         prepared.deadline,
                     )
@@ -74,27 +79,51 @@ class AdvanceCollaborationSpaceProvisioning(
                         reusable.state.expiresAt,
                     )
                 )
+        checkInterrupted()
+        val afterLogin = reobserve(actor, lease, started, prepared)
+        if (afterLogin is Result.Failed) return afterLogin
         if (candidate is Result.Failed) return candidate
         val value = (candidate as Result.Success).value
         val valid = candidateMatches(value, prepared.device, clock.instant())
         if (valid is Result.Failed) return valid
+        val verified =
+            if (prepared.retained == null) null
+            else {
+                val read =
+                    keys.ownDeviceKeys(
+                        value.userId,
+                        value.deviceId,
+                        value.accessToken,
+                        prepared.deadline,
+                    )
+                val observedAt = clock.instant().truncatedTo(ChronoUnit.MICROS)
+                checkInterrupted()
+                val afterKeys = reobserve(actor, lease, started, prepared)
+                if (afterKeys is Result.Failed) return afterKeys
+                if (read is Result.Failed) return read
+                val deviceKeys = (read as Result.Success).value ?: return invalidKeys()
+                val validated =
+                    validateCollaborationDeviceKeys(deviceKeys, value.userId, value.deviceId)
+                if (validated is Result.Failed) return invalidKeys()
+                val fingerprint = (validated as Result.Success).value
+                if (fingerprint != prepared.device.legacyKeyFingerprint) return invalidKeys()
+                VerifiedKeys(fingerprint, observedAt)
+            }
         // Synapse logout removes all tokens and E2EE keys for this device. A losing candidate
         // must expire within the provider's bounded lifetime, without cleanup logout.
         return transactions.run(actor) {
             observe(actor, lease, started, decrypt = false).flatMap { current ->
-                if (
-                    current.device != prepared.device ||
-                        current.head != prepared.head ||
-                        current.identity != prepared.identity ||
-                        current.state != prepared.state
-                )
-                    return@flatMap changed()
+                val consistent = sameObservation(prepared, current)
+                if (consistent is Result.Failed) return@flatMap consistent
                 val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
                 val window = window(prepared, current, clock.instant())
                 if (window is Result.Failed) return@flatMap window
                 val stillValid = candidateMatches(value, current.device, clock.instant())
                 if (stillValid is Result.Failed) return@flatMap stillValid
                 val prior = current.state
+                val generation =
+                    if (reusable != null) reusable.state.generation
+                    else (prior?.generation ?: -1) + 1
                 val stored =
                     if (reusable != null) Result.Success(Unit)
                     else {
@@ -108,7 +137,7 @@ class AdvanceCollaborationSpaceProvisioning(
                                     request.nativeSessionId,
                                     value.userId,
                                     value.deviceId,
-                                    (prior?.generation ?: -1) + 1,
+                                    generation,
                                     prior?.createdAt ?: at,
                                     at,
                                     value.expiresAt.truncatedTo(ChronoUnit.MICROS),
@@ -131,6 +160,7 @@ class AdvanceCollaborationSpaceProvisioning(
                     }
                     .flatMap { provisioning.finish(lease) }
                     .flatMap { if (it) Result.Success(Unit) else lostLease() }
+                    .flatMap { completeRetained(current, lease, generation, verified) }
                     .flatMap {
                         journal.record(
                             actor,
@@ -156,7 +186,7 @@ class AdvanceCollaborationSpaceProvisioning(
         }
     }
 
-    /** Account -> native parent -> device -> queue -> credential; claim committed before entry. */
+    /** Account -> native -> target -> queue -> credential -> original runtime; no provider I/O. */
     private fun observe(
         actor: Actor,
         lease: CollaborationSpaceProvisioningLease,
@@ -184,12 +214,6 @@ class AdvanceCollaborationSpaceProvisioning(
                 device.platform.name != request.client.platform.name
         )
             return denied()
-        // Retained-device activation needs its own old/new gateway and SDK ownership transfer.
-        // Metadata continuity alone cannot authorize two runtimes to use one E2EE device.
-        if (device.origin != CollaborationSpaceDeviceOrigin.SPACE)
-            return Result.Failed(
-                Failure(FailureKind.CONFLICT, "collaboration_device_migration_required")
-            )
         val readIdentity =
             selections.selection(request.spaceId, actor.accountId, provider.serverName)
         if (readIdentity is Result.Failed) return readIdentity
@@ -248,6 +272,8 @@ class AdvanceCollaborationSpaceProvisioning(
                 if (value.state != state) return changed()
                 value
             } else null
+        val retained = observeRetained(device, identity, (allowed as Result.Success).value)
+        if (retained is Result.Failed) return retained
         val refreshed = admit(actor, parent, lease, started)
         if (refreshed is Result.Failed) return refreshed
         val admission = (refreshed as Result.Success).value
@@ -259,11 +285,156 @@ class AdvanceCollaborationSpaceProvisioning(
                 head,
                 state,
                 credential,
+                (retained as Result.Success).value,
                 admission,
                 minOf(admission.expiresAt, lease.until, request.expiresAt, started.plusSeconds(60)),
             )
         )
     }
+
+    private fun observeRetained(
+        device: CollaborationSpaceDevice,
+        identity: CollaborationSpaceIdentity,
+        admission: CollaborationSpaceAdmission,
+    ): Result<RetainedObservation?> {
+        if (device.origin == CollaborationSpaceDeviceOrigin.SPACE) return Result.Success(null)
+        val position = device.legacy ?: return changed()
+        val fingerprint = device.legacyKeyFingerprint ?: return changed()
+        val read =
+            legacyParents.find(
+                device.spaceId,
+                device.accountId,
+                admission.nativeSessionId,
+                position,
+            )
+        if (read is Result.Failed) return read
+        val source = (read as Result.Success).value
+        val matched =
+            collaborationLegacyFreezeOwner(
+                identity,
+                device,
+                source,
+                admission,
+                device.version,
+                fingerprint,
+                clock.instant(),
+            )
+        if (matched is Result.Failed) return matched
+        val owner = (matched as Result.Success).value
+        val readRuntime = runtimes.find(owner, lock = true)
+        if (readRuntime is Result.Failed) return readRuntime
+        val runtime = (readRuntime as Result.Success).value ?: return waiting()
+        val target = CollaborationLegacyRuntimeTarget(device.spaceId, device.id)
+        val action = collaborationLegacyFreezeAction(runtime, owner, target, clock.instant())
+        if (action is Result.Failed) return action
+        if ((action as Result.Success).value == CollaborationLegacyFreezeAction.FREEZE)
+            return waiting()
+        val readSlots = runtimes.slots(owner)
+        if (readSlots is Result.Failed) return readSlots
+        val drained =
+            collaborationLegacyRuntimeDrainStatus(
+                runtime,
+                owner,
+                target,
+                (readSlots as Result.Success).value,
+                clock.instant(),
+            )
+        if (drained is Result.Failed) return drained
+        if ((drained as Result.Success).value.activeRequests != 0) return waiting()
+        val readGateway = gateways.find(device.spaceId, owner)
+        if (readGateway is Result.Failed) return readGateway
+        val gateway = (readGateway as Result.Success).value
+        if (
+            gateway != null &&
+                (gateway.owner != owner ||
+                    gateway.spaceId != device.spaceId ||
+                    gateway.revokedAt != null ||
+                    gateway.rotatedAt > clock.instant() ||
+                    gateway.version !in 0..999999)
+        )
+            return changed()
+        return Result.Success(RetainedObservation(requireNotNull(source), runtime, gateway))
+    }
+
+    private fun reobserve(
+        actor: Actor,
+        lease: CollaborationSpaceProvisioningLease,
+        started: Instant,
+        prepared: Observation,
+    ): Result<Unit> =
+        transactions.run(actor) {
+            observe(actor, lease, started, decrypt = false).flatMap { current ->
+                sameObservation(prepared, current).flatMap {
+                    window(prepared, current, clock.instant())
+                }
+            }
+        }
+
+    private fun sameObservation(prepared: Observation, current: Observation): Result<Unit> =
+        if (
+            current.device != prepared.device ||
+                current.head != prepared.head ||
+                current.identity != prepared.identity ||
+                current.state != prepared.state ||
+                current.retained != prepared.retained
+        )
+            changed()
+        else Result.Success(Unit)
+
+    private fun completeRetained(
+        current: Observation,
+        lease: CollaborationSpaceProvisioningLease,
+        generation: Long,
+        verified: VerifiedKeys?,
+    ): Result<Unit> {
+        val retained =
+            current.retained ?: return if (verified == null) Result.Success(Unit) else changed()
+        val proof = verified ?: return invalidKeys()
+        val at = clock.instant()
+        if (
+            proof.observedAt > at ||
+                proof.observedAt < at.minusSeconds(30) ||
+                proof.observedAt < requireNotNull(retained.runtime.frozenAt) ||
+                proof.fingerprint != current.device.legacyKeyFingerprint
+        )
+            return invalidKeys()
+        return completions
+            .complete(
+                CompleteCollaborationLegacyRuntimeRequest(
+                    retained.runtime.owner,
+                    CollaborationLegacyRuntimeTarget(current.device.spaceId, current.device.id),
+                    lease.request.nativeSessionVersion,
+                    current.device.version + 1,
+                    generation,
+                    lease.request.revision,
+                    retained.source.device.deviceVersion,
+                    retained.source.device.credentialGeneration,
+                    retained.gateway?.version,
+                    proof.fingerprint,
+                    proof.observedAt,
+                )
+            )
+            .map { Unit }
+    }
+
+    private fun checkInterrupted() {
+        if (Thread.currentThread().isInterrupted)
+            throw InterruptedException("Collaboration activation interrupted")
+    }
+
+    private fun waiting() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_busy"))
+
+    private fun invalidKeys() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_provider_invalid_response"))
+
+    private data class RetainedObservation(
+        val source: CollaborationLegacyParent,
+        val runtime: CollaborationLegacyRuntime,
+        val gateway: CollaborationLegacyGateway?,
+    )
+
+    private data class VerifiedKeys(val fingerprint: String, val observedAt: Instant)
 
     private fun admit(
         actor: Actor,
@@ -339,6 +510,7 @@ class AdvanceCollaborationSpaceProvisioning(
         val head: CollaborationSpaceProvisioning,
         val state: CollaborationSpaceProviderState?,
         val credential: CollaborationSpaceProviderSession?,
+        val retained: RetainedObservation?,
         val admission: CollaborationSpaceAdmission,
         val deadline: Instant,
     )

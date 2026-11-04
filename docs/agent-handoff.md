@@ -1,5 +1,52 @@
 # Agent continuation — HRIS workspace
 
+## Retained worker activation accepted — 4 November 2026
+
+Based on pushed612d8279, the existing group worker now supports an exact retained
+LEGACY target. Current native/group/client/MFA/canonical identity and original
+source/key/gateway metadata, DRAINING target and zero live slots are observed before
+provider I/O. Login and actual signed device-key readback run outside SQL; exact
+observations and deadlines are checked after success/failure and before publication.
+No old job/room locks, provider logout, hidden retries or extra runtime leases.
+
+Group credential/ACTIVE device/SUCCEEDED queue, V124 original retirement/completion
+and journal commit atomically. Missing/not-frozen/busy originals use bounded existing
+jittered retry/proof limits. New SPACE behavior remains covered. DI consumes existing
+key port and the accepted legacy gateway/completion ports; no duplicate provider port.
+
+[Evidence](measurements/collaboration-retained-worker-activation-2026-11-04.json): focused23
+PASS133.163s, API47 PASS156.651s, full worker127 PASS365.38s
+(126 active/one pre-existing opt-in retention skip); same8290 unchanged inputs and
+format/architecture PASS. Actual PostgreSQL cases exercise every publication-stage
+rollback/cancel/interruption/flag, late proof/source changes, missing/substituted keys,
+finite busy defer/reclaim and competing workers. Actual pinned Synapse login/readback/
+restart preserves user/device/fingerprint without deleting keys. All owned resources
+closed. Three earlier failures and fixture-only fixes are retained; production source
+is identical across the focused runs (see measurement for exact scope).
+
+NEXT explicit completed native replay. Ignored completed-replay-next contains an
+initial policy, four UC drafts, five new actual test methods and fixture helpers;
+NOT applied/compiled/accepted. It needs DI plus all constructor call sites updated.
+Current registration/retry/freeze/drain require original ACTIVE/target PROVISIONING,
+so legitimate post-activation recovery currently fails. Review original version/time
+contracts in retained-worker-next/replay-review.md. V118 identityObservedAt is
+provider CREATED_AT, not retirement time; V106 cleared provider is immutable, while
+V104 permits later old-device terminal metadata versions preserving revokedAt.
+Group publication timestamps precede completion and must not be equated to it.
+
+Then group HTTP/device/room/gateway and durable Mobile SDK/store/inbox/outbox/read/
+push/deep-link ownership. Mobile must confirm original identity-key publication and
+provider readback BEFORE permanent freeze; a reserved fingerprint alone cannot prove
+upload or private-key ownership. Durably gate all future SDK acquisition, preserve
+exact original company/native store namespace/passphrase alias and uncertain sends.
+No completed mapping alone proves SDK shutdown or provider rollback.
+
+Main6bd1b0b8/Mobileeba80079 currently record612d8279 and need this accepted commit
+linked. No phone/live change: normal phone28, live8b40/schema116 pushON/SMTP OFF,
+Mobile3d85d569/hosted gates and Starter9959c1d remain current. All54 groups and actual
+Apple runtime remain open. Continue full long run, frequent updates, atomic Git
+handoffs and immediate pushes.
+
 ## V125 original-gateway metadata accepted — 4 November 2026
 
 Based on pushed60b58d3d, V125 adds exactly ten owned public-gateway metadata columns

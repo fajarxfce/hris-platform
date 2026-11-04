@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.*
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
@@ -68,10 +69,10 @@ class CollaborationSpaceWorkerPublicationTest {
             "grant select on all tables in schema public to space_advance_command_fixture"
         )
         owner.execute(
-            "grant update on accounts,native_sessions,collaboration_space_devices,collaboration_space_provisioning,collaboration_space_provider_sessions to space_advance_command_fixture"
+            "grant update on accounts,native_sessions,collaboration_space_devices,collaboration_space_provisioning,collaboration_space_provider_sessions,collaboration_legacy_runtime,collaboration_legacy_runtime_leases to space_advance_command_fixture"
         )
         owner.execute(
-            "grant insert on collaboration_space_provider_sessions,collaboration_space_provisioning,collaboration_space_identities,collaboration_space_devices,collaboration_space_device_sessions,operation_receipts,audit_entries,platform_audit_metadata,outbox_events to space_advance_command_fixture"
+            "grant insert on collaboration_space_provider_sessions,collaboration_space_provisioning,collaboration_space_identities,collaboration_space_devices,collaboration_space_device_sessions,collaboration_legacy_runtime,collaboration_legacy_runtime_leases,operation_receipts,audit_entries,platform_audit_metadata,outbox_events to space_advance_command_fixture"
         )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
         runtime =
@@ -131,6 +132,628 @@ class CollaborationSpaceWorkerPublicationTest {
             )
         }
         fixtures.clear()
+    }
+
+    @Test
+    fun retainedActivationMatchesActualSignedReadbackAndRetiresOnlyItsOriginalGateway() {
+        for (withGateway in listOf(false, true)) {
+            val f = Fixture(verifiedMfa = true)
+            val original = f.activeLegacy(signed = true)
+            val gateway = if (withGateway) f.gateway(original) else null
+            val id = f.register(original)
+            f.freeze(id)
+            val lease = f.claim(id)
+            val before = f.originalSnapshot()
+            val queried = AtomicInteger()
+            val keys =
+                f.keyProvider { user, device, token, deadline ->
+                    queried.incrementAndGet()
+                    assertEquals(f.retainedKeys!!.userId, user)
+                    assertEquals(f.retainedKeys!!.deviceId, device)
+                    assertTrue(token.startsWith("fictional-token-"))
+                    assertTrue(deadline <= lease.until)
+                    for ((table, column, value) in
+                        listOf(
+                            Triple("accounts", "id", f.account),
+                            Triple("native_sessions", "id", f.session),
+                            Triple("collaboration_space_devices", "id", id),
+                            Triple("collaboration_legacy_runtime", "device_id", original.deviceId),
+                        )) assertEquals(
+                        1,
+                        owner
+                            .queryForList(
+                                "select $column from $table where $column=? for update nowait",
+                                value,
+                            )
+                            .size,
+                    )
+                    Result.Success(f.retainedKeys!!.device)
+                }
+            val matrix = f.provider(id)
+            success(f.advance(lease, matrix, keys = keys))
+            assertEquals(1, matrix.calls.get())
+            assertEquals(1, queried.get())
+            val completion = requireNotNull(f.completion(original))
+            assertEquals(f.runtimeOwner(original), completion.owner)
+            assertEquals(CollaborationLegacyRuntimeTarget(space, id), completion.target)
+            assertEquals(f.fingerprint(), completion.fingerprint)
+            assertEquals(2L, completion.sourceDeviceVersion)
+            assertEquals(1L, completion.sourceProviderGeneration)
+            assertEquals(gateway, completion.sourceGateway?.id)
+            assertEquals(if (withGateway) 1L else null, completion.sourceGateway?.version)
+            assertEquals(1L, f.device(id).version)
+            assertEquals(CollaborationDeviceState.ACTIVE, f.device(id).state)
+            assertEquals(CollaborationSpaceProvisioningState.SUCCEEDED, f.work(id).state)
+            assertEquals(f.retainedKeys!!.deviceId, f.credential(id).state.matrixDeviceId)
+            val after = f.originalSnapshot()
+            assertEquals(
+                before.getValue("collaboration_device_key_publications"),
+                after.getValue("collaboration_device_key_publications"),
+            )
+            assertEquals("REVOKED", after.getValue("collaboration_devices").single()["state"])
+            assertNull(
+                after.getValue("collaboration_provider_sessions").single()["token_encrypted"]
+            )
+            if (withGateway)
+                for (column in
+                    listOf("access_hash", "refresh_hash", "replay_encrypted")) assertNull(
+                    after.getValue("collaboration_gateway_sessions").single()[column]
+                )
+            f.activatedCount(1)
+            assertInstanceOf(Result.Failed::class.java, f.advance(lease, matrix, keys = keys))
+            assertEquals(1, matrix.calls.get())
+            assertEquals(1, queried.get())
+            assertEquals(completion, f.completion(original))
+        }
+    }
+
+    @Test
+    fun retainedActivationWaitsForExplicitFreezeAndFiniteOldRequestsWithoutCallingProvider() {
+        for (phase in listOf("absent", "legacy", "busy")) {
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            val id = f.register(original)
+            val originalOwner = f.runtimeOwner(original)
+            var oldLease: CollaborationLegacyRuntimeLease? = null
+            if (phase != "absent")
+                success(
+                    f.transactions.run(f.actor) {
+                        f.runtimes.ensure(
+                            originalOwner,
+                            Instant.now().truncatedTo(ChronoUnit.MICROS),
+                        )
+                    }
+                )
+            if (phase == "busy") {
+                oldLease =
+                    requireNotNull(
+                        success(
+                            f.transactions.run(f.actor.copy(companyId = f.company)) {
+                                f.runtimes.claim(
+                                    originalOwner,
+                                    Instant.now().plusSeconds(30).truncatedTo(ChronoUnit.MICROS),
+                                )
+                            }
+                        )
+                    )
+                f.freeze(id)
+            }
+            var lease = f.claim(id)
+            val matrix = f.provider(id)
+            val before = f.originalSnapshot()
+            val failed = f.advance(lease, matrix)
+            failure(failed, "collaboration_runtime_busy")
+            assertEquals(0, matrix.calls.get())
+            assertNull(f.state(id))
+            assertNull(f.completion(original))
+            assertEquals(before, f.originalSnapshot())
+            if (phase == "absent") {
+                assertTrue(success(f.settle(lease, (failed as Result.Failed).failure)))
+                val waiting = f.work(id)
+                assertEquals(CollaborationSpaceProvisioningState.QUEUED, waiting.state)
+                assertNull(waiting.lastOutcome)
+                assertEquals(
+                    "PUBLICATION_CHANGED",
+                    owner.queryForObject(
+                        "select details->>'failure' from audit_entries where actor_id=? and action='collaboration.space_provisioning_deferred'",
+                        String::class.java,
+                        f.account,
+                    ),
+                )
+                assertEquals(1, waiting.attempts)
+                assertTrue(waiting.availableAt > Instant.now())
+                assertTrue(waiting.availableAt <= Instant.now().plusSeconds(3))
+                assertTrue(
+                    success(
+                            ClaimCollaborationSpaceProvisioning(
+                                    f.provisioning,
+                                    CollaborationSpacePolicy(true, 28, 28),
+                                    CollaborationMatrixPolicy(true, server),
+                                )
+                                .execute(UUID.randomUUID(), 1)
+                        )
+                        .isEmpty()
+                )
+                f.freeze(id)
+                Thread.sleep(
+                    (Duration.between(Instant.now(), waiting.availableAt).toMillis() + 25).coerceIn(
+                        1,
+                        3025,
+                    )
+                )
+                val retry = f.claim(id)
+                assertEquals(2, retry.attempt)
+                assertEquals(lease.request, retry.request)
+                assertNotEquals(lease.token, retry.token)
+                lease = retry
+            }
+            if (oldLease != null)
+                success(f.transactions.run(f.actor) { f.runtimes.release(oldLease) })
+            if (phase == "legacy") f.freeze(id)
+            success(f.advance(lease, matrix))
+            assertEquals(1, matrix.calls.get())
+            f.activatedCount(1)
+        }
+    }
+
+    @Test
+    fun retainedProviderErrorsAndKeysCannotPublishAfterNativeOrSourceChanges() {
+        for (stage in listOf("login", "keys")) for (change in
+            listOf("native", "gateway", "provider", "offboard")) {
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            f.gateway(original)
+            val id = f.register(original)
+            f.freeze(id)
+            val lease = f.claim(id)
+            var changed = false
+            fun changeOnce() {
+                if (changed) return
+                changed = true
+                when (change) {
+                    "native" ->
+                        owner.update(
+                            "update native_sessions set version=version+1,rotated_at=clock_timestamp() where id=?",
+                            f.session,
+                        )
+                    "gateway" ->
+                        owner.update(
+                            "update collaboration_gateway_sessions set version=version+1,rotated_at=clock_timestamp(),access_hash=?,refresh_hash=?,replay_until=clock_timestamp()+interval '10 seconds',replay_encrypted='fictional-late-gateway-envelope' where account_id=?",
+                            compact(UUID.randomUUID()).repeat(2),
+                            compact(UUID.randomUUID()).repeat(2),
+                            f.account,
+                        )
+                    "provider" ->
+                        owner.update(
+                            "update collaboration_provider_sessions set generation=generation+1,updated_at=clock_timestamp() where account_id=?",
+                            f.account,
+                        )
+                    "offboard" ->
+                        owner.update(
+                            "update company_memberships set active=false,version=version+1 where account_id=?",
+                            f.account,
+                        )
+                }
+            }
+            val readCalls = AtomicInteger()
+            val failure = Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_error"))
+            val matrix =
+                if (stage == "login")
+                    MatrixStub {
+                        changeOnce()
+                        failure
+                    }
+                else f.provider(id)
+            val keys =
+                f.keyProvider { _, _, _, _ ->
+                    readCalls.incrementAndGet()
+                    changeOnce()
+                    failure
+                }
+            val result = f.advance(lease, matrix, keys = keys)
+            assertInstanceOf(Result.Failed::class.java, result)
+            assertNotEquals("fixture_provider_error", (result as Result.Failed).failure.code)
+            assertEquals(if (stage == "login") 0 else 1, readCalls.get())
+            assertEquals(
+                0,
+                owner.queryForObject(
+                    "select count(*) from collaboration_legacy_runtime_completions where account_id=?",
+                    Int::class.java,
+                    f.account,
+                ),
+            )
+            assertEquals(
+                "ACTIVE",
+                owner.queryForObject(
+                    "select state from collaboration_devices where account_id=?",
+                    String::class.java,
+                    f.account,
+                ),
+            )
+            assertEquals(
+                "PROVISIONING",
+                owner.queryForObject(
+                    "select state from collaboration_space_devices where account_id=?",
+                    String::class.java,
+                    f.account,
+                ),
+            )
+            assertEquals(
+                0,
+                owner.queryForObject(
+                    "select count(*) from collaboration_space_provider_sessions where account_id=?",
+                    Int::class.java,
+                    f.account,
+                ),
+            )
+            f.activatedCount(0)
+        }
+    }
+
+    @Test
+    fun retainedProviderCancellationAndInterruptionNeverPublishOrContinueReadback() {
+        for (stage in listOf("login", "keys")) for (mode in listOf("cancel", "interrupt", "flag")) {
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            val id = f.register(original)
+            f.freeze(id)
+            val lease = f.claim(id)
+            val before = f.originalSnapshot()
+            val cancellation = CancellationException("fixture cancellation")
+            val interruption = InterruptedException("fixture interruption")
+            fun interrupt() {
+                when (mode) {
+                    "cancel" -> throw cancellation
+                    "interrupt" -> throw interruption
+                    else -> Thread.currentThread().interrupt()
+                }
+            }
+            val matrix = f.provider(id) { if (stage == "login") interrupt() }
+            val reads = AtomicInteger()
+            val keys =
+                f.keyProvider { _, _, _, _ ->
+                    reads.incrementAndGet()
+                    interrupt()
+                    Result.Success(f.retainedKeys!!.device)
+                }
+            fun run() = f.advance(lease, matrix, keys = keys)
+            try {
+                when (mode) {
+                    "cancel" ->
+                        assertSame(
+                            cancellation,
+                            assertThrows(CancellationException::class.java) { run() },
+                        )
+                    "interrupt" ->
+                        assertSame(
+                            interruption,
+                            assertThrows(InterruptedException::class.java) { run() },
+                        )
+                    else -> {
+                        assertThrows(InterruptedException::class.java) { run() }
+                        assertTrue(Thread.currentThread().isInterrupted)
+                    }
+                }
+            } finally {
+                Thread.interrupted()
+            }
+            assertEquals(if (stage == "login") 0 else 1, reads.get())
+            assertEquals(before, f.originalSnapshot())
+            assertNull(f.state(id))
+            assertNull(f.completion(original))
+            f.activatedCount(0)
+            success(f.advance(lease, f.provider(id)))
+            f.activatedCount(1)
+        }
+    }
+
+    @Test
+    fun retainedMissingSubstitutedAndInvalidSignedKeysLeaveOldStateRecoverable() {
+        for (shape in listOf("absent", "user", "device", "signature", "new-keys")) {
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            val id = f.register(original)
+            f.freeze(id)
+            val lease = f.claim(id)
+            val before = f.originalSnapshot()
+            val valid = f.retainedKeys!!.device
+            val wrong =
+                when (shape) {
+                    "absent" -> null
+                    "user" -> valid.copy(userId = "@other:$server")
+                    "device" -> valid.copy(deviceId = "HRIS_other")
+                    "signature" -> valid.copy(signatures = emptyMap())
+                    else -> MatrixKeyFixture(valid.userId, valid.deviceId).device
+                }
+            failure(
+                f.advance(
+                    lease,
+                    f.provider(id),
+                    keys = f.keyProvider { _, _, _, _ -> Result.Success(wrong) },
+                ),
+                "collaboration_provider_invalid_response",
+            )
+            assertEquals(before, f.originalSnapshot())
+            assertNull(f.state(id))
+            assertNull(f.completion(original))
+            assertEquals(CollaborationSpaceProvisioningState.RUNNING, f.work(id).state)
+            f.activatedCount(0)
+            success(f.advance(lease, f.provider(id)))
+            f.activatedCount(1)
+        }
+    }
+
+    @Test
+    fun retainedPublicationRollsBackOriginalRetirementAndNewStateAtEveryWriteBoundary() {
+        for (stage in listOf("credential", "device", "queue", "completion", "journal")) for (mode in
+            listOf("failure", "cancel", "interrupt", "flag")) {
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            f.gateway(original)
+            val id = f.register(original)
+            f.freeze(id)
+            val lease = f.claim(id)
+            val before = f.originalSnapshot()
+            val device = f.device(id)
+            val head = f.work(id)
+            val cancellation = CancellationException("fixture cancellation")
+            val interruption = InterruptedException("fixture interruption")
+            fun injected(): Result<Unit> =
+                when (mode) {
+                    "cancel" -> throw cancellation
+                    "interrupt" -> throw interruption
+                    "flag" -> {
+                        Thread.currentThread().interrupt()
+                        Result.Success(Unit)
+                    }
+                    else -> Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_write_failed"))
+                }
+            val credentials =
+                object : CollaborationSpaceProviderSessionRepository by f.credentials {
+                    override fun create(session: CollaborationSpaceProviderSession): Result<Unit> =
+                        f.credentials.create(session).flatMap {
+                            if (stage == "credential") injected() else Result.Success(Unit)
+                        }
+                }
+            val registry =
+                object : CollaborationSpaceDeviceRepository by f.registry {
+                    override fun replace(
+                        device: CollaborationSpaceDevice,
+                        expectedVersion: Long,
+                    ): Result<Unit> =
+                        f.registry.replace(device, expectedVersion).flatMap {
+                            if (stage == "device") injected() else Result.Success(Unit)
+                        }
+                }
+            val queue =
+                object : CollaborationSpaceProvisioningRepository by f.provisioning {
+                    override fun finish(
+                        lease: CollaborationSpaceProvisioningLease,
+                        failure: CollaborationSpaceProvisioningFailure?,
+                    ): Result<Boolean> =
+                        f.provisioning.finish(lease, failure).flatMap { done ->
+                            (if (stage == "queue") injected() else Result.Success(Unit)).map {
+                                done
+                            }
+                        }
+                }
+            val completion =
+                object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                    override fun complete(
+                        request: CompleteCollaborationLegacyRuntimeRequest
+                    ): Result<CollaborationLegacyRuntimeCompletion> =
+                        f.completions.complete(request).flatMap { done ->
+                            (if (stage == "completion") injected() else Result.Success(Unit)).map {
+                                done
+                            }
+                        }
+                }
+            val journal = hookJournal { actor, record ->
+                f.journal.record(actor, record).flatMap {
+                    if (stage == "journal") injected() else Result.Success(Unit)
+                }
+            }
+            fun run() =
+                f.advance(
+                    lease,
+                    f.provider(id),
+                    registry,
+                    queue,
+                    credentials,
+                    journal,
+                    completions = completion,
+                )
+            try {
+                when (mode) {
+                    "cancel" ->
+                        assertSame(
+                            cancellation,
+                            assertThrows(CancellationException::class.java) { run() },
+                        )
+                    "interrupt" ->
+                        assertSame(
+                            interruption,
+                            assertThrows(InterruptedException::class.java) { run() },
+                        )
+                    "flag" -> {
+                        assertThrows(InterruptedException::class.java) { run() }
+                        assertTrue(Thread.currentThread().isInterrupted)
+                    }
+                    else -> failure(run(), "fixture_write_failed")
+                }
+            } finally {
+                Thread.interrupted()
+            }
+            assertEquals(before, f.originalSnapshot())
+            assertEquals(device, f.device(id))
+            assertEquals(head, f.work(id))
+            assertNull(f.state(id))
+            assertNull(f.completion(original))
+            f.activatedCount(0)
+            success(f.advance(lease, f.provider(id)))
+            f.activatedCount(1)
+        }
+    }
+
+    @Test
+    fun retainedLateAdmissionAfterCompletionRollsBackBothSidesAndCanRetry() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        f.gateway(original)
+        val id = f.register(original)
+        f.freeze(id)
+        val lease = f.claim(id)
+        val before = f.originalSnapshot()
+        val clock = MutableClock(Instant.now())
+        val journal = hookJournal { actor, record ->
+            f.journal.record(actor, record).map { clock.at = lease.until }
+        }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.advance(lease, f.provider(id), journal = journal, clock = clock),
+        )
+        assertEquals(before, f.originalSnapshot())
+        assertNull(f.state(id))
+        assertNull(f.completion(original))
+        f.activatedCount(0)
+        success(f.advance(lease, f.provider(id)))
+        f.activatedCount(1)
+    }
+
+    @Test
+    fun retainedCompetingWorkersPublishOneTransferAndNeverReplaceTheWinningCredential() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        val id = f.register(original)
+        f.freeze(id)
+        val lease = f.claim(id)
+        val device = f.device(id)
+        val barrier = CyclicBarrier(2)
+        val tokens = ConcurrentHashMap.newKeySet<String>()
+        val matrix = MatrixStub {
+            assertEquals(original, it.retainedDevice)
+            val token = "fictional-token-${UUID.randomUUID()}"
+            tokens.add(token)
+            barrier.await(5, TimeUnit.SECONDS)
+            Result.Success(
+                CollaborationMatrixCredential(
+                    device.matrixUserId,
+                    device.matrixDeviceId,
+                    token,
+                    Instant.now().plusSeconds(590),
+                )
+            )
+        }
+        val pool = Executors.newFixedThreadPool(2)
+        try {
+            val results =
+                (1..2)
+                    .map { pool.submit<Result<Unit>> { f.advance(lease, matrix) } }
+                    .map { it.get(15, TimeUnit.SECONDS) }
+            assertEquals(1, results.count { it is Result.Success })
+            assertEquals(1, results.count { it is Result.Failed })
+            assertEquals(2, matrix.calls.get())
+            assertTrue(f.credential(id).accessToken in tokens)
+            assertEquals(0L, f.credential(id).state.generation)
+            assertNotNull(f.completion(original))
+            assertEquals(1L, f.device(id).version)
+            f.activatedCount(1)
+        } finally {
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+        }
+    }
+
+    @Test
+    fun retainedWorkerUsesActualSynapseReadbackAndKeepsKeysAcrossProviderRestart() {
+        MatrixProviderFixture("10m").use { provider ->
+            provider.start()
+            val f = Fixture()
+            val original = f.activeLegacy(signed = true)
+            val at = Instant.now()
+            val oldCredential =
+                success(
+                    provider.repository.login(
+                        CollaborationMatrixLogin(
+                            f.company,
+                            f.account,
+                            original.deviceId,
+                            at,
+                            at.plusSeconds(60),
+                        )
+                    )
+                )
+            fun keyRepository() =
+                InternalCollaborationMatrixKeyRepository(
+                    dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource(
+                        provider.client,
+                        provider.config,
+                        Clock.systemUTC(),
+                    )
+                )
+            success(
+                keyRepository()
+                    .upload(
+                        CollaborationMatrixKeyUpload(requireNotNull(f.retainedKeys).device),
+                        oldCredential.accessToken,
+                        Instant.now().plusSeconds(20),
+                    )
+            )
+            // Synapse's normal per-account login limiter remains enabled in this fixture.
+            Thread.sleep(11000)
+            val id = f.register(original)
+            f.freeze(id)
+            val lease = f.claim(id)
+            val matrix =
+                InternalCollaborationSpaceMatrixRepository(
+                    dev.fajar.hris.collaboration.data.matrix.HmacMatrixJwtDataSource(
+                        provider.config
+                    ),
+                    dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource(
+                        provider.client,
+                        provider.config,
+                        Clock.systemUTC(),
+                    ),
+                    Clock.systemUTC(),
+                )
+            success(f.advance(lease, matrix, keys = keyRepository()))
+            val current = f.credential(id)
+            assertEquals(oldCredential.userId, current.state.matrixUserId)
+            assertEquals(oldCredential.deviceId, current.state.matrixDeviceId)
+            assertNotEquals(oldCredential.accessToken, current.accessToken)
+            val completion = requireNotNull(f.completion(original))
+            assertEquals(f.fingerprint(), completion.fingerprint)
+            fun checkKeys(token: String) {
+                val key =
+                    requireNotNull(
+                        success(
+                            keyRepository()
+                                .ownDeviceKeys(
+                                    current.state.matrixUserId,
+                                    current.state.matrixDeviceId,
+                                    token,
+                                    Instant.now().plusSeconds(20),
+                                )
+                        )
+                    )
+                assertEquals(
+                    f.fingerprint(),
+                    success(
+                        validateCollaborationDeviceKeys(
+                            key,
+                            current.state.matrixUserId,
+                            current.state.matrixDeviceId,
+                        )
+                    ),
+                )
+            }
+            checkKeys(current.accessToken)
+            provider.restart()
+            checkKeys(current.accessToken)
+            // Retirement stops HRIS gateways, never logs the provider device out or deletes keys.
+            checkKeys(oldCredential.accessToken)
+            f.activatedCount(1)
+        }
     }
 
     @Test
@@ -206,7 +829,7 @@ class CollaborationSpaceWorkerPublicationTest {
         val retainedMatrix = retained.provider(retainedId)
         failure(
             retained.advance(retained.claim(retainedId), retainedMatrix),
-            "collaboration_device_migration_required",
+            "collaboration_runtime_busy",
         )
         assertEquals(0, retainedMatrix.calls.get())
         assertNull(retained.state(retainedId))
@@ -815,6 +1438,19 @@ class CollaborationSpaceWorkerPublicationTest {
             StoredCollaborationLegacyParentRepository(
                 PostgresCollaborationLegacyParentDataSource(sql)
             )
+        val runtimes =
+            StoredCollaborationLegacyRuntimeRepository(
+                PostgresCollaborationLegacyRuntimeDataSource(sql)
+            )
+        val gateways =
+            StoredCollaborationLegacyGatewayRepository(
+                PostgresCollaborationLegacyGatewayDataSource(sql)
+            )
+        val completions =
+            StoredCollaborationLegacyRuntimeCompletionRepository(
+                PostgresCollaborationLegacyRuntimeCompletionDataSource(sql)
+            )
+        var retainedKeys: MatrixKeyFixture? = null
         val session: UUID
 
         init {
@@ -861,7 +1497,7 @@ class CollaborationSpaceWorkerPublicationTest {
             return id
         }
 
-        fun activeLegacy(): CollaborationLegacyDevicePosition {
+        fun activeLegacy(signed: Boolean = false): CollaborationLegacyDevicePosition {
             val device = UUID.randomUUID()
             val at = baseAt.minusSeconds(30).toString()
             owner.update(
@@ -896,16 +1532,120 @@ class CollaborationSpaceWorkerPublicationTest {
                 company,
                 device,
             )
+            if (signed)
+                retainedKeys =
+                    MatrixKeyFixture(
+                        "@hris_${compact(company)}_${compact(account)}:$server",
+                        "HRIS_${compact(device)}",
+                    )
             owner.update(
                 "insert into collaboration_device_key_publications(company_id,device_id,account_id,fingerprint,version,reserved_at) values(?,?,?, ?,0,?::timestamptz)",
                 company,
                 device,
                 account,
-                "a".repeat(64),
+                fingerprint(),
                 at,
             )
             return CollaborationLegacyDevicePosition(company, device)
         }
+
+        fun fingerprint(): String =
+            retainedKeys?.let {
+                success(validateCollaborationDeviceKeys(it.device, it.userId, it.deviceId))
+            } ?: "a".repeat(64)
+
+        fun runtimeOwner(original: CollaborationLegacyDevicePosition) =
+            CollaborationLegacyRuntimeOwner(original.companyId, original.deviceId, account, session)
+
+        fun freeze(id: UUID) {
+            success(
+                FreezeNativeCollaborationLegacyRuntime(
+                        registry,
+                        legacyParents,
+                        selections,
+                        runtimes,
+                        spaces,
+                        sessions,
+                        identities,
+                        operations,
+                        journal,
+                        transactions,
+                        CollaborationSpacePolicy(true, 28, 28),
+                        CollaborationMatrixPolicy(true, server),
+                        IdentitySecurityPolicy(),
+                        Clock.systemUTC(),
+                    )
+                    .execute(
+                        actor,
+                        session,
+                        0,
+                        space,
+                        client,
+                        UUID.randomUUID(),
+                        id,
+                        0,
+                        fingerprint(),
+                    )
+            )
+        }
+
+        fun gateway(original: CollaborationLegacyDevicePosition): UUID {
+            val id = UUID.randomUUID()
+            val at = baseAt.minusSeconds(20)
+            owner.update(
+                "insert into collaboration_gateway_sessions(company_id,id,account_id,device_id,native_session_id,platform,client_build,version,access_hash,refresh_hash,created_at,rotated_at,expires_at,access_expires_at,replay_kind,bootstrap_operation_id,replay_until,replay_encrypted) values(?,?,?,?,?,'ANDROID',28,0,?,?,?::timestamptz,?::timestamptz,?::timestamptz,?::timestamptz,'BOOTSTRAP',?,?::timestamptz,'fictional-replay-envelope')",
+                company,
+                id,
+                account,
+                original.deviceId,
+                session,
+                compact(UUID.randomUUID()).repeat(2),
+                compact(UUID.randomUUID()).repeat(2),
+                at.toString(),
+                at.toString(),
+                at.plusSeconds(600).toString(),
+                at.plusSeconds(300).toString(),
+                UUID.randomUUID(),
+                at.plusSeconds(30).toString(),
+            )
+            return id
+        }
+
+        fun keyProvider(
+            action: (String, String, String, Instant) -> Result<CollaborationMatrixDeviceKeys?> =
+                { user, device, _, deadline ->
+                    val value = requireNotNull(retainedKeys)
+                    assertEquals(value.userId, user)
+                    assertEquals(value.deviceId, device)
+                    assertTrue(deadline > Instant.now())
+                    assertTrue(deadline <= Instant.now().plusSeconds(60))
+                    Result.Success(value.device)
+                }
+        ): CollaborationMatrixKeyRepository =
+            object :
+                CollaborationMatrixKeyRepository by DisabledCollaborationMatrixKeyRepository() {
+                override fun ownDeviceKeys(
+                    userId: String,
+                    deviceId: String,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixDeviceKeys?> =
+                    action(userId, deviceId, token, deadline)
+            }
+
+        fun originalSnapshot(): Map<String, List<Map<String, Any?>>> =
+            listOf(
+                    "collaboration_devices",
+                    "collaboration_provider_sessions",
+                    "collaboration_gateway_sessions",
+                    "collaboration_device_key_publications",
+                )
+                .associateWith {
+                    owner.queryForList("select * from $it where account_id=? order by 1,2", account)
+                }
+
+        fun completion(original: CollaborationLegacyDevicePosition) =
+            success(transactions.run(actor) { completions.find(runtimeOwner(original)) })
 
         fun select() {
             success(
@@ -1017,7 +1757,7 @@ class CollaborationSpaceWorkerPublicationTest {
                             if (retained == null) CollaborationSpaceDeviceOrigin.SPACE
                             else CollaborationSpaceDeviceOrigin.LEGACY,
                             retained,
-                            if (retained == null) null else "a".repeat(64),
+                            if (retained == null) null else fingerprint(),
                         )
                 )
                 .id
@@ -1031,12 +1771,19 @@ class CollaborationSpaceWorkerPublicationTest {
             credentials: CollaborationSpaceProviderSessionRepository = this.credentials,
             journal: ChangeJournalRepository = this.journal,
             clock: Clock = Clock.systemUTC(),
+            keys: CollaborationMatrixKeyRepository = keyProvider(),
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
         ): Result<Unit> =
             AdvanceCollaborationSpaceProvisioning(
                     registry,
                     provisioning,
                     credentials,
                     matrix,
+                    keys,
+                    legacyParents,
+                    runtimes,
+                    gateways,
+                    completions,
                     selections,
                     spaces,
                     sessions,
@@ -1099,7 +1846,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 assertEquals(space, request.spaceId)
                 assertEquals(account, request.accountId)
                 assertEquals(device, request.deviceId)
-                assertNull(request.retainedDevice)
+                assertEquals(expected.legacy, request.retainedDevice)
                 assertTrue(request.expiresAt <= request.issuedAt.plusSeconds(60))
                 for ((table, key, id) in
                     listOf(

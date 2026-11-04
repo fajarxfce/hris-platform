@@ -35,6 +35,45 @@ class CollaborationSpaceProvisioningOutcomePolicyTest {
         )
 
     @Test
+    fun waitingForOriginalRuntimeUsesTheSameFiniteProofAndAttemptBudgets() {
+        val busy = Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_busy")
+        val result = resolveCollaborationSpaceProvisioningFailure(lease, busy, at)
+        assertEquals(CollaborationSpaceProvisioningFailure.PUBLICATION_CHANGED, result.failure)
+        assertTrue(requireNotNull(result.delaySeconds) in 1..3)
+        for (attempt in listOf(0, 8, 9)) assertNull(
+            resolveCollaborationSpaceProvisioningFailure(lease.copy(attempt = attempt), busy, at)
+                .delaySeconds
+        )
+        assertNull(
+            resolveCollaborationSpaceProvisioningFailure(lease, busy, lease.until).delaySeconds
+        )
+        assertNull(
+            resolveCollaborationSpaceProvisioningFailure(
+                    lease.copy(request = lease.request.copy(expiresAt = at.plusSeconds(1))),
+                    busy,
+                    at,
+                )
+                .delaySeconds
+        )
+        assertNull(
+            resolveCollaborationSpaceProvisioningFailure(
+                    lease,
+                    busy.copy(kind = FailureKind.FORBIDDEN),
+                    at,
+                )
+                .delaySeconds
+        )
+        assertNull(
+            resolveCollaborationSpaceProvisioningFailure(
+                    lease,
+                    busy.copy(code = "collaboration_runtime_changed"),
+                    at,
+                )
+                .delaySeconds
+        )
+    }
+
+    @Test
     fun temporaryFailureUsesFiniteAttemptAndDeadlineBudgetsAndIgnoresRawParameters() {
         val failure = Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable")
         for (attempt in 1..7) {

@@ -69,6 +69,22 @@ class CollaborationConfiguration {
     ): CollaborationLegacyParentRepository = StoredCollaborationLegacyParentRepository(source)
 
     @Bean
+    fun collaborationLegacyGatewayRepository(
+        sql: DSLContext
+    ): CollaborationLegacyGatewayRepository =
+        StoredCollaborationLegacyGatewayRepository(
+            PostgresCollaborationLegacyGatewayDataSource(sql)
+        )
+
+    @Bean
+    fun collaborationLegacyRuntimeCompletionRepository(
+        sql: DSLContext
+    ): CollaborationLegacyRuntimeCompletionRepository =
+        StoredCollaborationLegacyRuntimeCompletionRepository(
+            PostgresCollaborationLegacyRuntimeCompletionDataSource(sql)
+        )
+
+    @Bean
     fun collaborationSpaceIdentitySource(sql: DSLContext): CollaborationSpaceIdentityDataSource =
         PostgresCollaborationSpaceIdentityDataSource(sql)
 
@@ -250,6 +266,11 @@ class CollaborationConfiguration {
         provisioning: CollaborationSpaceProvisioningRepository,
         credentials: CollaborationSpaceProviderSessionRepository,
         matrix: CollaborationSpaceMatrixRepository,
+        keys: CollaborationMatrixKeyRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        runtimes: CollaborationLegacyRuntimeRepository,
+        gateways: CollaborationLegacyGatewayRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
         selections: CollaborationSpaceIdentityRepository,
         spaces: CollaborationSpaceRepository,
         sessions: NativeSessionRepository,
@@ -266,6 +287,11 @@ class CollaborationConfiguration {
             provisioning,
             credentials,
             matrix,
+            keys,
+            legacyParents,
+            runtimes,
+            gateways,
+            completions,
             selections,
             spaces,
             sessions,

@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Group Matrix room protocol accepted — 4 November 2026
+
+Group branch [0a6ad2b2](https://github.com/fajarxfce/hris-platform/commit/0a6ad2b2) preserves
+explicit canonical users from different historical companies with distinct group
+alias/immutable marker and strict room-state assessment. [Evidence](https://github.com/fajarxfce/hris-platform/blob/0a6ad2b2/docs/measurements/collaboration-space-room-provider-2026-11-04.json):
+96 domain cases pass in initial41.723s; final6 data cases PASS50.407s with quality
+checks and8,371 unchanged inputs. Four initial failures were test fixtures only:
+JSON child iteration and stale provider endpoint after restart. Production unchanged.
+Actual Synapse retains original signed keys, room/alias identity and peer joins;
+lost creation responses recover one room and foreign membership is rejected. No SDK
+E2EE message or product acceptance. First GitHub push had a transient server error;
+the retry succeeded. All provider drafts are applied/stale; use committed source.
+
+NEXT group-owned room request/queue/publication and original adoption. CRITICAL:
+V129 inventory lacks binding.account_id, the actual old Matrix room creator. That can
+differ from conversation.createdBy. Add public room creator metadata and validate it
+against the original pair before adoption, including a fixture whose peer created
+the room. Keep requester and Matrix creator distinct; never log in as the peer.
+Generic background_jobs remains company-only. Preserve canonical users, original
+coordinates, native/device proof and exact lease/current-admission fences. Then
+recipient keys/content/sync/push and Mobile adoption. Group disabled/all54 groups open;
+Mobile33eb35b2/hosted0b804cb2, phone28/live8b40/schema116 push ON/SMTP OFF and
+Starter9959c1d unchanged. Continue long run, updates, atomic pushes and feature installs.
+
 ## Native group conversations accepted — 4 November 2026
 
 Group branch [b478f776](https://github.com/fajarxfce/hris-platform/commit/b478f776) adds

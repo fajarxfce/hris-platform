@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Group gateway native transport accepted — 4 November 2026
+
+Group branch is pushed through [272b66b5](https://github.com/fajarxfce/hris-platform/commit/272b66b5).
+Native bootstrap returns original Matrix identity atomically with group credentials;
+status supplies safe gateway revision/deadline recovery metadata. Distinct group
+refresh dispatch, native observed-version/idempotency HTTP and module DI are wired.
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/272b66b5/docs/measurements/collaboration-space-gateway-http-2026-11-04.json):
+93 domain/33 data pass, API/OpenAPI92 PASS158.550s and full worker127 PASS356.150s
+(126 active/one existing retention skip),8,324 final inputs unchanged, format and
+architecture PASS. Three preliminary failures and test-only corrections are recorded.
+Actual elapsed recovery42.128s and offboarding11.098s pass; old refresh remains covered.
+
+NEXT bounded group request ownership, native provider renewal after expiry and group
+replay maintenance, then group room authority and Mobile key preflight/handover/full
+history/outbox/read/push/deep-link adoption. Expired gateway replay's specific401 is
+not evidence that the native parent or owned local history should be discarded.
+Do not reopen original company runtime slots or change the original SDK namespace.
+Group feature remains disabled; no provider/room exchange, Mobile caller or rollout.
+Mobile68b9232b/hosted code0b804cb2, normal phone28/live8b40/schema116 pushON/SMTPOFF
+and Starter9959c1d unchanged. All54 groups remain open. Continue full long run, frequent
+updates, atomic pushed commits and validated product feature builds on the phone.
+Implementation continues in the group worktree; this peer change is documentation only.
+
 ## Native group gateway issuance accepted — 4 November 2026
 
 Group branch is pushed through `6b92246a`. Native bootstrap/refresh enforce current

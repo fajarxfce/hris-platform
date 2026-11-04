@@ -37,6 +37,29 @@ class CollaborationLegacyRuntimeMappingTest {
         )
 
     @Test
+    fun exactLeaseLookupCarriesItsGuardAndRejectsAnUnexpectedSlot() {
+        var guarded = false
+        var answer = legacyRuntimeLeaseRow(lease)
+        val source =
+            object : Source() {
+                override fun lease(
+                    owner: CollaborationLegacyRuntimeCoordinatesData,
+                    slot: Int,
+                    lock: Boolean,
+                ): CollaborationLegacyRuntimeLeasesRecord {
+                    guarded = lock
+                    return answer
+                }
+            }
+        val repository = StoredCollaborationLegacyRuntimeRepository(source)
+        assertEquals(lease, success(repository.lease(owner, 0, true)))
+        assertTrue(guarded)
+        answer = legacyRuntimeLeaseRow(lease.copy(slot = 1))
+        assertInstanceOf(Result.Failed::class.java, repository.lease(owner, 0, false))
+        assertInstanceOf(Result.Failed::class.java, repository.lease(owner, 8, true))
+    }
+
+    @Test
     fun ensureReturnsTheRetainedFreezeAndMalformedOwnersOrStatesNeverEscape() {
         val frozen =
             row().apply {
@@ -230,6 +253,12 @@ class CollaborationLegacyRuntimeMappingTest {
             owner: CollaborationLegacyRuntimeCoordinatesData,
             lock: Boolean,
         ): CollaborationLegacyRuntimeRecord? = error("Unexpected find")
+
+        override fun lease(
+            owner: CollaborationLegacyRuntimeCoordinatesData,
+            slot: Int,
+            lock: Boolean,
+        ): CollaborationLegacyRuntimeLeasesRecord? = error("Unexpected lease lookup")
 
         override fun slots(
             owner: CollaborationLegacyRuntimeCoordinatesData

@@ -35,6 +35,18 @@ class StoredCollaborationLegacyRuntimeRepository(
         source.find(owner.raw(), lock)?.let { legacyRuntimeFromRow(it, owner) }
     }
 
+    override fun lease(
+        owner: CollaborationLegacyRuntimeOwner,
+        slot: Int,
+        lock: Boolean,
+    ): Result<CollaborationLegacyRuntimeLease?> = safeDatabaseCall {
+        require(slot in 0..7)
+        source
+            .lease(owner.raw(), slot, lock)
+            ?.let { legacyRuntimeLeaseFromRow(it, owner) }
+            ?.also { require(it.slot == slot) }
+    }
+
     override fun slots(
         owner: CollaborationLegacyRuntimeOwner
     ): Result<List<CollaborationLegacyRuntimeLease>> = safeDatabaseCall {

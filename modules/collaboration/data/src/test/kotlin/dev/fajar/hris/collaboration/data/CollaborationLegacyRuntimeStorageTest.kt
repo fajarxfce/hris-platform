@@ -10,6 +10,9 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.concurrent.CancellationException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import org.flywaydb.core.Flyway
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -26,6 +29,59 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @Testcontainers
 class CollaborationLegacyRuntimeStorageTest {
     @Container val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+
+    @Test
+    fun exactLeaseGuardSerializesPublicationObservationWithFinallyCleanup() {
+        with(Fixture()) {
+            migrate()
+            success(legacy { repository.ensure(key, now()) })
+            val lease =
+                requireNotNull(success(legacy { repository.claim(key, now().plusSeconds(30)) }))
+            val entered = CountDownLatch(1)
+            val leave = CountDownLatch(1)
+            val pool = Executors.newFixedThreadPool(2)
+            try {
+                val observation =
+                    pool.submit<CollaborationLegacyRuntimeLease> {
+                        requireNotNull(
+                            success(
+                                root {
+                                    repository.find(key, true).flatMap {
+                                        repository.lease(key, lease.slot, true).map { value ->
+                                            entered.countDown()
+                                            check(leave.await(5, TimeUnit.SECONDS))
+                                            value
+                                        }
+                                    }
+                                }
+                            )
+                        )
+                    }
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
+                assertInstanceOf(
+                    Result.Failed::class.java,
+                    run {
+                        runtime.queryForList(
+                            "select * from collaboration_legacy_runtime_leases where token=? for update nowait",
+                            lease.token,
+                        )
+                    },
+                )
+                val cleanup = pool.submit<Boolean> { success(root { repository.release(lease) }) }
+                assertFalse(cleanup.isDone)
+                leave.countDown()
+                assertEquals(lease, observation.get(10, TimeUnit.SECONDS))
+                assertTrue(cleanup.get(10, TimeUnit.SECONDS))
+                assertNotNull(
+                    success(root { repository.lease(key, lease.slot, false) })?.releasedAt
+                )
+            } finally {
+                leave.countDown()
+                pool.shutdownNow()
+                assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS))
+            }
+        }
+    }
 
     @Test
     fun typedOwnershipAndEveryReleaseCoordinateFenceAReusedSlotAcrossFreeze() {

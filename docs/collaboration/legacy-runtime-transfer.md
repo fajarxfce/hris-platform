@@ -75,3 +75,11 @@ records 26 passing mapping/actual-storage/native/worker cases in 115.242s with
 interruption and exact cleanup after native-parent purge pass. An earlier run
 failed three actual-storage cases because the plain SQL timestamp argument required
 an explicit cast; the corrected query passes. No DI or provider caller is wired yet.
+
+Pure original-runtime admission and exact live-lease validation are also available.
+They preserve current admission time bounds and distinguish a coherent DRAINING
+owner from permanent account revocation. The repository can read/lock one exact
+slot after the runtime head, so a publication transaction can serialize with its
+finally cleanup. [Policy/guard evidence](../measurements/collaboration-legacy-runtime-policy-2026-11-04.json)
+records 30 passing cases in 128.584s, including actual row contention against cleanup,
+with 8264 unchanged inputs and quality gates. No provider caller is wired yet.

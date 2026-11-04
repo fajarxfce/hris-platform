@@ -17,6 +17,13 @@ interface CollaborationLegacyRuntimeRepository {
         lock: Boolean,
     ): Result<CollaborationLegacyRuntime?>
 
+    /** Lock after the runtime head when publishing, so cleanup cannot race validation. */
+    fun lease(
+        owner: CollaborationLegacyRuntimeOwner,
+        slot: Int,
+        lock: Boolean,
+    ): Result<CollaborationLegacyRuntimeLease?>
+
     fun slots(owner: CollaborationLegacyRuntimeOwner): Result<List<CollaborationLegacyRuntimeLease>>
 
     fun claim(

@@ -29,6 +29,23 @@ class PostgresCollaborationLegacyRuntimeDataSource(private val sql: DSLContext) 
         return if (lock) query.forUpdate().fetchOne() else query.fetchOne()
     }
 
+    override fun lease(
+        owner: CollaborationLegacyRuntimeCoordinatesData,
+        slot: Int,
+        lock: Boolean,
+    ): CollaborationLegacyRuntimeLeasesRecord? {
+        val query =
+            sql.selectFrom(L)
+                .where(
+                    L.COMPANY_ID.eq(owner.companyId),
+                    L.DEVICE_ID.eq(owner.deviceId),
+                    L.ACCOUNT_ID.eq(owner.accountId),
+                    L.NATIVE_SESSION_ID.eq(owner.nativeSessionId),
+                    L.SLOT.eq(slot),
+                )
+        return if (lock) query.forUpdate().fetchOne() else query.fetchOne()
+    }
+
     override fun slots(
         owner: CollaborationLegacyRuntimeCoordinatesData
     ): List<CollaborationLegacyRuntimeLeasesRecord> =

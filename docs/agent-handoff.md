@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+## Original runtime policy and exact lease guard accepted — 4 November 2026
+
+Pure owner/lifecycle/admission-window and unchanged live-lease validation now
+rejects wrong original scope, replaced/released/expired slots and inconsistent
+timestamps. Coherent DRAINING returns collaboration_runtime_transferring; it does
+not masquerade as account revocation. Exact-slot read optionally locks the row
+AFTER the runtime head. Actual publication observation blocks a NOWAIT probe and
+serializes concurrent finally cleanup until commit. Provider callers remain unwired.
+
+[Evidence](measurements/collaboration-legacy-runtime-policy-2026-11-04.json):30 PASS
+128.584s,8264 unchanged inputs, format/architecture PASS, no failed run. Two domain,
+four mapping/four actual storage, nine native registration/status and eleven group
+worker publication/outcome cases. All sessions/tests complete. Prior typed ports
+are ad1d7cca, V123 storage16420c3e; main dc082f5d needs this new commit recorded.
+
+Next wire fixed provider operations using actual current runtime/lease checks.
+Read ignored runtime-ports-next/contract.md and consumer-integration.md. Gateway
+admission must claim before I/O (including renewal), validate before/after each
+fixed operation, hold runtime then exact lease during publication, and release in
+finally without masking original exceptions or clearing interruption. Bootstrap/
+refresh, old native provisioning and direct-room workers also require the fence;
+no public transfer can appear until all are integrated. DI changes require actual
+API and full worker contexts. Preserve SDK keys/store/transaction IDs and all room/
+push/read ownership. Never logout late/losing Matrix candidates.
+
+Mobile source3d85d569 protocol41741297195 is accepted, documented at1ae13d74.
+Control41741297181 portable passed; Apple is building the iOS host. Native41741297183
+is now executing on the owned runner emulator. Prepared audits remain under Mobile
+.work/local-sdk-identity-2026-11-03/hosted. Physical phone28 and live8b40/schema116
+pushON/SMTP OFF are unchanged, actual Apple SDK remains open. Continue the full
+long run, frequent user/Git updates and every atomic commit pushed.
+
 ## Typed legacy runtime ports accepted — 4 November 2026
 
 Domain owner/runtime/lease entities and repository contract, raw DTO/jOOQ source,

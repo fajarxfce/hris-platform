@@ -20,6 +20,12 @@ interface CollaborationLegacyRuntimeDataSource {
         lock: Boolean,
     ): CollaborationLegacyRuntimeRecord?
 
+    fun lease(
+        owner: CollaborationLegacyRuntimeCoordinatesData,
+        slot: Int,
+        lock: Boolean,
+    ): CollaborationLegacyRuntimeLeasesRecord?
+
     fun slots(
         owner: CollaborationLegacyRuntimeCoordinatesData
     ): List<CollaborationLegacyRuntimeLeasesRecord>

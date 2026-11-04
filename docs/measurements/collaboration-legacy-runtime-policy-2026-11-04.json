@@ -1,0 +1,68 @@
+{
+  "scope": "Pure original-runtime admission/live-lease validation and guarded exact-slot reads; still no provider caller integration",
+  "baseCommit": "ad1d7cca",
+  "validation": {
+    "startedAt": "2026-11-04T00:13:05.233033+00:00",
+    "elapsedSeconds": 128.584,
+    "exitCode": 0,
+    "sourceFiles": 8264,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.domain.CollaborationLegacyRuntimePolicyTest.xml": {
+        "sha256": "5bdadfa29507dc440d1b65ed788cb4fe7caae8d2e0ccb9ea4b0dd0f18a707b5c",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyRuntimeStorageTest.xml": {
+        "sha256": "5feee6ccc18ff96724187bbbf5d2ea7878fcb5731a08a8412eb03e7ff6b92932",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+        "sha256": "f7a3d6e77762ec0fa0f6c9a515c54754cb15a0a1eb10b631788011fca0e1c19e",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceDeviceRegistrationTest.xml": {
+        "sha256": "1bf9f186c3f6ba125e59d7f676cd997ede1f48ea854a88ba05ac902ea05590b2",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyRuntimeMappingTest.xml": {
+        "sha256": "15ece432ca972d864c8efd9786b7b8b6a6aa30020080d417c83fcd30c8f2074b",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "failedRuns": [],
+  "evidence": [
+    "Pure policy validates original owner, runtime lifecycle, current admission window and exact unchanged unreleased lease/version/slot/time bounds",
+    "A coherent DRAINING owner returns a temporary transferring error, not account revocation; malformed state and stale/expired/replaced lease return changed",
+    "Repository exact-slot reads carry optional FOR UPDATE and reject unexpected slot mapping",
+    "Actual PostgreSQL publication observation takes runtime then exact lease guards; separate NOWAIT lookup fails and concurrent finally cleanup completes only after observation commits",
+    "Native registration/status and group worker publication/outcome regression remains passing; all checked inputs unchanged and format/architecture pass"
+  ],
+  "limits": [
+    "Pure policies and lease read ports are not yet invoked by legacy provider use cases or gateway issuance",
+    "Current full native/company/client/MFA authority remains the caller responsibility",
+    "Completion/credential retirement, Mobile SDK stop/alias and coherent room/push/read transfer remain unfinished",
+    "Live8b40/schema116 pushON, normal phone28 and Starter9959c1d are unchanged"
+  ]
+}

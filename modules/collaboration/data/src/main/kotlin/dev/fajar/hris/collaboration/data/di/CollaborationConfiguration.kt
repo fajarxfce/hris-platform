@@ -841,6 +841,46 @@ class CollaborationConfiguration {
     ) = MaintainCollaborationSpaceTransientState(gateway, requests, transactions, clock)
 
     @Bean
+    fun accessNativeCollaborationSpaceMatrixDevice(
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        requests: CollaborationSpaceRequestRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        matrix: CollaborationMatrixRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        AccessNativeCollaborationSpaceMatrixDevice(
+            gateway,
+            requests,
+            registry,
+            providers,
+            matrix,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            security,
+            policy,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun renewNativeCollaborationSpaceProvider(
         requests: CollaborationSpaceRequestRepository,
         registry: CollaborationSpaceDeviceRepository,

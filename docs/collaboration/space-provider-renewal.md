@@ -75,8 +75,9 @@ tests additionally exercise signed keys and an isolated real Synapse restart. Ex
 accepted runs and any preliminary failures belong in the accompanying measurement.
 API and full worker application contexts are required for the new shared DI graph.
 
-Current group gateway exchange, room/member/key authority and Mobile orchestration
-remain separate work. This command alone enables no product group runtime or rollout.
+Fixed group [self access](space-gateway-access.md) now checks current provider and
+gateway/request ownership without calling this renewal use case. Group room/content
+exchange, member/key authority and Mobile orchestration remain separate work. This command alone enables no product group runtime or rollout.
 
 [Accepted measurement](../measurements/collaboration-space-provider-renewal-2026-11-04.json)
 records exact source/report hashes, focused and broader outcomes, actual retained

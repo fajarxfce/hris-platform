@@ -1,5 +1,50 @@
 # Agent continuation — HRIS workspace
 
+## Group gateway self access accepted — 4 November 2026
+
+Based onb2dee963, AccessNativeCollaborationSpaceMatrixDevice now admits fixed Matrix
+identity and metadata-only capabilities with separate group ownership. Anonymous
+opaque lookup only identifies the owner; account/native/device/gateway guards enforce
+current native/group/client/MFA, exact canonical ACTIVE binding, live provider and
+completed retained provenance. Access expiry is checked separately from refresh's
+metadata policy. Original native/security/provider generation facts remain pinned
+across I/O. Seven gateway slots have original30s budgets clipped to authority/provider/
+head bounds; renewal slot0 remains available. Exact release preserves a successor.
+Current denial takes precedence on both provider outcomes. Capabilities performs no
+provider I/O/decryption; identity uses only neutral whoAmI, never company login/logout.
+Read [self access](collaboration/space-gateway-access.md).
+
+One module binding and fixed identity/capability controller dispatch are wired. Other
+Matrix endpoints have no group dispatch or room/key/content authority yet. Existing
+strict parsing and company protocol remain covered. [Evidence](measurements/collaboration-space-gateway-access-2026-11-04.json):
+focused7 PASS114.736s, data9/API130 PASS331.029s (139 total),
+full worker128 PASS347.237s (127 active/one existing retention skip),
+8,340 identical inputs and format/architecture. No preliminary failing gate. Actual
+PostgreSQL/Synapse covers restart, current generation changes, seven competing requests,
+reserved renewal capacity, replacement/cancellation/purge and original retained identity.
+Actual HTTP exercises expired provider head -> native renewal -> bootstrap -> self
+identity/capabilities and native revocation during provider response. All34 prior
+HTTP protocol cases remain in the 36-case class. Owned resources and test sessions
+are finished; the recorder has run and is stale after this commit.
+
+NEXT group public-key reservation/publication, recipient authority and room/member/
+original-room inventory before sync/send/read/push/content or Mobile adoption. Read
+ignored group-runtime-next/key-publication.md: preserve V112 immutable reservation
+and V114 pre-ack device-list behavior, reject retained key replacement, and separate
+offline recipient key availability from the sender's short-lived access/provider
+credentials. Never require a receiver's short token to stay live just for offline
+E2EE delivery. Native hard-parent replacement still needs explicit ownership recovery.
+Do not reopen original DRAINING company runtime or alias space IDs into company scopes.
+
+Then Mobile key preflight/stage/freeze/completion/atomic adoption with original SDK
+namespace/passphrase, local history and uncertain sends retained across inbox/outbox/
+drafts/read/push/deep links. Group availability remains disabled; no product caller,
+APK or rollout. All54 groups and actual Apple Matrix/APNs/CallKit remain open.
+Mainc8d65e82/Mobileb84f5ce5 with hosted code0b804cb2, normal phone28/live8b40/schema116
+pushON/SMTPOFF and Starter9959c1d unchanged. Continue full long run, frequent updates,
+atomic immediate pushes and validated product feature installs only. All changed
+files belong to this increment; never install proof APKs on the user phone.
+
 ## Native provider recovery and group maintenance accepted — 4 November 2026
 
 Based on88d20851, explicit native provider renewal now recovers expired Matrix heads

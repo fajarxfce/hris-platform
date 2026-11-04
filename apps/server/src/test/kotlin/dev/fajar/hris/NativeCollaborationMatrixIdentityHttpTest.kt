@@ -30,6 +30,8 @@ import tools.jackson.databind.json.JsonMapper
         [
             "HRIS_COLLABORATION_ENABLED=true",
             "HRIS_MATRIX_ENABLED=true",
+            "HRIS_COLLABORATION_SPACE_ENABLED=true",
+            "HRIS_COLLABORATION_SPACE_MIN_ANDROID_BUILD=1",
             "HRIS_COLLABORATION_PUSH_ENABLED=true",
             "HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED=true",
             "HRIS_MATRIX_PUSH_CALLBACK_SOURCES=127.0.0.1/32",
@@ -383,6 +385,174 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 .build(),
             HttpResponse.BodyHandlers.ofString(),
         )
+    }
+
+    @Test
+    fun groupIdentityHttpRecoversExpiredProviderAndKeepsSelfOperationsInTheGroupNamespace() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val before = provider.queries.get()
+        val reply = identity(n, token)
+        assertEquals(200, reply.statusCode(), reply.body())
+        val body = json.readTree(reply.body())
+        assertEquals(setOf("user_id", "device_id", "is_guest"), body.propertyNames().toSet())
+        val row =
+            database()
+                .queryForMap(
+                    "select matrix_user_id,matrix_device_id from collaboration_space_devices where id=?",
+                    device,
+                )
+        assertEquals(row["matrix_user_id"], body["user_id"].asString())
+        assertEquals(row["matrix_device_id"], body["device_id"].asString())
+        assertFalse(body["is_guest"].asBoolean())
+        assertEquals(before + 1, provider.queries.get())
+        val capabilities =
+            n.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/capabilities"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer $token")
+                    .GET()
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(200, capabilities.statusCode(), capabilities.body())
+        assertFalse(
+            json
+                .readTree(capabilities.body())["capabilities"]["m.change_password"]["enabled"]
+                .asBoolean()
+        )
+        assertEquals(before + 1, provider.queries.get())
+        assertEquals(400, identity(n, token, suffix = "?access_token=forbidden").statusCode())
+        assertEquals(401, identity(n, token, duplicate = true).statusCode())
+        assertEquals(
+            400,
+            identity(n, token, body = HttpRequest.BodyPublishers.ofString("{}")).statusCode(),
+        )
+        assertEquals(401, identity(n, n.access).statusCode())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupIdentityHttpWithholdsAProviderReplyAfterItsNativeParentIsRevoked() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val before = provider.queries.get()
+        provider.onQuery.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        val reply = identity(n, token)
+        assertEquals(401, reply.statusCode(), reply.body())
+        assertEquals("M_UNKNOWN_TOKEN", json.readTree(reply.body())["errcode"].asString())
+        assertEquals(before + 1, provider.queries.get())
+        assertEquals(401, identity(n, token).statusCode())
+        assertEquals(before + 1, provider.queries.get())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select generation from collaboration_space_provider_sessions where device_id=?",
+                    Long::class.java,
+                    device,
+                ),
+        )
+    }
+
+    private fun groupNativeCall(
+        n: Native,
+        path: String,
+        body: Map<String, Any>? = null,
+    ): HttpResponse<String> {
+        val builder =
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path"))
+                .timeout(Duration.ofSeconds(15))
+                .header("Authorization", "Bearer ${n.access}")
+                .header("X-HRIS-Client-Platform", "ANDROID")
+                .header("X-HRIS-Client-Build", "1")
+        if (body == null) builder.GET()
+        else
+            builder
+                .header("Content-Type", "application/json")
+                .header("Idempotency-Key", UUID.randomUUID().toString())
+                .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)))
+        return n.fixture.browser.send(builder.build(), HttpResponse.BodyHandlers.ofString())
+    }
+
+    private fun enrollGroup(n: Native): Pair<UUID, String> {
+        ownedParents.add(n.session)
+        val current = groupNativeCall(n, "/api/v1/collaboration/spaces/current")
+        assertEquals(200, current.statusCode(), current.body())
+        val space = json.readTree(current.body())["spaceId"].asString()
+        val base = "/api/v1/collaboration/spaces/$space"
+        assertEquals(200, groupNativeCall(n, "$base/identity", emptyMap()).statusCode())
+        val registered =
+            groupNativeCall(
+                n,
+                "$base/native-device",
+                mapOf(
+                    "platform" to "ANDROID",
+                    "origin" to "SPACE",
+                    "label" to "Group protocol fixture",
+                ),
+            )
+        assertEquals(200, registered.statusCode(), registered.body())
+        val device = UUID.fromString(json.readTree(registered.body())["id"].asString())
+        val db = database()
+        val at = clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS)
+        val expires = at.plusSeconds(1)
+        db.update(
+            "update collaboration_space_provisioning set state='RUNNING',attempts=1,lease_owner=?,lease_token=?,lease_until=least(expires_at,clock_timestamp()+interval '30 seconds') where device_id=?",
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            device,
+        )
+        db.update(
+            "insert into collaboration_space_provider_sessions(space_id,device_id,account_id,native_session_id,matrix_user_id,matrix_device_id,generation,token_encrypted,created_at,updated_at,token_expires_at) select space_id,id,account_id,origin_native_session_id,matrix_user_id,matrix_device_id,0,'expired-fixture-envelope',?::timestamptz,?::timestamptz,?::timestamptz from collaboration_space_devices where id=?",
+            at.toString(),
+            at.toString(),
+            expires.toString(),
+            device,
+        )
+        db.update(
+            "update collaboration_space_devices set state='ACTIVE',version=version+1,updated_at=?::timestamptz where id=?",
+            at.toString(),
+            device,
+        )
+        db.update(
+            "update collaboration_space_provisioning set state='SUCCEEDED',lease_owner=null,lease_token=null,lease_until=null,completed_at=?::timestamptz,last_outcome_revision=revision,last_outcome_state='SUCCEEDED',last_outcome_at=?::timestamptz where device_id=?",
+            at.toString(),
+            at.toString(),
+            device,
+        )
+        val remaining = Duration.between(java.time.Instant.now(), expires).toNanos()
+        if (remaining > 0) TimeUnit.NANOSECONDS.sleep(remaining + 20_000_000)
+        val input = mapOf("deviceId" to device, "expectedDeviceVersion" to 1)
+        val renewed = groupNativeCall(n, "$base/native-device/provider/renew", input)
+        assertEquals(200, renewed.statusCode(), renewed.body())
+        assertEquals(1L, json.readTree(renewed.body())["providerGeneration"].asLong())
+        val bootstrap = groupNativeCall(n, "$base/native-device/bootstrap", input)
+        assertEquals(200, bootstrap.statusCode(), bootstrap.body())
+        return device to json.readTree(bootstrap.body())["accessToken"].asString()
     }
 
     private fun enroll(n: Native): Pair<UUID, String> {

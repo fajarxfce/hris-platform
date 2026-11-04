@@ -47,7 +47,9 @@ returns original Matrix identity and credentials from one guarded transaction;
 owned status exposes only safe gateway revision/deadline metadata. Standard Matrix
 refresh dispatches the distinct group prefix to its own use case. The owning module
 binds group storage and issuance while availability remains disabled by default.
-Gateway request/room authority and group runtime adoption remain unfinished.
+Fixed [group self access](collaboration/space-gateway-access.md) now admits Matrix
+identity and metadata-only capabilities under exact group gateway/request ownership.
+Key/room/content authority and group runtime adoption remain unfinished.
 [Native provider renewal](collaboration/space-provider-renewal.md) recovers an expired
 head through current admission, bounded outside-SQL login and exact-generation
 publication. It preserves original identity/key provenance and requires a separate
@@ -61,7 +63,8 @@ cancellation; callers own current admission, transactions and post-I/O authority
 Operational cleanup preserves device/key provenance and never reopens original company
 runtime slots. Native renewal uses the reserved slot within its original request
 budget; the shared cleanup worker timer also runs an atomic bounded group replay/
-request cleanup pass. Current gateway exchange and room authority remain next.
+request cleanup pass. Identity/capability access uses ordinary slots1–7 and preserves
+the reserved renewal slot. Group key/room/content authority remains next.
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 

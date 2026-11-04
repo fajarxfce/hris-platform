@@ -5,7 +5,7 @@ domain types, opaque token prefixes and authenticated replay context are distinc
 from the existing company gateway. It does not create credentials during migration,
 exchange a provider bearer or move a Mobile SDK store. Native HTTP issuance and
 refresh dispatch are implemented separately below.
-[Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Native issuance use cases are separately validated below. Current gateway request/room authority and Mobile adoption remain unfinished.
+[Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Native issuance use cases are separately validated below. Current key/room/content authority and Mobile adoption remain unfinished.
 
 ## Native issuance use cases
 
@@ -79,8 +79,9 @@ cooldown under PostgreSQL's wall-clock publication guard.
 [bounded group request slot](space-request-lifecycle.md) to recover an expired provider
 head before fresh bootstrap, without reopening original company runtime slots. Group
 replay and request cleanup now share the existing owned worker timer with separate
-bounded group transaction ownership. Current gateway exchange and room authority
-remain required before Mobile group adoption.
+bounded group transaction ownership. [Self access](space-gateway-access.md) now admits group identity/capabilities with
+exact current gateway/provider/request ownership and final checks on both provider
+outcomes. Key/room/content authority remains required before Mobile group adoption.
 
 ## Ownership and authority
 
@@ -147,6 +148,6 @@ alongside the unchanged legacy envelope formats. Unknown future schemas are reje
 Recovery acceptance must exercise the generated SQL projection against actual
 encrypted bootstrap and refresh rows, key rotation and restored PostgreSQL data.
 
-The next increment must implement current group gateway request admission and room authority,
+The next increment must implement group key/room/content authority,
 then join these to the durable Mobile handover. An accepted storage adapter alone
 does not satisfy cross-company chat or authorize freezing the old client runtime.

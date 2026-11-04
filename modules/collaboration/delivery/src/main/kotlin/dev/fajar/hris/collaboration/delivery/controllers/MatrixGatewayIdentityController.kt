@@ -2,7 +2,9 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
+import dev.fajar.hris.collaboration.domain.policies.validCollaborationSpaceGatewayAccess
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
+import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationSpaceMatrixDevice
 import dev.fajar.hris.core.domain.Result
 import jakarta.servlet.http.HttpServletRequest
 import java.util.UUID
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class MatrixGatewayIdentityController(private val identity: AccessNativeCollaborationMatrixDevice) {
+class MatrixGatewayIdentityController(
+    private val identity: AccessNativeCollaborationMatrixDevice,
+    private val group: AccessNativeCollaborationSpaceMatrixDevice,
+) {
     @GetMapping("/_matrix/client/v3/account/whoami")
     fun get(request: HttpServletRequest): ResponseEntity<Any> {
         // Never accept tokens through URLs, cookies or a JSON body. Duplicate bearer headers
@@ -35,7 +40,10 @@ class MatrixGatewayIdentityController(private val identity: AccessNativeCollabor
             return matrixGatewayProblem(collaborationGatewayAuthenticationRequired().failure)
         val token = first.substring(7)
         val correlation = request.getAttribute("hris.correlationId") as? UUID ?: UUID.randomUUID()
-        return when (val result = identity.identity(token, correlation)) {
+        val result =
+            if (validCollaborationSpaceGatewayAccess(token)) group.identity(token, correlation)
+            else identity.identity(token, correlation)
+        return when (result) {
             is Result.Failed -> matrixGatewayProblem(result.failure)
             is Result.Success ->
                 ResponseEntity.ok()

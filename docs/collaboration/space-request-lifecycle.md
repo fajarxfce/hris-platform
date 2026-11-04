@@ -3,8 +3,8 @@
 V127 adds operational leases for group gateway I/O and native provider renewal.
 These leases have separate organization ownership. They do not reopen original
 company runtime slots, transfer SDK files or grant provider/room authority. The
-native provider-renewal command now binds and uses slot0. Group gateway exchange
-and Mobile adoption remain unfinished.
+native provider-renewal command now uses slot0; fixed group identity/capability
+access uses slots1–7. Key/room/content exchange and Mobile adoption remain unfinished.
 
 ## Bounds and current authority
 
@@ -72,8 +72,10 @@ time remain unchanged. Losing candidates expire without logout.
 The existing owned cleanup timer also invokes group maintenance. One transaction
 clears at most100 expired gateway replay caches and100 expired request leases;
 failed results and cancellation roll back both batches. No additional timer or
-unbounded drain loop is created. Current gateway exchange and Mobile adoption remain
-unfinished; request metadata alone still grants no content or room authority.
+unbounded drain loop is created. [Self access](space-gateway-access.md) now claims
+ordinary slots with current provider/gateway admission and final I/O checks. Group
+key/room/content authority and Mobile adoption remain unfinished; request metadata
+alone grants none of them.
 
 Then implement room/member authority and Mobile provider-key preflight, handover and
 ownership across inbox/outbox/drafts/read/history/push/deep links. Expired gateway

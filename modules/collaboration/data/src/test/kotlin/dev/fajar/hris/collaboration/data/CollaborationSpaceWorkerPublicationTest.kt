@@ -1200,6 +1200,30 @@ class CollaborationSpaceWorkerPublicationTest {
         assertEquals(0, blocked.calls.get())
         val value = success(f.renewProvider(id, f.provider(id)))
         assertEquals(requireNotNull(before).generation + 1, value.providerGeneration)
+        val bootstrap = success(f.groupBootstrap(id)).tokens
+        val expectedIdentity =
+            CollaborationMatrixIdentity(device.matrixUserId, device.matrixDeviceId, false)
+        val identityProvider =
+            object : CollaborationMatrixRepository by DisabledCollaborationMatrixRepository() {
+                override fun whoAmI(
+                    accessToken: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixIdentity> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    return Result.Success(expectedIdentity)
+                }
+            }
+        assertEquals(
+            expectedIdentity,
+            success(f.groupIdentity(bootstrap.accessToken, identityProvider)),
+        )
+        failure(
+            f.groupIdentity(bootstrap.accessToken, identityProvider, missing),
+            "collaboration_access_denied",
+        )
         assertEquals(device, f.device(id))
         assertEquals(snapshot, f.originalSnapshot())
     }
@@ -1308,6 +1332,15 @@ class CollaborationSpaceWorkerPublicationTest {
             provider.restart()
             checkKeys(recovered.accessToken)
             checkKeys(oldCredential.accessToken)
+            val groupTokens = success(f.groupBootstrap(id)).tokens
+            assertEquals(
+                CollaborationMatrixIdentity(
+                    current.state.matrixUserId,
+                    current.state.matrixDeviceId,
+                    false,
+                ),
+                success(f.groupIdentity(groupTokens.accessToken, provider.repository)),
+            )
             f.activatedCount(1)
         }
     }
@@ -2347,6 +2380,47 @@ class CollaborationSpaceWorkerPublicationTest {
                     device(id).version,
                     client,
                 )
+
+        fun groupIdentity(
+            token: String,
+            matrix: CollaborationMatrixRepository,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+        ): Result<CollaborationMatrixIdentity> {
+            val gateway =
+                EncryptedCollaborationSpaceGatewaySessionRepository(
+                    PostgresCollaborationSpaceGatewaySessionDataSource(sql),
+                    JceIdentityTokenDataSource(
+                        parseIdentityKeyring(
+                            "fixture",
+                            "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 47 }),
+                        )
+                    ),
+                )
+            val requests =
+                StoredCollaborationSpaceRequestRepository(
+                    PostgresCollaborationSpaceRequestDataSource(sql)
+                )
+            return AccessNativeCollaborationSpaceMatrixDevice(
+                    gateway,
+                    requests,
+                    registry,
+                    credentials,
+                    matrix,
+                    selections,
+                    legacyParents,
+                    completions,
+                    provisioning,
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    IdentitySecurityPolicy(),
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    Clock.systemUTC(),
+                )
+                .identity(token, UUID.randomUUID())
+        }
 
         fun groupRefresh(
             token: String,

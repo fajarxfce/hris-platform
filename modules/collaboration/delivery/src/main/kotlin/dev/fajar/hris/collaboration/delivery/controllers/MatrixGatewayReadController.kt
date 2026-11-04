@@ -6,7 +6,9 @@ import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixPolicy
 import dev.fajar.hris.collaboration.domain.entities.CollaborationRoomPageRequest
 import dev.fajar.hris.collaboration.domain.entities.CollaborationServicePolicy
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
+import dev.fajar.hris.collaboration.domain.policies.validCollaborationSpaceGatewayAccess
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
+import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationSpaceMatrixDevice
 import dev.fajar.hris.core.domain.*
 import jakarta.servlet.http.HttpServletRequest
 import java.util.UUID
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MatrixGatewayReadController(
     private val device: AccessNativeCollaborationMatrixDevice,
+    private val group: AccessNativeCollaborationSpaceMatrixDevice,
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
 ) {
@@ -53,7 +56,11 @@ class MatrixGatewayReadController(
     @GetMapping("/_matrix/client/v3/capabilities")
     fun capabilities(request: HttpServletRequest): ResponseEntity<Any> =
         read(request) { token, correlation ->
-            device.capabilities(token, correlation).map {
+            val admitted =
+                if (validCollaborationSpaceGatewayAccess(token))
+                    group.capabilities(token, correlation)
+                else device.capabilities(token, correlation)
+            admitted.map {
                 mapOf(
                     "capabilities" to
                         mapOf(

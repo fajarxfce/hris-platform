@@ -1,5 +1,19 @@
 # Delivery and validation
 
+## Group gateway identity and capabilities — 4 November 2026
+
+Fixed self access now uses current group/native/provider authority and exact bounded
+gateway requests, with distinct identity/capability prefix dispatch. Capabilities
+never decrypts; provider identity is checked against the original device after final
+admission. Read [the contract](collaboration/space-gateway-access.md).
+[Evidence](measurements/collaboration-space-gateway-access-2026-11-04.json): focused7
+PASS114.736s, data9/API130 PASS331.029s and full worker128
+PASS347.237s (one existing retention skip), identical8,340 inputs and
+quality checks. Actual provider restart/retained identity and HTTP expired-provider
+recovery/revocation pass; all34 prior HTTP protocol cases remain covered. No failing gate.
+Group key/room/content authority and Mobile adoption remain next; all54 groups stay
+open. No product APK or rollout; phone28/live8b40/schema116 are unchanged.
+
 ## Native provider renewal and group cleanup — 4 November 2026
 
 Explicit native renewal recovers expired provider heads with original identity/key

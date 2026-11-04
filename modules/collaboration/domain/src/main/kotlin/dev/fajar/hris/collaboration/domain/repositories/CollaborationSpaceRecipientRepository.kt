@@ -7,7 +7,11 @@ import java.util.UUID
 
 interface CollaborationSpaceRecipientRepository {
     /**
-     * At most 100 accounts and five devices per account; original Matrix coordinates are retained.
+     * Currently scoped to the transaction caller at root company scope. Current canonical group
+     * eligibility and an exact verified room pair gate peers; own candidates need no room. This
+     * projection supplies public metadata only, not caller/native admission or signed provider
+     * trust. At most 100 accounts and five devices per account; original Matrix coordinates are
+     * retained.
      */
     fun devices(
         spaceId: UUID,

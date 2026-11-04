@@ -13,9 +13,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-/**
- * Fixed self and own-key operations under group ownership. Room/recipient authority is separate.
- */
+/** Fixed self, own-key and scoped recipient-key operations under group ownership. */
 class AccessNativeCollaborationSpaceMatrixDevice(
     private val gateway: CollaborationSpaceGatewaySessionRepository,
     private val requests: CollaborationSpaceRequestRepository,
@@ -37,6 +35,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val keys: CollaborationSpaceKeyRepository,
     private val providerKeys: CollaborationMatrixKeyRepository,
     private val journal: ChangeJournalRepository,
+    private val recipients: CollaborationSpaceRecipientRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -92,6 +91,122 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             val published = (readback as Result.Success).value ?: return@admitted invalidProvider()
             validatePublicKeys(exchange.observation, retained, published).flatMap {
                 exchange.publishKeys(retained).flatMap { response }
+            }
+        }
+    }
+
+    fun queryKeys(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationMatrixKeyQuery,
+    ): Result<CollaborationMatrixKeyQueryResult> {
+        val captured = snapshotCollaborationSpaceKeyQuery(request)
+        if (captured is Result.Failed) return captured
+        val query = (captured as Result.Success).value
+        return recipientOperation(token, correlationId, query, includeReserved = true) {
+            exchange,
+            selected ->
+            val expanded = selected.providerRequest()
+            if (expanded.devices.isEmpty())
+                Result.Success(
+                    CollaborationMatrixKeyQueryResult(selected.accounts.mapValues { emptyMap() })
+                )
+            else
+                exchange.exchange { bearer, deadline ->
+                    providerKeys.deviceKeys(expanded, bearer, deadline).flatMap {
+                        verifyCollaborationSpaceKeyQuery(selected, it)
+                    }
+                }
+        }
+    }
+
+    fun claimKeys(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationMatrixKeyClaim,
+    ): Result<CollaborationMatrixKeyClaimResult> {
+        val captured = snapshotCollaborationSpaceKeyClaim(request)
+        if (captured is Result.Failed) return captured
+        val claim = (captured as Result.Success).value
+        val query =
+            CollaborationMatrixKeyQuery(claim.oneTimeKeys.mapValues { it.value.keys.toList() })
+        return recipientOperation(token, correlationId, query, includeReserved = false) {
+            exchange,
+            selected ->
+            val expanded = selected.providerRequest()
+            if (expanded.devices.isEmpty())
+                return@recipientOperation Result.Success(
+                    CollaborationMatrixKeyClaimResult(selected.accounts.mapValues { emptyMap() })
+                )
+            val verified =
+                exchange.exchange { bearer, deadline ->
+                    providerKeys.deviceKeys(expanded, bearer, deadline).flatMap {
+                        verifyCollaborationSpaceKeyQuery(selected, it)
+                    }
+                }
+            if (verified is Result.Failed) return@recipientOperation verified
+            val exact =
+                CollaborationMatrixKeyClaim(
+                    expanded.devices.mapValues { (_, devices) ->
+                        devices.associateWith { "signed_curve25519" }
+                    }
+                )
+            exchange.exchange { bearer, deadline ->
+                providerKeys.claimKeys(exact, bearer, deadline).flatMap {
+                    verifyCollaborationSpaceKeyClaim(
+                        selected,
+                        (verified as Result.Success).value,
+                        it,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun <T> recipientOperation(
+        token: String,
+        correlationId: UUID,
+        query: CollaborationMatrixKeyQuery,
+        includeReserved: Boolean,
+        operation: (Exchange, CollaborationSpaceKeySelection) -> Result<T>,
+    ): Result<T> =
+        admitted(
+            token,
+            correlationId,
+            decrypt = true,
+            prepare = { observed -> prepareRecipients(observed, query, includeReserved) },
+            extraAccounts = { head ->
+                collaborationSpaceKeyQueryAccounts(query, head.spaceId, provider.serverName).map {
+                    it.values.toSet()
+                }
+            },
+            revalidate = { observed, original ->
+                prepareRecipients(observed, query, includeReserved).flatMap { current ->
+                    if (current == original) Result.Success(Unit)
+                    else collaborationSpaceRecipientsChanged()
+                }
+            },
+            operation = operation,
+        )
+
+    private fun prepareRecipients(
+        observed: Observation,
+        query: CollaborationMatrixKeyQuery,
+        includeReserved: Boolean,
+    ): Result<CollaborationSpaceKeySelection> {
+        val spaceId = observed.device.spaceId
+        return collaborationSpaceKeyQueryAccounts(query, spaceId, provider.serverName).flatMap {
+            accounts ->
+            val at = clock.instant()
+            recipients.devices(spaceId, accounts.values.toSet(), at).flatMap { candidates ->
+                selectCollaborationSpaceKeys(
+                    spaceId,
+                    provider.serverName,
+                    query,
+                    candidates,
+                    at,
+                    includeReserved,
+                )
             }
         }
     }
@@ -198,14 +313,21 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         private val context: Context,
         val observation: Observation,
         val lease: CollaborationSpaceRequestLease,
+        private val checkExtra: (() -> Result<Unit>)? = null,
     ) {
         fun <T> exchange(call: (String, Instant) -> Result<T>): Result<T> {
-            val before = transactions.run(context.scope) { confirm(context, observation, lease) }
+            val before =
+                transactions.run(context.scope) {
+                    checkpoint(context, observation, lease, checkExtra)
+                }
             if (before is Result.Failed) return before
             val response = call(requireNotNull(observation.credential).accessToken, lease.expiresAt)
             if (Thread.currentThread().isInterrupted)
                 throw InterruptedException("Group key request interrupted")
-            val after = transactions.run(context.scope) { confirm(context, observation, lease) }
+            val after =
+                transactions.run(context.scope) {
+                    checkpoint(context, observation, lease, checkExtra)
+                }
             return if (after is Result.Failed) after else response
         }
 
@@ -220,7 +342,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
 
         fun publishKeys(retained: CollaborationSpaceKeyPublication): Result<Unit> =
             transactions.run(context.scope) {
-                confirm(context, observation, lease)
+                checkpoint(context, observation, lease, checkExtra)
                     .flatMap {
                         keys.find(context.spaceId, context.scope.accountId, context.deviceId)
                     }
@@ -238,7 +360,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                         )
                             return@publish keysChanged()
                         if (current.version == 1L)
-                            return@publish confirm(context, observation, lease)
+                            return@publish checkpoint(context, observation, lease, checkExtra)
                         val next = retained.copy(version = 1, publishedAt = at)
                         keys
                             .publish(current, at)
@@ -256,7 +378,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                                     ),
                                 )
                             }
-                            .flatMap { confirm(context, observation, lease) }
+                            .flatMap { checkpoint(context, observation, lease, checkExtra) }
                             .flatMap {
                                 keys.find(
                                     context.spaceId,
@@ -265,7 +387,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                                 )
                             }
                             .flatMap {
-                                if (it == next) confirm(context, observation, lease)
+                                if (it == next) checkpoint(context, observation, lease, checkExtra)
                                 else keysChanged()
                             }
                     }
@@ -298,6 +420,10 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         correlationId: UUID,
         decrypt: Boolean,
         prepare: (Observation) -> Result<S>,
+        extraAccounts: (CollaborationSpaceGatewaySession) -> Result<Set<UUID>> = {
+            Result.Success(emptySet())
+        },
+        revalidate: ((Observation, S) -> Result<Unit>)? = null,
         operation: (Exchange, S) -> Result<T>,
     ): Result<T> {
         if (
@@ -312,7 +438,17 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         val resolved = transactions.run(lookup) { gateway.findAccess(token) }
         if (resolved is Result.Failed) return resolved
         val initial = (resolved as Result.Success).value ?: return authenticationRequired()
-        val context = Context(lookup.copy(accountId = initial.accountId), initial, started)
+        val requestedAccounts = extraAccounts(initial)
+        if (requestedAccounts is Result.Failed) return requestedAccounts
+        val peers = (requestedAccounts as Result.Success).value
+        if (peers.size > 100 || UUID(0, 0) in peers) return invalidProvider()
+        val context =
+            Context(
+                lookup.copy(accountId = initial.accountId),
+                initial,
+                started,
+                (peers + initial.accountId).sorted(),
+            )
         val prepared =
             transactions.run(context.scope) {
                 observe(context, decrypt).flatMap { observed ->
@@ -336,9 +472,11 @@ class AccessNativeCollaborationSpaceMatrixDevice(
                             )
                         confirm(context, observed, lease).flatMap {
                             prepare(observed).flatMap { extra ->
-                                confirm(context, observed, lease).map {
-                                    Preparation(observed, lease, extra)
-                                }
+                                val checked =
+                                    revalidate?.invoke(observed, extra) ?: Result.Success(Unit)
+                                checked
+                                    .flatMap { confirm(context, observed, lease) }
+                                    .map { Preparation(observed, lease, extra) }
                             }
                         }
                     }
@@ -346,16 +484,26 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             }
         if (prepared is Result.Failed) return prepared
         val value = (prepared as Result.Success).value
+        val checkExtra: (() -> Result<Unit>)? =
+            revalidate?.let { check -> { check(value.observation, value.extra) } }
         var originalFailure: Throwable? = null
         try {
             val before =
-                transactions.run(context.scope) { confirm(context, value.observation, value.lease) }
+                transactions.run(context.scope) {
+                    checkpoint(context, value.observation, value.lease, checkExtra)
+                }
             if (before is Result.Failed) return before
-            val response = operation(Exchange(context, value.observation, value.lease), value.extra)
+            val response =
+                operation(
+                    Exchange(context, value.observation, value.lease, checkExtra),
+                    value.extra,
+                )
             if (Thread.currentThread().isInterrupted)
                 throw InterruptedException("Group request interrupted")
             val after =
-                transactions.run(context.scope) { confirm(context, value.observation, value.lease) }
+                transactions.run(context.scope) {
+                    checkpoint(context, value.observation, value.lease, checkExtra)
+                }
             return if (after is Result.Failed) after else response
         } catch (failure: Throwable) {
             originalFailure = failure
@@ -372,6 +520,17 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             }
         }
     }
+
+    private fun checkpoint(
+        context: Context,
+        original: Observation,
+        lease: CollaborationSpaceRequestLease,
+        extra: (() -> Result<Unit>)?,
+    ): Result<Unit> =
+        confirm(context, original, lease).flatMap {
+            if (extra == null) Result.Success(Unit)
+            else extra().flatMap { confirm(context, original, lease) }
+        }
 
     private fun confirm(
         context: Context,
@@ -428,10 +587,14 @@ class AccessNativeCollaborationSpaceMatrixDevice(
             head.version,
         )
 
-    /** Account -> native -> device -> gateway -> request; provider I/O is always outside. */
+    /**
+     * Sorted accounts -> native -> device -> gateway -> request; provider I/O is always outside.
+     */
     private fun observe(context: Context, decrypt: Boolean): Result<Observation> {
-        val guarded = identities.lockAccount(context.scope.accountId, shared = true)
-        if (guarded is Result.Failed) return guarded
+        for (account in context.accounts) {
+            val guarded = identities.lockAccount(account, shared = true)
+            if (guarded is Result.Failed) return guarded
+        }
         val locked = sessions.lock(context.parentId, context.scope.accountId)
         if (locked is Result.Failed) return locked
         val parent = (locked as Result.Success).value ?: return nativeAuthenticationRequired()
@@ -599,6 +762,7 @@ class AccessNativeCollaborationSpaceMatrixDevice(
         val scope: Actor,
         val initial: CollaborationSpaceGatewaySession,
         val started: Instant,
+        val accounts: List<UUID>,
     ) {
         val spaceId
             get() = initial.spaceId

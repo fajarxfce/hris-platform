@@ -1388,6 +1388,55 @@ class CollaborationSpaceWorkerPublicationTest {
                     ),
                 "collaboration_space_device_keys_changed",
             )
+            val selected =
+                CollaborationMatrixKeyQuery(
+                    mapOf(retainedKey.userId to listOf(retainedKey.deviceId))
+                )
+            val queried =
+                success(
+                    uploadCommand().queryKeys(groupTokens.accessToken, UUID.randomUUID(), selected)
+                )
+            assertEquals(
+                retainedKey.device,
+                queried.deviceKeys[retainedKey.userId]?.get(retainedKey.deviceId),
+            )
+            val keyClaim =
+                CollaborationMatrixKeyClaim(
+                    mapOf(retainedKey.userId to mapOf(retainedKey.deviceId to "signed_curve25519"))
+                )
+            val consumed =
+                success(
+                    uploadCommand().claimKeys(groupTokens.accessToken, UUID.randomUUID(), keyClaim)
+                )
+            assertNotEquals(
+                true,
+                consumed.oneTimeKeys
+                    .getValue(retainedKey.userId)
+                    .getValue(retainedKey.deviceId)
+                    .values
+                    .single()
+                    .fallback,
+            )
+            provider.restart()
+            assertEquals(
+                queried,
+                success(
+                    uploadCommand().queryKeys(groupTokens.accessToken, UUID.randomUUID(), selected)
+                ),
+            )
+            val fallback =
+                success(
+                    uploadCommand().claimKeys(groupTokens.accessToken, UUID.randomUUID(), keyClaim)
+                )
+            assertEquals(
+                true,
+                fallback.oneTimeKeys
+                    .getValue(retainedKey.userId)
+                    .getValue(retainedKey.deviceId)
+                    .values
+                    .single()
+                    .fallback,
+            )
             checkKeys(recovered.accessToken)
             assertEquals(originalRows, f.originalSnapshot())
             f.activatedCount(1)
@@ -2465,6 +2514,172 @@ class CollaborationSpaceWorkerPublicationTest {
         assertEquals(priorB, b.originalSnapshot())
     }
 
+    @Test
+    fun twoCompletedDevicesFromDifferentCompaniesQueryAndClaimTheirOriginalMatrixIdentities() {
+        val a = Fixture(verifiedMfa = true)
+        val b = Fixture(verifiedMfa = true)
+        val oldA = a.activeLegacy(signed = true)
+        val oldB = b.activeLegacy(signed = true)
+        val idA = completeRoomDevice(a, oldA)
+        val idB = completeRoomDevice(b, oldB)
+        a.assertRetainedGroupKeyStorage(idA)
+        b.assertRetainedGroupKeyStorage(idB)
+        val group = UUID.randomUUID()
+        val pair = listOf(a.account, b.account).sortedBy(UUID::toString)
+        owner.update(
+            "insert into collaboration_space_direct_conversations(space_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,clock_timestamp())",
+            space,
+            group,
+            pair[0],
+            pair[1],
+            a.account,
+        )
+        success(a.requestRoom(group, idA))
+        val lease =
+            success(
+                    a.transactions.run(a.actor.copy(accountId = UUID(0, 0))) {
+                        a.roomRepository().claim(UUID.randomUUID(), 8, 60)
+                    }
+                )
+                .single { it.request.conversationId == group }
+                .lease!!
+        val binding =
+            CollaborationSpaceRoomBinding(
+                space,
+                group,
+                a.account,
+                lease.request.revision,
+                lease.token,
+                "!retained-peer:matrix.example.test",
+                Instant.now().truncatedTo(ChronoUnit.MICROS),
+                a.account,
+            )
+        success(
+            a.transactions.run(a.actor) {
+                a.roomRepository().publish(binding).flatMap {
+                    a.roomRepository().finish(lease).flatMap {
+                        if (it) Result.Success(Unit)
+                        else Result.Failed(Failure(FailureKind.CONFLICT, "fixture_room_lost"))
+                    }
+                }
+            }
+        )
+        val first = a.retainedKeys!!
+        val second = b.retainedKeys!!
+        assertNotEquals(a.company, b.company)
+        assertNotEquals("HRISG_${compact(idB)}", second.deviceId)
+        val token = success(a.groupBootstrap(idA)).tokens.accessToken
+        val stored = a.credential(idA)
+        var consumed = 0
+        val provider =
+            object :
+                CollaborationMatrixKeyRepository by DisabledCollaborationMatrixKeyRepository() {
+                override fun deviceKeys(
+                    request: CollaborationMatrixKeyQuery,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyQueryResult> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(stored.accessToken, token)
+                    assertTrue(deadline > Instant.now())
+                    val materials = listOf(first, second).associateBy { it.userId }
+                    return Result.Success(
+                        CollaborationMatrixKeyQueryResult(
+                            request.devices.mapValues { (user, ids) ->
+                                val key = materials.getValue(user)
+                                assertEquals(listOf(key.deviceId), ids)
+                                mapOf(key.deviceId to key.device)
+                            }
+                        )
+                    )
+                }
+
+                override fun claimKeys(
+                    request: CollaborationMatrixKeyClaim,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyClaimResult> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(stored.accessToken, token)
+                    assertTrue(deadline > Instant.now())
+                    consumed++
+                    assertEquals(
+                        mapOf(second.userId to mapOf(second.deviceId to "signed_curve25519")),
+                        request.oneTimeKeys,
+                    )
+                    return Result.Success(
+                        CollaborationMatrixKeyClaimResult(
+                            mapOf(
+                                second.userId to
+                                    mapOf(
+                                        second.deviceId to
+                                            mapOf("signed_curve25519:old" to second.signed())
+                                    )
+                            )
+                        )
+                    )
+                }
+            }
+        val command =
+            a.groupAccess(DisabledCollaborationMatrixRepository(), providerKeys = provider)
+        val wrongAlias = "@hrisg_${compact(space)}_${compact(b.account)}:$server"
+        val query =
+            CollaborationMatrixKeyQuery(
+                mapOf(
+                    first.userId to emptyList(),
+                    second.userId to emptyList(),
+                    wrongAlias to emptyList(),
+                )
+            )
+        fun read() = success(command.queryKeys(token, UUID.randomUUID(), query))
+        val priorA = a.originalSnapshot()
+        val priorB = b.originalSnapshot()
+        val expected = read()
+        assertEquals(first.device, expected.deviceKeys[first.userId]?.get(first.deviceId))
+        assertEquals(second.device, expected.deviceKeys[second.userId]?.get(second.deviceId))
+        assertTrue(expected.deviceKeys.getValue(wrongAlias).isEmpty())
+        owner.update(
+            "insert into company_memberships(company_id,account_id) values(?,?)",
+            a.company,
+            b.account,
+        )
+        owner.update(
+            "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+            a.company,
+            b.account,
+        )
+        owner.update("update companies set active=false where id=?", b.company)
+        b.expireProvider(idB)
+        owner.update(
+            "update native_sessions set access_expires_at=clock_timestamp()-interval '1 second' where id=?",
+            b.session,
+        )
+        assertEquals(expected, read())
+        val claim =
+            success(
+                command.claimKeys(
+                    token,
+                    UUID.randomUUID(),
+                    CollaborationMatrixKeyClaim(
+                        mapOf(second.userId to mapOf(second.deviceId to "signed_curve25519"))
+                    ),
+                )
+            )
+        assertEquals(1, claim.oneTimeKeys.getValue(second.userId).getValue(second.deviceId).size)
+        assertEquals(1, consumed)
+        assertEquals(priorA, a.originalSnapshot())
+        assertEquals(priorB, b.originalSnapshot())
+        owner.update("delete from native_sessions where id=?", b.session)
+        assertTrue(read().deviceKeys.getValue(second.userId).isEmpty())
+        assertEquals(priorB, b.originalSnapshot())
+    }
+
     private fun completeRoomDevice(f: Fixture, original: CollaborationLegacyDevicePosition): UUID {
         f.gateway(original)
         val id = f.register(original)
@@ -3048,6 +3263,9 @@ class CollaborationSpaceWorkerPublicationTest {
                 StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(sql)),
                 providerKeys,
                 journal,
+                StoredCollaborationSpaceRecipientRepository(
+                    PostgresCollaborationSpaceRecipientDataSource(sql)
+                ),
             )
         }
 

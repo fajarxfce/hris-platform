@@ -597,6 +597,9 @@ class NativeCollaborationSpaceKeyUploadTest {
                 keys,
                 providerKeys,
                 journal,
+                StoredCollaborationSpaceRecipientRepository(
+                    PostgresCollaborationSpaceRecipientDataSource(base.sql)
+                ),
             )
 
         fun upload(

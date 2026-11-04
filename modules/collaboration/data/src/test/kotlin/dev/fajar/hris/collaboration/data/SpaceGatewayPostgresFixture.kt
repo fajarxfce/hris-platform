@@ -118,7 +118,7 @@ internal class SpaceGatewayPostgresFixture(
         )
     }
 
-    fun migrate() {
+    fun migrate(beforeQueue: () -> Unit = {}) {
         Flyway.configure().dataSource(source).target("121").load().migrate()
         // An already-active SPACE device from before the queue migration is valid input.
         // Preserve its original provider/native coordinates through the later migrations.
@@ -138,6 +138,7 @@ internal class SpaceGatewayPostgresFixture(
             "update collaboration_space_devices set state='ACTIVE',version=1 where id=?",
             device,
         )
+        beforeQueue()
         Flyway.configure().dataSource(source).target("125").load().migrate()
         val retained = owner.queryForList("select * from collaboration_space_devices")
         Flyway.configure().dataSource(source).target("126").load().migrate()

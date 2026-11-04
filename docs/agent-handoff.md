@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Scoped recipient query and claim accepted — 4 November 2026
+
+Group Matrix key query and claim now enforce current native, device and gateway
+access through the V135 recipient projection. Requested aliases retain their original
+Matrix IDs. Sorted account guards precede native/device guards; bounded recipient
+observations are checked around every provider outcome. Queries include pending key
+publication. Claims verify confirmed signed identities before consuming one-time or
+fallback keys. Changed recipients return HTTP 503 so clients can retry.
+[Protocol](collaboration/space-recipient-key-exchange.md),
+[evidence](measurements/collaboration-space-recipient-key-exchange-2026-11-04.json).
+
+Validation passed: 121 policy tests (44.187 s), 29 gateway tests (384.642 s),
+32 retained-device tests (263.747 s), 137 actual API tests (203.967 s), and the full
+worker suite (138 tests in 386.225 s; 137 passed and one existing optional test skipped).
+Quality checks pass. Final API and worker gates used 8,429 identical unchanged inputs.
+Two initial HTTP test setup failures were corrected without production changes; the
+evidence records both attempts and source continuity. Coverage includes cross-company
+PostgreSQL access, offline recipients, publication races, revocation on success and
+failure, cancellation, original LEGACY IDs, actual Synapse keys and restart behavior.
+All gate sessions are closed.
+
+NEXT: fixed group to-device transport, room content/sync/push and full Mobile SDK
+adoption. Preserve confirmed current targets, detached signed sender/recipient keys,
+original transaction IDs and the original SDK device namespace. Synapse transaction
+caching does not guarantee deduplication across provider restart; SDK uncertain-send
+and duplicate handling still need acceptance. Native hard-parent replacement and
+retention of the original passphrase, keys and history remain required. Shared DI
+changes require actual API and full worker gates. Ignored to-device drafts are
+unapplied; committed source and this protocol are authoritative.
+
+Base `6fd2819f` and peer handoffs Main `853cb440` / Mobile `8e50c470` are pushed.
+Group rollout stays disabled and all 54 PRD acceptance groups remain open. Live
+`8b40` / schema 116 (push on, SMTP off), normal phone release 28, Mobile product and
+hosted checks `0b804cb2`, and Starter `9959c1d` remain unchanged. Continue the long run,
+regular updates, atomic pushes and validated product feature installs.
+
 ## Current receiving-device projection accepted — 4 November 2026
 
 V135 provides a minimal read-only public-key candidate view for current organization

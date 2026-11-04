@@ -233,7 +233,9 @@
         "space-room-worker.md",
         "../measurements/collaboration-space-room-worker-2026-11-04.json",
         "space-key-recipients.md",
-        "../measurements/collaboration-space-key-recipients-2026-11-04.json"
+        "../measurements/collaboration-space-key-recipients-2026-11-04.json",
+        "space-recipient-key-exchange.md",
+        "../measurements/collaboration-space-recipient-key-exchange-2026-11-04.json"
       ]
     },
     {
@@ -301,7 +303,9 @@
         "space-room-worker.md",
         "../measurements/collaboration-space-room-worker-2026-11-04.json",
         "space-key-recipients.md",
-        "../measurements/collaboration-space-key-recipients-2026-11-04.json"
+        "../measurements/collaboration-space-key-recipients-2026-11-04.json",
+        "space-recipient-key-exchange.md",
+        "../measurements/collaboration-space-recipient-key-exchange-2026-11-04.json"
       ]
     },
     {

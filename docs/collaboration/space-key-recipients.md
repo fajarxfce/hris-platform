@@ -49,8 +49,8 @@ provenance. The typed path has actual PostgreSQL coverage plus bounded/malformed
 acquisition and cancellation tests. Exact results and source continuity are recorded in the
 [acceptance measurement](../measurements/collaboration-space-key-recipients-2026-11-04.json).
 
-This storage does not expose a Matrix key endpoint. Gateway queries/claims/to-device
-must still lock the required accounts before native/device guards and revalidate
-current caller, selected recipient set and room authority around every provider
-outcome. Recipient key signatures, content/sync/push and full Mobile SDK adoption
-remain separate required work; group rollout stays disabled.
+The [fixed key query/claim consumers](space-recipient-key-exchange.md) now lock required
+accounts before native/device guards and revalidate current caller, selected recipients
+and exact slot around every provider outcome. They verify detached signed identities;
+claims require acknowledgement before consumption. To-device/content/sync/push and
+full Mobile SDK adoption remain required; group rollout stays disabled.

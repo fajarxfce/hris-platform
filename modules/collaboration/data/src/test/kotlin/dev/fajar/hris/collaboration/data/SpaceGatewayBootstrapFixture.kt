@@ -21,8 +21,11 @@ import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy
 import org.testcontainers.postgresql.PostgreSQLContainer
 import tools.jackson.databind.ObjectMapper
 
-internal class SpaceGatewayBootstrapFixture(postgres: PostgreSQLContainer) {
-    val storage = SpaceGatewayPostgresFixture(postgres, ageSeconds = 120).also { it.migrate() }
+internal class SpaceGatewayBootstrapFixture(
+    postgres: PostgreSQLContainer,
+    val storage: SpaceGatewayPostgresFixture =
+        SpaceGatewayPostgresFixture(postgres, ageSeconds = 120).also { it.migrate() },
+) {
     val clock = SpaceGatewayClock(storage.at.plusSeconds(10))
     val client = ClientVersion(ClientPlatform.ANDROID, 5)
     val sql = DSL.using(TransactionAwareDataSourceProxy(storage.runtimeSource), SQLDialect.POSTGRES)

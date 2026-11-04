@@ -919,6 +919,15 @@ class CollaborationConfiguration {
     ): CollaborationSpaceKeyRepository = StoredCollaborationSpaceKeyRepository(source)
 
     @Bean
+    fun collaborationSpaceRecipientSource(sql: DSLContext): CollaborationSpaceRecipientDataSource =
+        PostgresCollaborationSpaceRecipientDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceRecipients(
+        source: CollaborationSpaceRecipientDataSource
+    ): CollaborationSpaceRecipientRepository = StoredCollaborationSpaceRecipientRepository(source)
+
+    @Bean
     fun accessNativeCollaborationSpaceMatrixDevice(
         gateway: CollaborationSpaceGatewaySessionRepository,
         requests: CollaborationSpaceRequestRepository,
@@ -940,6 +949,7 @@ class CollaborationConfiguration {
         keys: CollaborationSpaceKeyRepository,
         providerKeys: CollaborationMatrixKeyRepository,
         journal: ChangeJournalRepository,
+        recipients: CollaborationSpaceRecipientRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -962,6 +972,7 @@ class CollaborationConfiguration {
             keys,
             providerKeys,
             journal,
+            recipients,
         )
 
     @Bean

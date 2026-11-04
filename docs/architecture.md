@@ -153,7 +153,12 @@ verified room pairs gate peers; native hard authority gates receiving independen
 of short provider/access expiry. Completed LEGACY devices retain their original
 Matrix coordinates and fingerprint. Typed acquisition is bounded to 100 accounts,
 500 devices and five per account, with overflow rejection and safe error mapping.
-Key endpoint consumers still own current admission and signed provider verification.
+The [fixed group key endpoints](collaboration/space-recipient-key-exchange.md) now
+own current caller/recipient admission and detached signed provider verification.
+Sorted account guards precede native/device/gateway/request locks. Queries preserve
+pending publication races; claims verify confirmed identities before OTK consumption.
+Every provider outcome rechecks the exact selected set and original lease/deadline.
+To-device/content/sync/push and full Mobile adoption remain separate work.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

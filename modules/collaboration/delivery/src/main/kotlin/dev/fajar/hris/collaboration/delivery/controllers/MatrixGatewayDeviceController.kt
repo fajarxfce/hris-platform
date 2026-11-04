@@ -125,45 +125,51 @@ class MatrixGatewayDeviceController(
     @PostMapping("/_matrix/client/v3/keys/query")
     fun query(request: HttpServletRequest): ResponseEntity<Any> =
         keyRequest(request, ::matrixKeyQueryRequest) { token, correlation, query ->
-            device.queryKeys(token, correlation, query).map { result ->
-                mapOf(
-                    "failures" to emptyMap<String, Any>(),
-                    "device_keys" to
-                        result.deviceKeys.mapValues { (_, devices) ->
-                            devices.mapValues { (_, key) ->
-                                mapOf(
-                                    "user_id" to key.userId,
-                                    "device_id" to key.deviceId,
-                                    "algorithms" to key.algorithms,
-                                    "keys" to key.keys,
-                                    "signatures" to key.signatures,
-                                )
-                            }
-                        },
-                )
-            }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.queryKeys(token, correlation, query)
+                else device.queryKeys(token, correlation, query))
+                .map { result ->
+                    mapOf(
+                        "failures" to emptyMap<String, Any>(),
+                        "device_keys" to
+                            result.deviceKeys.mapValues { (_, devices) ->
+                                devices.mapValues { (_, key) ->
+                                    mapOf(
+                                        "user_id" to key.userId,
+                                        "device_id" to key.deviceId,
+                                        "algorithms" to key.algorithms,
+                                        "keys" to key.keys,
+                                        "signatures" to key.signatures,
+                                    )
+                                }
+                            },
+                    )
+                }
         }
 
     @PostMapping("/_matrix/client/v3/keys/claim")
     fun claim(request: HttpServletRequest): ResponseEntity<Any> =
         keyRequest(request, ::matrixKeyClaimRequest) { token, correlation, claim ->
-            device.claimKeys(token, correlation, claim).map { result ->
-                mapOf(
-                    "failures" to emptyMap<String, Any>(),
-                    "one_time_keys" to
-                        result.oneTimeKeys.mapValues { (_, devices) ->
-                            devices.mapValues { (_, keys) ->
-                                keys.mapValues { (_, key) ->
-                                    buildMap<String, Any> {
-                                        put("key", key.key)
-                                        put("signatures", key.signatures)
-                                        key.fallback?.let { put("fallback", it) }
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.claimKeys(token, correlation, claim)
+                else device.claimKeys(token, correlation, claim))
+                .map { result ->
+                    mapOf(
+                        "failures" to emptyMap<String, Any>(),
+                        "one_time_keys" to
+                            result.oneTimeKeys.mapValues { (_, devices) ->
+                                devices.mapValues { (_, keys) ->
+                                    keys.mapValues { (_, key) ->
+                                        buildMap<String, Any> {
+                                            put("key", key.key)
+                                            put("signatures", key.signatures)
+                                            key.fallback?.let { put("fallback", it) }
+                                        }
                                     }
                                 }
-                            }
-                        },
-                )
-            }
+                            },
+                    )
+                }
         }
 
     @PutMapping("/_matrix/client/v3/sendToDevice/m.room.encrypted/{transactionId}")

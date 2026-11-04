@@ -61,7 +61,8 @@ protocol dispatch. Shared module DI requires actual API and full worker validati
 records exact outcomes, source/report hashes, actual provider/HTTP cases and
 reproduction commands.
 
-Next complete group room/member authority and original-room inventory, then
-recipient queries/content/sync and Mobile adoption.
+Room preparation and [recipient query/claim](space-recipient-key-exchange.md) are now
+implemented separately. Next complete encrypted to-device/content/sync/push and Mobile
+adoption.
 Keep original SDK namespaces, passphrases, owned history and uncertain sends. All54
 communications acceptance groups remain open; no product rollout is implied here.

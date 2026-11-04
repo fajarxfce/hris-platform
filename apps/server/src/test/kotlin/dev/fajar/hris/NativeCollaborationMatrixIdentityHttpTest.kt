@@ -2,8 +2,12 @@ package dev.fajar.hris
 
 import com.sun.net.httpserver.HttpServer
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
+import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceKeyPublication
 import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceKeyRepository
+import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.domain.Result
+import dev.fajar.hris.core.domain.TransactionRunner
 import java.net.InetSocketAddress
 import java.net.URI
 import java.net.http.*
@@ -19,6 +23,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
@@ -43,6 +48,8 @@ import tools.jackson.databind.json.JsonMapper
 )
 class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture() {
     private val ownedParents = mutableSetOf<UUID>()
+    @Autowired private lateinit var groupKeyTransactions: TransactionRunner
+    @Autowired private lateinit var groupKeyPublications: CollaborationSpaceKeyRepository
 
     @BeforeEach
     fun alignProtocolClockWithCurrentDatabaseTime() {
@@ -479,7 +486,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     @Test
-    fun groupKeyUploadUsesOriginalIdentityAndStrictUploadOnlyDispatch() {
+    fun groupKeyUploadUsesOriginalIdentityAndStrictGroupKeyDispatch() {
         val n = native()
         val (device, token) = enrollGroup(n)
         val row =
@@ -543,7 +550,11 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 ),
                 path = "query",
             )
-        assertEquals(401, query.statusCode(), query.body())
+        assertEquals(200, query.statusCode(), query.body())
+        assertEquals(
+            json.valueToTree(key.body()["device_keys"]),
+            json.readTree(query.body())["device_keys"][key.user][key.device],
+        )
         assertEquals(
             0,
             database()
@@ -604,6 +615,248 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         } finally {
             provider.onKeyUpload.set(null)
         }
+    }
+
+    @Test
+    fun groupKeyQueryAndClaimUseStrictOpaqueAuthorityAndOriginalSignedFields() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val key = groupFixtureKeys(device)
+        val queryBody =
+            json.writeValueAsString(mapOf("device_keys" to mapOf(key.user to emptyList<String>())))
+        val claimBody =
+            json.writeValueAsString(
+                mapOf(
+                    "one_time_keys" to mapOf(key.user to mapOf(key.device to "signed_curve25519"))
+                )
+            )
+        val beforeQueries = provider.keyQueries.get()
+        val beforeClaims = provider.keyClaims.get()
+        for (path in listOf("query", "claim")) {
+            val body = if (path == "query") queryBody else claimBody
+            // Invalid tokens enter company dispatch; isolate authentication with a shape valid
+            // in both namespaces. Group device IDs remain intentionally invalid in company claims.
+            val credentialBody =
+                if (path == "claim")
+                    body.replace(
+                        key.device,
+                        "HRIS_" + UUID.randomUUID().toString().replace("-", ""),
+                    )
+                else body
+            for (credential in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+                401,
+                uploadKeys(n, credential, credentialBody, path = path).statusCode(),
+            )
+            assertEquals(
+                401,
+                uploadKeys(n, token, body, duplicate = true, path = path).statusCode(),
+            )
+            assertEquals(400, uploadKeys(n, token, body + "{}", path = path).statusCode())
+            assertEquals(
+                400,
+                uploadKeys(n, token, body, suffix = "?access_token=forbidden", path = path)
+                    .statusCode(),
+            )
+            assertEquals(
+                413,
+                uploadKeys(n, token, " ".repeat(65537), chunked = true, path = path).statusCode(),
+            )
+        }
+        assertEquals(400, uploadKeys(n, n.access, claimBody, path = "claim").statusCode())
+        assertEquals(beforeQueries, provider.keyQueries.get())
+        assertEquals(beforeClaims, provider.keyClaims.get())
+        val pending = uploadKeys(n, token, claimBody, path = "claim")
+        assertEquals(200, pending.statusCode(), pending.body())
+        assertTrue(json.readTree(pending.body())["one_time_keys"][key.user].isEmpty)
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        val wrongAlias =
+            "@hris_${UUID.randomUUID().toString().replace("-","")}_${n.fixture.account.toString().replace("-","")}:matrix.example.test"
+        val mixed =
+            json.writeValueAsString(
+                mapOf(
+                    "device_keys" to
+                        mapOf(key.user to emptyList<String>(), wrongAlias to emptyList<String>())
+                )
+            )
+        val queried = uploadKeys(n, token, mixed, chunked = true, path = "query")
+        assertEquals(200, queried.statusCode(), queried.body())
+        val data = json.readTree(queried.body())
+        assertEquals(setOf("failures", "device_keys"), data.propertyNames().toSet())
+        assertEquals(
+            json.valueToTree(key.body()["device_keys"]),
+            data["device_keys"][key.user][key.device],
+        )
+        assertTrue(data["device_keys"][wrongAlias].isEmpty)
+        assertEquals("no-store", queried.headers().firstValue("Cache-Control").orElse(""))
+        val claimed = uploadKeys(n, token, claimBody, chunked = true, path = "claim")
+        assertEquals(200, claimed.statusCode(), claimed.body())
+        assertEquals(
+            json.valueToTree(key.body()["one_time_keys"]),
+            json.readTree(claimed.body())["one_time_keys"][key.user][key.device],
+        )
+        assertEquals("no-store", claimed.headers().firstValue("Cache-Control").orElse(""))
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupKeyDiscoveryReturnsRetryWhenPublicationChangesAndPendingCannotClaim() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        val key = groupFixtureKeys(device)
+        val signed =
+            matrixKeyUploadRequest(json.readTree(json.writeValueAsString(key.body()))).deviceKeys!!
+        val fingerprint =
+            (validateCollaborationDeviceKeys(signed, key.user, key.device) as Result.Success).value
+        val scope = Actor(n.fixture.account, null, emptySet(), clock.instant(), UUID.randomUUID())
+        val reservation =
+            CollaborationSpaceKeyPublication(
+                database()
+                    .queryForObject(
+                        "select space_id from collaboration_space_devices where id=?",
+                        UUID::class.java,
+                        device,
+                    )!!,
+                n.fixture.account,
+                device,
+                n.session,
+                key.user,
+                key.device,
+                fingerprint,
+                0,
+                clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS),
+            )
+        assertInstanceOf(
+            Result.Success::class.java,
+            groupKeyTransactions.run(scope) { groupKeyPublications.reserve(reservation) },
+        )
+        provider.putDeviceKeys(key)
+        val pending = queryFixtureKeys(n, token, key)
+        assertEquals(200, pending.statusCode(), pending.body())
+        assertEquals(
+            json.valueToTree(key.body()["device_keys"]),
+            json.readTree(pending.body())["device_keys"][key.user][key.device],
+        )
+        val count = provider.keyClaims.get()
+        val claim =
+            json.writeValueAsString(
+                mapOf(
+                    "one_time_keys" to mapOf(key.user to mapOf(key.device to "signed_curve25519"))
+                )
+            )
+        val unconfirmed = uploadKeys(n, token, claim, path = "claim")
+        assertEquals(200, unconfirmed.statusCode(), unconfirmed.body())
+        assertTrue(json.readTree(unconfirmed.body())["one_time_keys"][key.user].isEmpty)
+        assertEquals(count, provider.keyClaims.get())
+        provider.onKeyQuery.set {
+            assertInstanceOf(
+                Result.Success::class.java,
+                groupKeyTransactions.run(scope) {
+                    groupKeyPublications.publish(
+                        reservation,
+                        clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS),
+                    )
+                },
+            )
+        }
+        try {
+            val changed = queryFixtureKeys(n, token, key)
+            assertEquals(503, changed.statusCode(), changed.body())
+            assertEquals(
+                "collaboration_recipients_changed",
+                json.readTree(changed.body())["org.hris.error_code"].asString(),
+            )
+            assertEquals("no-store", changed.headers().firstValue("Cache-Control").orElse(""))
+            assertFalse(changed.body().contains(fingerprint))
+            assertEquals(200, queryFixtureKeys(n, token, key).statusCode())
+        } finally {
+            provider.onKeyQuery.set(null)
+        }
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun groupQueryAndClaimWithholdSignedResultsAfterNativeRevocation() {
+        for (path in listOf("query", "claim")) {
+            val n = native()
+            val (device, token) = enrollGroup(n)
+            val key = groupFixtureKeys(device)
+            assertEquals(
+                200,
+                uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode(),
+            )
+            val hook = if (path == "query") provider.onKeyQuery else provider.onKeyClaim
+            hook.set {
+                database()
+                    .update(
+                        "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                        n.session,
+                    )
+            }
+            try {
+                val body =
+                    if (path == "query")
+                        mapOf("device_keys" to mapOf(key.user to emptyList<String>()))
+                    else
+                        mapOf(
+                            "one_time_keys" to
+                                mapOf(key.user to mapOf(key.device to "signed_curve25519"))
+                        )
+                val response = uploadKeys(n, token, json.writeValueAsString(body), path = path)
+                assertEquals(401, response.statusCode(), response.body())
+                assertEquals(
+                    "M_UNKNOWN_TOKEN",
+                    json.readTree(response.body())["errcode"].asString(),
+                )
+                assertFalse(response.body().contains(key.user))
+                assertFalse(response.body().contains(token))
+                assertEquals(
+                    1L,
+                    database()
+                        .queryForObject(
+                            "select version from collaboration_space_key_publications where device_id=?",
+                            Long::class.java,
+                            device,
+                        ),
+                )
+                assertEquals(
+                    0,
+                    database()
+                        .queryForObject(
+                            "select count(*) from collaboration_space_request_leases where device_id=?",
+                            Int::class.java,
+                            device,
+                        ),
+                )
+            } finally {
+                hook.set(null)
+            }
+        }
+    }
+
+    private fun groupFixtureKeys(device: UUID): KeyPayload {
+        val row =
+            database()
+                .queryForMap(
+                    "select matrix_user_id,matrix_device_id from collaboration_space_devices where id=?",
+                    device,
+                )
+        return KeyPayload(row["matrix_user_id"] as String, row["matrix_device_id"] as String)
     }
 
     private fun groupNativeCall(

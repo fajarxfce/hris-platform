@@ -1,5 +1,24 @@
 # Agent continuation — HRIS workspace
 
+## Group request ownership accepted — 4 November 2026
+
+Group branch is pushed through [88d20851](https://github.com/fajarxfce/hris-platform/commit/88d20851).
+V127 and typed storage bound each group device to seven ordinary gateway requests
+and one reserved provider-renewal request. Exact release preserves a successor;
+expired cleanup retains device/key provenance after offboarding or native purge.
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/88d20851/docs/measurements/collaboration-space-request-storage-2026-11-04.json):
+six focused PostgreSQL cases PASS92.446s, then all76 database plus five typed-data
+cases PASS679.944s on8,333 unchanged inputs, format/architecture and17 recovery tests.
+The initial test-only JDBC nullability compile correction is recorded.
+
+Next wire explicit native provider renewal, current gateway request authority and
+bounded request/replay maintenance, then rooms and Mobile handover/adoption. The
+storage increment grants no access and adds no DI, provider exchange or rollout.
+Mobile766572b6/accepted code0b804cb2, phone release28/live8b40/schema116 pushON/SMTPOFF
+and Starter9959c1d stay unchanged. All54 groups remain open. Continue the full long
+run, frequent updates, atomic immediate pushes and validated product feature installs.
+Implementation remains in the group worktree; this peer checkpoint is documentation.
+
 ## Group gateway native transport accepted — 4 November 2026
 
 Group branch is pushed through [272b66b5](https://github.com/fajarxfce/hris-platform/commit/272b66b5).

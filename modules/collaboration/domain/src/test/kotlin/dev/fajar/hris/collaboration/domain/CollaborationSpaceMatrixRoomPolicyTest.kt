@@ -136,6 +136,82 @@ class CollaborationSpaceMatrixRoomPolicyTest {
         assertFalse(validCollaborationSpaceRoomRequest(request, "invalid/server"))
     }
 
+    @Test
+    fun recoveringPeerRetainsActualCreatorAndRequiresItsOwnJoinedMembership() {
+        val recovering =
+            request.copy(
+                creatorAccountId = request.peerAccountId,
+                peerAccountId = request.creatorAccountId,
+                creatorUserId = request.peerUserId,
+                peerUserId = request.creatorUserId,
+            )
+        val joined =
+            observed()
+                .copy(
+                    members = mapOf(request.creatorUserId to "join", request.peerUserId to "join")
+                )
+        assertEquals(
+            Result.Success(
+                CollaborationSpaceRoomAssessment(
+                    creator,
+                    CollaborationMatrixRoomRepair(emptySet(), false),
+                )
+            ),
+            assessCollaborationSpaceRecoveredRoom(recovering, joined, server),
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            assessCollaborationSpaceRecoveredRoom(recovering, observed(), server),
+        )
+        for (invalid in
+            listOf(
+                joined.copy(creator = "@foreign:$server"),
+                joined.copy(marker = null),
+                joined.copy(members = joined.members + ("@foreign:$server" to "join")),
+                joined.copy(power = collaborationDirectRoomPower().copy(invite = 0)),
+            )) {
+            assertInstanceOf(
+                Result.Failed::class.java,
+                assessCollaborationSpaceRecoveredRoom(recovering, invalid, server),
+            )
+        }
+    }
+
+    @Test
+    fun missingInitialStateCannotBeRepairedByImpersonatingTheOtherCreator() {
+        val partial =
+            observed()
+                .copy(
+                    encryptionAlgorithm = null,
+                    members = mapOf(request.creatorUserId to "join", request.peerUserId to "join"),
+                )
+        assertEquals(
+            Result.Success(
+                CollaborationSpaceRoomAssessment(
+                    creator,
+                    CollaborationMatrixRoomRepair(
+                        setOf(CollaborationMatrixRoomSetting.ENCRYPTION),
+                        false,
+                    ),
+                )
+            ),
+            assessCollaborationSpaceRecoveredRoom(request, partial, server),
+        )
+        val recovering =
+            request.copy(
+                creatorAccountId = request.peerAccountId,
+                peerAccountId = request.creatorAccountId,
+                creatorUserId = request.peerUserId,
+                peerUserId = request.creatorUserId,
+            )
+        val rejected = assessCollaborationSpaceRecoveredRoom(recovering, partial, server)
+        assertInstanceOf(Result.Failed::class.java, rejected)
+        assertEquals(
+            "collaboration_room_recovery_requires_creator",
+            (rejected as Result.Failed).failure.code,
+        )
+    }
+
     private fun observed() =
         CollaborationSpaceMatrixRoomObservation(
             request.creatorUserId,

@@ -132,6 +132,7 @@ class CollaborationSpaceMatrixRoomRepositoryTest {
                 { f.repo.create(f.request, f.token, f.deadline) },
                 { f.repo.resolve(f.request, f.token, f.deadline) },
                 { f.repo.observe(f.raw.id, f.token, f.deadline) },
+                { f.repo.join(f.raw.id, f.token, f.deadline) },
                 { f.repo.invitePeer(f.raw.id, f.request, f.token, f.deadline) },
                 {
                     f.repo.putInitialSetting(
@@ -188,11 +189,46 @@ class CollaborationSpaceMatrixRoomRepositoryTest {
         assertEquals(0, f.raw.calls)
     }
 
+    @Test
+    fun joiningRequiresExactRoomReadbackAndPreservesCancellation() {
+        val f = Fixture()
+        assertEquals(Result.Success(Unit), f.repo.join(f.raw.id, f.token, f.deadline))
+        for (invalid in
+            listOf(
+                f.json.createObjectNode(),
+                f.json.createObjectNode().put("room_id", "!other:matrix.example.test"),
+                f.json.createObjectNode().put("room_id", 123),
+                f.json.createArrayNode(),
+            )) {
+            f.raw.joinResponse = invalid
+            assertInstanceOf(Result.Failed::class.java, f.repo.join(f.raw.id, f.token, f.deadline))
+        }
+        val calls = f.raw.calls
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.repo.join("!invalid room", f.token, f.deadline),
+        )
+        assertEquals(calls, f.raw.calls)
+        f.raw.failure = "cancel"
+        assertThrows(CancellationException::class.java) {
+            f.repo.join(f.raw.id, f.token, f.deadline)
+        }
+        f.raw.failure = "interrupt"
+        try {
+            assertThrows(InterruptedException::class.java) {
+                f.repo.join(f.raw.id, f.token, f.deadline)
+            }
+        } finally {
+            Thread.interrupted()
+        }
+    }
+
     private class Raw : MatrixRoomDataSource {
         var id = "!owned:matrix.example.test"
         var alias: String? = null
         var invited: String? = null
         var body: Map<String, Any>? = null
+        var joinResponse: JsonNode? = null
         var events = emptyList<MatrixRoomStateEventData>()
         var failure: String? = null
         var calls = 0
@@ -220,6 +256,12 @@ class CollaborationSpaceMatrixRoomRepositoryTest {
             acquire()
             this.body = body
             return MatrixRoomCreateData.Created(id)
+        }
+
+        override fun join(roomId: String, token: String, deadline: Instant): JsonNode {
+            acquire()
+            return joinResponse
+                ?: JsonMapper.builder().build().createObjectNode().put("room_id", roomId)
         }
 
         override fun roomState(

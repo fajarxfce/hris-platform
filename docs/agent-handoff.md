@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Provider peer recovery accepted — 4 November 2026
+
+Typed join requires exact room-ID readback. Recovered SPACE room assessment retains
+actual immutable creator from the exact canonical pair, requires the current caller
+to be joined, and applies strict marker/member/encryption/version/power checks. Only
+the actual creator may repair missing initial settings or invite. No other account
+is impersonated. LEGACY continues to require its exact original creator and state.
+[Protocol](collaboration/space-room-provider.md),
+[evidence](measurements/collaboration-space-peer-provider-2026-11-04.json): all 105 domain,
+five provider mapping and four actual Synapse cases pass in 83.55 seconds, plus quality
+checks on 8,398 unchanged inputs. Actual first-creator/second-recoverer lost response,
+same alias, own second token and both original signed keys survive provider restart.
+All sessions closed. No SDK-message, worker or rollout claim follows from these checks.
+
+NEXT bounded room worker. V127 request slots currently require gateway coordinates
+for slots 1..7 and reserve slot zero for provider renewal. Add an explicit room-control
+kind sharing slots 1..7 with current own native/device proof; never fabricate gateway
+coordinates or consume the renewal slot. Preserve expiry, exact release, cancellation,
+RLS and cleanup. Then claim/advance/settle, current admission around every external
+outcome, atomic binding/success/journal and actual PostgreSQL/Synapse/worker tests.
+Provider/policy/join drafts are now APPLIED/STALE. Worker design remains unapplied.
+Shared DI changes require actual API and FULL worker context gates. Then recipient
+keys/content/sync/push, offline keys/native hard-parent replacement and full Mobile
+adoption preserving SDK namespace/passphrase, keys/history and uncertain sends.
+
+V133/native API checkpoint a0653dcf is pushed; peer handoffs Main cdda9cc0 and Mobile
+07032335 are pushed. Group disabled and all 54 PRD groups open. Live 8b40/schema 116
+push ON/SMTP OFF, normal phone 28, Mobile product/hosted 0b804cb2 and Starter 9959c1d
+unchanged. Continue long run, updates, atomic pushes and validated product APK installs.
+
 ## Participant-owned room preparation and native API accepted — 4 November 2026
 
 V133 retains separate private preparation heads for the exact two participants and

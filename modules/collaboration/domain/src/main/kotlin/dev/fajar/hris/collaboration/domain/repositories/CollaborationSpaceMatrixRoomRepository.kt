@@ -17,6 +17,8 @@ interface CollaborationSpaceMatrixRoomRepository {
         deadline: Instant,
     ): Result<CollaborationMatrixRoomCreation>
 
+    fun join(roomId: String, token: String, deadline: Instant): Result<Unit>
+
     fun observe(
         roomId: String,
         token: String,

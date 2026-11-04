@@ -73,6 +73,14 @@ class InternalCollaborationSpaceMatrixRoomRepository(
         }
     }
 
+    override fun join(roomId: String, token: String, deadline: Instant): Result<Unit> =
+        safeMatrixProviderCall {
+            require(validCollaborationSpaceRoomId(roomId))
+            val response = client.join(roomId, token, deadline)
+            if (!response.isObject || text(response, "room_id") != roomId)
+                throw MatrixResponseException()
+        }
+
     override fun observe(
         roomId: String,
         token: String,

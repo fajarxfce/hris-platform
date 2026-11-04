@@ -134,8 +134,11 @@ explicit canonical Matrix users and a distinct immutable organization alias/mark
 It shares raw provider I/O and fixed settings, while preserving separate company/group
 request and observation types. Provider state assessment rejects foreign membership
 or conflicting state and permits only missing initial settings on a matching candidate.
-No durable room grant follows from resolution or creation alone; current group-owned
-request/publication and original-room adoption remain required integration.
+Typed join requires exact room readback; recovered-room assessment retains the actual
+canonical creator and requires the caller to have joined. Only the actual creator
+may repair absent initial settings. Actual own-peer recovery, same alias and original
+keys survive Synapse restart. No durable room grant follows from provider success:
+the bounded room worker must still perform current admission and atomic publication.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.
 

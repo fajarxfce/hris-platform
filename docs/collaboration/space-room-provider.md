@@ -1,5 +1,31 @@
 # Group Matrix room protocol
 
+## Current recovery contract
+
+Either admitted participant may recover the immutable SPACE intent's stable alias
+using its own provider credentials. Typed `join` validates the candidate and requires
+exact `room_id` readback. It grants no authority by itself. After joining, recovered
+room assessment requires the caller's joined membership and retains the actual
+`m.room.create` sender, which must be one of the exact two canonical participants.
+The strict room policy is oriented to that creator. A different participant cannot
+repair missing initial settings or invitation; it gets a stable conflict instead.
+Healthy recovered state has no pending repair before binding publication.
+
+[Current evidence](../measurements/collaboration-space-peer-provider-2026-11-04.json):
+105 domain, five repository and four actual Synapse cases pass in 83.55 seconds with
+quality checks and 8,398 unchanged inputs. The first participant creates but loses
+the response; the second resolves and joins the same room with its own credentials.
+Actual creator, same alias and both original signed device keys survive restart.
+These are protocol/key checks; encrypted SDK-message acceptance remains separate.
+
+[V131–V133 storage](space-room-lifecycle.md), [V132 routing](original-pair-routing.md)
+and [native HTTP](native-space-room.md) now pin both participants, exact original or
+SPACE intent and atomic binding/success. The room worker is still required to admit
+current authority around every provider outcome. V127 has no room-control slot kind;
+add a bounded kind sharing slots 1..7 without fabricating gateway coordinates or using
+renewal slot zero. Recipient content/sync/push and Mobile integration remain disabled.
+Earlier sections below record the original adapter and verification checkpoints.
+
 Group rooms carry an explicit organization space, conversation, creator/peer account
 IDs and both canonical Matrix user IDs. User IDs may retain different original
 companies or use the new organization namespace. The provider adapter never derives

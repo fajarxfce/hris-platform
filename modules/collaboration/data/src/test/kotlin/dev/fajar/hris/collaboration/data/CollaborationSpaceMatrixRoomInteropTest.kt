@@ -486,6 +486,192 @@ class CollaborationSpaceMatrixRoomInteropTest {
         }
     }
 
+    @Test
+    fun anotherRetainedParticipantRecoversLostCreateWithItsOwnTokenAndOriginalKeys() {
+        MatrixProviderFixture("10m").use { f ->
+            f.start()
+            fun raw() = HttpMatrixClientDataSource(f.client, f.config, f.clock)
+            fun deadline() = f.clock.instant().plusSeconds(20)
+            val firstOriginal = f.login()
+            val secondAccount = UUID.randomUUID()
+            val secondCompany = UUID.randomUUID()
+            val secondDevice = UUID.randomUUID()
+            val originalAt = f.clock.instant()
+            val secondOriginal =
+                success(
+                    f.repository.login(
+                        f.request.copy(
+                            companyId = secondCompany,
+                            accountId = secondAccount,
+                            deviceId = secondDevice,
+                            issuedAt = originalAt,
+                            expiresAt = originalAt.plusSeconds(60),
+                        )
+                    )
+                )
+            val firstKeys = MatrixKeyFixture(firstOriginal.userId, firstOriginal.deviceId)
+            val secondKeys = MatrixKeyFixture(secondOriginal.userId, secondOriginal.deviceId)
+            val keys = InternalCollaborationMatrixKeyRepository(raw())
+            success(
+                keys.upload(
+                    CollaborationMatrixKeyUpload(firstKeys.device),
+                    firstOriginal.accessToken,
+                    deadline(),
+                )
+            )
+            success(
+                keys.upload(
+                    CollaborationMatrixKeyUpload(secondKeys.device),
+                    secondOriginal.accessToken,
+                    deadline(),
+                )
+            )
+            val space = UUID.randomUUID()
+            val group =
+                InternalCollaborationSpaceMatrixRepository(
+                    HmacMatrixJwtDataSource(f.config),
+                    raw(),
+                    f.clock,
+                )
+            val at = f.clock.instant()
+            val first =
+                success(
+                    group.login(
+                        CollaborationSpaceMatrixLogin(
+                            space,
+                            f.request.accountId,
+                            UUID.randomUUID(),
+                            f.request.companyId,
+                            CollaborationLegacyDevicePosition(
+                                f.request.companyId,
+                                f.request.deviceId,
+                            ),
+                            at,
+                            at.plusSeconds(60),
+                        )
+                    )
+                )
+            val second =
+                success(
+                    group.login(
+                        CollaborationSpaceMatrixLogin(
+                            space,
+                            secondAccount,
+                            UUID.randomUUID(),
+                            secondCompany,
+                            CollaborationLegacyDevicePosition(secondCompany, secondDevice),
+                            at,
+                            at.plusSeconds(60),
+                        )
+                    )
+                )
+            assertEquals(firstOriginal.userId, first.userId)
+            assertEquals(firstOriginal.deviceId, first.deviceId)
+            assertEquals(secondOriginal.userId, second.userId)
+            assertEquals(secondOriginal.deviceId, second.deviceId)
+            val requested =
+                CollaborationSpaceMatrixDirectRoom(
+                    space,
+                    UUID.randomUUID(),
+                    f.request.accountId,
+                    secondAccount,
+                    first.userId,
+                    second.userId,
+                )
+            val recovering =
+                requested.copy(
+                    creatorAccountId = secondAccount,
+                    peerAccountId = f.request.accountId,
+                    creatorUserId = second.userId,
+                    peerUserId = first.userId,
+                )
+            val control = raw()
+            var created: String? = null
+            val lost =
+                object : MatrixRoomDataSource by control {
+                    override fun createRoom(
+                        body: Map<String, Any>,
+                        token: String,
+                        deadline: Instant,
+                    ): MatrixRoomCreateData {
+                        created =
+                            (control.createRoom(body, token, deadline)
+                                    as MatrixRoomCreateData.Created)
+                                .roomId
+                        throw IOException("fixture response lost after actual room creation")
+                    }
+                }
+            assertInstanceOf(
+                Result.Failed::class.java,
+                InternalCollaborationSpaceMatrixRoomRepository(lost, f.config.serverName)
+                    .create(requested, first.accessToken, deadline()),
+            )
+            val rooms = InternalCollaborationSpaceMatrixRoomRepository(control, f.config.serverName)
+            val room = requireNotNull(created)
+            assertEquals(room, success(rooms.resolve(recovering, second.accessToken, deadline())))
+            assertEquals(
+                CollaborationMatrixRoomCreation.AliasInUse,
+                success(rooms.create(recovering, second.accessToken, deadline())),
+            )
+            success(rooms.join(room, second.accessToken, deadline()))
+            val observed = success(rooms.observe(room, second.accessToken, deadline()))
+            assertEquals(first.userId, observed.creator)
+            val accepted =
+                Result.Success(
+                    CollaborationSpaceRoomAssessment(
+                        f.request.accountId,
+                        CollaborationMatrixRoomRepair(emptySet(), false),
+                    )
+                )
+            assertEquals(
+                accepted,
+                assessCollaborationSpaceRecoveredRoom(recovering, observed, f.config.serverName),
+            )
+            val query =
+                CollaborationMatrixKeyQuery(
+                    mapOf(
+                        first.userId to listOf(first.deviceId),
+                        second.userId to listOf(second.deviceId),
+                    )
+                )
+            val expected =
+                mapOf(
+                    first.userId to mapOf(first.deviceId to firstKeys.device),
+                    second.userId to mapOf(second.deviceId to secondKeys.device),
+                )
+            assertEquals(
+                expected,
+                success(keys.deviceKeys(query, second.accessToken, deadline())).deviceKeys,
+            )
+            f.restart()
+            val restartedRaw = raw()
+            val restarted =
+                InternalCollaborationSpaceMatrixRoomRepository(restartedRaw, f.config.serverName)
+            assertEquals(
+                room,
+                success(restarted.resolve(recovering, second.accessToken, deadline())),
+            )
+            success(restarted.join(room, second.accessToken, deadline()))
+            assertEquals(observed, success(restarted.observe(room, second.accessToken, deadline())))
+            assertEquals(
+                accepted,
+                assessCollaborationSpaceRecoveredRoom(
+                    recovering,
+                    success(restarted.observe(room, second.accessToken, deadline())),
+                    f.config.serverName,
+                ),
+            )
+            assertEquals(
+                expected,
+                success(
+                        InternalCollaborationMatrixKeyRepository(restartedRaw)
+                            .deviceKeys(query, second.accessToken, deadline())
+                    )
+                    .deviceKeys,
+            )
+        }
+    }
+
     private fun <T> success(result: Result<T>): T {
         assertInstanceOf(Result.Success::class.java, result) {
             if (result is Result.Failed) result.failure.code else "Unexpected result"

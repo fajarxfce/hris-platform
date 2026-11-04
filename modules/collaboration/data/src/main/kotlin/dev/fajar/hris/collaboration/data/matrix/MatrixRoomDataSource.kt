@@ -9,6 +9,8 @@ interface MatrixRoomDataSource {
 
     fun createRoom(body: Map<String, Any>, token: String, deadline: Instant): MatrixRoomCreateData
 
+    fun join(roomId: String, token: String, deadline: Instant): JsonNode
+
     fun roomState(roomId: String, token: String, deadline: Instant): List<MatrixRoomStateEventData>
 
     fun putRoomState(

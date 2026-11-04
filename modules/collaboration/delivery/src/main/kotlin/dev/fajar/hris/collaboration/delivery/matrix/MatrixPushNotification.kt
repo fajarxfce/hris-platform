@@ -34,7 +34,7 @@ private val pushParser =
  * content, names, arbitrary device data and tweaks are rejected. Counts never become authority. The
  * HTTP owner must also bound stream size/time before acquiring this byte array.
  */
-fun matrixPushNotification(bytes: ByteArray): CollaborationPushHint? {
+fun matrixPushNotification(bytes: ByteArray): MatrixPushBatch? {
     if (bytes.size !in 2..MATRIX_PUSH_MAXIMUM_BYTES) return null
     val root =
         try {
@@ -93,7 +93,7 @@ fun matrixPushNotification(bytes: ByteArray): CollaborationPushHint? {
     } else if (event == null) return null
     val devices = node.path("devices")
     if (!devices.isArray || devices.size() !in 1..MATRIX_PUSH_MAXIMUM_DEVICES) return null
-    val keys = ArrayList<CollaborationPushKey>(devices.size())
+    val keys = ArrayList<MatrixPushDeviceKey>(devices.size())
     for (device in devices) {
         if (
             !device.isObject ||
@@ -106,7 +106,8 @@ fun matrixPushNotification(bytes: ByteArray): CollaborationPushHint? {
         )
             return null
         val key = device["pushkey"].asString()
-        if (!key.matches(Regex("hriscp1_[a-f0-9]{64}")) || keys.any { it.value == key }) return null
+        if (!key.matches(Regex("hris[gc]p1_[a-f0-9]{64}")) || keys.any { it.value == key })
+            return null
         if (device.has("pushkey_ts") && !nonnegativeLong(device["pushkey_ts"])) return null
         if (device.has("data")) {
             val data = device["data"]
@@ -120,9 +121,11 @@ fun matrixPushNotification(bytes: ByteArray): CollaborationPushHint? {
         }
         if (device.has("tweaks") && (!device["tweaks"].isObject || !device["tweaks"].isEmpty))
             return null
-        keys += CollaborationPushKey(key)
+        keys +=
+            if (key.startsWith("hriscp1_")) MatrixPushDeviceKey.Company(CollaborationPushKey(key))
+            else MatrixPushDeviceKey.Space(CollaborationSpacePushKey(key))
     }
-    return CollaborationPushHint(event, keys)
+    return MatrixPushBatch(event, keys)
 }
 
 private fun nonnegativeLong(node: JsonNode): Boolean =

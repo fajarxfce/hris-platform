@@ -63,7 +63,7 @@ class MatrixPushCallbackController(
             is Result.Success ->
                 ResponseEntity.ok()
                     .header("Cache-Control", "no-store")
-                    .body(mapOf("rejected" to result.value.rejected.map { it.value }))
+                    .body(mapOf("rejected" to result.value.rejected))
         }
     }
 

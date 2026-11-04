@@ -28,6 +28,47 @@ class MatrixPushNotificationTest {
         matrixPushNotification(json.writeValueAsBytes(mapOf("notification" to value)))
 
     @Test
+    fun mixedCompanyAndGroupKeysShareOneTotalLimitAndRemainTyped() {
+        val group = "hrisgp1_" + "b".repeat(64)
+        val mixed =
+            requireNotNull(
+                decode(event + ("devices" to listOf(device, device + ("pushkey" to group))))
+            )
+        assertInstanceOf(MatrixPushDeviceKey.Company::class.java, mixed.keys[0])
+        assertInstanceOf(MatrixPushDeviceKey.Space::class.java, mixed.keys[1])
+        assertEquals(listOf(key, group), mixed.keys.map { it.value })
+        assertFalse(mixed.toString().contains(group))
+        assertFalse(mixed.keys[1].toString().contains(group))
+        val all =
+            (0 until 32).map {
+                device +
+                    ("pushkey" to
+                        ((if (it % 2 == 0) "hriscp1_" else "hrisgp1_") +
+                            it.toString(16).padStart(64, '0')))
+            }
+        assertEquals(32, requireNotNull(decode(event + ("devices" to all))).keys.size)
+        assertNull(decode(event + ("devices" to (all + device))))
+        assertNull(
+            decode(
+                event +
+                    ("devices" to
+                        listOf(
+                            device,
+                            device + ("pushkey" to group),
+                            device + ("pushkey" to group),
+                        ))
+            )
+        )
+        assertNull(
+            decode(
+                event +
+                    ("devices" to
+                        listOf(device, device + ("pushkey" to ("hrisgp2_" + "b".repeat(64)))))
+            )
+        )
+    }
+
+    @Test
     fun actualSynapseEventOnlyAndLegacyBadgeShapesHaveNoPlaintextProjection() {
         val accepted = requireNotNull(decode(event))
         assertEquals("!room:fixture.invalid", accepted.event?.roomId)

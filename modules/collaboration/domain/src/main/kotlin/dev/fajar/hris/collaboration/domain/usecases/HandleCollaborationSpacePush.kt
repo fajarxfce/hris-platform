@@ -5,11 +5,15 @@ import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.push.domain.entities.*
+import dev.fajar.hris.push.domain.repositories.PushRepository
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-/** Root-owned opaque wake admission. No provider credential or native push token is acquired. */
+/**
+ * Root-owned opaque wake admission and fenced worker delivery. Content stays separately admitted.
+ */
 class HandleCollaborationSpacePush(
     private val bindings: CollaborationSpacePushBindingRepository,
     private val queue: CollaborationSpacePushQueueRepository,
@@ -31,7 +35,211 @@ class HandleCollaborationSpacePush(
     private val policy: CollaborationSpacePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val push: PushRepository,
 ) {
+    fun claim(ownerId: UUID, limit: Int): Result<List<CollaborationSpacePushLease>> {
+        if (!service.enabled || !service.pushEnabled || !provider.enabled || !policy.enabled)
+            return Result.Success(emptyList())
+        if (ownerId == UUID(0, 0) || limit !in 1..8)
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_push_batch")
+            )
+        return transactions.run(
+            Actor(UUID(0, 0), null, emptySet(), Instant.EPOCH, UUID.randomUUID())
+        ) {
+            queue.claim(ownerId, limit, 60, 8).flatMap { heads ->
+                val leases = heads.mapNotNull { it.lease }
+                if (
+                    heads.size > limit ||
+                        heads.any { !validCollaborationSpacePushHead(it) } ||
+                        leases.size != heads.size ||
+                        leases.any { it.ownerId != ownerId } ||
+                        leases.map { it.spaceId to it.deviceId }.toSet().size != leases.size
+                )
+                    collaborationPushLeaseLost()
+                else Result.Success(leases)
+            }
+        }
+    }
+
+    /** Current owner is captured/acknowledged under guards; FCM runs outside every transaction. */
+    fun deliver(lease: CollaborationSpacePushLease): Result<Unit> {
+        if (!service.enabled || !service.pushEnabled || !provider.enabled || !policy.enabled)
+            return unavailable()
+        if (!validCollaborationSpacePushLease(lease)) return collaborationPushLeaseLost()
+        val start = clock.instant()
+        val budget = Budget(start, minOf(start.plusSeconds(20), lease.expiresAt))
+        val prepared =
+            withLease<PushPreparation?>(lease, budget) { target, head ->
+                if (
+                    head.expiresAt <= clock.instant() ||
+                        target == CollaborationSpacePushTarget.Retired
+                )
+                    return@withLease finish(lease).map { null }
+                if (target !is CollaborationSpacePushTarget.Ready)
+                    return@withLease retryOrFinish(lease, head, budget).map { null }
+                val event = collaborationSpacePushVisibleEvent(head, lease, clock.instant())
+                if (event != null) {
+                    val owned = ownedRoom(target, event, budget)
+                    if (owned is Result.Failed) return@withLease owned
+                    if (!(owned as Result.Success).value)
+                        return@withLease finish(lease).map { null }
+                }
+                val acquired =
+                    step(budget) {
+                        nativePush.token(
+                            lease.accountId,
+                            lease.nativeSessionId,
+                            target.registration.version,
+                        )
+                    }
+                if (acquired is Result.Failed) return@withLease acquired
+                val token = (acquired as Result.Success).value ?: return@withLease unavailable()
+                confirm(target, budget).flatMap {
+                    collaborationSpacePushMessage(
+                            head,
+                            lease,
+                            target,
+                            token,
+                            clock.instant(),
+                            budget.deadline,
+                        )
+                        .map { PushPreparation(target, it) }
+                }
+            }
+        if (prepared is Result.Failed) return prepared
+        val ready = (prepared as Result.Success).value ?: return Result.Success(Unit)
+        if (!current(budget)) return unavailable()
+        val outcome = push.send(ready.message)
+        return withLease(lease, budget) { target, head ->
+            val at = clock.instant()
+            if (head.expiresAt <= at || target == CollaborationSpacePushTarget.Retired)
+                return@withLease finish(lease)
+            if (
+                target !is CollaborationSpacePushTarget.Ready ||
+                    !sameCollaborationSpacePushTarget(ready.target, target, at)
+            )
+                return@withLease retryOrFinish(lease, head, budget)
+            val retry =
+                (outcome as? Result.Failed)?.let {
+                    collaborationPushRetryAt(it.failure, head.attempts, at, head.expiresAt)
+                }
+            val ack = if (retry == null) finish(lease) else defer(lease, retry)
+            if (ack is Result.Failed) return@withLease ack
+            // Failed confirmation rolls back the actual captured-revision acknowledgment.
+            confirm(target, budget).flatMap {
+                if (outcome is Result.Success && outcome.value == PushOutcome.UNREGISTERED)
+                    disableExactRegistration(target, budget)
+                else Result.Success(Unit)
+            }
+        }
+    }
+
+    private class PushPreparation(
+        val target: CollaborationSpacePushTarget.Ready,
+        val message: PushMessage,
+    )
+
+    private fun <T> withLease(
+        lease: CollaborationSpacePushLease,
+        budget: Budget,
+        operation: (CollaborationSpacePushTarget, CollaborationSpacePushHead) -> Result<T>,
+    ): Result<T> =
+        step(budget) {
+            val actor = Actor(lease.accountId, null, emptySet(), budget.started, UUID.randomUUID())
+            transactions.run(actor) {
+                val read =
+                    step(budget) { bindings.find(lease.spaceId, lease.accountId, lease.deviceId) }
+                if (read is Result.Failed) return@run read
+                val binding =
+                    (read as Result.Success).value ?: return@run collaborationPushLeaseLost()
+                if (binding.nativeSessionId != lease.nativeSessionId)
+                    return@run collaborationPushLeaseLost()
+                observe(binding, budget).flatMap { target ->
+                    val loaded =
+                        step(budget) {
+                            queue.find(lease.spaceId, lease.accountId, lease.deviceId, lock = true)
+                        }
+                    if (loaded is Result.Failed) return@flatMap loaded
+                    val head =
+                        (loaded as Result.Success).value
+                            ?: return@flatMap collaborationPushLeaseLost()
+                    if (
+                        !validCollaborationSpacePushHead(head) ||
+                            head.lease != lease ||
+                            head.nativeSessionId != lease.nativeSessionId ||
+                            lease.expiresAt <= clock.instant()
+                    )
+                        return@flatMap collaborationPushLeaseLost()
+                    operation(target, head).flatMap {
+                        if (current(budget) && clock.instant() < lease.expiresAt) Result.Success(it)
+                        else collaborationPushLeaseLost()
+                    }
+                }
+            }
+        }
+
+    private fun finish(lease: CollaborationSpacePushLease): Result<Unit> =
+        queue.finish(lease).flatMap {
+            if (it) Result.Success(Unit) else collaborationPushLeaseLost()
+        }
+
+    private fun defer(lease: CollaborationSpacePushLease, at: Instant): Result<Unit> =
+        queue.defer(lease, at).flatMap {
+            if (it) Result.Success(Unit) else collaborationPushLeaseLost()
+        }
+
+    private fun retryOrFinish(
+        lease: CollaborationSpacePushLease,
+        head: CollaborationSpacePushHead,
+        budget: Budget,
+    ): Result<Unit> {
+        if (!current(budget)) return unavailable()
+        val at =
+            collaborationPushRetryAt(
+                Failure(FailureKind.UNAVAILABLE, "collaboration_push_unavailable"),
+                head.attempts,
+                clock.instant(),
+                head.expiresAt,
+            )
+        return if (at == null) finish(lease) else defer(lease, at)
+    }
+
+    /**
+     * Current target was confirmed after queue ACK under account/native/device/gateway guards. Only
+     * this exact local mutation is allowed; readback and final directory/time checks share its
+     * transaction. An intentionally disabled registration must never be readmitted as Ready.
+     */
+    private fun disableExactRegistration(
+        target: CollaborationSpacePushTarget.Ready,
+        budget: Budget,
+    ): Result<Unit> {
+        val old = target.registration
+        val expected =
+            old.copy(
+                enabled = false,
+                version = old.version + 1,
+                updatedAt = clock.instant().truncatedTo(java.time.temporal.ChronoUnit.MICROS),
+            )
+        return step(budget) { nativePush.save(expected, null, old.version) }
+            .flatMap { saved ->
+                if (!saved) return@flatMap collaborationPushLeaseLost()
+                step(budget) { nativePush.find(old.accountId, old.sessionId) }
+                    .flatMap readback@{ current ->
+                        if (current != expected) return@readback collaborationPushLeaseLost()
+                        step(budget) { spaces.current() }
+                            .flatMap { space ->
+                                if (
+                                    space == target.binding.spaceId &&
+                                        clock.instant() < target.expiresAt
+                                )
+                                    Result.Success(Unit)
+                                else unavailable()
+                            }
+                    }
+            }
+    }
+
     /**
      * Validate the complete bounded input before any write; partial committed keys are retryable.
      */

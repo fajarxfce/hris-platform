@@ -503,6 +503,63 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun collaborationSpacePushQueueSource(sql: DSLContext): CollaborationSpacePushQueueDataSource =
+        PostgresCollaborationSpacePushQueueDataSource(sql)
+
+    @Bean
+    fun collaborationSpacePushQueue(
+        source: CollaborationSpacePushQueueDataSource
+    ): CollaborationSpacePushQueueRepository = StoredCollaborationSpacePushQueueRepository(source)
+
+    @Bean
+    fun handleCollaborationSpacePush(
+        bindings: CollaborationSpacePushBindingRepository,
+        queue: CollaborationSpacePushQueueRepository,
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        sessions: NativeSessionRepository,
+        nativePush: NativePushRegistrationRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+        push: dev.fajar.hris.push.domain.repositories.PushRepository,
+    ) =
+        HandleCollaborationSpacePush(
+            bindings,
+            queue,
+            gateway,
+            registry,
+            providers,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            rooms,
+            conversations,
+            sessions,
+            nativePush,
+            identities,
+            transactions,
+            service,
+            policy,
+            provider,
+            clock,
+            push,
+        )
+
+    @Bean
     fun collaborationPushQueueSource(sql: DSLContext): CollaborationPushQueueDataSource =
         PostgresCollaborationPushQueueDataSource(sql)
 

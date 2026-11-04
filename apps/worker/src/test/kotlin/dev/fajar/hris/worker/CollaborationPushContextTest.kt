@@ -1,7 +1,9 @@
 package dev.fajar.hris.worker
 
 import dev.fajar.hris.collaboration.domain.entities.CollaborationPushHead
+import dev.fajar.hris.collaboration.domain.entities.CollaborationSpacePushHead
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationPushQueueRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpacePushQueueRepository
 import dev.fajar.hris.core.domain.Result
 import dev.fajar.hris.worker.push.CollaborationPushWorker
 import java.nio.file.Files
@@ -79,6 +81,7 @@ class CollaborationPushContextTest {
                     "HRIS_COLLABORATION_ENABLED",
                     "HRIS_MATRIX_ENABLED",
                     "HRIS_COLLABORATION_PUSH_ENABLED",
+                    "HRIS_COLLABORATION_SPACE_ENABLED",
                     "hris.worker.enabled",
                 )
             for (disabled in listOf<String?>(null) + flags) {
@@ -135,20 +138,35 @@ class CollaborationPushContextTest {
                     context.getBean("collaborationPushTasks", ThreadPoolTaskExecutor::class.java)
                 val timers =
                     context.getBean("collaborationPushTimers", ThreadPoolTaskScheduler::class.java)
+                val groupTasks =
+                    context.getBean(
+                        "collaborationSpacePushTasks",
+                        ThreadPoolTaskExecutor::class.java,
+                    )
+                val groupTimers =
+                    context.getBean(
+                        "collaborationSpacePushTimers",
+                        ThreadPoolTaskScheduler::class.java,
+                    )
                 val workers = context.getBeansOfType(CollaborationPushWorker::class.java)
                 val probe = context.getBean(CollaborationPushContextProbe::class.java)
                 try {
                     assertEquals(4, tasks.maxPoolSize)
                     assertTrue(tasks.threadPoolExecutor.queue.isEmpty())
-                    if (disabled == null) {
-                        val worker = workers.values.single()
-                        assertTrue(worker.isRunning)
+                    if (disabled == null || disabled == "HRIS_COLLABORATION_SPACE_ENABLED") {
+                        assertEquals(if (disabled == null) 2 else 1, workers.size)
+                        assertTrue(workers.values.all { it.isRunning })
                         val until = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
-                        while (probe.claims.get() == 0 && System.nanoTime() < until) TimeUnit
-                            .MILLISECONDS
-                            .sleep(10)
+                        while (
+                            (probe.claims.get() == 0 ||
+                                (disabled == null && probe.spaceClaims.get() == 0)) &&
+                                System.nanoTime() < until
+                        ) TimeUnit.MILLISECONDS.sleep(10)
                         assertTrue(probe.claims.get() > 0, "Enabled actual worker never claimed")
                         assertEquals(0, probe.failedClaims.get())
+                        if (disabled == null) assertTrue(probe.spaceClaims.get() > 0)
+                        else assertEquals(0, probe.spaceClaims.get())
+                        assertEquals(0, probe.failedSpaceClaims.get())
                     } else {
                         assertTrue(
                             workers.isEmpty(),
@@ -156,13 +174,19 @@ class CollaborationPushContextTest {
                         )
                         TimeUnit.MILLISECONDS.sleep(100)
                         assertEquals(0, probe.claims.get())
+                        assertEquals(0, probe.spaceClaims.get())
+                        assertEquals(0, probe.failedSpaceClaims.get())
                         assertEquals(0, probe.failedClaims.get())
                         assertTrue(timers.scheduledThreadPoolExecutor.queue.isEmpty())
+                        assertTrue(groupTimers.scheduledThreadPoolExecutor.queue.isEmpty())
                     }
                 } finally {
                     context.close()
                 }
                 assertTrue(workers.values.none { it.isRunning })
+                assertEquals(4, groupTasks.maxPoolSize)
+                assertTrue(groupTasks.threadPoolExecutor.isTerminated)
+                assertTrue(groupTimers.scheduledThreadPoolExecutor.isTerminated)
                 assertTrue(tasks.threadPoolExecutor.isTerminated)
                 assertTrue(timers.scheduledThreadPoolExecutor.isTerminated)
             }
@@ -177,11 +201,34 @@ class CollaborationPushContextTest {
 class CollaborationPushContextProbe {
     val claims = AtomicInteger()
     val failedClaims = AtomicInteger()
+    val spaceClaims = AtomicInteger()
+    val failedSpaceClaims = AtomicInteger()
 }
 
 @TestConfiguration(proxyBeanMethods = false)
 class CollaborationPushContextProbeConfiguration {
     @Bean fun collaborationPushContextProbe() = CollaborationPushContextProbe()
+
+    @Bean
+    @Primary
+    fun observedCollaborationSpacePushQueue(
+        @Qualifier("collaborationSpacePushQueue") delegate: CollaborationSpacePushQueueRepository,
+        probe: CollaborationPushContextProbe,
+    ): CollaborationSpacePushQueueRepository =
+        object : CollaborationSpacePushQueueRepository by delegate {
+            override fun claim(
+                ownerId: UUID,
+                limit: Int,
+                leaseSeconds: Int,
+                maximumAttempts: Int,
+            ): Result<List<CollaborationSpacePushHead>> {
+                check(limit in 1..4 && leaseSeconds == 60 && maximumAttempts == 8)
+                val result = delegate.claim(ownerId, limit, leaseSeconds, maximumAttempts)
+                if (result is Result.Success) probe.spaceClaims.incrementAndGet()
+                else probe.failedSpaceClaims.incrementAndGet()
+                return result
+            }
+        }
 
     @Bean
     @Primary

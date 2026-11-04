@@ -397,6 +397,72 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun mixedPushCallbackKeepsSeparateGroupOwnershipAndRejectsInvalidBatchBeforeAnyWrite() {
+        val n = native()
+        val (device, token) = enrollGroup(n)
+        savePush(n)
+        assertEquals(200, pusher(n, token).statusCode())
+        val key = provider.pushes.last()["pushkey"].asString()
+        assertTrue(key.startsWith("hrisgp1_"))
+        val unknownCompany = "hriscp1_" + "d".repeat(64)
+        val unknownGroup = "hrisgp1_" + "c".repeat(64)
+        assertEquals(400, callback(callbackBody(listOf(key, key, unknownCompany))).statusCode())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_push_hints where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+        val original =
+            database()
+                .queryForList(
+                    "select row_to_json(h)::text as snapshot from collaboration_push_hints h where account_id=? order by company_id,device_id",
+                    n.fixture.account,
+                )
+        val body = callbackBody(listOf(unknownGroup, key, unknownCompany))
+        val response = callback(body)
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals(
+            listOf(unknownGroup, unknownCompany),
+            json.readTree(response.body())["rejected"].toList().map { it.asString() },
+        )
+        repeat(2) { assertEquals(response.body(), callback(body).body()) }
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select revision from collaboration_space_push_hints where device_id=?",
+                    Long::class.java,
+                    device,
+                ),
+        )
+        assertEquals(
+            original,
+            database()
+                .queryForList(
+                    "select row_to_json(h)::text as snapshot from collaboration_push_hints h where account_id=? order by company_id,device_id",
+                    n.fixture.account,
+                ),
+        )
+        savePush(n, expected = 0, enabled = false)
+        assertEquals("{\"rejected\":[]}", callback(callbackBody(listOf(key))).body())
+        database()
+            .update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                n.session,
+            )
+        val retired = callback(callbackBody(listOf(unknownCompany, key)))
+        assertEquals(200, retired.statusCode(), retired.body())
+        assertEquals(
+            listOf(unknownCompany, key),
+            json.readTree(retired.body())["rejected"].toList().map { it.asString() },
+        )
+    }
+
+    @Test
     fun groupManagedPusherUsesSeparateStableCapabilityAndSurvivesNativeTokenRotation() {
         val n = native()
         val (device, token) = enrollGroup(n)

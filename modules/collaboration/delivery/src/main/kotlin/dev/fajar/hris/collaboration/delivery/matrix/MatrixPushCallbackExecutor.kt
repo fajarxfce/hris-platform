@@ -1,6 +1,5 @@
 package dev.fajar.hris.collaboration.delivery.matrix
 
-import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.domain.*
 import java.time.Clock
 import java.time.Duration
@@ -10,14 +9,13 @@ import java.util.concurrent.*
 
 /** Fixed capacity without a waiting queue. Caller timeout cancels only its owned FutureTask. */
 class MatrixPushCallbackExecutor(
-    private val operation:
-        (CollaborationPushHint, UUID, Instant) -> Result<CollaborationPushReceipt>,
+    private val operation: (MatrixPushBatch, UUID, Instant) -> Result<MatrixPushBatchReceipt>,
     private val clock: Clock,
     private val timeout: Duration = Duration.ofSeconds(10),
 ) : AutoCloseable {
     private val lifecycle = Any()
     private var closed = false
-    private val active = mutableSetOf<FutureTask<Result<CollaborationPushReceipt>>>()
+    private val active = mutableSetOf<FutureTask<Result<MatrixPushBatchReceipt>>>()
     private val executor =
         ThreadPoolExecutor(
                 4,
@@ -34,7 +32,7 @@ class MatrixPushCallbackExecutor(
         require(timeout >= Duration.ofMillis(10) && timeout <= Duration.ofSeconds(10))
     }
 
-    fun accept(hint: CollaborationPushHint, correlationId: UUID): Result<CollaborationPushReceipt> {
+    fun accept(hint: MatrixPushBatch, correlationId: UUID): Result<MatrixPushBatchReceipt> {
         val started = System.nanoTime()
         val deadline = clock.instant().plus(timeout)
         val task = FutureTask(Callable { operation(hint, correlationId, deadline) })

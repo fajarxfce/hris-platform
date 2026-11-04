@@ -370,6 +370,9 @@ class CollaborationSpacePushAdmissionTest {
                 policy,
                 CollaborationMatrixPolicy(true, "matrix.example.test"),
                 clock,
+                dev.fajar.hris.push.domain.repositories.PushRepository {
+                    error("Callback cannot send to FCM")
+                },
             )
 
         fun hint(event: CollaborationPushEvent? = null) =

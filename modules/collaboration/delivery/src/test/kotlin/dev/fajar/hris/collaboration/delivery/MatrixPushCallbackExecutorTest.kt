@@ -1,6 +1,6 @@
 package dev.fajar.hris.collaboration.delivery
 
-import dev.fajar.hris.collaboration.delivery.matrix.MatrixPushCallbackExecutor
+import dev.fajar.hris.collaboration.delivery.matrix.*
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.domain.Result
 import java.time.Clock
@@ -14,10 +14,13 @@ import org.junit.jupiter.api.Test
 
 class MatrixPushCallbackExecutorTest {
     private val hint =
-        CollaborationPushHint(null, listOf(CollaborationPushKey("hriscp1_" + "a".repeat(64))))
+        MatrixPushBatch(
+            null,
+            listOf(MatrixPushDeviceKey.Company(CollaborationPushKey("hriscp1_" + "a".repeat(64)))),
+        )
 
-    private fun success(): Result<CollaborationPushReceipt> =
-        Result.Success(CollaborationPushReceipt(emptyList()))
+    private fun success(): Result<MatrixPushBatchReceipt> =
+        Result.Success(MatrixPushBatchReceipt(emptyList()))
 
     @Test
     fun fourLiveOperationsRejectExtraWorkWithoutAWaitingQueue() {
@@ -39,7 +42,7 @@ class MatrixPushCallbackExecutorTest {
         try {
             val pending =
                 List(4) {
-                    clients.submit<Result<CollaborationPushReceipt>> {
+                    clients.submit<Result<MatrixPushBatchReceipt>> {
                         executor.accept(hint, UUID.randomUUID())
                     }
                 }
@@ -123,7 +126,7 @@ class MatrixPushCallbackExecutorTest {
         try {
             val pending =
                 List(4) {
-                    clients.submit<Result<CollaborationPushReceipt>> {
+                    clients.submit<Result<MatrixPushBatchReceipt>> {
                         executor.accept(hint, UUID.randomUUID())
                     }
                 }
@@ -164,7 +167,7 @@ class MatrixPushCallbackExecutorTest {
             )
         try {
             val pending =
-                caller.submit<Result<CollaborationPushReceipt>> {
+                caller.submit<Result<MatrixPushBatchReceipt>> {
                     executor.accept(hint, UUID.randomUUID())
                 }
             assertTrue(entered.await(2, TimeUnit.SECONDS))

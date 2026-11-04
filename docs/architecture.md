@@ -1,5 +1,7 @@
 # Architecture
 
+[Organization push callback and worker](collaboration/space-push-delivery.md) integrate typed mixed callbacks, bounded group delivery and exact token/queue outcome fencing. Shared API and FULL worker graphs are validated; Mobile owner adoption and actual group FCM acceptance remain required.
+
 [Organization callback admission](collaboration/space-push-admission.md) validates current background ownership and exact retained completion separately from interactive assurance. Opaque append and final eligibility checks are transactional; HTTP/worker/Mobile integration remains required.
 
 V137 [organization push wake storage](collaboration/space-push-queue.md) retains separate coalesced heads, bounded group leases and exact transactional readback. Root/worker isolation and isolated archive recovery are verified; current callback/delivery admission and Mobile routing remain separate integration.

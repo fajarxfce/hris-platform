@@ -257,6 +257,9 @@ class CollaborationSpaceWorkerPublicationTest {
                 CollaborationSpacePolicy(true, 28, 28),
                 CollaborationMatrixPolicy(true, server),
                 wakeClock,
+                dev.fajar.hris.push.domain.repositories.PushRepository {
+                    error("Callback cannot send to FCM")
+                },
             )
         val hint =
             CollaborationSpacePushHint(

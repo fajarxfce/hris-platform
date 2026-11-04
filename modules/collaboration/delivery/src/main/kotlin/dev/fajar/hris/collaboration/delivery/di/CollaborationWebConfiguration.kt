@@ -1,9 +1,11 @@
 package dev.fajar.hris.collaboration.delivery.di
 
+import dev.fajar.hris.collaboration.delivery.matrix.MatrixPushBatchDispatcher
 import dev.fajar.hris.collaboration.delivery.matrix.MatrixPushCallbackErrorFilter
 import dev.fajar.hris.collaboration.delivery.matrix.MatrixPushCallbackExecutor
 import dev.fajar.hris.collaboration.delivery.matrix.writeMatrixGatewayDenied
 import dev.fajar.hris.collaboration.domain.usecases.HandleCollaborationPush
+import dev.fajar.hris.collaboration.domain.usecases.HandleCollaborationSpacePush
 import java.time.Clock
 import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory
 import org.springframework.boot.web.server.WebServerFactoryCustomizer
@@ -34,8 +36,15 @@ class CollaborationWebConfiguration {
         matrixPushCallbackSettings(environment)
 
     @Bean(destroyMethod = "close")
-    fun collaborationPushCallbackExecutor(handler: HandleCollaborationPush, clock: Clock) =
-        MatrixPushCallbackExecutor(handler::accept, clock)
+    fun collaborationPushCallbackExecutor(
+        handler: HandleCollaborationPush,
+        groups: HandleCollaborationSpacePush,
+        clock: Clock,
+    ) =
+        MatrixPushCallbackExecutor(
+            MatrixPushBatchDispatcher(handler::accept, groups::accept, clock)::accept,
+            clock,
+        )
 
     /** Validate the actual socket read bound; do not change unrelated upload behavior. */
     @Bean

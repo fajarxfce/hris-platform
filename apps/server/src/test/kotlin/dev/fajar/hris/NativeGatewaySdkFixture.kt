@@ -3,8 +3,6 @@ package dev.fajar.hris
 import java.net.URI
 import java.net.http.*
 import java.time.Duration
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -16,7 +14,7 @@ abstract class NativeGatewaySdkFixture : NativeCollaborationApiFixture() {
 
     @BeforeEach
     fun alignSdkClock() {
-        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+        clock.followSystemTime()
     }
 
     @AfterEach

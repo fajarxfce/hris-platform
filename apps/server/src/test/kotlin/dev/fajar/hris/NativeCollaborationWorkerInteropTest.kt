@@ -10,6 +10,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFilePermissions
 import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterEach
@@ -245,8 +246,15 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
         assertEquals(0, trace.applicationAdmissions().getValue("failures"))
         assertEquals(1, trace.applicationSummaryReadCount())
         assertTrue(trace.applicationAdmittedBeforeSend())
-        verifyCiphertext(sender, room, proof.path("eventId").asString())
-        historyEvents.forEach { verifyCiphertext(recipient, room, it) }
+        // The driver has fully stopped its SDKs. Its original public tokens can expire or
+        // rotate during this multi-minute proof; verification needs fresh, normally admitted
+        // credentials for the same identities, not a longer production token lifetime.
+        val verificationSender = verificationOwner(sender)
+        val verificationRecipient = verificationOwner(recipient)
+        HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().use { client ->
+            verifyCiphertext(client, verificationSender, room, proof.path("eventId").asString())
+            historyEvents.forEach { verifyCiphertext(client, verificationRecipient, room, it) }
+        }
         assertEquals(
             2,
             database()
@@ -271,6 +279,7 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
                 "workerEncryptedSends" to 1,
                 "seededPeerEncryptedSends" to 175,
                 "foregroundHistoryAccepted" to true,
+                "freshCiphertextVerificationAdmission" to true,
                 "incomingAdmissions" to trace.incomingAdmissions(),
                 "applicationAdmissions" to trace.applicationAdmissions(),
                 "proof" to json.convertValue(proof, Map::class.java),
@@ -336,21 +345,75 @@ class NativeCollaborationWorkerInteropTest : NativeGatewaySdkFixture() {
         }
     }
 
-    private fun verifyCiphertext(owner: SdkOwner, room: String, event: String) {
+    private fun verificationOwner(owner: SdkOwner): SdkOwner {
+        // Read only this isolated fixture's immutable owner and current generation. SDK
+        // cleanup has already joined all writers before this new HTTP bootstrap.
+        val head =
+            database()
+                .queryForMap(
+                    "select g.version,g.rotated_at,d.version as device_version from collaboration_gateway_sessions g join collaboration_devices d on d.company_id=g.company_id and d.id=g.device_id where g.company_id=? and g.account_id=? and g.device_id=? and g.native_session_id=?",
+                    owner.native.fixture.company,
+                    owner.native.fixture.account,
+                    owner.device,
+                    owner.native.session,
+                )
+        val earliest =
+            (head.getValue("rotated_at") as java.sql.Timestamp).toInstant().plusSeconds(10)
+        val waitMillis = Duration.between(Instant.now(), earliest).toMillis() + 1
+        assertTrue(waitMillis <= 11_000, "Verification rotation wait must remain bounded")
+        if (waitMillis > 0) Thread.sleep(waitMillis)
         val response =
-            HttpClient.newHttpClient()
-                .send(
-                    HttpRequest.newBuilder(
-                            URI(
-                                "http://127.0.0.1:$port/_matrix/client/v3/rooms/${encode(room)}/event/${encode(event)}"
+            owner.native.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port${owner.native.path}/bootstrap"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer ${owner.native.access}")
+                    .header("Content-Type", "application/json")
+                    .header("X-HRIS-Client-Platform", "ANDROID")
+                    .header("X-HRIS-Client-Build", "1")
+                    .header("Idempotency-Key", UUID.randomUUID().toString())
+                    .POST(
+                        HttpRequest.BodyPublishers.ofString(
+                            json.writeValueAsString(
+                                mapOf(
+                                    "deviceId" to owner.device,
+                                    "expectedDeviceVersion" to head.getValue("device_version"),
+                                    "expectedGatewayVersion" to head.getValue("version"),
+                                )
                             )
                         )
-                        .timeout(Duration.ofSeconds(15))
-                        .header("Authorization", "Bearer ${owner.session.getValue("accessToken")}")
-                        .GET()
-                        .build(),
-                    HttpResponse.BodyHandlers.ofString(),
-                )
+                    )
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(200, response.statusCode(), "Fresh ciphertext verification admission failed")
+        val value = json.readTree(response.body())
+        assertEquals(owner.session.getValue("userId"), value.path("matrixUserId").asString())
+        assertEquals(owner.session.getValue("deviceId"), value.path("matrixDeviceId").asString())
+        assertEquals(
+            (head.getValue("version") as Number).toLong() + 1,
+            value.path("version").asLong(),
+        )
+        return SdkOwner(
+            owner.native,
+            owner.device,
+            owner.session + ("accessToken" to value.path("accessToken").asString()),
+        )
+    }
+
+    private fun verifyCiphertext(client: HttpClient, owner: SdkOwner, room: String, event: String) {
+        val response =
+            client.send(
+                HttpRequest.newBuilder(
+                        URI(
+                            "http://127.0.0.1:$port/_matrix/client/v3/rooms/${encode(room)}/event/${encode(event)}"
+                        )
+                    )
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer ${owner.session.getValue("accessToken")}")
+                    .GET()
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
         assertEquals(200, response.statusCode(), "Owned ciphertext read failed")
         val value = json.readTree(response.body())
         assertEquals("m.room.encrypted", value.path("type").asString())

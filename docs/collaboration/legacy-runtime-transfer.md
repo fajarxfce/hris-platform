@@ -3,8 +3,8 @@
 V123 adds storage for one immutable original company/device/account/native owner
 and at most eight reusable in-flight request slots per device. Both tables start
 empty. The schema does not freeze existing devices, move provider credentials,
-change SDK directories, or grant group access. Old callers are not yet connected
-to these fences; transfer remains unavailable until that integration is complete.
+change SDK directories, or grant group access. The gateway integration is now accepted; provisioning/direct-room workers and
+gateway issuance still require these fences before transfer can be exposed.
 
 A runtime starts in LEGACY at version 0. A root-scoped operation can freeze it to
 DRAINING at version 1, naming an exact PROVISIONING group device with matching
@@ -31,7 +31,7 @@ remains possible after freeze, offboarding or parent purge. Runtime provenance a
 slots have no cascading native-parent foreign key. An expired lease allows bounded
 server recovery; it does not demonstrate that a remote provider rolled back I/O.
 
-Application integration must cover `AccessNativeCollaborationMatrixDevice`,
+Application integration must cover all fixed gateway operations,
 `AdvanceNativeCollaborationProvisioning`, and `AdvanceNativeCollaborationDirectRoom`,
 including bearer renewal and all final publication checks. Gateway bootstrap and
 refresh must not recreate authority after freeze/transfer. Acquire ordinary
@@ -74,7 +74,8 @@ records 26 passing mapping/actual-storage/native/worker cases in 115.242s with
 8262 unchanged checked inputs and quality gates. Caller rollback, cancellation,
 interruption and exact cleanup after native-parent purge pass. An earlier run
 failed three actual-storage cases because the plain SQL timestamp argument required
-an explicit cast; the corrected query passes. No DI or provider caller is wired yet.
+an explicit cast; the corrected query passes. That port increment did not wire DI
+or a provider caller.
 
 Pure original-runtime admission and exact live-lease validation are also available.
 They preserve current admission time bounds and distinguish a coherent DRAINING
@@ -82,4 +83,44 @@ owner from permanent account revocation. The repository can read/lock one exact
 slot after the runtime head, so a publication transaction can serialize with its
 finally cleanup. [Policy/guard evidence](../measurements/collaboration-legacy-runtime-policy-2026-11-04.json)
 records 30 passing cases in 128.584s, including actual row contention against cleanup,
-with 8264 unchanged inputs and quality gates. No provider caller is wired yet.
+with 8264 unchanged inputs and quality gates. That policy increment did not yet
+wire a provider caller.
+
+## Accepted gateway integration
+
+`AccessNativeCollaborationMatrixDevice` now captures one lease after its ordinary
+current native/company/client/MFA admission and before preparation writes. A failed
+preparation rolls back both its metadata and claim. One lease covers the entire
+finite gateway operation, including internal provider credential renewal and all
+key/pusher/read/write exchanges. Full capacity returns temporary busy without
+provider I/O or an internal retry. Runtime then exact-slot guards are held only
+inside short observation/publication transactions; network calls hold no SQL locks.
+
+Each provider call checks current authority and the exact lease before and after
+I/O, including provider failures. A freeze or replacement makes the late result
+unusable. Credential/key/pusher publication checks the same guards, and the final
+clock bounds include the lease deadline. The exchange deadline is the earliest
+native admission, public access, internal provider credential or runtime expiry.
+No losing Matrix credential is logged out; remote changes may already exist even
+when their local publication is withheld.
+
+Finally cleanup compares the original exact lease. A failed metadata result leaves
+a finite recoverable slot and preserves the provider outcome without retrying it.
+Original exceptions survive cleanup exceptions, including the same exception
+instance. An already-interrupted thread keeps its flag and starts no cleanup SQL;
+expiry enables later reclaim with a new token. These server facts do not prove a
+client SDK stopped or a remote provider rolled back its request.
+
+Full native data regression passes160 cases in243.562s, including actual Synapse,
+freeze during renewal/key/pusher publication, eight-slot saturation, cancellation,
+interruption, cleanup failure and real-time expiry/key retry. Actual API47 cases
+pass152.165s; full worker126 active cases plus one existing opt-in skip pass342.882s.
+Five actual Android SDK/worker cases pass1047.184s, including all three
+176-message process-death recovery states, fresh same-identity ciphertext verification
+and automatic WorkManager execution after network restore. All checked inputs remain
+unchanged within each run; format/architecture pass and exact owned emulators stop.
+[Gateway evidence](../measurements/collaboration-legacy-runtime-gateway-2026-11-04.json)
+records the source relationship and all failed attempts, including the expired-token
+verifier correction without relaxing production lifetimes. No group completion or
+public transfer endpoint is exposed. Keep the remaining worker, issuance and Mobile
+ownership requirements above.

@@ -13,7 +13,6 @@ import java.net.http.*
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.Base64
 import java.util.UUID
 import org.junit.jupiter.api.AfterAll
@@ -66,7 +65,7 @@ class NativeCollaborationPushProviderHttpTest : NativeCollaborationApiFixture() 
 
     @BeforeEach
     fun prepareProviderIngress() {
-        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+        clock.followSystemTime()
         provider.startProxy(port)
     }
 
@@ -128,6 +127,7 @@ class NativeCollaborationPushProviderHttpTest : NativeCollaborationApiFixture() 
                 )
             )
         val peerAccount = UUID.randomUUID()
+        val peerAdmittedAt = clock.instant()
         val peer =
             success(
                 matrix.login(
@@ -135,8 +135,8 @@ class NativeCollaborationPushProviderHttpTest : NativeCollaborationApiFixture() 
                         n.fixture.company,
                         peerAccount,
                         UUID.randomUUID(),
-                        clock.instant(),
-                        clock.instant().plusSeconds(60),
+                        peerAdmittedAt,
+                        peerAdmittedAt.plusSeconds(60),
                     )
                 )
             )

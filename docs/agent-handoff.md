@@ -1,5 +1,64 @@
 # Agent continuation — HRIS workspace
 
+## Legacy Matrix gateway runtime fence accepted — 4 November 2026
+
+This increment (based on8787a0fa) gives AccessNativeCollaborationMatrixDevice one
+bounded original-runtime lease over every fixed gateway operation and internal
+provider renewal. It checks current authority plus runtime then exact-slot guards
+before/after provider success/failure and during publication. Network I/O holds no
+SQL locks. Failed preparation rolls its claim back; finally release preserves
+original/same exceptions and never clears interruption. Full eight-slot capacity
+returns temporary busy without I/O/retry, and real expiry permits exact recovery.
+Published original keys and winning provider credentials survive late/frozen work;
+no losing Matrix login is logged out.
+
+[Evidence](measurements/collaboration-legacy-runtime-gateway-2026-11-04.json): full
+native data160 PASS243.562s; actual API47 PASS152.165s; full worker127 cases (126
+active/one existing opt-in elapsed-retention skip) PASS342.882s. Current Android SDK
+five cases PASS1047.184s: actual encrypted SDK receipt recovery,
+Android WorkManager after process death/network restore, and QUEUED/CANCELLED_DRAFT/
+FROZEN_DRAFT recovery of176 originals each. Each native driver cleans up; both owned
+emulator lifetimes are stopped with transport absence verified. APK0ccc4c12 comes
+from accepted Mobile3d85d569 and was never installed on the phone.
+
+Each accepted check freezes8264 inputs and passes format/architecture. API/full
+worker sources match. Full native data differs only in later API test fixtures:
+push peer JWT captures one real instant; SDK worker ciphertext verifier acquires
+fresh normally admitted same-identity credentials after SDK shutdown, with bounded
+rotation wait and one owned/closed HTTP client. Production/native-data hashes are
+unchanged across those checks. Failed runs are retained: missing imports; positive
+fake-clock claims; protected fixture-table access; old deadline assumptions; moving
+peer-JWT clock; SDK1 correctly refusing an already installed owned proof package;
+SDK2 four/five accepted despite all drivers passing because later ciphertext
+verification used an expired original five-minute public token. Production time
+limits were not relaxed. All current checks/sessions and owned emulators are closed.
+
+Only the gateway caller is fenced here. Next apply/review the four remaining
+consumer drafts in ignored runtime-consumer-next, verifying *-base.json first:
+BootstrapNativeCollaborationGateway, RefreshNativeCollaborationGateway,
+AdvanceNativeCollaborationProvisioning and AdvanceNativeCollaborationDirectRoom.
+Their six-file assembly includes shared DI and real fixture factories plus six new
+test methods. It has been formatted, not compiled or accepted. Never overwrite the
+current Access use case with the older draft alongside it. The prepared focused
+script selects18 cases; full native is expected166. Review worker-review.md and
+transfer-publication-review.md. Required actual API/full worker/current SDK gates
+follow these new shared graph edits. An old negative fake-time retry fixture may
+restore real time before its positive worker continuation only when no future
+write was committed; otherwise wait genuinely. Never fabricate SQL lease times.
+
+After every legacy caller is fenced, implement admitted atomic group publication/
+old credential retirement plus Mobile durable SDK drain/alias and coherent room,
+inbox/outbox/read/push/deep-link ownership. No public transfer endpoint or completed
+group runtime is enabled. Never take old job/room guards after account/native.
+
+Mobilefcf4cd33 records all hosted3d85d569 gates: protocol41741297195, control
+41741297181 (3114 portable/1217 Apple and full Xcode), native41741297183 (232
+Android-host/18 proof-host/5 native plus three inspected SystemUI PNGs). Main80ef0d95
+needs this accepted group commit recorded. Live8b40/schema116 pushON/SMTP OFF,
+normal phone28 and Starter9959c1d stay unchanged. All54 communications acceptance
+groups and actual Apple Matrix/APNs/CallKit remain open. Continue the full long
+run, frequent user updates, Git evidence and immediate push of every atomic commit.
+
 ## Original runtime policy and exact lease guard accepted — 4 November 2026
 
 Pure owner/lifecycle/admission-window and unchanged live-lease validation now

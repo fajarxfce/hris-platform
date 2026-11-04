@@ -9,8 +9,6 @@ import java.net.URI
 import java.net.http.*
 import java.nio.file.Path
 import java.time.Duration
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.*
@@ -48,7 +46,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     fun alignProtocolClockWithCurrentDatabaseTime() {
         // This live eligibility view uses database time. The broader People fixture
         // intentionally uses October 1; that is not a live protocol parent today.
-        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+        clock.followSystemTime()
     }
 
     @AfterEach

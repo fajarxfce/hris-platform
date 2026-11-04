@@ -810,6 +810,14 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun collaborationLegacyRuntimeRepository(
+        sql: DSLContext
+    ): CollaborationLegacyRuntimeRepository =
+        StoredCollaborationLegacyRuntimeRepository(
+            PostgresCollaborationLegacyRuntimeDataSource(sql)
+        )
+
+    @Bean
     fun accessNativeCollaborationMatrixDevice(
         gateway: CollaborationGatewaySessionRepository,
         registry: CollaborationRegistryRepository,
@@ -840,6 +848,7 @@ class CollaborationConfiguration {
         pushBindings: CollaborationPushBindingRepository,
         providerPush: CollaborationMatrixPusherRepository,
         nativePush: NativePushRegistrationRepository,
+        runtimes: CollaborationLegacyRuntimeRepository,
     ) =
         AccessNativeCollaborationMatrixDevice(
             gateway,
@@ -871,6 +880,7 @@ class CollaborationConfiguration {
             pushBindings,
             providerPush,
             nativePush,
+            runtimes,
         )
 
     @Bean

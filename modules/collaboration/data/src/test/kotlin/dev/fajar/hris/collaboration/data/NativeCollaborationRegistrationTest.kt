@@ -4,10 +4,13 @@ import dev.fajar.hris.administration.data.datasources.PostgresCompanyClientPolic
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.collaboration.data.datasources.CollaborationLegacyRuntimeCoordinatesData
+import dev.fajar.hris.collaboration.data.datasources.CollaborationLegacyRuntimeDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDeviceKeyDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectRoomDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationLegacyRuntimeDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationPushBindingDataSource
@@ -32,6 +35,7 @@ import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatri
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDeviceKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRoomRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationLegacyRuntimeRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationPushQueueRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRecipientRepository
@@ -46,6 +50,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationDeviceKeyRe
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationLegacyRuntimeRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixPusherRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
@@ -62,6 +67,7 @@ import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
 import dev.fajar.hris.core.database.repositories.*
+import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.datasources.PostgresNativePushRegistrationDataSource
@@ -1383,6 +1389,7 @@ class NativeCollaborationRegistrationTest {
     }
 
     private class RecordingMatrix(private val clock: Clock) : CollaborationMatrixRepository {
+        var lifetimeSeconds = 300L
         val logins = AtomicInteger()
         val logouts = AtomicInteger()
         val queries = AtomicInteger()
@@ -1398,7 +1405,7 @@ class NativeCollaborationRegistrationTest {
                         "@${collaborationMatrixLocalpart(request.companyId, request.accountId)}:proof.invalid",
                         collaborationMatrixDeviceId(request.deviceId),
                         "fictional-provider-${UUID.randomUUID()}",
-                        clock.instant().plusSeconds(300),
+                        clock.instant().plusSeconds(lifetimeSeconds),
                     )
                 )
                 .also {
@@ -1757,6 +1764,349 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun gatewayRuntimeFreezeStopsFurtherProviderCallsAndRetainsPublishedKeys() {
+        val k = KeyUploadFixture()
+        success(k.upload())
+        val published = requireNotNull(k.publication())
+        val calls =
+            listOf(
+                k.matrix.logins.get(),
+                k.matrix.queries.get(),
+                k.provider.queries.get(),
+                k.provider.uploads.get(),
+            )
+        val prior = requireNotNull(k.g.f.credential(k.g.device))
+        k.g.f.freezeRuntime(k.g.owner, published.fingerprint)
+        assertEquals("collaboration_runtime_transferring", failed(k.upload()))
+        assertEquals(
+            "collaboration_runtime_transferring",
+            failed(k.command.identity(k.tokens.accessToken, UUID.randomUUID())),
+        )
+        assertEquals(
+            calls,
+            listOf(
+                k.matrix.logins.get(),
+                k.matrix.queries.get(),
+                k.provider.queries.get(),
+                k.provider.uploads.get(),
+            ),
+        )
+        assertEquals(published, k.publication())
+        assertEquals(prior.accessToken, k.g.f.credential(k.g.device)?.accessToken)
+        assertEquals(0, k.matrix.logouts.get())
+        assertTrue(k.g.runtimeSlots().all { it.releasedAt != null })
+    }
+
+    @Test
+    fun gatewayRuntimeFreezeDuringProviderWriteWithholdsLateSuccessAndFailure() {
+        for (providerFails in listOf(false, true)) {
+            val k = KeyUploadFixture()
+            k.provider.onUpload = { request ->
+                k.g.f.freezeRuntime(k.g.owner, requireNotNull(k.publication()).fingerprint)
+                if (providerFails)
+                    Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+                else k.provider.accept(request)
+            }
+            assertEquals("collaboration_runtime_transferring", failed(k.upload()))
+            assertEquals(0L, k.publication()?.version)
+            assertEquals(1, k.provider.uploads.get())
+            assertEquals(1, k.provider.queries.get())
+            assertEquals(0, k.matrix.logouts.get())
+            assertTrue(k.g.runtimeSlots().all { it.releasedAt != null })
+        }
+    }
+
+    @Test
+    fun gatewayRuntimeFullCapacityHasNoProviderIoAndReleasedSlotResumes() {
+        val k = KeyUploadFixture()
+        success(k.upload())
+        val occupied =
+            (0 until 8).map {
+                requireNotNull(
+                    success(
+                        k.g.f.transactions.run(k.g.f.actor) {
+                            k.g.f.legacyRuntimes.claim(
+                                k.g.owner,
+                                Instant.now().plusSeconds(30).truncatedTo(ChronoUnit.MICROS),
+                            )
+                        }
+                    )
+                )
+            }
+        val calls = k.provider.queries.get()
+        val audit = k.g.f.rows("audit_entries")
+        assertEquals("collaboration_runtime_busy", failed(k.upload()))
+        assertEquals(calls, k.provider.queries.get())
+        assertEquals(audit, k.g.f.rows("audit_entries"))
+        assertEquals(occupied.toSet(), k.g.runtimeSlots().toSet())
+        assertTrue(
+            success(
+                k.g.f.transactions.run(k.g.f.actor) {
+                    k.g.f.legacyRuntimes.release(occupied.first())
+                }
+            )
+        )
+        success(k.upload())
+        val reused = k.g.runtimeSlots().single { it.slot == occupied.first().slot }
+        assertNotEquals(occupied.first().token, reused.token)
+        assertNotNull(reused.releasedAt)
+        for (lease in occupied.drop(1)) assertTrue(
+            success(k.g.f.transactions.run(k.g.f.actor) { k.g.f.legacyRuntimes.release(lease) })
+        )
+        assertEquals(8, k.g.runtimeSlots().size)
+        assertTrue(k.g.runtimeSlots().all { it.releasedAt != null })
+    }
+
+    @Test
+    fun gatewayRuntimeCancellationReleasesExactLeaseWithoutPublishingKeys() {
+        val k = KeyUploadFixture()
+        val cancelled = CancellationException("owned gateway fixture")
+        k.provider.onQuery = { throw cancelled }
+        assertSame(cancelled, assertThrows(CancellationException::class.java) { k.upload() })
+        assertEquals(0L, k.publication()?.version)
+        assertEquals(0, k.provider.uploads.get())
+        val lease = k.g.runtimeSlots().single()
+        assertNotNull(lease.releasedAt)
+        k.provider.onQuery = null
+        success(k.upload())
+        assertNotEquals(lease.token, k.g.runtimeSlots().single().token)
+    }
+
+    @Test
+    fun gatewayRuntimeCleanupFailurePreservesCancellationAndBoundedRecovery() {
+        for (mode in listOf("failed", "throws", "same_exception")) {
+            val k = KeyUploadFixture()
+            success(k.upload())
+            val cancelled = CancellationException("owned gateway fixture")
+            val cleanup = IllegalStateException("owned metadata cleanup fixture")
+            val runtimes =
+                object : CollaborationLegacyRuntimeRepository by k.g.f.legacyRuntimes {
+                    override fun release(lease: CollaborationLegacyRuntimeLease): Result<Boolean> {
+                        if (mode == "throws") throw cleanup
+                        if (mode == "same_exception") throw cancelled
+                        return Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "fixture_cleanup_failed")
+                        )
+                    }
+                }
+            k.matrix.onQuery = { throw cancelled }
+            val command = k.g.f.matrixIdentity(k.matrix, runtimes = runtimes)
+            assertSame(
+                cancelled,
+                assertThrows(CancellationException::class.java) {
+                    command.identity(k.tokens.accessToken, UUID.randomUUID())
+                },
+            )
+            assertEquals(
+                if (mode == "throws") listOf(cleanup) else emptyList(),
+                cancelled.suppressed.toList(),
+            )
+            val lease = k.g.runtimeSlots().single()
+            assertNull(lease.releasedAt)
+            assertTrue(Duration.between(lease.startedAt, lease.expiresAt) <= Duration.ofSeconds(60))
+            assertTrue(
+                success(k.g.f.transactions.run(k.g.f.actor) { k.g.f.legacyRuntimes.release(lease) })
+            )
+            assertEquals(0, k.matrix.logouts.get())
+        }
+    }
+
+    @Test
+    fun gatewayRuntimeInterruptedThreadSkipsSqlCleanupAndExpiredSlotCanBeReclaimed() {
+        val k = KeyUploadFixture()
+        success(k.upload())
+        val releases = AtomicInteger()
+        val runtimes =
+            object : CollaborationLegacyRuntimeRepository by k.g.f.legacyRuntimes {
+                override fun claim(
+                    owner: CollaborationLegacyRuntimeOwner,
+                    until: Instant,
+                ): Result<CollaborationLegacyRuntimeLease?> =
+                    k.g.f.legacyRuntimes.claim(
+                        owner,
+                        minOf(until, Instant.now().plusSeconds(1)).truncatedTo(ChronoUnit.MICROS),
+                    )
+
+                override fun release(lease: CollaborationLegacyRuntimeLease): Result<Boolean> {
+                    releases.incrementAndGet()
+                    return k.g.f.legacyRuntimes.release(lease)
+                }
+            }
+        val interrupted = InterruptedException("owned gateway fixture")
+        k.matrix.onQuery = {
+            Thread.currentThread().interrupt()
+            throw interrupted
+        }
+        val command = k.g.f.matrixIdentity(k.matrix, runtimes = runtimes)
+        try {
+            assertSame(
+                interrupted,
+                assertThrows(InterruptedException::class.java) {
+                    command.identity(k.tokens.accessToken, UUID.randomUUID())
+                },
+            )
+            assertTrue(Thread.currentThread().isInterrupted)
+            assertEquals(0, releases.get())
+        } finally {
+            // The fixture owns this interrupt; production must never clear it for cleanup.
+            Thread.interrupted()
+        }
+        val abandoned = k.g.runtimeSlots().single()
+        assertNull(abandoned.releasedAt)
+        k.g.f.awaitRealTime(abandoned.expiresAt.plusMillis(1))
+        k.matrix.onQuery = { Result.Success(requireNotNull(k.matrix.issued[it])) }
+        success(command.identity(k.tokens.accessToken, UUID.randomUUID()))
+        val reclaimed = k.g.runtimeSlots().single()
+        assertNotEquals(abandoned.token, reclaimed.token)
+        assertNotNull(reclaimed.releasedAt)
+        assertEquals(1, releases.get())
+    }
+
+    @Test
+    fun gatewayRuntimeFreezeDuringRenewalCannotReplaceTheRetainedCredential() {
+        val k = KeyUploadFixture()
+        k.matrix.lifetimeSeconds = 21
+        success(k.upload())
+        val prior = requireNotNull(k.g.f.credential(k.g.device))
+        val publicVersion = k.g.f.gatewayHead(k.g.device).version
+        k.g.f.awaitRealTime(requireNotNull(prior.expiresAt).minusSeconds(9))
+        k.matrix.lifetimeSeconds = 300
+        k.matrix.onLogin = { request ->
+            k.g.f.freezeRuntime(k.g.owner, requireNotNull(k.publication()).fingerprint)
+            k.matrix.issue(request)
+        }
+        assertEquals(
+            "collaboration_runtime_transferring",
+            failed(k.command.identity(k.tokens.accessToken, UUID.randomUUID())),
+        )
+        val retained = requireNotNull(k.g.f.credential(k.g.device))
+        assertEquals(prior.generation, retained.generation)
+        assertEquals(prior.accessToken, retained.accessToken)
+        assertEquals(publicVersion, k.g.f.gatewayHead(k.g.device).version)
+        assertEquals(2, k.matrix.logins.get())
+        assertEquals(0, k.matrix.logouts.get())
+        assertTrue(k.g.runtimeSlots().all { it.releasedAt != null })
+    }
+
+    @Test
+    fun gatewayRuntimeFreezeDuringPusherSetCannotPublishLateSuccessOrFailure() {
+        for (providerFails in listOf(false, true)) {
+            val p = PusherFixture()
+            val keys =
+                MatrixKeyFixture(
+                    "@${collaborationMatrixLocalpart(requireNotNull(p.f.actor.companyId), p.f.account)}:proof.invalid",
+                    collaborationMatrixDeviceId(p.g.device),
+                )
+            success(
+                p.f
+                    .matrixIdentity(p.matrix, providerKeys = RecordingKeys())
+                    .uploadKeys(
+                        p.token,
+                        UUID.randomUUID(),
+                        CollaborationMatrixKeyUpload(keys.device, emptyMap(), emptyMap()),
+                    )
+            )
+            val published =
+                requireNotNull(
+                    success(
+                        p.f.transactions.run(p.f.actor) {
+                            p.f.deviceKeys.find(
+                                requireNotNull(p.f.actor.companyId),
+                                p.f.account,
+                                p.g.device,
+                            )
+                        }
+                    )
+                )
+            p.onSet = {
+                p.f.freezeRuntime(p.g.owner, published.fingerprint)
+                if (providerFails)
+                    Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+                else Result.Success(Unit)
+            }
+            assertEquals("collaboration_runtime_transferring", failed(p.ensure()))
+            assertEquals(0L, p.binding().version)
+            assertEquals(1, p.keys.size)
+            assertEquals(0, p.matrix.logouts.get())
+            assertTrue(p.g.runtimeSlots().all { it.releasedAt != null })
+        }
+    }
+
+    @Test
+    fun gatewayRuntimeFailedMetadataCleanupPreservesTheProviderOutcomeWithoutRetry() {
+        for (providerFails in listOf(false, true)) {
+            val k = KeyUploadFixture()
+            success(k.upload())
+            val failure = Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+            val releases = AtomicInteger()
+            val runtimes =
+                object : CollaborationLegacyRuntimeRepository by k.g.f.legacyRuntimes {
+                    override fun release(lease: CollaborationLegacyRuntimeLease): Result<Boolean> {
+                        releases.incrementAndGet()
+                        return Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "fixture_cleanup_failed")
+                        )
+                    }
+                }
+            val before = k.matrix.queries.get()
+            k.matrix.onQuery = {
+                if (providerFails) failure else Result.Success(requireNotNull(k.matrix.issued[it]))
+            }
+            val result =
+                k.g.f
+                    .matrixIdentity(k.matrix, runtimes = runtimes)
+                    .identity(k.tokens.accessToken, UUID.randomUUID())
+            if (providerFails) assertEquals(failure, result) else success(result)
+            assertEquals(before + 1, k.matrix.queries.get())
+            assertEquals(1, releases.get())
+            val lease = k.g.runtimeSlots().single()
+            assertNull(lease.releasedAt)
+            assertTrue(
+                success(k.g.f.transactions.run(k.g.f.actor) { k.g.f.legacyRuntimes.release(lease) })
+            )
+        }
+    }
+
+    @Test
+    fun gatewayRuntimeExpiredReadbackRetainsReservationForAdmittedRetry() {
+        val k = KeyUploadFixture()
+        val runtimes =
+            object : CollaborationLegacyRuntimeRepository by k.g.f.legacyRuntimes {
+                override fun claim(
+                    owner: CollaborationLegacyRuntimeOwner,
+                    until: Instant,
+                ): Result<CollaborationLegacyRuntimeLease?> =
+                    k.g.f.legacyRuntimes.claim(
+                        owner,
+                        minOf(until, Instant.now().plusSeconds(1)).truncatedTo(ChronoUnit.MICROS),
+                    )
+            }
+        val command = k.g.f.matrixIdentity(k.matrix, providerKeys = k.provider, runtimes = runtimes)
+        k.provider.onQuery = {
+            if (k.provider.queries.get() == 2)
+                k.g.f.awaitRealTime(k.g.runtimeSlots().single().expiresAt.plusMillis(1))
+            Result.Success(k.provider.stored)
+        }
+        assertEquals(
+            "collaboration_runtime_changed",
+            failed(command.uploadKeys(k.tokens.accessToken, UUID.randomUUID(), k.request)),
+        )
+        val reserved = requireNotNull(k.publication())
+        assertEquals(0L, reserved.version)
+        assertEquals(k.keys.device, k.provider.stored)
+        val expired = k.g.runtimeSlots().single()
+        assertNotNull(expired.releasedAt)
+        k.provider.onQuery = null
+        success(k.upload())
+        val published = requireNotNull(k.publication())
+        assertEquals(reserved.fingerprint, published.fingerprint)
+        assertEquals(reserved.reservedAt, published.reservedAt)
+        assertEquals(1L, published.version)
+        assertNotEquals(expired.token, k.g.runtimeSlots().single().token)
+        assertEquals(0, k.matrix.logouts.get())
+    }
+
+    @Test
     fun gatewayKeyReadbackCannotConfirmMissingChangedLateOrUnavailableProviderIdentity() {
         for (mode in listOf("missing", "changed", "expired", "unavailable")) {
             val k = KeyUploadFixture()
@@ -1792,8 +2142,12 @@ class NativeCollaborationRegistrationTest {
             assertEquals(1, k.provider.uploads.get())
             assertEquals(0, k.matrix.logouts.get())
             k.provider.onQuery = null
-            assertInstanceOf(Result.Success::class.java, k.upload(), mode)
-            assertEquals(1L, k.publication()?.version)
+            // This expiry case deliberately advances a frozen clock beyond real DB time.
+            // A separate short real-lease test exercises the admitted retry after expiry.
+            if (mode != "expired") {
+                assertInstanceOf(Result.Success::class.java, k.upload(), mode)
+                assertEquals(1L, k.publication()?.version)
+            }
         }
     }
 
@@ -3365,7 +3719,7 @@ class NativeCollaborationRegistrationTest {
                     CollaborationSyncRequest(null, 0),
                 )
             )
-        g.f.clock.at = g.f.clock.at.plusSeconds(11)
+        g.f.awaitRealTime(g.f.clock.at.plusSeconds(11))
         val refreshed = success(g.refresh(tokens.refreshToken))
         assertNotEquals(tokens.accessToken, refreshed.accessToken)
         success(
@@ -3407,16 +3761,18 @@ class NativeCollaborationRegistrationTest {
     @Test
     fun gatewayIdentityRenewsOnlyInternalProviderBearerAndKeepsDeviceAndPublicSession() {
         val g = GatewayFixture()
-        val matrix = RecordingMatrix(g.f.clock)
+        val matrix = RecordingMatrix(g.f.clock).apply { lifetimeSeconds = 21 }
         val request = g.f.matrixIdentity(matrix)
         val tokens = success(g.bootstrap())
         val first = success(request.identity(tokens.accessToken, UUID.randomUUID()))
         assertEquals(first, success(request.identity(tokens.accessToken, UUID.randomUUID())))
         assertEquals(1, matrix.logins.get())
         val prior = requireNotNull(g.f.credential(g.device))
-        g.f.clock.at = g.f.clock.at.plusSeconds(280)
+        // A real short-lived bearer crosses the renewal margin without moving the
+        // application clock beyond the database's authoritative lease deadline.
+        g.f.awaitRealTime(requireNotNull(prior.expiresAt).minusSeconds(9))
+        matrix.lifetimeSeconds = 300
         val next = success(g.refresh(tokens.refreshToken))
-        g.f.clock.at = g.f.clock.at.plusSeconds(20)
         assertEquals(first, success(request.identity(next.accessToken, UUID.randomUUID())))
         val renewed = requireNotNull(g.f.credential(g.device))
         assertEquals(prior.generation + 1, renewed.generation)
@@ -3454,7 +3810,7 @@ class NativeCollaborationRegistrationTest {
     fun gatewayIdentityDoesNotPublishAcrossConcurrentPublicRefresh() {
         val g = GatewayFixture()
         val tokens = success(g.bootstrap())
-        g.f.clock.at = g.f.clock.at.plusSeconds(10)
+        g.f.awaitRealTime(g.f.clock.at.plusSeconds(11))
         val matrix = RecordingMatrix(g.f.clock)
         matrix.onLogin = {
             success(g.refresh(tokens.refreshToken))
@@ -5946,7 +6302,17 @@ class NativeCollaborationRegistrationTest {
         val p = PusherFixture()
         success(p.ensure())
         val event = p.f.pushRoom(p.g.parent, p.g.device)
-        p.rotate(expiresAt = p.f.clock.at.plusSeconds(86400))
+        p.rotate(
+            expiresAt =
+                requireNotNull(
+                        sql.queryForObject(
+                            "select expires_at from native_sessions where id=?",
+                            OffsetDateTime::class.java,
+                            p.g.parent,
+                        )
+                    )
+                    .toInstant()
+        )
         p.f.clock.at = p.f.clock.at.plusSeconds(901)
         assertEquals(0, success(p.accept(event)).rejected.size)
         val first = p.head()!!
@@ -6713,6 +7079,17 @@ class NativeCollaborationRegistrationTest {
         val parent = f.parent(authenticationLeadSeconds = authenticationLeadSeconds)
         val device = (f.register(parent) as Result.Success).value.id
         val operation = UUID.randomUUID()
+        val owner
+            get() =
+                CollaborationLegacyRuntimeOwner(
+                    requireNotNull(f.actor.companyId),
+                    device,
+                    f.account,
+                    parent,
+                )
+
+        fun runtimeSlots() =
+            (f.transactions.run(f.actor) { f.legacyRuntimes.slots(owner) } as Result.Success).value
 
         init {
             f.activate(device)
@@ -6742,6 +7119,15 @@ class NativeCollaborationRegistrationTest {
     private class Fixture(val account: UUID = UUID.randomUUID(), worker: Boolean = false) {
         private val source = if (worker) pushWorkerRuntime else runtime
         val clock = MutableClock(Instant.now().truncatedTo(ChronoUnit.MICROS))
+
+        fun awaitRealTime(until: Instant) {
+            val remaining = Duration.between(Instant.now(), until).toMillis()
+            require(remaining <= 30_000) { "Fixture wait must remain bounded" }
+            if (remaining >= 0) Thread.sleep(remaining + 1)
+            clock.at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            check(clock.at >= until)
+        }
+
         val transactions =
             PostgresTransactionRunner(JdbcTransactionManager(source), JdbcTemplate(source))
         private val dsl = DSL.using(TransactionAwareDataSourceProxy(source), SQLDialect.POSTGRES)
@@ -7168,6 +7554,28 @@ class NativeCollaborationRegistrationTest {
                 clock,
             )
 
+        val legacyRuntimes: CollaborationLegacyRuntimeRepository by lazy {
+            val raw = PostgresCollaborationLegacyRuntimeDataSource(dsl)
+            StoredCollaborationLegacyRuntimeRepository(
+                object : CollaborationLegacyRuntimeDataSource by raw {
+                    override fun claim(
+                        owner: CollaborationLegacyRuntimeCoordinatesData,
+                        until: java.time.OffsetDateTime,
+                    ): List<
+                        dev.fajar.hris.schema.tables.records.CollaborationLegacyRuntimeLeasesRecord
+                    > {
+                        val rows = raw.claim(owner, until)
+                        // Align the frozen fixture clock with an actual newly claimed SQL lease.
+                        // Later deliberate expiry/backward-clock mutations remain observable.
+                        rows.singleOrNull()?.startedAt?.toInstant()?.let { started ->
+                            synchronized(clock) { if (clock.at < started) clock.at = started }
+                        }
+                        return rows
+                    }
+                }
+            )
+        }
+
         fun matrixIdentity(
             matrix: CollaborationMatrixRepository,
             journal: ChangeJournalRepository = this.journal,
@@ -7194,6 +7602,7 @@ class NativeCollaborationRegistrationTest {
             providerPush: CollaborationMatrixPusherRepository =
                 DisabledCollaborationMatrixPusherRepository(),
             pushEnabled: Boolean = false,
+            runtimes: CollaborationLegacyRuntimeRepository = legacyRuntimes,
         ) =
             AccessNativeCollaborationMatrixDevice(
                 gateway,
@@ -7232,7 +7641,66 @@ class NativeCollaborationRegistrationTest {
                 pushBindings,
                 providerPush,
                 nativePush,
+                runtimes,
             )
+
+        fun freezeRuntime(owner: CollaborationLegacyRuntimeOwner, fingerprint: String) {
+            val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            val root = actor.copy(companyId = null)
+            val target =
+                success(
+                    transactions.run(root) {
+                        safeDatabaseCall {
+                            val space =
+                                requireNotNull(
+                                        dsl.fetchOne(
+                                            "select space_id from collaboration_space_directory"
+                                        )
+                                    )
+                                    .get(0, UUID::class.java)
+                            val id = UUID.randomUUID()
+                            val user =
+                                "@${collaborationMatrixLocalpart(owner.companyId, account)}:proof.invalid"
+                            dsl.execute(
+                                "insert into collaboration_space_identities(space_id,account_id,matrix_server_name,matrix_user_id,origin,legacy_company_id,legacy_device_id,created_at) values(?,?,'proof.invalid',?,'LEGACY',?,?,?::timestamptz)",
+                                space,
+                                account,
+                                user,
+                                owner.companyId,
+                                owner.deviceId,
+                                at.toString(),
+                            )
+                            dsl.execute(
+                                "insert into collaboration_space_devices(space_id,id,account_id,matrix_user_id,matrix_device_id,origin,legacy_company_id,legacy_device_id,legacy_key_fingerprint,origin_native_session_id,platform,label,state,version,created_at,updated_at) values(?,?,?,?,?,'LEGACY',?,?,?,?,'ANDROID','Fictional transfer','PROVISIONING',0,?::timestamptz,?::timestamptz)",
+                                space,
+                                id,
+                                account,
+                                user,
+                                collaborationMatrixDeviceId(owner.deviceId),
+                                owner.companyId,
+                                owner.deviceId,
+                                fingerprint,
+                                owner.nativeSessionId,
+                                at.toString(),
+                                at.toString(),
+                            )
+                            dsl.execute(
+                                "insert into collaboration_space_device_sessions(space_id,device_id,account_id,native_session_id,bound_at) values(?,?,?,?,?::timestamptz)",
+                                space,
+                                id,
+                                account,
+                                owner.nativeSessionId,
+                                at.toString(),
+                            )
+                            CollaborationLegacyRuntimeTarget(space, id)
+                        }
+                    }
+                )
+            assertTrue(
+                success(transactions.run(root) { legacyRuntimes.freeze(owner, target, 0, at) })
+            )
+            clock.at = maxOf(clock.at, Instant.now().truncatedTo(ChronoUnit.MICROS))
+        }
 
         fun pushHandler(
             queue: CollaborationPushQueueRepository = pushQueue,

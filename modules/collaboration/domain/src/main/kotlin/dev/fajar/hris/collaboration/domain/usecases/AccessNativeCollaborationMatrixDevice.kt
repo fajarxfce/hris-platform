@@ -45,6 +45,7 @@ class AccessNativeCollaborationMatrixDevice(
     private val pushBindings: CollaborationPushBindingRepository,
     private val providerPush: CollaborationMatrixPusherRepository,
     private val nativePush: NativePushRegistrationRepository,
+    private val runtimes: CollaborationLegacyRuntimeRepository,
 ) {
     fun ensurePusher(token: String, correlationId: UUID): Result<Unit> {
         if (!service.pushEnabled) return pushUnavailable()
@@ -1129,36 +1130,129 @@ class AccessNativeCollaborationMatrixDevice(
         val captured =
             transactions.run(scope) {
                 observe(scope, initial, relatedAccounts).flatMap { observation ->
-                    val extra: Result<S> =
-                        if (resolvedAccounts is Result.Failed) resolvedAccounts
-                        else prepare(initial, observation)
-                    validateObservation(observation.admission, observation.admission).flatMap {
-                        extra.map { Preparation(observation, it) }
+                    claimRuntime(observation).flatMap { claimed ->
+                        val extra: Result<S> =
+                            if (resolvedAccounts is Result.Failed) resolvedAccounts
+                            else prepare(initial, observation)
+                        validateObservation(observation.admission, observation.admission).flatMap {
+                            validateCollaborationLegacyRuntimeLease(
+                                    claimed.runtime,
+                                    claimed.lease,
+                                    claimed.lease,
+                                    observation.admission,
+                                    clock.instant(),
+                                )
+                                .flatMap {
+                                    extra.map { Preparation(observation, it, claimed.lease) }
+                                }
+                        }
                     }
                 }
             }
         if (captured is Result.Failed) return captured
         val prepared = (captured as Result.Success).value
-        val observed = prepared.observation
-        val credential =
-            if (usable(observed.credential)) Result.Success(requireNotNull(observed.credential))
-            else renew(scope, initial, observed)
-        if (credential is Result.Failed) return credential
-        val active = (credential as Result.Success).value
-        val deadline =
-            minOf(
-                observed.admission.expiresAt,
-                initial.accessExpiresAt,
-                requireNotNull(active.expiresAt),
+        var originalFailure: Throwable? = null
+        try {
+            val observed = prepared.observation
+            val credential =
+                if (usable(observed.credential)) Result.Success(requireNotNull(observed.credential))
+                else renew(scope, initial, observed, prepared.lease)
+            if (credential is Result.Failed) return credential
+            val active = (credential as Result.Success).value
+            val deadline =
+                minOf(
+                    observed.admission.expiresAt,
+                    initial.accessExpiresAt,
+                    requireNotNull(active.expiresAt),
+                    prepared.lease.expiresAt,
+                )
+            if (clock.instant() >= deadline) return changed()
+            return operation(
+                Exchange(
+                    scope,
+                    initial,
+                    observed.admission,
+                    active,
+                    deadline,
+                    relatedAccounts,
+                    prepared.lease,
+                ) {
+                    revalidate(initial, prepared.extra)
+                },
+                prepared.extra,
             )
-        if (clock.instant() >= deadline) return changed()
-        return operation(
-            Exchange(scope, initial, observed.admission, active, deadline, relatedAccounts) {
-                revalidate(initial, prepared.extra)
-            },
-            prepared.extra,
-        )
+        } catch (failure: Throwable) {
+            originalFailure = failure
+            throw failure
+        } finally {
+            // Do not clear cancellation/interruption to start more SQL. The finite lease
+            // remains recoverable if this request cannot finish metadata cleanup.
+            if (!Thread.currentThread().isInterrupted) {
+                try {
+                    transactions.run(scope) { runtimes.release(prepared.lease) }
+                } catch (cleanup: Throwable) {
+                    val original = originalFailure
+                    if (original == null) throw cleanup
+                    if (original !== cleanup) original.addSuppressed(cleanup)
+                }
+            }
+        }
     }
+
+    /** Caller owns current admission and its transaction; this method performs no provider I/O. */
+    private fun claimRuntime(observation: Observation): Result<RuntimeClaim> {
+        val admission = observation.admission
+        val owner = collaborationLegacyRuntimeOwner(admission)
+        val at = clock.instant().truncatedTo(ChronoUnit.MICROS)
+        return runtimes.ensure(owner, at).flatMap { runtime ->
+            admitCollaborationLegacyRuntime(runtime, admission, clock.instant()).flatMap {
+                val until =
+                    minOf(admission.expiresAt, at.plusSeconds(60)).truncatedTo(ChronoUnit.MICROS)
+                runtimes.claim(owner, until).flatMap { lease ->
+                    if (lease == null)
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_busy")
+                        )
+                    else
+                        validateCollaborationLegacyRuntimeLease(
+                                runtime,
+                                lease,
+                                lease,
+                                admission,
+                                clock.instant(),
+                            )
+                            .map { RuntimeClaim(runtime, lease) }
+                }
+            }
+        }
+    }
+
+    /** Runtime then exact slot guards remain held until the caller's transaction ends. */
+    private fun checkRuntime(
+        observation: Observation,
+        lease: CollaborationLegacyRuntimeLease,
+    ): Result<Unit> {
+        val owner = collaborationLegacyRuntimeOwner(observation.admission)
+        return runtimes.find(owner, lock = true).flatMap { runtime ->
+            if (runtime == null)
+                Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_runtime_changed"))
+            else
+                runtimes.lease(owner, lease.slot, lock = true).flatMap { current ->
+                    validateCollaborationLegacyRuntimeLease(
+                        runtime,
+                        lease,
+                        current,
+                        observation.admission,
+                        clock.instant(),
+                    )
+                }
+        }
+    }
+
+    private class RuntimeClaim(
+        val runtime: CollaborationLegacyRuntime,
+        val lease: CollaborationLegacyRuntimeLease,
+    )
 
     private inner class Exchange(
         val scope: Actor,
@@ -1167,6 +1261,7 @@ class AccessNativeCollaborationMatrixDevice(
         val credential: CollaborationProviderSession,
         val deadline: Instant,
         val relatedAccounts: Set<UUID>,
+        val runtimeLease: CollaborationLegacyRuntimeLease,
         val extraCheck: () -> Result<Unit>,
     ) {
         fun <T> exchange(request: (String, Instant) -> Result<T>): Result<T> {
@@ -1192,63 +1287,78 @@ class AccessNativeCollaborationMatrixDevice(
         private fun check(): Result<Unit> =
             transactions.run(scope) {
                 observe(scope, initial, relatedAccounts).flatMap { current ->
-                    validateObservation(admission, current.admission).flatMap {
-                        extraCheck().flatMap {
-                            if (clock.instant() >= deadline) changed() else Result.Success(Unit)
+                    validateObservation(admission, current.admission)
+                        .flatMap { checkRuntime(current, runtimeLease) }
+                        .flatMap {
+                            extraCheck().flatMap {
+                                if (clock.instant() >= deadline) changed() else Result.Success(Unit)
+                            }
                         }
-                    }
                 }
             }
 
         fun publishPusher(prepared: PusherPreparation): Result<Unit> =
             transactions.run(scope) {
                 observe(scope, initial).flatMap { current ->
-                    validateObservation(admission, current.admission).flatMap {
-                        checkPusher(initial, prepared).flatMap validate@{
-                            if (clock.instant() >= deadline) return@validate changed()
-                            pushBindings.lock(initial.companyId, initial.deviceId).flatMap {
-                                pushBindings
-                                    .find(initial.companyId, initial.accountId, initial.deviceId)
-                                    .flatMap { binding ->
-                                        if (binding == null) pushChanged()
-                                        else if (binding.version == 1L) Result.Success(Unit)
-                                        else
-                                            pushBindings
-                                                .publish(
-                                                    binding,
-                                                    clock.instant().truncatedTo(ChronoUnit.MICROS),
-                                                )
-                                                .flatMap { published ->
-                                                    if (!published) pushChanged()
-                                                    else
-                                                        journal.record(
-                                                            current.actor,
-                                                            ChangeRecord(
-                                                                "collaboration_device",
-                                                                initial.deviceId,
-                                                                "collaboration.push_published",
-                                                            ),
-                                                        )
-                                                }
-                                    }
-                                    .flatMap {
-                                        validateObservation(admission, current.admission).flatMap {
-                                            checkPusher(initial, prepared).flatMap {
-                                                if (clock.instant() >= deadline) changed()
-                                                else Result.Success(Unit)
-                                            }
+                    validateObservation(admission, current.admission)
+                        .flatMap { checkRuntime(current, runtimeLease) }
+                        .flatMap {
+                            checkPusher(initial, prepared).flatMap validate@{
+                                if (clock.instant() >= deadline) return@validate changed()
+                                pushBindings.lock(initial.companyId, initial.deviceId).flatMap {
+                                    pushBindings
+                                        .find(
+                                            initial.companyId,
+                                            initial.accountId,
+                                            initial.deviceId,
+                                        )
+                                        .flatMap { binding ->
+                                            if (binding == null) pushChanged()
+                                            else if (binding.version == 1L) Result.Success(Unit)
+                                            else
+                                                pushBindings
+                                                    .publish(
+                                                        binding,
+                                                        clock
+                                                            .instant()
+                                                            .truncatedTo(ChronoUnit.MICROS),
+                                                    )
+                                                    .flatMap { published ->
+                                                        if (!published) pushChanged()
+                                                        else
+                                                            journal.record(
+                                                                current.actor,
+                                                                ChangeRecord(
+                                                                    "collaboration_device",
+                                                                    initial.deviceId,
+                                                                    "collaboration.push_published",
+                                                                ),
+                                                            )
+                                                    }
                                         }
-                                    }
+                                        .flatMap {
+                                            validateObservation(admission, current.admission)
+                                                .flatMap { checkRuntime(current, runtimeLease) }
+                                                .flatMap {
+                                                    checkPusher(initial, prepared).flatMap {
+                                                        if (clock.instant() >= deadline) changed()
+                                                        else Result.Success(Unit)
+                                                    }
+                                                }
+                                        }
+                                }
                             }
                         }
-                    }
                 }
             }
 
         fun publishKeys(retained: CollaborationDeviceKeyPublication): Result<Unit> =
             transactions.run(scope) {
                 observe(scope, initial).flatMap observation@{ current ->
-                    val validated = validateObservation(admission, current.admission)
+                    val validated =
+                        validateObservation(admission, current.admission).flatMap {
+                            checkRuntime(current, runtimeLease)
+                        }
                     if (validated is Result.Failed) return@observation validated
                     if (clock.instant() >= deadline) return@observation changed()
                     val locked = keys.lock(initial.companyId, initial.deviceId)
@@ -1286,7 +1396,11 @@ class AccessNativeCollaborationMatrixDevice(
             }
     }
 
-    private class Preparation<T>(val observation: Observation, val extra: T)
+    private class Preparation<T>(
+        val observation: Observation,
+        val extra: T,
+        val lease: CollaborationLegacyRuntimeLease,
+    )
 
     private fun keysChanged() =
         Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_device_key_recovery_required"))
@@ -1321,7 +1435,17 @@ class AccessNativeCollaborationMatrixDevice(
         scope: Actor,
         initial: CollaborationGatewaySession,
         prepared: Observation,
+        runtimeLease: CollaborationLegacyRuntimeLease,
     ): Result<CollaborationProviderSession> {
+        val before =
+            transactions.run(scope) {
+                observe(scope, initial).flatMap { current ->
+                    validateObservation(prepared.admission, current.admission).flatMap {
+                        checkRuntime(current, runtimeLease)
+                    }
+                }
+            }
+        if (before is Result.Failed) return before
         val issued =
             matrix.login(
                 CollaborationMatrixLogin(
@@ -1329,72 +1453,79 @@ class AccessNativeCollaborationMatrixDevice(
                     initial.accountId,
                     initial.deviceId,
                     prepared.admission.admittedAt,
-                    prepared.admission.expiresAt,
+                    minOf(prepared.admission.expiresAt, runtimeLease.expiresAt),
                 )
             )
         // Losing/late candidates expire privately. Synapse logout would erase the winning keys.
         return transactions.run(scope) {
             observe(scope, initial).flatMap { current ->
-                validateObservation(prepared.admission, current.admission).flatMap publication@{
-                    if (issued is Result.Failed) return@publication issued
-                    val candidate = (issued as Result.Success).value
-                    if (
-                        candidate.userId != expectedUser(initial) ||
-                            candidate.deviceId != collaborationMatrixDeviceId(initial.deviceId)
-                    )
-                        return@publication invalidProvider()
-                    val prior = current.credential
-                    if (prior?.generation != prepared.credential?.generation)
-                        return@publication if (usable(prior)) Result.Success(requireNotNull(prior))
-                        else changed()
-                    val now = clock.instant().truncatedTo(ChronoUnit.MICROS)
-                    if (
-                        candidate.expiresAt <= now.plusSeconds(10) ||
-                            candidate.expiresAt > now.plusSeconds(600)
-                    )
-                        return@publication invalidProvider()
-                    if ((prior?.generation ?: -1) >= 999999)
-                        return@publication Result.Failed(
-                            Failure(
-                                FailureKind.UNAUTHENTICATED,
-                                "collaboration_provider_renewal_required",
-                            )
+                validateObservation(prepared.admission, current.admission)
+                    .flatMap { checkRuntime(current, runtimeLease) }
+                    .flatMap publication@{
+                        if (issued is Result.Failed) return@publication issued
+                        val candidate = (issued as Result.Success).value
+                        if (
+                            candidate.userId != expectedUser(initial) ||
+                                candidate.deviceId != collaborationMatrixDeviceId(initial.deviceId)
                         )
-                    val next =
-                        CollaborationProviderSession(
-                            initial.companyId,
-                            initial.accountId,
-                            initial.deviceId,
-                            candidate.userId,
-                            candidate.deviceId,
-                            (prior?.generation ?: -1) + 1,
-                            candidate.accessToken,
-                            prior?.createdAt ?: now,
-                            now,
-                            candidate.expiresAt,
+                            return@publication invalidProvider()
+                        val prior = current.credential
+                        if (prior?.generation != prepared.credential?.generation)
+                            return@publication if (usable(prior))
+                                Result.Success(requireNotNull(prior))
+                            else changed()
+                        val now = clock.instant().truncatedTo(ChronoUnit.MICROS)
+                        if (
+                            candidate.expiresAt <= now.plusSeconds(10) ||
+                                candidate.expiresAt > now.plusSeconds(600)
                         )
-                    val stored =
-                        if (prior == null) credentials.create(next)
-                        else credentials.rotate(next, prior.generation)
-                    stored
-                        .flatMap {
-                            journal.record(
-                                current.actor,
-                                ChangeRecord(
-                                    "collaboration_device",
-                                    initial.deviceId,
-                                    "collaboration.provider_renewed",
-                                    mapOf("generation" to next.generation.toString()),
-                                ),
+                            return@publication invalidProvider()
+                        if ((prior?.generation ?: -1) >= 999999)
+                            return@publication Result.Failed(
+                                Failure(
+                                    FailureKind.UNAUTHENTICATED,
+                                    "collaboration_provider_renewal_required",
+                                )
                             )
-                        }
-                        .flatMap { validateObservation(prepared.admission, current.admission) }
-                        .flatMap {
-                            if (initial.accessExpiresAt <= clock.instant() || !usable(next))
-                                changed()
-                            else Result.Success(next)
-                        }
-                }
+                        val next =
+                            CollaborationProviderSession(
+                                initial.companyId,
+                                initial.accountId,
+                                initial.deviceId,
+                                candidate.userId,
+                                candidate.deviceId,
+                                (prior?.generation ?: -1) + 1,
+                                candidate.accessToken,
+                                prior?.createdAt ?: now,
+                                now,
+                                candidate.expiresAt,
+                            )
+                        val stored =
+                            if (prior == null) credentials.create(next)
+                            else credentials.rotate(next, prior.generation)
+                        stored
+                            .flatMap {
+                                journal.record(
+                                    current.actor,
+                                    ChangeRecord(
+                                        "collaboration_device",
+                                        initial.deviceId,
+                                        "collaboration.provider_renewed",
+                                        mapOf("generation" to next.generation.toString()),
+                                    ),
+                                )
+                            }
+                            .flatMap { validateObservation(prepared.admission, current.admission) }
+                            .flatMap {
+                                if (
+                                    initial.accessExpiresAt <= clock.instant() ||
+                                        runtimeLease.expiresAt <= clock.instant() ||
+                                        !usable(next)
+                                )
+                                    changed()
+                                else Result.Success(next)
+                            }
+                    }
             }
         }
     }

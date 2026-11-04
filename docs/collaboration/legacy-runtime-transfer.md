@@ -234,3 +234,24 @@ cases, all passing with unchanged checked inputs. Recovery now recognizes124.
 This function has no application/worker/HTTP/client caller yet. Database fixtures use
 synthetic key/credential metadata; actual provider readback, retained activation,
 completed-mapping replay continuity and durable Mobile ownership remain required.
+
+
+## Typed completion port
+
+The completion repository now binds the fixed worker function and reads exact owned
+immutable mapping inside the caller transaction. It checks all requested successor
+versions and identity coordinates. Missing, foreign or unreadable post-write mapping
+must fail and roll back both old retirement and new publication. A thread interrupted
+after the function starts no further readback SQL. No internal retry is performed.
+
+[Port evidence](../measurements/collaboration-legacy-runtime-completion-ports-2026-11-04.json)
+records12 passing mapping/actual storage cases in111.923s,8280 unchanged checked
+inputs and quality gates. Original cancellation, caller rollback, wrong owner/stale
+generations, no-gateway completion and actual API capability denial are covered.
+The first compile failure and the Java jOOQ/nullable-version fixes are retained.
+
+No use case or shared DI consumes this port yet. Before worker integration, add an
+owned original-gateway metadata read: the current legacy-parent projection lacks
+its head/version. Expose no access/refresh hash or encrypted replay and preserve
+exact version checks. Actual provider-key readback, completed replay and durable
+client ownership still govern retained activation.

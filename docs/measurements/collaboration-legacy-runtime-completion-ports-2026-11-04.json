@@ -1,0 +1,64 @@
+{
+  "scope": "Typed exact-owner completion lookup and worker-only atomic completion port with strict post-write mapping.",
+  "baseCommit": "a22816d0",
+  "run": {
+    "startedAt": "2026-11-04T02:52:10.899312+00:00",
+    "elapsedSeconds": 111.923,
+    "exitCode": 0,
+    "sourceFiles": 8280,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyRuntimeStorageTest.xml": {
+        "sha256": "5d1feedb40cfa8eb0426ed42a06c6d2c16ed62bbee3c91e57c18aa24f1d69680",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "TEST-dev.fajar.hris.collaboration.data.CollaborationLegacyRuntimeCompletionMappingTest.xml": {
+        "sha256": "a47e818cf33c3e245bdc67ad70616457ea7b249500bdf45d4811a67306bf4e61",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "sourceManifestSha256": "e5bf035324849dfc0e11f034e0171f058571141cf0eeb03ef60893ffe524b667",
+  "currentSourcesMatch": true,
+  "earlierFailedRun": {
+    "startedAt": "2026-11-04T02:49:48.374715+00:00",
+    "elapsedSeconds": 14.8,
+    "exitCode": 1,
+    "sourceFiles": 8280,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {}
+  },
+  "evidence": [
+    "Four mapping and eight actual storage cases pass; four storage cases are new and four existing original-runtime cases remain passing. Format and architecture pass with8280 unchanged inputs.",
+    "The fixed SQL function call binds explicit PostgreSQL types and retains all current/target/original expected versions and key-readback time. Returned metadata must match the exact owner and successor generations.",
+    "Actual missing/foreign/unreadable post-write mapping, original cancellation/interruption and thread flag all roll back both original retirement and group publication. Identical retry succeeds.",
+    "A post-function interruption skips another SQL readback, preserves its flag and rolls the caller transaction back. There is no hidden retry.",
+    "Actual wrong original owner/native, target or stale provider/gateway generations produce no partial publication. A runtime without worker capability receives access_denied and creates no metadata.",
+    "Optional no-gateway completion and terminal source versions are represented without inventing a gateway. Malformed coordinates/IDs/fingerprints/timestamps/version pairs fail inside the shared safe database boundary.",
+    "First run stopped14.8s before tests: the repo uses Java jOOQ static table fields, not Kotlin references; a nullable Long from another module needed a local capture for range validation. Both production fixes are included."
+  ],
+  "limits": [
+    "No shared DI/worker/HTTP/client caller consumes the port yet; no new product or provider/SDK acceptance.",
+    "Current legacy-parent metadata lacks the original public-gateway head/version required by completion. Add a narrow owned metadata view/port before worker integration; do not guess a version or expose hashes/ciphertext.",
+    "Next admitted retained worker with existing provider key readback and completed replay, then durable Mobile SDK/store/inbox/outbox/read/push handover.",
+    "Live8b40/schema116 pushON/SMTP OFF, normal phone28, Mobile3d85d569 and Starter9959c1d remain current; all54 groups and actual Apple runtime remain open."
+  ]
+}

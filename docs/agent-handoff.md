@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Typed retained completion port accepted — 4 November 2026
+
+Based on pusheda22816d0, the completion repository now reads exact owned immutable
+metadata and invokes the fixed V124 worker-only function with explicit PostgreSQL
+parameter types. Its post-write mapping must match original/target coordinates,
+current native/queue proof, successor versions, optional gateway and key-readback
+timestamp. Missing/foreign/unreadable mapping fails inside the same safe database
+boundary so the caller transaction rolls back. Post-function interruption skips
+another SQL readback and preserves its flag. No hidden retry or nested transaction.
+
+[Evidence](measurements/collaboration-legacy-runtime-completion-ports-2026-11-04.json):
+runtime-completion-ports2 PASS111.923s,12 cases (four mapping/eight actual storage),
+8280 unchanged inputs and format/architecture PASS. Four new storage cases verify
+real same-transaction publication/retirement, nullable gateway, wrong owner/stale
+versions, every post-write readback failure, original cancellation/interruption and
+API capability denial. Four old runtime cases remain passing. First run failed14.8s
+before tests on Java jOOQ import and cross-module nullable Long range inference;
+fixed the static table import and captured the nullable version locally. All owned
+tests/resources are closed. No DI, worker, HTTP or Mobile caller is enabled yet.
+
+Next original public-gateway metadata: existing CollaborationLegacyParent exposes
+provider/device/key metadata but not the gateway head/version required by V124.
+Prepare a narrow owned projection using existing NOLOGIN legacy reader and eligible
+space directory, with only original coordinates, gateway id/native/version and
+created/rotated/revoked timestamps. Do not guess version0, use a broad company
+transaction, relax final version checks or make hashes/ciphertext root-readable.
+Absence must mean no head; wrong native or revoked metadata must not look absent.
+Then wire admitted retained worker, existing provider key readback, explicit completed
+mapping replay and durable Mobile ownership. See ignored runtime-completion-next/
+port-and-worker-review.md. Prior completion-port drafts are now stale; tracked code
+is authoritative. No new migration has been added beyond V124 at this point.
+
+Mainacaf8ba2/Mobile786ca06e record V124 and need this new accepted port commit recorded.
+Mobile code3d85d569/hosted gates, normal phone28, live8b40/schema116 pushON/SMTP OFF
+and Starter9959c1d remain current. No product build here; all54 communications groups
+and actual Apple runtime remain open. Continue full long run, frequent user updates,
+atomic Git evidence and immediate pushes.
+
 ## V124 retained completion storage accepted — 4 November 2026
 
 Based on pushed9d3c8a99, V124 records immutable original/target completion provenance

@@ -2,7 +2,7 @@
 
 ## Legacy runtime storage accepted; integration continues — 4 November 2026
 
-Group source in /home/fajar/hris/.worktrees/communication-space is now ad1d7cca (preceded by 16420c3e),
+Group source in /home/fajar/hris/.worktrees/communication-space is now 8787a0fa (preceded by ad1d7cca, 16420c3e),
 feat/communication-space, pushed. Its handoff and collaboration/legacy-runtime-
 transfer.md are authoritative. V123 adds exact original company/device/account/
 native ownership, one irreversible LEGACY -> DRAINING freeze intent to a retained
@@ -21,8 +21,12 @@ storage/native/worker cases PASS115.242s with8262 unchanged inputs and quality.
 A plain jOOQ timestamp binding caused three initial storage failures; an explicit
 PostgreSQL timestamptz cast fixes the query. Exact stale-release fences, freeze
 continuity, transaction rollback/cancel/interruption and cleanup after parent purge
-pass. Tracked code supersedes those drafts. Next fence gateway/provisioning/direct-
-room provider I/O and implement admitted atomic group publication/legacy retirement.
+pass. Tracked code supersedes those drafts. Pure owner/phase/admission/live-lease validation and exact guarded slot reads now
+pass30 cases in128.584s with8264 unchanged inputs and quality (8787a0fa). Actual
+publication observation serializes with finally cleanup. No failed run in this
+policy/guard unit. Next fence gateway/provisioning/direct-room provider I/O and
+implement admitted atomic group publication/legacy retirement; its ignored
+consumer-integration.md describes the reviewed call sites and frozen test-clock issue.
 Preserve original SDK store/private keys/transaction IDs and explicit room/push/read
 ownership. Never logout losing Matrix candidates.
 

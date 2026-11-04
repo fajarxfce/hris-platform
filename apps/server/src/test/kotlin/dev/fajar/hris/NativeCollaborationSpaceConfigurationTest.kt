@@ -253,6 +253,7 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
                 "label",
                 "provisioning",
                 "observedAt",
+                "gateway",
             ),
             device.propertyNames().toSet(),
         )
@@ -529,6 +530,295 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
                 ),
         )
     }
+
+    @Test
+    fun groupGatewayHttpRecoversLostBootstrapUsingOwnedStatusThenRefreshesTheExactPair() {
+        val n = groupNative()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val input = mapOf("deviceId" to device, "expectedDeviceVersion" to 1)
+        val operation = UUID.randomUUID()
+        val first = groupCall(n, "$base/native-device/bootstrap", input, operation = operation)
+        assertEquals(200, first.statusCode(), first.body())
+        assertTrue(first.headers().firstValue("Cache-Control").orElse("").contains("no-store"))
+        assertTrue(first.headers().firstValue("Cache-Control").orElse("").contains("private"))
+        val data = json.readTree(first.body())
+        assertEquals(
+            setOf(
+                "spaceId",
+                "accountId",
+                "deviceId",
+                "nativeSessionId",
+                "matrixUserId",
+                "matrixDeviceId",
+                "sessionId",
+                "version",
+                "accessToken",
+                "refreshToken",
+                "accessExpiresAt",
+                "expiresAt",
+            ),
+            data.propertyNames().toSet(),
+        )
+        assertEquals(base.substringAfterLast('/'), data["spaceId"].asString())
+        assertEquals(n.fixture.account.toString(), data["accountId"].asString())
+        assertEquals(device.toString(), data["deviceId"].asString())
+        assertEquals(n.session.toString(), data["nativeSessionId"].asString())
+        val original =
+            database()
+                .queryForMap(
+                    "select matrix_user_id,matrix_device_id from collaboration_space_devices where id=?",
+                    device,
+                )
+        assertEquals(original["matrix_user_id"], data["matrixUserId"].asString())
+        assertEquals(original["matrix_device_id"], data["matrixDeviceId"].asString())
+        assertTrue(data["accessToken"].asString().startsWith("hris_mxg_a_"))
+        assertTrue(data["refreshToken"].asString().startsWith("hris_mxg_r_"))
+        assertEquals(
+            data,
+            json.readTree(
+                groupCall(n, "$base/native-device/bootstrap", input, operation = operation).body()
+            ),
+        )
+        advanceGroupClock(31)
+        failure(
+            groupCall(n, "$base/native-device/bootstrap", input, operation = operation),
+            401,
+            "collaboration_space_gateway_authentication_required",
+        )
+        val status = groupCall(n, "$base/native-device")
+        assertEquals(200, status.statusCode(), status.body())
+        val gateway = json.readTree(status.body())["device"]["gateway"]
+        assertEquals(
+            setOf("id", "version", "clientBuild", "accessExpiresAt", "expiresAt", "revokedAt"),
+            gateway.propertyNames().toSet(),
+        )
+        assertEquals(data["sessionId"].asString(), gateway["id"].asString())
+        assertEquals(0L, gateway["version"].asLong())
+        val rotated =
+            groupCall(
+                n,
+                "$base/native-device/bootstrap",
+                input + ("expectedGatewayVersion" to gateway["version"].asLong()),
+            )
+        assertEquals(200, rotated.statusCode(), rotated.body())
+        val next = json.readTree(rotated.body())
+        assertEquals(1L, next["version"].asLong())
+        assertEquals(data["expiresAt"], next["expiresAt"])
+        assertEquals(data["matrixDeviceId"], next["matrixDeviceId"])
+        assertNotEquals(data["refreshToken"], next["refreshToken"])
+        assertEquals(429, groupRefresh(next["refreshToken"].asString()).statusCode())
+        advanceGroupClock(11)
+        val refresh = groupRefresh(next["refreshToken"].asString())
+        assertEquals(200, refresh.statusCode(), refresh.body())
+        val refreshed = json.readTree(refresh.body())
+        assertEquals(
+            setOf("access_token", "refresh_token", "expires_in_ms"),
+            refreshed.propertyNames().toSet(),
+        )
+        assertEquals(300000L, refreshed["expires_in_ms"].asLong())
+        assertTrue(refresh.headers().firstValue("Cache-Control").orElse("").contains("no-store"))
+        assertEquals(refreshed, json.readTree(groupRefresh(next["refreshToken"].asString()).body()))
+        assertEquals(
+            2L,
+            json
+                .readTree(groupCall(n, "$base/native-device").body())["device"]["gateway"][
+                    "version"]
+                .asLong(),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_gateway_sessions where account_id=?",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+    }
+
+    @Test
+    fun groupGatewayHttpRejectsForeignParentsInvalidVersionsAndMissingNativeTransport() {
+        val n = groupNative()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val input = mapOf("deviceId" to device, "expectedDeviceVersion" to 1)
+        val path = "$base/native-device/bootstrap"
+        assertEquals(400, groupCall(n, path, input, operation = null).statusCode())
+        assertEquals(400, groupCall(n, path, mapOf("deviceId" to device)).statusCode())
+        assertEquals(403, groupCall(n, path, input, token = null, cookies = false).statusCode())
+        assertEquals(403, groupCall(n, path, input, token = null).statusCode())
+        for (bad in listOf(-1L, 1000000L)) failure(
+            groupCall(n, path, input + ("expectedDeviceVersion" to bad)),
+            409,
+            "collaboration_space_gateway_changed",
+        )
+        for (bad in listOf(-1L, 999999L)) failure(
+            groupCall(n, path, input + ("expectedGatewayVersion" to bad)),
+            409,
+            "collaboration_space_gateway_changed",
+        )
+        val peer = groupNative()
+        failure(groupCall(peer, path, input), 403, "collaboration_access_denied")
+        failure(
+            groupCall(
+                n,
+                path.replace(base.substringAfterLast('/'), UUID.randomUUID().toString()),
+                input,
+            ),
+            403,
+            "collaboration_access_denied",
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_gateway_sessions where account_id=?",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+    }
+
+    @Test
+    fun groupGatewayHttpRechecksOffboardingForBootstrapReplayStatusAndRefresh() {
+        val n = groupNative()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val input = mapOf("deviceId" to device, "expectedDeviceVersion" to 1)
+        val operation = UUID.randomUUID()
+        val issued = groupCall(n, "$base/native-device/bootstrap", input, operation = operation)
+        assertEquals(200, issued.statusCode(), issued.body())
+        val first = json.readTree(issued.body())
+        advanceGroupClock(11)
+        val rotation = groupRefresh(first["refreshToken"].asString())
+        assertEquals(200, rotation.statusCode(), rotation.body())
+        val next = json.readTree(rotation.body())
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                n.fixture.account,
+            )
+        failure(
+            groupCall(n, "$base/native-device/bootstrap", input, operation = operation),
+            403,
+            "collaboration_access_denied",
+        )
+        failure(groupCall(n, "$base/native-device"), 403, "collaboration_access_denied")
+        for (token in listOf(first["refreshToken"].asString(), next["refresh_token"].asString())) {
+            val response = groupRefresh(token)
+            assertEquals(403, response.statusCode(), response.body())
+            assertEquals("M_FORBIDDEN", json.readTree(response.body())["errcode"].asString())
+            assertFalse(response.body().contains(token))
+        }
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from collaboration_space_gateway_sessions where account_id=?",
+                    Long::class.java,
+                    n.fixture.account,
+                ),
+        )
+    }
+
+    @Test
+    fun groupRefreshStrictParsingDoesNotAcceptAmbiguousOrOversizedCredentials() {
+        val token = "hris_mxg_r_" + "a".repeat(43)
+        val valid = json.writeValueAsString(mapOf("refresh_token" to token))
+        for (body in
+            listOf(
+                "[]",
+                "{}",
+                "{\"refresh_token\":null}",
+                valid + "{}",
+                "{\"refresh_token\":\"$token\",\"refresh_token\":\"$token\"}",
+                "{\"refresh_token\":\"$token\",\"extra\":true}",
+            )) {
+            val response = groupRefreshBody(body)
+            assertEquals(400, response.statusCode(), response.body())
+            assertEquals("M_BAD_JSON", json.readTree(response.body())["errcode"].asString())
+        }
+        assertEquals(413, groupRefreshBody(" ".repeat(2049)).statusCode())
+        assertEquals(415, groupRefreshBody(valid, "text/plain").statusCode())
+        for (unknown in
+            listOf(
+                token,
+                "hris_mx_r_" + "a".repeat(43),
+                "hris_mxg_a_" + "a".repeat(43),
+                "unknown",
+            )) {
+            val response = groupRefresh(unknown)
+            assertEquals(401, response.statusCode(), response.body())
+            assertEquals("M_UNKNOWN_TOKEN", json.readTree(response.body())["errcode"].asString())
+            assertFalse(response.body().contains(unknown))
+        }
+    }
+
+    private fun advanceGroupClock(seconds: Long) {
+        require(seconds in 1..31)
+        val target = clock.instant().plusSeconds(seconds)
+        // Publication SQL also observes real time. Exercise replay/cooldown expiry instead
+        // of creating a future gateway row or an already-expired registration request.
+        val remaining = java.time.Duration.between(Instant.now(), target).toNanos()
+        if (remaining > 0) java.util.concurrent.TimeUnit.NANOSECONDS.sleep(remaining + 20_000_000)
+        clock.set(target)
+    }
+
+    /** Stored provider metadata only: API tests must not make external provider calls. */
+    private fun activeGroupFixture(n: Native, base: String): UUID {
+        assertEquals(200, groupCall(n, "$base/identity", post = true).statusCode())
+        val registered = groupCall(n, "$base/native-device", groupRegistration())
+        assertEquals(200, registered.statusCode(), registered.body())
+        val id = UUID.fromString(json.readTree(registered.body())["id"].asString())
+        val db = database()
+        val at = clock.instant().toString()
+        db.update(
+            "update collaboration_space_provisioning set state='RUNNING', attempts=1, lease_owner=?,lease_token=?,lease_until=least(expires_at,clock_timestamp()+interval '30 seconds') where device_id=?",
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            id,
+        )
+        db.update(
+            "insert into collaboration_space_provider_sessions(space_id,device_id,account_id,native_session_id,matrix_user_id,matrix_device_id,generation,token_encrypted,created_at,updated_at,token_expires_at) select space_id,id,account_id,origin_native_session_id,matrix_user_id,matrix_device_id,0,'fixture-not-a-provider-token',?::timestamptz,?::timestamptz,?::timestamptz+interval '5 minutes' from collaboration_space_devices where id=?",
+            at,
+            at,
+            at,
+            id,
+        )
+        db.update(
+            "update collaboration_space_devices set state='ACTIVE',version=version+1,updated_at=?::timestamptz where id=?",
+            at,
+            id,
+        )
+        db.update(
+            "update collaboration_space_provisioning set state='SUCCEEDED',lease_owner=null,lease_token=null,lease_until=null,completed_at=?::timestamptz,last_outcome_revision=revision,last_outcome_state='SUCCEEDED',last_outcome_at=?::timestamptz where device_id=?",
+            at,
+            at,
+            id,
+        )
+        return id
+    }
+
+    private fun groupRefresh(token: String) =
+        groupRefreshBody(json.writeValueAsString(mapOf("refresh_token" to token)))
+
+    private fun groupRefreshBody(
+        body: String,
+        contentType: String = "application/json",
+    ): java.net.http.HttpResponse<String> =
+        java.net.http.HttpClient.newHttpClient().use {
+            it.send(
+                java.net.http.HttpRequest.newBuilder(
+                        java.net.URI("http://127.0.0.1:$port/_matrix/client/v3/refresh")
+                    )
+                    .timeout(java.time.Duration.ofSeconds(15))
+                    .header("Content-Type", contentType)
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(body))
+                    .build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString(),
+            )
+        }
 
     private fun groupNative(grant: Boolean = true): Native {
         clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))

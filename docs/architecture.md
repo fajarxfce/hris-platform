@@ -42,9 +42,14 @@ V126 stores separate [organization gateway credentials](collaboration/space-gate
 Typed ports use distinct token/replay namespaces and verify exact post-write readback.
 Retained metadata, anonymous opaque identification and encrypted replay do not grant
 current application authority. Native bootstrap/refresh now revalidate current canonical device/provider/completed-transfer
-admission and commit credential/receipt/journal changes atomically. Coherent HTTP
-transport, gateway request/room authority and group runtime adoption remain unfinished;
-no new DI binding is enabled by these increments.
+admission and commit credential/receipt/journal changes atomically. Native bootstrap
+returns original Matrix identity and credentials from one guarded transaction;
+owned status exposes only safe gateway revision/deadline metadata. Standard Matrix
+refresh dispatches the distinct group prefix to its own use case. The owning module
+binds group storage and issuance while availability remains disabled by default.
+Gateway request/room authority, provider renewal and group runtime adoption remain
+unfinished. Current admission never authorizes deletion of owned local history merely
+because a gateway replay expired.
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 

@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.collaboration.delivery.requests.*
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceBootstrapResponse
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceDeviceResponse
 import dev.fajar.hris.collaboration.domain.entities.CollaborationLegacyRuntimeDrainStatus
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -9,6 +10,7 @@ import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.*
 import dev.fajar.hris.identity.delivery.security.*
 import java.util.UUID
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -21,7 +23,36 @@ class NativeCollaborationSpaceDeviceController(
     private val retry: RetryNativeCollaborationSpaceProvisioning,
     private val freeze: FreezeNativeCollaborationLegacyRuntime,
     private val drain: GetNativeCollaborationLegacyRuntimeDrain,
+    private val bootstrap: BootstrapNativeCollaborationSpaceGateway,
 ) {
+    @PostMapping("/bootstrap", consumes = ["application/json"])
+    fun bootstrapSpaceGateway(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @PathVariable spaceId: UUID,
+        @RequestHeader("Idempotency-Key") operation: UUID,
+        @RequestBody input: BootstrapCollaborationSpaceGatewayRequest,
+    ): ResponseEntity<NativeCollaborationSpaceBootstrapResponse> {
+        val result =
+            bootstrap
+                .execute(
+                    actor,
+                    identity.sessionId,
+                    identity.sessionVersion,
+                    spaceId,
+                    operation,
+                    input.deviceId,
+                    input.expectedDeviceVersion,
+                    input.expectedGatewayVersion,
+                    client.version,
+                )
+                .response()
+        return ResponseEntity.ok()
+            .header("Cache-Control", "private, no-store")
+            .body(NativeCollaborationSpaceBootstrapResponse(result))
+    }
+
     @GetMapping
     fun spaceDeviceStatus(
         actor: Actor,

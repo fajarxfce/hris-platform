@@ -58,6 +58,66 @@ class CollaborationSpaceDeviceStatusPolicyTest {
         )
 
     @Test
+    fun recoveryMetadataKeepsExpiredOwnedHeadAndRejectsForeignOrImpossibleCoordinates() {
+        val active = device.copy(state = CollaborationDeviceState.ACTIVE, version = 1)
+        val completed = queued.copy(state = CollaborationSpaceProvisioningState.SUCCEEDED)
+        val gateway =
+            CollaborationSpaceGatewaySession(
+                UUID.randomUUID(),
+                device.spaceId,
+                device.accountId,
+                device.id,
+                device.originNativeSessionId,
+                device.platform,
+                28,
+                0,
+                at,
+                at,
+                at.plusSeconds(600),
+                at.plusSeconds(300),
+            )
+        val expired =
+            collaborationSpaceDeviceStatus(active, completed, at.plusSeconds(900), gateway)
+        assertInstanceOf(Result.Success::class.java, expired)
+        val metadata = requireNotNull((expired as Result.Success).value.gateway)
+        assertEquals(gateway.id, metadata.id)
+        assertEquals(gateway.accessExpiresAt, metadata.accessExpiresAt)
+        assertEquals(gateway.expiresAt, metadata.expiresAt)
+        val retired = gateway.copy(version = 1000000, revokedAt = at.plusSeconds(20))
+        val revoked =
+            active.copy(state = CollaborationDeviceState.REVOKED, revokedAt = at.plusSeconds(20))
+        assertEquals(
+            retired.revokedAt,
+            (collaborationSpaceDeviceStatus(revoked, completed, at.plusSeconds(900), retired)
+                    as Result.Success)
+                .value
+                .gateway
+                ?.revokedAt,
+        )
+        for (invalid in
+            listOf(
+                gateway.copy(spaceId = UUID.randomUUID()),
+                gateway.copy(accountId = UUID.randomUUID()),
+                gateway.copy(deviceId = UUID.randomUUID()),
+                gateway.copy(nativeSessionId = UUID.randomUUID()),
+                gateway.copy(platform = CollaborationPlatform.IOS),
+                gateway.copy(createdAt = at.minusSeconds(1)),
+                gateway.copy(rotatedAt = at.plusSeconds(1)),
+                gateway.copy(accessExpiresAt = at),
+                gateway.copy(expiresAt = at.plusSeconds(299)),
+                gateway.copy(version = -1),
+                gateway.copy(clientBuild = 0),
+                gateway.copy(revokedAt = at.plusSeconds(1)),
+            )) assertInstanceOf(
+            Result.Failed::class.java,
+            collaborationSpaceDeviceStatus(active, completed, at, invalid),
+        )
+        assertNull(
+            (collaborationSpaceDeviceStatus(active, completed, at) as Result.Success).value.gateway
+        )
+    }
+
+    @Test
     fun statusKeepsDeadlineAndPriorOutcomeWhileRetryIsExplicitlyBounded() {
         val first = status(device, queued, at)
         assertEquals(at.plusSeconds(60), first.provisioning.retryNotBefore)

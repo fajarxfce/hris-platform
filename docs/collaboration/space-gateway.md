@@ -3,7 +3,8 @@
 V126 introduces one retained credential head per organization device. Its table,
 domain types, opaque token prefixes and authenticated replay context are distinct
 from the existing company gateway. It does not create credentials during migration,
-enable an HTTP route, exchange a provider bearer or move a Mobile SDK store.
+exchange a provider bearer or move a Mobile SDK store. Native HTTP issuance and
+refresh dispatch are implemented separately below.
 [Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Native issuance use cases are separately validated below. Current gateway request/provider/room authority and Mobile adoption remain unfinished.
 
 ## Native issuance use cases
@@ -28,12 +29,56 @@ an expired access token is allowed only inside the remaining native/provider/har
 lifetimes. The original completed runtime stays DRAINING and its keys/retired facts
 remain unchanged.
 
-These use cases have no HTTP or DI binding yet. Before transport, bootstrap must return
-original Matrix user/device IDs from the same guarded observation as its tokens.
-A retained Matrix device ID cannot be derived from the new group UUID. Native group
-status also needs safe gateway revision/deadline metadata so a lost initial response
-can recover after the encrypted replay expires. Then validate strict transport/OpenAPI
-and both API/full-worker contexts before a Mobile caller is enabled.
+## Native transport and recovery
+
+`POST /api/v1/collaboration/spaces/{spaceId}/native-device/bootstrap` requires the
+current native bearer, Android/iOS client headers and `Idempotency-Key`. Its separate
+request contains `deviceId`, required `expectedDeviceVersion` (0–999999), and nullable
+`expectedGatewayVersion` (0–999998; absent for the first issuance). A conflicting
+operation or observed version cannot rotate the head. Responses are private/no-store
+and credential-bearing objects redact their string representation.
+
+Bootstrap returns original Matrix user/device IDs together with space, account,
+group-device and native-parent IDs and the opaque session ID/version/token pair and
+access/hard deadlines. The use case captures that envelope under the same transaction
+guards on issuance and replay. The controller neither derives a retained Matrix device
+ID from a new group UUID nor performs a follow-up identity lookup.
+
+Native group device status adds nullable owned gateway metadata: ID, version, client
+build, access/hard deadlines and revocation time. It exposes no hashes, replay payload
+or provider credential. Metadata retains expired deadlines; current native/group
+admission still gates the server read. A mismatched owner, parent, platform or invalid
+chronology fails instead of appearing absent. Provisioning provenance remains required
+for the current device status; imported pre-queue fixtures do not invent it.
+
+After the bounded bootstrap replay expires, read status and persist a new operation
+with its observed gateway version. The same old operation cannot silently issue a new
+pair. An expired credential replay returns the specific
+`collaboration_space_gateway_authentication_required` code (HTTP 401); it does not
+itself revoke the native parent or authorize deletion of owned local history. Status
+must reacquire current native/group admission before a new bootstrap operation.
+Standard `POST /_matrix/client/v3/refresh` dispatches a correctly shaped
+`hris_mxg_r_` credential to the group use case. Legacy refresh remains separate. Both
+responses retain Matrix token field names and no-store behavior. The existing strict
+2048-byte parser rejects duplicate/extra fields, trailing JSON and excessive nesting,
+with bounded reading and cancellation propagation.
+
+The owning configuration binds group storage, bootstrap, refresh and status. Group
+availability remains disabled by default. This does not grant group sync/send, provider
+renewal or room access, and no Mobile product caller is enabled. Current transport
+validation is recorded separately from the earlier storage and issuance gates.
+
+[Transport evidence](../measurements/collaboration-space-gateway-http-2026-11-04.json)
+records 93 domain/33 actual data cases, 92 API/OpenAPI cases (158.550s) and full
+worker127 (356.150s; 126 active and one existing retention skip), with identical
+final inputs and format/architecture checks. Preliminary test-only corrections are
+retained. Lost-response and revoked-access cases exercise actual elapsed replay and
+cooldown under PostgreSQL's wall-clock publication guard.
+
+Before enabling group use, add bounded group request ownership and provider renewal
+without reopening original company runtime slots. Expired group replay cleanup has
+a typed storage port but still needs its own use case and worker scheduling; the
+existing replay job handles only company gateway heads.
 
 ## Ownership and authority
 
@@ -46,9 +91,9 @@ A root account transaction can read its retained metadata after expiry or loss o
 chat eligibility. An anonymous root transaction can identify one head using the
 hash of a correctly shaped `hris_mxg_a_` or `hris_mxg_r_` token. The lookup uses a
 separate transaction-local setting and confers no HR company access. Identification
-alone is insufficient for request admission. The future use cases must acquire and
-recheck current account, native session, organization policy, device, provider and
-room authority before exchange or replay publication.
+alone is insufficient for request admission. Issuance rechecks current account, native session, organization policy, device and
+provider metadata before replay publication. Gateway request exchange must additionally
+implement its own current admission and room authority.
 
 Writes require the exact active group device and bound, current native parent;
 the account security version must still match. New credentials cannot outlive the
@@ -82,8 +127,8 @@ tokens. Failed results must roll back through `TransactionRunner`; cancellation 
 interruption propagate without an implicit retry.
 
 Reading retained metadata or decrypting a stored response is not evidence that its
-deadline is current. The future use case must check response expiry and all current
-admission at its final publication point, including recovery of a prior operation.
+deadline is current. Issuance checks response expiry and all current admission at its final publication
+point, including recovery of a prior operation.
 
 ## Retirement and recovery
 
@@ -99,6 +144,6 @@ alongside the unchanged legacy envelope formats. Unknown future schemas are reje
 Recovery acceptance must exercise the generated SQL projection against actual
 encrypted bootstrap and refresh rows, key rotation and restored PostgreSQL data.
 
-The next increment must implement coherent native transport, current group gateway request admission and room authority,
+The next increment must implement current group gateway request admission, provider renewal and room authority,
 then join these to the durable Mobile handover. An accepted storage adapter alone
 does not satisfy cross-company chat or authorize freezing the old client runtime.

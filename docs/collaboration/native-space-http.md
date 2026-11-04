@@ -5,7 +5,7 @@ current chat eligibility in at least one active company, MFA when required, and
 `X-HRIS-Client-Platform` / `X-HRIS-Client-Build`. Group chat remains disabled by
 default through `HRIS_COLLABORATION_SPACE_ENABLED`; minimum Android/iOS builds use
 the corresponding `HRIS_COLLABORATION_SPACE_MIN_*_BUILD` settings. This does not
-enable a Mobile caller, group Matrix gateway or room exchange.
+enable a Mobile caller, group gateway request exchange or room access.
 
 The root is `/api/v1/collaboration/spaces`. A selected HR company is unnecessary.
 
@@ -14,15 +14,17 @@ The root is `/api/v1/collaboration/spaces`. A selected HR company is unnecessary
 | GET | `/current` | Current space/account/native IDs, versions and short observation deadline |
 | GET | `/{spaceId}/contacts` | Eligible account names and bounded public company labels |
 | POST | `/{spaceId}/identity` | Canonical provider-user selection receipt |
-| GET | `/{spaceId}/native-device` | Nullable current device and safe provisioning status |
+| GET | `/{spaceId}/native-device` | Nullable current device, provisioning and gateway recovery metadata |
 | POST | `/{spaceId}/native-device` | Explicit SPACE or LEGACY registration receipt |
 | POST | `/{spaceId}/native-device/retry` | Explicit ended-request retry receipt |
+| POST | `/{spaceId}/native-device/bootstrap` | Atomic original Matrix identity and group gateway credentials |
 | POST | `/{spaceId}/native-device/legacy-runtime/freeze` | Exact-target original runtime freeze receipt |
 | GET | `/{spaceId}/native-device/legacy-runtime/drain` | Actual bounded remaining original requests |
 
 Mutations require `Idempotency-Key`. Persist the original operation UUID, account,
-native parent, space, payload and observed versions. The public receipt contains
-only `id` and `version`; replay returns that same receipt after current admission.
+native parent, space, payload and observed versions. Setup mutation receipts contain only `id` and `version`; replay returns that same
+receipt after current admission. Bootstrap has the separate credential response and
+bounded recovery contract described in [group gateway transport](space-gateway.md).
 Selection and registration perform no provider I/O. Retry uses exact device and
 provisioning revisions, preserves prior outcome and respects the existing cooldown.
 Polling status neither retries work nor renews its original native proof.

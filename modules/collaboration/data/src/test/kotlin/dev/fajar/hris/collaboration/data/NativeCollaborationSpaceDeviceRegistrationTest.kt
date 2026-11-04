@@ -10,6 +10,7 @@ import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
 import dev.fajar.hris.core.database.repositories.*
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.data.crypto.parseIdentityKeyring
 import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
@@ -1246,6 +1247,17 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
             GetNativeCollaborationSpaceDeviceStatus(
                     registry,
                     provisioning,
+                    EncryptedCollaborationSpaceGatewaySessionRepository(
+                        PostgresCollaborationSpaceGatewaySessionDataSource(sql),
+                        JceIdentityTokenDataSource(
+                            parseIdentityKeyring(
+                                "fixture",
+                                "fixture:" +
+                                    java.util.Base64.getEncoder()
+                                        .encodeToString(ByteArray(32) { 47 }),
+                            )
+                        ),
+                    ),
                     spaces,
                     sessions,
                     identities,

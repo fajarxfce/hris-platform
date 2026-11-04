@@ -161,6 +161,7 @@ class CollaborationConfiguration {
     fun getNativeCollaborationSpaceDeviceStatus(
         registry: CollaborationSpaceDeviceRepository,
         provisioning: CollaborationSpaceProvisioningRepository,
+        gateway: CollaborationSpaceGatewaySessionRepository,
         spaces: CollaborationSpaceRepository,
         sessions: NativeSessionRepository,
         identities: IdentityRepository,
@@ -172,6 +173,7 @@ class CollaborationConfiguration {
         GetNativeCollaborationSpaceDeviceStatus(
             registry,
             provisioning,
+            gateway,
             spaces,
             sessions,
             identities,
@@ -807,6 +809,97 @@ class CollaborationConfiguration {
         clients.getIfAvailable()?.let {
             InternalCollaborationMatrixRoomRepository(it, provider.serverName)
         } ?: DisabledCollaborationMatrixRoomRepository()
+
+    @Bean
+    fun collaborationSpaceGatewaySource(
+        sql: DSLContext
+    ): CollaborationSpaceGatewaySessionDataSource =
+        PostgresCollaborationSpaceGatewaySessionDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceGatewaySessions(
+        source: CollaborationSpaceGatewaySessionDataSource,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationSpaceGatewaySessionRepository =
+        EncryptedCollaborationSpaceGatewaySessionRepository(source, crypto)
+
+    @Bean
+    fun bootstrapNativeCollaborationSpaceGateway(
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        BootstrapNativeCollaborationSpaceGateway(
+            gateway,
+            registry,
+            providers,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            policy,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun refreshNativeCollaborationSpaceGateway(
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        RefreshNativeCollaborationSpaceGateway(
+            gateway,
+            registry,
+            providers,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            journal,
+            transactions,
+            security,
+            policy,
+            provider,
+            clock,
+        )
 
     @Bean
     fun collaborationGatewaySource(sql: DSLContext): CollaborationGatewaySessionDataSource =

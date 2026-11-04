@@ -1,5 +1,54 @@
 # Agent continuation — HRIS workspace
 
+## Group gateway native HTTP accepted — 4 November 2026
+
+Based on 6b92246a, native bootstrap now returns original Matrix user/device identity
+with exact group/account/device/native-parent coordinates and its credential pair
+from the same guarded transaction. Native status exposes nullable safe gateway
+revision/deadline metadata; it preserves expired owned facts and rejects mismatched
+scope/chronology. The new native bootstrap route requires observed versions and an
+operation UUID. Standard Matrix refresh dispatches distinct group tokens to their
+own use case. Four module bindings plus the changed status dependency are wired;
+group availability remains disabled by default. Read [the contract](collaboration/space-gateway.md).
+
+[Evidence](measurements/collaboration-space-gateway-http-2026-11-04.json): 93 domain
+and 33 actual data cases pass; API/OpenAPI92 PASS158.550s; full worker127 PASS356.150s
+(126 active, one existing opt-in retention skip), 8,324 final inputs unchanged and
+format/architecture PASS. Only the HTTP fixture changed after the passing domain/
+data gate. Actual HTTP waits through replay expiry and cooldown (42.128s recovery,
+11.098s offboarding), reads status and rotates a fresh operation while preserving
+identity/hard deadline. Old company refresh, strict parsing, default-disabled,
+foreign/missing/version guards and generated contract coverage pass. Retained worker
+cases assert original Matrix identity in the atomic envelope. No provider I/O occurs
+in the HTTP fixtures; separate retained-provider evidence remains applicable.
+
+All three unsuccessful preliminary gates are recorded: two test helper references
+prevented data compilation; a backdated native request had already expired and the
+old status assertion omitted gateway; two HTTP expectations differed from the actual
+existing 401 gateway-replay and 403 CSRF/transport contracts. Fixes affect tests only.
+An expired gateway replay does not revoke the native parent or justify deleting local
+history/keys; current status admission must precede a new bootstrap operation.
+All local gates have finished. The evidence recorder has run and is now stale.
+
+NEXT implement bounded group request ownership and current gateway exchange,
+including native provider renewal before bootstrap when its provider head expires.
+The original company runtime's eight slots stay DRAINING and cannot be reused.
+Existing provider ports offer exact-generation read/CAS; login belongs outside SQL
+with final admission on success/failure and retained Matrix identity/creation time.
+Losing login candidates expire; never logout a retained Matrix device. Add group
+expired-replay maintenance: the existing scheduler only clears company heads.
+The ignored space-gateway-access-next contract records the reviewed follow-ups;
+no lease schema, provider renewal or group request exchange is implemented yet.
+
+Then group room/member authority, provider key publication/readback and Mobile
+handover/adoption across store/inbox/outbox/drafts/read/history/push/deep links.
+No permanent server freeze before successful local staging/current admission.
+Preserve original SDK namespaces and uncertain sends. All54 acceptance groups and
+actual Apple Matrix/APNs/CallKit remain open. Mobile68b9232b/hosted code0b804cb2,
+main d4e2a771, normal phone28/live8b40/schema116 pushON/SMTPOFF and Starter9959c1d
+remain current. Continue full long run, frequent updates, atomic commits/immediate
+pushes and installation only of a validated new product feature build.
+
 ## Group gateway issuance accepted — 4 November 2026
 
 Based on 338915f5, four production files add pure group session/response/provider

@@ -148,10 +148,18 @@ class CollaborationSpaceWorkerPublicationTest {
         success(f.advance(f.claim(id), f.provider(id)))
         val done = f.completion(original)
         val before = f.originalSnapshot()
-        val provider = f.state(id)
+        val provider = requireNotNull(f.state(id))
         val operation = UUID.randomUUID()
-        val first = success(f.groupBootstrap(id, operation))
-        val replay = success(f.groupBootstrap(id, operation))
+        val bootstrap = success(f.groupBootstrap(id, operation))
+        val first = bootstrap.tokens
+        assertEquals(provider.spaceId, bootstrap.spaceId)
+        assertEquals(f.actor.accountId, bootstrap.accountId)
+        assertEquals(f.session, bootstrap.nativeSessionId)
+        assertEquals(id, bootstrap.deviceId)
+        assertEquals(provider.matrixUserId, bootstrap.matrixUserId)
+        assertEquals(provider.matrixDeviceId, bootstrap.matrixDeviceId)
+        assertNotEquals("HRISG_" + id.toString().replace("-", ""), bootstrap.matrixDeviceId)
+        val replay = success(f.groupBootstrap(id, operation)).tokens
         assertEquals(first.accessToken, replay.accessToken)
         assertEquals(first.refreshToken, replay.refreshToken)
         assertEquals(first.replayUntil, replay.replayUntil)
@@ -173,7 +181,7 @@ class CollaborationSpaceWorkerPublicationTest {
         )
         assertEquals(
             first.accessToken,
-            success(f.groupBootstrap(id, operation, nativeVersion = 1)).accessToken,
+            success(f.groupBootstrap(id, operation, nativeVersion = 1)).tokens.accessToken,
         )
     }
 
@@ -185,7 +193,7 @@ class CollaborationSpaceWorkerPublicationTest {
         val id = f.register(original)
         f.freeze(id)
         success(f.advance(f.claim(id), f.provider(id)))
-        val first = success(f.groupBootstrap(id))
+        val first = success(f.groupBootstrap(id)).tokens
         val old = f.originalSnapshot()
         val completed = f.completion(original)
         // The database also checks wall-clock publication. A future injected application
@@ -2215,7 +2223,7 @@ class CollaborationSpaceWorkerPublicationTest {
             operation: UUID = UUID.randomUUID(),
             nativeVersion: Long = 0,
             completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
-        ): Result<CollaborationSpaceGatewayTokens> {
+        ): Result<CollaborationSpaceGatewayBootstrap> {
             val gateway =
                 EncryptedCollaborationSpaceGatewaySessionRepository(
                     PostgresCollaborationSpaceGatewaySessionDataSource(sql),

@@ -118,6 +118,17 @@ internal class SpaceGatewayBootstrapFixture(postgres: PostgreSQLContainer) {
         build: ClientVersion? = client,
         command: BootstrapNativeCollaborationSpaceGateway = command(),
     ) =
+        bootstrapEnvelope(operation, expectedGatewayVersion, request, nativeVersion, build, command)
+            .map { it.tokens }
+
+    fun bootstrapEnvelope(
+        operation: UUID = UUID.randomUUID(),
+        expectedGatewayVersion: Long? = null,
+        request: Actor = storage.actor,
+        nativeVersion: Long = 0,
+        build: ClientVersion? = client,
+        command: BootstrapNativeCollaborationSpaceGateway = command(),
+    ) =
         command.execute(
             request,
             storage.parent,

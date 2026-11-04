@@ -37,6 +37,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/native-device" to "get",
                 "$base/native-device" to "post",
                 "$base/native-device/retry" to "post",
+                "$base/native-device/bootstrap" to "post",
                 "$base/native-device/legacy-runtime/freeze" to "post",
                 "$base/native-device/legacy-runtime/drain" to "get",
             )
@@ -91,6 +92,36 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "observedAt",
             ),
             schemas["CollaborationLegacyRuntimeDrainStatus"]["properties"].propertyNames().toSet(),
+        )
+        val bootstrap = schemas["BootstrapCollaborationSpaceGatewayRequest"]
+        assertEquals(
+            setOf("deviceId", "expectedDeviceVersion"),
+            bootstrap["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(999999L, bootstrap["properties"]["expectedDeviceVersion"]["maximum"].asLong())
+        assertEquals(999998L, bootstrap["properties"]["expectedGatewayVersion"]["maximum"].asLong())
+        assertEquals(
+            setOf(
+                "spaceId",
+                "accountId",
+                "deviceId",
+                "nativeSessionId",
+                "matrixUserId",
+                "matrixDeviceId",
+                "sessionId",
+                "version",
+                "accessToken",
+                "refreshToken",
+                "accessExpiresAt",
+                "expiresAt",
+            ),
+            schemas["NativeCollaborationSpaceBootstrapResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+        assertEquals(
+            setOf("id", "version", "clientBuild", "accessExpiresAt", "expiresAt", "revokedAt"),
+            schemas["CollaborationSpaceGatewayStatus"]["properties"].propertyNames().toSet(),
         )
         assertEquals(
             setOf("deviceId", "expectedDeviceVersion", "expectedProvisioningRevision"),

@@ -73,7 +73,20 @@ class NativeCollaborationSpaceGatewayBootstrapTest {
     fun ordinaryEmployeeBootstrapRecoversTheSamePairAcrossNativeRefreshAndRetainsItsHardDeadline() {
         val f = SpaceGatewayBootstrapFixture(postgres)
         val op = UUID.randomUUID()
-        val first = f.storage.success(f.bootstrap(op))
+        val envelope = f.storage.success(f.bootstrapEnvelope(op))
+        val first = envelope.tokens
+        assertEquals(f.storage.space, envelope.spaceId)
+        assertEquals(f.storage.actor.accountId, envelope.accountId)
+        assertEquals(f.storage.device, envelope.deviceId)
+        assertEquals(f.storage.parent, envelope.nativeSessionId)
+        val identity =
+            f.storage.owner.queryForMap(
+                "select matrix_user_id,matrix_device_id from collaboration_space_devices where id=?",
+                f.storage.device,
+            )
+        assertEquals(identity["matrix_user_id"], envelope.matrixUserId)
+        assertEquals(identity["matrix_device_id"], envelope.matrixDeviceId)
+        assertEquals("CollaborationSpaceGatewayBootstrap(<redacted>)", envelope.toString())
         assertEquals(
             mapOf(
                 "collaboration_space_gateway_sessions" to 1,

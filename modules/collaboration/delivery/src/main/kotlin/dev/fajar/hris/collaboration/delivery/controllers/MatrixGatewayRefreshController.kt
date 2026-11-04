@@ -3,12 +3,16 @@ package dev.fajar.hris.collaboration.delivery.controllers
 import com.fasterxml.jackson.annotation.JsonProperty
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.domain.entities.CollaborationGatewayTokens
+import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceGatewayTokens
+import dev.fajar.hris.collaboration.domain.policies.validCollaborationSpaceGatewayRefresh
 import dev.fajar.hris.collaboration.domain.usecases.RefreshNativeCollaborationGateway
+import dev.fajar.hris.collaboration.domain.usecases.RefreshNativeCollaborationSpaceGateway
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.core.http.*
 import jakarta.servlet.http.HttpServletRequest
 import java.time.Clock
 import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -21,6 +25,7 @@ import tools.jackson.databind.json.JsonMapper
 @RestController
 class MatrixGatewayRefreshController(
     private val refresh: RefreshNativeCollaborationGateway,
+    private val refreshSpace: RefreshNativeCollaborationSpaceGateway,
     private val clock: Clock,
 ) {
     private val parser =
@@ -76,12 +81,16 @@ class MatrixGatewayRefreshController(
                 return problem(400, "M_BAD_JSON")
             }
         val correlation = request.getAttribute("hris.correlationId") as? UUID ?: UUID.randomUUID()
-        return when (val result = refresh.execute(token, correlation)) {
+        val response =
+            if (validCollaborationSpaceGatewayRefresh(token))
+                refreshSpace.execute(token, correlation).map {
+                    MatrixGatewayRefreshResponse(it, clock)
+                }
+            else refresh.execute(token, correlation).map { MatrixGatewayRefreshResponse(it, clock) }
+        return when (val result = response) {
             is Result.Failed -> matrixGatewayProblem(result.failure)
             is Result.Success ->
-                ResponseEntity.ok()
-                    .header("Cache-Control", "no-store")
-                    .body(MatrixGatewayRefreshResponse(result.value, clock))
+                ResponseEntity.ok().header("Cache-Control", "no-store").body(result.value)
         }
     }
 
@@ -91,12 +100,25 @@ class MatrixGatewayRefreshController(
             .body(mapOf("errcode" to code, "error" to "Invalid Matrix refresh request."))
 }
 
-class MatrixGatewayRefreshResponse(tokens: CollaborationGatewayTokens, clock: Clock) {
-    @get:JsonProperty("access_token") val accessToken = tokens.accessToken
-    @get:JsonProperty("refresh_token") val refreshToken = tokens.refreshToken
+class MatrixGatewayRefreshResponse
+private constructor(
+    @get:JsonProperty("access_token") val accessToken: String,
+    @get:JsonProperty("refresh_token") val refreshToken: String,
+    accessExpiresAt: Instant,
+    clock: Clock,
+) {
+    constructor(
+        tokens: CollaborationGatewayTokens,
+        clock: Clock,
+    ) : this(tokens.accessToken, tokens.refreshToken, tokens.accessExpiresAt, clock)
+
+    constructor(
+        tokens: CollaborationSpaceGatewayTokens,
+        clock: Clock,
+    ) : this(tokens.accessToken, tokens.refreshToken, tokens.accessExpiresAt, clock)
+
     @get:JsonProperty("expires_in_ms")
-    val expiresInMs =
-        Duration.between(clock.instant(), tokens.accessExpiresAt).toMillis().coerceAtLeast(0)
+    val expiresInMs = Duration.between(clock.instant(), accessExpiresAt).toMillis().coerceAtLeast(0)
 
     override fun toString() = "MatrixGatewayRefreshResponse(<redacted>)"
 }

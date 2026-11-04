@@ -13,6 +13,17 @@ data class CollaborationSpaceDeviceStatus(
     val label: String,
     val provisioning: CollaborationSpaceProvisioningStatus,
     val observedAt: Instant,
+    val gateway: CollaborationSpaceGatewayStatus?,
+)
+
+/** Owned recovery metadata; no credential, provider authority or current access grant. */
+data class CollaborationSpaceGatewayStatus(
+    val id: UUID,
+    val version: Long,
+    val clientBuild: Int,
+    val accessExpiresAt: Instant,
+    val expiresAt: Instant,
+    val revokedAt: Instant?,
 )
 
 data class CollaborationSpaceProvisioningStatus(

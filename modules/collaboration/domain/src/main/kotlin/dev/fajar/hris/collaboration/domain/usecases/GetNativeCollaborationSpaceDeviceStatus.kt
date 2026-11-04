@@ -14,6 +14,7 @@ import java.util.UUID
 class GetNativeCollaborationSpaceDeviceStatus(
     private val registry: CollaborationSpaceDeviceRepository,
     private val provisioning: CollaborationSpaceProvisioningRepository,
+    private val gateway: CollaborationSpaceGatewaySessionRepository,
     private val spaces: CollaborationSpaceRepository,
     private val sessions: NativeSessionRepository,
     private val identities: IdentityRepository,
@@ -86,8 +87,15 @@ class GetNativeCollaborationSpaceDeviceStatus(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.UNEXPECTED, "invalid_collaboration_provisioning")
                     )
+            val observedGateway = gateway.find(spaceId, actor.accountId, device.id)
+            if (observedGateway is Result.Failed) return@run observedGateway
             admission().flatMap { current ->
-                collaborationSpaceDeviceStatus(device, head, current.admittedAt)
+                collaborationSpaceDeviceStatus(
+                    device,
+                    head,
+                    current.admittedAt,
+                    (observedGateway as Result.Success).value,
+                )
             }
         }
     }

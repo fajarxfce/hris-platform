@@ -42,7 +42,7 @@ class BootstrapNativeCollaborationSpaceGateway(
         expectedDeviceVersion: Long,
         expectedGatewayVersion: Long?,
         client: ClientVersion?,
-    ): Result<CollaborationSpaceGatewayTokens> {
+    ): Result<CollaborationSpaceGatewayBootstrap> {
         if (actor.companyId != null)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_scope_required"))
         val enabled = validateCollaborationSpaceClient(client, policy)
@@ -95,6 +95,17 @@ class BootstrapNativeCollaborationSpaceGateway(
                     device.revokedAt != null
             )
                 return@run denied()
+
+            fun response(tokens: CollaborationSpaceGatewayTokens) =
+                CollaborationSpaceGatewayBootstrap(
+                    device.spaceId,
+                    device.accountId,
+                    device.id,
+                    device.originNativeSessionId,
+                    device.matrixUserId,
+                    device.matrixDeviceId,
+                    tokens,
+                )
 
             fun admission(): Result<CollaborationSpaceAdmission> {
                 val acquired = identities.access(actor.accountId, null)
@@ -228,7 +239,7 @@ class BootstrapNativeCollaborationSpaceGateway(
                             device,
                             clock.instant(),
                         )
-                        .map { tokens }
+                        .map { response(tokens) }
                 }
             }
             if (device.version != expectedDeviceVersion || old?.version != expectedGatewayVersion)
@@ -289,7 +300,7 @@ class BootstrapNativeCollaborationSpaceGateway(
                             clock.instant(),
                         )
                     }
-                    .map { tokens }
+                    .map { response(tokens) }
             }
         }
     }

@@ -9,7 +9,25 @@ fun collaborationSpaceDeviceStatus(
     device: CollaborationSpaceDevice,
     head: CollaborationSpaceProvisioning,
     at: Instant,
+    gateway: CollaborationSpaceGatewaySession? = null,
 ): Result<CollaborationSpaceDeviceStatus> {
+    if (
+        gateway != null &&
+            (gateway.spaceId != device.spaceId ||
+                gateway.accountId != device.accountId ||
+                gateway.deviceId != device.id ||
+                gateway.nativeSessionId != device.originNativeSessionId ||
+                gateway.platform != device.platform ||
+                gateway.version !in 0..1000000 ||
+                gateway.clientBuild !in 1..999999999 ||
+                gateway.createdAt < device.createdAt ||
+                gateway.rotatedAt < gateway.createdAt ||
+                gateway.rotatedAt > at ||
+                gateway.accessExpiresAt <= gateway.rotatedAt ||
+                gateway.expiresAt < gateway.accessExpiresAt ||
+                gateway.revokedAt?.let { it < gateway.rotatedAt || it > at } == true)
+    )
+        return Result.Failed(Failure(FailureKind.UNEXPECTED, "invalid_collaboration_space_gateway"))
     val request = head.request
     if (
         device.spaceId != request.spaceId ||
@@ -60,6 +78,16 @@ fun collaborationSpaceDeviceStatus(
                 retry,
             ),
             at,
+            gateway?.let {
+                CollaborationSpaceGatewayStatus(
+                    it.id,
+                    it.version,
+                    it.clientBuild,
+                    it.accessExpiresAt,
+                    it.expiresAt,
+                    it.revokedAt,
+                )
+            },
         )
     )
 }

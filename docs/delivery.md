@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Native group gateway transport — 4 November 2026
+
+Atomic original Matrix bootstrap identity, native versioned credential issuance,
+owned gateway status recovery and distinct standard Matrix refresh dispatch pass
+93 domain/33 data cases, 92 API/OpenAPI cases in158.550s and full worker127 in356.150s
+(126 active/one existing retention skip). Final8,324 inputs match, with format and
+architecture checks. [Evidence](measurements/collaboration-space-gateway-http-2026-11-04.json)
+records the test-only corrections and actual elapsed replay/cooldown recovery.
+Group availability remains disabled; provider renewal, group request/room authority,
+replay maintenance and Mobile group adoption remain required before product rollout.
+Normal phone28/live8b40/schema116 and all54 open communications groups are unchanged.
+
 ## Native organization gateway issuance — 4 November 2026
 
 Bootstrap/refresh use cases pass 14 focused and 154 broader domain/data cases with

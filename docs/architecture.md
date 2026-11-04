@@ -1,5 +1,7 @@
 # Architecture
 
+The [complete original/group read scope](collaboration/space-read-scope.md) preserves both original and published owned-room tuples, exact adoption overlap and per-room historical aliases. It rejects incomplete capacity without advancing sync; current native/provider admission and sync integration remain separate.
+
 [Fresh-device history](collaboration/space-history-device-identity.md) now accepts an original canonical Matrix user with a new HRISG_ device while retaining exact room ownership and isolated device cursors. Only completed retained devices can bridge their original company cursor.
 
 The [original owned-room inventory](collaboration/space-original-room-inventory.md) now provides bounded exact original company/server metadata through the existing restricted V129/V130 projection. Current completed-device read admission and combined group/original provider sync remain separate requirements.

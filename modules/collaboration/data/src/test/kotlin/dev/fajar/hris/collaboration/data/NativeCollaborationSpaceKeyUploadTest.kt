@@ -609,6 +609,8 @@ class NativeCollaborationSpaceKeyUploadTest {
                 StoredCollaborationSpaceConversationRepository(
                     PostgresCollaborationSpaceConversationDataSource(base.sql)
                 ),
+                EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
+                DisabledCollaborationSpaceMatrixSyncRepository(),
             )
 
         fun upload(

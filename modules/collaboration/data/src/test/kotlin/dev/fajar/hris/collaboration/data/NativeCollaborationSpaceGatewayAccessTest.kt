@@ -440,6 +440,8 @@ class NativeCollaborationSpaceGatewayAccessTest {
                 StoredCollaborationSpaceConversationRepository(
                     PostgresCollaborationSpaceConversationDataSource(base.sql)
                 ),
+                EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
+                DisabledCollaborationSpaceMatrixSyncRepository(),
             )
 
         fun access(

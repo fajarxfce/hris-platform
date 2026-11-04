@@ -2001,6 +2001,180 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         assertEquals(before, provider.roomCalls.get())
     }
 
+    @Test
+    fun groupSyncScopesRoomHistoryAndResetsExpandedInventoryWithoutAcceptingAnotherDeviceCursor() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val (peerDevice, peerToken) = enrollGroup(b)
+        fun encoded(value: String) =
+            java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8)
+        val empty = sync(a, token, "?timeout=0")
+        assertEquals(200, empty.statusCode(), empty.body())
+        val emptyCursor = json.readTree(empty.body()).path("next_batch").asString()
+        val room = publishedGroupRoom(a, device, b)
+        val events = groupHistoryEvents(room, device, peerDevice)
+        val own = events.first().getValue("sender")
+        val creation =
+            mapOf(
+                "type" to "m.room.create",
+                "sender" to own,
+                "state_key" to "",
+                "room_id" to room,
+                "event_id" to "\$group-sync-create-$device",
+                "origin_server_ts" to 0,
+                "content" to mapOf("room_version" to "12", "m.federate" to false),
+            )
+        provider.syncPayload.set(
+            mapOf(
+                "next_batch" to "fixture-private-since",
+                "rooms" to
+                    mapOf(
+                        "join" to
+                            mapOf(
+                                room to
+                                    mapOf(
+                                        "state" to
+                                            mapOf("events" to (listOf(creation) + events.drop(1))),
+                                        "timeline" to
+                                            mapOf(
+                                                "events" to events.take(1),
+                                                "prev_batch" to "private-history",
+                                                "limited" to true,
+                                            ),
+                                    ),
+                                "!foreign-sync:matrix.example.test" to
+                                    mapOf("private" to "foreign-marker"),
+                            )
+                    ),
+            )
+        )
+        try {
+            val first = sync(a, token, "?since=${encoded(emptyCursor)}&timeout=0")
+            assertEquals(200, first.statusCode(), first.body())
+            assertEquals("no-store", first.headers().firstValue("Cache-Control").orElse(""))
+            assertFalse(provider.lastSyncQuery.get().contains("since="))
+            val body = json.readTree(first.body())
+            assertEquals(setOf(room), body.path("rooms").path("join").propertyNames().toSet())
+            assertFalse(first.body().contains("foreign-marker"))
+            assertFalse(first.body().contains("private-history"))
+            assertFalse(first.body().contains("fixture-private-since"))
+            assertEquals(
+                events[0].getValue("event_id"),
+                body
+                    .path("rooms")
+                    .path("join")
+                    .path(room)
+                    .path("timeline")
+                    .path("events")
+                    .single()
+                    .path("event_id")
+                    .asString(),
+            )
+            val cursor = body.path("next_batch").asString()
+            val continued = sync(a, token, "?since=${encoded(cursor)}&timeout=0")
+            assertEquals(200, continued.statusCode(), continued.body())
+            assertTrue(provider.lastSyncQuery.get().contains("since=fixture-private-since"))
+            val before = provider.syncs.get()
+            assertEquals(
+                400,
+                sync(b, peerToken, "?since=${encoded(cursor)}&timeout=0").statusCode(),
+            )
+            assertEquals(before, provider.syncs.get())
+            database()
+                .update(
+                    "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                    b.fixture.account,
+                )
+            database().update("delete from native_sessions where id=?", b.session)
+            val retained = sync(a, token, "?since=${encoded(cursor)}&timeout=0")
+            assertEquals(200, retained.statusCode(), retained.body())
+            assertEquals(
+                setOf(room),
+                json.readTree(retained.body()).path("rooms").path("join").propertyNames().toSet(),
+            )
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.syncPayload.set(null)
+        }
+    }
+
+    @Test
+    fun groupSyncWithholdsProviderBatchAfterCurrentNativeParentRevocation() {
+        val a = groupEmployee()
+        val (device, token) = enrollGroup(a)
+        val before = provider.syncs.get()
+        provider.onSync.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=clock_timestamp(),version=version+1 where id=?",
+                    a.session,
+                )
+        }
+        try {
+            val denied = sync(a, token, "?timeout=0")
+            assertEquals(401, denied.statusCode(), denied.body())
+            assertFalse(denied.body().contains("next_batch"))
+            assertFalse(denied.body().contains("fixture-private-since"))
+            assertEquals(before + 1, provider.syncs.get())
+            assertEquals(401, sync(a, token, "?timeout=0").statusCode())
+            assertEquals(before + 1, provider.syncs.get())
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_request_leases where device_id=?",
+                        Int::class.java,
+                        device,
+                    ),
+            )
+        } finally {
+            provider.onSync.set(null)
+        }
+    }
+
+    @Test
+    fun groupSyncRequiresUnambiguousGatewayAuthorityAndStrictQueryBeforeProviderAccess() {
+        val a = groupEmployee()
+        val (_, token) = enrollGroup(a)
+        val before = provider.syncs.get()
+        for (response in
+            listOf(
+                sync(a),
+                sync(a, a.access),
+                sync(a, "fictional-provider-token"),
+                sync(a, token, duplicate = true),
+            )) {
+            assertEquals(401, response.statusCode(), response.body())
+        }
+        for (suffix in
+            listOf(
+                "?access_token=fixture",
+                "?since=a&since=b",
+                "?since=raw-provider-position",
+                "?timeout=-1",
+                "?timeout=30001",
+                "?full_state=yes",
+                "?filter=foreign-filter",
+                "?use_state_after=1",
+                "?use_state_after=true&use_state_after=false",
+                "?set_presence=unknown",
+            )) {
+            val response = sync(a, token, suffix)
+            assertEquals(400, response.statusCode(), suffix + response.body())
+        }
+        assertEquals(400, sync(a, token, body = "{}").statusCode())
+        assertEquals(before, provider.syncs.get())
+    }
+
     private fun sync(
         n: Native,
         token: String? = null,
@@ -3076,6 +3250,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val queries = AtomicInteger()
         val syncs = AtomicInteger()
         val onSync = AtomicReference<(() -> Unit)?>(null)
+        val syncPayload = AtomicReference<Map<String, Any>?>(null)
+        val lastSyncQuery = AtomicReference<String>("")
         val roomStates = ConcurrentHashMap<String, List<Map<String, Any>>>()
         val roomReceipts = java.util.concurrent.atomic.AtomicInteger()
         val roomCalls = AtomicInteger()
@@ -3261,11 +3437,13 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                             .removePrefix("Bearer ")]
                                 )
                                 syncs.incrementAndGet()
+                                lastSyncQuery.set(request.requestURI.query ?: "")
                                 onSync.getAndSet(null)?.invoke()
-                                mapOf(
-                                    "next_batch" to "fixture-private-since",
-                                    "rooms" to emptyMap<String, Any>(),
-                                )
+                                syncPayload.get()
+                                    ?: mapOf(
+                                        "next_batch" to "fixture-private-since",
+                                        "rooms" to emptyMap<String, Any>(),
+                                    )
                             }
                             else -> {
                                 if (

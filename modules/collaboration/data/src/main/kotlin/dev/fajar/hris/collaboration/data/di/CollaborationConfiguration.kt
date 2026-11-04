@@ -631,6 +631,20 @@ class CollaborationConfiguration {
     ): CollaborationSyncCursorRepository = EncryptedCollaborationSyncCursorRepository(crypto)
 
     @Bean
+    fun collaborationSpaceSyncCursors(
+        crypto: IdentityTokenDataSource
+    ): CollaborationSpaceSyncCursorRepository =
+        EncryptedCollaborationSpaceSyncCursorRepository(crypto)
+
+    @Bean
+    fun collaborationSpaceMatrixSync(
+        source: ObjectProvider<MatrixSyncDataSource>,
+        crypto: IdentityTokenDataSource,
+    ): CollaborationSpaceMatrixSyncRepository =
+        source.ifAvailable?.let { InternalCollaborationSpaceMatrixSyncRepository(it, crypto) }
+            ?: DisabledCollaborationSpaceMatrixSyncRepository()
+
+    @Bean
     fun collaborationMatrixSync(
         source: ObjectProvider<MatrixSyncDataSource>,
         crypto: IdentityTokenDataSource,
@@ -964,6 +978,8 @@ class CollaborationConfiguration {
         providerRoomMessage: CollaborationMatrixRoomMessageRepository,
         providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository,
         conversations: CollaborationSpaceConversationRepository,
+        syncCursors: CollaborationSpaceSyncCursorRepository,
+        providerSync: CollaborationSpaceMatrixSyncRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -992,6 +1008,8 @@ class CollaborationConfiguration {
             providerRoomMessage,
             providerRoomHistory,
             conversations,
+            syncCursors,
+            providerSync,
         )
 
     @Bean

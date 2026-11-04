@@ -2275,8 +2275,77 @@ class CollaborationSpaceWorkerPublicationTest {
                     deadline: Instant,
                 ) = read(owner, room, bearer, deadline)
             }
+        val syncCrypto = collaborationCursorFixture()
+        val syncCursors = EncryptedCollaborationSpaceSyncCursorRepository(syncCrypto)
+        val syncPositions = mutableListOf<CollaborationSyncPosition?>()
+        var afterSync: () -> Unit = {}
+        val sync =
+            object : CollaborationSpaceMatrixSyncRepository {
+                override fun sync(
+                    owner: CollaborationSpaceHistoryOwner,
+                    scope: CollaborationSpaceReadScope,
+                    position: CollaborationSyncPosition?,
+                    timeoutMillis: Int,
+                    fullState: Boolean,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixSyncBatch> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(expectedOwner, owner)
+                    assertEquals(listOf(CollaborationSpaceReadRoom.Original(original)), scope.rooms)
+                    assertEquals(credential.accessToken, bearer)
+                    assertTrue(
+                        deadline > Instant.now() && deadline <= Instant.now().plusSeconds(30)
+                    )
+                    syncPositions += position
+                    afterSync()
+                    return Result.Success(
+                        CollaborationMatrixSyncBatch("s-original", "42", emptyMap())
+                    )
+                }
+            }
         val command =
-            a.groupAccess(DisabledCollaborationMatrixRepository(), providerRoomHistory = history)
+            a.groupAccess(
+                DisabledCollaborationMatrixRepository(),
+                providerRoomHistory = history,
+                providerSync = sync,
+                syncCursors = syncCursors,
+            )
+        val firstSync =
+            success(
+                command.sync(token, UUID.randomUUID(), CollaborationSyncRequest(null, 0, false))
+            )
+        assertNull(syncPositions.last())
+        val saved = success(syncCursors.open(expectedOwner, firstSync.nextBatch))
+        success(
+            command.sync(
+                token,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(firstSync.nextBatch, 0, false),
+            )
+        )
+        assertEquals(saved, syncPositions.last())
+        val oldCursor =
+            success(
+                EncryptedCollaborationSyncCursorRepository(syncCrypto)
+                    .seal(
+                        CollaborationSyncOwner(a.company, a.account, oldA.deviceId, server),
+                        CollaborationSyncPosition("a".repeat(64), "old-private-since", "old-filter"),
+                    )
+            )
+        val oldResult =
+            command.sync(token, UUID.randomUUID(), CollaborationSyncRequest(oldCursor, 0, false))
+        if (retained) {
+            success(oldResult)
+            assertNull(syncPositions.last())
+            assertEquals(3, syncPositions.size)
+        } else {
+            failure(oldResult, "invalid_collaboration_sync_cursor")
+            assertEquals(2, syncPositions.size)
+        }
         success(
             command.roomMessages(
                 token,
@@ -2301,6 +2370,14 @@ class CollaborationSpaceWorkerPublicationTest {
         owner.update("delete from native_sessions where id=?", b.session)
         success(command.roomEvent(token, UUID.randomUUID(), roomId, "\$original"))
         assertEquals(4, calls)
+        success(
+            command.sync(
+                token,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(firstSync.nextBatch, 0, false),
+            )
+        )
+        assertEquals(saved, syncPositions.last())
         var originalLookups = 0
         var changed = false
         val tracked =
@@ -2366,6 +2443,17 @@ class CollaborationSpaceWorkerPublicationTest {
             command.roomEvent(token, UUID.randomUUID(), roomId, "\$original")
         }
         assertEquals(6, calls)
+        val syncBeforeCancel = syncPositions.size
+        afterSync = { throw CancellationException("fictional original sync cancellation") }
+        assertThrows(CancellationException::class.java) {
+            command.sync(
+                token,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(firstSync.nextBatch, 0, false),
+            )
+        }
+        assertEquals(syncBeforeCancel + 1, syncPositions.size)
+        afterSync = {}
         assertEquals(prior, a.originalSnapshot())
         // Current native revocation dominates either provider outcome.
         providerFailure =
@@ -2392,6 +2480,15 @@ class CollaborationSpaceWorkerPublicationTest {
             command.roomEvent(token, UUID.randomUUID(), roomId, "\$original") as Result.Failed
         assertEquals(FailureKind.UNAUTHENTICATED, denied.failure.kind)
         assertEquals(7, calls)
+        val beforeDeniedSync = syncPositions.size
+        val deniedSync =
+            command.sync(
+                token,
+                UUID.randomUUID(),
+                CollaborationSyncRequest(firstSync.nextBatch, 0, false),
+            ) as Result.Failed
+        assertEquals(FailureKind.UNAUTHENTICATED, deniedSync.failure.kind)
+        assertEquals(beforeDeniedSync, syncPositions.size)
     }
 
     private fun seedOriginalRoom(
@@ -4081,6 +4178,10 @@ class CollaborationSpaceWorkerPublicationTest {
                 DisabledCollaborationMatrixRoomMessageRepository(),
             providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository =
                 DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
+            providerSync: CollaborationSpaceMatrixSyncRepository =
+                DisabledCollaborationSpaceMatrixSyncRepository(),
+            syncCursors: CollaborationSpaceSyncCursorRepository =
+                EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
             rooms: CollaborationSpaceRoomRepository = roomRepository(),
             conversations: CollaborationSpaceConversationRepository =
                 StoredCollaborationSpaceConversationRepository(
@@ -4130,6 +4231,8 @@ class CollaborationSpaceWorkerPublicationTest {
                 providerRoomMessage,
                 providerRoomHistory,
                 conversations,
+                syncCursors,
+                providerSync,
             )
         }
 

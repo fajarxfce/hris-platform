@@ -41,6 +41,8 @@ class AccessNativeCollaborationSpaceMatrixDevice(
     private val providerRoomMessage: CollaborationMatrixRoomMessageRepository,
     private val providerRoomHistory: CollaborationSpaceMatrixRoomHistoryRepository,
     private val conversations: CollaborationSpaceConversationRepository,
+    private val syncCursors: CollaborationSpaceSyncCursorRepository,
+    private val providerSync: CollaborationSpaceMatrixSyncRepository,
 ) {
     fun identity(token: String, correlationId: UUID): Result<CollaborationMatrixIdentity> =
         admitted(token, correlationId, decrypt = true) { observed, until ->
@@ -59,6 +61,112 @@ class AccessNativeCollaborationSpaceMatrixDevice(
 
     fun capabilities(token: String, correlationId: UUID): Result<Unit> =
         admitted(token, correlationId, decrypt = false) { _, _ -> Result.Success(Unit) }
+
+    fun sync(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationSyncRequest,
+    ): Result<CollaborationSyncResult> {
+        if (
+            request.timeoutMillis !in 0..30_000 ||
+                request.since?.let {
+                    it.length !in 1..4096 || it.any { character -> character.code !in 33..126 }
+                } == true
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_sync_request")
+            )
+        return admitted(
+            token,
+            correlationId,
+            decrypt = true,
+            prepare = { prepareSync(it) },
+            revalidate = { observed, prepared ->
+                prepareSync(observed).flatMap { current ->
+                    if (current == prepared) Result.Success(Unit)
+                    else
+                        Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "collaboration_sync_scope_changed")
+                        )
+                }
+            },
+        ) { exchange, prepared ->
+            // Crypto and provider work run outside SQL. The outer runner confirms both outcomes,
+            // including after cursor sealing, under the original request deadline.
+            val opened =
+                request.since?.let { syncCursors.open(prepared.owner, it) } ?: Result.Success(null)
+            opened.flatMap { position ->
+                exchange
+                    .exchange { bearer, deadline ->
+                        providerSync.sync(
+                            prepared.owner,
+                            prepared.rooms,
+                            position?.takeIf { it.scopeDigest == prepared.rooms.digest },
+                            request.timeoutMillis,
+                            request.fullState,
+                            bearer,
+                            deadline,
+                        )
+                    }
+                    .flatMap { batch ->
+                        syncCursors
+                            .seal(
+                                prepared.owner,
+                                CollaborationSyncPosition(
+                                    prepared.rooms.digest,
+                                    batch.providerSince,
+                                    batch.providerFilterId,
+                                ),
+                            )
+                            .map { CollaborationSyncResult(it, batch.payload) }
+                    }
+            }
+        }
+    }
+
+    private fun prepareSync(observed: Observation): Result<SyncPreparation> {
+        val device = observed.device
+        val owner =
+            CollaborationSpaceHistoryOwner(
+                device.spaceId,
+                device.accountId,
+                device.id,
+                provider.serverName,
+                device.matrixUserId,
+                device.matrixDeviceId,
+                device.legacy,
+            )
+        if (!validCollaborationSpaceHistoryIdentity(owner)) return invalidProvider()
+        return rooms
+            .ownedBoundRooms(
+                owner.spaceId,
+                owner.accountId,
+                owner.serverName,
+                COLLABORATION_SYNC_ROOM_LIMIT + 1,
+            )
+            .flatMap { published ->
+                val company = collaborationSpaceHistoryOriginalCompany(owner)
+                val originals =
+                    if (company == null) Result.Success(emptyList())
+                    else
+                        conversations.ownedLegacyRooms(
+                            owner.spaceId,
+                            owner.accountId,
+                            company,
+                            owner.serverName,
+                            COLLABORATION_SYNC_ROOM_LIMIT + 1,
+                        )
+                originals.flatMap { original ->
+                    snapshotCollaborationSpaceReadScope(owner, published, original, clock.instant())
+                        .map { SyncPreparation(owner, it) }
+                }
+            }
+    }
+
+    private data class SyncPreparation(
+        val owner: CollaborationSpaceHistoryOwner,
+        val rooms: CollaborationSpaceReadScope,
+    )
 
     fun roomMessages(
         token: String,

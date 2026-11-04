@@ -3,7 +3,9 @@ package dev.fajar.hris.collaboration.delivery.controllers
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSyncRequest
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
+import dev.fajar.hris.collaboration.domain.policies.validCollaborationSpaceGatewayAccess
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
+import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationSpaceMatrixDevice
 import dev.fajar.hris.core.domain.*
 import jakarta.servlet.http.HttpServletRequest
 import java.util.UUID
@@ -12,7 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class MatrixGatewaySyncController(private val device: AccessNativeCollaborationMatrixDevice) {
+class MatrixGatewaySyncController(
+    private val device: AccessNativeCollaborationMatrixDevice,
+    private val group: AccessNativeCollaborationSpaceMatrixDevice,
+) {
     @GetMapping("/_matrix/client/v3/sync")
     fun get(request: HttpServletRequest): ResponseEntity<Any> {
         fun invalid() =
@@ -50,13 +55,13 @@ class MatrixGatewaySyncController(private val device: AccessNativeCollaborationM
         if (presence != null && presence !in setOf("online", "offline", "unavailable"))
             return invalid()
         val correlation = request.getAttribute("hris.correlationId") as? UUID ?: UUID.randomUUID()
+        val token = first.substring(7)
+        val sync = CollaborationSyncRequest(request.getParameter("since"), timeout, full == "true")
         return when (
             val result =
-                device.sync(
-                    first.substring(7),
-                    correlation,
-                    CollaborationSyncRequest(request.getParameter("since"), timeout, full == "true"),
-                )
+                if (validCollaborationSpaceGatewayAccess(token))
+                    group.sync(token, correlation, sync)
+                else device.sync(token, correlation, sync)
         ) {
             is Result.Failed -> matrixGatewayProblem(result.failure)
             is Result.Success ->

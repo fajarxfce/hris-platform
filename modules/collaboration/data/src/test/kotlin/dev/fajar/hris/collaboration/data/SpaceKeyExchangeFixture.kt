@@ -266,6 +266,10 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             DisabledCollaborationMatrixRoomMessageRepository(),
         roomHistory: CollaborationSpaceMatrixRoomHistoryRepository =
             DisabledCollaborationSpaceMatrixRoomHistoryRepository(),
+        sync: CollaborationSpaceMatrixSyncRepository =
+            DisabledCollaborationSpaceMatrixSyncRepository(),
+        syncCursors: CollaborationSpaceSyncCursorRepository =
+            EncryptedCollaborationSpaceSyncCursorRepository(collaborationCursorFixture()),
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             s.repo,
@@ -296,6 +300,8 @@ internal class SpaceKeyExchangeFixture(postgres: PostgreSQLContainer) {
             StoredCollaborationSpaceConversationRepository(
                 PostgresCollaborationSpaceConversationDataSource(base.sql)
             ),
+            syncCursors,
+            sync,
         )
 
     fun queryRequest() =

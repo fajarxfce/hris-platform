@@ -243,7 +243,9 @@
         "space-room-history-protocol.md",
         "../measurements/collaboration-space-room-history-protocol-2026-11-04.json",
         "space-room-history-access.md",
-        "../measurements/collaboration-space-room-history-access-2026-11-04.json"
+        "../measurements/collaboration-space-room-history-access-2026-11-04.json",
+        "space-room-sync-scope.md",
+        "../measurements/collaboration-space-room-sync-scope-2026-11-04.json"
       ]
     },
     {
@@ -321,7 +323,9 @@
         "space-room-history-protocol.md",
         "../measurements/collaboration-space-room-history-protocol-2026-11-04.json",
         "space-room-history-access.md",
-        "../measurements/collaboration-space-room-history-access-2026-11-04.json"
+        "../measurements/collaboration-space-room-history-access-2026-11-04.json",
+        "space-room-sync-scope.md",
+        "../measurements/collaboration-space-room-sync-scope-2026-11-04.json"
       ]
     },
     {

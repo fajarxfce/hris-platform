@@ -217,6 +217,13 @@ class CollaborationSpaceRoomWorkerPolicyTest {
             roomId: String,
         ): Result<CollaborationSpaceBoundRoom?> = error("Unexpected claim operation")
 
+        override fun ownedBoundRooms(
+            spaceId: UUID,
+            accountId: UUID,
+            serverName: String,
+            limit: Int,
+        ): Result<List<CollaborationSpaceBoundRoom>> = error("Unexpected claim operation")
+
         override fun provisioning(
             spaceId: UUID,
             accountId: UUID,

@@ -33,6 +33,14 @@ interface CollaborationSpaceRoomRepository {
         roomId: String,
     ): Result<CollaborationSpaceBoundRoom?>
 
+    /** Bounded immutable participant-owned room inventory; no current receiving grant. */
+    fun ownedBoundRooms(
+        spaceId: UUID,
+        accountId: UUID,
+        serverName: String,
+        limit: Int,
+    ): Result<List<CollaborationSpaceBoundRoom>>
+
     fun status(
         spaceId: UUID,
         accountId: UUID,

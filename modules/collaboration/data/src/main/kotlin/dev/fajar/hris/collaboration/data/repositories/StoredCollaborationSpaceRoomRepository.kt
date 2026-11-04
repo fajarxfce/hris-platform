@@ -76,6 +76,34 @@ class StoredCollaborationSpaceRoomRepository(private val source: CollaborationSp
         }
     }
 
+    override fun ownedBoundRooms(
+        spaceId: UUID,
+        accountId: UUID,
+        serverName: String,
+        limit: Int,
+    ): Result<List<CollaborationSpaceBoundRoom>> = safeDatabaseCall {
+        requireSpaceRoomIds(spaceId, accountId)
+        require(validCollaborationSpaceServer(serverName))
+        require(limit in 1..COLLABORATION_SYNC_ROOM_LIMIT + 1)
+        val rows = source.ownedBoundRooms(spaceId, accountId, serverName, limit)
+        require(rows.size <= limit)
+        val rooms =
+            rows.map { row ->
+                val conversation = requireNotNull(row.binding.conversationId)
+                val intent = row.intent.toSpaceRoomIntent(spaceId, accountId, conversation)
+                val binding = row.toSpaceRoomBinding(spaceId, accountId, conversation)
+                require(intent.serverName == serverName)
+                CollaborationSpaceBoundRoom(intent, binding)
+            }
+        require(
+            rooms.zipWithNext().all { (a, b) ->
+                a.intent.conversationId.toString() < b.intent.conversationId.toString()
+            }
+        )
+        require(rooms.map { it.binding.roomId }.toSet().size == rooms.size)
+        rooms
+    }
+
     override fun status(
         spaceId: UUID,
         accountId: UUID,

@@ -1,5 +1,19 @@
 # Delivery and validation
 
+## Retained group public-key storage — 4 November 2026
+
+V128 and typed ports preserve exact group/device/native/Matrix public identity through
+uncertain uploads, offboarding, parent purge and archive restoration. Only an exact
+reservation can advance to acknowledgement; current live writes and immutable retained
+LEGACY fingerprints are enforced. Read [the contract](collaboration/space-key-publication.md).
+[Evidence](measurements/collaboration-space-key-storage-2026-11-04.json): all 82 database
+and 6 data/retained-provider checks PASS 792.52s on 8,350 unchanged inputs with
+format/architecture; 18 recovery cases pass. An initial missing test-role table grant
+caused two retained-fixture failures; only that grant changed before final acceptance.
+Actual concurrency, lock-wait expiry, rollback, archive restore and original signed
+Synapse keys after restart pass. Group key exchange, recipients/rooms and Mobile
+adoption remain next. No product APK/rollout; all 54 groups remain open.
+
 ## Group gateway identity and capabilities — 4 November 2026
 
 Fixed self access now uses current group/native/provider authority and exact bounded

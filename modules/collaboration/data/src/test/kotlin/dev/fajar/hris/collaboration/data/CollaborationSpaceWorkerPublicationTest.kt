@@ -80,6 +80,9 @@ class CollaborationSpaceWorkerPublicationTest {
         owner.execute(
             "grant insert,update,delete on collaboration_space_request_leases to space_advance_command_fixture"
         )
+        owner.execute(
+            "grant insert,update on collaboration_space_key_publications to space_advance_command_fixture"
+        )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
         runtime =
             DriverManagerDataSource(
@@ -1224,6 +1227,7 @@ class CollaborationSpaceWorkerPublicationTest {
             f.groupIdentity(bootstrap.accessToken, identityProvider, missing),
             "collaboration_access_denied",
         )
+        f.assertRetainedGroupKeyStorage(id)
         assertEquals(device, f.device(id))
         assertEquals(snapshot, f.originalSnapshot())
     }
@@ -1341,6 +1345,9 @@ class CollaborationSpaceWorkerPublicationTest {
                 ),
                 success(f.groupIdentity(groupTokens.accessToken, provider.repository)),
             )
+            f.assertRetainedGroupKeyStorage(id)
+            checkKeys(recovered.accessToken)
+            assertEquals(originalRows, f.originalSnapshot())
             f.activatedCount(1)
         }
     }
@@ -2380,6 +2387,37 @@ class CollaborationSpaceWorkerPublicationTest {
                     device(id).version,
                     client,
                 )
+
+        fun assertRetainedGroupKeyStorage(id: UUID) {
+            val device = device(id)
+            val keys =
+                StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(sql))
+            val value =
+                CollaborationSpaceKeyPublication(
+                    space,
+                    account,
+                    id,
+                    session,
+                    device.matrixUserId,
+                    device.matrixDeviceId,
+                    requireNotNull(device.legacyKeyFingerprint),
+                    0,
+                    Instant.now().truncatedTo(ChronoUnit.MICROS),
+                )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) { keys.reserve(value.copy(fingerprint = "b".repeat(64))) },
+            )
+            assertNull(success(transactions.run(actor) { keys.find(space, account, id) }))
+            success(transactions.run(actor) { keys.reserve(value) })
+            assertEquals(value, success(transactions.run(actor) { keys.find(space, account, id) }))
+            val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            success(transactions.run(actor) { keys.publish(value, at) })
+            assertEquals(
+                value.copy(version = 1, publishedAt = at),
+                success(transactions.run(actor) { keys.find(space, account, id) }),
+            )
+        }
 
         fun groupIdentity(
             token: String,

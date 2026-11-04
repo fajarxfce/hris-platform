@@ -66,6 +66,14 @@ budget; the shared cleanup worker timer also runs an atomic bounded group replay
 request cleanup pass. Identity/capability access uses ordinary slots1–7 and preserves
 the reserved renewal slot. Group key/room/content authority remains next.
 
+V128 retains separate [group public-key identity](collaboration/space-key-publication.md)
+reservations with original native/Matrix provenance. Only the exact initial reservation
+can advance to acknowledged publication; replacement/reset/deletion are forbidden.
+Root-owned reads survive offboarding and parent purge, while writes require current
+native/group/device authority and retained LEGACY completion. Typed storage verifies
+write readback inside the caller's transaction. Gateway signed-key exchange, recipient
+room authority and offline key availability remain separate required integration.
+
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.

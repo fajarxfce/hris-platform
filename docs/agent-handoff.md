@@ -1,5 +1,50 @@
 # Agent continuation — HRIS workspace
 
+## Group public-key storage accepted — 4 November 2026
+
+Based on 941fa2f5, V128 and typed ports retain immutable group public-key identity:
+space/account/device/original native parent, original Matrix IDs, fingerprint and
+reservation time. Only version 0 to 1 acknowledgement is permitted. No reset, deletion
+or transient native FK can erase an uncertain upload. Root ownership preserves reads
+after offboarding/purge; current group/native/security/ACTIVE-device authority governs
+writes, including actual expiry after a device-row wait. LEGACY writes additionally
+require completed transfer and the already retained fingerprint. Exact write readback,
+failed-result rollback and cancellation remain inside the caller's transaction.
+Read [the contract](collaboration/space-key-publication.md).
+
+[Evidence](measurements/collaboration-space-key-storage-2026-11-04.json): final all 82
+database plus 6 data/retained-provider cases PASS 792.52s, 8,350 unchanged inputs,
+format/architecture and 18 recovery-tool cases PASS. Initial 12-case gate in 213.756s
+passed six database/four typed cases but failed two retained fixtures because their
+explicit role write grants omitted the new table. Only that isolated fixture grant
+changed before the final gate; production implementation remained unchanged. Actual
+concurrency, observed PostgreSQL lock wait/expiry, archive restore, rollback, native
+purge and original signed keys after Synapse restart are covered. Recovery accepts
+schema 128, rejects 129 and keeps V126's encrypted projection unchanged.
+
+NEXT wire fixed group key upload into AccessNativeCollaborationSpaceMatrixDevice:
+bounded immutable input, counts-only with no reservation/acknowledgement, committed
+reservation before outside-SQL upload, signed prior/readback continuity and current
+exact request authority before acknowledgement. Shared DI must run actual API and
+FULL worker. Concrete reviewed-but-UNAPPLIED drafts are ignored key-storage/*.txt,
+with generator scripts and notes; recheck/format/compile them before use. They are not
+part of this accepted storage increment. Follow the tracked contract without relying
+on drafts: no arbitrary provider callbacks, UC-to-UC calls or old runtime reopening.
+
+Then group recipient pre-ack behavior (include version 0 with publicationConfirmed),
+current room/member/original-room authority and Mobile preflight/stage/freeze/completion/
+atomic adoption. Receiving keys must not require an offline recipient's short native
+or provider token. Native hard-parent replacement remains explicit required recovery.
+Preserve original SDK namespace/passphrase, local history and uncertain sends across
+inbox/outbox/drafts/read/push/deep links. No group key endpoint, DI or product caller is
+enabled here. Group remains disabled and all 54 acceptance groups remain open.
+
+Main peer 9b4fa5ca/Mobile 08b0cecf/hosted product code 0b804cb2, phone release 28,
+live 8b40/schema 116 push ON/SMTP OFF and Starter 9959c1d stay unchanged. Continue full
+long run, frequent updates, immediate atomic pushes and validated product feature
+installs only. Test sessions are finished; the recorder has run and is stale after
+this commit. Never install proof APKs or reinstall unchanged phone 28.
+
 ## Group gateway self access accepted — 4 November 2026
 
 Based onb2dee963, AccessNativeCollaborationSpaceMatrixDevice now admits fixed Matrix

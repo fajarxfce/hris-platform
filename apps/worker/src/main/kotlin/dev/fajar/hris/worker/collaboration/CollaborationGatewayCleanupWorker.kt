@@ -1,6 +1,7 @@
 package dev.fajar.hris.worker.collaboration
 
 import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationGatewayReplays
+import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationSpaceTransientState
 import dev.fajar.hris.core.domain.Result
 import java.time.Duration
 import java.util.concurrent.CancellationException
@@ -12,6 +13,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 /** A single fixed-delay task with bounded database work and no per-session queue. */
 class CollaborationGatewayCleanupWorker(
     private val maintain: MaintainCollaborationGatewayReplays,
+    private val maintainSpace: MaintainCollaborationSpaceTransientState,
     private val timer: ThreadPoolTaskScheduler,
     private val interval: Duration = Duration.ofSeconds(5),
 ) : SmartLifecycle {
@@ -50,6 +52,14 @@ class CollaborationGatewayCleanupWorker(
                     "Collaboration gateway cache cleanup stopped code={}",
                     result.failure.code,
                 )
+            if (running) {
+                val group = maintainSpace.execute()
+                if (running && group is Result.Failed)
+                    logger.warn(
+                        "Collaboration group transient cleanup stopped code={}",
+                        group.failure.code,
+                    )
+            }
         } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
         } catch (_: CancellationException) {

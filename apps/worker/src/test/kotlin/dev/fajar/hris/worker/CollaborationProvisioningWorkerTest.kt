@@ -11,6 +11,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomR
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.domain.usecases.GetNativeCollaborationDirectRoomStatus
 import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationGatewayReplays
+import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationSpaceTransientState
 import dev.fajar.hris.collaboration.domain.usecases.OpenNativeCollaborationDirect
 import dev.fajar.hris.collaboration.domain.usecases.RegisterNativeCollaborationDevice
 import dev.fajar.hris.collaboration.domain.usecases.RequestNativeCollaborationDirectRoom
@@ -104,6 +105,13 @@ class CollaborationProvisioningWorkerTest {
     @Autowired private lateinit var http: MatrixHttpClientOwner
     @Autowired private lateinit var gateway: CollaborationGatewaySessionRepository
     @Autowired private lateinit var maintainGateway: MaintainCollaborationGatewayReplays
+    @Autowired private lateinit var maintainSpace: MaintainCollaborationSpaceTransientState
+    @Autowired
+    private lateinit var spaceGateway:
+        dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceGatewaySessionRepository
+    @Autowired
+    private lateinit var spaceRequests:
+        dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceRequestRepository
     @Autowired private lateinit var context: ApplicationContext
 
     private fun database() =
@@ -560,6 +568,7 @@ class CollaborationProvisioningWorkerTest {
         val worker =
             CollaborationGatewayCleanupWorker(
                 MaintainCollaborationGatewayReplays(probe, transactions, Clock.systemUTC()),
+                maintainSpace,
                 timer,
                 Duration.ofSeconds(1),
             )
@@ -625,11 +634,76 @@ class CollaborationProvisioningWorkerTest {
                 initialize()
                 shutdown()
             }
-        val worker = CollaborationGatewayCleanupWorker(maintainGateway, timer)
+        val worker = CollaborationGatewayCleanupWorker(maintainGateway, maintainSpace, timer)
         try {
             assertThrows(RuntimeException::class.java) { worker.start() }
             assertFalse(worker.isRunning)
         } finally {
+            worker.stop()
+        }
+    }
+
+    @Test
+    fun groupCleanupSharesTheOwnedTimerAndStopsAnInFlightRequestBatch() {
+        val entered = CountDownLatch(1)
+        val exited = CountDownLatch(1)
+        val released = CountDownLatch(1)
+        val callback = CountDownLatch(1)
+        val calls = AtomicInteger()
+        val requests =
+            object :
+                dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceRequestRepository by spaceRequests {
+                override fun clearExpired(at: Instant, limit: Int): Result<Int> {
+                    assertEquals(100, limit)
+                    calls.incrementAndGet()
+                    try {
+                        val result = spaceRequests.clearExpired(at, limit)
+                        entered.countDown()
+                        check(released.await(5, TimeUnit.SECONDS))
+                        return result
+                    } finally {
+                        exited.countDown()
+                    }
+                }
+            }
+        val timer =
+            ThreadPoolTaskScheduler().apply {
+                poolSize = 1
+                setThreadNamePrefix("owned-group-cleanup-fixture-")
+                setRemoveOnCancelPolicy(true)
+                setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+                setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+                setWaitForTasksToCompleteOnShutdown(false)
+                setAwaitTerminationSeconds(3)
+                initialize()
+            }
+        val worker =
+            CollaborationGatewayCleanupWorker(
+                maintainGateway,
+                MaintainCollaborationSpaceTransientState(
+                    spaceGateway,
+                    requests,
+                    transactions,
+                    Clock.systemUTC(),
+                ),
+                timer,
+                Duration.ofSeconds(1),
+            )
+        try {
+            worker.start()
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            worker.stop(Runnable { callback.countDown() })
+            assertTrue(callback.await(3, TimeUnit.SECONDS))
+            assertTrue(exited.await(3, TimeUnit.SECONDS))
+            assertFalse(worker.isRunning)
+            assertEquals(1, calls.get())
+            assertEquals(0, success(maintainSpace.execute()))
+            assertEquals(
+                "invalid_cleanup_limit",
+                (maintainSpace.execute(0) as Result.Failed).failure.code,
+            )
+        } finally {
+            released.countDown()
             worker.stop()
         }
     }

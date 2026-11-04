@@ -3,6 +3,8 @@ package dev.fajar.hris.collaboration.data
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationSpaceRequestRepository
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceRequestRepository
+import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationSpaceTransientState
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.schema.tables.records.CollaborationSpaceRequestLeasesRecord
 import java.time.Instant
@@ -300,7 +302,97 @@ class CollaborationSpaceRequestRepositoryTest {
         assertEquals(0, calls)
     }
 
-    private inner class Fixture {
+    @Test
+    fun groupMaintenanceAtomicallyClearsOnlyExpiredOperationalStateAndRollsBackOnInterruption() {
+        val f = Fixture(replaySeconds = 1)
+        val live = requireNotNull(success(f.claim()))
+        val expired = requireNotNull(success(f.claim(f.renewal, until(1))))
+        val remaining = java.time.Duration.between(Instant.now(), expired.expiresAt).toNanos()
+        if (remaining > 0) TimeUnit.NANOSECONDS.sleep(remaining + 20_000_000)
+        f.storage.owner.update("delete from native_sessions where id=?", f.owner.nativeSessionId)
+        val before = f.provenance()
+        val workerGateway = f.storage.repository(f.storage.workerSource)
+        val workerRequests =
+            StoredCollaborationSpaceRequestRepository(f.source(f.storage.workerSource))
+        val transactions = f.storage.transactions(f.storage.workerSource)
+        for (mode in listOf("failed", "cancel", "interrupt")) {
+            var removed = false
+            val probe =
+                object : CollaborationSpaceRequestRepository by workerRequests {
+                    override fun clearExpired(at: Instant, limit: Int): Result<Int> =
+                        workerRequests.clearExpired(at, limit).flatMap {
+                            assertEquals(1, it)
+                            removed = true
+                            when (mode) {
+                                "cancel" ->
+                                    throw CancellationException("fixture maintenance cancellation")
+                                "interrupt" ->
+                                    throw InterruptedException("fixture maintenance interruption")
+                                else ->
+                                    Result.Failed(
+                                        Failure(FailureKind.UNAVAILABLE, "fixture_cleanup_failed")
+                                    )
+                            }
+                        }
+                }
+            val useCase =
+                MaintainCollaborationSpaceTransientState(
+                    workerGateway,
+                    probe,
+                    transactions,
+                    java.time.Clock.systemUTC(),
+                )
+            val run = { useCase.execute(1) }
+            when (mode) {
+                "cancel" -> assertThrows(CancellationException::class.java) { run() }
+                "interrupt" -> assertThrows(InterruptedException::class.java) { run() }
+                else -> assertInstanceOf(Result.Failed::class.java, run())
+            }
+            assertTrue(removed, mode)
+            assertEquals(2, f.count(), mode)
+            assertEquals(before, f.provenance(), mode)
+        }
+        val useCase =
+            MaintainCollaborationSpaceTransientState(
+                workerGateway,
+                workerRequests,
+                transactions,
+                java.time.Clock.systemUTC(),
+            )
+        assertEquals(2, success(useCase.execute(1)))
+        assertEquals(0, success(useCase.execute(100)))
+        assertEquals(1, f.count())
+        assertEquals(live, success(f.storage.tx { f.repo.find(f.owner, live.slot) }))
+        assertNull(f.storage.raw().replayEncrypted)
+        val after = f.provenance()
+        for (table in
+            listOf(
+                "collaboration_space_devices",
+                "collaboration_space_provider_sessions",
+            )) assertEquals(before[table], after[table])
+        val oldHead = before.getValue("collaboration_space_gateway_sessions").single()
+        val newHead = after.getValue("collaboration_space_gateway_sessions").single()
+        val cleared =
+            setOf(
+                "replay_kind",
+                "bootstrap_operation_id",
+                "previous_refresh_hash",
+                "replay_encrypted",
+            )
+        for (column in cleared) assertNull(newHead[column], column)
+        for (column in oldHead.keys - cleared) assertEquals(
+            oldHead[column],
+            newHead[column],
+            column,
+        )
+        for (limit in listOf(0, 101)) assertEquals(
+            "invalid_cleanup_limit",
+            (useCase.execute(limit) as Result.Failed).failure.code,
+        )
+        assertEquals(1, f.count())
+    }
+
+    private inner class Fixture(replaySeconds: Long = 30) {
         val storage = SpaceGatewayPostgresFixture(postgres).also { it.migrate() }
         val owner =
             CollaborationSpaceRequestOwner(
@@ -327,7 +419,7 @@ class CollaborationSpaceRequestRepositoryTest {
                     storage.repo.create(
                         storage.session,
                         storage.operation,
-                        storage.at.plusSeconds(30),
+                        storage.at.plusSeconds(replaySeconds),
                     )
                 }
             )

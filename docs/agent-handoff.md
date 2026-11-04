@@ -1,5 +1,54 @@
 # Agent continuation — HRIS workspace
 
+## Native provider recovery and group maintenance accepted — 4 November 2026
+
+Based on88d20851, explicit native provider renewal now recovers expired Matrix heads
+without changing original user/device identity, creation time or retained keys. It
+requires current native/group/client/MFA, canonical ACTIVE binding and exact completed
+LEGACY provenance. Slot0 bounds one candidate to the original30-second deadline;
+login and signed retained-key readback happen outside SQL, with current admission and
+exact lease rechecks on both outcomes. Generation CAS, receipt and journal are atomic;
+final readback/authority failure rolls back. Exact release cannot remove a successor.
+No-op and receipt recovery avoid another login. No losing candidate is logged out.
+Read [the contract](collaboration/space-provider-renewal.md).
+
+Native POST /spaces/{spaceId}/native-device/provider/renew requires an operation UUID
+and observed device version; its private/no-store response names deviceId and
+providerGeneration, not provider credentials. The module binds request storage and
+renewal. The existing owned cleanup timer now invokes a bounded group transaction
+for at most100 expired replay caches and100 expired request leases. Failed results
+and interruption roll back both batches; stop cancels in-flight group work. No extra
+timer or unbounded loop is created. Current credential hashes/provenance remain intact.
+
+[Evidence](measurements/collaboration-space-provider-renewal-2026-11-04.json): focused8
+PASS150.027s includes actual Synapse renewal and original signed keys
+across restart. Broader domain93/data41 ran in287.367s; one maintenance
+test expected replay markers to remain, then was corrected to the existing four-field
+cache cleanup contract. All29 publication and six renewal cases passed that run.
+Final data6/API94 PASS226.232s, full worker128 PASS352.928s
+(127 active/one existing retention skip), format/architecture and8,338 unchanged final
+inputs. Only the maintenance test changed between broader and final gates. Earlier
+test clock/error-code and post-restart fixture-adapter corrections are recorded.
+All proof/test sessions are finished. The evidence recorder has run and is stale.
+
+NEXT implement current group gateway exchange with slots1..7, exact opaque head and
+provider-generation ownership, outside-SQL I/O and final authority checks; then group
+key/room/member authority and original-room inventory. See ignored group-runtime-next
+notes for concrete sequencing. Do not route a space ID through a company actor or
+reopen DRAINING original runtime slots. Native renewal is explicit recovery; gateway
+bootstrap/refresh continue to require a live provider head. Expired replay alone never
+authorizes deleting local history or invalidating the native parent.
+
+Then Mobile preflight/stage/freeze/completion/atomic bootstrap adoption while keeping
+original SDK namespaces/passphrases, uncertain sends and group ownership of history,
+outbox/drafts/read/push/deep links. Group availability remains disabled; no content/
+room exchange, Mobile caller or product rollout. All54 groups and actual Apple Matrix/
+APNs/CallKit remain open. Native-parent replacement still needs explicit recovery.
+Main ef586d83, Mobile7fdb55e6/hosted code0b804cb2, normal phone28/live8b40/schema116
+pushON/SMTPOFF and Starter9959c1d unchanged. Continue full long run, frequent updates,
+atomic immediate pushes and validated new product feature installs only. Never
+install proof APKs or reinstall unchanged phone28. All files in this increment are owned.
+
 ## Group request storage accepted — 4 November 2026
 
 Based on272b66b5, V127 supplies seven exact gateway request slots and one reserved

@@ -77,6 +77,9 @@ class CollaborationSpaceWorkerPublicationTest {
         owner.execute(
             "grant insert,update on collaboration_space_gateway_sessions to space_advance_command_fixture"
         )
+        owner.execute(
+            "grant insert,update,delete on collaboration_space_request_leases to space_advance_command_fixture"
+        )
         owner.execute("grant hris_worker_capability to space_advance_command_fixture")
         runtime =
             DriverManagerDataSource(
@@ -1120,6 +1123,88 @@ class CollaborationSpaceWorkerPublicationTest {
     }
 
     @Test
+    fun retainedNativeRenewalRequiresSignedContinuityAndRechecksBothKeyOutcomes() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        val id = f.register(original)
+        f.freeze(id)
+        success(f.advance(f.claim(id), f.provider(id)))
+        f.expireProvider(id)
+        val before = f.state(id)
+        val snapshot = f.originalSnapshot()
+        val device = f.device(id)
+        for (mode in
+            listOf(
+                "missing",
+                "changed",
+                "denied-success",
+                "denied-failure",
+                "cancel",
+                "interrupt",
+            )) {
+            var denied = false
+            var readKeys = false
+            val spaces =
+                object : CollaborationSpaceRepository by f.spaces {
+                    override fun current(): Result<UUID?> =
+                        if (denied) Result.Success(null) else f.spaces.current()
+                }
+            val keys =
+                f.keyProvider { user, providerDevice, _, _ ->
+                    readKeys = true
+                    when (mode) {
+                        "missing" -> Result.Success(null)
+                        "changed" -> Result.Success(MatrixKeyFixture(user, providerDevice).device)
+                        "denied-success" -> {
+                            denied = true
+                            Result.Success(f.retainedKeys!!.device)
+                        }
+                        "denied-failure" -> {
+                            denied = true
+                            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+                        }
+                        "cancel" -> throw CancellationException("fixture key cancellation")
+                        else -> throw InterruptedException("fixture key interruption")
+                    }
+                }
+            val matrix = f.provider(id)
+            val run = { f.renewProvider(id, matrix, keys, spaces) }
+            when (mode) {
+                "cancel" -> assertThrows(CancellationException::class.java) { run() }
+                "interrupt" -> assertThrows(InterruptedException::class.java) { run() }
+                "denied-success",
+                "denied-failure" -> failure(run(), "collaboration_access_denied")
+                else -> failure(run(), "collaboration_provider_invalid_keys")
+            }
+            assertTrue(readKeys, mode)
+            assertEquals(1, matrix.calls.get(), mode)
+            assertEquals(before, f.state(id), mode)
+            assertEquals(snapshot, f.originalSnapshot(), mode)
+            assertEquals(
+                0,
+                owner.queryForObject(
+                    "select count(*) from collaboration_space_request_leases where account_id=?",
+                    Int::class.java,
+                    f.account,
+                ),
+            )
+        }
+        val missing =
+            object : CollaborationLegacyRuntimeCompletionRepository by f.completions {
+                override fun find(
+                    owner: CollaborationLegacyRuntimeOwner
+                ): Result<CollaborationLegacyRuntimeCompletion?> = Result.Success(null)
+            }
+        val blocked = f.provider(id)
+        failure(f.renewProvider(id, blocked, completions = missing), "collaboration_access_denied")
+        assertEquals(0, blocked.calls.get())
+        val value = success(f.renewProvider(id, f.provider(id)))
+        assertEquals(requireNotNull(before).generation + 1, value.providerGeneration)
+        assertEquals(device, f.device(id))
+        assertEquals(snapshot, f.originalSnapshot())
+    }
+
+    @Test
     fun retainedWorkerUsesActualSynapseReadbackAndKeepsKeysAcrossProviderRestart() {
         MatrixProviderFixture("10m").use { provider ->
             provider.start()
@@ -1159,7 +1244,7 @@ class CollaborationSpaceWorkerPublicationTest {
             val id = f.register(original)
             f.freeze(id)
             val lease = f.claim(id)
-            val matrix =
+            fun matrix() =
                 InternalCollaborationSpaceMatrixRepository(
                     dev.fajar.hris.collaboration.data.matrix.HmacMatrixJwtDataSource(
                         provider.config
@@ -1171,7 +1256,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     ),
                     Clock.systemUTC(),
                 )
-            success(f.advance(lease, matrix, keys = keyRepository()))
+            success(f.advance(lease, matrix(), keys = keyRepository()))
             val current = f.credential(id)
             assertEquals(oldCredential.userId, current.state.matrixUserId)
             assertEquals(oldCredential.deviceId, current.state.matrixDeviceId)
@@ -1206,6 +1291,22 @@ class CollaborationSpaceWorkerPublicationTest {
             provider.restart()
             checkKeys(current.accessToken)
             // Retirement stops HRIS gateways, never logs the provider device out or deletes keys.
+            checkKeys(oldCredential.accessToken)
+            // Preserve Synapse's login limiter; this wait precedes the bounded native command.
+            Thread.sleep(11000)
+            f.expireProvider(id)
+            val prior = f.credential(id)
+            val originalRows = f.originalSnapshot()
+            val renewed = success(f.renewProvider(id, matrix(), keyRepository()))
+            val recovered = f.credential(id)
+            assertEquals(prior.state.generation + 1, renewed.providerGeneration)
+            assertEquals(prior.state.createdAt, recovered.state.createdAt)
+            assertNotEquals(prior.accessToken, recovered.accessToken)
+            assertEquals(originalRows, f.originalSnapshot())
+            assertEquals(completion, f.completion(original))
+            checkKeys(recovered.accessToken)
+            provider.restart()
+            checkKeys(recovered.accessToken)
             checkKeys(oldCredential.accessToken)
             f.activatedCount(1)
         }
@@ -2182,6 +2283,70 @@ class CollaborationSpaceWorkerPublicationTest {
             )
             return work(id)
         }
+
+        fun expireProvider(id: UUID) {
+            val prior = credential(id)
+            val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
+            val until = at.plusSeconds(1)
+            success(
+                transactions.run(actor) {
+                    credentials.rotate(
+                        prior.copy(
+                            state =
+                                prior.state.copy(
+                                    generation = prior.state.generation + 1,
+                                    updatedAt = at,
+                                    expiresAt = until,
+                                )
+                        ),
+                        prior.state.generation,
+                    )
+                }
+            )
+            val remaining = Duration.between(Instant.now(), until).toNanos()
+            if (remaining > 0) TimeUnit.NANOSECONDS.sleep(remaining + 20_000_000)
+        }
+
+        fun renewProvider(
+            id: UUID,
+            matrix: CollaborationSpaceMatrixRepository,
+            keys: CollaborationMatrixKeyRepository = keyProvider(),
+            spaces: CollaborationSpaceRepository = this.spaces,
+            completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+        ) =
+            RenewNativeCollaborationSpaceProvider(
+                    StoredCollaborationSpaceRequestRepository(
+                        PostgresCollaborationSpaceRequestDataSource(sql)
+                    ),
+                    registry,
+                    credentials,
+                    matrix,
+                    keys,
+                    selections,
+                    legacyParents,
+                    completions,
+                    provisioning,
+                    spaces,
+                    sessions,
+                    identities,
+                    operations,
+                    journal,
+                    transactions,
+                    IdentitySecurityPolicy(),
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    Clock.systemUTC(),
+                )
+                .execute(
+                    actor,
+                    session,
+                    0,
+                    space,
+                    UUID.randomUUID(),
+                    id,
+                    device(id).version,
+                    client,
+                )
 
         fun groupRefresh(
             token: String,

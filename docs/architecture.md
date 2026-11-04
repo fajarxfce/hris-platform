@@ -47,8 +47,11 @@ returns original Matrix identity and credentials from one guarded transaction;
 owned status exposes only safe gateway revision/deadline metadata. Standard Matrix
 refresh dispatches the distinct group prefix to its own use case. The owning module
 binds group storage and issuance while availability remains disabled by default.
-Gateway request/room authority, provider renewal and group runtime adoption remain
-unfinished. Current admission never authorizes deletion of owned local history merely
+Gateway request/room authority and group runtime adoption remain unfinished.
+[Native provider renewal](collaboration/space-provider-renewal.md) recovers an expired
+head through current admission, bounded outside-SQL login and exact-generation
+publication. It preserves original identity/key provenance and requires a separate
+versioned native command before gateway bootstrap. Current admission never authorizes deletion of owned local history merely
 because a gateway replay expired.
 
 V127 provides separate [group request lease storage](collaboration/space-request-lifecycle.md).
@@ -56,7 +59,9 @@ Seven gateway slots and one reserved native-renewal slot have finite expiry and 
 owner/native/gateway coordinates. Typed repositories validate readback and preserve
 cancellation; callers own current admission, transactions and post-I/O authority.
 Operational cleanup preserves device/key provenance and never reopens original company
-runtime slots. Provider renewal, current request use cases and worker DI remain next.
+runtime slots. Native renewal uses the reserved slot within its original request
+budget; the shared cleanup worker timer also runs an atomic bounded group replay/
+request cleanup pass. Current gateway exchange and room authority remain next.
 
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 

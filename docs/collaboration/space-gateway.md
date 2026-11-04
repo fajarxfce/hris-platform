@@ -5,7 +5,7 @@ domain types, opaque token prefixes and authenticated replay context are distinc
 from the existing company gateway. It does not create credentials during migration,
 exchange a provider bearer or move a Mobile SDK store. Native HTTP issuance and
 refresh dispatch are implemented separately below.
-[Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Native issuance use cases are separately validated below. Current gateway request/provider/room authority and Mobile adoption remain unfinished.
+[Validation](../measurements/collaboration-space-gateway-storage-2026-11-04.json) passes 19 focused cases and 181 broader regression cases on identical inputs, plus 16 recovery-tool cases and format/architecture checks. Native issuance use cases are separately validated below. Current gateway request/room authority and Mobile adoption remain unfinished.
 
 ## Native issuance use cases
 
@@ -64,8 +64,8 @@ responses retain Matrix token field names and no-store behavior. The existing st
 with bounded reading and cancellation propagation.
 
 The owning configuration binds group storage, bootstrap, refresh and status. Group
-availability remains disabled by default. This does not grant group sync/send, provider
-renewal or room access, and no Mobile product caller is enabled. Current transport
+availability remains disabled by default. Group sync/send and room authority remain
+unimplemented; separate native provider renewal is described below. Current transport
 validation is recorded separately from the earlier storage and issuance gates.
 
 [Transport evidence](../measurements/collaboration-space-gateway-http-2026-11-04.json)
@@ -75,10 +75,12 @@ final inputs and format/architecture checks. Preliminary test-only corrections a
 retained. Lost-response and revoked-access cases exercise actual elapsed replay and
 cooldown under PostgreSQL's wall-clock publication guard.
 
-Before enabling group use, connect the [bounded group request storage](space-request-lifecycle.md)
-to current request admission and provider renewal without reopening original company runtime slots. Expired group replay cleanup has
-a typed storage port but still needs its own use case and worker scheduling; the
-existing replay job handles only company gateway heads.
+[Native provider renewal](space-provider-renewal.md) now uses the reserved
+[bounded group request slot](space-request-lifecycle.md) to recover an expired provider
+head before fresh bootstrap, without reopening original company runtime slots. Group
+replay and request cleanup now share the existing owned worker timer with separate
+bounded group transaction ownership. Current gateway exchange and room authority
+remain required before Mobile group adoption.
 
 ## Ownership and authority
 
@@ -136,14 +138,15 @@ Terminal retirement requires the matching revoked group device, preserves the la
 issued facts, advances the revision and clears token hashes and replay material.
 It remains possible after offboarding or native-session purge. Rows cannot be deleted
 or revived. The bounded worker cleanup selects at most 100 expired replay rows with
-`SKIP LOCKED`; it removes only encrypted replay material and retains the expired
-deadline and every logical credential fact.
+`SKIP LOCKED`; it clears replay ciphertext, kind, bootstrap operation and previous
+refresh hash together, retaining the expired replay deadline, current credential
+hashes and immutable identity/version facts.
 
 The recovery tool recognizes schema 126 and the distinct group authenticated purpose,
 alongside the unchanged legacy envelope formats. Unknown future schemas are rejected.
 Recovery acceptance must exercise the generated SQL projection against actual
 encrypted bootstrap and refresh rows, key rotation and restored PostgreSQL data.
 
-The next increment must implement current group gateway request admission, provider renewal and room authority,
+The next increment must implement current group gateway request admission and room authority,
 then join these to the durable Mobile handover. An accepted storage adapter alone
 does not satisfy cross-company chat or authorize freezing the old client runtime.

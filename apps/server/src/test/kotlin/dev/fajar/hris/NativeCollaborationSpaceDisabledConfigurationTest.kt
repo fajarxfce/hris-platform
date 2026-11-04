@@ -40,6 +40,8 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
                     """{"platform":"ANDROID","label":"Fictional disabled","origin":"SPACE"}""",
                 "$base/native-device/bootstrap" to
                     """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
+                "$base/native-device/provider/renew" to
+                    """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
                 "$base/native-device/retry" to
                     """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0,"expectedProvisioningRevision":0}""",
                 "$base/native-device/legacy-runtime/freeze" to

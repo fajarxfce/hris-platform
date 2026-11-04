@@ -755,6 +755,93 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
         }
     }
 
+    @Test
+    fun nativeProviderRenewalHttpRecoversSafeReceiptAndRechecksOffboarding() {
+        val n = groupNative()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val path = "$base/native-device/provider/renew"
+        val input = mapOf("deviceId" to device, "expectedDeviceVersion" to 1)
+        val operation = UUID.randomUUID()
+        val response = groupCall(n, path, input, operation = operation)
+        assertEquals(200, response.statusCode(), response.body())
+        assertTrue(
+            response.headers().firstValue("Cache-Control").orElse("").contains("private, no-store")
+        )
+        val body = json.readTree(response.body())
+        assertEquals(setOf("deviceId", "providerGeneration"), body.propertyNames().toSet())
+        assertEquals(device.toString(), body["deviceId"].asString())
+        assertEquals(0L, body["providerGeneration"].asLong())
+        assertEquals(body, json.readTree(groupCall(n, path, input, operation = operation).body()))
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where account_id=?",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.space_provider_renewal'",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+        database()
+            .update(
+                "update company_memberships set active=false,version=version+1 where account_id=?",
+                n.fixture.account,
+            )
+        failure(
+            groupCall(n, path, input, operation = operation),
+            403,
+            "collaboration_access_denied",
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.space_provider_renewal'",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+    }
+
+    @Test
+    fun nativeProviderRenewalHttpRequiresOwnedDeviceCurrentBuildVersionsAndNativeTransport() {
+        val n = groupNative()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val path = "$base/native-device/provider/renew"
+        val input = mapOf("deviceId" to device, "expectedDeviceVersion" to 1)
+        assertEquals(400, groupCall(n, path, input, operation = null).statusCode())
+        assertEquals(400, groupCall(n, path, mapOf("deviceId" to device)).statusCode())
+        assertEquals(400, groupCall(n, path, mapOf("expectedDeviceVersion" to 1)).statusCode())
+        assertEquals(403, groupCall(n, path, input, token = null, cookies = false).statusCode())
+        assertEquals(403, groupCall(n, path, input, token = null).statusCode())
+        for (bad in listOf(-1L, 0L, 1000000L)) failure(
+            groupCall(n, path, input + ("expectedDeviceVersion" to bad)),
+            409,
+            "collaboration_space_provider_changed",
+        )
+        failure(groupCall(n, path, input, build = "27"), 403, "client_update_required")
+        failure(groupCall(groupNative(), path, input), 403, "collaboration_access_denied")
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.space_provider_renewal'",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+    }
+
     private fun advanceGroupClock(seconds: Long) {
         require(seconds in 1..31)
         val target = clock.instant().plusSeconds(seconds)

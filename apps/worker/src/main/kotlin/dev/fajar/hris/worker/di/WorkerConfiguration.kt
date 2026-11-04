@@ -232,6 +232,8 @@ class WorkerConfiguration {
     )
     fun collaborationGatewayCleanupWorker(
         maintain: dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationGatewayReplays,
+        maintainSpace:
+            dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationSpaceTransientState,
         @org.springframework.beans.factory.annotation.Qualifier("collaborationGatewayCleanupTimer")
         timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
         @org.springframework.beans.factory.annotation.Value(
@@ -241,6 +243,7 @@ class WorkerConfiguration {
     ) =
         dev.fajar.hris.worker.collaboration.CollaborationGatewayCleanupWorker(
             maintain,
+            maintainSpace,
             timer,
             java.time.Duration.ofSeconds(intervalSeconds),
         )

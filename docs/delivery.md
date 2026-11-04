@@ -1,5 +1,20 @@
 # Delivery and validation
 
+## Native provider renewal and group cleanup — 4 November 2026
+
+Explicit native renewal recovers expired provider heads with original identity/key
+continuity, finite request ownership and atomic generation/receipt/journal publication.
+Native HTTP returns safe generation metadata; group replay/request cleanup shares
+the existing owned worker timer. Read [the contract](collaboration/space-provider-renewal.md).
+[Evidence](measurements/collaboration-space-provider-renewal-2026-11-04.json): focused8
+PASS150.027s includes actual Synapse restart/key preservation; final
+coverage domain93/data41/API94/full worker128 (one existing worker retention skip).
+Final data6/API94 PASS226.232s and full worker PASS352.928s,
+with identical8,338 inputs and quality gates. Initial test-only corrections are
+recorded, including cache metadata cleanup; no failed assertion remains.
+Group request/room authority and Mobile adoption remain next. No deployment or product
+APK; phone28/live8b40/schema116 and all54 open communications groups are unchanged.
+
 ## Bounded group request storage — 4 November 2026
 
 Separate V127 slots and typed storage pass81 checks (all database76 plus data5) in

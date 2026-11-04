@@ -38,6 +38,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/native-device" to "post",
                 "$base/native-device/retry" to "post",
                 "$base/native-device/bootstrap" to "post",
+                "$base/native-device/provider/renew" to "post",
                 "$base/native-device/legacy-runtime/freeze" to "post",
                 "$base/native-device/legacy-runtime/drain" to "get",
             )
@@ -92,6 +93,16 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "observedAt",
             ),
             schemas["CollaborationLegacyRuntimeDrainStatus"]["properties"].propertyNames().toSet(),
+        )
+        val renewal = schemas["RenewCollaborationSpaceProviderRequest"]
+        assertEquals(
+            setOf("deviceId", "expectedDeviceVersion"),
+            renewal["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(999999L, renewal["properties"]["expectedDeviceVersion"]["maximum"].asLong())
+        assertEquals(
+            setOf("deviceId", "providerGeneration"),
+            schemas["CollaborationSpaceProviderRenewal"]["properties"].propertyNames().toSet(),
         )
         val bootstrap = schemas["BootstrapCollaborationSpaceGatewayRequest"]
         assertEquals(

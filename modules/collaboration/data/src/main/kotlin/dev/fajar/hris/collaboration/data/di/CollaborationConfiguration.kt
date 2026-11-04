@@ -824,6 +824,67 @@ class CollaborationConfiguration {
         EncryptedCollaborationSpaceGatewaySessionRepository(source, crypto)
 
     @Bean
+    fun collaborationSpaceRequestSource(sql: DSLContext): CollaborationSpaceRequestDataSource =
+        PostgresCollaborationSpaceRequestDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceRequests(
+        source: CollaborationSpaceRequestDataSource
+    ): CollaborationSpaceRequestRepository = StoredCollaborationSpaceRequestRepository(source)
+
+    @Bean
+    fun maintainCollaborationSpaceTransientState(
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        requests: CollaborationSpaceRequestRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = MaintainCollaborationSpaceTransientState(gateway, requests, transactions, clock)
+
+    @Bean
+    fun renewNativeCollaborationSpaceProvider(
+        requests: CollaborationSpaceRequestRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        matrix: CollaborationSpaceMatrixRepository,
+        keys: CollaborationMatrixKeyRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        RenewNativeCollaborationSpaceProvider(
+            requests,
+            registry,
+            providers,
+            matrix,
+            keys,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            policy,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun bootstrapNativeCollaborationSpaceGateway(
         gateway: CollaborationSpaceGatewaySessionRepository,
         registry: CollaborationSpaceDeviceRepository,

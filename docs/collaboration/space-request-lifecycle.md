@@ -3,16 +3,17 @@
 V127 adds operational leases for group gateway I/O and native provider renewal.
 These leases have separate organization ownership. They do not reopen original
 company runtime slots, transfer SDK files or grant provider/room authority. The
-feature still has no product caller or DI binding at this storage increment.
+native provider-renewal command now binds and uses slot0. Group gateway exchange
+and Mobile adoption remain unfinished.
 
 ## Bounds and current authority
 
 Each exact space/account/device/original-native parent has seven ordinary gateway
 slots (1–7) and one reserved provider-renewal slot (0). Gateway positions also pin
 the gateway ID/version. The database permits at most60 seconds per lease; use cases
-must clip that ceiling to their original admitted request deadline. A future renewal
-caller must serialize candidate login through the reserved slot while ordinary
-requests remain independently bounded.
+must clip that ceiling to their original admitted request deadline. Native renewal
+serializes one candidate login through slot0 within its original30-second budget;
+ordinary gateway request capacity remains independent.
 
 The claim function serializes on the group device and recomputes time after waiting.
 New claims require an active device, current bound native access/security and current
@@ -63,12 +64,16 @@ nullability. No provider, API/worker DI or Mobile runtime acceptance is claimed 
 
 ## Remaining integration
 
-No current gateway exchange, native provider renewal, request maintenance scheduling
-or Mobile adoption is enabled here. Native provider renewal must recover an expired
-provider head before bootstrap, because current group issuance requires live metadata.
-Retain original Matrix identity/creation time, perform login outside SQL and use final
-admission plus generation CAS. Losing candidates expire; never logout a retained
-Matrix device. Add group gateway replay cleanup as well as expired request cleanup.
+[Native provider renewal](space-provider-renewal.md) now recovers an expired head
+before bootstrap using current admission, an exact reserved lease, outside-SQL
+login/signed retained-key readback and generation CAS. Original identity and creation
+time remain unchanged. Losing candidates expire without logout.
+
+The existing owned cleanup timer also invokes group maintenance. One transaction
+clears at most100 expired gateway replay caches and100 expired request leases;
+failed results and cancellation roll back both batches. No additional timer or
+unbounded drain loop is created. Current gateway exchange and Mobile adoption remain
+unfinished; request metadata alone still grants no content or room authority.
 
 Then implement room/member authority and Mobile provider-key preflight, handover and
 ownership across inbox/outbox/drafts/read/history/push/deep links. Expired gateway

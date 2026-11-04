@@ -4,6 +4,13 @@ The user requested this amendment on3 November2026. It is required work under
 CHAT-01, not accepted implementation. The deployment serves one organization
 group, so contact discovery spans its companies; guests remain meeting-only.
 
+## Group gateway storage — 4 November 2026
+
+[Separate gateway storage](space-gateway.md) is accepted with 19 focused and 181 broader
+checks, plus actual encrypted recovery/archive validation. Current gateway request
+admission, room authority and Mobile orchestration remain next work. New opaque token
+prefixes and replay contexts do not route through the legacy company gateway.
+
 ## Native setup transport — 4 November 2026
 
 [Native group HTTP](native-space-http.md) now exposes current discovery, bounded

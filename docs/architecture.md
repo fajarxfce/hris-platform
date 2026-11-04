@@ -38,6 +38,12 @@ identity; a new parent cannot silently reuse a retained device. Public metadata 
 not private-key possession or provider authority. Native setup and the admitted provisioning worker are wired; product runtime
 transition remains unfinished; see [identity migration](collaboration/identity-migration.md).
 
+V126 stores separate [organization gateway credentials](collaboration/space-gateway.md).
+Typed ports use distinct token/replay namespaces and verify exact post-write readback.
+Retained metadata, anonymous opaque identification and encrypted replay do not grant
+current application authority. Gateway admission, HTTP and group runtime adoption
+remain unfinished; no new DI binding is enabled by the storage increment.
+
 Business modules own domain, data, and delivery projects. Domain publishes entities, repository contracts, use cases, and pure policy without framework dependencies. Data implements datasource contracts, mapping, repositories, and DI. Delivery owns HTTP and job entry points. The application composes modules.
 
 Use cases may depend on repository contracts from other modules. Datasources never depend on datasources, repositories never invoke repositories, and use cases never invoke use cases. Shared approval transitions are pure policies, not a universal business orchestrator.

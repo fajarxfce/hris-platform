@@ -42,7 +42,7 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("extract(epoch FROM token_expires_at)*1000000", expiring)
         self.assertIn(":expires:", expiring)
         with self.assertRaises(recovery.RecoveryError):
-            recovery.envelope_query(126)
+            recovery.envelope_query(127)
 
     def test_gateway_replay_projection_is_schema_gated_and_authenticates_its_metadata(self):
         for schema in (59, 103, 106, 107, 108):
@@ -93,10 +93,20 @@ class RecoverySetTest(unittest.TestCase):
         self.assertEqual(recovery.envelope_query(124), recovery.envelope_query(125))
         self.assertNotIn("collaboration_space_legacy_gateways", recovery.envelope_query(125))
 
+    def test_space_gateway_replay_is_separate_and_keeps_legacy_projection(self):
+        self.assertNotIn("collaboration_space_gateway_sessions", recovery.envelope_query(125))
+        sql = recovery.envelope_query(126)
+        self.assertIn("hris:matrix-space-gateway:v1:", sql)
+        self.assertIn("space_id::text||':'||account_id::text", sql)
+        self.assertIn("FROM collaboration_space_gateway_sessions WHERE replay_encrypted IS NOT NULL", sql)
+        self.assertIn("FROM collaboration_gateway_sessions WHERE replay_encrypted IS NOT NULL", sql)
+        self.assertIn("hris:matrix-gateway:v1:", sql)
+        self.assertIn("LIMIT 100001", sql)
+
     def test_schema_gate_accepts_reviewed_group_credentials_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 126, None, 'invalid'):
+        for schema in (58, 127, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

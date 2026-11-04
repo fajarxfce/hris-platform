@@ -1,5 +1,16 @@
 # Delivery and validation
 
+## Organization gateway storage — 4 November 2026
+
+Separate V126 storage and typed encrypted ports pass 19 focused and 181 broader
+PostgreSQL/domain/data checks on the same 8,314 inputs, with format/architecture and
+16 recovery-tool checks. [Evidence](measurements/collaboration-space-gateway-storage-2026-11-04.json)
+retains the initial fixture failure and confirms unchanged migration SQL, rollback,
+competing refresh, old/new keyrings, archive restore and actual recovery AAD parity.
+Read the [contract](collaboration/space-gateway.md) before adding current gateway
+admission or HTTP. No live migration, DI binding, provider exchange, Mobile group
+caller or new phone APK is enabled by this increment.
+
 ## Organization contact directory foundation — 3 November 2026
 
 V117 introduces a stable installation communication space and minimal eligible

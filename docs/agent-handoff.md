@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Organization gateway storage accepted — 4 November 2026
+
+V126 and eight typed domain/data files now provide a distinct organization gateway
+credential head, separate opaque prefixes and authenticated replay purpose. Exact
+scope and phase mapping, post-write readback, bounded replay cleanup and permanent
+retirement preserve original native/device provenance after purge or offboarding.
+The repository does not substitute metadata or replay decryption for current admission.
+No HTTP route, DI binding, provider exchange or Mobile group adoption is enabled.
+
+[Contract](collaboration/space-gateway.md) and [evidence](measurements/collaboration-space-gateway-storage-2026-11-04.json):
+focused 19 PASS in 154.081s (core 7, mapping 8, actual repository 4); broader 181 PASS
+in 888.458s (all core database 70, domain 26, selected old/group data 85), on the same
+8,314 unchanged inputs. Format/architecture and 16 recovery-tool tests pass. Actual
+PostgreSQL covers scoped lookup, competing refresh, exact lost-response recovery,
+rollback after readback faults/cancellation/interruption, key rotation, archive restore,
+SQL/Kotlin authenticated-context parity and bounded locked-row cleanup after native
+purge/offboarding. An initial database fixture expected no own-company label; it was
+corrected before both passing runs. V126 SQL never changed between those runs.
+
+Mobile hosted acceptance is pushed in `21eca8e6`, on tested code `0b804cb2`: all three
+workflows passed, artifact digests/source hashes and SystemUI images are verified.
+Control has 3,118 portable and 1,219 Apple-simulator tests plus iOS host compilation;
+native-HRIS has 5 actual scenarios, 241 Android-host and 18 proof-host cases; both
+Android/web sync modes pass. Actual Apple Matrix/APNs/CallKit remain unfinished.
+
+NEXT implement current group gateway device/provider/completed-transfer admission,
+bootstrap/refresh and exact receipt/journal recovery; then native HTTP/OpenAPI and
+full API/worker DI. Follow with group rooms and Mobile key publication/readback,
+handover orchestration and group inbox/outbox/history/read/push/deep-link ownership.
+The ignored `space-gateway-authority-next` contract/policy draft is not applied or
+tested. All local gate/collector sessions have finished. Do not repeat passed storage
+regression without a relevant change. Keep the original SDK namespace and require
+successful local staging/current admission before permanent server freeze.
+
+Normal phone release 28, live 8b40/schema 116 pushON/SMTPOFF and Starter 9959c1d remain
+unchanged. Cross-company end-to-end acceptance and all 54 communications groups remain
+open. Continue the long run, frequent updates, atomic Git handoffs and immediate pushes.
+
 ## Durable Mobile handover accepted locally; group gateway continues — 4 November 2026
 
 Mobile code is pushed as `0b804cb2`. Local handover reads/stages immutable protected

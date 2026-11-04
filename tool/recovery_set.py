@@ -59,7 +59,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V124 records immutable completion metadata and atomically clears retired old
 # credentials. Remaining envelopes retain their existing authenticated purposes.
 # V125 adds owned public-gateway metadata without any credential/envelope change.
-MAX_SCHEMA = 125
+# V126 adds a separate organization gateway replay namespace and authenticated context.
+MAX_SCHEMA = 126
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -119,6 +120,20 @@ def envelope_query(schema):
         collaboration += (" UNION ALL SELECT 'hris:matrix-space:v1:'||"
                           "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),token_encrypted"
                           " FROM collaboration_space_provider_sessions WHERE token_encrypted IS NOT NULL\n")
+    if int(schema) >= 126:
+        fields = [
+            "space_id::text", "account_id::text", "device_id::text", "id::text",
+            "native_session_id::text", "platform", "client_build::text", "version::text",
+            *["((extract(epoch FROM " + name + ")*1000000)::bigint)::text"
+              for name in ("created_at", "rotated_at", "expires_at", "access_expires_at")],
+            "access_hash", "refresh_hash", "replay_kind",
+            "CASE WHEN replay_kind='BOOTSTRAP' THEN bootstrap_operation_id::text ELSE previous_refresh_hash END",
+            "((extract(epoch FROM replay_until)*1000000)::bigint)::text",
+        ]
+        canonical = "||':'||".join(fields)
+        collaboration += (" UNION ALL SELECT 'hris:matrix-space-gateway:v1:'||"
+                          "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),replay_encrypted"
+                          " FROM collaboration_space_gateway_sessions WHERE replay_encrypted IS NOT NULL\n")
     return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
             ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 

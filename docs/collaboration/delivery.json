@@ -98,7 +98,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/collaboration-space-native-setup-storage.md",
         "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/measurements/collaboration-space-native-setup-storage-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/collaboration-space-native-setup-flow.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/measurements/collaboration-space-native-setup-flow-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/measurements/collaboration-space-native-setup-flow-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/ef9692b98b4437c30f2e2658537230b6648ce430/docs/measurements/android-release-phone-2026-11-05-build30.json"
       ]
     },
     {
@@ -453,7 +454,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/collaboration-space-native-setup-storage.md",
         "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/measurements/collaboration-space-native-setup-storage-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/collaboration-space-native-setup-flow.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/measurements/collaboration-space-native-setup-flow-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/measurements/collaboration-space-native-setup-flow-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/ef9692b98b4437c30f2e2658537230b6648ce430/docs/measurements/android-release-phone-2026-11-05-build30.json"
       ]
     },
     {
@@ -850,6 +852,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Product release 30 from Mobile source 3e1cee4c is installed in place on the authorized WireGuard phone; verified exact APK startup and pulled-back bytes, same app identity/data, no phone UI automation. Delivery record ef9692b98b4437c30f2e2658537230b6648ce430. Latest user priority: WhatsApp/Telegram-style chat-room long-press, contextual actions, multi-select/delete and real edit/reply/forward flows with offline retention; deliver in the following build. Then continue explicit bootstrap operation resolution, original SDK inventory/hard-parent recovery and adoption, group UI/runtime and typed push/background replies. All 54 PRD groups remain open; live backend 8b40/schema 116 unchanged. https://github.com/fajarxfce/hris-mobile/blob/ef9692b98b4437c30f2e2658537230b6648ce430/docs/agent-handoff.md",
     "Mobile finite native setup owning flow is accepted at 3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044. Continue explicit bootstrap operation recovery, original private SDK inventory, hard-parent recovery, freeze/adoption, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay, durable setup storage plus finite setup preparation/replay and retry reconciliation are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/agent-handoff.md",
     "Mobile durable native setup storage is accepted at 28377007d6023ae4c0a6ab43c809deaddb96ea9e. Continue finite native setup preparation/replay and receipt reconciliation, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/agent-handoff.md",
     "Mobile native retry/bootstrap transport is accepted at 0c8b05e4b91d1f01272fb962073f552ac4a5dab5. Continue durable native provisioning retry/bootstrap commands and finite owning flows, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/0c8b05e4b91d1f01272fb962073f552ac4a5dab5/docs/agent-handoff.md",

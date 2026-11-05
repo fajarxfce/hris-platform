@@ -1,5 +1,13 @@
 # Agent continuation — HRIS workspace
 
+## Actual original-gateway SDK recovery — 5 November 2026
+
+Mobile [8fdbe89b](https://github.com/fajarxfce/hris-mobile/commit/8fdbe89bc9c97efc152c96367e24c0a0116f8fe8) is committed; matching root/native evidence and reviewed screenshots are included.
+
+The real SDK receives typed rejected-refresh authentication, then the Mobile repository drains its exact original client and installs confirmed newer credentials into the same protected store. Original keys, HRIS parent/device and one key publication remain; actual SDK sync resumes. Both native suites pass on the same APK, preserving normal renewal, encrypted exchange/history/receipt/process-death assertions: 145.221s /2 cases/12,260 unchanged inputs, no skip. [Contract](collaboration/native-sdk-auth-recovery.md), [evidence](measurements/collaboration-sdk-auth-recovery-2026-11-05.json).
+
+Mobile root/Android/browser/proof passes 2479 fresh/531.299s/4,050 unchanged inputs, with reviewed compact reconnect and large-text UI. User confirms release31 immediately shows Bima messages on reopening. Backend runtime remains live8b40/schema116. No production deployment or generic connection root-cause claim; release32 delivery is still next. Continue original-bootstrap resolution and organization adoption, delivered message actions, group runtime/UI, calls/meetings; all54 groups stay open. Push each atomic commit and keep Git handoffs current.
+
 ## Original Android SDK access renewal verified — 5 November 2026
 
 The real pinned SDK renews both original gateway sessions after injected server-side

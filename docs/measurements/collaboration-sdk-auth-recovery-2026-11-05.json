@@ -1,0 +1,391 @@
+{
+  "startedAt": "2026-11-05T07:18:26.671010+00:00",
+  "elapsedSeconds": 145.221,
+  "exitCode": 0,
+  "sourceFiles": 12260,
+  "sourcesUnchanged": true,
+  "apkSha256": "ab255d5b991727ab1ef29fae990cc9f82e218e1e67ce847639977c26008a6ed6",
+  "apkUnchanged": true,
+  "counts": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "resultSha256": "ada1380520b58b45b61d65d1b8ae6f639f113301f738a0f626d8877add3595c8",
+  "sourceManifestSha256": "c42d43fb2f075f6fb8fba1cb466ab1cab84ae6f9441987f686206aa3a500793d",
+  "recordedAt": "2026-11-05T07:22:05.718108+00:00",
+  "testCaseSeconds": {
+    "TEST-dev.fajar.hris.NativeCollaborationSdkInteropTest": {
+      "actualAndroidSdkRenewsAccessAndExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission()": 47.621
+    },
+    "TEST-dev.fajar.hris.NativeCollaborationSdkAuthInteropTest": {
+      "actualSdkRecoversRejectedRefreshOnTheOriginalGatewayWithoutReplacingPrivateKeys()": 9.198
+    }
+  },
+  "runtimeMatchesLiveCommit": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+  "mobileSourceParent": "7e3332f04daec8d12054e6272a2c6d4f2fa510ff",
+  "nativeRecovery": {
+    "actualSdkAuthRejected": true,
+    "actualSdkAuthRecovered": true,
+    "sameGatewayRotatedOnce": true,
+    "hrisParentStillActive": true,
+    "originalDeviceStillActive": true,
+    "oneKeyPublication": true,
+    "native": {
+      "passed": true,
+      "cleanup": true,
+      "artifact": {
+        "apkSha256": "ab255d5b991727ab1ef29fae990cc9f82e218e1e67ce847639977c26008a6ed6",
+        "package": "dev.fajar.hris.collaboration.proof",
+        "avd": "hris-mobile-dev",
+        "androidApi": "35"
+      },
+      "diagnostic": {
+        "replyComplete": false,
+        "resultComplete": false,
+        "instrumentationComplete": true,
+        "failureFrames": []
+      },
+      "typedAuthRejection": true,
+      "liveSyncRejected": true,
+      "runtimeEntryRejected": true,
+      "localReadPolicyPreserved": true,
+      "originalKeysPreserved": true,
+      "ownedRuntimeDrained": true,
+      "sameStoreCredentialsReplaced": true,
+      "actualSdkSyncRestored": true
+    },
+    "gateway": [
+      {
+        "method": "GET",
+        "route": "/_matrix/client/versions",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/user/_/account_data/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 403,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/user/_/account_data/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 403,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 503,
+        "contentLength": 17408,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": "collaboration_provider_rejected",
+        "keyShape": {
+          "parsed": true,
+          "devicePresent": true,
+          "oneTimeCount": 50,
+          "fallbackCount": 0,
+          "overlappingIds": 0,
+          "oneTimeMarkedFallback": 0,
+          "fallbackNotMarked": 0,
+          "shapeValid": true
+        }
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 503,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": "collaboration_recipients_changed"
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "10000",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 17776,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": "",
+        "keyShape": {
+          "parsed": true,
+          "devicePresent": true,
+          "oneTimeCount": 50,
+          "fallbackCount": 1,
+          "overlappingIds": 1,
+          "oneTimeMarkedFallback": 0,
+          "fallbackNotMarked": 0,
+          "shapeValid": true
+        }
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 401,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "10000",
+        "errorCode": "collaboration_gateway_authentication_required"
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/refresh",
+        "query": [],
+        "unknownQuery": false,
+        "status": 401,
+        "contentLength": 73,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": "collaboration_gateway_authentication_required"
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/user/_/account_data/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 403,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/user/_/account_data/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 403,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      }
+    ]
+  },
+  "normalRenewalAndEncryptedExchange": {
+    "passed": true,
+    "encryptedBothDirections": true,
+    "sdkAccessRenewed": true,
+    "sameGatewayAfterRenewal": true,
+    "verificationUsedRefreshReplay": true,
+    "logicalIdsPreserved": true,
+    "cleanup": true,
+    "protectedStoreReopened": true,
+    "missingRecordPreserved": true,
+    "wrongPassphrasePreserved": true,
+    "exclusiveOwner": true,
+    "processRestarted": true,
+    "queueRestored": true,
+    "transactionReused": true,
+    "identityAfterRestart": true,
+    "messageIntentRestored": true,
+    "queueMappingRecovered": true,
+    "queueWriterExclusive": true,
+    "perRoomDeliveryIsolated": true,
+    "heldQueueRestored": true,
+    "nativeDeliveryOwned": true,
+    "commonSenderOwned": true,
+    "receiptJournalRecovered": true,
+    "projectionInterrupted": true,
+    "originalHistoryWindowOwned": true,
+    "historyBodiesRestored": true,
+    "nativeReadReceiptsExchanged": true,
+    "nativePrivateReceiptIsolated": true,
+    "nativeReadReceiptStoreRestored": true,
+    "nativeLocalReadIntentPrepared": true,
+    "nativeLocalReadIntentStoreRestored": true,
+    "nativeReadReceiptReplayAdmitted": true,
+    "nativeReadReceiptAckUncertaintyRecovered": true,
+    "commonHistoryAcquisitionOwned": true,
+    "latestHistoryHeadOwned": true,
+    "admittedHistoryHeads": true,
+    "providerHistoryPageOwned": true,
+    "commonProviderHistoryAcquisitionOwned": true,
+    "providerHistoryReferencesRestored": true,
+    "providerHistoryReferencesReconciled": true,
+    "providerHistoryRestartPreserved": true,
+    "historyRuntimeReopened": true,
+    "ackBeforeJournalRecovered": true,
+    "processRestartedAfterAck": true,
+    "completionCleanupRecovered": true,
+    "processRestartedAfterCompletion": true,
+    "encryptedSendCount": 3,
+    "admittedProviderPages": true,
+    "historyWindow": {
+      "originals": 2,
+      "unavailable": 9,
+      "extractionNanos": 13334687,
+      "modelCharacters": 4732,
+      "originalCharacters": 953
+    },
+    "applicationAdmittedBeforeSend": true,
+    "applicationAdmittedAroundHistory": true,
+    "applicationAdmissions": {
+      "device": 26,
+      "conversation": 26,
+      "room": 26,
+      "failures": 0
+    },
+    "heldRoomNeverSent": true,
+    "pausedAcrossRestart": true,
+    "syncInterruptedAfterRestart": true,
+    "syncRetriedWithRetainedCursor": true,
+    "artifact": {
+      "apkSha256": "ab255d5b991727ab1ef29fae990cc9f82e218e1e67ce847639977c26008a6ed6",
+      "package": "dev.fajar.hris.collaboration.proof",
+      "avd": "hris-mobile-dev",
+      "androidApi": "35"
+    }
+  },
+  "ownedEmulatorStop": {
+    "pid": 2503483,
+    "serial": "emulator-5562",
+    "stopped": true,
+    "signalSent": true,
+    "transportAbsent": true,
+    "seconds": 2.007
+  },
+  "limits": [
+    "The user confirmed that release31 shows Bima messages immediately on reopening. The earlier generic connection failure is still not attributed by isolated fixtures; no account, private keys or phone data reset.",
+    "The rejected-refresh local-read flag checks policy; actual encrypted history/queue/process-death behavior remains separately required by the normal native suite.",
+    "Rejected-auth fixture advances isolated server time by 11 seconds beyond the real ten-second rotation guard. Normal-renewal fixture freezes server time after access expiry and uses only the existing bounded replay window; neither proves late-replay or clock-skew recovery.",
+    "No new live FCM/SystemUI, physical phone UI, Apple, organization adoption, call or meeting acceptance. All 54 communications PRD groups remain open."
+  ],
+  "priorRuns": {
+    "native1": {
+      "startedAt": "2026-11-05T06:48:24.325212+00:00",
+      "elapsedSeconds": 66.213,
+      "exitCode": 1,
+      "sourceFiles": 12256,
+      "sourcesUnchanged": true,
+      "apkSha256": "8d5e7b2757016e6749961e46541a7bd81df37f3054c4f92a5bdb8f0dc891bae5",
+      "apkUnchanged": true,
+      "counts": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "resultSha256": "b1127c61fa2e0c24a41e54bbc3a8f449ba61e365a530d5c0e381626fbbd62c6b",
+      "sourceManifestSha256": "d7d79e4355ce40138479a47a3c98e06eb148aa803227733ab14676f6bfd29de9"
+    },
+    "native2": {
+      "startedAt": "2026-11-05T06:50:11.555826+00:00",
+      "elapsedSeconds": 72.829,
+      "exitCode": 0,
+      "sourceFiles": 12256,
+      "sourcesUnchanged": true,
+      "apkSha256": "8d5e7b2757016e6749961e46541a7bd81df37f3054c4f92a5bdb8f0dc891bae5",
+      "apkUnchanged": true,
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "resultSha256": "a63e182941180e9167c9b8a986c2f594f706f36fe2c2e589a06f41aeda735004",
+      "sourceManifestSha256": "beb74b2c283f902e57e1be4f37b2b5aa359469aea4bf1e54cb9dd28666873779"
+    },
+    "native3": {
+      "startedAt": "2026-11-05T06:59:31.937736+00:00",
+      "elapsedSeconds": 73.375,
+      "exitCode": 0,
+      "sourceFiles": 12258,
+      "sourcesUnchanged": true,
+      "apkSha256": "5490e6cc9c631a449a4a9c8e59b761e0018f2e8edbb769b5f3748984550e6de0",
+      "apkUnchanged": true,
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "resultSha256": "5edc1cc49c0037dced9a6d2681081ad33919746cee456fad0463965b948db143",
+      "sourceManifestSha256": "05b3c9e34fd40d48da462361684dbb0876623f3bc20932db6051711439a383f5"
+    }
+  },
+  "priorFailureExplanation": "Native1 attempted a second bootstrap while the fixture clock was frozen inside the ten-second rotation guard and received429. Native2 advanced only isolated test time by11seconds and passed; native3 added actual same-store recovery and passed. Final suite also validates bounded interruption-safe cleanup.",
+  "mobileSourceCommit": "8fdbe89bc9c97efc152c96367e24c0a0116f8fe8"
+}

@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Device sync implemented; release36 native acceptance next — 5 November 2026
+
+Mobile [a26a1248](https://github.com/fajarxfce/hris-mobile/commit/a26a124837637831655d19cc9dc89c1929e65e02)
+is pushed. Enrolled devices now synchronize without room or outgoing-message
+activity. Device sync and incoming acquisition share the first bounded phase;
+existing company/admission budgets, SDK ownership and recipient publication guards
+remain. First sync is not a key-publication acknowledgment.
+[Contract and validation](https://github.com/fajarxfce/hris-mobile/blob/a26a1248/docs/collaboration-device-sync.md).
+Full :check/Android/browser/proof pass521.721s,3,664 fresh cases,zero failures/errors/
+skips,4,077 unchanged inputs. Earlier worker fixture expectation corrected before
+that complete pass. Clean ARM64 devRelease36 build/lint is running; no release36
+native or phone acceptance yet. Apple-only CI42036083914 runs this source;
+42026950708 passed157a/release35.
+
+User phone remains validated35 (older-history reopening fixed), installed in place
+without UI driving. Bima is now cleanly stopped; retain userdata.img and sidecars,
+SDK keys and messages. Sample1 retained release34/Home runs on owned emulator5562,
+PID680459 (verify current owner record), one ACTIVE device/zero confirmed key
+publications and no provider-room request/binding. Candidate36 must publish keys
+without a first message/room, then retain the same device/keys across cold restart.
+Mobile local release36 scripts enforce the owned image and artifact checks.
+Samples3/4 Firebase/HRIS links exist; product device activation still pending.
+
+Backend11a98115/schema116 unchanged; group V117–137 remain unshipped. Do not weaken
+recipient guards, send artificial user messages or reset/clone SDK stores. After
+native acceptance, activate remaining fictional receivers, announce EACH phone
+install and use --install-only. Continue forwarding stashbfdef2ce (batch118 focused
+passed), Starter generic-storage port, edit/delete/groups/calls/meet. All54 groups
+remain open. Push every commit and preserve these continuation notes.
+
 ## Release35 history fix delivered; initial recipient activation next — 5 November 2026
 
 Mobile source157a257d568c10f32e7159722d8fdd7f579b09e4 is installed in place as

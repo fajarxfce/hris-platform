@@ -204,5 +204,36 @@
     "directConversations": 1,
     "requestedProviderRooms": 0,
     "boundProviderRooms": 0
+  },
+  "initialDeviceSync": {
+    "source": "a26a124837637831655d19cc9dc89c1929e65e02",
+    "recordedAt": "2026-11-05T13:29:41.467924+00:00",
+    "sourceValidated": true,
+    "fullGateSeconds": 521.721,
+    "freshCases": 3664,
+    "sourceFiles": 4077,
+    "failures": 0,
+    "serverGuardUnchanged": true,
+    "sample1BeforeCandidate": {
+      "activeDevices": 1,
+      "confirmedKeyPublications": 0,
+      "directConversations": 1,
+      "requestedProviderRooms": 0,
+      "boundProviderRooms": 0,
+      "deviceIdentitySha256": "2aaf0fdea20f5e691e10c667c7f22bfaf8a75d35cab9d1d9324eff3569cd9da0",
+      "publicationIdentitySha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "sample": 1,
+      "readAt": "2026-11-05T13:15:39.988204+00:00",
+      "readOnly": true,
+      "fictionalAccountOnly": true
+    },
+    "release36NativeAcceptance": "pending",
+    "phoneVersionCode": 35,
+    "appleCi": {
+      "id": 42036083914,
+      "source": "a26a124837637831655d19cc9dc89c1929e65e02",
+      "status": "in_progress",
+      "url": "https://github.com/fajarxfce/hris-mobile/actions/runs/42036083914"
+    }
   }
 }

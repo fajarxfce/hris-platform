@@ -1,5 +1,12 @@
 # Agent continuation — HRIS workspace
 
+## Pinned-database full CI dispatched — 5 November 2026
+
+Product `472abcc9a3514c19b8ae0b5b8ae6ac625576837c` is pushed. Full Verify
+[42126384926](https://github.com/fajarxfce/hris-platform/actions/runs/42126384926) was dispatched once on that exact source and is
+running. Do not duplicate dispatch or rerun the superseded029c5828 failure.
+All configuration/probe evidence and remaining work are below. No deployment.
+
 ## PostgreSQL timezone mismatch reproduced; image pin ready for full CI — 5 November 2026
 
 [Image contract](database-images.md), [evidence](measurements/postgres-image-pin-2026-11-05.json).

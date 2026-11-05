@@ -1,5 +1,13 @@
 # Agent continuation — HRIS workspace
 
+## Original chat connection recovery — 5 November 2026
+
+Mobile [8fdbe89b](https://github.com/fajarxfce/hris-mobile/commit/8fdbe89bc9c97efc152c96367e24c0a0116f8fe8) and Main proof [0c62f0d7](https://github.com/fajarxfce/hris-platform/commit/0c62f0d755651d8fa841f061271b3b565038dc45) are pushed. The Mobile runtime detects typed SDK auth rejection and installs a confirmed newer original-gateway bootstrap only after exact store drain. Original keys/local history remain; compact reconnect UI and bounded quiet setup checks replace routine refresh/technical recovery copy. User confirms release31 Bima messages appear immediately on reopening. Physical phone internet-off behavior has not been directly tested; automated offline/local-history cases pass.
+
+Final Mobile root/Android/browser/proof: 2,479 fresh cases /531.299s/4,050 unchanged inputs. Both actual API/PG/Synapse/Android SDK suites pass /145.221s/12,260 unchanged inputs, same proof APK ab255d5b, including original-store recovery after real rejected refresh and unchanged normal renewal/encrypted/history/process-death checks. Exactly three encrypted sends remain mandatory. Driver cleanup and owned-emulator shutdown pass. [Contract](https://github.com/fajarxfce/hris-mobile/blob/8fdbe89bc9c97efc152c96367e24c0a0116f8fe8/docs/collaboration-chat-reconnect.md), [native evidence](https://github.com/fajarxfce/hris-platform/blob/0c62f0d755651d8fa841f061271b3b565038dc45/docs/measurements/collaboration-sdk-auth-recovery-2026-11-05.json).
+
+This proves Main's schema116 runtime, not this worktree's organization runtime. Port Main's new NativeCollaborationSdkAuthInteropTest/driver and earlier normal-renewal test changes when integrating; do not claim Group acceptance from Main evidence. Live8b40/schema116 and phone31 remain; validated release32 build/install-only with notice is next. Earlier generic Bima connection error remains unattributed. Continue original-bootstrap resolution, private-store/hard-parent recovery/adoption, delivered edit/reply/forward/delete-for-all, group runtime/UI, calls/meetings. All54 PRD groups stay open; push every atomic commit and maintain Git handoffs.
+
 ## Original Android SDK access renewal verified — 5 November 2026
 
 Main Platform [de987b13](https://github.com/fajarxfce/hris-platform/commit/de987b13eec8d9d0a7f7a082ba432e2222a89509) is pushed.

@@ -106,7 +106,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/9d5ca633709f23588fd3fc9b29a88002bd4d3b4d/docs/measurements/chat-local-entry-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/8b13e8b9ff851e7c1334de87891b2ec4c0678bb5/docs/measurements/android-release-phone-2026-11-05-build31.json",
         "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/collaboration/native-sdk-access-renewal.md",
-        "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/measurements/collaboration-sdk-access-renewal-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/measurements/collaboration-sdk-access-renewal-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/e347b0cbccec91f0ede7a82d230c484803558463/docs/measurements/android-release-phone-2026-11-05-build32.json"
       ]
     },
     {
@@ -469,7 +470,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/9d5ca633709f23588fd3fc9b29a88002bd4d3b4d/docs/measurements/chat-local-entry-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/8b13e8b9ff851e7c1334de87891b2ec4c0678bb5/docs/measurements/android-release-phone-2026-11-05-build31.json",
         "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/collaboration/native-sdk-access-renewal.md",
-        "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/measurements/collaboration-sdk-access-renewal-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/measurements/collaboration-sdk-access-renewal-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/e347b0cbccec91f0ede7a82d230c484803558463/docs/measurements/android-release-phone-2026-11-05-build32.json"
       ]
     },
     {
@@ -866,6 +868,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Product release32 with a clean conversation header, long-press selection and original-store SDK authentication recovery is installed on the authorized WireGuard phone. Exact release APK startup/pullback verified, identity retained, install-only. Delivery record e347b0cbccec91f0ede7a82d230c484803558463. Earlier Bima Generic transport errors remain unattributed; physical offline test not claimed. Continue delivered message actions, organization adoption/group UI, calls and meetings. All54groups open; live8b40/schema116 unchanged. https://github.com/fajarxfce/hris-mobile/blob/e347b0cbccec91f0ede7a82d230c484803558463/docs/agent-handoff.md",
     "Mobile64c9432f removes thread connection subtitles and permanent select icon; long-press/contextual actions retained. Focused18/root812 pass, six reviewed screenshots. Release32 building, not installed yet. Continue original-store recovery diagnostics, delivered message actions, original-bootstrap resolution/adoption, group UI, calls/meetings; all54groups open, live8b40/schema116 unchanged. https://github.com/fajarxfce/hris-mobile/blob/64c9432f6538070f6adf750dd3920481efa7c032/docs/collaboration-chat-header.md",
     "Validated Mobile original-store reconnect is pushed at 8fdbe89bc9c97efc152c96367e24c0a0116f8fe8, with actual Main SDK recovery proof at 0c62f0d755651d8fa841f061271b3b565038dc45. Build/test/install release32 with notice/install-only; user confirms release31 Bima immediate reopening. Direct physical offline check and earlier generic error attribution remain separate. Continue long run; all54 feature groups remain open.",
     "Product release31 with local history before network, automatic reconnect, contextual unsent replies, long-press selection and local deletion is installed on the authorized WireGuard phone; exact APK startup/pullback verified, same identity/data, install-only. Delivery record 8b13e8b9ff851e7c1334de87891b2ec4c0678bb5. Actual Bima provider/session failure remains under investigation; inspect private operation diagnostics and prove original SDK refresh/cache recovery without reset. Then delivered edit/reply/forward/delete-for-all, organization adoption/group UI, calls and meetings. All54groups remain open; live8b40/schema116 unchanged. https://github.com/fajarxfce/hris-mobile/blob/8b13e8b9ff851e7c1334de87891b2ec4c0678bb5/docs/agent-handoff.md",

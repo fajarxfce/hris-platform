@@ -1,5 +1,22 @@
 # Agent continuation — HRIS workspace
 
+## Main quoted reply envelope — 5 November 2026
+
+Main [d4f34140](https://github.com/fajarxfce/hris-platform/commit/d4f34140a1dd71388bd434de64e3f514f491f482) is pushed.
+Its native gateway accepts the exact bounded reply reference alongside encrypted
+content, with existing native/participant/sender-key admission. Arbitrary relations
+and plaintext metadata remain rejected. Opaque references do not authorize target
+reads. Synapse transaction replay/rotation and HTTP/PG revocation checks pass.
+[Contract](https://github.com/fajarxfce/hris-platform/blob/d4f34140a1dd71388bd434de64e3f514f491f482/docs/collaboration/quoted-reply-envelope.md),
+[evidence](https://github.com/fajarxfce/hris-platform/blob/d4f34140a1dd71388bd434de64e3f514f491f482/docs/measurements/collaboration-reply-envelope-2026-11-05.json).
+
+Main gate:427.516s/158 fresh/zero failures or errors/one existing opt-in worker skip,
+8,211 unchanged inputs, including full worker. This is not Group runtime acceptance;
+port the reply envelope and native renewal/auth/offline fixtures with Group's own gate.
+Mobile durable draft/outbox integration is in progress; history/UI/actual native reply
+exchange remain next. No deployment; live8b40/schema116 and phone32 unchanged.
+Continue long run and atomic pushes; all54 acceptance groups remain open.
+
 ## Cold offline history verified — 5 November 2026
 
 Mobile [2032793a](https://github.com/fajarxfce/hris-mobile/commit/2032793a90f67c01eb2e4545c5b7e3437037b492) is pushed.

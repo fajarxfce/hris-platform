@@ -130,3 +130,10 @@ References checked during planning:
 - https://docs.livekit.io/transport/self-hosting/distributed/
 - https://developer.android.com/develop/connectivity/telecom/voip-app/telecom
 - https://developer.apple.com/documentation/pushkit/responding-to-voip-notifications-from-pushkit
+
+## Quoted reply continuation
+
+Main [d4f34140](https://github.com/fajarxfce/hris-platform/commit/d4f34140a1dd71388bd434de64e3f514f491f482) validates
+the exact encrypted reply envelope. This worktree still requires the source port and
+its own provider/API/worker gate. Mobile draft/outbox/history/UI and native acceptance
+are in progress; no Group reply acceptance is claimed.

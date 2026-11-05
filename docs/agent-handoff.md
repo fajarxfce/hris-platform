@@ -1,50 +1,51 @@
 # Agent continuation — HRIS workspace
 
-## Chat hub validated; release 38 builds, metadata deltas remain next — 5 November 2026
+## Release 38 chat hub delivered; metadata delta implementation next — 5 November 2026
 
-Mobile [34e68b128bd9fa80ccc817d8e008caf850920d96](https://github.com/fajarxfce/hris-mobile/commit/34e68b128bd9fa80ccc817d8e008caf850920d96)
-is committed/pushed. Four root destinations now group Conversations/Contacts inside
-Chat. Contacts retains the company employee directory; New chat opens the existing
-cross-company participant picker. Rows are not yet account-resolved chat actions;
-Calls remains future work. Same-owner previews survive names-only local emissions,
-duplicate list emissions do not restart details, identical metadata skips encrypted
-writes, and an empty Next acquisition no longer reacts to unrelated later rows.
+Mobile source34e68b128bd9fa80ccc817d8e008caf850920d96 and delivery docs37c3f05a are
+committed/pushed. Non-debuggable ARM64 devRelease38/1.0.0 installed in place on the
+phone at17:18UTC,60.322s including device SHA verification. APK88,403,668 bytes,
+SHA256cbb6c3d1f6fcffde562a02584212354f561e6b1947cd48766c51a52e8581524e.
+No phone UI operated or data cleared. [Evidence](https://github.com/fajarxfce/hris-mobile/blob/37c3f05a/docs/measurements/android-release-phone-2026-11-05-build38.json).
+Do not reinstall; future installs require announcement and explicit install-only.
 
-Mobile full2 PASSES root check/Android/browser/proof build-tests:1,045 fresh cases,
-399.451s,4,103 unchanged inputs; zero failures/errors/skips. All90 AppFlow cases pass.
-The earlier full1 login timeout and emulator exit under host load are retained in
-[measurement](https://github.com/fajarxfce/hris-mobile/blob/34e68b12/docs/measurements/chat-hub-2026-11-05.json).
-Six synthetic compact/dark200%/landscape captures reviewed. Clean ARM64 release38
-build/lint now runs in Mobile .work/release-phone-2026-11-05-build38; freeze its HEAD
-and working tree until the wrapper and children drain. No38 artifact/delivery yet.
-[Mobile Apple42069899173](https://github.com/fajarxfce/hris-mobile/actions/runs/42069899173)
-runs exact34e68b12; do not dispatch another same-branch Apple run.
+Chat groups Conversations/Contacts in one bottom destination. Existing directory
+rows still lack account-linked chat actions. Names-only local emissions no longer
+clear same-owner previews; duplicate emissions/identical metadata cause no detail
+restart or encrypted rewrite. Empty Next no longer leaves latent navigation. Actual
+HTTP metadata acquisition still uses UUID pages, NOT a delta feed; Matrix messages
+already synchronize incrementally. This transport gap remains current priority.
 
-Phone remains37, SHA256724f4be58de4ff27e3fbedac367e8edb0239180271442db5a09b0d3f848af738,
-with Forward/native and four retained Bima history checks accepted. It was reachable
-at16:44UTC. All owned emulator images are now stopped; old PID records are stale.
-After build verify artifact, start retained Rani/sample1, update37→38, run prepared
-hub/Newchat/offline/cold-restart proof; no new messages needed. Then restore Bima as
-receiver and announce EACH phone install, explicit10.77.77.3:5555,--install-only.
-Never drive phone UI; preserve all userdata, sidecars, keys and native identities.
+Native Rani proof98.877s passes section/Newchat return, both draft previews, history,
+offline reopening and cold offline process restart. HTTP probe confirms unavailable
+server; Contacts also retained. Four captures reviewed. Rani SAMPLE-001 alone gained
+people.directory.read via normal admin API, then Change company/reselect refreshed
+workspace permissions. Existing collaboration.chat retained; temporary operator
+session revoked. No identities, keys or messages reset; other memberships unchanged.
+Local provision.py chat-only assertion is now stale for Rani; do not rerun blindly.
 
-Starter independent batch Apple42061944252 PASSES118cases/31suites, six batch cases,
-full simulator app/associations. All ten exact-port hashes verified; docs f99650d
-pushed. No pending Starter batch acceptance or source port for HRIS hub policy.
+Retained Bima passes4history checks109.672s with8rows and no Older/decryption/history
+failure. Owned receiver5562/PID2232286/startTicks157580400 runs38; verify current
+start record. Rani stopped38; Nadia/Dimas stopped37. Preserve userdata AND sidecars/
+keys, and never repeat the already accepted Forward publication.
 
-Metadata summary HTTP still uses UUID pages, NOT changed-only acquisition; Matrix
-message transport already uses incremental positions. No-op storage/retained UI is
-not completion of the HTTP delta requirement. [Backend continuation](collaboration/direct-summaries.md#incremental-metadata-follow-up)
-records existing journal and immutable-identity constraints; no SQL/runtime change
-has been made. Live backend11a98115/schema116 and chat pushOFF remain unchanged.
-Group V117–137 are still unshipped; coordinate migration numbering before adding a
-new production migration. No group cutover or physical iPhone acceptance is claimed.
+Mobile full2 passed1,045fresh/399.451s with4,103 unchanged inputs; clean38build/lint
+528.929s/zero lint. All local wrappers drained. MobileApple42069899173 exact34e68b12
+passed simulator tests17:12UTC; full app still building17:20. Do not duplicate dispatch;
+full reports/app/association audit pending. Starter batchApple42061944252 accepted
+118cases/31suites with exact port; docs f99650d pushed. No Starter hub policy port.
 
-Protected Mobile editing WIP stasha34a7b2261f4ea35df0bad44412cfc40ef9e5f20 (five
-unvalidated decoder/policy files) and oldbfdef2ce remain. Continue metadata deltas,
-editing/deletion/groups/calls/meet; immutable original send evidence and the15-minute
-server-acceptance edit window remain required. All54 PRD groups remain open.
-Push every commit; current user corrections do not cancel the larger task.
+Live backend11a98115/schema116 unchanged; chat pushOFF. New metadata migration must
+precede the unshipped groupV117–137 range. Flyway dotted116.1 is a possible insertion
+without rewriting either existing history; tool/generate_jooq.py currently parses
+integer versions and must be fixed/tested before using it. No new migration exists
+or is deployed yet. [Metadata contract constraints](collaboration/direct-summaries.md#incremental-metadata-follow-up).
+
+Protected Mobile editing stasha34a7b (five unvalidated policy/decoder files) and
+originalbfdef2ce remain. Immutable original send evidence,15-minute edit window,
+account/device/admission isolation remain required. Continue metadata deltas,
+account-linked contacts, edit/delete/groups/calls/meet; all54 PRD groups remain open.
+Push every commit; user corrections do not cancel broader long-run work.
 
 ## All four fictional receivers ready; forwarding resumes — 5 November 2026
 

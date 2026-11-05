@@ -1,5 +1,42 @@
 # Agent continuation — HRIS workspace
 
+## Local chat entry, reconnect and unsent messages — 5 November 2026
+
+Mobile [9d5ca633](https://github.com/fajarxfce/hris-mobile/commit/9d5ca633709f23588fd3fc9b29a88002bd4d3b4d) is pushed.
+
+Chat now projects owned local history/outgoing messages before network preparation.
+Reopening does not display a network loading ring. Foreground transient failures retry
+with a timeout per attempt, increasing delay and lifecycle/account cancellation. Inbox and
+thread routine refresh controls are removed; transient connection status stays in the
+header, while local/known denial/recovery errors remain actionable. Owned SDK rows
+already shown remain through transient failures; this does not newly persist a failed
+canonical history import. [Contract](https://github.com/fajarxfce/hris-mobile/blob/9d5ca633709f23588fd3fc9b29a88002bd4d3b4d/docs/collaboration-chat-local-entry.md).
+
+Held notification replies appear in the original conversation with preserved text and
+a direct review action. Inbox rows identify unsent messages; only orphaned inputs use
+a fallback entry. The global Saved replies utility no longer appears for ordinary
+queues. Recovery still uses the original durable intent and draft-aware departure.
+Short EN/ID copy and 375px light/dark200% plus 320px detail screenshots are reviewed.
+Android diagnostics identify a closed SDK operation/type without content or secrets.
+
+Final focused 193 fresh cases / 103.676 s (unchanged tests may reuse earlier passing outputs; report hashes distinguish fresh and reused results); root :check, Android-host and dev compilation 805 fresh cases / 265.682 s. Format, architecture and detekt pass. Both final gates preserve identical 4,040 inputs. [Evidence](https://github.com/fajarxfce/hris-mobile/blob/9d5ca633709f23588fd3fc9b29a88002bd4d3b4d/docs/measurements/chat-local-entry-2026-11-05.json).
+
+NEXT: build and validate release31, announce then install-only on authorized phone,
+and read the new operation diagnostics to resolve the actual Bima failure. Never reset
+private SDK/account data. Upstream pinnedSDK26.10.23 Rust8de215a0 confirms automatic
+refresh is enabled, /join always performs HTTP and refresh errors may become Generic;
+ClientDelegate.didReceiveAuthError provides a typed rejected-token signal, currently
+not installed by the product. Inspect callback ownership plus exact original gateway
+recovery, and prove offline reopening after actual canonical acquisition. Do not claim
+the reported session problem solved merely because generic error UI is removed.
+
+Then continue delivered edit/reply/forward/delete-for-all, organization bootstrap
+resolution/private-store inventory/hard-parent recovery/freeze/adoption and group
+runtime/UI, typed push, calls and meetings. All54PRD groups remain open. No new APK,
+phone interaction, live deployment, actual JNI/provider/FCM/SystemUI, Apple runtime or
+performance acceptance in this commit. Phone30/source3e1cee4c and live8b40/schema116
+unchanged. Continue long run and atomic pushes; no routine confirmation is needed.
+
 ## Chat selection and local deletion — 5 November 2026
 
 Mobile [db446996](https://github.com/fajarxfce/hris-mobile/commit/db446996a54fd65e9fb18177334dcfb6c27ff164) is pushed.

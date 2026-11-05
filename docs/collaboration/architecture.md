@@ -137,3 +137,10 @@ Main [d4f34140](https://github.com/fajarxfce/hris-platform/commit/d4f34140a1dd71
 the exact encrypted reply envelope. This worktree still requires the source port and
 its own provider/API/worker gate. Mobile draft/outbox/history/UI and native acceptance
 are in progress; no Group reply acceptance is claimed.
+
+## Mobile quoted intent continuation
+
+Mobile [e47d9166](https://github.com/fajarxfce/hris-mobile/commit/e47d91662996a7fb724567ba7076938fc03d6724) preserves
+original reply identity through encrypted draft/outbox and paused queue delivery.
+Product history/UI and actual native quoted-message proof are in progress. Current
+phone32 and live8b40/schema116 remain unchanged; all54 groups remain open.

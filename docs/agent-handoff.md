@@ -1,5 +1,12 @@
 # Agent continuation — HRIS workspace
 
+## Normalized image full CI dispatched — 5 November 2026
+
+Product `49ec23e0d73f9c7e19d2ba19aa6927633e04bbd1` is pushed. Full Verify
+[42129516710](https://github.com/fajarxfce/hris-platform/actions/runs/42129516710) was dispatched once on that exact source and is
+running. Do not duplicate or rerun the older failed sources. Local24-case
+acceptance, failure diagnosis and continuation are below. No deployment yet.
+
 ## Digest-only Testcontainers correction passes locally — 5 November 2026
 
 [Contract](database-images.md), [evidence](measurements/postgres-image-pin-2026-11-05.json).

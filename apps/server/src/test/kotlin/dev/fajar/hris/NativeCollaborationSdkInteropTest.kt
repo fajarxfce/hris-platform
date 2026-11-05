@@ -325,6 +325,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "ackBeforeJournalRecovered",
                     "processRestartedAfterAck",
                     "completionCleanupRecovered",
+                    "coldHistoryRecoveredOffline",
+                    "gatewayUnavailableAfterProcessDeath",
                     "processRestartedAfterCompletion",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
@@ -441,6 +443,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "ackBeforeJournalRecovered" to true,
                     "processRestartedAfterAck" to true,
                     "completionCleanupRecovered" to true,
+                    "coldHistoryRecoveredOffline" to true,
+                    "gatewayUnavailableAfterProcessDeath" to true,
                     "processRestartedAfterCompletion" to true,
                     "encryptedSendCount" to 3,
                     "admittedProviderPages" to true,

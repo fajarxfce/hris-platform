@@ -7,10 +7,34 @@ import time
 import unittest
 from unittest.mock import MagicMock, patch
 
-from collaboration_hris_native import app_write_script, checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
+from collaboration_hris_native import app_write_script, disconnect_owned_gateway, checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
 
 
 class HrisNativeDriverTest(unittest.TestCase):
+    def test_disconnect_removes_only_the_exact_owned_mapping(self):
+        native = MagicMock(port=18200)
+        native.command.side_effect = ["fixture tcp:18200 tcp:18200\nfixture tcp:18300 tcp:18300\n", "", "fixture tcp:18300 tcp:18300\n"]
+        disconnect_owned_gateway(native)
+        self.assertIsNone(native.port)
+        self.assertEqual(native.command.call_args_list[1].args, ("reverse", "--remove", "tcp:18200"))
+
+    def test_disconnect_rejects_replaced_or_missing_mapping_without_removal(self):
+        for mappings in ["", "fixture tcp:18200 tcp:18300\n", "fixture tcp:18200 tcp:18200\nfixture tcp:18200 tcp:18200\n"]:
+            native = MagicMock(port=18200)
+            native.command.return_value = mappings
+            with self.assertRaises(RuntimeError):
+                disconnect_owned_gateway(native)
+            self.assertEqual(native.port, 18200)
+            native.command.assert_called_once_with("reverse", "--list")
+
+    def test_disconnect_keeps_cleanup_ownership_when_removal_is_uncertain(self):
+        for after in ["fixture tcp:18200 tcp:18200\n", RuntimeError("read failed")]:
+            native = MagicMock(port=18200)
+            native.command.side_effect = ["fixture tcp:18200 tcp:18200\n", "", after]
+            with self.assertRaises(RuntimeError):
+                disconnect_owned_gateway(native)
+            self.assertEqual(native.port, 18200)
+
     def evidence(self):
         return {"encryptedBothDirections": True, "logicalIdsPreserved": True, "syncMode": "classic",
                 "protectedStoreReopened": True, "missingRecordPreserved": True,
@@ -35,6 +59,8 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "historyRuntimeReopened": True,
                 "ackBeforeJournalRecovered": True,
                 "completionCleanupRecovered": True,
+                "coldHistoryRecoveredOffline": True,
+                "gatewayUnavailableAfterProcessDeath": True,
                 "ackSenderEventId": "$third", "ackTransaction": "ack-transaction",
                 "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
@@ -136,7 +162,7 @@ class HrisNativeDriverTest(unittest.TestCase):
 
     def fixture(self, root, base="http://127.0.0.1:43210"):
         private_json(root / "fixture.json", {"baseUrl": base})
-        native = MagicMock(adb="owned-adb", serial="emulator-5560")
+        native = MagicMock(adb="owned-adb", serial="emulator-5560", port=18200)
         native.cleanup.return_value = True
         native.bind.return_value = {"apkSha256": "fictional"}
         process = MagicMock()
@@ -159,8 +185,14 @@ class HrisNativeDriverTest(unittest.TestCase):
         private_json(root / "resume.json", {"ready": True})
         native.process_id.side_effect = [101, None, 202, 202, None, 303, 303, None, 404]
         reads = 0
+        gateway_mapped = True
         def command(*arguments):
-            nonlocal reads
+            nonlocal reads, gateway_mapped
+            if arguments == ("reverse", "--list"):
+                return "fixture tcp:18200 tcp:18200\n" if gateway_mapped else ""
+            if arguments == ("reverse", "--remove", "tcp:18200"):
+                gateway_mapped = False
+                return ""
             if arguments[:3] == ("shell", "am", "force-stop"):
                 return ""
             name = Path(arguments[-1]).stem

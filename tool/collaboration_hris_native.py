@@ -46,6 +46,21 @@ def app_write_script(name):
     return f"set -eu; umask 077; set -C; cat > {temporary}; mv -n {temporary} {target}; test ! -e {temporary}"
 
 
+def disconnect_owned_gateway(native):
+    port = native.port
+    if type(port) is not int or not 1024 <= port <= 65535:
+        raise ValueError("Missing owned gateway mapping")
+    local = f"tcp:{port}"
+    mappings = [line.split() for line in native.command("reverse", "--list").splitlines()]
+    selected = [fields for fields in mappings if len(fields) == 3 and fields[1] == local]
+    if len(selected) != 1 or selected[0][2] != local:
+        raise RuntimeError("Owned gateway mapping changed before disconnect")
+    native.command("reverse", "--remove", local)
+    if any(local in line.split()[1:2] for line in native.command("reverse", "--list").splitlines()):
+        raise RuntimeError("Owned gateway mapping remained after disconnect")
+    native.port = None
+
+
 def proof_evidence(value):
     if not isinstance(value, dict) or value.get("encryptedBothDirections") is not True or value.get("logicalIdsPreserved") is not True or value.get("syncMode") != "classic":
         raise ValueError("Invalid owned exchange evidence")
@@ -59,7 +74,8 @@ def proof_evidence(value):
                  "nativeLocalReadIntentPrepared", "nativeLocalReadIntentStoreRestored", "nativeReadReceiptReplayAdmitted", "nativeReadReceiptAckUncertaintyRecovered",
                  "originalHistoryWindowOwned", "historyBodiesRestored", "commonHistoryAcquisitionOwned", "latestHistoryHeadOwned", "providerHistoryPageOwned",
                  "commonProviderHistoryAcquisitionOwned", "providerHistoryReferencesRestored",
-                 "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered", "completionCleanupRecovered"):
+                 "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered", "completionCleanupRecovered",
+                 "coldHistoryRecoveredOffline", "gatewayUnavailableAfterProcessDeath"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True
@@ -270,6 +286,7 @@ def run(apk, sdk, directory):
                     if not stop_process(process) or native.process_id() is not None:
                         raise RuntimeError("Owned completion process did not stop")
                     private_json(directory / "native-completed.json", archived)
+                    disconnect_owned_gateway(native)
                     process = start("hris-completion-recover")
             if archived is not None and archive_restored is None:
                 checkpoint = app_json("gateway-completion-restored")

@@ -192,3 +192,15 @@ markers. An uncertain typing command is never retried. Normal read, provider, de
 cleanup and overall deadlines remain unchanged.25 driver regressions pass0.013s.
 Repeat the actual scenario with unchanged APKs/worker; this is not a product send fix.
 Phone release33 remains prepared pending full backend CI and validated rollout.
+
+## Current product path passes — 5 November 2026
+
+The second attempt passes241.839s/one fresh case/zero skips on unchanged Mobile36e78206
+APKs and current worker; actual driver179.364s. Native password login, chat activation,
+Firebase-caused process restart, real SystemUI notification and encrypted inline reply
+all pass. Server counts1/1/1. All five actual PNGs reviewed; driver and independent
+checks verify emulator/transport/image/credentials cleanup. Worker bytes match the
+accepted CI/deployed worker artifact. [Evidence](../measurements/product-chat-fcm-current-2026-11-05.json).
+The first input timeout remains recorded. The empty-room image still shows a Load
+messages action; this is an outstanding UX issue. This scenario does not diagnose
+old/new Bima pending sends on the physical phone or close any whole PRD group.

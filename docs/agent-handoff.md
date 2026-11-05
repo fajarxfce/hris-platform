@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Quoted backend live and current product FCM accepted — 5 November 2026
+
+Live API/worker source11a98115 (bounded reply enveloped4f34140) replaces8b40 using
+exact artifacts from all14 passed CI42004588608 jobs. Activation19.094s; API/worker/
+provider healthy. Schema116/Matrix/TLS/data/config/dashboard preserved; retained old
+images support image-only rollback. [Rollout](collaboration/quoted-reply-rollout.md),
+[evidence](measurements/chat-quoted-rollout-2026-11-05.json).
+
+Current Mobile36e78206 actual product FCM attempt2 passes241.839s/one case/zero skips;
+driver179.364s, counts1/1/1. Real Firebase process restart/SystemUI encrypted inline
+reply, five reviewed images and independent cleanup accepted. Worker bytes match CI.
+[Evidence](measurements/product-chat-fcm-current-2026-11-05.json). Earlier typing timeout
+retained;45s bounded input adjustment has no uncertain retries. No phone send proof.
+Fresh empty chat still shows Load messages and needs UX correction.
+
+Release33 source36e78206 is installed in place on10.77.77.3:5555 after announcement;
+86.234s including pullback, exact e97aceff bytes matched, app ID/first-install preserved.
+No UI launch or data reset. Connected phone has no running app process yet; optional
+request to open Bima once is pending for new closed diagnostics. Preserve keys/intents.
+Mobile Apple-only CI42009694285 on36e78206 is running. All54 groups open; continue full
+long run, atomic pushes, group adoption/UI/edit/forward/delete-for-all/calls/meetings.
+
 ## Current product FCM setup attempt — 5 November 2026
 
 Current Mobile36e78206 product/peer debug fixtures build116.057s; worker13.602s.

@@ -1,0 +1,229 @@
+{
+  "recordedAt": "2026-11-05T10:25:24.265206+00:00",
+  "source": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+  "ci": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/42004588608",
+    "allFourteenJobsPassed": true,
+    "jobs": [
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T09:51:14Z"
+      },
+      {
+        "name": "dashboard (1)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T09:49:18Z"
+      },
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:35Z",
+        "completedAt": "2026-11-05T09:51:27Z"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T10:01:45Z"
+      },
+      {
+        "name": "backend (4)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T09:59:41Z"
+      },
+      {
+        "name": "backend (7)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T10:02:21Z"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T09:55:17Z"
+      },
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T09:51:36Z"
+      },
+      {
+        "name": "backend (5)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T09:59:59Z"
+      },
+      {
+        "name": "backend (8)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T10:07:30Z"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:35Z",
+        "completedAt": "2026-11-05T09:55:41Z"
+      },
+      {
+        "name": "backend (6)",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T09:42:34Z",
+        "completedAt": "2026-11-05T10:00:22Z"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T10:07:33Z",
+        "completedAt": "2026-11-05T10:20:32Z"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "success",
+        "startedAt": "2026-11-05T10:07:33Z",
+        "completedAt": "2026-11-05T10:08:51Z"
+      }
+    ]
+  },
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42004588608",
+    "headSha": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+    "stagedAt": "2026-11-05T10:21:26.996710+00:00",
+    "elapsedSeconds": 33.037,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13405625713,
+        "archiveSha256": "d3df1225bef04d22f5948b1619b678457f3221239506e300c12d14d057d34f4a",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-quoted-reply-2026-11-05/packages/api/apps-server.jar",
+        "sha256": "d00a6438a7e18d8fb93b29abaa32ad2f1f9f7428b629017393e3d19a2c844fc1",
+        "bytes": 98539759
+      },
+      {
+        "role": "worker",
+        "artifactId": 13405371064,
+        "archiveSha256": "68f51502358597c99c923c204a7cdd48c11d9091f935567ef4e94107aec7df73",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-quoted-reply-2026-11-05/packages/worker/apps-worker.jar",
+        "sha256": "64654564bb34b855f5fa9bc1d05387486900d4386a6b1ce25c30fd1c5f7735bf",
+        "bytes": 78608580
+      }
+    ]
+  },
+  "images": {
+    "success": true,
+    "source": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42004588608",
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:quoted-reply-11a98115",
+        "image": "sha256:ff8885b7bc664f4df74efc15695bed9d95945b6c53928967304fcf0cc7d6b78c",
+        "packageSha256": "d00a6438a7e18d8fb93b29abaa32ad2f1f9f7428b629017393e3d19a2c844fc1",
+        "packageBytes": 98539759,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "tag": "hris-dev-worker:quoted-reply-11a98115",
+        "image": "sha256:2a3a785e9c0e3ea4d69d8f0034173da2f4e5ae62b123f7892c6be97eec0ad92d",
+        "packageSha256": "64654564bb34b855f5fa9bc1d05387486900d4386a6b1ce25c30fd1c5f7735bf",
+        "packageBytes": 78608580,
+        "runtimeUser": "10001:10001"
+      }
+    },
+    "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+    "dockerfileSha256": "c25d8f22fa916d04eadbd4ebf4c4fc3802c40474b23f55f9d9c801475cbd7c47",
+    "existingServicesUnchanged": true,
+    "buildLibsUnchanged": true,
+    "originalOverlaySha256": "6817cd11b01b85b44de9abcb7dcc1385ec9b1b262cf77302c7a96fdab01474b7",
+    "candidateOverlaySha256": "84c3c1a2e1f8ad1a65770e6a978772d0635b6f09b8d9a2ac41c4c73980f753eb",
+    "elapsedSeconds": 30.466
+  },
+  "runtime": {
+    "success": true,
+    "source": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+    "schema": 116,
+    "migrationStarted": false,
+    "startedAt": "2026-11-05T10:23:29.557396+00:00",
+    "api": {
+      "container": "d7994096d4a0993f9ce517b5d43e06dc7a41082eb1950f97a76b221a26f4dfd1",
+      "image": "sha256:ff8885b7bc664f4df74efc15695bed9d95945b6c53928967304fcf0cc7d6b78c",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "worker": {
+      "container": "ef33932cb14c848e08d2704d90a875f362ec462309fad12138fc2c764d085c1f",
+      "image": "sha256:2a3a785e9c0e3ea4d69d8f0034173da2f4e5ae62b123f7892c6be97eec0ad92d",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "apiHealthy": true,
+    "providerHealthy": true,
+    "privateTlsValidationStatus": 400,
+    "untrustedDirectCallbacks": [
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      }
+    ],
+    "untrustedProxyStatus": 403,
+    "chatPushEnabled": true,
+    "smtpEnabled": false,
+    "hostProviderPortsPublished": false,
+    "existingDatabaseAndStorageUnchanged": true,
+    "existingEnvironmentAndIdentityKeysPreserved": true,
+    "dashboardUnchanged": true,
+    "oldImagesRetained": true,
+    "proxy": {
+      "container": "19245d3d651eec1833c12b1f843b42d83b1e1d3a3fc0061095671086ae7ac67c",
+      "image": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "runtimeUser": "10001:10001"
+    },
+    "matrix": {
+      "container": "00188dc9022bc1df24525c7ec7f92a5c8299a9cf69ea0297052047b5b885f42f",
+      "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+    },
+    "elapsedSeconds": 19.094
+  },
+  "previousImages": {
+    "api": {
+      "container": "cbc3565a2dde4ddf551e5974ca23af6c535a003ef804b23e3610806302d4a82e",
+      "image": "sha256:08df88ffd7cda11cc11e647422095d60e42bb1b095eb42e8633164bc38ce9287",
+      "retainedTag": "hris-dev-api:before-quoted-reply-20261105T102143",
+      "startedAt": "2026-11-03T19:36:03.263606011Z"
+    },
+    "worker": {
+      "container": "0edb936d0674310d3e4b304edf8887c723ae5e8d149456a97011714c4e1b83b1",
+      "image": "sha256:276c545e35f78ef5fa43213fe48cbff6c18d38e880ea35ddfed81dcf3ce9797a",
+      "retainedTag": "hris-dev-worker:before-quoted-reply-20261105T102143",
+      "startedAt": "2026-11-03T19:36:03.470057858Z"
+    }
+  },
+  "scope": "Only API/worker image fields changed. Main production unchanged from the CI source; subsequent commits change tests/docs only.",
+  "nativeProof": "collaboration-quoted-native-2026-11-05.json",
+  "productFcmProof": "product-chat-fcm-current-2026-11-05.json",
+  "rollback": "Restore retained prior API/worker image references through the original private compose overlay, then recreate only api and worker. Never restore old database data over new messages."
+}

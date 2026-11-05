@@ -1,0 +1,86 @@
+{
+  "platformCommit": "49f33df6f343b978d16fa46a894a78388d4cd229",
+  "mobileCommit": "36e78206d792ac68a38585b80e17234d0e691b22",
+  "startedAt": "2026-11-05T10:18:36.996607+00:00",
+  "seconds": 241.839,
+  "exitCode": 0,
+  "inputsUnchanged": true,
+  "mobileInputsUnchanged": true,
+  "counts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "junitSha256": "06af06b84c5cf91326aade9e954b8911b5d6e5761d5760d480246c6003776011",
+  "workerJarSha256": "64654564bb34b855f5fa9bc1d05387486900d4386a6b1ce25c30fd1c5f7735bf",
+  "mobileArtifacts": [
+    {
+      "file": "product1.apk",
+      "package": "dev.fajar.hris.mobile.dev",
+      "sha256": "58a8318982f3ebe3b473afef1e733c524aea657caeffa22b083e558170f225b8",
+      "bytes": 103863697,
+      "debuggable": true,
+      "abis": [
+        "x86_64"
+      ],
+      "signatureVerified": true
+    },
+    {
+      "file": "peer1.apk",
+      "package": "dev.fajar.hris.collaboration.proof",
+      "sha256": "5c7ba2561f55ed05e983a5fc51ea1e1be4977920a81aafb03883e2eeb5ce20ed",
+      "bytes": 103881093,
+      "debuggable": true,
+      "abis": [
+        "x86_64"
+      ],
+      "signatureVerified": true
+    }
+  ],
+  "driver": {
+    "passed": true,
+    "phoneTouched": false,
+    "serial": "emulator-5562",
+    "productStartedByPush": true,
+    "encryptedReplyReceived": true,
+    "cleanedUp": true,
+    "peerCleanedUp": true,
+    "deviceCleanedUp": true,
+    "elapsedSeconds": 179.364
+  },
+  "serverCounts": {
+    "registrations": 1,
+    "pushers": 1,
+    "delivered": 1
+  },
+  "screenshots": {
+    "docs/images/product-chat-fcm-2026-11-05/product-chat-notification.png": {
+      "sha256": "883e5bf29df598d3fc357981ad111fd14dec2982fa01d49a288d3648e0e3c1ca",
+      "reviewed": true
+    },
+    "docs/images/product-chat-fcm-2026-11-05/product-chat-ready.png": {
+      "sha256": "d72d9a3e598301cd373b3af0151003df60b3dd95636f1995297dc42edb236fe5",
+      "reviewed": true
+    },
+    "docs/images/product-chat-fcm-2026-11-05/product-chat-reply-acknowledged.png": {
+      "sha256": "4d27a19a6a2099bbecfc1a1400e2ee17cbf6f3afbdc2a557815943b8aed54d9f",
+      "reviewed": true
+    },
+    "docs/images/product-chat-fcm-2026-11-05/product-chat-reply-editor.png": {
+      "sha256": "b031ff761855ae7bce4c31e2cececf1cdbb067cd4e36e6026e51bf6c4586e098",
+      "reviewed": true
+    },
+    "docs/images/product-chat-fcm-2026-11-05/product-notifications-enabled.png": {
+      "sha256": "b197ec443a7d92dcc657eb88a12b79c09496e44e43f84541df11b3fba2d34a44",
+      "reviewed": true
+    }
+  },
+  "cleanupIndependentlyVerified": true,
+  "limits": [
+    "One owned emulator/native-password fictional-account scenario; no physical-phone send acceptance.",
+    "First attempt failed during ADB input and is retained separately.",
+    "Empty chat still exposes Load messages; further UX work remains.",
+    "No new voice/video/meeting/Apple acceptance. All54 groups remain open."
+  ]
+}

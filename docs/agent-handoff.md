@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## PostgreSQL timezone mismatch reproduced; image pin ready for full CI — 5 November 2026
+
+[Image contract](database-images.md), [evidence](measurements/postgres-image-pin-2026-11-05.json).
+Full edit-envelope CI42120370137 on029c5828 completed with2 failures: backend3
+OffboardingScheduleHttpTest and backend7 OnboardingScheduleHttpTest, both repeated
+Havana midnight constraints. Ten other backend/dashboard jobs passed;2 dependent
+integration jobs skipped. Actual disposable PostgreSQL SQL confirms old10a5c69a
+maps midnight to05UTC; new mutable-tag80df0884 maps04UTC, while Java uses05UTC.
+Both probe containers removed; no runtime changes. Do not rerun the old product.
+
+The version catalog now owns the immutable10a5c69a image, used by all48 Kotlin
+Testcontainers declarations and4 real Python fixture/codegen consumers. Standalone
+Compose/proof pins are checked against it. Catalog/helper changes invalidate codegen.
+Architecture/image checks and Python recovery/workload tests pass; Kotlin changes
+formatted. NEXT: push this pin and dispatch one complete Verify on the new product
+head. The prepared .work/check-pin.py has NOT run; JVM/database acceptance will be
+provided by full CI, not inferred from the SQL probe. Record exact run/head/results
+and audit release artifacts before deploying the already implemented edit envelope.
+
+Mobile references2 PASS122 fresh cases/135.577s; references-full2 is now running.
+Its earlier test-scope compile failure and intentionally stopped full attempt are
+retained. Persisted-edit product d47554f8 Apple42123588891 still builds the full app.
+Phone40 remains installed, no new APK. Both retained emulators stopped. Starter
+bce2012 complete. Continue replacement transport evidence/outbox/long-press edits
+and all54 PRD groups after the active gates; no feature group closure is claimed.
+Live54b10ce8/schema116.1 retains push/callback/delivery/worker FCM ON and SMTP OFF.
+
 ## Edit release CI running — 5 November 2026
 
 Product029c58283726ea4a44e9c0fc45f91428a128f3c6 is committed/pushed. Full Verify

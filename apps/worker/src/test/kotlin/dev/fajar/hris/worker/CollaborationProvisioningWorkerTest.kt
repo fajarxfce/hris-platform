@@ -64,7 +64,9 @@ class CollaborationProvisioningWorkerTest {
     companion object {
         @Container
         @JvmStatic
-        val postgres = PostgreSQLContainer("postgres:18.6-alpine").withInitScript("worker-role.sql")
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
+                .withInitScript("worker-role.sql")
         @Container @JvmStatic val matrix = WorkerMatrixFixture()
 
         @DynamicPropertySource

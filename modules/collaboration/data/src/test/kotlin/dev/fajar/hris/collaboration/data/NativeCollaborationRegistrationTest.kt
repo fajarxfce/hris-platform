@@ -348,7 +348,10 @@ class NativeCollaborationRegistrationTest {
     companion object {
         @Container
         @JvmStatic
-        val postgres = org.testcontainers.postgresql.PostgreSQLContainer("postgres:18.6-alpine")
+        val postgres =
+            org.testcontainers.postgresql.PostgreSQLContainer(
+                requireNotNull(System.getProperty("hris.postgres.image"))
+            )
         private lateinit var source: DriverManagerDataSource
         private lateinit var sql: JdbcTemplate
         private lateinit var runtime: DriverManagerDataSource

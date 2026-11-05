@@ -22,7 +22,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @Testcontainers
 class CollaborationSummaryMigrationTest {
     companion object {
-        @Container @JvmStatic val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+        @Container
+        @JvmStatic
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
     }
 
     @Test

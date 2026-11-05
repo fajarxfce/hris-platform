@@ -18,6 +18,7 @@ from urllib.request import Request, ProxyHandler, build_opener
 from urllib.error import URLError
 import uuid
 
+from container_images import postgres_image
 import database_recovery as database
 import recovery_set as recovery
 from recovery_document_metadata import seed_metadata, verify_metadata
@@ -129,7 +130,7 @@ def main():
                 "POSTGRES_DB": "hris", "POSTGRES_USER": "hris_migrator", "POSTGRES_PASSWORD": passwords["migration"],
                 "HRIS_DATABASE_PASSWORD": passwords["api"], "HRIS_WORKER_DATABASE_PASSWORD": passwords["worker"],
             })
-            database_container = run("database", "postgres:18.6-alpine", [], alias="database",
+            database_container = run("database", postgres_image(), [], alias="database",
                 environment_file=root / "database.env", extra=(
                     "--tmpfs", "/var/lib/postgresql:size=768m",
                     "--mount", f"type=bind,source={ROOT / 'deploy/postgres/init-runtime.sh'},target=/docker-entrypoint-initdb.d/10-runtime.sh,readonly",

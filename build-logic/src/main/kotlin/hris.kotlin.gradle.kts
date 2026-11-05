@@ -24,6 +24,10 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    systemProperty(
+        "hris.postgres.image",
+        catalog.findVersion("postgres-image").get().requiredVersion,
+    )
     maxParallelForks = 1
     maxHeapSize = "768m"
     testLogging {

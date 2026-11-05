@@ -39,7 +39,8 @@ abstract class ApiIntegrationTest {
         @Container
         @JvmStatic
         val container =
-            PostgreSQLContainer("postgres:18.6-alpine").withInitScript("runtime-role.sql")
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
+                .withInitScript("runtime-role.sql")
 
         @DynamicPropertySource
         @JvmStatic

@@ -25,6 +25,8 @@ val generateJooq by
         group = "code generation"
         inputs.dir("src/main/resources/db/migration")
         inputs.file(rootProject.file("tool/generate_jooq.py"))
+        inputs.file(rootProject.file("tool/container_images.py"))
+        inputs.file(rootProject.file("gradle/libs.versions.toml"))
         inputs.file(rootProject.file("tool/migration_versions.py"))
         inputs.files(jooqGenerator)
         outputs.dir(generated)

@@ -7,6 +7,7 @@ import tempfile
 import time
 import uuid
 from xml.sax.saxutils import escape
+from container_images import postgres_image
 from migration_versions import ordered_migrations
 
 classpath, destination, migration_dir = sys.argv[1:]
@@ -22,7 +23,7 @@ def run(*args, **kwargs):
 try:
     run("run", "--rm", "-d", "--name", container, "--label", "dev.fajar.hris=codegen",
         "-e", "POSTGRES_PASSWORD=codegen-only", "-e", "POSTGRES_DB=hris",
-        "-p", "127.0.0.1::5432", "postgres:18.6-alpine", stdout=subprocess.DEVNULL)
+        "-p", "127.0.0.1::5432", postgres_image(), stdout=subprocess.DEVNULL)
     for attempt in range(90):
         if subprocess.run(docker + ["exec", "-e", "PGPASSWORD=codegen-only", container, "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "hris", "-c", "select 1"],
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:

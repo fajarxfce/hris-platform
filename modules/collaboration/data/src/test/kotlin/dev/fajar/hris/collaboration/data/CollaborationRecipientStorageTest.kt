@@ -24,7 +24,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @Testcontainers
 class CollaborationRecipientStorageTest {
     companion object {
-        @Container @JvmStatic val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+        @Container
+        @JvmStatic
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
         lateinit var owner: JdbcTemplate
         private lateinit var upgraded: Fixture
 

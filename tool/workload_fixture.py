@@ -11,6 +11,7 @@ import tempfile
 import time
 import uuid
 
+from container_images import postgres_image
 import database_recovery as docker
 from recovery_storage import container_endpoint
 
@@ -68,7 +69,7 @@ class WorkloadFixture:
             "POSTGRES_DB": "hris", "POSTGRES_USER": "hris_migrator", "POSTGRES_PASSWORD": passwords["migration"],
             "HRIS_DATABASE_PASSWORD": passwords["api"], "HRIS_WORKER_DATABASE_PASSWORD": passwords["worker"],
         })
-        self.run("database", "postgres:18.6-alpine",
+        self.run("database", postgres_image(),
             ("postgres", "-c", "shared_buffers=2GB", "-c", "work_mem=16MB", "-c", "effective_cache_size=6GB"),
             memory=self.database_memory, extra=(
                 "--mount", f"type=volume,source={self.volume},target=/var/lib/postgresql",

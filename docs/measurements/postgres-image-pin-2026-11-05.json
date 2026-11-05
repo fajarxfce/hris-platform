@@ -1,0 +1,233 @@
+{
+  "date": "2026-11-05",
+  "status": "configuration and isolated SQL checks passed; full Verify required on the new commit",
+  "failedRun": {
+    "headSha": "029c58283726ea4a44e9c0fc45f91428a128f3c6",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42120370137",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (7)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (8)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (5)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (6)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "dashboard (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "timezoneBinaryComparison": [
+    {
+      "image": "postgres@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+      "timezoneSource": "/usr/share/zoneinfo",
+      "midnightUtcByFold": {
+        "0": "2026-11-01T04:00:00+00:00",
+        "1": "2026-11-01T05:00:00+00:00"
+      }
+    },
+    {
+      "image": "postgres@sha256:80df0884d0d3b7f0f7b2c37f273b1c12d5fd66e25aaef2e19ebf95908d620f11",
+      "timezoneSource": "/usr/share/zoneinfo",
+      "midnightUtcByFold": {
+        "0": "2026-11-01T04:00:00+00:00",
+        "1": "2026-11-01T04:00:00+00:00"
+      }
+    }
+  ],
+  "isolatedPostgresSql": [
+    {
+      "image": "postgres@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+      "havanaMidnightUTC": "2026-11-01T05:00:00Z"
+    },
+    {
+      "image": "postgres@sha256:80df0884d0d3b7f0f7b2c37f273b1c12d5fd66e25aaef2e19ebf95908d620f11",
+      "havanaMidnightUTC": "2026-11-01T04:00:00Z"
+    }
+  ],
+  "sqlProbeCleanup": "Both disposable network-none containers removed; no live database or application changed.",
+  "toolChecks": [
+    {
+      "command": [
+        "python3",
+        "tool/container_images.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.026,
+      "logSha256": "b282a50c6e33efffc80c2c7869b7b9c63b74776770a61d0ca09c31ddcc2264bd"
+    },
+    {
+      "command": [
+        "python3",
+        "tool/check_architecture.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.635,
+      "logSha256": "8df21d3390edfb2d3e3fd3e74afc9ff9079999dd6645cae691387156647b137f"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tool",
+        "-p",
+        "test_database_recovery.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.122,
+      "logSha256": "5c4fa7ff70d8c635fafb800ad9e4cd51b5f366237c2741dbc00cb4477a53fe73"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tool",
+        "-p",
+        "test_recovery_*.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.186,
+      "logSha256": "7c71f735061a048be1076c301aabd1e52bac2e25dd1694e96332c3a8757b77a2"
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tool",
+        "-p",
+        "test_workload.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.182,
+      "logSha256": "f8628a873e5aa0624321025daa844bfae00cba06253ccc782d86b06a5a3b5b11"
+    }
+  ],
+  "pythonTests": {
+    "databaseRecovery": 21,
+    "recoverySet": 24,
+    "workload": 16,
+    "failures": 0,
+    "errors": 0
+  },
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/ApiIntegrationTest.kt": "c5e2def215fd21f57b16627ed8ad60120dac2e81309dd2cc30dedc62318325be",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "cf20f186e1f5d71622912dfc21a7b0bbee5a48220d96f0e60236fc42f3ce066d",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationPushContextTest.kt": "86a5e55d97749309b89ac6cce5a6a8e163d169d736abae115784bd7bf5bd4c5e",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationSummaryWorkerTest.kt": "317af206a8b2eda833bf6e2eee7c10dbadc221f151fcf4255d44a0c8d2fdb51b",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CommunicationsWorkerFixture.kt": "a5b6879606414cc3950907250706da3e373940ce60d28eff16826fd43750b7dc",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/DirectoryProjectionWorkerTest.kt": "c3cd50c27d2476f5f2ab186efb6f969560e0fa0c5fb522ec6da6e93c9c96efcc",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/DocumentValidationWorkerTest.kt": "3c4d55539fc5668a8f5b047737c26b6383192a48406e93c3281fad08a75c03ae",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/EmployeeImportWorkerTest.kt": "a22be9763a5a7d1bad5341d9d61154551098ce595ac78e29458d5699d4335e73",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/IdentityMailWorkerTest.kt": "b4926dba649c290e7b0d38f8c5f9e737bca604063d50e373a1fe766348232df2",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/LeaveBatchWorkerTest.kt": "12b7a4a91af5b8b8b9ee7707d9fb1dec84914ae1b3b615dbdaf6b24b7886ec3c",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/LeaveCarryExpiryWorkerTest.kt": "233323d365cbb905d0e414813bb6572bd75e7f7631cb5ffe6eeff8901d209493",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/MobileSyncWorkerTest.kt": "cf281bd768585083c292f50d5203d01ed25b58940dd25641f05c0f89cd01d021",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/NativeSessionCleanupWorkerTest.kt": "6ecf6df621760cf45896009d7d329937b2c95f8f164e427d5521b63852097288",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/ObjectCleanupWorkerTest.kt": "7d85d433e9fd39a9fce4a5dbb88809154b963cbd3d7369bde19a729d0fcb5135",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/OffboardingScheduleWorkerTest.kt": "327c25637889996d4c8a15da433b88981ca6517e9c7bdd0caf36d65bd4381eb6",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/OnboardingScheduleWorkerTest.kt": "6b461367fda4e9771e922a6fbf85f62515b5daf442f1429dce88adc32b3347bc",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/PayrollCalculationWorkerTest.kt": "8664144068597a2b76f51d08f60abfa611602fa456385fdbbe29c5a90a83ad8a",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/ReportExportElapsedRetentionTest.kt": "f5d24bfe488c192d1738c690342ec96e9b5682f1bf9fd87350f94932ca0d893e",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/ReportExportRetentionWorkerTest.kt": "369d4071af821d297d90168173e06c514fb02f047cc7cba7c2831aaaa3e59681",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/ReportExportWorkerTest.kt": "38054d894db2855ebfd7e3d108989ff536d305f26352b4529ef9bfc666512c77",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/SelfProfileProjectionWorkerTest.kt": "640db73ac76e2a8856c928b22d56de0ae5fbfd593418b01eacb17f6b6b8fe08e",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationObservationTest.kt": "58031b276235b3ef5ecd68cacd2056df4fc334d4a6ff11f013d26d571e2fcad4",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationTest.kt": "c2b55604c8fa0ec97e6c3d890109c40fef378016e45689369ba3d342e885aec1",
+    "build-logic/src/main/kotlin/hris.kotlin.gradle.kts": "df3cce8162792fd584b2bc866b280e97b026f5a7e724d56d36972c697b5564b1",
+    "build.gradle.kts": "7ee56112c0091fa57e8a9c1abff8c9a911a29b508b5fffe9859d8c270277ad19",
+    "compose.yml": "d7783fabc35c9aebb792c5199174bb3050a93405b090bcf34a2d2301690d5e76",
+    "core/database/build.gradle.kts": "976a5d55ebc65a02d108dc5cfa2e58c42c8c3e37c398372adae94260b474e4d5",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/AttendanceSyncMigrationTest.kt": "707682022e7f3337f9fe09635e3b7c7fb64a87ffd953a3a5001ee608ee2c3c86",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CalendarSyncMigrationTest.kt": "419269870ff9a45ca1ee62d6c80e57bf0bb3730bf5d2a41576293e78d00ca14f",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationAvailabilityMigrationTest.kt": "5f9b2410f54356cda9785ea4e19346b2f1c768295271d32e598bfd7d178a25dd",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationDeviceMigrationTest.kt": "5e0fc0ca15ddb0fb3339011c12b5246e6d096bb633e3e772ed548c671871ec61",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationDirectMigrationTest.kt": "90bb859194449a8938bfaa8b69abbfba9df2b2b38fe894542a883d86d9911d60",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSummaryIsolationTest.kt": "acdd1135623245f2b57c1e38222d6d6b42c6196daa65d7d41a93e4f253042cc2",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSummaryMigrationTest.kt": "662b3af7a28c29fcb8c3d1468833d05bd73561c0e831748ca4e42c9124362aa3",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/DocumentMetadataMigrationTest.kt": "04e4a295b0f4aef0d5ad611adbb7a9cc8cf341d3d2f73d4062847fd3730c5b1c",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/LeaveAccountMigrationTest.kt": "5b65b0f9c355706ae1335171dda0e143173e26e08e360a2b6046357578742658",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/LeaveCarryMigrationTest.kt": "6703e664805026e991a7295a19fbe1ddbf7f5e824191084a8feadf3632249d96",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/PayrollAssessmentRevisionMigrationTest.kt": "23f0fc185a356eb0e727b325e50d499cea1bc47f7fc82e68ea8cc36ad94a7cc4",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/PayrollSettlementMigrationTest.kt": "b178224f1fd4e558379fa6ccbeff18b787ca548e5ed3d0bff803ae88e28d7733",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/PlatformAccountAuditMigrationTest.kt": "541b8ad373d8e4080da34299be8af937ee3bd9f95ca27eef0d1ec9a5ac7591f0",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/PlatformAuditMigrationTest.kt": "4b33b141e6505a04e674363d6f1be8fead797ece347d7900940382cdbc738449",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/PostgresIsolationTest.kt": "942140938da5531ffc36036130fb4090be991339b63687508f6d565fbe581e20",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/RosterResetMigrationTest.kt": "83909d619f8cc161b3c0e70f4356dcd419c888c0aac6ff62fbf3e0318d22a9f6",
+    "gradle/libs.versions.toml": "15892f32c655f0a1a3123708f1caa0e17ea43aa89d96a6446262375d318a5c6d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationDeviceKeyStorageTest.kt": "9b98eba7c3dc9f2e30327155c9e1eef78ba7f81ae8c8b404aee3089c30c1f0a3",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationDirectRoomStorageTest.kt": "3f9e8e75e2d007a267b14dcb3bf8ab1ef880b82898f86855e8a0a8e25954ca6d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationGatewaySessionTest.kt": "c4cf89a1ae768fe2a604a854abb286c6f8aeb1e670f2a449b90c6818dbda1d2c",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationProviderCredentialTest.kt": "106bfb84121ae75da6e117843c8a505cec648fa52f841fc8f4c2bff940f5570c",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationPushBindingStorageTest.kt": "bb698c7369591f73b9c775526c6c51b9b6d6dc7e81c64b74c4a664fb39b57824",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationPushQueueTest.kt": "b6fdd2c4e1a8b04cf1ac2f0b17f818bacd05af1d059b38d1d3504a6dd6e2c57d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationRecipientStorageTest.kt": "d450b1425e758d74ca521d339751bee5c048d9937807a9b622f486310242267d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationRegistryTest.kt": "3d7f18e808670924cb71ab8709c75b36102efb4e590022997e17988673dc93ce",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "7f967b00d97116bca957ad6d1f6170c0654d9ba9ebcf3550fc33d9c069814d37",
+    "tool/check_recovery_set.py": "991b8756402e9e54b98b2df529eeca3ba6cec1c24965ccb475c00b1a836d076c",
+    "tool/container_images.py": "ae4072e0f277516d82684997e19b6aab1eee9d89d22d58eec8260f967090fba7",
+    "tool/dashboard_backend_fixture.py": "ad9e77c090d36bcf2af56f4ee8637322d8bb808d15dcd1b249a89d4af5fd5c39",
+    "tool/generate_jooq.py": "b0e371bb15b6fbd6a974151c4b7f652670c1691381cd4843645f5d14de5470b6",
+    "tool/workload_fixture.py": "780082742b667f5a301fa8fd91eef84710bda24d9c8aa3f765f5928764cac32d"
+  },
+  "limits": [
+    "No new JVM/database integration acceptance yet. Full CI must execute the existing onboarding/offboarding cases against the pinned image.",
+    "Existing runtime remains 54b10ce8/schema116.1; no deployment.",
+    "Image pin preserves current Java/PostgreSQL timezone agreement; planned timezone updates require joint review of future scheduled boundaries."
+  ]
+}

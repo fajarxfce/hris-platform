@@ -38,7 +38,9 @@ class ReportExportRetentionWorkerTest {
     companion object {
         @Container
         @JvmStatic
-        val postgres = PostgreSQLContainer("postgres:18.6-alpine").withInitScript("worker-role.sql")
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
+                .withInitScript("worker-role.sql")
 
         @DynamicPropertySource
         @JvmStatic

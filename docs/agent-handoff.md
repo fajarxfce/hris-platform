@@ -1,5 +1,52 @@
 # Agent continuation — HRIS workspace
 
+## Durable organization device registration — 5 November 2026
+
+Mobile [024bc193](https://github.com/fajarxfce/hris-mobile/commit/024bc19376123beb6da8d1bee6d9838426361844) is pushed.
+
+Encrypted registration storage now retains original operation/native binding,
+platform/build, selected provider user, label/device origin and exact original SDK
+company/user/device/fingerprint/physical native family. User origin and device origin
+are independent: a new SPACE device can use an existing LEGACY user, but storage
+never authorizes that enrollment. The original physical family remains separate
+from the request parent; no cross-parent recovery authority is inferred.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/collaboration-space-registration-storage.md).
+
+One registration anchor per original request parent supports bounded all-parent
+account observation after reauthentication and exact-parent reads. Empty reads
+allocate no key. Separate AES-GCM request/outcome purposes bind account/space/native
+resource/op/revision; protected key loss cannot regenerate over retained records.
+Unconfirmed is durable, CAS checks the exact original, and Registered is terminal.
+Confirmed access failures cannot be downgraded by uncertain retries. No HTTP, SDK,
+scheduling, server schema or directory admission change is introduced.
+
+Fourteen common storage cases pass on actual SQLite and IndexedDB. They cover
+restart/new login, immutable original operation/provenance, response loss after
+commit, contention/CAS, terminal success, corrupt routing/ciphertext/bounds, shared
+key loss, independent user/device origins, retained denial and all-parent inventory.
+Actual AppContainer resolves the repository. Focused: 14 cases /
+118.582 s. Root :check, Android-host and dev compilation: 2,624
+fresh cases / 350.224 s. Browser data/domain: 1,551 cases /
+135.925 s. All final gates preserve identical 3,980 build/application
+inputs; format, architecture and detekt pass. All gate sessions closed.
+[Evidence](https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/measurements/collaboration-space-registration-storage-2026-11-05.json).
+
+NEXT: account-owned local observer plus finite explicit registration preparation
+and replay/HTTP. Reacquire current selected user/native status and actual original
+SDK under one bounded attempt, independently of retained command age. Use the
+original operation/native parent and actual current platform/build headers; do not
+copy identity-selection's fresh-parent retry rule. Register/retry do not bind old
+build; bootstrap does. No SPACE fallback on an absent open SDK or current-parent
+device: retained-store inventory or explicit recovery must establish eligibility.
+Hard-parent recovery, original physical-store adoption, current group runtime/UI
+and typed push/background replies remain outstanding. Completed anchors stay
+retained; later archival must preserve the original registration for recovery.
+
+All 54 PRD groups remain open. No new APK/phone, live deployment, provider/FCM,
+Apple runtime or performance acceptance. Live backend 8b40/schema 116 and phone
+release 29/source 084662c5 unchanged. Continue long run, atomic pushes and validated
+install-only product delivery with advance notice.
+
 ## Selected organization identity on native clients — 5 November 2026
 
 Mobile [c79ca453](https://github.com/fajarxfce/hris-mobile/commit/c79ca4532e42ff4c8d2c1856ddd077c91b75d539) is pushed.

@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## History fix pushed; first-room activation follow-up — 5 November 2026
+
+Mobile157a257d568c10f32e7159722d8fdd7f579b09e4 fixes retained older-history end
+restoration. Full :check/Android/browser/proof pass506.364s/1,064 fresh/4,071
+unchanged source inputs; focused6 pass. Actual release34 receiver reproduces the
+reported reopen bug. Clean signed release35 build/lint pass596.23s/zero lint;
+APK SHA256 c227ba97083c3bccff4a42f113eb8ce8517411b3d97f2779ba646f266f575175.
+It is installed IN THE OWNED BIMA EMULATOR ONLY for current-source reopen/cold
+process proof. Phone remains34. Finish actual proof, exact cold-start smoke,
+announce EACH phone install, install-only. Apple-only CI42026950708 is running on
+157a; prior42017858911 passed745e. Live11a98115/schema116 unchanged.
+
+Sample1 completed Firebase/HRIS login, registration, bootstrap and Open chat via
+the normal product. Read-only DB shows one ACTIVE device, zero key publications,
+one canonical direct but zero provider-room requests/bindings. Closing/reopening
+the empty room did not publish keys. No message was sent to force activation.
+This exposes a first-room activation follow-up: setup persists a recovery wake,
+but a room without pending messages is not provisioned. Trace background runtime
+activation/key upload before claiming all demo recipients are ready. Keep the
+existing recipient guard and all original SDK identities. [Evidence](measurements/chat-demo-readiness-2026-11-05.json).
+
+Sample1 emulator stopped cleanly; its userdata and sidecars are retained alongside
+Bima's. Samples3/4 have Firebase/HRIS links and prepared separate persistent data,
+but no product devices. Bima now runs emulator5562/PID429598 with its retained
+identity. Stop/start ownership is in each private .work/demo-chat-device directory.
+After release35 delivery, address initial key publication, then resume protected
+forwarding stash bfdef2ce and the full communications plan. All54 groups open.
+
 ## Bima send accepted; older-history regression active — 5 November 2026
 
 At12:02:36 the user confirmed previously pending Bima messages were sent. The

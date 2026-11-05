@@ -107,7 +107,7 @@
   "next": [
     "Fix Mobile older-history end restoration after room recreation; regression reproduced with room metadata.",
     "Retain Bima SDK/OS data and native parent; no cleanup revocation or data reset.",
-    "Activate SDK devices for the other three fictional samples; Firebase/HRIS links are ready.",
+    "Investigate initial device-key publication before any provider room exists: sample1 completed product device/bootstrap setup but has zero key publications and no provider room request. Preserve sample1 data; samples3/4 remain unactivated.",
     "Resume stashed forwarding after urgent history fix, full gates and generic Starter port."
   ],
   "limits": [
@@ -115,7 +115,7 @@
     "Peer UI confirms eight message rows and no decryption placeholder; message contents were not logged or manually inspected.",
     "All54 PRD groups remain open."
   ],
-  "lastUpdatedAt": "2026-11-05T12:13:03.755991+00:00",
+  "lastUpdatedAt": "2026-11-05T12:37:24.403001+00:00",
   "userConfirmation": {
     "at": "2026-11-05T12:02:36Z",
     "result": "Previously pending messages sent"
@@ -169,5 +169,40 @@
       "phoneTouched": false,
       "chatDeviceReady": false
     }
-  ]
+  ],
+  "latestReadiness": {
+    "readAt": "2026-11-05T12:31:31.421488+00:00",
+    "readOnly": true,
+    "fictionalSamplesOnly": true,
+    "rows": [
+      {
+        "sample": 1,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 2,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 1
+      },
+      {
+        "sample": 3,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 4,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      }
+    ]
+  },
+  "newEmptyRoom": {
+    "readAt": "2026-11-05T12:33:35.391453+00:00",
+    "sample": 1,
+    "readOnly": true,
+    "directConversations": 1,
+    "requestedProviderRooms": 0,
+    "boundProviderRooms": 0
+  }
 }

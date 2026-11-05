@@ -131,3 +131,14 @@ native APK interop cases and the elapsed-retention workload. All nine new summar
 HTTP cases execute successfully. Both backend/control and company-settings jobs
 pass; downloaded artifact digest is verified. [CI evidence](../measurements/collaboration-summary-feed-ci-2026-11-05.json).
 Full release CI42091460931 and live migration/deployment remain pending.
+
+## Retained-data migration rehearsal — 5 November 2026
+
+[Evidence](../measurements/collaboration-summary-upgrade-2026-11-05.json): a private
+MVCC backup of the running schema116 database was restored to isolated PostgreSQL
+and migrated/validated to116.1. All200 prior business tables retain exact counts
+and content hashes; original migration rows remain unchanged. Seven retained pairs
+enter the bounded refresh queue. Runtime roles remain restricted and constraints
+valid. No live service or data changed. Runtime image compatibility and final
+deployment remain separate gates; full CI42091460931 is rerunning only the timed-out
+dashboard-integration job after slow Ubuntu font downloads exhausted its20min budget.

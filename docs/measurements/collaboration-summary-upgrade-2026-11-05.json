@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "source": "d03fb4720f53ccd17f197cd5109f88cd2c19bd00",
+  "beforeSchema": "116",
+  "afterSchema": "116.1",
+  "originalMigrationHistoryPreserved": true,
+  "existingTablesPreserved": 200,
+  "queueCounts": {
+    "pairs": 7,
+    "queued": 7,
+    "records": 0
+  },
+  "restrictedRuntimeRoles": true,
+  "failedMigrations": 0,
+  "invalidConstraints": 0,
+  "hostPortsPublished": false,
+  "temporaryResourcesRemoved": true,
+  "applicationProcessesStarted": false,
+  "elapsedSeconds": 20.051,
+  "backup": {
+    "schema": "116",
+    "files": {
+      "database.dump": {
+        "bytes": 1941958,
+        "sha256": "d591f9c564a5fdb69c4f78b21cb1de67b327753859f8541b178d02eddfe5690c"
+      },
+      "roles.sql": {
+        "bytes": 1549,
+        "sha256": "6c9fb52571e20ebac6a0208d180da272f88449b858b4dd6c41d84361753ebaae"
+      }
+    },
+    "createdAt": "2026-11-05T20:04:44.372940+00:00",
+    "elapsedSeconds": 2.389,
+    "servicesUnchanged": true,
+    "scope": "Database-only MVCC dump, copied into an isolated temporary PostgreSQL instance. Provider/object storage unchanged; this rehearsal never restores over live data."
+  },
+  "remaining": "Full CI job completion, artifact/image staging, final runtime compatibility checks and live migration/deployment. No application processes were started in this rehearsal."
+}

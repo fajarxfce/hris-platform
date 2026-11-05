@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Metadata migration rehearsal passed; live rollout pending — 5 November 2026
+
+[Migration evidence](measurements/collaboration-summary-upgrade-2026-11-05.json):
+MVCC database backup at20:04:44UTC/schema116 restored and migrated in an isolated
+PostgreSQL container. V116.1 validates in20.051s; exact row-count/content hashes of
+all200 pre-existing business tables and all original migration-history rows remain
+unchanged. Seven existing pairs are queued; no summary records fabricated. Runtime
+roles remain restricted, zero invalid constraints/failed migrations. Owned temporary
+containers/network removed; no application processes or host ports used. Live
+API/worker/provider/database/storage never stopped or changed. Private backup and
+logs are recorded under .work/chat-summary-delta-2026-11-05/backup.json and upgrade.json.
+
+Full CI42091460931/productd03fb472 attempt1:13jobs passed; dashboard-integration hit
+its20-minute job limit. Ubuntu font packages took9m54s at33.8kB/s; browser downloads
+then completed in6s. Native dashboard integration/mail/FCM fixture checks passed;
+worker integration was interrupted, not accepted. Exactly that cancelled job was
+rerun (attempt2, requested20:01UTC); no duplicate backend/recovery jobs. Attempt2
+passed dependency installation20:10:28UTC and is running integration tests. Preserve
+full-ci-attempt1.json/dashboard-attempt1.log/dashboard-rerun.json. Do not claim all14
+checks or deploy until this finishes. Artifact/image staging scripts remain unrun.
+
+NEXT: audit final CI; stage exact API/worker artifacts/images, verify old runtime
+compatibility against additive116.1 and retain a final checkpoint for rollout.
+Keep current live11a98115/schema116/chat pushOFF, server FCMON, SMTPOFF, existing
+provider/identity keys and Docker networking. Never restore old data over later
+writes. Mobile8e06a6b3 has accepted bounded Sync; uncommitted UI integration is under
+whole-app/browser/Android consumer-full1 now. Phone39 unchanged. Starter fbe5ea8
+UI port accepted; generic raw store port follows Mobile/native consumer proof.
+All54 communication PRD groups remain open; group V117–137 branch untouched.
+
+
 ## Summary feed control CI accepted; full release CI running — 5 November 2026
 
 Collaboration control42090785206 PASSES exactd03fb472:706 cases/113 suites,

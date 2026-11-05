@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Release34 queue fix delivered; forwarding continues — 5 November 2026
+
+Mobile source745e5a0256904453992e5e864bdd59e373de9513 is installed in place as
+ARM64 devRelease34 on10.77.77.3:5555. Hasheded7799bb9b643c1bcd5184581e2875444a4f74bda4bdf8b90336d876cdb699
+matched directly on-device; signer/app ID/first-install time preserved. Announced
+install-only,465.301s; no UI driving/reset. Two exact-APK emulator starts passed;
+images reviewed, owned emulator stopped. Build/lint505.825s/zero lint issues.
+[Mobile evidence](https://github.com/fajarxfce/hris-mobile/blob/f6a26a1c/docs/measurements/android-release-phone-2026-11-05-build34.json).
+
+Actual original/new encrypted queue recovery native proof remains the prior165.743s
+pass. Physical Bima old/new acceptance is still pending; user was asked once after
+installation. Apple42017858911 on745e is building the simulator app after simulator
+tests passed; not yet final acceptance. Live API/worker11a98115/schema116 unchanged.
+No Main runtime source change or rollout is required for the queue fix.
+
+Mobile WIP now adds atomic batch insertion for forwarding. Five shared SQLite/
+IndexedDB cases plus existing suites pass118 fresh/86.668s/4,076 unchanged inputs.
+Forwarded-content plumbing has started but is not validated/delivered. Continue
+local recipient selection, durable one/multiple forwarding, indicator and native/
+offline recovery; full Mobile gate and generic Starter port remain. Keep original
+store/keys/intents. All54 PRD groups open, including edit/redaction, groups, calls
+and meetings. Continue authorized long run, atomic pushes and announced installs.
+
 ## Queued-auth-recovery native acceptance passed — 5 November 2026
 
 Mobile [745e5a02](https://github.com/fajarxfce/hris-mobile/commit/745e5a0256904453992e5e864bdd59e373de9513)

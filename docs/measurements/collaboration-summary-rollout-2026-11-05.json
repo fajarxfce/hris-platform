@@ -1,0 +1,241 @@
+{
+  "runtime": {
+    "success": true,
+    "source": "54b10ce8a687294e8f39e609078830e2f1ec08d6",
+    "schema": "116.1",
+    "migrationStarted": true,
+    "startedAt": "2026-11-05T21:08:15.441980+00:00",
+    "applicationsStoppedAt": "2026-11-05T21:08:18.567379+00:00",
+    "existingTablesPreserved": 200,
+    "originalMigrationHistoryPreserved": true,
+    "checkpointFiles": {
+      "database.dump": {
+        "bytes": 1942418,
+        "sha256": "9c121c7cc2a11f8e15d524dc6c1716caf6b47f55db462a7792fbcb36844a2a6d"
+      },
+      "roles.sql": {
+        "bytes": 1549,
+        "sha256": "b9c3adbdf164f0273b262fcb55897e205569b75e691f67d61f61c3db8c4207c2"
+      }
+    },
+    "api": {
+      "container": "961d6438dcaf44374fdc57820470295b1295e20187e1c921d82f0fac7128d814",
+      "image": "sha256:3ce0e623b4bdaf2b444b158d71ec31c578b119f90110180874f3545361cca627",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "worker": {
+      "container": "8f12d3e56601f8dd4bdb6df2bb43956346c1d71e517a0e7afacb47a7e09e6f05",
+      "image": "sha256:55c44ae48a9e6bb2bfd18babc7699c55963e3c57c077ac59aa9bf4eae802e9b7",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "summaryProjection": {
+      "pairs": 7,
+      "records": 14,
+      "duePairs": 0,
+      "pendingPublications": 0,
+      "published": 14
+    },
+    "apiHealthy": true,
+    "providerHealthy": true,
+    "privateTlsValidationStatus": 400,
+    "untrustedDirectCallbacks": [
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      }
+    ],
+    "untrustedProxyStatus": 403,
+    "chatPushEnabled": true,
+    "smtpEnabled": false,
+    "hostProviderPortsPublished": false,
+    "existingDatabaseAndStorageContainersPreserved": true,
+    "existingEnvironmentAndIdentityKeysPreserved": true,
+    "dashboardUnchanged": true,
+    "oldImagesRetained": true,
+    "proxy": {
+      "container": "19245d3d651eec1833c12b1f843b42d83b1e1d3a3fc0061095671086ae7ac67c",
+      "image": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "runtimeUser": "10001:10001"
+    },
+    "matrix": {
+      "container": "00188dc9022bc1df24525c7ec7f92a5c8299a9cf69ea0297052047b5b885f42f",
+      "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+    },
+    "elapsedSeconds": 41.429
+  },
+  "ci": {
+    "headSha": "54b10ce8a687294e8f39e609078830e2f1ec08d6",
+    "conclusion": "success",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/42102966162"
+  },
+  "ciJobs": [
+    {
+      "name": "dashboard (2)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (1)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (8)",
+      "conclusion": "success"
+    },
+    {
+      "name": "dashboard (3)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (7)",
+      "conclusion": "success"
+    },
+    {
+      "name": "dashboard (1)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (4)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (5)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (6)",
+      "conclusion": "success"
+    },
+    {
+      "name": "dashboard (4)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (2)",
+      "conclusion": "success"
+    },
+    {
+      "name": "backend (3)",
+      "conclusion": "success"
+    },
+    {
+      "name": "recovery-integration",
+      "conclusion": "success"
+    },
+    {
+      "name": "dashboard-integration",
+      "conclusion": "success"
+    }
+  ],
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42102966162",
+    "headSha": "54b10ce8a687294e8f39e609078830e2f1ec08d6",
+    "stagedAt": "2026-11-05T21:01:59.160581+00:00",
+    "elapsedSeconds": 37.793,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13450679993,
+        "archiveSha256": "c6ac734a21724259ccf3a91137a86be8d1e03fee9399c3d1efc81f6aed9175c6",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-summary-delta-2026-11-05/packages/api/apps-server.jar",
+        "sha256": "1293aed357f8b2ae38dae76bff32c408ecb618a01eeddc78e157b8586a532c0b",
+        "bytes": 98699634
+      },
+      {
+        "role": "worker",
+        "artifactId": 13450749894,
+        "archiveSha256": "069234ef5efb20417190e473ddd6c2f162de6924bff98937f59319ad1e043d78",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-summary-delta-2026-11-05/packages/worker/apps-worker.jar",
+        "sha256": "7280a96d9ef7103887acf6ef9df54ad74e6d3b7747e918f39279fe9d0adebf64",
+        "bytes": 78770096
+      }
+    ]
+  },
+  "images": {
+    "success": true,
+    "source": "54b10ce8a687294e8f39e609078830e2f1ec08d6",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42102966162",
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:summary-delta-54b10ce8",
+        "image": "sha256:3ce0e623b4bdaf2b444b158d71ec31c578b119f90110180874f3545361cca627",
+        "packageSha256": "1293aed357f8b2ae38dae76bff32c408ecb618a01eeddc78e157b8586a532c0b",
+        "packageBytes": 98699634,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "tag": "hris-dev-worker:summary-delta-54b10ce8",
+        "image": "sha256:55c44ae48a9e6bb2bfd18babc7699c55963e3c57c077ac59aa9bf4eae802e9b7",
+        "packageSha256": "7280a96d9ef7103887acf6ef9df54ad74e6d3b7747e918f39279fe9d0adebf64",
+        "packageBytes": 78770096,
+        "runtimeUser": "10001:10001"
+      }
+    },
+    "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+    "dockerfileSha256": "c25d8f22fa916d04eadbd4ebf4c4fc3802c40474b23f55f9d9c801475cbd7c47",
+    "existingServicesUnchanged": true,
+    "buildLibsUnchanged": true,
+    "originalOverlaySha256": "84c3c1a2e1f8ad1a65770e6a978772d0635b6f09b8d9a2ac41c4c73980f753eb",
+    "candidateOverlaySha256": "bd9ced2702a3ebd9255c71a4406dc156d56c5406626836d65f34454438bfee4c",
+    "elapsedSeconds": 24.648
+  },
+  "oldRuntimeCompatibility": {
+    "success": true,
+    "startedAt": "2026-11-05T21:05:51.792753+00:00",
+    "migrationSource": "54b10ce8a687294e8f39e609078830e2f1ec08d6",
+    "runtimeSource": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+    "apps": {
+      "api": {
+        "image": "sha256:ff8885b7bc664f4df74efc15695bed9d95945b6c53928967304fcf0cc7d6b78c",
+        "started": true,
+        "restartCount": 0,
+        "databaseErrors": false
+      },
+      "worker": {
+        "image": "sha256:2a3a785e9c0e3ea4d69d8f0034173da2f4e5ae62b123f7892c6be97eec0ad92d",
+        "started": true,
+        "restartCount": 0,
+        "databaseErrors": false
+      }
+    },
+    "cloneSummaryJournalRows": 14,
+    "healthStatuses": [
+      200
+    ],
+    "oldWorkerPublishedSummaryRows": 14,
+    "schema": "116.1",
+    "apiHealthy": true,
+    "networkInternal": true,
+    "hostPortsPublished": false,
+    "liveServicesUnchanged": true,
+    "temporaryResourcesRemoved": true,
+    "scope": "Old API/worker startup, scheduled database access and publication of clone-only new summary journal records on migrated retained copy. Fresh clone-only runtime passwords; outbound FCM/mail/chat delivery and external document scanner disabled and network internal. No authenticated business acceptance, no live data mutation.",
+    "elapsedSeconds": 53.91
+  },
+  "earlierIsolatedAttempts": [
+    "Attempts1/2 failed because the fixture changed HRIS_DATABASE_PASSWORD but not HRIS_WORKER_DATABASE_PASSWORD; no product or live credentials changed.",
+    "Attempt3 started API but worker required a resolved external scanner host absent from the internal-only fixture network; disable scanner only in the isolated copy.",
+    "Attempt4 started both applications but its single readiness request returned HTTPError. The final fixture uses a bounded readiness wait and also verifies the old worker publishes fourteen clone-only new-collection journal rows."
+  ],
+  "scope": "Private pilot API/worker rollout and additive migration. Full fourteen-job CI and exact artifact digests accepted. Live push/callback/delivery and worker FCM remain enabled, SMTP disabled. No new end-to-end notification, Android UI or physical iPhone acceptance in this record."
+}

@@ -1,8 +1,9 @@
 # Incremental direct-summary metadata
 
 Storage capture, bounded projection and the dedicated native metadata feed are
-accepted locally. The live endpoint still acquires UUID pages. Deployment and the
-atomic Mobile consumer remain pending; changed-only acquisition is not yet delivered.
+active in the private pilot on54b10ce8/schema116.1. Mobile927407ad activates the
+atomic incremental consumer and passes full local gates; release40 native and
+phone acceptance follow the server rollout.
 
 
 ## Accepted native feed
@@ -142,3 +143,26 @@ enter the bounded refresh queue. Runtime roles remain restricted and constraints
 valid. No live service or data changed. Runtime image compatibility and final
 deployment remain separate gates; full CI42091460931 is rerunning only the timed-out
 dashboard-integration job after slow Ubuntu font downloads exhausted its20min budget.
+
+## Private pilot rollout
+
+[Rollout evidence](../measurements/collaboration-summary-rollout-2026-11-05.json)
+records full CI42102966162 on54b10ce8, verified API/worker package digests and
+41.429-second deployment at21:08UTC. API/worker alone were quiesced for a final
+private database checkpoint. V116.1 migrated and validated with exact content/count
+preservation across200 existing business tables and unchanged original migration
+history. The real worker created14 owner records from7 retained pairs and published
+all14 journal entries; no due pair or unpublished summary remained at acceptance.
+
+Old11a98115 images also booted against a migrated retained copy and published14
+clone-only new-collection journal rows without database errors. That isolated
+network disables external delivery/scanning; it does not claim authenticated
+business or external-provider acceptance. Initial fixture/configuration/readiness
+failures and corrections are recorded. All temporary resources were removed.
+
+Live API/worker images alone changed. Existing database, storage, Matrix and push
+gateway containers/keys/settings persisted. Push/callback/delivery and worker FCM
+remain enabled; SMTP remains disabled. Trusted private TLS invalid input returned
+400; direct/forged/untrusted callbacks returned403. No test notification was sent.
+Rollback retains old images/configuration; never restore an old database over new
+writes. Group integration must still retain116.1 before its unshipped117–137 range.

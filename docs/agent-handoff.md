@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Incremental metadata deployed — 5 November 2026, 21:08UTC
+
+[Rollout evidence](measurements/collaboration-summary-rollout-2026-11-05.json).
+Live API/worker now use54b10ce8a687294e8f39e609078830e2f1ec08d6/schema116.1,
+not11a98115. Full CI42102966162 all14jobs PASS; downloaded API/worker artifacts
+match GitHub archive digests and staged image JARs. Runtime41.429s PASS: all200
+pre-existing business-table contents/counts and migration history preserved;
+7 pairs→14 owned summaries and14 published changes,0 pending/due. API/provider
+healthy, original provider/storage/database containers and identity/configuration
+retained. Push/callback/delivery and worker FCM ON; SMTP OFF. No feature flag change.
+
+Old11a98115 API/worker pass startup/scheduled database access and14 new-collection
+publications on an internal-only migrated copy (53.91s). Initial fixture password,
+external scanner and single-readiness failures are documented; all clone resources
+and local wrappers are drained. Final live checkpoint is private outside Git;
+.work/chat-summary-delta-2026-11-05/live-checkpoint.json records its path/digests.
+Old images remain tagged. No automatic data rollback. Do not rerun deployment.
+
+Mobile927407ad product is pushed; consumer-full3 PASS4,895 fresh cases, Android
+release40 built626.219s with zero lint issues. APK6d782185… (88,469,236 bytes) is
+verified, but native/phone acceptance is still pending. Phone39 stays installed;
+preflight confirms in-place signer. Rani retained emulator is starting on5562 for
+actual summary HTTP and online/offline/cold-reopen proof. Bima's prior process
+exited independently20:32; observed/cleared stale owner record, userdata retained.
+Mobile Apple42106835639 on927407ad is running; no duplicate dispatch.
+
+Continue native release40 proof, announce and install-only to phone, then port nine
+generic raw-store files/tests to Starter (script prepared, not run) and continue
+all54 chat/call/meeting PRD groups. Preserve both Mobile stashes and original
+crypto/device data. Accepted Forward publications must not be repeated. Next edit
+work must keep original send/receipt facts separate from SDK replacement events.
+
+
 ## Runtime correction and active CI — 5 November 2026
 
 [Read-only inspection](measurements/collaboration-runtime-flags-2026-11-05.json)

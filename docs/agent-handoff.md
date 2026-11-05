@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Release35 history fix delivered; initial recipient activation next — 5 November 2026
+
+Mobile source157a257d568c10f32e7159722d8fdd7f579b09e4 is installed in place as
+ARM64 devRelease35 on10.77.77.3:5555. Announced install-only; signer/app ID/first
+install time preserved; device SHA256 matches c227ba97083c3bccff4a42f113eb8ce8517411b3d97f2779ba646f266f575175.
+Install32.829s. No phone UI driving. [Delivery and actual proof](https://github.com/fajarxfce/hris-mobile/blob/94dcdfb3/docs/measurements/android-release-phone-2026-11-05-build35.json).
+
+Older messages no longer returns after reopening an exhausted room. Retained room
+metadata is not counted as pending messages; actual unresolved messages remain
+available. Source gate1,064 fresh pass506.364s/4,071 unchanged inputs; focused6.
+Build/lint596.23s/zero lint. Exact APK on retained Bima account passes in-place
+update, two room recreations and cold process restart108.748s: eight messages stay
+visible with no older control or decryption/history error. Redacted image reviewed.
+Bima emulator5562/PID429598 remains running; preserve userdata/sidecars/native parent.
+
+User confirmed Bima send after receiver activation. Sample1 normal product setup
+now has an ACTIVE device but no published key: an empty direct has no provider-room
+request/binding. Incoming recovery skips NOT_REQUESTED rooms, and sync starts only
+on timeline entry; investigate device-level initial sync before the first room.
+Do not weaken recipient guard or send a message merely to force setup. Sample1
+persistent data retained, emulator stopped; samples3/4 Firebase/HRIS links ready,
+SDK activation pending. Backend11a98115/schema116 unchanged. Apple42026950708 runs
+on157a; previous42017858911 passed745e. Protected Mobile forward stashbfdef2ce remains
+incomplete (core batch focused118 passed). Continue activation, forwarding, groups,
+calls and meetings; all54 PRD groups open. Group V117–137 remain unshipped; generic
+batch storage still needs Starter port after validation. Push every commit.
+
 ## History fix pushed; first-room activation follow-up — 5 November 2026
 
 Mobile157a257d568c10f32e7159722d8fdd7f579b09e4 fixes retained older-history end

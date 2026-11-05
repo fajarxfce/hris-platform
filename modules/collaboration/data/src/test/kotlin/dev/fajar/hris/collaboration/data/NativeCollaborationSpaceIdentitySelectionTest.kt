@@ -5,6 +5,7 @@ import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.*
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceIdentityRepository
+import dev.fajar.hris.collaboration.domain.usecases.GetNativeCollaborationSpaceIdentity
 import dev.fajar.hris.collaboration.domain.usecases.SelectNativeCollaborationSpaceIdentity
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
@@ -74,6 +75,155 @@ class NativeCollaborationSpaceIdentitySelectionTest {
             requireNotNull(
                 owner.queryForObject("select id from collaboration_spaces", UUID::class.java)
             )
+    }
+
+    @Test
+    fun nativeReadReturnsOnlyExistingSelectionWithoutChoosingPreferredLegacyOrNewUser() {
+        for (legacy in listOf(false, true)) {
+            val f = Fixture()
+            val oldUser = if (legacy) f.retiredLegacy() else null
+            repeat(2) { assertNull(success(f.read())) }
+            f.counts(0, 0, 0, 0)
+            success(f.execute(UUID.randomUUID()))
+            val original = f.selected()
+            repeat(2) { assertEquals(original, success(f.read())) }
+            assertEquals(
+                oldUser ?: "@hrisg_${compact(space)}_${compact(f.account)}:$server",
+                original.matrixUserId,
+            )
+            f.counts(1, 1, 1, 1)
+            val other = Fixture()
+            assertNull(success(other.read()))
+            other.counts(0, 0, 0, 0)
+            assertEquals(original, success(f.read(session = f.parent())))
+            f.counts(1, 1, 1, 1)
+        }
+    }
+
+    @Test
+    fun nativeReadStillRequiresCurrentParentClientRealmAndGroupOwnership() {
+        val f = Fixture()
+        success(f.execute(UUID.randomUUID()))
+        failure(f.read(request = f.actor.copy(companyId = f.company)), "platform_scope_required")
+        failure(f.read(build = client.copy(build = 27)), "client_update_required")
+        failure(f.read(version = 1), "native_session_invalid")
+        failure(f.read(session = UUID.randomUUID()), "native_session_invalid")
+        failure(f.read(session = Fixture().session), "native_session_invalid")
+        failure(f.read(requestedSpace = UUID.randomUUID()), "collaboration_access_denied")
+        failure(
+            f.read(requestedServer = "other.example.test"),
+            "collaboration_identity_migration_required",
+        )
+        failure(f.read(request = f.actor.copy(authenticatedAt = now)), "native_session_invalid")
+        owner.update(
+            "update native_sessions set revoked_at=?::timestamptz,version=version+1 where id=?",
+            now.toString(),
+            f.session,
+        )
+        failure(f.read(), "native_session_invalid")
+        f.counts(1, 1, 1, 1)
+    }
+
+    @Test
+    fun committedOffboardingAndNewMfaRequirementWinOverReadSnapshot() {
+        for (privileged in listOf(false, true)) {
+            val f = Fixture()
+            success(f.execute(UUID.randomUUID()))
+            val selection =
+                f.readHook {
+                    if (privileged)
+                        owner.update(
+                            "insert into membership_permissions(company_id,account_id,permission) values(?,?,'identity.manage')",
+                            f.company,
+                            f.account,
+                        )
+                    else
+                        owner.update(
+                            "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+                            f.company,
+                            f.account,
+                        )
+                }
+            failure(
+                f.read(selections = selection),
+                if (privileged) "mfa_setup_required" else "collaboration_access_denied",
+            )
+            f.counts(1, 1, 1, 1)
+            failure(
+                f.read(),
+                if (privileged) "mfa_setup_required" else "collaboration_access_denied",
+            )
+        }
+    }
+
+    @Test
+    fun readBudgetRollbackAndInterruptionCannotReturnLateIdentity() {
+        for (variant in 0..2) {
+            val f = Fixture()
+            success(f.execute(UUID.randomUUID()))
+            val selection =
+                f.readHook {
+                    when (variant) {
+                        0 -> f.clock.at = now.plusSeconds(30)
+                        1 -> f.clock.at = now.minusNanos(1)
+                        else -> Thread.currentThread().interrupt()
+                    }
+                }
+            if (variant == 2) {
+                try {
+                    assertThrows(InterruptedException::class.java) {
+                        f.read(selections = selection)
+                    }
+                    assertTrue(Thread.currentThread().isInterrupted)
+                } finally {
+                    Thread.interrupted()
+                }
+            } else failure(f.read(selections = selection), "collaboration_admission_changed")
+            f.clock.at = now
+            f.counts(1, 1, 1, 1)
+            assertEquals(f.selected(), success(f.read()))
+        }
+    }
+
+    @Test
+    fun failedOrWrongOwnerSnapshotsDoNotManufactureSelectionOrHideDeadlineExpiry() {
+        val f = Fixture()
+        val refused =
+            object : CollaborationSpaceIdentityRepository by f.selections {
+                override fun selection(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                ): Result<CollaborationSpaceIdentityInput?> =
+                    Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_read_failed"))
+            }
+        failure(f.read(selections = refused), "fixture_read_failed")
+        val late =
+            object : CollaborationSpaceIdentityRepository by refused {
+                override fun selection(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                ): Result<CollaborationSpaceIdentityInput?> {
+                    f.clock.at = now.plusSeconds(30)
+                    return refused.selection(spaceId, accountId, serverName)
+                }
+            }
+        failure(f.read(selections = late), "collaboration_admission_changed")
+        f.clock.at = now
+        val wrong =
+            object : CollaborationSpaceIdentityRepository by f.selections {
+                override fun selection(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                ): Result<CollaborationSpaceIdentityInput?> =
+                    Result.Success(
+                        CollaborationSpaceIdentityInput(spaceId, UUID.randomUUID(), null, null)
+                    )
+            }
+        failure(f.read(selections = wrong), "collaboration_access_denied")
+        f.counts(0, 0, 0, 0)
     }
 
     @Test
@@ -524,6 +674,41 @@ class NativeCollaborationSpaceIdentitySelectionTest {
                     clock,
                 )
                 .execute(request, session, version, space, build, operation)
+
+        fun read(
+            request: Actor = actor,
+            session: UUID = this.session,
+            version: Long = 0,
+            build: ClientVersion? = client,
+            requestedSpace: UUID = space,
+            requestedServer: String = server,
+            selections: CollaborationSpaceIdentityRepository = this.selections,
+        ): Result<CollaborationSpaceIdentity?> =
+            GetNativeCollaborationSpaceIdentity(
+                    selections,
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, requestedServer),
+                    IdentitySecurityPolicy(),
+                    clock,
+                )
+                .execute(request, session, version, requestedSpace, build)
+
+        fun readHook(afterRead: () -> Unit): CollaborationSpaceIdentityRepository =
+            object : CollaborationSpaceIdentityRepository by selections {
+                override fun selection(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                ): Result<CollaborationSpaceIdentityInput?> {
+                    val result = selections.selection(spaceId, accountId, serverName)
+                    afterRead()
+                    return result
+                }
+            }
 
         fun selected(): CollaborationSpaceIdentity =
             requireNotNull(

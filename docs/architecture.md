@@ -1,5 +1,9 @@
 # Architecture
 
+[Native selected identity metadata](collaboration/space-identity-read.md) reads the
+already retained provider user without selecting, enrolling or granting device
+authority; it lets Mobile match the correct original SDK user.
+
 [Original queued SDK history](collaboration/space-sdk-history.md) now survives the
 native group gateway transition, response loss and real Android process deaths with
 original keys and local history. The fixture establishes decryption continuity;

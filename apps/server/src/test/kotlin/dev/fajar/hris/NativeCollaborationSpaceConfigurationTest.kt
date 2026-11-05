@@ -57,6 +57,92 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     @Autowired private lateinit var policy: CollaborationSpacePolicy
 
     @Test
+    fun identityReadIsPrivateMetadataAndNeverSelectsOrDisclosesPreferredDeviceOrCredentials() {
+        for (legacy in listOf(false, true)) {
+            val n = groupNative()
+            val original = if (legacy) seedGroupLegacy(n) else null
+            val base = groupBase(n)
+            val before = groupCall(n, "$base/identity")
+            assertEquals(200, before.statusCode(), before.body())
+            assertTrue(json.readTree(before.body())["identity"].isNull)
+            assertTrue(before.headers().firstValue("Cache-Control").orElse("").contains("no-store"))
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_identities where account_id=?",
+                        Int::class.java,
+                        n.fixture.account,
+                    ),
+            )
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_devices where account_id=?",
+                        Int::class.java,
+                        n.fixture.account,
+                    ),
+            )
+            assertEquals(200, groupCall(n, "$base/identity", post = true).statusCode())
+            val after = groupCall(n, "$base/identity")
+            assertEquals(200, after.statusCode(), after.body())
+            val selected = json.readTree(after.body())["identity"]
+            assertEquals(
+                setOf(
+                    "spaceId",
+                    "accountId",
+                    "serverName",
+                    "matrixUserId",
+                    "origin",
+                    "legacyCompanyId",
+                    "version",
+                    "createdAt",
+                ),
+                selected.properties().map { it.key }.toSet(),
+            )
+            assertEquals(n.fixture.account.toString(), selected["accountId"].asString())
+            assertEquals(base.substringAfterLast('/'), selected["spaceId"].asString())
+            assertEquals("matrix.example.test", selected["serverName"].asString())
+            assertEquals(0L, selected["version"].asLong())
+            assertEquals(if (legacy) "LEGACY" else "SPACE", selected["origin"].asString())
+            val ownerPrefix =
+                (if (legacy) n.fixture.company.toString() else base.substringAfterLast('/'))
+                    .replace("-", "")
+            val account = n.fixture.account.toString().replace("-", "")
+            assertEquals(
+                "@${if (legacy) "hris" else "hrisg"}_${ownerPrefix}_${account}:matrix.example.test",
+                selected["matrixUserId"].asString(),
+            )
+            if (legacy) {
+                assertEquals(n.fixture.company.toString(), selected["legacyCompanyId"].asString())
+                assertFalse(after.body().contains(requireNotNull(original).toString()))
+            } else assertTrue(selected["legacyCompanyId"].isNull)
+            assertEquals(selected, json.readTree(groupCall(n, "$base/identity").body())["identity"])
+            assertEquals(
+                1,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_identities where account_id=?",
+                        Int::class.java,
+                        n.fixture.account,
+                    ),
+            )
+            assertEquals(
+                0,
+                database()
+                    .queryForObject(
+                        "select count(*) from collaboration_space_devices where account_id=?",
+                        Int::class.java,
+                        n.fixture.account,
+                    ),
+            )
+            val peer = groupNative()
+            assertTrue(json.readTree(groupCall(peer, "$base/identity").body())["identity"].isNull)
+        }
+    }
+
+    @Test
     fun admittedNativeRoomSetupAndPeerStatusNeverExposeThePrivateRequest() {
         val a = groupNative()
         val b = groupNative()
@@ -412,7 +498,12 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
         val n = groupNative()
         val base = groupBase(n)
         val reads =
-            listOf("/api/v1/collaboration/spaces/current", "$base/contacts", "$base/native-device")
+            listOf(
+                "/api/v1/collaboration/spaces/current",
+                "$base/contacts",
+                "$base/native-device",
+                "$base/identity",
+            )
         for (path in reads) {
             assertEquals(401, groupCall(n, path, token = null, cookies = false).statusCode())
             failure(get(n.fixture.browser, path), 403, "invalid_session_transport")

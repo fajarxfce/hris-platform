@@ -2,6 +2,8 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceAdmissionResponse
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceIdentity
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceIdentityResponse
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceContact
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.domain.Actor
@@ -9,6 +11,7 @@ import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.core.http.*
 import dev.fajar.hris.identity.delivery.security.*
 import java.util.UUID
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -19,7 +22,34 @@ class NativeCollaborationSpaceController(
     private val admission: AcquireNativeCollaborationSpaceAdmission,
     private val contacts: ListNativeCollaborationSpaceContacts,
     private val select: SelectNativeCollaborationSpaceIdentity,
+    private val selected: GetNativeCollaborationSpaceIdentity,
 ) {
+    @GetMapping("/{spaceId}/identity")
+    fun selectedIdentity(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @PathVariable spaceId: UUID,
+    ): ResponseEntity<NativeCollaborationSpaceIdentityResponse> {
+        val value =
+            selected
+                .execute(
+                    actor,
+                    identity.sessionId,
+                    identity.sessionVersion,
+                    spaceId,
+                    client.version,
+                )
+                .response()
+        return ResponseEntity.ok()
+            .header("Cache-Control", "private, no-store")
+            .body(
+                NativeCollaborationSpaceIdentityResponse(
+                    value?.let(::NativeCollaborationSpaceIdentity)
+                )
+            )
+    }
+
     @GetMapping("/current")
     fun currentSpace(
         actor: Actor,

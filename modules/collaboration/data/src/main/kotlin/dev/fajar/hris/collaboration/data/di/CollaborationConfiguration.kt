@@ -364,6 +364,30 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun getNativeCollaborationSpaceIdentity(
+        selections: CollaborationSpaceIdentityRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetNativeCollaborationSpaceIdentity(
+            selections,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
     fun registerNativeCollaborationSpaceDevice(
         registry: CollaborationSpaceDeviceRepository,
         provisioning: CollaborationSpaceProvisioningRepository,

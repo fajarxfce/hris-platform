@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Direct-summary worker accepted; native delta feed next — 5 November 2026
+
+Bounded metadata projection is implemented on66d18b2d and passes the full worker
+application graph:123 fresh cases378.467s, zero failures/errors, one existing opt-in
+elapsed-retention case skipped. Focused correction passes13 fresh cases97.671s;
+seven native HTTP API context cases are included. Four pure policy cases passed
+in the initial gate. All8,226 inputs remain unchanged. [Worker contract](collaboration/direct-summary-sync.md)
+and [evidence](measurements/collaboration-summary-worker-2026-11-05.json).
+The first gate failed three reads of an unused infinite PostgreSQL queue timestamp;
+selecting identity/continuation only fixes the mapping. All wrappers/children drained.
+
+Worker expands at most200 targets and projects200 pairs across four companies per
+pass. Queue-first MVCC reads, global enqueue order, unchanged-label suppression,
+independent owner revisions, false-result rollback, late rename capture, SKIP LOCKED,
+NO KEY UPDATE compatibility and cancellation are tested. No116.2 schema change or
+source guard was added. Live remains11a98115/schema116/chat pushOFF; nothing deployed.
+
+NEXT: dedicated native summary bootstrap/delta feed and atomic Mobile consumer.
+Draft entities, repositories, cursor policy/codec, raw reads, use case and controller
+live only in .work/chat-summary-delta-2026-11-05/feed-draft, not yet compiled/accepted.
+The local native-feed-contract.md records cursor/admission/pending/staging decisions.
+Copy after committing this worker, add real PostgreSQL/native HTTP/codec/policy tests,
+validate full worker graph again because shared DI changes. Bind cursors to stable
+native parent plus credential/company/member scope, never rotating session.version.
+Require coherent account-fanout/pair-refresh/unpublished pending checks before client
+replacement. Group117–137 remain unshipped; retain numeric migration ordering.
+
+Mobile source2539c658 is installed as release39 after announcement, with exact
+75ff3589 APK bytes verified; delivery notes4a60e9e6 pushed. Native compact filters,
+swipe tabs, floating action, drafts and cold offline proof pass156.226s; Bima history
+passes109.519s/eight rows. No phone UI driven, resets, new grants or key replacement.
+Bima retained receiver is emulator5562/PID2720994/startTicks158001625; verify before
+use. Apple42081732094 exact2539 still building full app at18:43; simulator tests passed.
+Starter six-file generic swipe port is uncommitted and its full1 gate is running;
+do not change its frozen sources. Preserve both Mobile protected edit/Forward
+stashes and all fixture userdata/sidecars. Continue full long run and push every
+commit; all54 PRD groups remain open, including actual metadata deltas, edit/delete,
+groups/media/backup/calls/meetings.
+
+
 ## Metadata storage accepted; latest UI feedback is active — 5 November 2026
 
 [Summary delta storage](collaboration/direct-summary-sync.md) now passes64 database/

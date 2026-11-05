@@ -1,8 +1,37 @@
 # Incremental direct-summary metadata
 
-The first increment supplies storage capture for a dedicated native metadata feed.
-The current live summary endpoint still acquires UUID pages. Projection execution,
-native HTTP cursors and the Mobile consumer are not implemented by this increment.
+Storage capture and the bounded projection worker are accepted locally. The current
+live summary endpoint still acquires UUID pages. Dedicated native HTTP cursors and
+the atomic Mobile consumer remain in progress; no delta endpoint is delivered yet.
+
+## Accepted projection worker
+
+One global transaction locks up to four pending account rows, reads finite
+continuations and enqueues at most200 distinct targets in one company/conversation
+order before advancing those accounts. Each invocation then projects at most200
+pairs in up to four explicit company transactions, with one source query and one
+current-record query per batch. Only changed owner records advance their metadata
+revision; unchanged labels produce no journal entries. Account queue reads select
+only identity/continuation; PostgreSQL's infinite due sentinel stays in SQL.
+
+Queue locks precede MVCC source reads, without source SHARE/UPDATE guards. Existing
+Identity/CredentialStore account mutations use NO KEY UPDATE, allowing immutable
+foreign-key references without reversing source/queue lock order. Tests exercise
+that compatibility, concurrent workers, late name capture,205-pair fanout across
+five companies, failed completion rollback and cancellation. The fixed-delay timer
+belongs only to the worker and stops with its owner. It maintains existing metadata
+independently of interactive module availability; every reader still requires
+current admission.
+
+[Worker verification](../measurements/collaboration-summary-worker-2026-11-05.json):
+focused correction passes13 fresh cases97.671s; all-worker gate passes123 fresh
+cases378.467s with zero failures/errors and one existing opt-in elapsed-retention
+case skipped. Six new PostgreSQL worker cases and seven native API context cases
+pass; four pure policy cases passed earlier and remain unchanged.8,226 source
+inputs are unchanged in each run. Format/architecture and complete worker/API DI
+checks pass. The first three failing queue reads remain recorded. No deployment.
+
+## Accepted storage foundation
 
 V116.1 follows the shipped V116 prefix and precedes the unshipped group V117–137
 range. No existing migration is edited or renumbered. jOOQ generation now orders

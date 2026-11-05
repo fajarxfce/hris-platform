@@ -25,6 +25,25 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationSummaryProjectionSource(
+        sql: DSLContext
+    ): CollaborationSummaryProjectionDataSource =
+        PostgresCollaborationSummaryProjectionDataSource(sql)
+
+    @Bean
+    fun collaborationSummaryProjections(
+        source: CollaborationSummaryProjectionDataSource
+    ): CollaborationSummaryProjectionRepository =
+        StoredCollaborationSummaryProjectionRepository(source)
+
+    @Bean
+    fun refreshCollaborationSummaries(
+        projections: CollaborationSummaryProjectionRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = RefreshCollaborationSummaries(projections, transactions, clock)
+
+    @Bean
     fun collaborationPushQueueSource(sql: DSLContext): CollaborationPushQueueDataSource =
         PostgresCollaborationPushQueueDataSource(sql)
 

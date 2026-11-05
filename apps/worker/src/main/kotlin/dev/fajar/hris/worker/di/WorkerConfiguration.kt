@@ -355,6 +355,30 @@ class WorkerConfiguration {
     ) = dev.fajar.hris.worker.sync.CompanyDirectoryWorker(refresh, timer)
 
     @Bean
+    fun collaborationSummaryTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-collaboration-summary-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun collaborationSummaryWorker(
+        refresh: RefreshCollaborationSummaries,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationSummaryTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.collaboration.CollaborationSummaryWorker(refresh, timer)
+
+    @Bean
     fun selfProfileProjectionTimers() =
         org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
             poolSize = 1

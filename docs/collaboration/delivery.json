@@ -96,7 +96,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/0c8b05e4b91d1f01272fb962073f552ac4a5dab5/docs/collaboration-space-native-setup.md",
         "https://github.com/fajarxfce/hris-mobile/blob/0c8b05e4b91d1f01272fb962073f552ac4a5dab5/docs/measurements/collaboration-space-native-setup-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/collaboration-space-native-setup-storage.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/measurements/collaboration-space-native-setup-storage-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/measurements/collaboration-space-native-setup-storage-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/collaboration-space-native-setup-flow.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/measurements/collaboration-space-native-setup-flow-2026-11-05.json"
       ]
     },
     {
@@ -449,7 +451,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/0c8b05e4b91d1f01272fb962073f552ac4a5dab5/docs/collaboration-space-native-setup.md",
         "https://github.com/fajarxfce/hris-mobile/blob/0c8b05e4b91d1f01272fb962073f552ac4a5dab5/docs/measurements/collaboration-space-native-setup-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/collaboration-space-native-setup-storage.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/measurements/collaboration-space-native-setup-storage-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/measurements/collaboration-space-native-setup-storage-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/collaboration-space-native-setup-flow.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/measurements/collaboration-space-native-setup-flow-2026-11-05.json"
       ]
     },
     {
@@ -846,6 +850,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Mobile finite native setup owning flow is accepted at 3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044. Continue explicit bootstrap operation recovery, original private SDK inventory, hard-parent recovery, freeze/adoption, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay, durable setup storage plus finite setup preparation/replay and retry reconciliation are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/3e1cee4c1c78d99d19c11dcd515cc7cfb69bf044/docs/agent-handoff.md",
     "Mobile durable native setup storage is accepted at 28377007d6023ae4c0a6ab43c809deaddb96ea9e. Continue finite native setup preparation/replay and receipt reconciliation, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/28377007d6023ae4c0a6ab43c809deaddb96ea9e/docs/agent-handoff.md",
     "Mobile native retry/bootstrap transport is accepted at 0c8b05e4b91d1f01272fb962073f552ac4a5dab5. Continue durable native provisioning retry/bootstrap commands and finite owning flows, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/0c8b05e4b91d1f01272fb962073f552ac4a5dab5/docs/agent-handoff.md",
     "Mobile native original-device registration flow is accepted at 46db17ee308ffab4c8d5c7744af12f840b2e2c48. Continue native provisioning retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/46db17ee308ffab4c8d5c7744af12f840b2e2c48/docs/agent-handoff.md",

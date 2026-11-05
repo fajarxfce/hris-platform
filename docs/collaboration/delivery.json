@@ -86,7 +86,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/5860290e69b26c85f049467363ec55170b3e72e7/docs/collaboration-local-sdk-identity.md",
         "https://github.com/fajarxfce/hris-mobile/blob/5860290e69b26c85f049467363ec55170b3e72e7/docs/measurements/collaboration-local-sdk-identity-2026-11-05.json",
         "docs/collaboration/space-identity-read.md",
-        "docs/measurements/collaboration-space-identity-read-2026-11-05.json"
+        "docs/measurements/collaboration-space-identity-read-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/collaboration-space-identity-observation.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/measurements/collaboration-space-identity-observation-2026-11-05.json"
       ]
     },
     {
@@ -429,7 +431,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/5860290e69b26c85f049467363ec55170b3e72e7/docs/collaboration-local-sdk-identity.md",
         "https://github.com/fajarxfce/hris-mobile/blob/5860290e69b26c85f049467363ec55170b3e72e7/docs/measurements/collaboration-local-sdk-identity-2026-11-05.json",
         "docs/collaboration/space-identity-read.md",
-        "docs/measurements/collaboration-space-identity-read-2026-11-05.json"
+        "docs/measurements/collaboration-space-identity-read-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/collaboration-space-identity-observation.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/measurements/collaboration-space-identity-observation-2026-11-05.json"
       ]
     },
     {
@@ -826,6 +830,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Mobile selected-identity native read is accepted at c79ca4532e42ff4c8d2c1856ddd077c91b75d539. Continue durable native group device registration/retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status and local SDK identity port are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/agent-handoff.md",
     "Native GET selected provider-user metadata is validated. Implement Mobile native read then durable device registration/retry/bootstrap, matching actual local SDK user rather than current company or preferred device. No selection/enrollment from GET; all54 groups stay open. See docs/collaboration/space-identity-read.md.",
     "Mobile local SDK identity observation is accepted at 5860290e69b26c85f049467363ec55170b3e72e7. Continue durable native group device registration/retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection, native-device status and local SDK identity port are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/5860290e69b26c85f049467363ec55170b3e72e7/docs/agent-handoff.md",
     "Mobile native organization device status is accepted at fb055f630570ada53a93020f3932308b2df48a72. Continue durable native group device registration/retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection and finite native-device status are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/fb055f630570ada53a93020f3932308b2df48a72/docs/agent-handoff.md",

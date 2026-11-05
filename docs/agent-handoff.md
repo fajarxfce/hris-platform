@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Actual Bima rejection traced; receiver activated — 5 November 2026
+
+Release34 user still reported pending old/new messages. Passive45s captured four
+PUT Send403 with exact `collaboration_recipient_unavailable`; DB confirms allfour
+fictional SAMPLE accounts had zero chat devices/publications. Directory enrollment
+onNov3 explicitly did not provision recipient keys. The native queue recovery fix
+now permits attempts; this second, demonstrated recipient guard is not weakened.
+[Evidence](measurements/chat-demo-readiness-2026-11-05.json).
+
+Bima SAMPLE2 now has Firebase Email/password in cmp-fajar and a normal MFA-audited
+HRIS OIDC link. No mail sent, no real identity changed, temporary operator revoked.
+Exact Mobile release34 logs in as Bima, selects the demo company, registers and
+bootstraps chat on an OWNED persistent emulator. DB confirms one ACTIVE device and
+one confirmed immutable keypublication at11:59:41. Product thread is open. No actual
+phone send/decryption accepted yet: post-activation passive window had no traffic;
+optional user request to reopen Bima is pending. Other three samples still need
+activation. No phone UI driving/reset; original user's keys/outbox retained.
+
+ACTIVE owned emulator5562/PID133701/startTicks155609766. Its persistent Mobile
+`.work/demo-chat-device-2026-11-05/bima/userdata.img` and sidecars MUST survive;
+start/stop scripts in that directory. Do not revoke its native parent or clear app
+as test cleanup. Firebase plan and sample credentials are private ignored files;
+never upload them. See Mobile `.work/chat-send-diagnosis-2026-11-05/CURRENT.md`.
+
+Mobile forwarding WIP is safely stashed with untracked files at
+bfdef2ce9641173e0ff68528f8982c5bab15bf72/basef6a26a1c. Core batch gate passed118;
+forward metadata still incomplete/unvalidated. Apply after urgent fix; never pop
+blindly. No local Gradle job; Mobile/Main source clean. Live11a/schema116 unchanged.
+Continue long run, all54 groups open; push each commit and announce each install.
+
 ## Release34 queue fix delivered; forwarding continues — 5 November 2026
 
 Mobile source745e5a0256904453992e5e864bdd59e373de9513 is installed in place as

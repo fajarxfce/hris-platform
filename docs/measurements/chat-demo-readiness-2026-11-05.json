@@ -1,0 +1,118 @@
+{
+  "recordedAt": "2026-11-05T12:02:04.564547+00:00",
+  "phoneRelease": 34,
+  "mobileSource": "745e5a0256904453992e5e864bdd59e373de9513",
+  "liveBackend": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+  "userReportsStillPending": true,
+  "passiveFailure": {
+    "durationSeconds": 45,
+    "passiveReadOnly": true,
+    "http": [
+      {
+        "operation": "GET_History",
+        "status": 200,
+        "count": 8
+      },
+      {
+        "operation": "GET_HrisApi",
+        "status": 200,
+        "count": 112
+      },
+      {
+        "operation": "GET_Matrix_rooms_context",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "operation": "GET_Sync",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "operation": "POST_Join",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "operation": "PUT_Send",
+        "status": 403,
+        "count": 4
+      },
+      {
+        "operation": "Unmatched",
+        "status": 200,
+        "count": 1
+      }
+    ],
+    "failures": [
+      {
+        "operation": "PUT_Send",
+        "category": "collaboration_recipient_unavailable",
+        "count": 4
+      }
+    ]
+  },
+  "before": {
+    "readAt": "2026-11-05T11:50:04.937426+00:00",
+    "readOnly": true,
+    "fictionalSamplesOnly": true,
+    "rows": [
+      {
+        "sample": 1,
+        "isBima": false,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 2,
+        "isBima": true,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 3,
+        "isBima": false,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 4,
+        "isBima": false,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      }
+    ]
+  },
+  "bimaFirebase": {
+    "completedAt": "2026-11-05T11:53:21.070250+00:00",
+    "fictionalSample": 2,
+    "firebaseEmailPasswordReady": true,
+    "normalAuditedHrisIdentityLink": true,
+    "temporaryOperatorSessionRevoked": true,
+    "mailSent": false,
+    "phoneTouched": false,
+    "chatDeviceReady": false
+  },
+  "bimaDevice": {
+    "readAt": "2026-11-05T11:59:41.101698+00:00",
+    "fictionalSample": 2,
+    "activeDevices": 1,
+    "confirmedKeyPublications": 1
+  },
+  "physicalSendAccepted": false,
+  "recipientPlaintextInspected": false,
+  "keysRetained": true,
+  "backendGuardChanged": false,
+  "forwardingStash": "bfdef2ce9641173e0ff68528f8982c5bab15bf72",
+  "next": [
+    "Observe original phone send after recipient activation and actual peer decryption.",
+    "Retain Bima SDK/OS data and native parent; no cleanup revocation or data reset.",
+    "Activate other three authorized fictional samples.",
+    "Resume stashed forwarding after diagnosis, full gates and generic Starter port."
+  ],
+  "limits": [
+    "No packet, token, raw request path or message body persisted by the passive trace.",
+    "A confirmed key publication is readiness evidence, not proof of physical message delivery.",
+    "All54 PRD groups remain open."
+  ]
+}

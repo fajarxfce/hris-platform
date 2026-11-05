@@ -1,5 +1,25 @@
 # Agent continuation — HRIS workspace
 
+## Main and Mobile native quoted reply proof — 5 November 2026
+
+Mobile [36e78206](https://github.com/fajarxfce/hris-mobile/commit/36e78206d792ac68a38585b80e17234d0e691b22)
+and Main [d322c12a](https://github.com/fajarxfce/hris-platform/commit/d322c12a32be736fbf660319e3515227218157fb) are pushed.
+Actual recipient decryption checks the exact quote, original-transaction recovery
+survives death before receipt journaling, and a later cold process reads all three
+messages and the reference with the gateway unreachable. Exactly three sends.
+Both native suites pass159.069s/two cases/zero skips/12,277 unchanged inputs. Driver31
+pass. Mobile root/Android/browser/proof passes2,155 fresh/417.551s/4,066 unchanged.
+[Evidence](https://github.com/fajarxfce/hris-platform/blob/d322c12a32be736fbf660319e3515227218157fb/docs/measurements/collaboration-quoted-native-2026-11-05.json).
+
+Mobile also adds privacy-preserving SDK queue/acquisition and delivery-stage markers
+in6753b7a1; pending OLD AND NEW Bima messages are NOT yet diagnosed. Release33 is
+building. Phone32/live8b40/schema116 unchanged. Main full CI42004588608 will gate an
+API/worker-only envelope rollout; preserve Matrix/TLS/data. Announce EACH phone
+install before install-only. No outstanding question. Group runtime/proof ports
+remain unvalidated and must receive their own gate. All54 groups remain open;
+continue the authorized long run and push every commit.
+
+
 ## Mobile quoted reply UI and pending-send investigation — 5 November 2026
 
 Mobile [f6f770bb](https://github.com/fajarxfce/hris-mobile/commit/f6f770bb7ea1dc815b46119055b82e4e90f558e7) is pushed.

@@ -99,20 +99,75 @@
     "activeDevices": 1,
     "confirmedKeyPublications": 1
   },
-  "physicalSendAccepted": false,
+  "physicalSendAccepted": true,
   "recipientPlaintextInspected": false,
   "keysRetained": true,
   "backendGuardChanged": false,
   "forwardingStash": "bfdef2ce9641173e0ff68528f8982c5bab15bf72",
   "next": [
-    "Observe original phone send after recipient activation and actual peer decryption.",
+    "Fix Mobile older-history end restoration after room recreation; regression reproduced with room metadata.",
     "Retain Bima SDK/OS data and native parent; no cleanup revocation or data reset.",
-    "Activate other three authorized fictional samples.",
-    "Resume stashed forwarding after diagnosis, full gates and generic Starter port."
+    "Activate SDK devices for the other three fictional samples; Firebase/HRIS links are ready.",
+    "Resume stashed forwarding after urgent history fix, full gates and generic Starter port."
   ],
   "limits": [
     "No packet, token, raw request path or message body persisted by the passive trace.",
-    "A confirmed key publication is readiness evidence, not proof of physical message delivery.",
+    "Peer UI confirms eight message rows and no decryption placeholder; message contents were not logged or manually inspected.",
     "All54 PRD groups remain open."
+  ],
+  "lastUpdatedAt": "2026-11-05T12:13:03.755991+00:00",
+  "userConfirmation": {
+    "at": "2026-11-05T12:02:36Z",
+    "result": "Previously pending messages sent"
+  },
+  "recipientVisibleRows": {
+    "readAt": "2026-11-05T12:12:06.867251+00:00",
+    "ownedEmulatorOnly": true,
+    "release": 34,
+    "messageRows": 8,
+    "textNodeCounts": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "decryptionPlaceholderRows": 0,
+    "messageBodiesRetained": false
+  },
+  "otherSampleFirebaseLinks": [
+    {
+      "completedAt": "2026-11-05T12:02:05.586342+00:00",
+      "fictionalSample": 1,
+      "firebaseEmailPasswordReady": true,
+      "normalAuditedHrisIdentityLink": true,
+      "temporaryOperatorSessionRevoked": true,
+      "mailSent": false,
+      "phoneTouched": false,
+      "chatDeviceReady": false
+    },
+    {
+      "completedAt": "2026-11-05T12:03:09.448615+00:00",
+      "fictionalSample": 3,
+      "firebaseEmailPasswordReady": true,
+      "normalAuditedHrisIdentityLink": true,
+      "temporaryOperatorSessionRevoked": true,
+      "mailSent": false,
+      "phoneTouched": false,
+      "chatDeviceReady": false
+    },
+    {
+      "completedAt": "2026-11-05T12:03:57.868765+00:00",
+      "fictionalSample": 4,
+      "firebaseEmailPasswordReady": true,
+      "normalAuditedHrisIdentityLink": true,
+      "temporaryOperatorSessionRevoked": true,
+      "mailSent": false,
+      "phoneTouched": false,
+      "chatDeviceReady": false
+    }
   ]
 }

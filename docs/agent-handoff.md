@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Bima send accepted; older-history regression active — 5 November 2026
+
+At12:02:36 the user confirmed previously pending Bima messages were sent. The
+owned Bima receiver shows eight message rows, each with content/time, and zero
+exact decryption placeholders. Message bodies are not logged or retained in this
+evidence. [Updated readiness evidence](measurements/chat-demo-readiness-2026-11-05.json).
+The recipient guard remains unchanged. Allfour fictional samples now have Firebase/
+HRIS identity links; only Bima has an active SDK device and confirmed publication.
+Other three still need normal product device setup. Do not clear Bima userdata or
+sidecars, revoke its native parent, or treat this persistent receiver as disposable.
+
+User priority: Older messages reappears after closing/reopening an exhausted room.
+Mobile regression reproduces it with retained room-state references (two failures
+in six focused cases); the pager fix is being tested. Preserve those references
+without presenting them as messages; scan only owned local metadata, retain actual
+unresolved messages, handle concurrent traversal changes/cancellation. Phone34 and
+live11a/schema116 unchanged. Forwarding stash bfdef2ce remains intact.
+
+Mobile Apple-only CI42017858911 on745e5a02 completed successfully: iOS simulator
+tests and simulator app build pass. This is source745e acceptance, not the new
+history candidate. Continue Mobile gate, validated release35, notify EACH install,
+then resume the communications plan. All54 groups open; push every commit.
+
 ## Actual Bima rejection traced; receiver activated — 5 November 2026
 
 Release34 user still reported pending old/new messages. Passive45s captured four

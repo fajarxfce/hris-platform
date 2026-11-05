@@ -84,4 +84,34 @@ class CollaborationRoomMessagePolicyTest {
             )
         )
     }
+
+    @Test
+    fun replacementReferencesShareBoundsAndAreMutuallyExclusiveWithReplies() {
+        for (target in listOf("\$original", "\$" + "x".repeat(254))) {
+            assertEquals(
+                Result.Success(Unit),
+                validateCollaborationRoomMessage(message.copy(replacesEventId = target)),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                validateCollaborationRoomMessage(
+                    message.copy(replacesEventId = target, replyToEventId = target)
+                ),
+            )
+        }
+        for (target in
+            listOf(
+                "",
+                "\$",
+                "plain",
+                "\$space here",
+                "\$line\n",
+                "\$nul\u0000",
+                "\$é",
+                "\$" + "x".repeat(255),
+            )) assertInstanceOf(
+            Result.Failed::class.java,
+            validateCollaborationRoomMessage(message.copy(replacesEventId = target)),
+        )
+    }
 }

@@ -37,7 +37,7 @@ class MatrixRoomReplyRequestTest {
                 emptyMap<String, Any>(),
                 emptyList<Any>(),
                 "\$original",
-                mapOf("rel_type" to "m.replace", "event_id" to "\$original"),
+                mapOf("rel_type" to "m.annotation", "event_id" to "\$original"),
                 mapOf("m.in_reply_to" to null),
                 mapOf("m.in_reply_to" to emptyMap<String, Any>()),
                 mapOf("m.in_reply_to" to mapOf("event_id" to 4)),
@@ -55,6 +55,47 @@ class MatrixRoomReplyRequestTest {
             matrixRoomMessageRequest(
                 "reply",
                 json.readTree(json.writeValueAsString(content + ("body" to "private"))),
+            )
+        }
+    }
+
+    @Test
+    fun replacementCarriesOnlyItsOpaqueTargetAndCannotMixRelationKindsOrExposeEditedText() {
+        val target = "\$" + "x".repeat(254)
+        val relation = mapOf("rel_type" to "m.replace", "event_id" to target)
+        val request =
+            matrixRoomMessageRequest(
+                "edit",
+                json.readTree(json.writeValueAsString(content + ("m.relates_to" to relation))),
+            )
+        assertNull(request.replyToEventId)
+        assertEquals(target, request.replacesEventId)
+        assertFalse(request.toString().contains(target))
+        for (invalid in
+            listOf(
+                relation + ("m.in_reply_to" to mapOf("event_id" to target)),
+                relation + ("body" to "edited private text"),
+                relation + ("m.new_content" to mapOf("body" to "edited private text")),
+                relation + ("event_id" to 42),
+                relation + ("rel_type" to null),
+                relation + ("event_id" to "\$" + "x".repeat(255)),
+                relation - "event_id",
+            )) assertThrows(IllegalArgumentException::class.java) {
+            matrixRoomMessageRequest(
+                "edit",
+                json.readTree(json.writeValueAsString(content + ("m.relates_to" to invalid))),
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            matrixRoomMessageRequest(
+                "edit",
+                json.readTree(
+                    json.writeValueAsString(
+                        content +
+                            ("m.relates_to" to relation) +
+                            ("m.new_content" to mapOf("body" to "private"))
+                    )
+                ),
             )
         }
     }

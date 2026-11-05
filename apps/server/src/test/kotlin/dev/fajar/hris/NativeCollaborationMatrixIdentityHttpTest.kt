@@ -1220,6 +1220,16 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             assertEquals(200, response.statusCode(), response.body())
             assertEquals(json.readTree(replyBody), provider.lastRoomCiphertext.get())
         }
+        val editBody =
+            json.writeValueAsString(
+                content +
+                    ("m.relates_to" to mapOf("rel_type" to "m.replace", "event_id" to "\$original"))
+            )
+        repeat(2) {
+            val response = send(editBody, route = "rooms/$room/send/m.room.encrypted/fixture-edit")
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals(json.readTree(editBody), provider.lastRoomCiphertext.get())
+        }
         for (bad in
             listOf(
                 "{}",
@@ -1232,7 +1242,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 json.writeValueAsString(
                     content +
                         ("m.relates_to" to
-                            mapOf("rel_type" to "m.replace", "event_id" to "\$original"))
+                            mapOf("rel_type" to "m.annotation", "event_id" to "\$original"))
                 ),
                 json.writeValueAsString(
                     content +
@@ -1257,7 +1267,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         )
         assertEquals(403, send(route = "rooms/$room/send/m.room.message/fixture-txn").statusCode())
         assertEquals(413, send("{\"ciphertext\":\"" + "A".repeat(70_000) + "\"}").statusCode())
-        assertEquals(before + 4, provider.roomSends.get())
+        assertEquals(before + 6, provider.roomSends.get())
         provider.onRoomSend.set {
             database()
                 .update(
@@ -1265,10 +1275,10 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                     parent,
                 )
         }
-        val late = send(replyBody, route = "rooms/$room/send/m.room.encrypted/fixture-reply")
+        val late = send(editBody, route = "rooms/$room/send/m.room.encrypted/fixture-edit")
         assertEquals(403, late.statusCode(), late.body())
         assertFalse(late.body().contains("event_id"))
-        assertEquals(before + 5, provider.roomSends.get())
+        assertEquals(before + 7, provider.roomSends.get())
     }
 
     @Test
@@ -2168,7 +2178,8 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                     roomCalls.incrementAndGet()
                                     when (relative.substringAfter('/')) {
                                         "send/m.room.encrypted/fixture-txn",
-                                        "send/m.room.encrypted/fixture-reply" -> {
+                                        "send/m.room.encrypted/fixture-reply",
+                                        "send/m.room.encrypted/fixture-edit" -> {
                                             assertEquals("PUT", request.requestMethod)
                                             roomSends.incrementAndGet()
                                             lastRoomCiphertext.set(

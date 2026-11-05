@@ -1,0 +1,323 @@
+{
+  "scope": "Opaque encrypted replacement envelope; native SDK edit publication and product authoring remain separate",
+  "baseCommit": "7883d1172a61c13547bfa26c8c3076c15d3f828b",
+  "attempts": [
+    {
+      "startedAt": "2026-11-05T21:58:05.894856+00:00",
+      "elapsedSeconds": 97.642,
+      "exitCode": 1,
+      "sourceFiles": 8240,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 44,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": []
+    },
+    {
+      "startedAt": "2026-11-05T22:05:03.601022+00:00",
+      "elapsedSeconds": 73.185,
+      "exitCode": 1,
+      "sourceFiles": 8240,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 34,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": []
+    },
+    {
+      "startedAt": "2026-11-05T22:06:45.695236+00:00",
+      "elapsedSeconds": 409.09,
+      "exitCode": 0,
+      "sourceFiles": 8240,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 157,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "skipped": [
+        {
+          "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+        }
+      ]
+    }
+  ],
+  "acceptedCounts": {
+    "tests": 166,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "acceptedReports": {
+    "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixRoomReplyRequestTest.xml": {
+      "sha256": "7f6b52740fd84166440b97b14076e381b0a4d7d4dc885c57a0c1621ab689d1e7",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope1"
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.MatrixRoomMessageMappingTest.xml": {
+      "sha256": "529d70479c83d0327a04d024770a177ae440928004bd4001a7a2d85af352ee63",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope1"
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.MatrixRoomMessageInteropTest.xml": {
+      "sha256": "863461543c59c57f846abcc60c2253afd017a26381e9f7764f0c79818dd70ffe",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope1"
+    },
+    "modules/collaboration/domain/build/test-results/test/TEST-dev.fajar.hris.collaboration.domain.CollaborationRoomMessagePolicyTest.xml": {
+      "sha256": "c29abca7ab3b692eb4dd152e29eaff781c302b14981408d1af4194f862283600",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope1"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationProvisioningWorkerTest.xml": {
+      "sha256": "3c86275e17c330e628ad5caeda725485b47841d34dd2a94b58b994852e271d87",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationPushContextTest.xml": {
+      "sha256": "66807ea305631beb5f091b89662b31d7bbdf3e69e69653a8f20bee1f4fce6f12",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationPushLoopTest.xml": {
+      "sha256": "e6b6d608c0f060e2d95b69097e997e60d9587a3581b25936920395850b0d179d",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.CollaborationSummaryWorkerTest.xml": {
+      "sha256": "5bf4d5a41b99598337be1028804bbacd6cac5f08771e11fbc0b9302fd865fb92",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.DirectoryProjectionWorkerTest.xml": {
+      "sha256": "ff7564f39a9436eca8b46f276048d630f7f0d9265693d178ec3b4cad6fade1e1",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.DocumentValidationWorkerTest.xml": {
+      "sha256": "30795ae87fc22e8bea452535b1e4482c7425fd3ea5423345504fb80d60f3fe4f",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.EmployeeImportWorkerTest.xml": {
+      "sha256": "d4c558ff7d56dcab4899190a2d56bd7fad2c3f8957be42d78a3390e051f850ef",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.IdentityMailWorkerTest.xml": {
+      "sha256": "1ab4cee2dd5ba55feebe3ed5c689670abda37734b78de9317944bff904d98cf4",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxEmailWorkerTest.xml": {
+      "sha256": "510841ba4176b83889a68617ff7c3321049322d369c23da2062ab74396a21d83",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.InboxPushWorkerTest.xml": {
+      "sha256": "59175ce34c238bc90d4a12bc65b60947b655b98dbed82263b04014c1ac862fb4",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.LeaveBatchWorkerTest.xml": {
+      "sha256": "1646e8bc6cdeb5c9c790999a675c371a8a9f9e6f1390d2d75572783496d0acfc",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest.xml": {
+      "sha256": "a3a97b0f049c760978835f2e5ca6a56992109106dbe697a38f3eec93b3b8230c",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.MobileSyncWorkerTest.xml": {
+      "sha256": "839226c56e79b090e5764eb5858e42660b3498e05f2d7c31870682a3c055dbd9",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.NativeSessionCleanupWorkerTest.xml": {
+      "sha256": "b08e78c120c465a49c53af6ea5441c569d8e6af6e690609e7df7e965f5ec76b4",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ObjectCleanupWorkerTest.xml": {
+      "sha256": "a50f453efcba77070808827fa797bf08539286fb9e20f35a01ba6dcf0a55a46b",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.OffboardingScheduleWorkerTest.xml": {
+      "sha256": "90fa1a25f94275912a88e991128930559f9eb14de91ed8f4a67413db0be86034",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.OnboardingScheduleWorkerTest.xml": {
+      "sha256": "17726566da5bb321064f1e4078725770a24ff42ba048090c01c1e94c504e5f95",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.PayrollCalculationWorkerTest.xml": {
+      "sha256": "47620e1c9cf258a7526a5ba55ccd14b9ef394f69536d2cc45f2147f38c18721b",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportElapsedRetentionTest.xml": {
+      "sha256": "641a7915343747b3aa3bfde81f1884c12961228f03ae9ced6faf6e9ef7699e2e",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportRetentionWorkerTest.xml": {
+      "sha256": "bf478d2c6aa6d409b4bfb55ba6d78da2c74d81bf77b6800d198276d2b347d9aa",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.ReportExportWorkerTest.xml": {
+      "sha256": "2da8b3d3c82232a6cc1ec70d97d33a6537010294c8248629e77a8dbfca11ca76",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.SelfProfileProjectionWorkerTest.xml": {
+      "sha256": "2dd48fb4ea038b8318e56a3e9069d9120ec3416703d9a3d54b44d4ecb7a99d8a",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationObservationTest.xml": {
+      "sha256": "4608ddc80f76e786247b2f11a2b30660bdd8e0a0935e484614faa1f57ed10442",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationTest.xml": {
+      "sha256": "59b4d86a1f56fe8746349ab50e73d6266b98db8fb95e57e2fabf8704b374ecbb",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.AnnouncementPublicationWorkerTest.xml": {
+      "sha256": "fd7b6f63aa5dd3770e3d997ecd2ccd53e1a9b6c02df954e3195a59bb37925ee0",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    },
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+      "sha256": "8be1d34aeb9a1eaf57dfd3f1fa19fe6800f06314fe33a22fdc6418049e83c62f",
+      "tests": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executedIn": "envelope3"
+    }
+  },
+  "sourceHashes": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "4e18b177f4d48fcf1f60485b23347a293453b96c67b97030d26919d5b21b83e3",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixRoomMessageRepository.kt": "ac919fdf483050fd0c4d0966c243958385581620a0fe2beac18c63e79867b50a",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomMessageInteropTest.kt": "642af72d8a3c2ae9bdabdb6859e1b0e97334991cca81725f3738584877618b8b",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomMessageMappingTest.kt": "7fac6ec93f4b5e3deb8edf6d7a626ec8abd155d550022a5c3ac80396598fb0c9",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/MatrixRoomMessageRequest.kt": "0a58366d6be9df8d0590d156cad6ef31c1cd08a84df1f0c1a50c274dd1a7167e",
+    "modules/collaboration/delivery/src/test/kotlin/dev/fajar/hris/collaboration/delivery/MatrixRoomReplyRequestTest.kt": "86654777e46216db3dff09cb0ef314b9492713359ce3fb27b1eca6d1c5188ac0",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRoomMessage.kt": "aff5c54df4eacf97dc9e7799378966d413e58eb8006feea1124e35ef49a8fd77",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationRoomMessagePolicy.kt": "d2141e8792919060eafeaf5de3935b6d6d8a8ea800c6a4f8f7d324ab65612873",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationRoomMessagePolicyTest.kt": "532ee880feedba8dbdafdd0936d0d5dfb5464eef5aab6dd0d9e20162c2c6bfdd"
+  },
+  "sourceManifestSha256": "7da0a7b6dd68099ec6eea5d4fd216355ffe93474d7bd4a953f6db8ab59af6ffd",
+  "fixtureCorrections": [
+    "First run: owned fake provider lacked fixture-edit route; added explicit route.",
+    "Second run: expected provider-call counters excluded two added edit calls; corrected six/seven totals. Late native revocation now exercises the edit envelope."
+  ],
+  "limits": [
+    "One pre-existing opt-in elapsed-retention worker test skipped.",
+    "Real Synapse receives synthetic encrypted fixture ciphertext; no claim of SDK edit encryption/decryption.",
+    "No schema or live runtime changes; live source remains54b10ce8/schema116.1, push/FCM enabled, SMTP disabled."
+  ],
+  "next": "Commit/push, full CI on exact product head; Mobile receiver/outbox/long-press and native acceptance before release."
+}

@@ -52,6 +52,23 @@ class MatrixRoomMessageMappingTest {
             mapOf("m.in_reply_to" to mapOf("event_id" to "\$original")),
             requireNotNull(observed)["m.relates_to"],
         )
+        assertEquals(
+            Result.Success("\$fixture"),
+            repository.send(
+                "!owned",
+                message.copy(replacesEventId = "\$original"),
+                "fixture",
+                Instant.now().plusSeconds(5),
+            ),
+        )
+        assertEquals(
+            setOf("algorithm", "ciphertext", "session_id", "m.relates_to"),
+            requireNotNull(observed).keys,
+        )
+        assertEquals(
+            mapOf("rel_type" to "m.replace", "event_id" to "\$original"),
+            requireNotNull(observed)["m.relates_to"],
+        )
         for (invalid in
             listOf(
                 emptyMap(),

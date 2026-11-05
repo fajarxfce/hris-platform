@@ -9,6 +9,8 @@ data class CollaborationRoomMessage(
     val deviceId: String? = null,
     /** Opaque reference only; it grants no access to the target event or another room. */
     val replyToEventId: String? = null,
+    /** Replacement target only. The encrypted payload carries the new text and edit identity. */
+    val replacesEventId: String? = null,
 ) {
     override fun toString() = "CollaborationRoomMessage(redacted)"
 }

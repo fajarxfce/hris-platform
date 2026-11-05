@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Edit envelope accepted locally; receiver work continues — 5 November 2026
+
+[Contract](collaboration/message-edit-envelope.md) and
+[evidence](measurements/collaboration-edit-envelope-2026-11-05.json). Nine Kotlin
+files add exact opaque `m.replace` beside the existing quoted-reply relation;
+mutually exclusive shapes, unchanged native admission, provider transaction
+deduplication and late-revocation checks. Accepted166 cases/30 suites (157 fresh
+in409.09s plus9 unchanged earlier focused cases), zero failures/errors, one
+existing opt-in elapsed-retention skip. HTTP fixture route/counter corrections
+are documented. No SDK edit encryption/decryption claim. All local Platform
+wrappers drained. Next: push and one full CI on the exact product head, audit
+artifacts before any live rollout. No schema change. Group branch not ported yet.
+
+Current cross-repository state supersedes the older rollout entry below: Mobile
+release40 source927407ad is accepted on both retained emulators and installed-only
+on the phone; original account/app data retained. Apple42106835639 fully passed
+and is recorded in Mobile34fbefbc. Never reinstall40 or repeat accepted Forward
+publications. Both emulators are stopped with data/keys preserved. Starter raw
+staging port ab4cac74 is fully accepted locally and on Apple42113508947, recorded
+in bce2012; no remaining Starter gate. Mobile has uncommitted edit storage and
+native receiver work, with focused receive1 running under frozen sources. Its
+full updated root/browser/Android/lint gate, native proof, durable edit outbox and
+long-press authoring remain. Preserve both Mobile stashes. All54 PRD groups remain
+open; continue work after this increment.
+
+Live remains54b10ce8/schema116.1 with push/callback/delivery/worker FCM ON and SMTP
+OFF. Do not repeat the already accepted summary rollout or restore old database
+contents over later writes. Keep group V117–137 and existing provider identity.
+
 ## Incremental metadata deployed — 5 November 2026, 21:08UTC
 
 [Rollout evidence](measurements/collaboration-summary-rollout-2026-11-05.json).

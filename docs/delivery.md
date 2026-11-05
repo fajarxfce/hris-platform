@@ -1,5 +1,23 @@
 # Delivery and validation
 
+## Mobile quoted-reply intent — 5 November 2026
+
+Mobile [e47d9166](https://github.com/fajarxfce/hris-mobile/commit/e47d91662996a7fb724567ba7076938fc03d6724) is pushed.
+Encrypted drafts/outbox retain the original reply reference through exact save/freeze/
+queue retry, background recovery and paused native queue encoding. Complete content
+fingerprints include the relation; same-text retries cannot retarget a logical send.
+Outgoing reference validation matches Main gatewayd4f34140 without tightening historical
+IDs. No quoted body snapshots. [Contract](https://github.com/fajarxfce/hris-mobile/blob/e47d91662996a7fb724567ba7076938fc03d6724/docs/collaboration-chat-quoted-draft.md),
+[evidence](https://github.com/fajarxfce/hris-mobile/blob/e47d91662996a7fb724567ba7076938fc03d6724/docs/measurements/chat-quoted-draft-2026-11-05.json).
+
+Final Mobile root/Android/browser/format/architecture gate501.591s/3,401 fresh/zero
+failures/errors/skips/4,052 unchanged inputs. Earlier compile failure and passed
+pre-alignment gate are recorded. Worker recovery uses a simulated SDK, not new actual
+quoted-message interop. Product quote history/observer/UI is now WIP in Mobile, with
+focused checks next. Then actual native encrypted reply and cold offline proof,
+validated gateway deployment and product APK. Phone32 and live8b40/schema116 unchanged.
+All54 groups remain open; continue long run and push every commit.
+
 ## Quoted reply gateway contract — 5 November 2026
 
 Main accepts only the bounded `m.relates_to.m.in_reply_to.event_id` envelope. Plain

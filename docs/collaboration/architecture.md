@@ -136,3 +136,10 @@ References checked during planning:
 [Bounded reply metadata](quoted-reply-envelope.md) extends the existing encrypted
 send path without changing admission or adding a provider lookup for the target.
 Mobile UI/native reply acceptance remains pending; all54 groups stay open.
+
+## Mobile quoted intent continuation
+
+Mobile [e47d9166](https://github.com/fajarxfce/hris-mobile/commit/e47d91662996a7fb724567ba7076938fc03d6724) preserves
+original reply identity through encrypted draft/outbox and paused queue delivery.
+Product history/UI and actual native quoted-message proof are in progress. Current
+phone32 and live8b40/schema116 remain unchanged; all54 groups remain open.

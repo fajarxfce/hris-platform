@@ -327,6 +327,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "completionCleanupRecovered",
                     "coldHistoryRecoveredOffline",
                     "gatewayUnavailableAfterProcessDeath",
+                    "quotedReplyDecrypted",
+                    "quotedReplyRecovered",
+                    "quotedReplyRecoveredOffline",
                     "processRestartedAfterCompletion",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
@@ -362,6 +365,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 room,
                 proof.path("ackSenderEventId").asString(),
                 sender.session.getValue("userId"),
+                replyToEventId = proof.path("senderEventId").asString(),
             )
             assertEquals(
                 3,
@@ -445,6 +449,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "completionCleanupRecovered" to true,
                     "coldHistoryRecoveredOffline" to true,
                     "gatewayUnavailableAfterProcessDeath" to true,
+                    "quotedReplyDecrypted" to true,
+                    "quotedReplyRecovered" to true,
+                    "quotedReplyRecoveredOffline" to true,
                     "processRestartedAfterCompletion" to true,
                     "encryptedSendCount" to 3,
                     "admittedProviderPages" to true,
@@ -519,7 +526,13 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
         return SdkOwner(owner.native, owner.device, owner.session + ("accessToken" to access))
     }
 
-    private fun verifyCiphertext(owner: SdkOwner, room: String, event: String, sender: String) {
+    private fun verifyCiphertext(
+        owner: SdkOwner,
+        room: String,
+        event: String,
+        sender: String,
+        replyToEventId: String? = null,
+    ) {
         fun encode(value: String) =
             java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8)
         val response =
@@ -541,6 +554,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
         assertEquals(sender, value.path("sender").asString())
         assertFalse(value.path("content").has("body"))
         assertTrue(value.path("content").path("ciphertext").isString)
+        val relation = value.path("content").path("m.relates_to")
+        if (replyToEventId == null) assertFalse(value.path("content").has("m.relates_to"))
+        else
+            assertEquals(replyToEventId, relation.path("m.in_reply_to").path("event_id").asString())
     }
 
     private fun writePrivate(path: Path, value: Any) {

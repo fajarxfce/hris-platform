@@ -75,7 +75,8 @@ def proof_evidence(value):
                  "originalHistoryWindowOwned", "historyBodiesRestored", "commonHistoryAcquisitionOwned", "latestHistoryHeadOwned", "providerHistoryPageOwned",
                  "commonProviderHistoryAcquisitionOwned", "providerHistoryReferencesRestored",
                  "providerHistoryReferencesReconciled", "providerHistoryRestartPreserved", "historyRuntimeReopened", "ackBeforeJournalRecovered", "completionCleanupRecovered",
-                 "coldHistoryRecoveredOffline", "gatewayUnavailableAfterProcessDeath"):
+                 "coldHistoryRecoveredOffline", "gatewayUnavailableAfterProcessDeath",
+                 "quotedReplyDecrypted", "quotedReplyRecovered", "quotedReplyRecoveredOffline"):
         if value.get(name) is not True:
             raise ValueError("Invalid owned protected store evidence")
         output[name] = True
@@ -118,7 +119,8 @@ def checkpoint_evidence(value, staged=False, acknowledged=False, completed=False
     if not isinstance(transaction, str) or not re.fullmatch(r"[A-Za-z0-9._~-]{1,128}", transaction):
         raise ValueError("Invalid owned pending transaction")
     if acknowledged:
-        if value.get("ackObserved") is not True or value.get("receiptAbsent") is not True:
+        if (value.get("ackObserved") is not True or value.get("receiptAbsent") is not True
+                or value.get("quotedReplyDecrypted") is not True):
             raise ValueError("Invalid owned acknowledgement checkpoint")
     if completed:
         if value.get("archiveRetained") is not True or value.get("receiptRetained") is not True:

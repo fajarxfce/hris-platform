@@ -61,6 +61,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "completionCleanupRecovered": True,
                 "coldHistoryRecoveredOffline": True,
                 "gatewayUnavailableAfterProcessDeath": True,
+                "quotedReplyDecrypted": True, "quotedReplyRecovered": True, "quotedReplyRecoveredOffline": True,
                 "ackSenderEventId": "$third", "ackTransaction": "ack-transaction",
                 "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
@@ -86,6 +87,15 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("ackTransaction", "first-transaction")):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
+
+    def test_quoted_reply_requires_decryption_recovery_and_cold_history(self):
+        proof = self.evidence()
+        for name in ["quotedReplyDecrypted", "quotedReplyRecovered", "quotedReplyRecoveredOffline"]:
+            with self.subTest(name=name, missing=True), self.assertRaises(ValueError):
+                proof_evidence({k: v for k, v in proof.items() if k != name})
+            for value in (False, None, 1, "true", [], {}):
+                with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                    proof_evidence(proof | {name: value})
 
     def test_local_read_intent_recovery_requires_each_strict_true_flag(self):
         proof = self.evidence()
@@ -210,7 +220,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 return json.dumps(restored or {"transactionId": "first-transaction", "processId": 202})
             if name == "gateway-acknowledged":
                 return json.dumps(acknowledged or {"transactionId": "ack-transaction", "processId": 202,
-                                                  "ackObserved": True, "receiptAbsent": True})
+                                                  "ackObserved": True, "receiptAbsent": True, "quotedReplyDecrypted": True})
             if name == "gateway-ack-restored":
                 return json.dumps(ack_restored or {"transactionId": "ack-transaction", "processId": 303})
             if name == "gateway-completed":
@@ -268,15 +278,15 @@ class HrisNativeDriverTest(unittest.TestCase):
             self.assertFalse((root / "native-staged.json").exists())
 
     def test_ack_checkpoint_requires_observed_ack_and_absent_journal(self):
-        checkpoint = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True}
+        checkpoint = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True, "quotedReplyDecrypted": True}
         self.assertEqual({"processId": 202, "transactionId": "ack-transaction"},
                          checkpoint_evidence(checkpoint | {"eventId": "$untrusted"}, acknowledged=True))
-        for name, wrong in (("ackObserved", 1), ("receiptAbsent", False), ("receiptAbsent", "true")):
+        for name, wrong in (("ackObserved", 1), ("receiptAbsent", False), ("receiptAbsent", "true"), ("quotedReplyDecrypted", False), ("quotedReplyDecrypted", 1)):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 checkpoint_evidence(checkpoint | {name: wrong}, acknowledged=True)
 
     def test_ack_requires_its_original_process_and_a_new_transaction_before_death(self):
-        base = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True}
+        base = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True, "quotedReplyDecrypted": True}
         for change in ({"processId": 101}, {"transactionId": "first-transaction"}, {"receiptAbsent": False}):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)

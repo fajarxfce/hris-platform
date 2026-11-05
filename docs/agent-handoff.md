@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Release 33, current FCM acceptance, and active queue recovery — 5 November 2026
+
+Mobile [ae6872a2](https://github.com/fajarxfce/hris-mobile/commit/ae6872a2)
+records source36e78206 installed as ARM64 devRelease33 on10.77.77.3:5555.
+Build/lint522.126s, no lint issues; two exact-APK emulator cold starts pass.
+Installation announced and install-only; original signer/app ID/data preserved,
+installed APK pulled back and matched. SHA256
+e97aceff5053638741209951c511af2a129637d6a24d4f08fbdad8fbfc494338.
+[Delivery evidence](https://github.com/fajarxfce/hris-mobile/blob/ae6872a2/docs/measurements/android-release-phone-2026-11-05-build33.json).
+
+Live API/worker are now11a98115/schema116 after all14 jobs of
+[Main CI42004588608](https://github.com/fajarxfce/hris-platform/actions/runs/42004588608)
+passed. Image-only rollout19.094s; original Matrix identity, TLS, database, proxy,
+and storage retained. FCM enabled, SMTP disabled. Current product-source FCM proof
+passes241.839s/one actual case: Firebase restarts the product process, SystemUI
+shows the notification, and its inline reply reaches the peer encrypted. Five
+real screenshots reviewed; owned emulator/fixture cleanup independently verified.
+[Rollout and FCM records](https://github.com/fajarxfce/hris-platform/commit/fe38da505292c30c9c1f16f2c0d7b5cc7daa2f7f).
+
+At10:31 phone33 produced closed retained-Rejected and delivery-QueueUnresolved
+markers. Mobile source investigation found bootstrap credential replacement also
+changed the queue binding, leaving earlier staged transactions unmatched. Active
+uncommitted fix preserves the SDK store's original queue operation, verifies exact
+retained transactions for affected legacy bindings, and retries bounded ordinary
+API/auth failures with original SDK transaction IDs. Focused validation is running;
+this is NOT yet an accepted phone-send fix. Preserve keys, all original intents,
+and access/encryption fences. Empty-room manual network controls are also being
+removed. Apple CI42009694285 is still running; no new Apple acceptance claimed.
+
+NEXT: complete regression/root checks, actual queued-auth-recovery native proof,
+then build and validate release34; announce EACH install before install-only.
+Keep user phone UI untouched. Continue all54 open PRD groups; group runtime/proof
+ports still need their own validation. This branch's V117–137 migrations are not
+live; do not treat Main schema116 rollout as their deployment. Push every commit.
+
 ## Main and Mobile native quoted reply proof — 5 November 2026
 
 Mobile [36e78206](https://github.com/fajarxfce/hris-mobile/commit/36e78206d792ac68a38585b80e17234d0e691b22)

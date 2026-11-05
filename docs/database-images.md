@@ -7,6 +7,13 @@ dashboard and recovery integration fixtures. Code generation tracks both files a
 inputs. The standalone Compose and native proof manifests retain explicit matching
 pins; `containerImageCheck`, included in `check`, detects drift between them.
 
+Testcontainers 2.0.5 does not parse the combined `postgres:tag@sha256:digest`
+spelling correctly: it treats `postgres:tag` as the repository and rejects its
+compatibility with PostgreSQL. The Gradle convention validates the catalog value
+and passes the equivalent `postgres@sha256:digest` spelling to JVM tests. Docker,
+Compose and Python fixtures retain the combined spelling. The digest is identical;
+no mutable fallback or compatibility override is used.
+
 This also fixes a timezone-data mismatch exposed by Verify
 [42120370137](https://github.com/fajarxfce/hris-platform/actions/runs/42120370137).
 Backend shards 3 and 7 failed the existing offboarding/onboarding repeated-midnight
@@ -34,3 +41,11 @@ When changing the image, update the version catalog, Compose and native proof
 manifest together. Run `./gradlew containerImageCheck`, the onboarding/offboarding
 HTTP and worker cases, database/migration checks, and the full Verify workflow
 before deploying the resulting application or database image.
+
+The combined-name CI attempt42126384926 failed all eight backend jobs during
+shared database-test initialization; four dashboard jobs passed and downstream
+integration jobs were skipped. The corrected digest-only convention passes24
+local cases in306.132s: PostgreSQL isolation, both previously failing repeated-
+midnight HTTP cases, and worker context/lifecycle. Image consistency, formatting
+and architecture also pass. Full Verify on the corrected commit remains required
+before deployment. [Evidence](measurements/postgres-image-pin-2026-11-05.json).

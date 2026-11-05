@@ -1,6 +1,6 @@
 {
   "date": "2026-11-05",
-  "status": "configuration and isolated SQL checks passed; full Verify required on the new commit",
+  "status": "Digest-only Testcontainers normalization passes24 real local database/HTTP/worker cases; new full Verify required",
   "failedRun": {
     "headSha": "029c58283726ea4a44e9c0fc45f91428a128f3c6",
     "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42120370137",
@@ -226,8 +226,128 @@
     "tool/workload_fixture.py": "780082742b667f5a301fa8fd91eef84710bda24d9c8aa3f765f5928764cac32d"
   },
   "limits": [
-    "No new JVM/database integration acceptance yet. Full CI must execute the existing onboarding/offboarding cases against the pinned image.",
+    "Local24-case smoke passes on digest-only image spelling; complete normalized-source CI remains required.",
     "Existing runtime remains 54b10ce8/schema116.1; no deployment.",
     "Image pin preserves current Java/PostgreSQL timezone agreement; planned timezone updates require joint review of future scheduled boundaries."
-  ]
+  ],
+  "combinedTagDigestAttempt": {
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42126384926",
+    "headSha": "472abcc9a3514c19b8ae0b5b8ae6ac625576837c",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (5)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (4)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (7)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (6)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (8)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "dashboard (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "skipped"
+      }
+    ],
+    "cause": "Testcontainers2.0.5 parses postgres:tag@sha256 as repository postgres:tag and rejects compatibility before database tests. Docker/codegen pull succeeds. Source-inspected parser normalization now uses the identical digest-only name, with no compatibility override or mutable fallback."
+  },
+  "digestNormalization": {
+    "path": "build-logic/src/main/kotlin/hris.kotlin.gradle.kts",
+    "sha256": "66201975af892cc00c3846b8f57bf54a16feca8ba0fc4255d1e06939540bb655",
+    "localSmoke": {
+      "startedAt": "2026-11-05T23:20:11.292375+00:00",
+      "elapsedSeconds": 306.132,
+      "exitCode": 0,
+      "sourceFiles": 8242,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "apps/worker/build/test-results/test/TEST-dev.fajar.hris.worker.WorkerIntegrationTest.xml": {
+          "sha256": "074efc83c77f6e00cc08fc7d77dcd32f7dc6f3b940eb56f8a9a9abe871831f6f",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.OnboardingScheduleHttpTest.xml": {
+          "sha256": "a2c8529254ebea6dfb9a2ab23a7c8d033280fda4daf18c740fa9284f1c36a9dd",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.OffboardingScheduleHttpTest.xml": {
+          "sha256": "5a3bb2247755c7ae312c9061e6a711a80d960dd15cac055ad1dfb668753ce957",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+          "sha256": "98a6e0c5a1474c4457d1cbd7f1c71afeed2a12c7cf5d02f406bfa0ba3e771e50",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "coverage": [
+      "15 PostgresIsolationTest cases",
+      "OnboardingScheduleHttpTest repeated-midnight admission at both boundaries",
+      "OffboardingScheduleHttpTest repeated-midnight constraint",
+      "7 WorkerIntegrationTest context/lifecycle cases",
+      "Image consistency, formatting and architecture checks"
+    ],
+    "remaining": "Run full Verify on the normalized product commit before artifact staging/deployment."
+  }
 }

@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Digest-only Testcontainers correction passes locally — 5 November 2026
+
+[Contract](database-images.md), [evidence](measurements/postgres-image-pin-2026-11-05.json).
+FullCI42126384926 on472abcc9 failed all8 backend jobs at shared database-test
+initialization: Testcontainers2.0.5 treats postgres:tag@sha256 as repository
+postgres:tag, so its normal compatibility guard rejects the name. Four dashboard
+jobs passed;2 downstream jobs skipped. Docker/codegen pulls worked. Source-inspected
+parser now receives the identical digest-only image through the convention;
+catalog/Compose/Python pins stay unchanged. No compatibility bypass or mutable fallback.
+
+Local pin-smoke1 PASS306.132s/24 fresh cases/0 failures/errors/skips/8,242 unchanged
+inputs:15 PostgreSQL isolation, both previous Havana-midnight HTTP cases,7 worker
+context/lifecycle. Image consistency, formatting and architecture pass. Driver26626
+drained. NEXT commit/push this normalization and dispatch one NEW full Verify on
+its exact product head, then audit all14 jobs/packages before rollout. Do not rerun
+old029c5828 or472abcc9. No live container, configuration or database change yet.
+
+Mobile fb52611d reference increment is pushed (full4,981 tests/lint0); abfef37f
+records Apple42123588891 exactd47554f8 PASS1,310 cases/154 suites and full app.
+Twelve-file separate edit transport evidence WIP is now running evidence2 after
+fixing a nullable test value. evidence1 stopped after test compilation failure;
+its processes/driver drained. Added a7th real storage case for query substitution
+and tampered point records. Finish that gate/full checks, then commit/push and
+continue edit outbox/recovery/retirement/UI/native proof and all54 PRD groups.
+Phone40 stays installed; emulators stopped/keys retained; Starter bce2012 complete.
+Live54b10ce8/schema116.1 retains push/callback/delivery/worker FCM ON and SMTP OFF.
+
 ## Pinned-database full CI dispatched — 5 November 2026
 
 Product `472abcc9a3514c19b8ae0b5b8ae6ac625576837c` is pushed. Full Verify

@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Summary feed control CI accepted; full release CI running — 5 November 2026
+
+Collaboration control42090785206 PASSES exactd03fb472:706 cases/113 suites,
+zero failures/errors; seven existing opt-in skips (six native APK interop cases
+and elapsed-retention). All nine new summary HTTP cases execute. Both jobs pass;
+artifact13445149310 digest38bd2e50… verified. [CI evidence](measurements/collaboration-summary-feed-ci-2026-11-05.json).
+First audit expected only the worker opt-in skip; the broader native wildcard's
+six existing skips were inspected and the exact seven-case set recorded. No new
+feed test is skipped. Control audit wrappers/children are drained.
+
+Full CI42091460931 still runs exactd03fb472; do not duplicate dispatch. Prepared
+.work/chat-summary-delta-2026-11-05/stage-packages.py and stage-images.py require
+all14 jobs and exact artifacts before use. Neither has run; no image build or
+live switch. Schema116.1 will require a real retained backup/restore/migration
+rollout procedure, not the previous schema-unchanged quoted-reply deploy script.
+Live remains11a98115/schema116/chat pushOFF. Preserve existing provider/session keys.
+
+Mobile transport a931a09d is accepted (617 browser and10 desktop cases), and raw
+storage5f0eacdd adds staging discard/bounded working reads after full4,070 fresh
+cases755.207s, Android/lint0. Its first SQLite pre-cancellation defect is fixed.
+Mobile storage Apple dispatch is next. Encrypted format2/repository/storage tests
+exist only as uncompiled .work consumer drafts; Sync use case and ChatInbox wiring
+remain. Phone39 stays installed; no repeat installation or Forward publication.
+Starter UI port e501d4da is fully accepted, with Apple118 cases/full Xcode app
+recorded in fbe5ea8. New generic storage port waits for Mobile consumer/native proof.
+Continue long run through54 open PRD groups; retain group117–137, numeric Flyway
+ordering, both protected Mobile stashes, emulator images and original SDK keys.
+
+
 ## Native summary feed accepted; atomic Mobile consumer next — 5 November 2026
 
 Dedicated bootstrap/delta metadata HTTP, authenticated cursor codec/policy and raw

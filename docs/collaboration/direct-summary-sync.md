@@ -124,3 +124,10 @@ publication. The first negative-fixture expectation failures remain recorded.
 
 No live migration, worker timer, native endpoint, phone change or throughput claim
 is part of this storage acceptance. Live remains11a98115/schema116.
+
+Independent Collaboration control42090785206 passes exact d03fb472:706 cases across
+113 suites, zero failures/errors. Seven existing opt-in cases are skipped: six
+native APK interop cases and the elapsed-retention workload. All nine new summary
+HTTP cases execute successfully. Both backend/control and company-settings jobs
+pass; downloaded artifact digest is verified. [CI evidence](../measurements/collaboration-summary-feed-ci-2026-11-05.json).
+Full release CI42091460931 and live migration/deployment remain pending.

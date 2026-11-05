@@ -89,7 +89,7 @@ jobs:
   dashboard-integration:
     needs: [backend, dashboard]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     defaults:
       run:
         working-directory: apps/dashboard

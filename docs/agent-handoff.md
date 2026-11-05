@@ -1,5 +1,30 @@
 # Agent continuation — HRIS workspace
 
+## CI dependency setup exhausted integration budget twice — 5 November 2026
+
+Product source remainsd03fb472. Full CI42091460931 attempt2 also reaches the20min
+job limit: native integration/mail/FCM/worker/storage checks PASS, then exports
+gets only24 seconds before cancellation20:21:27UTC. All13 other jobs remain passed.
+Both attempts and exact step statuses are retained in .work/chat-summary-delta-
+2026-11-05/full-ci-attempt{1,2}.json. No assertion failure justifies reducing coverage.
+
+The dashboard-integration job budget increases20→35 minutes to include slow Ubuntu
+font downloads plus all integration suites. Existing worker8min and exports5min
+step deadlines stay unchanged; every command/test remains. YAML parsed. Next push
+and dispatch one fresh full CI on this exact workflow head; do NOT rerun the old
+20min job again or claim its exports passed. Current runtime source and migration
+files are unchanged. Artifact/image staging scripts still reference the old run and
+MUST be updated to the new accepted run/head after completion. No live changes.
+
+Mobile consumer-full1 ran4,895 fresh cases582.805s: two failures are the same stale
+expectation that a name change restarts preview observation (Desktop/Browser).
+Also two LongMethod lint findings. Explicit helper extraction and stronger retained
+preview/checkpoint assertions are applied; consumer-full2 is running under frozen
+inputs. Apple raw5f0eacdd accepted1,279 cases/full app; Mobile76943710 records it.
+Retained database116→116.1 rehearsal is accepted as below. Complete metadata release40
+delivery and remaining54 PRD groups; phone39 stays installed.
+
+
 ## Metadata migration rehearsal passed; live rollout pending — 5 November 2026
 
 [Migration evidence](measurements/collaboration-summary-upgrade-2026-11-05.json):

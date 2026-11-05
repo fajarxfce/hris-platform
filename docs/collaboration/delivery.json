@@ -90,7 +90,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/collaboration-space-identity-observation.md",
         "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/measurements/collaboration-space-identity-observation-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/collaboration-space-registration-storage.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/measurements/collaboration-space-registration-storage-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/measurements/collaboration-space-registration-storage-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/46db17ee308ffab4c8d5c7744af12f840b2e2c48/docs/collaboration-space-registration-flow.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/46db17ee308ffab4c8d5c7744af12f840b2e2c48/docs/measurements/collaboration-space-registration-flow-2026-11-05.json"
       ]
     },
     {
@@ -437,7 +439,9 @@
         "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/collaboration-space-identity-observation.md",
         "https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/measurements/collaboration-space-identity-observation-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/collaboration-space-registration-storage.md",
-        "https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/measurements/collaboration-space-registration-storage-2026-11-05.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/measurements/collaboration-space-registration-storage-2026-11-05.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/46db17ee308ffab4c8d5c7744af12f840b2e2c48/docs/collaboration-space-registration-flow.md",
+        "https://github.com/fajarxfce/hris-mobile/blob/46db17ee308ffab4c8d5c7744af12f840b2e2c48/docs/measurements/collaboration-space-registration-flow-2026-11-05.json"
       ]
     },
     {
@@ -834,6 +838,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
+    "Mobile native original-device registration flow is accepted at 46db17ee308ffab4c8d5c7744af12f840b2e2c48. Continue native provisioning retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity, registration storage and explicit original-device preparation/replay are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/46db17ee308ffab4c8d5c7744af12f840b2e2c48/docs/agent-handoff.md",
     "Mobile durable registration storage is accepted at 024bc19376123beb6da8d1bee6d9838426361844. Continue durable native group device registration/retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status, local SDK identity and registration storage are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/024bc19376123beb6da8d1bee6d9838426361844/docs/agent-handoff.md",
     "Mobile selected-identity native read is accepted at c79ca4532e42ff4c8d2c1856ddd077c91b75d539. Continue durable native group device registration/retry/bootstrap, original SDK store adoption and hard-parent recovery, group UI and typed push/background/reply integration. Directory/local root, identity selection/read, native-device status and local SDK identity port are accepted; verified product release 29 is installed on the phone. Device and SDK adoption remain separate. Current product remains company chat; all 54 groups open. https://github.com/fajarxfce/hris-mobile/blob/c79ca4532e42ff4c8d2c1856ddd077c91b75d539/docs/agent-handoff.md",
     "Native GET selected provider-user metadata is validated. Implement Mobile native read then durable device registration/retry/bootstrap, matching actual local SDK user rather than current company or preferred device. No selection/enrollment from GET; all54 groups stay open. See docs/collaboration/space-identity-read.md.",

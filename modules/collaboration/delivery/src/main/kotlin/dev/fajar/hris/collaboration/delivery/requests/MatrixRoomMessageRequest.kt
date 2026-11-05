@@ -8,7 +8,15 @@ fun matrixRoomMessageRequest(transactionId: String, body: JsonNode): Collaborati
     require(
         body.isObject &&
             body.propertyNames().all {
-                it in setOf("algorithm", "ciphertext", "session_id", "sender_key", "device_id")
+                it in
+                    setOf(
+                        "algorithm",
+                        "ciphertext",
+                        "session_id",
+                        "sender_key",
+                        "device_id",
+                        "m.relates_to",
+                    )
             }
     )
     require(body.path("algorithm").asString() == "m.megolm.v1.aes-sha2")
@@ -18,6 +26,12 @@ fun matrixRoomMessageRequest(transactionId: String, body: JsonNode): Collaborati
         text(body.path("session_id"), 44),
         body.get("sender_key")?.let { text(it, 44) },
         body.get("device_id")?.let { text(it, 128) },
+        body.get("m.relates_to")?.let { relation ->
+            require(relation.isObject && relation.propertyNames() == setOf("m.in_reply_to"))
+            val target = relation.path("m.in_reply_to")
+            require(target.isObject && target.propertyNames() == setOf("event_id"))
+            text(target.path("event_id"), 255)
+        },
     )
 }
 

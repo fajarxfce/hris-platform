@@ -1,5 +1,21 @@
 # Agent continuation — HRIS workspace
 
+## Quoted reply gateway contract — 5 November 2026
+
+Main accepts only the bounded `m.relates_to.m.in_reply_to.event_id` envelope. Plain
+messages remain compatible; arbitrary relations and plaintext metadata are rejected.
+Existing participant/native/key admission remains unchanged. Real Synapse preserves
+the reference and original transaction across token rotation; native HTTP/PG checks
+retain revocation. [Contract](collaboration/quoted-reply-envelope.md),
+[evidence](measurements/collaboration-reply-envelope-2026-11-05.json).
+
+Gate passes in 427.516s: 158 fresh cases, zero failures/errors, one existing opt-in
+elapsed-retention worker case skipped, 8,211 unchanged inputs. Full worker suite ran.
+No live deploy, no actual SDK quoted-message proof yet. Live8b40/schema116 and installed
+Mobile32 remain unchanged. Mobile reply draft/outbox work is in progress, followed by
+history and composer UI, actual encrypted native exchange and a validated phone update.
+Group port requires its own gate. All54 acceptance groups remain open; continue long run.
+
 ## Cold offline history verified — 5 November 2026
 
 Mobile [2032793a](https://github.com/fajarxfce/hris-mobile/commit/2032793a90f67c01eb2e4545c5b7e3437037b492) is pushed.

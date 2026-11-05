@@ -79,6 +79,15 @@ class MatrixRoomMessageInteropTest {
             }
             val first = send(creator.accessToken)
             assertEquals(first, send(creator.accessToken))
+            val reply = message.copy(transactionId = "fixture-reply", replyToEventId = first)
+            fun sendReply(bearer: String): String {
+                val result = messages.send(id, reply, bearer, f.clock.instant().plusSeconds(20))
+                assertInstanceOf(Result.Success::class.java, result)
+                return (result as Result.Success).value
+            }
+            val replyId = sendReply(creator.accessToken)
+            assertNotEquals(first, replyId)
+            assertEquals(replyId, sendReply(creator.accessToken))
             val atRefresh = f.clock.instant()
             val freshResult =
                 f.repository.login(
@@ -88,6 +97,7 @@ class MatrixRoomMessageInteropTest {
             val fresh = (freshResult as Result.Success).value
             assertNotEquals(creator.accessToken, fresh.accessToken)
             assertEquals(first, send(fresh.accessToken))
+            assertEquals(replyId, sendReply(fresh.accessToken))
             assertInstanceOf(
                 Result.Success::class.java,
                 messages.send(
@@ -128,6 +138,16 @@ class MatrixRoomMessageInteropTest {
                 (received.single()["content"] as Map<*, *>)["ciphertext"],
             )
             assertFalse(received.single().containsKey("unsigned"))
+            val receivedReplies =
+                events.map { it as Map<*, *> }.filter { it["event_id"] == replyId }
+            assertEquals(1, receivedReplies.size)
+            val replyContent = receivedReplies.single()["content"] as Map<*, *>
+            assertEquals(message.ciphertext, replyContent["ciphertext"])
+            assertEquals(
+                mapOf("m.in_reply_to" to mapOf("event_id" to first)),
+                replyContent["m.relates_to"],
+            )
+            assertFalse(replyContent.containsKey("body"))
         }
     }
 }

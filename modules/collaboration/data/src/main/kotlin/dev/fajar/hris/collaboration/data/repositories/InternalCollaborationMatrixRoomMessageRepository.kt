@@ -22,6 +22,9 @@ class InternalCollaborationMatrixRoomMessageRepository(
                 put("session_id", message.sessionId)
                 message.senderKey?.let { put("sender_key", it) }
                 message.deviceId?.let { put("device_id", it) }
+                message.replyToEventId?.let {
+                    put("m.relates_to", mapOf("m.in_reply_to" to mapOf("event_id" to it)))
+                }
             }
         val response =
             source.sendRoomMessage(roomId, message.transactionId, content, bearer, deadline)

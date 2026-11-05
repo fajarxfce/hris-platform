@@ -7,6 +7,8 @@ data class CollaborationRoomMessage(
     val sessionId: String,
     val senderKey: String? = null,
     val deviceId: String? = null,
+    /** Opaque reference only; it grants no access to the target event or another room. */
+    val replyToEventId: String? = null,
 ) {
     override fun toString() = "CollaborationRoomMessage(redacted)"
 }

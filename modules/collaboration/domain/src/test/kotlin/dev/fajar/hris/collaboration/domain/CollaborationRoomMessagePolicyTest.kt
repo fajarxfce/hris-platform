@@ -37,6 +37,29 @@ class CollaborationRoomMessagePolicyTest {
     }
 
     @Test
+    fun replyReferencesAreBoundedOpaqueEventIdsAndNeverExpandTheMessageAuthority() {
+        for (target in listOf("\$original", "\$" + "x".repeat(254))) {
+            val reply = message.copy(replyToEventId = target)
+            assertEquals(Result.Success(Unit), validateCollaborationRoomMessage(reply))
+            assertFalse(reply.toString().contains(target))
+        }
+        for (target in
+            listOf(
+                "",
+                "\$",
+                "not-event",
+                "\$with space",
+                "\$line\n",
+                "\$nul\u0000",
+                "\$" + "x".repeat(255),
+                "\$é",
+            )) assertInstanceOf(
+            Result.Failed::class.java,
+            validateCollaborationRoomMessage(message.copy(replyToEventId = target)),
+        )
+    }
+
+    @Test
     fun deprecatedSenderMetadataWhenPresentMustMatchThePinnedDevice() {
         val keys =
             CollaborationMatrixDeviceKeys(

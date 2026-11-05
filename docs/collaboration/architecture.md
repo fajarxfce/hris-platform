@@ -130,3 +130,9 @@ References checked during planning:
 - https://docs.livekit.io/transport/self-hosting/distributed/
 - https://developer.android.com/develop/connectivity/telecom/voip-app/telecom
 - https://developer.apple.com/documentation/pushkit/responding-to-voip-notifications-from-pushkit
+
+## Quoted reply envelope
+
+[Bounded reply metadata](quoted-reply-envelope.md) extends the existing encrypted
+send path without changing admission or adding a provider lookup for the target.
+Mobile UI/native reply acceptance remains pending; all54 groups stay open.

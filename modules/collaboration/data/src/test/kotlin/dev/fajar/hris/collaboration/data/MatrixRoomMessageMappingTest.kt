@@ -39,6 +39,19 @@ class MatrixRoomMessageMappingTest {
         fun send() = repository.send("!owned", message, "fixture", Instant.now().plusSeconds(5))
         assertEquals(Result.Success("\$fixture"), send())
         assertEquals(setOf("algorithm", "ciphertext", "session_id"), requireNotNull(observed).keys)
+        val reply = message.copy(replyToEventId = "\$original")
+        assertEquals(
+            Result.Success("\$fixture"),
+            repository.send("!owned", reply, "fixture", Instant.now().plusSeconds(5)),
+        )
+        assertEquals(
+            setOf("algorithm", "ciphertext", "session_id", "m.relates_to"),
+            requireNotNull(observed).keys,
+        )
+        assertEquals(
+            mapOf("m.in_reply_to" to mapOf("event_id" to "\$original")),
+            requireNotNull(observed)["m.relates_to"],
+        )
         for (invalid in
             listOf(
                 emptyMap(),

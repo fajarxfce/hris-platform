@@ -1,5 +1,27 @@
 # Delivery and validation
 
+## Chat header correction — 5 November 2026
+
+Mobile [64c9432f](https://github.com/fajarxfce/hris-mobile/commit/64c9432f6538070f6adf750dd3920481efa7c032) is pushed.
+
+The thread header now shows the conversation name and Back only. Removed every
+connection subtitle and the permanent checkmark selection button. Long-press selects
+the first message; normal taps do not start selection. Contextual count/copy/delete
+and accessible bubble selection remain. The empty-selection event/handler is removed.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/64c9432f6538070f6adf750dd3920481efa7c032/docs/collaboration-chat-header.md), [evidence](https://github.com/fajarxfce/hris-mobile/blob/64c9432f6538070f6adf750dd3920481efa7c032/docs/measurements/chat-header-2026-11-05.json).
+
+Focused18 / 89.943s and root/Android812 / 286.239s pass on 4,050 unchanged inputs. Reviewed screenshots include compact, landscape and 200% text.
+User confirms immediate release31 Bima history on reopening. Physical internet-off
+behavior is not yet tested on that phone; closed release31 Generic timeline/sync
+errors still lack attribution. Native original-store recovery proof remains bound
+to unchanged data source in8fdbe89b/Main0c62f0d7.
+
+NEXT: clean-source release32 build/lint/owned-emulator startup, announce phone install
+and use --install-only. Then inspect closed operation diagnostics, continue delivered
+edit/reply/forward/delete-for-all, original-bootstrap resolution/adoption, group UI,
+calls and meetings. All54 groups open; live8b40/schema116 unchanged. Push each commit
+and continue the authorized long run. This HRIS feature does not need a Starter port.
+
 ## Actual original-gateway SDK recovery — 5 November 2026
 
 Mobile [8fdbe89b](https://github.com/fajarxfce/hris-mobile/commit/8fdbe89bc9c97efc152c96367e24c0a0116f8fe8) is committed; matching root/native evidence and reviewed screenshots are included.

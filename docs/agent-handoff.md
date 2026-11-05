@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Original Android SDK access renewal verified — 5 November 2026
+
+The real pinned SDK renews both original gateway sessions after injected server-side
+access expiry, retaining original keys, store, queued transaction and canonical history.
+Subsequent process-death/receipt recovery and exactly three encrypted sends still pass.
+Both refreshes cross the real HRIS API/PG/Synapse fixture; the server verifies ciphertext
+with bounded refresh replay, without another rotation. Fixed server time keeps the
+30-second verifier replay window open; this is not late-replay or clock-skew acceptance.
+[Contract](collaboration/native-sdk-access-renewal.md).
+
+Native case51.293s/fullgate123.990s, one passed and none skipped; format/architecture
+pass on12,248 unchanged backend/Mobile inputs and exact proofAPK3cedee24. Mobile proof
+build18host cases/168.282s/4,040 unchanged inputs. Only two backend test files change;
+runtime source equals live8b40. Original-driver cleanup and emulator shutdown succeed.
+[Evidence](measurements/collaboration-sdk-access-renewal-2026-11-05.json).
+
+NEXT: read release31 operation diagnostics and user reopen result for the real Bima
+error. Normal SDK renewal now passes; do not label that actual error fixed or reset
+private keys/account data. Inspect typed rejected-auth signal and original gateway
+recovery if indicated, then real delivered edit/reply/forward/delete-for-all, organization
+adoption, group runtime/UI, calls and meetings. All54groups stay open, phone31 and
+live8b40/schema116 unchanged. Continue long run, atomic pushes and validated delivery.
+
 ## Product release 31 installed — 5 November 2026
 
 Mobile delivery record [8b13e8b9](https://github.com/fajarxfce/hris-mobile/commit/8b13e8b9ff851e7c1334de87891b2ec4c0678bb5) is pushed.

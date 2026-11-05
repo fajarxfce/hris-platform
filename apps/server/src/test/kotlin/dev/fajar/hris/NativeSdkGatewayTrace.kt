@@ -329,6 +329,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 "unstable",
                 "versions",
                 "capabilities",
+                "refresh",
                 "sync",
                 "keys",
                 "upload",

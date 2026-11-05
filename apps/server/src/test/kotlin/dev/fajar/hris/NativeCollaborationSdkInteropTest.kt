@@ -65,7 +65,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
 
     @Test
     @Timeout(value = 8, unit = TimeUnit.MINUTES)
-    fun actualAndroidSdkExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission() {
+    fun actualAndroidSdkRenewsAccessAndExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission() {
         val owner = native()
         val sender = sdkOwner(owner)
         val recipient = sdkOwner(sdkPeer(owner))
@@ -215,6 +215,44 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 trace.earlyEncryptedSendCount(),
                 "SDK sent before explicit queue admission",
             )
+            val renewingOwners = listOf(sender, recipient)
+            for (sdk in renewingOwners) assertEquals(
+                sdk.session.getValue("gatewayVersion").toLong(),
+                gatewayVersion(sdk),
+            )
+            // Inject server-side credential age after restoration of the original SDK stores.
+            // Android wall time stays unchanged; the fixed server clock also keeps the existing
+            // bounded refresh replay available for the independent ciphertext verifier below.
+            clock.set(
+                renewingOwners
+                    .maxOf { java.time.Instant.parse(it.session.getValue("accessExpiresAt")) }
+                    .plusSeconds(1)
+            )
+            val renewalDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(45)
+            while (
+                renewingOwners.any {
+                    gatewayVersion(it) != it.session.getValue("gatewayVersion").toLong() + 1
+                } ||
+                    trace.snapshot().count {
+                        it["method"] == "POST" &&
+                            it["route"] == "/_matrix/client/v3/refresh" &&
+                            it["status"] == 200
+                    } < 2
+            ) {
+                if (!process.isAlive) fail<Nothing>(diagnostic(directory))
+                if (System.nanoTime() >= renewalDeadline)
+                    fail<Nothing>("Original SDK access renewal exceeded its deadline")
+                Thread.sleep(100)
+            }
+            assertEquals(
+                2,
+                trace.snapshot().count {
+                    it["method"] == "POST" &&
+                        it["route"] == "/_matrix/client/v3/refresh" &&
+                        it["status"] == 200
+                },
+                "Both original SDK owners must refresh through the HRIS gateway",
+            )
             trace.interruptNextRetainedSync()
             val interruptionDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(25)
             while (!trace.syncInterrupted()) {
@@ -301,20 +339,24 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 trace.heldRoomSendCount(),
                 "Unadmitted room attempted an encrypted send",
             )
+            // No fixture refresh is sent until native exchange, restarts and assertions finish.
+            // These requests replay the original successful SDK refresh; they may not rotate again.
+            val renewedSender = replaySdkRefresh(sender)
+            val renewedRecipient = replaySdkRefresh(recipient)
             verifyCiphertext(
-                sender,
+                renewedSender,
                 room,
                 proof.path("senderEventId").asString(),
                 sender.session.getValue("userId"),
             )
             verifyCiphertext(
-                recipient,
+                renewedRecipient,
                 room,
                 proof.path("recipientEventId").asString(),
                 recipient.session.getValue("userId"),
             )
             verifyCiphertext(
-                sender,
+                renewedSender,
                 room,
                 proof.path("ackSenderEventId").asString(),
                 sender.session.getValue("userId"),
@@ -356,6 +398,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 mapOf(
                     "passed" to true,
                     "encryptedBothDirections" to true,
+                    "sdkAccessRenewed" to true,
+                    "sameGatewayAfterRenewal" to true,
+                    "verificationUsedRefreshReplay" to true,
                     "logicalIdsPreserved" to true,
                     "cleanup" to true,
                     "protectedStoreReopened" to true,
@@ -425,10 +470,49 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     writePrivate(directory.resolve("gateway-trace.json"), trace.snapshot())
                 } finally {
                     Files.deleteIfExists(fixture)
+                    clock.followSystemTime()
                     if (interrupted) Thread.currentThread().interrupt()
                 }
             }
         }
+    }
+
+    private fun gatewayVersion(owner: SdkOwner): Long =
+        requireNotNull(
+            database()
+                .queryForObject(
+                    "select version from collaboration_gateway_sessions where id=? and native_session_id=? and device_id=? and revoked_at is null",
+                    Long::class.java,
+                    UUID.fromString(owner.session.getValue("gatewaySessionId")),
+                    owner.native.session,
+                    owner.device,
+                )
+        )
+
+    private fun replaySdkRefresh(owner: SdkOwner): SdkOwner {
+        val expected = owner.session.getValue("gatewayVersion").toLong() + 1
+        assertEquals(expected, gatewayVersion(owner))
+        val response =
+            owner.native.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/refresh"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Content-Type", "application/json")
+                    .POST(
+                        HttpRequest.BodyPublishers.ofString(
+                            json.writeValueAsString(
+                                mapOf("refresh_token" to owner.session.getValue("refreshToken"))
+                            )
+                        )
+                    )
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(200, response.statusCode(), "Original SDK refresh replay failed")
+        val value = json.readTree(response.body())
+        val access = value.path("access_token").asString()
+        assertTrue(access.isNotBlank() && access != owner.session.getValue("accessToken"))
+        assertEquals(expected, gatewayVersion(owner), "Verification replay rotated a gateway")
+        return SdkOwner(owner.native, owner.device, owner.session + ("accessToken" to access))
     }
 
     private fun verifyCiphertext(owner: SdkOwner, room: String, event: String, sender: String) {

@@ -1,0 +1,138 @@
+{
+  "startedAt": "2026-11-05T06:14:04.491472+00:00",
+  "elapsedSeconds": 123.99,
+  "exitCode": 0,
+  "sourceFiles": 12248,
+  "sourcesUnchanged": true,
+  "apkSha256": "3cedee245a0852b850c13e7f331d079c08bd883efcae52f295d2a667d1c985b0",
+  "apkUnchanged": true,
+  "counts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "reports": {
+    "TEST-dev.fajar.hris.NativeCollaborationSdkInteropTest.xml": {
+      "sha256": "9ac7bd51acfcf59e8cb28be8b11d7294413986f79551d23824319bf33305f02c",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "recordedAt": "2026-11-05T06:17:42.801626+00:00",
+  "parentCommit": "a6a6552198608c159de315b678191d6d2a0ae7a6",
+  "runtimeMatchesLiveCommit": "8b40bd0fb667bb39950f5e020157cba7ef27b3ba",
+  "mobileSourceCommit": "9d5ca633709f23588fd3fc9b29a88002bd4d3b4d",
+  "sourceManifestSha256": "22c70c8db337e770f0001ffd26ee6a042f015643cf55f156c50c6af5b58c5ee1",
+  "changedSources": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSdkInteropTest.kt": "00780161622abc61aed7999e5392b7d6f153f4af5213e6573f618705a8b92921",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeSdkGatewayTrace.kt": "0443f4aa56eafd617aaf491f30030729e05288d14d00d39feac5cbba14b9cc8c"
+  },
+  "nativeProof": {
+    "passed": true,
+    "encryptedBothDirections": true,
+    "sdkAccessRenewed": true,
+    "sameGatewayAfterRenewal": true,
+    "verificationUsedRefreshReplay": true,
+    "logicalIdsPreserved": true,
+    "cleanup": true,
+    "protectedStoreReopened": true,
+    "missingRecordPreserved": true,
+    "wrongPassphrasePreserved": true,
+    "exclusiveOwner": true,
+    "processRestarted": true,
+    "queueRestored": true,
+    "transactionReused": true,
+    "identityAfterRestart": true,
+    "messageIntentRestored": true,
+    "queueMappingRecovered": true,
+    "queueWriterExclusive": true,
+    "perRoomDeliveryIsolated": true,
+    "heldQueueRestored": true,
+    "nativeDeliveryOwned": true,
+    "commonSenderOwned": true,
+    "receiptJournalRecovered": true,
+    "projectionInterrupted": true,
+    "originalHistoryWindowOwned": true,
+    "historyBodiesRestored": true,
+    "nativeReadReceiptsExchanged": true,
+    "nativePrivateReceiptIsolated": true,
+    "nativeReadReceiptStoreRestored": true,
+    "nativeLocalReadIntentPrepared": true,
+    "nativeLocalReadIntentStoreRestored": true,
+    "nativeReadReceiptReplayAdmitted": true,
+    "nativeReadReceiptAckUncertaintyRecovered": true,
+    "commonHistoryAcquisitionOwned": true,
+    "latestHistoryHeadOwned": true,
+    "admittedHistoryHeads": true,
+    "providerHistoryPageOwned": true,
+    "commonProviderHistoryAcquisitionOwned": true,
+    "providerHistoryReferencesRestored": true,
+    "providerHistoryReferencesReconciled": true,
+    "providerHistoryRestartPreserved": true,
+    "historyRuntimeReopened": true,
+    "ackBeforeJournalRecovered": true,
+    "processRestartedAfterAck": true,
+    "completionCleanupRecovered": true,
+    "processRestartedAfterCompletion": true,
+    "encryptedSendCount": 3,
+    "admittedProviderPages": true,
+    "historyWindow": {
+      "originals": 2,
+      "unavailable": 9,
+      "extractionNanos": 9911121,
+      "modelCharacters": 4732,
+      "originalCharacters": 953
+    },
+    "applicationAdmittedBeforeSend": true,
+    "applicationAdmittedAroundHistory": true,
+    "applicationAdmissions": {
+      "device": 26,
+      "conversation": 26,
+      "room": 26,
+      "failures": 0
+    },
+    "heldRoomNeverSent": true,
+    "pausedAcrossRestart": true,
+    "syncInterruptedAfterRestart": true,
+    "syncRetriedWithRetainedCursor": true,
+    "artifact": {
+      "apkSha256": "3cedee245a0852b850c13e7f331d079c08bd883efcae52f295d2a667d1c985b0",
+      "package": "dev.fajar.hris.collaboration.proof",
+      "avd": "hris-mobile-dev",
+      "androidApi": "35"
+    }
+  },
+  "ownedEmulatorStop": {
+    "pid": 2073491,
+    "serial": "emulator-5562",
+    "stopped": true,
+    "signalSent": true,
+    "transportAbsent": true,
+    "seconds": 2.606
+  },
+  "mobileProofBuild": {
+    "startedAt": "2026-11-05T06:09:45.324318+00:00",
+    "elapsedSeconds": 168.282,
+    "exitCode": 0,
+    "sourceFiles": 4040,
+    "sourcesUnchanged": true,
+    "freshCounts": {
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "apkSha256": "3cedee245a0852b850c13e7f331d079c08bd883efcae52f295d2a667d1c985b0",
+    "commit": "9d5ca633709f23588fd3fc9b29a88002bd4d3b4d"
+  },
+  "testCaseSeconds": 51.293,
+  "limits": [
+    "Server clock advances past original gateway access expiry only after original native store restoration; Android wall time is unchanged. This is injected server-side credential age, not real five-minute waiting or clock-skew acceptance.",
+    "The fixed fixture clock keeps the existing 30-second refresh replay window open while the independent server ciphertext verifier runs. It does not prove arbitrarily late replay or lost-refresh recovery.",
+    "Normal native refresh/persistence passes. Actual Bima failure remains unproven; no private SDK/account data reset or production deployment.",
+    "No FCM/SystemUI, phone UI, Apple runtime, calls, meetings or performance acceptance. All 54 communications PRD groups remain open."
+  ]
+}

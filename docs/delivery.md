@@ -1,5 +1,31 @@
 # Delivery and validation
 
+## Mobile quoted reply UI and pending-send investigation — 5 November 2026
+
+Mobile [f6f770bb](https://github.com/fajarxfce/hris-mobile/commit/f6f770bb7ea1dc815b46119055b82e4e90f558e7) is pushed.
+Long-press Reply, composer/bubble quotes and checkpoint-driven local target previews
+are implemented; closing a quote preserves draft text. Send has no spinner, and a
+held connection does not block local acceptance or the next draft.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/f6f770bb7ea1dc815b46119055b82e4e90f558e7/docs/collaboration-chat-quoted-replies.md),
+[evidence](https://github.com/fajarxfce/hris-mobile/blob/f6f770bb7ea1dc815b46119055b82e4e90f558e7/docs/measurements/chat-quoted-replies-2026-11-05.json).
+
+Final Mobile root/Android/browser data and presentation/format/architecture pass:
+3,872 fresh cases, zero failures/errors/skips, 537.919s, 4,062 unchanged inputs.
+Focused42 pass; interrupted ui3 wrapper/original successful child recovery and
+subsequent normal root gate are recorded. Three reviewed renders remain hash-bound.
+No new actual SDK encrypted quoted reply proof or phone install is claimed.
+
+User confirms both OLD AND NEW Bima messages remain pending on phone32. Read-only
+metadata shows active original parent/device/key publication and normal gateway
+refreshes. Passive closed-category response samples show history/sync/join200 and
+optional m.secret_storage.default_key403; neither that optional rejection nor an
+older buffered ChatAuthSoftLogout proves the current send root cause. Mobile is
+investigating original SDK queue failure/recovery. Preserve all keys and intents.
+Actual native quoted reply/decryption/cold proof, validated envelope deployment and
+next announced install-only remain pending. Live8b40/schema116 and phone32 unchanged.
+Group runtime ports require their own validation. All54 PRD groups remain open;
+continue the authorized long run, atomic pushes, group adoption/UI, calls and meetings.
+
 ## Mobile quoted-reply intent — 5 November 2026
 
 Mobile [e47d9166](https://github.com/fajarxfce/hris-mobile/commit/e47d91662996a7fb724567ba7076938fc03d6724) is pushed.

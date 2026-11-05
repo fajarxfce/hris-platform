@@ -1,5 +1,24 @@
 # Agent continuation — HRIS workspace
 
+## Runtime correction and active CI — 5 November 2026
+
+[Read-only inspection](measurements/collaboration-runtime-flags-2026-11-05.json)
+corrects recent stale “chat pushOFF” notes: the running API and worker (started
+10:23:32UTC) and rendered Compose all have HRIS_COLLABORATION_PUSH_ENABLED,
+PUSH_CALLBACK_ENABLED and PUSH_DELIVERY_ENABLED=true. Worker FCM=true; SMTP=false.
+No setting was changed. Preserve these actual runtime flags during rollout; do
+not turn push off based on prior handoff summaries. This is configuration evidence,
+not a new notification-delivery acceptance run.
+
+Full CI42102966162 now runs exact54b10ce8a687294e8f39e609078830e2f1ec08d6 with
+35min dashboard-integration budget. Four dashboard and several backend shards have
+passed; remaining jobs running. Old42091460931 both attempts are cancelled/incomplete.
+Prepared stage-packages.py and stage-images.py now require42102966162/head54b10ce8.
+They are not executed. Product/migration source is unchanged from acceptedd03fb472.
+Retained database upgrade rehearsal200tables PASS; live remains11a98115/schema116.
+Mobile consumer-full3 is running after49 focused cases/strict lint pass; no new APK.
+
+
 ## CI dependency setup exhausted integration budget twice — 5 November 2026
 
 Product source remainsd03fb472. Full CI42091460931 attempt2 also reaches the20min

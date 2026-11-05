@@ -11,7 +11,8 @@ from collaboration_native_device import NativeDevice, PACKAGE, native_proof_seri
 from collaboration_hris_native import private_json, read_json, app_write_script, stop_process
 
 FLAGS = ("typedAuthRejection", "liveSyncRejected", "runtimeEntryRejected",
-         "localReadPolicyPreserved", "originalKeysPreserved", "ownedRuntimeDrained", "sameStoreCredentialsReplaced", "actualSdkSyncRestored")
+         "localReadPolicyPreserved", "originalKeysPreserved", "ownedRuntimeDrained", "sameStoreCredentialsReplaced", "actualSdkSyncRestored",
+         "queueOperationPreserved", "legacyQueueRecovered", "oldAndNewEncrypted", "retainedApiFailureRetried")
 
 
 def run(apk, sdk, directory):

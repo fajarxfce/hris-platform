@@ -23,6 +23,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val encryptedSendAllowed = AtomicBoolean()
     private val earlyEncryptedSends = AtomicInteger()
     private val acceptedEncryptedSends = AtomicInteger()
+    private val rejectNextEncrypted = AtomicBoolean()
+    private val rejectedEncryptedSends = AtomicInteger()
     private val heldRoom = AtomicReference<String?>()
     private val heldRoomSends = AtomicInteger()
     private val applicationDeviceReads = AtomicInteger()
@@ -142,6 +144,12 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
 
     fun acceptedEncryptedSendCount() = acceptedEncryptedSends.get()
 
+    fun rejectNextEncryptedSend() {
+        check(rejectNextEncrypted.compareAndSet(false, true))
+    }
+
+    fun rejectedEncryptedSendCount() = rejectedEncryptedSends.get()
+
     private fun recordApplicationAdmission(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -240,6 +248,19 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 ContentCachingRequestWrapper(request, 65_536)
             else null
         try {
+            if (
+                request.method == "PUT" &&
+                    request.requestURI.matches(encryptedSendRoute) &&
+                    rejectNextEncrypted.compareAndSet(true, false)
+            ) {
+                rejectedEncryptedSends.incrementAndGet()
+                response.status = 403
+                response.contentType = "application/json"
+                response.writer.write(
+                    """{"errcode":"M_FORBIDDEN","error":"fixture send rejection"}"""
+                )
+                return
+            }
             val cursor =
                 if (request.method == "GET" && request.requestURI == "/_matrix/client/v3/sync")
                     request.getParameter("since")?.let {

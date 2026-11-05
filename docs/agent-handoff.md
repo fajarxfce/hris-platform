@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Queued-auth-recovery native acceptance passed — 5 November 2026
+
+Mobile [745e5a02](https://github.com/fajarxfce/hris-mobile/commit/745e5a0256904453992e5e864bdd59e373de9513)
+is pushed. Stable queue operation survives credential replacement; affected legacy
+bindings require exact retained transactions in the same native family/device/room.
+Bounded retry releases API/auth failures without bypassing trust checks. Empty chat
+keeps the composer and removes manual network controls.
+[Native contract](collaboration/sdk-queue-recovery.md),
+[evidence](measurements/chat-queue-recovery-2026-11-05.json).
+
+Both actual native suites pass165.743s/two cases/zero skips/12,281 unchanged inputs,
+exact APK02269c9531c519579d334e25af2ea1caa58fb2cfa81f3e6a1ac284fb3961bb6e. The
+one-shot403 leaves an original message parked; SDK auth replacement preserves keys
+and queue ownership; a reproduced legacy record then permits a new message and
+both decrypt at the peer with original transaction/receipt bindings. Server
+assertions require exactly two accepted sends, one rejection and no premature
+send. Earlier quote/process death/cold-offline native coverage remains passing.
+Driver31 pass0.130s; emulator stopped1.604s with transport absence verified.
+
+Mobile :check/Android/browser passed1,241 fresh cases; packaging alone failed,
+then identical4,070 source inputs packaged/proof-tested55.536s/18 fresh. Focused54
+fresh pass380.779s, domain43 earlier. Earlier failed attempts are recorded; three
+current renders reviewed. Physical-phone Bima acceptance remains pending.
+
+Main changes are test fixtures/docs only. Live API/worker11a98115/schema116 and
+phone33 remain unchanged. Mobile clean signed release34 build/lint is now running;
+then exact-APK emulator check and EACH phone install announced before install-only.
+Apple CI42009694285 passed prior Mobile36e78206/release33 only. Group mirrorbf43351c
+will be updated after paired commits. All54 PRD groups open; continue long run.
+
 ## Quoted backend live and current product FCM accepted — 5 November 2026
 
 Live API/worker source11a98115 (bounded reply enveloped4f34140) replaces8b40 using

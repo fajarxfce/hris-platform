@@ -1,5 +1,9 @@
 package dev.fajar.hris
 
+import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
+import dev.fajar.hris.core.domain.Result
 import java.net.URI
 import java.net.http.*
 import java.nio.file.Files
@@ -33,6 +37,8 @@ import org.springframework.test.context.TestPropertySource
 )
 class NativeCollaborationSdkAuthInteropTest : NativeGatewaySdkFixture() {
     @Autowired private lateinit var trace: NativeSdkGatewayTrace
+    @Autowired private lateinit var matrix: CollaborationMatrixRepository
+    @Autowired private lateinit var rooms: CollaborationMatrixRoomRepository
 
     companion object {
         private val provider by lazy { NativeSdkMatrixServer() }
@@ -61,6 +67,11 @@ class NativeCollaborationSdkAuthInteropTest : NativeGatewaySdkFixture() {
     @Timeout(value = 5, unit = TimeUnit.MINUTES)
     fun actualSdkRecoversRejectedRefreshOnTheOriginalGatewayWithoutReplacingPrivateKeys() {
         val owner = sdkOwner(native())
+        val recipient = sdkOwner(sdkPeer(owner.native))
+        val conversation = UUID.randomUUID()
+        val room = createRoom(owner, recipient, conversation)
+        trace.allowEncryptedSends()
+        trace.rejectNextEncryptedSend()
         val root =
             generateSequence(Path.of(System.getProperty("user.dir")).toAbsolutePath()) { it.parent }
                 .take(5)
@@ -74,7 +85,17 @@ class NativeCollaborationSdkAuthInteropTest : NativeGatewaySdkFixture() {
         val fixture = directory.resolve("fixture.json")
         writePrivate(
             fixture,
-            mapOf("baseUrl" to "http://127.0.0.1:$port", "owner" to owner.session),
+            mapOf(
+                "baseUrl" to "http://127.0.0.1:$port",
+                "owner" to (owner.session + ("hrisAccessToken" to owner.native.access)),
+                "recipient" to recipient.session,
+                "roomId" to room,
+                "conversationId" to conversation.toString(),
+                "oldLogicalId" to UUID.randomUUID().toString(),
+                "newLogicalId" to UUID.randomUUID().toString(),
+                "oldBody" to "Fictional retained message before credential replacement",
+                "newBody" to "Fictional new message after credential replacement",
+            ),
         )
         var process: Process? = null
         try {
@@ -110,6 +131,8 @@ class NativeCollaborationSdkAuthInteropTest : NativeGatewaySdkFixture() {
             }
             val originalVersion = owner.session.getValue("gatewayVersion").toLong()
             assertEquals(originalVersion, gatewayVersion(owner))
+            assertEquals(1, trace.rejectedEncryptedSendCount())
+            assertEquals(0, trace.acceptedEncryptedSendCount())
             // The fixture clock is fixed; move beyond the real ten-second rotation guard.
             clock.set(clock.instant().plusSeconds(11))
             // A second admitted bootstrap supersedes SDK credentials on the SAME device and
@@ -133,10 +156,17 @@ class NativeCollaborationSdkAuthInteropTest : NativeGatewaySdkFixture() {
                     "localReadPolicyPreserved",
                     "sameStoreCredentialsReplaced",
                     "actualSdkSyncRestored",
+                    "queueOperationPreserved",
+                    "legacyQueueRecovered",
+                    "oldAndNewEncrypted",
+                    "retainedApiFailureRetried",
                     "originalKeysPreserved",
                     "ownedRuntimeDrained",
                 )
             for (flag in flags) assertTrue(result.path(flag).asBoolean(), flag)
+            assertEquals(2, trace.acceptedEncryptedSendCount())
+            assertEquals(1, trace.rejectedEncryptedSendCount())
+            assertEquals(0, trace.earlyEncryptedSendCount())
             assertTrue(
                 trace.snapshot().any {
                     it["route"] == "/_matrix/client/v3/refresh" && it["status"] == 401
@@ -195,6 +225,43 @@ class NativeCollaborationSdkAuthInteropTest : NativeGatewaySdkFixture() {
                 }
             }
         }
+    }
+
+    private fun createRoom(owner: SdkOwner, recipient: SdkOwner, conversation: UUID): String {
+        val now = clock.instant()
+        val loggedIn =
+            matrix.login(
+                CollaborationMatrixLogin(
+                    owner.native.fixture.company,
+                    owner.native.fixture.account,
+                    owner.device,
+                    now,
+                    now.plusSeconds(60),
+                )
+            )
+        assertInstanceOf(Result.Success::class.java, loggedIn)
+        val created =
+            rooms.create(
+                CollaborationMatrixDirectRoom(
+                    owner.native.fixture.company,
+                    conversation,
+                    owner.native.fixture.account,
+                    recipient.native.fixture.account,
+                ),
+                (loggedIn as Result.Success).value.accessToken,
+                clock.instant().plusSeconds(20),
+            )
+        assertInstanceOf(Result.Success::class.java, created)
+        val room =
+            ((created as Result.Success).value as CollaborationMatrixRoomCreation.Created).roomId
+        publishSdkRoom(
+            owner.native,
+            owner.device,
+            recipient.native.fixture.account,
+            room,
+            conversation,
+        )
+        return room
     }
 
     private fun clearFixture(original: Path, replacement: Path) {

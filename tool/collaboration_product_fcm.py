@@ -38,8 +38,10 @@ def setup_product(device, fixture, directory):
         fields = [n for n in device.tree().iter("node") if n.get("class") == "android.widget.EditText"]
         if len(fields) != 2:
             raise ValueError("Product login does not expose its two fields")
+        mark("entering_email" if index == 0 else "entering_password")
         device.tap(fields[index])
-        device.command("shell", "input", "text", input_text(value))
+        # Cold IME input can outlast ordinary ADB reads. Never retry uncertain typing.
+        device.command("shell", "input", "text", input_text(value), timeout=45)
     device.command("shell", "input", "keyevent", "KEYCODE_BACK")
     mark("submitting_login")
     device.click("Sign in")

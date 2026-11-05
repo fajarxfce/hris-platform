@@ -176,3 +176,19 @@ does not activate it. Full Verify found a dashboard test pressing Escape before
 its optional verification dialog finished the fresh check. The readiness assertion
 now waits for aria-busy=false; all nine assurance browser cases pass19.768s. A
 replacement full release gate, deployment checkpoints and live ingress checks remain.
+
+## Current build input timeout — 5 November 2026
+
+Current Mobile36e78206 product/peer fixture builds pass116.057s; current worker build
+passes13.602s. The first new actual attempt fails229.141s/one fresh case at ADB text
+input during login setup. The captured UI tree contains readable login controls;
+no crash/ANR markers appear in captured diagnostics. No valid screenshot, native
+registration, Matrix pusher or send is accepted. Both cleanups pass; independent
+checks confirm the owned emulator/transport, disposable image and fixture credentials
+are gone. [Evidence](../measurements/product-chat-fcm-input-2026-11-05.json).
+
+Only fixture typing now has a45-second budget, with separate email/password progress
+markers. An uncertain typing command is never retried. Normal read, provider, delivery,
+cleanup and overall deadlines remain unchanged.25 driver regressions pass0.013s.
+Repeat the actual scenario with unchanged APKs/worker; this is not a product send fix.
+Phone release33 remains prepared pending full backend CI and validated rollout.

@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Current product FCM setup attempt — 5 November 2026
+
+Current Mobile36e78206 product/peer debug fixtures build116.057s; worker13.602s.
+Actual product FCM attempt fails229.141s/one fresh case at ADB typing during login.
+Login UI is visible; no crash marker, registration/pusher/send or valid screenshot
+accepted. Driver and independent cleanup verify owned emulator/transport/image and
+fixture credentials removed. [Evidence](measurements/product-chat-fcm-input-2026-11-05.json).
+Only fixture typing gets45seconds and email/password stage markers; no uncertain
+input retry.25 Python cases pass. Repeat actual scenario with the same artifacts.
+
+Release33 ARM64 source36e78206 is ready: build522.126s/lint0, exact APK e97aceff,
+88,337,740bytes, signer/Firebase/WireGuard/16KiB/backup/closedmarkers verified. Two
+owned cold starts52.162s,12stable each and reviewed PNGs; emulator stopped. Phone
+preflight32 same signer, still NOT installed. CI42004588608 has13/14 jobs passed;
+await dashboard integration. Then Main work .work/chat-quoted-reply-2026-11-05/
+stage-packages.py,stage-images.py,deploy-apps.py (prepared, NOT executed); API/worker
+image-only update preserves Matrix/TLS/data. Announce EACH phone install before
+install-only. Do not run Mobile release33 record.py before actual installation.
+
+Old AND new Bima sends remain pending. New diagnostic release is needed to identify
+the failing stage/retained SDK failure. Preserve keys/intents; no question pending.
+All54 groups remain open. Continue long run and push every commit.
+
 ## Actual encrypted quoted replies verified — 5 November 2026
 
 The actual recipient decrypts the third message with its exact first-event quote.

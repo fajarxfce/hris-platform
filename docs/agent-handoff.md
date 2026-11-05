@@ -1,5 +1,41 @@
 # Agent continuation — HRIS workspace
 
+## Release 37 delivered; Chat/Contacts and stable inbox are current priority — 5 November 2026
+
+Mobile source 5a8d45240e1e21f0b2c7a3fca6629be1ecf65159 is installed in place on the
+authorized phone as ARM64 devRelease 37, SHA256
+724f4be58de4ff27e3fbedac367e8edb0239180271442db5a09b0d3f848af738. Data, signer and
+app identity retained; install-only, no phone UI driven. Mobile cf054b46 records
+actual offline Forward to two chats, cold restart, reconnect without duplicates,
+decrypted reception and cold offline retention on both Android receivers. Retained
+Bima passes four saved-end history checks (eight rows, no Older/decryption error).
+Mobile Apple 42054097304 passes exact source: 1,273 cases/148 suites and full app.
+
+Starter generic batch port 0fa8e094d29b4a4bb690962db2c48f87a98f4d34 is pushed;
+independent root/SQLite/browser/Android/lint/Web pass 803.314 s. Its Apple run
+42061944252 is active. One GitHub push failure and an HTTP 502 dispatch were
+reconciled before retry; do not dispatch again while that run is active.
+
+Latest user steering combines Employees and Chat into one bottom destination and
+reports chat-list blinking. Mobile work in .work/chat-hub-2026-11-05 now groups
+Conversations/Contacts, preserves owned previews across names-only local emissions,
+and skips unchanged encrypted summary writes. Focused gate is running; no new
+build/acceptance yet. Metadata summaries still use bounded UUID pages, not a delta
+feed. Message transport separately uses incremental Matrix positions. Do not claim
+the metadata synchronization gap is solved by a no-op write or a UI fix.
+
+Unvalidated five-file edit-policy/decoder WIP is protected in Mobile stash
+a34a7b2261f4ea35df0bad44412cfc40ef9e5f20; older bfdef2ce stash remains protected too.
+Resume delivered-message revisions after the current user corrections; preserve
+original send evidence and the PRD 15-minute server-acceptance window.
+
+Backend 11a98115/schema116 unchanged; group V117–137 remain unshipped and chat push
+rollout remains off. No SQL/provider mutation in this checkpoint. Owned Bima emulator
+5562 remains the release37 receiver (verify current start record); other three
+fictional devices are stopped with data/keys/sidecars intact. Continue metadata
+delta synchronization, edits/delete/groups/calls/meet; all 54 PRD groups remain open.
+Push each commit, notify before each authorized phone installation, install-only.
+
 ## All four fictional receivers ready; forwarding resumes — 5 November 2026
 
 Phone release36 is installed from Mobilea26a1248 (delivery docsa5bc4190),

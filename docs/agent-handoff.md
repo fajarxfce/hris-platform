@@ -1,40 +1,50 @@
 # Agent continuation — HRIS workspace
 
-## Release 37 delivered; Chat/Contacts and stable inbox are current priority — 5 November 2026
+## Chat hub validated; release 38 builds, metadata deltas remain next — 5 November 2026
 
-Mobile source 5a8d45240e1e21f0b2c7a3fca6629be1ecf65159 is installed in place on the
-authorized phone as ARM64 devRelease 37, SHA256
-724f4be58de4ff27e3fbedac367e8edb0239180271442db5a09b0d3f848af738. Data, signer and
-app identity retained; install-only, no phone UI driven. Mobile cf054b46 records
-actual offline Forward to two chats, cold restart, reconnect without duplicates,
-decrypted reception and cold offline retention on both Android receivers. Retained
-Bima passes four saved-end history checks (eight rows, no Older/decryption error).
-Mobile Apple 42054097304 passes exact source: 1,273 cases/148 suites and full app.
+Mobile [34e68b128bd9fa80ccc817d8e008caf850920d96](https://github.com/fajarxfce/hris-mobile/commit/34e68b128bd9fa80ccc817d8e008caf850920d96)
+is committed/pushed. Four root destinations now group Conversations/Contacts inside
+Chat. Contacts retains the company employee directory; New chat opens the existing
+cross-company participant picker. Rows are not yet account-resolved chat actions;
+Calls remains future work. Same-owner previews survive names-only local emissions,
+duplicate list emissions do not restart details, identical metadata skips encrypted
+writes, and an empty Next acquisition no longer reacts to unrelated later rows.
 
-Starter generic batch port 0fa8e094d29b4a4bb690962db2c48f87a98f4d34 is pushed;
-independent root/SQLite/browser/Android/lint/Web pass 803.314 s. Its Apple run
-42061944252 is active. One GitHub push failure and an HTTP 502 dispatch were
-reconciled before retry; do not dispatch again while that run is active.
+Mobile full2 PASSES root check/Android/browser/proof build-tests:1,045 fresh cases,
+399.451s,4,103 unchanged inputs; zero failures/errors/skips. All90 AppFlow cases pass.
+The earlier full1 login timeout and emulator exit under host load are retained in
+[measurement](https://github.com/fajarxfce/hris-mobile/blob/34e68b12/docs/measurements/chat-hub-2026-11-05.json).
+Six synthetic compact/dark200%/landscape captures reviewed. Clean ARM64 release38
+build/lint now runs in Mobile .work/release-phone-2026-11-05-build38; freeze its HEAD
+and working tree until the wrapper and children drain. No38 artifact/delivery yet.
+[Mobile Apple42069899173](https://github.com/fajarxfce/hris-mobile/actions/runs/42069899173)
+runs exact34e68b12; do not dispatch another same-branch Apple run.
 
-Latest user steering combines Employees and Chat into one bottom destination and
-reports chat-list blinking. Mobile work in .work/chat-hub-2026-11-05 now groups
-Conversations/Contacts, preserves owned previews across names-only local emissions,
-and skips unchanged encrypted summary writes. Focused gate is running; no new
-build/acceptance yet. Metadata summaries still use bounded UUID pages, not a delta
-feed. Message transport separately uses incremental Matrix positions. Do not claim
-the metadata synchronization gap is solved by a no-op write or a UI fix.
+Phone remains37, SHA256724f4be58de4ff27e3fbedac367e8edb0239180271442db5a09b0d3f848af738,
+with Forward/native and four retained Bima history checks accepted. It was reachable
+at16:44UTC. All owned emulator images are now stopped; old PID records are stale.
+After build verify artifact, start retained Rani/sample1, update37→38, run prepared
+hub/Newchat/offline/cold-restart proof; no new messages needed. Then restore Bima as
+receiver and announce EACH phone install, explicit10.77.77.3:5555,--install-only.
+Never drive phone UI; preserve all userdata, sidecars, keys and native identities.
 
-Unvalidated five-file edit-policy/decoder WIP is protected in Mobile stash
-a34a7b2261f4ea35df0bad44412cfc40ef9e5f20; older bfdef2ce stash remains protected too.
-Resume delivered-message revisions after the current user corrections; preserve
-original send evidence and the PRD 15-minute server-acceptance window.
+Starter independent batch Apple42061944252 PASSES118cases/31suites, six batch cases,
+full simulator app/associations. All ten exact-port hashes verified; docs f99650d
+pushed. No pending Starter batch acceptance or source port for HRIS hub policy.
 
-Backend 11a98115/schema116 unchanged; group V117–137 remain unshipped and chat push
-rollout remains off. No SQL/provider mutation in this checkpoint. Owned Bima emulator
-5562 remains the release37 receiver (verify current start record); other three
-fictional devices are stopped with data/keys/sidecars intact. Continue metadata
-delta synchronization, edits/delete/groups/calls/meet; all 54 PRD groups remain open.
-Push each commit, notify before each authorized phone installation, install-only.
+Metadata summary HTTP still uses UUID pages, NOT changed-only acquisition; Matrix
+message transport already uses incremental positions. No-op storage/retained UI is
+not completion of the HTTP delta requirement. [Backend continuation](collaboration/direct-summaries.md#incremental-metadata-follow-up)
+records existing journal and immutable-identity constraints; no SQL/runtime change
+has been made. Live backend11a98115/schema116 and chat pushOFF remain unchanged.
+Group V117–137 are still unshipped; coordinate migration numbering before adding a
+new production migration. No group cutover or physical iPhone acceptance is claimed.
+
+Protected Mobile editing WIP stasha34a7b2261f4ea35df0bad44412cfc40ef9e5f20 (five
+unvalidated decoder/policy files) and oldbfdef2ce remain. Continue metadata deltas,
+editing/deletion/groups/calls/meet; immutable original send evidence and the15-minute
+server-acceptance edit window remain required. All54 PRD groups remain open.
+Push every commit; current user corrections do not cancel the larger task.
 
 ## All four fictional receivers ready; forwarding resumes — 5 November 2026
 

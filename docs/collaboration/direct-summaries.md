@@ -38,3 +38,31 @@ product conversation-list/offline acceptance remain separate work.
 [Verification](../measurements/collaboration-direct-summaries-2026-11-01.json)
 records 25 database and nine HTTP cases (75s), followed by the final HTTP fixture
 resource-ownership check (49s). The initial cookie-fixture failure is retained.
+
+## Incremental metadata follow-up
+
+The current endpoint is **not** a change feed. Mobile34e68b12 removes identical
+local writes and partial-preview flicker; it does not reduce unchanged HTTP pages
+to deltas. The user's changed-only synchronization requirement remains open.
+
+Implementation must keep immutable direct identity (`version=0`, V110's mutation
+trigger) separate from mutable peer-label projection revisions. Do not repurpose
+conversation version or infer changes from a UUID page or wall-clock timestamp.
+Existing `mobile_sync_heads`/`mobile_sync_changes` and their worker publisher assign
+positions after business transactions commit; inspect V39 and subsequent collection
+migrations before reusing that raw publication mechanism. A native collaboration
+reader must retain current native parent, build, company, permission and account
+guards; access to a generic company sync cursor is not native chat admission.
+
+The follow-up needs bounded initial snapshot and incremental pages, a captured
+publication boundary, resumable opaque owner-scoped cursors, atomic local facts plus
+cursor publication, no-change responses, deletion markers and explicit expired-cursor
+recovery. Tests must cover late transaction commits, duplicate/uncertain page replies,
+peer-name changes, snapshot/delta overlap, removals, revoked admission and foreign
+owner/company cursors. Offboarding a counterpart alone must not erase previously
+owned metadata or pretend they remain eligible to receive new messages.
+
+Group migrations V117–137 exist on the separate communication-space branch and have
+not shipped. Coordinate their numbering/integration before adding the metadata
+projection migration. No new schema, delta endpoint or production rollout is claimed
+by these continuation notes.

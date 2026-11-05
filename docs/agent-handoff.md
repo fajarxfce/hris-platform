@@ -1,5 +1,12 @@
 # Agent continuation — HRIS workspace
 
+## Edit release CI running — 5 November 2026
+
+Product029c58283726ea4a44e9c0fc45f91428a128f3c6 is committed/pushed. Full Verify
+[42120370137](https://github.com/fajarxfce/hris-platform/actions/runs/42120370137)
+was dispatched once on that exact head and is running. Do not duplicate it.
+Local166-case acceptance and all remaining work are below. No deployment yet.
+
 ## Edit envelope accepted locally; receiver work continues — 5 November 2026
 
 [Contract](collaboration/message-edit-envelope.md) and

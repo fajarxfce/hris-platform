@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Original queued-message recovery verified — 5 November 2026
+
+Mobile [745e5a02](https://github.com/fajarxfce/hris-mobile/commit/745e5a0256904453992e5e864bdd59e373de9513)
+and Main [fd1a2b96](https://github.com/fajarxfce/hris-platform/commit/fd1a2b96) are pushed.
+The SDK store retains its original queue operation across credential replacement.
+Legacy mappings require exact retained transactions in the same native/device/room;
+ordinary API/auth failures retry with original transactions, excluding trust errors.
+Empty rooms keep the composer without manual network controls.
+[Implementation](https://github.com/fajarxfce/hris-mobile/blob/745e5a0256904453992e5e864bdd59e373de9513/docs/collaboration-chat-queue-recovery.md),
+[evidence](https://github.com/fajarxfce/hris-platform/blob/fd1a2b96/docs/measurements/chat-queue-recovery-2026-11-05.json).
+
+Actual native acceptance165.743s/two suites/zero skips/12,281 unchanged inputs.
+A real rejected old message survives credential replacement and reproduced legacy
+metadata; a new message stages while it is pending, then both decrypt at the peer
+using original transactions/receipts. Original keys/device/parent remain intact.
+The earlier quoted reply/process death/cold-offline history suite also passes.
+Driver31 pass0.130s; emulator stopped1.604s. Mobile :check/Android/browser pass1,241
+fresh; initial package failure recovered without source changes55.536s/18 fresh,
+with all4,070 source hashes identical. Prior fixture/UI failures are preserved.
+Three normal/large-text empty-room renders reviewed.
+
+Clean signed release34 build/lint is RUNNING in Mobile. Phone remains33; physical
+Bima old/new-send acceptance still pending. Follow exact APK emulator validation,
+then announce EACH install before install-only to10.77.77.3:5555. Live API/worker
+11a98115/schema116 unchanged: Main changes only test fixtures/docs. New Apple-only
+CI was requested for745e5a02; previous42009694285 passed36e78206 only. These runtime
+fixes are not ported to this branch's separate group SDK flow and have no Starter
+port. Group V117–137 remain unshipped. Continue all54 open PRD groups and push every
+commit; the pending-message complaint does not cancel the wider communications task.
+
 ## Release 33, current FCM acceptance, and active queue recovery — 5 November 2026
 
 Mobile [ae6872a2](https://github.com/fajarxfce/hris-mobile/commit/ae6872a2)

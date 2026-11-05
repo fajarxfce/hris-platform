@@ -1,8 +1,46 @@
 # Incremental direct-summary metadata
 
-Storage capture and the bounded projection worker are accepted locally. The current
-live summary endpoint still acquires UUID pages. Dedicated native HTTP cursors and
-the atomic Mobile consumer remain in progress; no delta endpoint is delivered yet.
+Storage capture, bounded projection and the dedicated native metadata feed are
+accepted locally. The live endpoint still acquires UUID pages. Deployment and the
+atomic Mobile consumer remain pending; changed-only acquisition is not yet delivered.
+
+
+## Accepted native feed
+
+Native Android/iOS clients read `/api/v1/companies/{companyId}/collaboration/direct-conversations/summary-sync/bootstrap`
+and `/changes`. The bootstrap cursor is optional only for the initial request;
+changes always requires one. Limits are 1–50. Bootstrap returns ordered metadata
+facts, either `nextPage` or `changesCursor`, `pending`, and `serverTime`. Changes
+returns ordered publication positions with current versioned facts, `nextCursor`,
+`hasMore`, `pending`, and `serverTime`. Null summaries are retained tombstones.
+Message bodies remain in the independent Matrix transport.
+
+Opaque authenticated cursors bind company, account, stable native parent,
+credential/company/membership versions, journal epoch and phase. Ordinary access
+rotation preserves the parent. Invalid framing/owner is rejected; scope changes,
+expired retention and out-of-range journal positions require a new bootstrap.
+Bootstrap expires after 15 minutes and is bounded to 1,000 pages. Changes captures
+a finite upper position for each round and renews its seven-day lifetime only at
+the round boundary. Source record revisions are independent of canonical version0.
+
+One batch hydrates at most50 distinct conversation identities per change page.
+Returning the current higher revision at an earlier reference prevents an old
+withdrawal from erasing a later restoration. The initial snapshot captures a
+publication boundary; clients must catch up afterward and wait for `pending=false`
+before replacing their visible generation. One coherent pending query includes
+relevant account fanout, owned pair refresh and unpublished owned references.
+Current policy, company/member/account and native-parent admission are checked
+before acquisition and again after either its successful or failed result. Cursor
+time is rechecked after I/O. Explicit owner predicates supplement company RLS.
+
+[Feed evidence](../measurements/collaboration-summary-feed-2026-11-05.json):
+focused correction passes10 fresh HTTP cases74.113s; the broad gate passes139
+fresh cases432.482s with zero failures/errors and one existing opt-in worker skip.
+The full worker application graph, 16 native HTTP cases, format and architecture
+pass on8,240 unchanged inputs. Six new policy/codec cases and three existing
+Matrix cursor cases passed earlier and remain unchanged. Failed fixture and
+compile attempts are retained in the evidence. No live deploy or Mobile delta
+acceptance is claimed.
 
 ## Accepted projection worker
 

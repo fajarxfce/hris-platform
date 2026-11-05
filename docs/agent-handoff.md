@@ -1,5 +1,42 @@
 # Agent continuation — HRIS workspace
 
+## Native summary feed accepted; atomic Mobile consumer next — 5 November 2026
+
+Dedicated bootstrap/delta metadata HTTP, authenticated cursor codec/policy and raw
+read repositories are accepted on31fa5067. [Contract](collaboration/direct-summary-sync.md)
+and [evidence](measurements/collaboration-summary-feed-2026-11-05.json).
+Full worker/API gate feed-full1 passes139 fresh cases432.482s, zero failures/errors,
+one existing opt-in elapsed-retention skip;8,240 inputs unchanged. Six new policy/
+codec and three existing Matrix cursor cases passed unchanged in feed1. feed3
+passes10 fresh HTTP cases74.113s. Earlier fixture/compile failures are documented.
+All Platform gate wrappers and children have drained; product sources may be edited.
+
+Stable native-parent cursors survive ordinary token rotation; current permission,
+MFA/client admission and time are rechecked after success/failure. Finite pages,
+late-commit publication, pending fanout/pairs/journal, one-batch current revision
+hydration, cross-account RLS and versioned tombstones/restoration are covered.
+No migration beyond116.1, no live deployment. Live11a98115/schema116/chat pushOFF.
+Full release/CI/artifact/deployment acceptance still precedes consumer rollout.
+
+NEXT: Mobile has eight formatted but uncommitted transport/DTO/repository/test
+files for this feed. Focused desktop/browser/Android gate transport1 is running;
+keep its sources frozen until wrapper40811 drains. Local atomic consumer/storage
+is not implemented. Preserve visible generation during bootstrap/catch-up, publish
+only after pending=false, and retain tombstones/version comparisons and exact
+cursor+facts CAS. Interactive new conversations must not wait for all bootstrap
+pages: planned exact-CAS staging discard preserves the active generation, while
+late background commits fail. Bounded working-generation reads include tombstones.
+These reusable storage primitives require Mobile proof before their Starter port.
+
+Phone release39 remains installed and accepted; Mobile Apple42081732094 is now
+fully audited:1,274 cases/148 suites, full Xcode simulator app/associations pass.
+Do not reinstall39 or repeat accepted native Forward publications. Starter six-file
+UI porte501d4da is locally accepted/pushed; Apple42088401280 passed simulator tests
+and is building its full app as of19:05UTC. Audit final job and artifact once done.
+Preserve fixture images/sidecars/keys, both Mobile stashes, numeric dotted migration
+ordering and unshipped group117–137. Continue long run through remaining54 PRD groups.
+
+
 ## Direct-summary worker accepted; native delta feed next — 5 November 2026
 
 Bounded metadata projection is implemented on66d18b2d and passes the full worker

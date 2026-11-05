@@ -66,3 +66,7 @@ Group migrations V117–137 exist on the separate communication-space branch and
 not shipped. Coordinate their numbering/integration before adding the metadata
 projection migration. No new schema, delta endpoint or production rollout is claimed
 by these continuation notes.
+
+V116.1 now provides [validated raw capture and projection storage](direct-summary-sync.md).
+Worker execution, the admitted delta reader and Mobile integration remain pending;
+this additive version precedes the unshipped group range without renumbering it.

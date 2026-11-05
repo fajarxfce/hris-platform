@@ -17,6 +17,7 @@ import database_recovery as database
 from database_recovery import RecoveryError
 from recovery_archive import capture_file, inspect_archive, restore_archive
 from recovery_storage import GARAGE_IMAGE, MAX_CONTENT, MAX_METADATA, restored_garage, scan_storage
+from migration_versions import migration_version
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVICES = ("api", "worker", "garage", "database")
@@ -41,7 +42,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V113 adds a public recipient projection; no new secret envelope format.
 # V115 retains encrypted opaque Matrix push keys bound to immutable native devices.
 # V116 retains bounded wake/lease metadata; no new encrypted envelope format.
-MAX_SCHEMA = 116
+# V116.1 adds public summary projections and raw queues, not encrypted envelopes.
+# CollaborationSummaryMigrationTest verifies their real dump/restore and guards.
+MAX_SCHEMA = (116, 1)
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -58,20 +61,20 @@ BASE_ENVELOPES_SQL = """
 
 
 def envelope_query(schema):
-    validate_schema({"observedSchema": schema})
+    version = validate_schema({"observedSchema": schema})
     collaboration = ""
-    if int(schema) >= 106:
+    if version >= (106,):
         collaboration = """
  UNION ALL SELECT 'hris:matrix:'||company_id||':'||account_id||':'||device_id||':'||generation, token_encrypted
  FROM collaboration_provider_sessions WHERE token_encrypted IS NOT NULL
 """
-    if int(schema) >= 107:
+    if version >= (107,):
         collaboration = collaboration.replace(
             "||generation, token_encrypted",
             "||generation||CASE WHEN token_expires_at IS NULL THEN '' ELSE ':expires:'||"
             "((extract(epoch FROM token_expires_at)*1000000)::bigint)::text END, token_encrypted",
         )
-    if int(schema) >= 109:
+    if version >= (109,):
         fields = [
             "company_id::text", "account_id::text", "device_id::text", "id::text",
             "native_session_id::text", "platform", "client_build::text", "version::text",
@@ -85,7 +88,7 @@ def envelope_query(schema):
         collaboration += (" UNION ALL SELECT 'hris:matrix-gateway:v1:'||"
                           "encode(sha256(convert_to(" + canonical + ",'UTF8')),'hex'),replay_encrypted"
                           " FROM collaboration_gateway_sessions WHERE replay_encrypted IS NOT NULL\n")
-    if int(schema) >= 115:
+    if version >= (115,):
         fields = ["company_id::text", "account_id::text", "device_id::text", "native_session_id::text",
                   "((extract(epoch FROM reserved_at)*1000000)::bigint)::text", "key_hash"]
         canonical = "||':'||".join(fields)
@@ -225,9 +228,13 @@ def validate_garage_config(path):
 
 def validate_schema(manifest):
     try:
-        schema = int(manifest["observedSchema"])
-        if not 59 <= schema <= MAX_SCHEMA:
+        value = manifest["observedSchema"]
+        if type(value) not in (str, int):
             raise ValueError()
+        schema = migration_version(str(value))
+        if not (59,) <= schema <= MAX_SCHEMA or (len(schema) > 1 and schema != (116, 1)):
+            raise ValueError()
+        return schema
     except (KeyError, TypeError, ValueError):
         raise RecoveryError("The source schema requires a reviewed recovery verifier") from None
 

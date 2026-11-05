@@ -25,6 +25,7 @@ val generateJooq by
         group = "code generation"
         inputs.dir("src/main/resources/db/migration")
         inputs.file(rootProject.file("tool/generate_jooq.py"))
+        inputs.file(rootProject.file("tool/migration_versions.py"))
         inputs.files(jooqGenerator)
         outputs.dir(generated)
         doFirst {
@@ -41,3 +42,21 @@ val generateJooq by
 sourceSets.main { java.srcDir(generated) }
 
 tasks.named("compileKotlin") { dependsOn(generateJooq) }
+
+val migrationVersionTest by
+    tasks.registering(Exec::class) {
+        group = "verification"
+        workingDir(rootProject.projectDir)
+        commandLine(
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tool",
+            "-p",
+            "test_migration_versions.py",
+        )
+    }
+
+tasks.named("check") { dependsOn(migrationVersionTest) }

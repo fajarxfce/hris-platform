@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Metadata storage accepted; latest UI feedback is active — 5 November 2026
+
+[Summary delta storage](collaboration/direct-summary-sync.md) now passes64 database/
+sync regressions229.29s plus migration-order/recovery/format/architecture tools,
+8,216 unchanged inputs. V116.1 slots before unshipped group117–137; generator and
+recovery verifier understand dotted versions. Raw account invalidation is O(1);
+worker-only fanout returns at most201 identities. Owner records/versioned tombstones
+capture into the existing after-commit journal; actual dump/restore and late-commit/
+rename races pass. Earlier two negative-test expectation failures are retained.
+NO live migration, projection worker, native delta HTTP or Mobile delta yet. Live
+11a98115/schema116, chat pushOFF. Next implement bounded fanout/projection worker,
+then admitted snapshot/delta cursors and atomic Mobile cursor publication. Do not
+mistake this raw storage increment for completion of changed-only synchronization.
+
+Latest user additions: in Contacts AND EmployeeSearch put department filtering as
+an icon to the right of search; allow horizontal swipes between Conversations/
+Contacts; REMOVE the Chat app bar/actions, replace New chat with a bottom-right FAB
+that smoothly hides on downward scroll and returns upward. Keep tabs fixed, state/
+scroll retained, hidden page acquisition stopped,48dp accessible filter, reduced
+motion. Mobile implementation is next; no newer source/APK than38 yet. Preserve
+protected editing stashes. Continue backend delta and broader communications after
+this UI delivery; user corrections do not cancel long-run work.
+
+Mobile Apple42069899173 exact34e68b12 has COMPLETED SUCCESSFULLY. Artifact13438555697
+(ios-simulator-reports) is538763bytes; report download/count and full job audit still
+need recording. Phone38/native accepted, docs37c3f05a; do not reinstall. Announce any
+future install-only and never drive phone UI. Bima remains owned receiver5562/38;
+verify its current start record. All local Backend schema wrappers have drained.
+
 ## Release 38 chat hub delivered; metadata delta implementation next — 5 November 2026
 
 Mobile source34e68b128bd9fa80ccc817d8e008caf850920d96 and delivery docs37c3f05a are

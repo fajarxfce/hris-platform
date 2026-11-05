@@ -7,8 +7,10 @@ import tempfile
 import time
 import uuid
 from xml.sax.saxutils import escape
+from migration_versions import ordered_migrations
 
 classpath, destination, migration_dir = sys.argv[1:]
+migrations = ordered_migrations(Path(migration_dir))
 container = "hris-schema-" + uuid.uuid4().hex[:12]
 docker = ["docker"]
 if subprocess.run(docker + ["info"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
@@ -28,7 +30,7 @@ try:
         time.sleep(0.25)
     else:
         raise RuntimeError("Temporary PostgreSQL did not start")
-    for migration in sorted(Path(migration_dir).glob("V*__*.sql"), key=lambda p: int(p.name.split("__")[0][1:])):
+    for migration in migrations:
         # Match Flyway's per-migration transaction, including SET LOCAL and schema guards.
         run("exec", "-i", container, "psql", "-U", "postgres", "-d", "hris", "-v", "ON_ERROR_STOP=1", "--single-transaction", "-f", "-",
             input=migration.read_bytes(), stdout=subprocess.DEVNULL)

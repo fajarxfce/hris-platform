@@ -1,6 +1,46 @@
 # Agent continuation — HRIS workspace
 
-## Current: SDK3 ARM64 recovery accepted; Mobile full gate running — 6 November 2026
+## Current: release50 delivered; recipient remains eligible offline — 6 November 2026
+
+Phone `10.77.77.3:5555` has Mobile release50/programf04c0864, installed in place
+at17:06UTC after advance notice, with no UI driving. APK SHA
+`215217d1a8f1228b4be526164efa79d75b5c647ad8980367735ea5aa2a1ce898`.
+Signer/application identity/data/keys remain. Mobile full7,086 cases and original
+Bima offline/online history smoke passed; all first f04c protocol/native/control CI
+artifacts are accepted. Portable4,303 and Apple1,673 cases pass, including the iOS
+host build; Android389 cases per ABI include original/confirmed queue native proof.
+See Mobile9e985385. These fixtures do NOT resolve the user's physical pending report.
+
+At18:20UTC a read-only live query of the existing peer's recipient view still finds
+one eligible, confirmed Bima device. Its native hard lifetime is live while short
+access is expired. The owned emulator has been stopped since17:04:22UTC. This checks
+the earlier receiver-readiness failure without restarting the receiver or sending
+anything. It does not fetch/verify provider keys or exercise SDK delivery.
+[Evidence](measurements/collaboration-recipient-offline-2026-11-06.json).
+At18:04UTC the phone's retained logs for BOTH app profile UIDs10962/1010962 had no new
+Chat/crash entries after50 installation. Missing retained logs cannot prove runtime
+success. The existing optional Bima-open request is pending; do not repeat it.
+
+Group work is in `/home/fajar/hris/.worktrees/communication-space`, merging Main8bad394e
+into group28bcf2a4. All seven conflicts are resolved/staged. Its frozen-source gate60730
+is still running; database131/domain156 cases passed, data/API/full-worker results
+are pending. This is the only heavy local job. Do not start builds or emulators until
+it ends. Group's ten-file bootstrap-supersession candidate is prepared outside build
+sources with base hashes; apply only after the merge is validated/committed. It uses
+the undeletable monotonic gateway head and returns a complete original descriptor,
+without pretending the original historically applied. Mobile has eleven uncommitted
+transport files plus tests/docs; format and architecture74 pass, Kotlin tests are
+queued. Their owning durable intent workflow and SDK-store adoption remain next.
+
+Live Platform10485916/schema116.1 and Starter578d97a are unchanged. Group117–137 stays
+unshipped. All owned emulators are stopped; retain original Bima data/keys and never
+reuse historical PIDs below. Announce each phone install, explicit serial and
+`--install-only`. Do not replay accepted sends, SDK publication or rollout. Continue
+all54 PRD groups through organization adoption/UI, media, calls, meetings and backup,
+with atomic pushes and evidence. Physical iPhone testing is waived; actual Apple
+push/call runtime and capacity acceptance remain separate obligations.
+
+## Prior checkpoint: SDK3 ARM64 recovery accepted; Mobile full gate running — 6 November 2026
 
 Platform production code is unchanged. Accepted cached-history fixture62ee1181 now
 also passes SDK3 ARM64 native recovery: run38765/native-sdk3-arm64-1,251.177s,

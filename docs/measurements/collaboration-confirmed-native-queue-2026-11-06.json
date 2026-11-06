@@ -1,0 +1,186 @@
+{
+  "mobileCandidateBuild": {
+    "build": {
+      "startedAt": "2026-11-06T10:40:58.889799+00:00",
+      "candidateOnly": true,
+      "uncommittedApplicationIntegration": true,
+      "sourceHead": "f6532c82d1b5f491e1c848dee0a6ace276e22e71",
+      "candidateAarSha256": "4534e86ed5f15fa036cf5c198cfbf551dbc742ca68d32363e8ba68305ddbb92a",
+      "initScriptSha256": "91e80b068829db0e18f1643302097c32c5c07cf4111429316a641af0dd30c050",
+      "exitCode": 0,
+      "elapsedSeconds": 80.14,
+      "inputsUnchanged": true
+    },
+    "apk": {
+      "artifact": ".work/sdk-confirmed-queue-2026-11-06/consumer-build-2/confirmed-queue-consumer-debug.apk",
+      "sha256": "fd265937885b5cada09d95afae9e8bf5eb6e6727c65cf839181a50c612cec914",
+      "bytes": 316309385,
+      "package": "dev.fajar.hris.collaboration.proof",
+      "debuggable": true,
+      "nativeMatchesCandidate": true,
+      "candidateSdkSha256": "4534e86ed5f15fa036cf5c198cfbf551dbc742ca68d32363e8ba68305ddbb92a",
+      "candidateJniSha256": {
+        "arm64-v8a": "43856af213036df7c2f70dabf7b387a7b60f21dbd79a0a23e69b4a814354a8d3",
+        "x86_64": "48f6a14d6e39a332f8d5f8cc75d8924d636951cdbd97bac1cbc96284eac894ad"
+      },
+      "queueMethodsAndProofMarkersCompiled": true,
+      "lintErrors": 0,
+      "lintWarnings": 47,
+      "executed": false,
+      "minifiedConsumer": false
+    },
+    "freshTestCounts": {
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "apps/collaboration-proof/build/test-results/testDebugUnitTest/TEST-dev.fajar.hris.collaboration.proof.HrisProofFailureTest.xml": {
+        "sha256": "da335c034fca270980efc223a6baa84912ac70c9442cee6f81ca7e05d3d78d91",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/collaboration-proof/build/test-results/testDebugUnitTest/TEST-dev.fajar.hris.collaboration.proof.HrisProofObservationTest.xml": {
+        "sha256": "5f999e3ca10b5a5e6e2c4d5c4deef10357f2ec7b0fbb028d3d79a7e56dc9af1b",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/collaboration-proof/build/test-results/testDebugUnitTest/TEST-dev.fajar.hris.collaboration.proof.HrisReadReceiptBarrierTest.xml": {
+        "sha256": "c5239b74e45c77edae8bb5781295cc5cc840bcf617b7cc30709756531d80d62b",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/collaboration-proof/build/test-results/testDebugUnitTest/TEST-dev.fajar.hris.collaboration.proof.NotificationInputCheckpointTest.xml": {
+        "sha256": "8a0046d561bfe2f037a3f849e15eea8c3518c919045b6108512c3b843866e76a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/collaboration-proof/build/test-results/testDebugUnitTest/TEST-dev.fajar.hris.collaboration.proof.HrisProofCleanupTest.xml": {
+        "sha256": "ddc5878e0a4a306c4634f174c1c2277eac50e8cf73b4776248a793c05c1c3131",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "sourceInputsSha256": "3bfad8e209d17d045fa5933ebfc144af5562ce42cbc8a51abf647f59f55aa9cd",
+    "change": "Proof uses the existing cached-room openTimeline method offline; production settlement and SDK sources are unchanged.",
+    "changedSourceFiles": [
+      "apps/collaboration-proof/src/main/kotlin/dev/fajar/hris/collaboration/proof/HrisProductQueueProof.kt"
+    ],
+    "priorUnchangedAndroidDataCases": 362
+  },
+  "nativeAcceptance": {
+    "startedAt": "2026-11-06T10:43:51.934097+00:00",
+    "elapsedSeconds": 171.206,
+    "exitCode": 0,
+    "sourceFiles": 12454,
+    "sourcesUnchanged": true,
+    "apkSha256": "fd265937885b5cada09d95afae9e8bf5eb6e6727c65cf839181a50c612cec914",
+    "apkUnchanged": true,
+    "counts": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.NativeCollaborationSdkInteropTest.xml": {
+        "sha256": "7e6a1ab07b2fba3de9f909677a7bc2a9ac390eadd9988dbba76158a1510f6224",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "accepted": [
+      {
+        "passed": true,
+        "cleanup": true,
+        "processRestartedAfterAck": true,
+        "coldHistoryRecoveredOffline": true,
+        "gatewayUnavailableAfterProcessDeath": true,
+        "quotedReplyRecoveredOffline": true,
+        "processRestartedAfterCompletion": true,
+        "encryptedSendCount": 3,
+        "nativeRedactionRequests": 0,
+        "retainedConfirmedQueueScenario": false
+      },
+      {
+        "passed": true,
+        "cleanup": true,
+        "processRestartedAfterAck": true,
+        "coldHistoryRecoveredOffline": true,
+        "gatewayUnavailableAfterProcessDeath": true,
+        "quotedReplyRecoveredOffline": true,
+        "processRestartedAfterCompletion": true,
+        "encryptedSendCount": 3,
+        "nativeRedactionRequests": 0,
+        "retainedConfirmedQueueScenario": true,
+        "confirmedNativeQueueRestored": true,
+        "confirmedNativeQueueSettledOffline": true,
+        "confirmedNativeQueueRetryNoop": true
+      }
+    ],
+    "sourceInputsSha256": "e293e465e34ca52454d7e838b41bd9cc36667cc1b61881d7f11422b7e32b74f1",
+    "emulatorStop": {
+      "pid": 1031697,
+      "startTicks": "163846449",
+      "stopped": true,
+      "dataRetained": true,
+      "phoneTouched": false,
+      "at": "2026-11-06T10:47:09.419928+00:00"
+    },
+    "scenarioConstruction": "The test SDK sends the staged content once through sendRaw with a separate HTTP transaction while the original queue entry stays paused. This constructs accepted content plus a retained native entry; it is not literal HTTP-response-loss injection.",
+    "phoneRootCauseProven": false
+  },
+  "earlierFailedAttempts": [
+    {
+      "attempt": 1,
+      "elapsedSeconds": 118.866,
+      "exitCode": 1,
+      "sourcesUnchanged": true,
+      "apkUnchanged": true,
+      "counts": {
+        "tests": 2,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "originalScenarioPassed": true,
+      "originalScenarioCleanup": true,
+      "retainedScenarioReachedAndroid": false,
+      "failure": "Provider login setup returned Result.Failed before creating the retained-queue driver fixture. The original assertion did not retain its failure code.",
+      "nextChange": "Give each scenario a fresh provider container as well as Spring context/trace; retain the same APK and all recovery assertions."
+    },
+    {
+      "attempt": 2,
+      "elapsedSeconds": 170.857,
+      "exitCode": 1,
+      "sourcesUnchanged": true,
+      "apkUnchanged": true,
+      "counts": {
+        "tests": 2,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "originalScenarioPassed": true,
+      "bothScenarioCleanup": true,
+      "retainedScenarioReachedAndroid": true,
+      "retainedOriginalSurvivedTwoRestarts": true,
+      "failure": "Fixture entered its offline observer through runtime.enterTimeline, which calls joinRoomById over the disconnected gateway. It failed before invoking settlement.",
+      "nextChange": "Use existing runtime.openTimeline for the already-known cached room; keep gateway disconnected and preserve all settlement/no-resend/no-redaction assertions."
+    }
+  ],
+  "shippingRuntimeChanged": false
+}

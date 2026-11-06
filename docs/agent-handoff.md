@@ -1,52 +1,58 @@
 # Agent continuation — HRIS workspace
 
-## Mobile send-order repair accepted; native queue proof in progress — 6 November 2026
+## Confirmed native queue recovery accepted; SDK distribution next — 6 November 2026
 
-Mobile2eba9321 records latest acceptance and active work. Release43 from46bec39a
-fixes the false interrupted-save banner and pending BBB moving above confirmed AAA.
-Local6,983 cases/lint0, retained-data Bima emulator offline/online first and repeat
-entry, and exact-source native381/Apple1,627/portable4,211 CI cases all pass.
-Exact arm64 APK SHA639a5454496813a9ad4fa70294a4fbb5364df8473658468662a199167fd970bf
-is READY, not installed: PHONE STILL42; bounded ADB reconnects time out. One phone
-availability question is pending. Announce each install, use accepted43's preflight
-and install.py --install-only, never launch/drive the phone UI or erase crypto/data.
+Mobile1f6613f0 preserves the accepted21-file application/Android recovery candidate
+as tool/collaboration-sdk-patches/confirmed-queue-android-consumer.patch. It applies
+to Mobilef6532c82, SHAa97d23385e7f4a399edd1c0c420c5759d3f6b8dc39eb48b8c6f781bad4b526b7;
+an isolated checkout reconstructed all files. Main Mobile source is still UNCOMMITTED
+until custom SDK distribution/full product acceptance; current upstream26.10.23
+lacks the new APIs. See its current handoff before touching the SDK/build workspace.
 
-Long pending is being repaired in Mobile. Real encrypted stores + application
-worker + FAKE SDK reproduced first-message recovery leaving a native transaction
-that blocks the next message. New domain-owned settlement passes45 application
-cases on4,212 unchanged inputs, including next-message delivery and idempotent
-retry. Rust SDK patch passes8 core/19 FFI cases; it compares exact original content
-and immutable completion provenance and settles locally without send/redaction.
-This is not yet proof of the phone's native root cause.
+This Platform increment adds a second NativeCollaborationSdkInteropTest scenario
+with strict driver evidence. Both scenarios retain every existing assertion; each
+owns a separate Spring context, trace and provider container. Redaction routes are
+observed through closed segment labels. Python driver34 cases PASS. Final Kotlin
+compile/format/architecture PASS32.279s on8,242 unchanged inputs.
 
-Current Platform THREE UNCOMMITTED test/driver files add a second native scenario;
-NO product/live source change. NativeCollaborationSdkInteropTest keeps the original
-scenario and adds retained-queue recovery with a fresh Spring trace/context per
-method. The private fixture asks Mobile to stage an actual paused native original,
-then send identical logical ID/full content via SDK sendRaw. Its HTTP transaction
-is different: this deliberately constructs the postcondition, not a literal lost
-HTTP reply. Existing owned-driver process deaths and offline gateway disconnection
-remain unchanged. New strict evidence requires original-restored, offline-settled,
-and repeat-no-op, while encrypted server sends remain exactly3. Driver34 tests
-PASS0.166s; Kotlin/native proof is NOT compiled/accepted yet.
+Actual native18481/native-3 PASSED171.206s:2 cases, zero failures/errors/skips,
+12,454 program/test inputs and APK unchanged. The new scenario retains the original
+native entry across two process deaths, settles offline, repeats without mutation,
+and makes exactly3 encrypted sends/zero server-redaction requests. Both clean up.
+It constructs server-accepted content with SDK sendRaw while keeping the staged
+native original paused; the HTTP transaction differs. This is recovery-postcondition
+proof, not literal lost-response injection or the user's phone root-cause diagnosis.
+[Evidence](measurements/collaboration-confirmed-native-queue-2026-11-06.json).
 
-Mobile main has UNCOMMITTED integration and TWO proof files, plus a temporary
-exact-hash candidate verification entry. New paired arm64/x86_64 queue AAR built
-89.489s,96,849,072 bytes SHA4534e86ed5f15fa036cf5c198cfbf551dbc742ca68d32363e8ba68305ddbb92a;
-all generated/JNI identities, API declarations and16KiB alignment verified.
-ONLY heavy job: Mobile candidate consumer60155 in .work/sdk-confirmed-queue-2026-11-06/
-consumer-build-1; Mobile sources frozen, no emulator active. Follow Mobile handoff.
-Next compile Platform test classes, then run BOTH SDK interop scenarios with this
-exact accepted candidate APK on owned emulator-5560. Build before starting emulator;
-use fresh probe userdata, preserve original Bima storage. Native consumer acceptance,
-remaining32-bit/Apple/full distribution and product gates still outstanding.
+Earlier native-1 failed second-provider login setup before Android; native-2 reached
+offline recovery but the fixture used joining enterTimeline. Separate provider
+containers and existing local openTimeline corrected those setup paths; settlement
+assertions were unchanged. Final Mobile proof APK316,309,385 bytes SHA
+fd265937885b5cada09d95afae9e8bf5eb6e6727c65cf839181a50c612cec914,
+paired queue AAR SHA4534e86ed5f15fa036cf5c198cfbf551dbc742ca68d32363e8ba68305ddbb92a.
+Consumer build370.511s/380 host tests/lint0; fixture correction80.140s/18 fresh proof
+cases with362 unchanged Android data cases. Production domain/worker45 cases also
+pass against real encrypted stores + fake SDK. Rust patch8 core/19 FFI cases pass.
 
-Old raw-only AAR/consumer/provider acceptance is separate; it excludes settlement.
-Never substitute it for the new queue candidate. Starter578d97a records navigation
-port e39747c passing local71/Apple129 cases; no HRIS policy port belongs there.
+All owned emulators are stopped; latest1031697/startTicks163846449 stopped10:47:09UTC.
+Original Bima userdata/keys and phone are untouched. ONLY heavy job: Mobile37017
+armv7 queue SDK build, .work/sdk-confirmed-queue-2026-11-06/android-armv7. Its9 SDK
+source inputs are FROZEN. Android x86 remains to build; preserve accepted arm64/x86_64
+outputs. No descriptor/workflow/publication or shipping dependency change yet.
+Next finish four-ABI distribution, full/minified product gates and application
+commit/push; then pin this Platform fixture in the Mobile native CI workflow.
+
+PHONE STILL42. Exact accepted release43 (send banner/order) is ready, SHA
+639a5454496813a9ad4fa70294a4fbb5364df8473658468662a199167fd970bf.
+Latest ADB reconnect about10:35UTC timed out; one availability question is pending.
+Do not rebuild43. Announce every install, use its preflight/install.py --install-only,
+and never launch/drive phone UI. Exact-source43 native381/Apple1,627/portable4,211
+CI cases are accepted; no redispatch. Starter578d97a records navigation port e39747c
+passing local71/Apple129 cases; no HRIS queue-policy port belongs there.
+
 Live Platform remains10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1 unchanged.
-Never replay accepted Forward publications or rollout. Continue all54 PRD groups
-and atomic pushes after current fixes; do not treat this checkpoint as completion.
+This is test/tooling work only. Never replay accepted Forward publications or rollout.
+Continue all54 PRD groups and atomic pushes after current fixes; this is not completion.
 
 ## Mobile release 41 installed; communications implementation continues — 6 November 2026
 

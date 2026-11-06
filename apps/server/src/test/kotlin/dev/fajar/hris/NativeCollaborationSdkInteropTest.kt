@@ -13,18 +13,21 @@ import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
 
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_NATIVE_APK", matches = ".+")
 @Import(NativeSdkGatewayTraceConfiguration::class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(
     properties =
         [
@@ -63,9 +66,20 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
         @JvmStatic @AfterAll fun closeMatrix() = provider.close()
     }
 
+    // Each Spring context/trace has its own provider data and login limits as well.
+    @AfterEach fun closeScenarioProvider() = provider.close()
+
     @Test
     @Timeout(value = 8, unit = TimeUnit.MINUTES)
-    fun actualAndroidSdkRenewsAccessAndExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission() {
+    fun actualAndroidSdkRenewsAccessAndExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission() =
+        proveExchange(retainConfirmedNativeQueue = false)
+
+    @Test
+    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    fun confirmedNativeOriginalIsSettledOfflineAfterProcessDeathWithoutAnotherSend() =
+        proveExchange(retainConfirmedNativeQueue = true)
+
+    private fun proveExchange(retainConfirmedNativeQueue: Boolean) {
         val owner = native()
         val sender = sdkOwner(owner)
         val recipient = sdkOwner(sdkPeer(owner))
@@ -81,7 +95,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     at.plusSeconds(60),
                 )
             )
-        assertInstanceOf(Result.Success::class.java, providerLogin)
+        assertInstanceOf(
+            Result.Success::class.java,
+            providerLogin,
+            (providerLogin as? Result.Failed)?.failure?.code,
+        )
         val created =
             rooms.create(
                 CollaborationMatrixDirectRoom(
@@ -137,6 +155,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             fixture,
             mapOf(
                 "baseUrl" to "http://127.0.0.1:$port",
+                "retainConfirmedNativeQueue" to retainConfirmedNativeQueue,
                 // This disposable API credential stays in private fixture input, never proof
                 // artifacts.
                 "sender" to (sender.session + ("hrisAccessToken" to owner.access)),
@@ -276,6 +295,21 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "SDK failed to retry with its retained cursor",
             )
             val proof = result.path("proof")
+            val confirmedQueueEvidence =
+                if (retainConfirmedNativeQueue)
+                    listOf(
+                            "confirmedNativeQueueRestored",
+                            "confirmedNativeQueueSettledOffline",
+                            "confirmedNativeQueueRetryNoop",
+                        )
+                        .associateWith { name ->
+                            assertTrue(
+                                proof.path(name).isBoolean && proof.path(name).booleanValue(),
+                                name,
+                            )
+                            true
+                        }
+                else emptyMap()
             for ((type, minimum) in mapOf("m.read" to 1, "m.read.private" to 4)) {
                 assertTrue(
                     trace.snapshot().count {
@@ -376,6 +410,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 },
                 "Original, reply and acknowledged message must each send once",
             )
+            assertTrue(
+                trace.snapshot().none { "/redact/" in it["route"].toString() },
+                "Local queue settlement must never request server redaction",
+            )
             val applicationReads = trace.applicationAdmissions()
             assertTrue(
                 listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 10 }
@@ -454,6 +492,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "quotedReplyRecoveredOffline" to true,
                     "processRestartedAfterCompletion" to true,
                     "encryptedSendCount" to 3,
+                    "nativeRedactionRequests" to 0,
                     "admittedProviderPages" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,
@@ -464,7 +503,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "syncInterruptedAfterRestart" to true,
                     "syncRetriedWithRetainedCursor" to true,
                     "artifact" to result.path("artifact"),
-                ),
+                    "retainedConfirmedQueueScenario" to retainConfirmedNativeQueue,
+                ) + confirmedQueueEvidence,
             )
         } finally {
             val interrupted = Thread.interrupted()

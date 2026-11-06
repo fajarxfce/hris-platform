@@ -367,6 +367,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 "context",
                 "event",
                 "send",
+                "redact",
                 "sendToDevice",
                 "m.room.encrypted",
                 "m.direct",

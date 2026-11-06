@@ -97,6 +97,21 @@ class HrisNativeDriverTest(unittest.TestCase):
                 with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                     proof_evidence(proof | {name: value})
 
+    def test_confirmed_queue_scenario_requires_each_strict_true_flag(self):
+        names = ("confirmedNativeQueueRestored", "confirmedNativeQueueSettledOffline", "confirmedNativeQueueRetryNoop")
+        proof = self.evidence() | dict.fromkeys(names, True)
+        self.assertEqual(proof, proof_evidence(proof, True))
+        self.assertEqual(self.evidence(), proof_evidence(proof, False))
+        for name in names:
+            with self.subTest(name=name, missing=True), self.assertRaises(ValueError):
+                proof_evidence({k: v for k, v in proof.items() if k != name}, True)
+            for value in (False, None, 1, "true", [], {}):
+                with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                    proof_evidence(proof | {name: value}, True)
+        for mode in (None, 1, "true", [], {}):
+            with self.subTest(mode=mode), self.assertRaises(ValueError):
+                proof_evidence(proof, mode)
+
     def test_local_read_intent_recovery_requires_each_strict_true_flag(self):
         proof = self.evidence()
         names = ['nativeLocalReadIntentPrepared', 'nativeLocalReadIntentStoreRestored', 'nativeReadReceiptReplayAdmitted', 'nativeReadReceiptAckUncertaintyRecovered']

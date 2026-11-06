@@ -61,7 +61,9 @@ def disconnect_owned_gateway(native):
     native.port = None
 
 
-def proof_evidence(value):
+def proof_evidence(value, confirmed_queue=False):
+    if type(confirmed_queue) is not bool:
+        raise ValueError("Invalid owned queue scenario")
     if not isinstance(value, dict) or value.get("encryptedBothDirections") is not True or value.get("logicalIdsPreserved") is not True or value.get("syncMode") != "classic":
         raise ValueError("Invalid owned exchange evidence")
     output = {"encryptedBothDirections": True, "logicalIdsPreserved": True, "syncMode": "classic"}
@@ -91,6 +93,11 @@ def proof_evidence(value):
     if output["ackTransaction"] == output["senderTransaction"]:
         raise ValueError("Owned crash transactions must be distinct")
     output["historyWindow"] = history_evidence(value.get("historyWindow"))
+    if confirmed_queue:
+        for name in ("confirmedNativeQueueRestored", "confirmedNativeQueueSettledOffline", "confirmedNativeQueueRetryNoop"):
+            if value.get(name) is not True:
+                raise ValueError("Invalid owned confirmed queue evidence")
+            output[name] = True
     return output
 
 
@@ -154,6 +161,9 @@ def stop_process(process):
 def run(apk, sdk, directory):
     directory = Path(directory).resolve(strict=True)
     fixture = read_json(directory / "fixture.json")
+    confirmed_queue = fixture.get("retainConfirmedNativeQueue", False)
+    if type(confirmed_queue) is not bool:
+        raise ValueError("Invalid owned queue scenario")
     home = urlparse(fixture["baseUrl"])
     if (home.scheme != "http" or home.hostname != "127.0.0.1"
             or not 1024 <= (home.port or 0) <= 65535 or home.username or home.password
@@ -219,7 +229,7 @@ def run(apk, sdk, directory):
                 if staged is None or restored is None or not resumed or acknowledged is None or ack_restored is None or not ack_resumed or archived is None or archive_restored is None or not archive_resumed:
                     raise RuntimeError("Owned process restart was not completed")
                 proof = app_json("gateway-result")
-                result["proof"] = proof_evidence(proof)
+                result["proof"] = proof_evidence(proof, confirmed_queue)
                 if (type(proof.get("processId")) is not int or proof["processId"] != archive_restored["processId"]
                         or result["proof"]["senderTransaction"] != staged["transactionId"]
                         or result["proof"]["ackTransaction"] != acknowledged["transactionId"]):

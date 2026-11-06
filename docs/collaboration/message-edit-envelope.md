@@ -35,3 +35,15 @@ does not establish actual SDK edit encryption/decryption, optimistic authoring,
 offline recovery or a delivered product feature. Full release CI, Mobile edit
 authoring/reception proof and the separate group-branch port remain. No schema,
 provider configuration or live runtime change is part of this commit.
+
+
+Full [Verify42139174304](https://github.com/fajarxfce/hris-platform/actions/runs/42139174304)
+on10485916 passed all14 jobs. Its exact GitHub-digest-verified API/worker artifacts
+were staged and their JAR digests rechecked inside non-root images. The live dev
+API/worker were switched on6November01:28UTC;19.227s complete rollout checks passed.
+Schema116.1 and migration history were checked again after startup. Existing
+provider/storage containers, flags and credential/key files remain unchanged;
+backup and previous images are retained. No Forward publication was repeated.
+[Rollout evidence](../measurements/collaboration-edit-envelope-release-2026-11-06.json).
+This accepts the server envelope rollout, not the pending native encrypted edit
+exchange or Mobile editor release. Phone40 is still installed.

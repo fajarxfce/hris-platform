@@ -1,5 +1,46 @@
 # Agent continuation — HRIS workspace
 
+## Edit-envelope server rollout accepted — 6 November 2026
+
+LIVE source10485916ee02850cf913793398f7ef3dd1e09afb, schema116.1. Full Verify
+42139174304 PASSall14 jobs; exact artifacts/digests verified. [Evidence](measurements/collaboration-edit-envelope-release-2026-11-06.json).
+Packages33.908s, images21.696s, rollout19.227s at01:28UTC all PASS. API imageab5a5e1f...
+containerb2002809..., worker image0ca5c11d... container01590afd...; runtime UID10001,
+restart0, API/provider healthy. Migration history/schema verified after startup;
+203-table inventory/checkpoint retained. Backup dump1,975,468B SHAda4a7216...;
+roles1,729B SHAd09a5741....7 direct pairs/14 summaries/14 publications, no due/pending.
+TLS callback validation400 and untrusted/forged callback403 checks passed. Database,
+Matrix/Garage/proxy containers, configs/keys, dashboard, push flags and SMTP OFF
+preserved. No data rollback. Old images retained. Drivers14903/11526/64661 drained.
+
+The scripts in .work/chat-edit-release-2026-11-05 HAVE NOW EXECUTED successfully;
+do not repeat them or the older summary deployment. Artifacts13468495220 and
+13468515150 belong to accepted104 CI; faileda678 fixture artifacts remain separate.
+API JARSHA45dfbc10..., worker7b5968be.... No source rebuild/deploy needed after this
+documentation commit. Earlier failed CI42134116564 had12 passes, recovery failure
+and dashboard integration cancelled; never retry or accept it. Recovery2 remains
+accepted locally, with all owned fixtures cleaned up.
+
+Mobile editor is integrated with screenshots and68 focused presentation cases
+PASS, Android/proof compilation PASS. Full editor-full1 completed790.255s with
+5,406 fresh cases and3 failures: one existing background-deadline timing case,
+and the shared SQLite/IndexedDB edit-storage page equality now needs to account
+for intentional history revision invalidation. Two test changes are APPLIED:
+explicit unchanged page contents/changed revision plus restart assertion, and a
+controlled monotonic/coroutine deadline test retaining exact2s expiry and cleanup.
+Focused editor-regressions1 is RUNNING under frozen Mobile sources; then full gates,
+commit/push and native edit exchange. No Mobile edit release accepted; phone40.
+
+Isolated .worktrees/matrix-sdk-raw-event is detached8de215a0... with an UNCOMPILED
+raw point-read extension and7 tests (metadata/byte limit/identity, SDK network/cache/
+cancellation). Patch archived in Mobile.work/sdk-raw-event-2026-11-06; no Rust/NDK
+installed, no artifact published/consumed. Need native decryption/reopen/UTD proof,
+controlled Android/Apple builds and integration under existing ownership guards.
+Retain normal drafts and make rejected edit text recoverable to the user; no new
+technical saved-replies page. All54 PRD groups still need continuation. Do not stop
+at this server milestone. Starterbce2012, both Mobile stashes, stopped Rani/Bima
+emulator data/keys and phone state remain; never repeat accepted Forward sends.
+
 ## Backup image manifest recovery accepted locally — 6 November 2026
 
 Two Python changes fix load_backup rejecting the combined postgres18.x-alpine

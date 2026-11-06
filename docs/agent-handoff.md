@@ -1,5 +1,19 @@
 # Agent continuation — HRIS workspace
 
+## Corrected ordering full CI running — 6 November 2026
+
+Product `a678286121b4ab8d0dd425f2498b5674966f74a0` is pushed. Full Verify
+[42134116564](https://github.com/fajarxfce/hris-platform/actions/runs/42134116564) was dispatched once on that exact source.
+Do not duplicate dispatch. Thirteen focused document-retirement cases passed;
+all14 full jobs/artifacts still require audit before rollout. No live changes.
+
+Mobile0e5270a8 target preparation is pushed/accepted5,015 cases. Its28 outbox drafts
+are applied, plus encrypted storage, queue/recovery/retirement, wire-content and
+Android SDK handle tests. Focused outbox1 now runs under frozen Mobile sources;
+no new UI, native edit exchange or APK acceptance yet. Continue integration and
+all54 PRD groups after these gates. Phone40, retained emulator data/keys and
+Starter bce2012 remain unchanged.
+
 ## Document retirement ordering gate corrected — 6 November 2026
 
 FullCI42129516710 exact49ec completed with11 passing jobs, backend8 failed the

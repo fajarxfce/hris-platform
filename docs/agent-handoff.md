@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Mobile release 41 installed; communications implementation continues — 6 November 2026
+
+Mobile58a5a6ed fixes retained reconnect feedback without changing access/recovery
+policy. Full gate passed1,114 fresh tests/lint0. Release41 from that exact source
+built/verified and passed four first/repeat offline/online emulator recordings;
+all8 adjacent frames show bubbles during transitions, with no stale feedback or
+current auth diagnostics. Installed on the authorized phone07:13UTC with advance
+notice, install-only, retained data/app identity and no phone UI interaction.
+APK SHAe45e6f1e0af64dc0c0c67106b126ff0fe805405082dba36541c99af7c35d3114.
+Mobile0c811974 records exact delivery evidence. Do not repeat the completed install.
+
+Mobile currently owns SDK AAR packaging85053 (isolated paired JNI/Kotlin inputs,
+no app dependency change/publication). No emulator active; original data retained.
+Its pending native notification fixture correction drives both existing recovery
+phases: transferred input may still need independent reply review after interruption.
+Python29 cases pass; Kotlin/native acceptance is pending. No production recovery
+policy changed; final held-copy/no-command assertions stay strict. Follow the top
+Mobile/docs/agent-handoff.md checkpoint before starting another heavy local job.
+
+Continue native SDK/edit proof, layer ownership review and all54 PRD groups. The
+old refresh-callback transport cause remains separate from the fixed UI feedback.
+Platform LIVE10485916/schema116.1 stays unchanged; never replay rollout or accepted
+Forward publications. Starter's MVI port remains accepted, no new generic port.
+
 ## Mobile replay fix and release recovery review — 6 November 2026
 
 Mobileac7668ae/abccff51 are pushed: unchanged original-message/alias/redaction

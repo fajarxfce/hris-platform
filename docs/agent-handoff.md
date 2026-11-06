@@ -1,42 +1,52 @@
 # Agent continuation — HRIS workspace
 
-## Mobile release43 accepted; queue recovery remains active — 6 November 2026
+## Mobile send-order repair accepted; native queue proof in progress — 6 November 2026
 
-Mobile46bec39a fixes the false interrupted-save banner and pending BBB moving above
-confirmed AAA. Full local gate passed6,983 fresh cases, Android/lint0 and Web.
-Release43 built from that exact source and passed retained-data offline/online
-Bima emulator first/repeat entry, all three screenshots reviewed. APK SHA
-639a5454496813a9ad4fa70294a4fbb5364df8473658468662a199167fd970bf.
-PHONE STILL42: bounded ADB reconnects time out;43 is ready, not installed. Do not
-rebuild it. Announce every install, then use Mobile's exact accepted artifact with
---install-only; never launch/drive the phone UI. Mobile56f48bd8 records acceptance.
+Mobile2eba9321 records latest acceptance and active work. Release43 from46bec39a
+fixes the false interrupted-save banner and pending BBB moving above confirmed AAA.
+Local6,983 cases/lint0, retained-data Bima emulator offline/online first and repeat
+entry, and exact-source native381/Apple1,627/portable4,211 CI cases all pass.
+Exact arm64 APK SHA639a5454496813a9ad4fa70294a4fbb5364df8473658468662a199167fd970bf
+is READY, not installed: PHONE STILL42; bounded ADB reconnects time out. One phone
+availability question is pending. Announce each install, use accepted43's preflight
+and install.py --install-only, never launch/drive the phone UI or erase crypto/data.
 
-Long pending diagnosis continues. Mobile0757067f retains a reproduced worker test:
-the fake SDK accepts an event but retains its native transaction after losing the
-response. First-message recovery completes; the next message blocks QueueUnresolved.
-Real encrypted stores and actual application worker are used, but this is not a
-native/phone root-cause proof. SDK settlement draft is separate, not shipping.
-Follow Mobile's current handoff before building or editing its SDK worktree.
-Only current heavy job is the new queue core test85403's follow-up core-2; no emulator
-active. The raw-event candidate described below excludes this new queue draft.
+Long pending is being repaired in Mobile. Real encrypted stores + application
+worker + FAKE SDK reproduced first-message recovery leaving a native transaction
+that blocks the next message. New domain-owned settlement passes45 application
+cases on4,212 unchanged inputs, including next-message delivery and idempotent
+retry. Rust SDK patch passes8 core/19 FFI cases; it compares exact original content
+and immutable completion provenance and settles locally without send/redaction.
+This is not yet proof of the phone's native root cause.
 
-Mobile4629aad9 records accepted isolated raw-event consumption. Paired arm64/x86_64
-AAR SHA94d907f139a7484bd687b538d8cfce3e90478daa2ab93b9835d9aa8a606becae,
-consumer build486.129s/lint0; provider b5707215cb144219bf2899cc6e5d6884 passed55.429s,
-both browser cases/native E2EE/refresh/logical IDs/offline invitee and cleanup.
-The fixture requires emulator-5560; initial serial and boot setup failures are
-retained separately. Owned fresh-data emulator564348 stopped09:35:40UTC. Bima data,
-phone and live Platform runtime untouched. Shipping SDK dependency unchanged;
-32-bit/Apple/minified and HRIS native edit recovery remain pending.
+Current Platform THREE UNCOMMITTED test/driver files add a second native scenario;
+NO product/live source change. NativeCollaborationSdkInteropTest keeps the original
+scenario and adds retained-queue recovery with a fresh Spring trace/context per
+method. The private fixture asks Mobile to stage an actual paused native original,
+then send identical logical ID/full content via SDK sendRaw. Its HTTP transaction
+is different: this deliberately constructs the postcondition, not a literal lost
+HTTP reply. Existing owned-driver process deaths and offline gateway disconnection
+remain unchanged. New strict evidence requires original-restored, offline-settled,
+and repeat-no-op, while encrypted server sends remain exactly3. Driver34 tests
+PASS0.166s; Kotlin/native proof is NOT compiled/accepted yet.
 
-Starter navigation e39747c passes local root/Android/Web71 cases and Apple129
-cases; Starter578d97a records acceptance. Mobile46bec39a Native42191546121 and
-Control42191546066 running at09:33UTC; do not dispatch duplicates. Earlier motion
-native/Apple evidence predates the send fix. Continue queue recovery, native edit,
-domain-owned history paging and all54 PRD groups. Platform remains
-LIVE10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1 unchanged. Never replay
-rollout or accepted Forward publications.
+Mobile main has UNCOMMITTED integration and TWO proof files, plus a temporary
+exact-hash candidate verification entry. New paired arm64/x86_64 queue AAR built
+89.489s,96,849,072 bytes SHA4534e86ed5f15fa036cf5c198cfbf551dbc742ca68d32363e8ba68305ddbb92a;
+all generated/JNI identities, API declarations and16KiB alignment verified.
+ONLY heavy job: Mobile candidate consumer60155 in .work/sdk-confirmed-queue-2026-11-06/
+consumer-build-1; Mobile sources frozen, no emulator active. Follow Mobile handoff.
+Next compile Platform test classes, then run BOTH SDK interop scenarios with this
+exact accepted candidate APK on owned emulator-5560. Build before starting emulator;
+use fresh probe userdata, preserve original Bima storage. Native consumer acceptance,
+remaining32-bit/Apple/full distribution and product gates still outstanding.
 
+Old raw-only AAR/consumer/provider acceptance is separate; it excludes settlement.
+Never substitute it for the new queue candidate. Starter578d97a records navigation
+port e39747c passing local71/Apple129 cases; no HRIS policy port belongs there.
+Live Platform remains10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1 unchanged.
+Never replay accepted Forward publications or rollout. Continue all54 PRD groups
+and atomic pushes after current fixes; do not treat this checkpoint as completion.
 
 ## Mobile release 41 installed; communications implementation continues — 6 November 2026
 

@@ -162,6 +162,7 @@ def run(apk, sdk, directory):
     native = NativeDevice(apk, native_proof_serial(), sdk, directory)
     process = None
     result = {"passed": False, "cleanup": False}
+    stage = "prepare"
 
     def app_json(name):
         try:
@@ -187,8 +188,11 @@ def run(apk, sdk, directory):
 
     try:
         native.prepare()
+        stage = "bind"
         result["artifact"] = native.bind({"matrix": {"baseUrl": fixture["baseUrl"]}})
+        stage = "deliver_fixture"
         write_app("gateway-fixture", fixture)
+        stage = "starting_initial_process"
         process = start("hris-stage")
         until = time.monotonic() + 300
         ready = False
@@ -202,9 +206,11 @@ def run(apk, sdk, directory):
         archived = None
         archive_restored = None
         archive_resumed = False
+        stage = "awaiting_initial_process"
         while time.monotonic() < until:
             completion = app_json("instrumentation")
             if completion is not None:
+                stage = "validating_completion"
                 result["diagnostic"] = native_diagnostic({"instrumentation": completion})
                 result["diagnostic"].pop("replyComplete")
                 result["diagnostic"].pop("resultComplete")
@@ -227,11 +233,13 @@ def run(apk, sdk, directory):
                 private_json(directory / "native-ready.json", {"ready": True})
                 ready = True
             if ready and not released and read_json(directory / "send.json") == {"ready": True}:
+                stage = "releasing_send"
                 write_app("gateway-send", {"ready": True})
                 released = True
             if released and staged is None:
                 checkpoint = app_json("gateway-staged")
                 if checkpoint is not None:
+                    stage = "validating_staged"
                     staged = checkpoint_evidence(checkpoint, staged=True)
                     if native.process_id() != staged["processId"]:
                         raise RuntimeError("Owned staging process was not confirmed")
@@ -239,10 +247,12 @@ def run(apk, sdk, directory):
                     if not stop_process(process) or native.process_id() is not None:
                         raise RuntimeError("Owned staging process did not stop")
                     private_json(directory / "native-staged.json", staged)
+                    stage = "awaiting_queue_restore"
                     process = start("hris-resume")
             if staged is not None and restored is None:
                 checkpoint = app_json("gateway-restored")
                 if checkpoint is not None:
+                    stage = "validating_queue_restore"
                     restored = checkpoint_evidence(checkpoint)
                     if (restored["processId"] == staged["processId"]
                             or restored["transactionId"] != staged["transactionId"]
@@ -250,11 +260,13 @@ def run(apk, sdk, directory):
                         raise RuntimeError("Owned queue restoration was not confirmed")
                     private_json(directory / "native-restored.json", {"ready": True})
             if restored is not None and not resumed and read_json(directory / "resume.json") == {"ready": True}:
+                stage = "awaiting_acknowledgement"
                 write_app("gateway-resume", {"ready": True})
                 resumed = True
             if resumed and acknowledged is None:
                 checkpoint = app_json("gateway-acknowledged")
                 if checkpoint is not None:
+                    stage = "validating_acknowledgement"
                     acknowledged = checkpoint_evidence(checkpoint, acknowledged=True)
                     if (acknowledged["processId"] != restored["processId"]
                             or acknowledged["transactionId"] == staged["transactionId"]
@@ -264,21 +276,25 @@ def run(apk, sdk, directory):
                     if not stop_process(process) or native.process_id() is not None:
                         raise RuntimeError("Owned acknowledgement process did not stop")
                     private_json(directory / "native-acknowledged.json", acknowledged)
+                    stage = "awaiting_acknowledgement_restore"
                     process = start("hris-ack-recover")
             if acknowledged is not None and ack_restored is None:
                 checkpoint = app_json("gateway-ack-restored")
                 if checkpoint is not None:
+                    stage = "validating_acknowledgement_restore"
                     ack_restored = checkpoint_evidence(checkpoint)
                     if (ack_restored["processId"] in (staged["processId"], restored["processId"])
                             or ack_restored["transactionId"] != acknowledged["transactionId"]
                             or native.process_id() != ack_restored["processId"]):
                         raise RuntimeError("Owned acknowledgement restoration was not confirmed")
                     private_json(directory / "native-ack-restored.json", ack_restored)
+                    stage = "awaiting_archive"
                     write_app("gateway-ack-resume", {"ready": True})
                     ack_resumed = True
             if ack_resumed and archived is None:
                 checkpoint = app_json("gateway-completed")
                 if checkpoint is not None:
+                    stage = "validating_archive"
                     archived = checkpoint_evidence(checkpoint, completed=True)
                     if (archived["processId"] != ack_restored["processId"]
                             or archived["transactionId"] != acknowledged["transactionId"]
@@ -288,17 +304,21 @@ def run(apk, sdk, directory):
                     if not stop_process(process) or native.process_id() is not None:
                         raise RuntimeError("Owned completion process did not stop")
                     private_json(directory / "native-completed.json", archived)
+                    stage = "disconnecting_gateway"
                     disconnect_owned_gateway(native)
+                    stage = "awaiting_offline_restore"
                     process = start("hris-completion-recover")
             if archived is not None and archive_restored is None:
                 checkpoint = app_json("gateway-completion-restored")
                 if checkpoint is not None:
+                    stage = "validating_offline_restore"
                     archive_restored = checkpoint_evidence(checkpoint)
                     if (archive_restored["processId"] in (staged["processId"], restored["processId"], ack_restored["processId"])
                             or archive_restored["transactionId"] != archived["transactionId"]
                             or native.process_id() != archive_restored["processId"]):
                         raise RuntimeError("Owned completion restoration was not confirmed")
                     private_json(directory / "native-completion-restored.json", archive_restored)
+                    stage = "awaiting_offline_completion"
                     write_app("gateway-completion-resume", {"ready": True})
                     archive_resumed = True
             if process.poll() is not None:
@@ -308,6 +328,7 @@ def run(apk, sdk, directory):
             raise TimeoutError("Owned native exchange exceeded its deadline")
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         result["failureCategory"] = type(error).__name__
+        result["failureStage"] = stage
     finally:
         stopped = stop_process(process)
         result["cleanup"] = native.cleanup() and stopped

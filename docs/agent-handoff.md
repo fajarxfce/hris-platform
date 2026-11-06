@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Native driver diagnosis and Mobile rendering — 6 November 2026
+
+The native HRIS test driver now records a bounded failureStage from its own
+control flow. It still excludes exception messages, command arguments and private
+fixtures.118 driver/provider cases pass; two new cases cover unexpected process
+exit and forged recovery metadata. [Evidence](measurements/collaboration-native-driver-stage-2026-11-06.json).
+No product code, database or deployment changed. LIVE remains10485916/schema116.1.
+
+Mobile native CI42162194348 failed only its main SDK exchange with generic
+RuntimeError. Notification, three worker and scheduled-worker cases passed. The
+bounded gateway trace ends with successful event requests and does not establish
+the final cause. The next CI fixture pin can use this driver increment; do not
+redeploy Platform or replay accepted production Forward publications.
+
+Mobile5be01225 and Starterdd40d24 are pushed. Starter queued-effect retirement is
+accepted locally and on Apple129 cases/full Xcode app. Mobile repeated room entries
+render during transitions. First-entry preparation is now applied and validated
+with233 focused cases and two actual-navigation cases, including prepared rows at
+32ms. Mobile full root/browser/Android gate60367 is active; source frozen. Candidate6
+Android build/recording remains next. All retained emulators are stopped with data
+and keys preserved. Phone40 has not changed.
+
+SDK raw-event patch now passes nine Rust cases including actual decryption,
+missing-key behavior and SQLite reopen. It is being recorded in Mobile Git; no
+Android/Apple SDK artifact changed and NDK is absent. Full native edit proof and
+all54 communications PRD groups remain open. Historical checkpoints below must
+not be replayed as instructions.
+
 ## Edit-envelope server rollout accepted — 6 November 2026
 
 LIVE source10485916ee02850cf913793398f7ef3dd1e09afb, schema116.1. Full Verify

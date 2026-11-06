@@ -399,6 +399,34 @@ class HrisNativeDriverTest(unittest.TestCase):
                 self.assertTrue(result["cleanup"])
                 self.assertNotIn("private-fixture", json.dumps(result))
                 self.assertEqual(type(error).__name__, result["failureCategory"])
+                self.assertEqual(stage, result["failureStage"])
+
+    def test_unexpected_process_exit_retains_only_the_owned_driver_stage(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native, process = self.fixture(root)
+            native.command.return_value = "{"
+            process.poll.return_value = 1
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value)
+            self.assertTrue(result["cleanup"])
+            self.assertEqual("RuntimeError", result["failureCategory"])
+            self.assertEqual("awaiting_initial_process", result["failureStage"])
+            self.assertNotIn("owned-adb", json.dumps(result))
+
+    def test_invalid_recovery_cannot_report_another_stage_or_private_message(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native, process = self.fixture(root)
+            self.handshake(root, native, restored={
+                "transactionId": "first-transaction", "processId": 101,
+                "failureStage": "private-fixture", "message": "private-fixture",
+            })
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value)
+            self.assertTrue(result["cleanup"])
+            self.assertEqual("validating_queue_restore", result["failureStage"])
+            self.assertNotIn("private-fixture", json.dumps(result))
 
     def test_success_requires_valid_receipts_and_completed_cleanup(self):
         for cleaned in (True, False):

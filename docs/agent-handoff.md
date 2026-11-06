@@ -1,30 +1,36 @@
 # Agent continuation — HRIS workspace
 
-## Mobile release 42 delivered; shared navigation port in progress — 6 November 2026
-
-Mobile23ce87fa implements directional280ms page push/Back with RTL and reduced
-motion. Complete local gate passed6,979 fresh tests (one unchanged-source debug
-packaging retry); release42 built91.727s/lint0. Eight Android videos/four forward
-and four Back trials cover offline/online first and repeated room entry. All eight
-strips reviewed: retained bubbles move with the page and the conversation list
-returns intact. Separate cold startup confirms nine rows/no Retry/Older/Reconnect.
-Mobilee74c613f records the complete safe delivery evidence and limitations.
+## Mobile send-order repair active; shared navigation port accepted — 6 November 2026
 
 PHONE NOW42, APK SHA09eea50a9ad0ef1f3b1294ba2e1fceb4503e418d3d6e795029c205c08376259f.
 Announced then installed08:06UTC, verified43.702s, data and identity preserved,
-no UI action. Never repeat this completed install. Both owned emulators stopped
-with original keys/data retained. Starter e39747c ports the exact three generic
-files; root/Android/Web PASS272.990s,71 fresh cases, lint0 errors/44 warnings.
-Apple scope42185888342 was dispatched once on e39747c and is running.
-Mobile SDK x86_64 driver95397 is now the ONLY heavy local job, child13949/
-startTicks162936862 since08:11UTC. Follow Mobile's latest handoff before builds.
+no UI action. Mobilee74c613f records eight reviewed forward/Back emulator videos,
+retained offline/online chat and release evidence. Do not repeat this install or
+launch/drive the user's phone. Both original-data emulators are stopped.
 
-The notification fixture correction27cff22a passes local/native two-phase recovery;
-no production deadline/assertion changed. SDK arm64 AAR970ea462 is built/verified
-but not consumed. Resume x86_64/consumer/native edit proof and history-pager domain
-ownership after the shared port, then all54 PRD groups. Runtime remains
-LIVE10485916/schema116.1; no Platform product/deployment change. Never replay the
-rollout or accepted Forward publications.
+Latest reports take priority: pending BBB moves above confirmed AAA, and normal
+local submissions display interrupted-save feedback. Mobile fixes both presentation
+behaviors; focused16 cases pass, including sequential acknowledgements with
+client/server clock skew. Closed StageMessage/DeliverMessages diagnostics are
+added without changing queue policy. Actual long pending remains under diagnosis.
+Mobile full gate97634 is the ONLY heavy local job;43 is only prepared, not built
+or installed. Follow its current handoff before another build/emulator. After its
+gate, commit/push, build/inspect43, then announce and install-only on the phone.
+
+Starter exact navigation port e39747c passes local root/Android/Web (71 fresh
+cases, lint0 errors/44 warnings) and Apple42185888342 (129 cases/34 suites, artifact
+13489600174 digest verified). Starter578d97a records/pushes acceptance. No redispatch
+or Starter phone install. Mobile motion Native42183953532 also passes; all six
+native result groups/cleanup and381 cases verified. Prior27cff Apple42181039404
+passes1,626 cases; these runs predate the new send-order fix.
+
+SDK x86_64 driver95397 FINISHED901.084s; exact paired Kotlin and16KiB native ELF
+verified. Both arm64/x86_64 JNI files are in the isolated wrapper. Two-ABI AAR and
+native consumer remain unexecuted; shipping SDK dependency unchanged. Resume after
+the send issue, then native edit proof, domain-owned history paging and all54 PRD
+groups.32-bit and Apple SDK pairs remain pending. Runtime stays LIVE10485916 /
+schema116.1; no Platform product/deployment change. Never replay rollout or accepted
+Forward publications.
 
 
 ## Mobile release 41 installed; communications implementation continues — 6 November 2026

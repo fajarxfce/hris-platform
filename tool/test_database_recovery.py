@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 import database_recovery as recovery
+from container_images import postgres_image
 
 ROLE_SQL = """CREATE ROLE hris_migrator;
 ALTER ROLE hris_migrator WITH SUPERUSER LOGIN;
@@ -108,10 +109,34 @@ class BackupFilesTest(unittest.TestCase):
 
     def test_unexpected_image_is_rejected(self):
         manifest = self.make_backup()
-        manifest["postgresImage"] = "unrelated-image:latest"
-        (self.directory / "manifest.json").write_text(json.dumps(manifest))
-        with self.assertRaisesRegex(recovery.RecoveryError, "manifest"):
-            recovery.load_backup(self.directory)
+        digest = "a" * 64
+        for image in ("unrelated-image:latest", "registry.example/postgres@sha256:" + digest,
+                      "postgres:17.6-alpine@sha256:" + digest, "postgres:latest@sha256:" + digest,
+                      "postgres:18.6-alpine@sha256:" + digest[:-1],
+                      "postgres:18.6-alpine@sha256:" + digest.upper(),
+                      "postgres:18.6-alpine@sha512:" + digest,
+                      "postgres:18.6-alpine@sha256:" + digest + " --privileged",
+                      "postgres:18.6-alpine\n", None, 18):
+            with self.subTest(image=image), patch.object(recovery, "command") as command:
+                manifest["postgresImage"] = image
+                (self.directory / "manifest.json").write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(recovery.RecoveryError, "manifest"):
+                    recovery.load_backup(self.directory)
+                command.assert_not_called()
+
+    def test_pinned_and_legacy_images_round_trip_without_changing_the_restore_identity(self):
+        manifest = self.make_backup()
+        pinned = postgres_image()
+        digest_only = "postgres@" + pinned.split("@", 1)[1]
+        for image in ("postgres:18.6-alpine", digest_only, pinned):
+            with self.subTest(image=image), patch.object(recovery, "command") as command:
+                manifest["postgresImage"] = image
+                (self.directory / "manifest.json").write_text(json.dumps(manifest))
+                directory, actual = recovery.load_backup(self.directory)
+                self.assertEqual(self.directory, directory)
+                self.assertEqual(manifest, actual)
+                self.assertEqual(image, actual["postgresImage"])
+                command.assert_not_called()
 
     def test_role_restore_retains_grantor_and_bootstrap_attributes(self):
         self.make_backup()

@@ -49,3 +49,19 @@ local cases in306.132s: PostgreSQL isolation, both previously failing repeated-
 midnight HTTP cases, and worker context/lifecycle. Image consistency, formatting
 and architecture also pass. Full Verify on the corrected commit remains required
 before deployment. [Evidence](measurements/postgres-image-pin-2026-11-05.json).
+
+Recovery manifests retain the exact Docker image reference observed by the backup
+writer. The reader accepts legacy PostgreSQL18.x-alpine tags, digest-only names,
+and combined18.x-alpine tag/digest names without normalizing or dropping the
+digest. Other repositories/major versions, malformed hashes and appended arguments
+remain rejected before Docker. This closes the recovery-integration failure in
+42134116564 after all eight backend and four dashboard shards passed.
+
+[Recovery evidence](measurements/backup-image-manifest-2026-11-06.json):46 unit tests
+and an isolated real backup/restore passed on schema116.1, including104 objects,
+separate retained encryption keys, wrong-key rejection and document metadata scope/
+constraints. The fixture used verified exacta678 API/worker artifacts in a detached
+checkout, leaving the main build outputs and live services alone. A first local
+attempt lacked the CI-created result directory and is recorded as unaccepted; the
+second completed and removed its owned resources. Full CI on the corrected source
+is still required before deployment.

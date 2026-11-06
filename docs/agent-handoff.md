@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+## Backup image manifest recovery accepted locally — 6 November 2026
+
+Two Python changes fix load_backup rejecting the combined postgres18.x-alpine
+image/tag/digest emitted by the writer. Exact image identity is preserved; invalid
+images/hashes and appended arguments remain rejected before Docker.46 unit tests
+PASS; real isolated recovery2 PASS68.003s on schema116.1,104 objects/2,098,795bytes,
+2 identity envelopes, retained keys/wrong-key rejection, document/announcement/audit
+metadata and scope constraints. Resources removed; driver49025 drained.
+[Evidence](measurements/backup-image-manifest-2026-11-06.json).
+The first local fixture completed assertions/cleanup but could not write its result
+because its detached checkout lacked .work; recovery1 is unaccepted, not omitted.
+
+Isolated checkout: .worktrees/recovery-image-manifest detacheda678 plus the2 Python
+files. Verified GitHub artifacts server13465631967 SHAad30e7ea… and worker13464914631
+SHAfc27c739…; extracted JARs45dfbc10…/7b5968be…. Main build/libs were not changed.
+No build is active there; do not rerun accepted recovery2 or repeat Forward sends.
+
+CI42134116564 exacta678 passed all8 backend and4 dashboard shards but FAILED recovery-
+integration; dashboard-integration was still running at last audit. gh API raw job
+logs require --allow-escape-sequences; that option does not exist on gh run view.
+Commit/push this fix and dispatch one full Verify on its exact source; do not retry
+old a678. Prepared edit-release scripts target a678 and are UNEXECUTED: do not run
+against failed CI. No live changes:54b/schema116.1/flags and Matrix/keys retained.
+
+Mobile f993e2a9 edit outbox is pushed: full5,065/719.112s, zero failures/errors/skips,
+Android lint0,4,177 source inputs unchanged. Next11 editor/projection drafts have
+now been APPLIED to Mobile and are being integrated; no UI acceptance/build yet.
+History revision invalidation, exact review-bound acknowledgement, DI/VM/selection/
+localization and new tests are in progress. Mobile source is editable; no heavy
+local job currently. Both stashes preserved; phone40, stopped retained emulators,
+Starterbce2012 unchanged. Continue all54 PRD groups after this commit.
+
 ## Corrected ordering full CI running — 6 November 2026
 
 Product `a678286121b4ab8d0dd425f2498b5674966f74a0` is pushed. Full Verify

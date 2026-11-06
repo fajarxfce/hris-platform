@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-06",
+  "scope": "Accept the writer-retained combined PostgreSQL tag/digest in backup manifests without changing restore identity",
+  "sourceSha256": {
+    "tool/database_recovery.py": "cef8bdb8acc3e409829b3465eeec7cdc5080e9b57607df234df4219fdccd8ba1",
+    "tool/test_database_recovery.py": "f5ba6c2e3939f250eddd27ed4dba5dc822220bc2d6dc71e63fb28fc0db118831"
+  },
+  "unitTests": {
+    "command": "python3 -m unittest discover -s tool -p 'test_*recovery*.py'",
+    "tests": 46,
+    "failures": 0,
+    "errors": 0,
+    "reportedSeconds": 0.119
+  },
+  "isolatedRecovery": {
+    "startedAt": "2026-11-06T00:41:42.871525+00:00",
+    "elapsedSeconds": 68.003,
+    "exitCode": 0,
+    "sourcesUnchanged": true,
+    "result": {
+      "restorePassed": true,
+      "schema": "116.1",
+      "identityEnvelopesVerified": 2,
+      "objects": 104,
+      "bytes": 2098795,
+      "sourceUnchangedByRestore": true,
+      "wrongRetiredKeyRejected": true,
+      "separateKeyPack": true,
+      "temporaryResourcesRemoved": true,
+      "typedAccountAuditRestored": true,
+      "announcementDeliveryRestored": true,
+      "announcementEmailRestored": true,
+      "documentMetadataRestored": true,
+      "documentMetadataHistoryRestored": true,
+      "documentMetadataScopeAndConstraintsRestored": true,
+      "retainedIdentityKeyIds": [
+        "current",
+        "old"
+      ]
+    },
+    "inputs": {
+      "purpose": "Isolated recovery fixture only; failing CI is not a deployment acceptance",
+      "headSha": "a678286121b4ab8d0dd425f2498b5674966f74a0",
+      "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42134116564",
+      "fixture": "/home/fajar/hris/.worktrees/recovery-image-manifest",
+      "packages": [
+        {
+          "role": "server",
+          "artifactId": 13465631967,
+          "archiveSha256": "ad30e7ea5d969069283bda64e7c0c94cd653f432d6cddd6e689a2c8c35daf6ee",
+          "githubDigestVerified": true,
+          "jarSha256": "45dfbc10d141c02f61d12fa36c798b2703deec9b1b802e6ac573405a1ea189b1",
+          "bytes": 98700805
+        },
+        {
+          "role": "worker",
+          "artifactId": 13464914631,
+          "archiveSha256": "fc27c739f511c96bd19368a6d0ec937ad7c132200c4b7e14c3417183e2399d63",
+          "githubDigestVerified": true,
+          "jarSha256": "7b5968bec4da6e7a21f1963de6170e09bd4bf0dc58bbe5cc4fb540efa5a95706",
+          "bytes": 78770874
+        }
+      ],
+      "patchSha256": {
+        "database_recovery.py": "cef8bdb8acc3e409829b3465eeec7cdc5080e9b57607df234df4219fdccd8ba1",
+        "test_database_recovery.py": "f5ba6c2e3939f250eddd27ed4dba5dc822220bc2d6dc71e63fb28fc0db118831"
+      }
+    }
+  },
+  "priorLocalAttempt": {
+    "startedAt": "2026-11-06T00:38:54.124405+00:00",
+    "elapsedSeconds": 68.355,
+    "exitCode": 1,
+    "sourcesUnchanged": true,
+    "reason": "Fixture completed assertions and cleanup but could not write its result because the isolated checkout lacked the CI-created .work directory; unaccepted attempt. Directory was created before recovery2."
+  },
+  "ciFailure": {
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42134116564",
+    "headSha": "a678286121b4ab8d0dd425f2498b5674966f74a0",
+    "job": "recovery-integration",
+    "jobId": 127628122995,
+    "reason": "load_backup rejected postgres:18.6-alpine@sha256:<digest> emitted by the backup writer",
+    "logSha256": "adfcd2f56e4bd236563d919d9f918a08e35e9ec99ad6373f7461b72380024651"
+  },
+  "liveDeploymentPerformed": false
+}

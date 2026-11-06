@@ -1,33 +1,38 @@
 # Agent continuation — HRIS workspace
 
-## Current: Mobile 47 installed; phone pending remains open — 6 November 2026
+## Current: Mobile 48 installed; retained pending diagnosis next — 6 November 2026
 
-Mobile source [074087d7](https://github.com/fajarxfce/hris-mobile/commit/074087d7)
-fixes latest-head ACK recovery with a failing-then-passing encrypted-store regression.
-Its full gate passed 5,283 fresh cases/622 suites and lint zero. Release 47 built in
-102.699s and passed retained Bima-store offline/online room-entry acceptance, then
-installed on 10.77.77.3:5555 at 14:13:15 UTC in 59.807s. Exact device APK SHA:
-3e9c265984ba902d751aaa95966e054e86f97301610958b1a47f8dc1be2adcbe.
-Data/login remain; phone UI was not launched. Emulator stopped with keys/data intact.
+Mobile source [cf28a7c4](https://github.com/fajarxfce/hris-mobile/commit/cf28a7c4)
+implements progressive per-message receipt persistence and fixed queue mapping
+failure categories. Full required gate passed 7,081 fresh cases/911 suites with
+zero failures/errors/skips and zero shipping lint findings. Exact release48 built
+in122.575s and is installed on10.77.77.3:5555 after notice, install-only/no UI.
+Install started15:07:09UTC and completed72.806s. Device APK SHA matches
+444ade26ccb411aeda91b7579fbfd6b5abb194c85b3a55491c9e61d4e5a5aa38.
+App identity, first install, data and keys remain; normal immutable public SDK2.
+[Release and limitations](https://github.com/fajarxfce/hris-mobile/blob/1e61b930/docs/measurements/collaboration-release48-2026-11-06.json).
 
-The user explicitly reports release 47 STILL PENDING for a long time. New app-only
-logs show DeliverMessages QueueUnresolved. Do not claim resolved or ask again.
-Mobile 6c9e3cc9 records release acceptance and the next reproduced problem: a first
-ACK is not durable until the whole send window ends. Progressive callbacks and closed mapping classifications are UNCOMMITTED; the
-first-receipt regression passed, and full gate session 91409 is the only heavy local
-job. Follow Mobile handoff/current .work result before touching source or starting
-another build/emulator. More precise closed mapping diagnostics are also needed.
+User answered47 still pending; the phone issue is OPEN. After48 update its app was
+not running. One optional request to open Bima for closed mapping diagnostics is
+pending. Follow Mobile handoff before asking or changing source. Do not reset
+pending commands, guess receipts, or replace original sends. Oldest legacy mapping,
+current receipt absence, native family/device and room now have separate markers.
 
-Exact release-46/source 00a51e14 native CI passed on both ARM64 and x86_64 (386 cases/
-67 suites each), both protocol modes passed 14 checks with cleanup, portable passed
-4,249/461, Apple passed 1,646/181 plus iOS host build. Native SDK 2 is immutable and already public;
-never republish or replace its assets. Release 44 remains rejected.
+First48 emulator smoke failed a soft-logout check; original device/native parent
+were active and normal refreshes followed the callbacks. Reconnect entry showed
+ready without new bootstrap; cold same-store entry recovered. The response cause
+remains open. The second full smoke passed four offline/online openings with12rows
+each, no auth diagnostic/crash, same process after30s, settings restored and zero
+new sends. Both original screenshots were inspected; failed evidence is retained.
+Original Bima emulator stopped15:06:58UTC with data/keys intact. No heavy local job
+or owned emulator is active. Sourcecf28 native42236786643/control42236786667 CI
+continues; no manual redispatch. Previous exact00a51e14 CI is fully accepted.
 
-Platform source remains 4dc8c9d15cde42160f93096325360a7aeff65204; no backend runtime
-change here. Live remains 10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1.
-Never replay accepted Forward sends/publications or the live rollout. Starter stays
-578d97a; no HRIS queue-policy port. All 54 PRD groups remain active. Every future
-phone installation requires advance notice, explicit serial and install-only/no UI.
+Platform code4dc8c9d15cde42160f93096325360a7aeff65204 and live
+10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1 remain unchanged. Never replay
+accepted Forward sends/publications or live rollout. Starter stays578d97a; this
+HRIS receipt policy does not belong there. All54PRD groups remain active. Future
+phone installs require notice, explicit serial and --install-only/no UI.
 
 ## Prior checkpoint: Mobile SDK 2 and phone release 46 accepted — 6 November 2026
 

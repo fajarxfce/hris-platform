@@ -1,5 +1,30 @@
 # Agent continuation — HRIS workspace
 
+## Mobile release 42 delivered; shared navigation port in progress — 6 November 2026
+
+Mobile23ce87fa implements directional280ms page push/Back with RTL and reduced
+motion. Complete local gate passed6,979 fresh tests (one unchanged-source debug
+packaging retry); release42 built91.727s/lint0. Eight Android videos/four forward
+and four Back trials cover offline/online first and repeated room entry. All eight
+strips reviewed: retained bubbles move with the page and the conversation list
+returns intact. Separate cold startup confirms nine rows/no Retry/Older/Reconnect.
+Mobilee74c613f records the complete safe delivery evidence and limitations.
+
+PHONE NOW42, APK SHA09eea50a9ad0ef1f3b1294ba2e1fceb4503e418d3d6e795029c205c08376259f.
+Announced then installed08:06UTC, verified43.702s, data and identity preserved,
+no UI action. Never repeat this completed install. Both owned emulators stopped
+with original keys/data retained. Starter owns the only heavy local job18630,
+root/Android/Web validation of the exact three generic motion files. Its Apple
+scope follows a tested commit once. Follow Mobile's latest handoff before builds.
+
+The notification fixture correction27cff22a passes local/native two-phase recovery;
+no production deadline/assertion changed. SDK arm64 AAR970ea462 is built/verified
+but not consumed. Resume x86_64/consumer/native edit proof and history-pager domain
+ownership after the shared port, then all54 PRD groups. Runtime remains
+LIVE10485916/schema116.1; no Platform product/deployment change. Never replay the
+rollout or accepted Forward publications.
+
+
 ## Mobile release 41 installed; communications implementation continues — 6 November 2026
 
 Mobile58a5a6ed fixes retained reconnect feedback without changing access/recovery

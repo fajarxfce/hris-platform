@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Mobile replay fix and release recovery review — 6 November 2026
+
+Mobileac7668ae/abccff51 are pushed: unchanged original-message/alias/redaction
+replays preserve ciphertext and revisions. The full gate passed2,353 cases and
+Android/lint0; generated SDK files were moved outside Mobile before the successful
+unchanged-source quality repeat. Native runs42163759500 and42168989689 failed at
+HrisProofOriginalHistory.verify:54 (replay equality), which this fix addresses.
+The latter's new failureStage is validating_completion. Do not weaken the assertion.
+Platformef8a41b3 Control42168678959/provider42168678967 both PASSED. Product runtime
+stays LIVE10485916/schema116.1; no rollout is required. Never replay Forward sends.
+
+Phone is still40. Mobile release41 built108.555s, verified and installed only on
+the retained Bima emulator. Four first/repeated recordings show bubbles during
+transitions, including an offline process start. A transient reconnect warning in
+online repeat held phone delivery. A subsequent three-entry online probe had nine
+rows/no auth diagnostic or warning; server audit confirms token rotations53/54.
+The original transport interruption cause is unestablished. Mobile is correcting
+stale SDK warning/Retry presentation during OFFLINE/CONNECTING; local-read denial
+must remain visible. Follow Mobile/docs/agent-handoff.md (6485436c checkpoint).
+Emulator is stopped with data/keys retained. Mobile owns the current local UI gate.
+
+SDK arm64 JNI and nine paired Kotlin files are built/hashed, four16KB LOAD segments;
+NDK/Rust tooling is installed. No AAR or native edit consumer acceptance yet.
+Generated files live outside Mobile at .worktrees/matrix-sdk-android-arm64-2026-11-06.
+Continue phone delivery, native edit proof, the layer audit and all54 PRD groups.
+
 ## Mobile first-frame acceptance and native build — 6 November 2026
 
 Mobile91902546 implements bounded visible-room preparation;891e41e7 records its

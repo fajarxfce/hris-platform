@@ -731,6 +731,151 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun explicitBootstrapReplacementReturnsItsOwnPairAndClosesTheOriginalWithoutForgingAReceipt() {
+        val n = groupNative()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val original = UUID.randomUUID()
+        val operation = UUID.randomUUID()
+        val descriptor =
+            mapOf(
+                "operationId" to original,
+                "spaceId" to base.substringAfterLast('/'),
+                "accountId" to n.fixture.account,
+                "nativeSessionId" to n.session,
+                "deviceId" to device,
+                "expectedDeviceVersion" to 1,
+                "platform" to "ANDROID",
+                "clientBuild" to 28,
+            )
+        val input =
+            mapOf("deviceId" to device, "expectedDeviceVersion" to 1, "supersedes" to descriptor)
+        val path = "$base/native-device/bootstrap/replacements"
+        failure(
+            groupCall(n, path, input, operation = operation, build = "27"),
+            403,
+            "client_update_required",
+        )
+        failure(
+            groupCall(
+                n,
+                path,
+                input + ("supersedes" to (descriptor + ("nativeSessionId" to UUID.randomUUID()))),
+                operation = operation,
+                build = "29",
+            ),
+            409,
+            "collaboration_space_bootstrap_replacement_changed",
+        )
+        failure(
+            groupCall(n, path, input, operation = original, build = "29"),
+            409,
+            "collaboration_space_bootstrap_replacement_changed",
+        )
+        val response = groupCall(n, path, input, operation = operation, build = "29")
+        assertEquals(200, response.statusCode(), response.body())
+        assertTrue(response.headers().firstValue("Cache-Control").orElse("").contains("private"))
+        assertTrue(response.headers().firstValue("Cache-Control").orElse("").contains("no-store"))
+        val value = json.readTree(response.body())
+        assertEquals(
+            setOf("superseded", "replacementOperationId", "gateway"),
+            value.propertyNames().toSet(),
+        )
+        val proof = value["superseded"]
+        assertEquals(
+            setOf(
+                "operationId",
+                "spaceId",
+                "accountId",
+                "nativeSessionId",
+                "deviceId",
+                "expectedDeviceVersion",
+                "expectedGatewayVersion",
+                "platform",
+                "clientBuild",
+            ),
+            proof.propertyNames().toSet(),
+        )
+        assertEquals(original.toString(), proof["operationId"].asString())
+        assertEquals(base.substringAfterLast('/'), proof["spaceId"].asString())
+        assertEquals(n.fixture.account.toString(), proof["accountId"].asString())
+        assertEquals(n.session.toString(), proof["nativeSessionId"].asString())
+        assertEquals(device.toString(), proof["deviceId"].asString())
+        assertEquals(1L, proof["expectedDeviceVersion"].asLong())
+        assertTrue(proof["expectedGatewayVersion"].isNull)
+        assertEquals("ANDROID", proof["platform"].asString())
+        assertEquals(28, proof["clientBuild"].asInt())
+        assertEquals(operation.toString(), value["replacementOperationId"].asString())
+        val gateway = value["gateway"]
+        assertEquals(device.toString(), gateway["deviceId"].asString())
+        assertEquals(n.session.toString(), gateway["nativeSessionId"].asString())
+        assertEquals(0L, gateway["version"].asLong())
+        assertTrue(gateway["accessToken"].asString().startsWith("hris_mxg_a_"))
+        assertTrue(gateway["refreshToken"].asString().startsWith("hris_mxg_r_"))
+        assertEquals(
+            value,
+            json.readTree(groupCall(n, path, input, operation = operation, build = "29").body()),
+        )
+        assertEquals(
+            29,
+            database()
+                .queryForObject(
+                    "select client_build from collaboration_space_gateway_sessions where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where operation_id=?",
+                    Int::class.java,
+                    original,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where operation_id=?",
+                    Int::class.java,
+                    operation,
+                ),
+        )
+        failure(
+            groupCall(
+                n,
+                "$base/native-device/bootstrap",
+                mapOf("deviceId" to device, "expectedDeviceVersion" to 1),
+                operation = original,
+            ),
+            409,
+            "collaboration_space_gateway_changed",
+        )
+        failure(
+            groupCall(
+                n,
+                path,
+                input + ("supersedes" to (descriptor + ("operationId" to UUID.randomUUID()))),
+                operation = operation,
+                build = "29",
+            ),
+            409,
+            "operation_payload_mismatch",
+        )
+        for (body in
+            listOf(
+                input - "supersedes",
+                input - "expectedDeviceVersion",
+                input + ("supersedes" to (descriptor - "clientBuild")),
+            )) {
+            assertEquals(400, groupCall(n, path, body, build = "29").statusCode())
+        }
+        assertEquals(400, groupCall(n, path, input, operation = null, build = "29").statusCode())
+    }
+
+    @Test
     fun groupGatewayHttpRecoversLostBootstrapUsingOwnedStatusThenRefreshesTheExactPair() {
         val n = groupNative()
         val base = groupBase(n)

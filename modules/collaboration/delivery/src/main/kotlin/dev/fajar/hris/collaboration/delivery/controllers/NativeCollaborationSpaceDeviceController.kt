@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.collaboration.delivery.requests.*
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceBootstrapReplacementResponse
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceBootstrapResponse
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceDeviceResponse
 import dev.fajar.hris.collaboration.domain.entities.CollaborationLegacyRuntimeDrainStatus
@@ -79,6 +80,35 @@ class NativeCollaborationSpaceDeviceController(
         return ResponseEntity.ok()
             .header("Cache-Control", "private, no-store")
             .body(NativeCollaborationSpaceBootstrapResponse(result))
+    }
+
+    @PostMapping("/bootstrap/replacements", consumes = ["application/json"])
+    fun replaceSpaceGatewayBootstrap(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @PathVariable spaceId: UUID,
+        @RequestHeader("Idempotency-Key") operation: UUID,
+        @RequestBody input: ReplaceCollaborationSpaceGatewayBootstrapRequest,
+    ): ResponseEntity<NativeCollaborationSpaceBootstrapReplacementResponse> {
+        val result =
+            bootstrap
+                .execute(
+                    actor,
+                    identity.sessionId,
+                    identity.sessionVersion,
+                    spaceId,
+                    operation,
+                    input.deviceId,
+                    input.expectedDeviceVersion,
+                    input.expectedGatewayVersion,
+                    client.version,
+                    input.supersedes.toIntent(),
+                )
+                .response()
+        return ResponseEntity.ok()
+            .header("Cache-Control", "private, no-store")
+            .body(NativeCollaborationSpaceBootstrapReplacementResponse(result))
     }
 
     @GetMapping

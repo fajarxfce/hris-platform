@@ -1,7 +1,8 @@
-# Explicit bootstrap replacement — design under validation
+# Explicit bootstrap replacement
 
-Implementation and acceptance are pending. This records the next owning-domain
-change; it does not activate organization chat or establish phone-send recovery.
+The backend contract is implemented and validated. It does not activate organization
+chat or establish phone-send recovery. Mobile transport is accepted at3d666135;
+durable local handoff and SDK adoption remain separate integration.
 
 An original bootstrap can remain uncertain after its 30-second credential replay
 expires, or after an application update changes the actual client build. A status
@@ -66,7 +67,7 @@ credentials require one durable local transition; expiry during that write requi
 fresh authority and cannot erase either fact. An expired replacement can itself be
 superseded using a new durable intent and current observed revision.
 
-## Required evidence
+## Validation and remaining integration
 
 - Pure bounds, same-parent/identity/platform matching, distinct operation IDs,
   older actual-build metadata and monotonic revision policy.
@@ -81,3 +82,14 @@ superseded using a new durable intent and current observed revision.
 - Actual API mapping, normal bootstrap compatibility and complete worker context.
 - Mobile durable link/CAS, process interruption, old-account disposal and original SDK
   namespace before any product activation or claim of end-to-end adoption.
+
+Gate81290 passes303.216s:38 cases, zero failures/errors/skips,8,637 unchanged inputs.
+It includes policy4, PostgreSQL13 (new replacement and ordinary bootstrap), native
+HTTP19 and two actual worker contexts. Format, architecture and image checks pass.
+[Evidence](../measurements/collaboration-space-bootstrap-supersession-2026-11-06.json).
+The expired replay case uses the actual maintenance role and asserts exactly one
+cleared encrypted replay. New minimum build6 rejects actual old build5 while allowing
+its historical descriptor inside an admitted build6 replacement. No new schema or DI
+binding is introduced. Full worker regression remains in the separate accepted merge.
+Mobile linked-intent persistence, inherited-denial retention, original private-store
+possession and hard-parent recovery are not established by this backend gate.

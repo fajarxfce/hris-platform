@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-06",
+  "status": "backend-contract-accepted-product-adoption-pending",
+  "base": "2db3f35e",
+  "endpoint": "POST /api/v1/native/collaboration/spaces/{spaceId}/native-device/bootstrap/replacements",
+  "gate": {
+    "startedAt": "2026-11-06T19:09:57.523600+00:00",
+    "elapsedSeconds": 303.216,
+    "exitCode": 0,
+    "sourceFiles": 8637,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "scopes": {
+      "modules/collaboration/domain": {
+        "suites": 1,
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "suites": 2,
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "suites": 1,
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "suites": 2,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "inputManifestSha256": "d74d819d3fb70397bc89f0ed8e283c712d267489021befcab494693e878f298f",
+    "reportManifestSha256": "e1751514058fb9bdc89d7cb3eb5a2bc362c9671e76ee3fabd76b0ae16fdb67e0",
+    "checks": [
+      "pure supersession policy",
+      "actual PostgreSQL replacement and original bootstrap tests",
+      "native collaboration HTTP context",
+      "actual provisioning and room worker contexts",
+      "formatCheck",
+      "architectureCheck",
+      "containerImageCheck"
+    ]
+  },
+  "implementationInputs": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt": "e16f84e1bacc060d5f09d4735749839f95ef97f370bfa48d0e2d2d8c8e0cf19c",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceBootstrapSupersessionTest.kt": "9d72ae64835b4c6932763e08d0bb26f0c2d034cb3b277f03d2613563ec290e01",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationSpaceDeviceController.kt": "afc27c59b8266afbc51c6388fcc34eaf79484715077a14bf72bc3c59b0768e2b",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/ReplaceCollaborationSpaceGatewayBootstrapRequest.kt": "33e1a5f9fdf4b5d8cc8dcb1c2fbb4944d32dd89dae4bb1edf7b662870a5c6390",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationSpaceBootstrapReplacementResponse.kt": "12b83302dc9b90906c716778fa7ca0903a150720f9d583dc6b245e257a1a28ad",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceGatewayBootstrap.kt": "3a0f2bb8d1485bb2f47a7d38b3c5561270d39cbcfe4511f8039620f45481c43b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceGatewayBootstrapIntent.kt": "15b18718c7e9cf9e7385da638fce5840d74b367842fcd29df30b8bbcdd9ec964",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceBootstrapSupersessionPolicy.kt": "b8c326afa15f81799d5b3576f365681ca7c9c3920f1e186c6045f7deec77191f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/BootstrapNativeCollaborationSpaceGateway.kt": "f1c06ac8db38397c6f17e4c4a4ba0d26800008ad4d6d0fee7e0f0600e5bb1d25",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationSpaceBootstrapSupersessionPolicyTest.kt": "00151c6111c20c784eb4b54e13418b9be20389ca9d94465f2a73c9bca9d212bc"
+  },
+  "cases": [
+    "initially absent original is fenced without a fabricated receipt",
+    "late original waiting after its operation lock cannot apply or deadlock replacement",
+    "actual maintenance-role cleanup clears one expired replay before recovery",
+    "current minimum-build increase accepts historical original metadata only in the body",
+    "repeated lost responses use flat immediate predecessor coordinates",
+    "competing replacements and refresh select one guarded winner",
+    "receipt/journal/cancellation/final-time failures roll back credentials and fence",
+    "complete HTTP proof, actual new build, cache-control and mandatory input validation",
+    "ordinary bootstrap compatibility and original payload fingerprint retained"
+  ],
+  "limits": {
+    "newSchema": false,
+    "diBindingsChanged": false,
+    "fullWorkerRegression": "Accepted separately in merge2db3f35e; this gate exercises two full application contexts, not all worker test methods.",
+    "mobileTransport": "Accepted at3d666135; durable original/successor workflow remains in progress.",
+    "productActivated": false,
+    "livePlatform": "10485916ee02850cf913793398f7ef3dd1e09afb",
+    "liveSchema": "116.1",
+    "organizationMigrations": "117-137 unshipped",
+    "phoneRelease": 50,
+    "phonePendingSendResolved": false,
+    "newPhoneInstall": false,
+    "newMessagesSent": 0,
+    "liveRollout": false
+  }
+}

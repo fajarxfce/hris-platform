@@ -1,5 +1,20 @@
 # Delivery and validation
 
+## Explicit organization bootstrap replacement — 6 November 2026
+
+The existing guarded bootstrap now accepts an explicit original descriptor in a
+separate replacement route, retains ordinary fingerprints and issues only the new
+operation's receipt. Its monotonic head fences late original application/replay without
+an original-operation lookup or extra schema. Complete returned coordinates prevent
+UUID-only false confirmation. Current actual client policy remains authoritative.
+
+Gate81290 passes303.216s:38 cases, no failures/errors/skips,8,637 unchanged inputs,
+including real PostgreSQL races/maintenance cleanup/rollback, API and two worker contexts.
+Format/architecture/image checks pass. [Evidence](measurements/collaboration-space-bootstrap-supersession-2026-11-06.json).
+Mobile transport3d666135 is accepted; its durable local handoff/owning recovery and
+original SDK adoption remain next. No group activation, live schema change or phone
+send acceptance follows from this contract. Current work is in the agent handoff.
+
 ## Organization branch reconciliation accepted — 6 November 2026
 
 Merge Main `8bad394e` into organization branch `28bcf2a4`. Shared DI retains both

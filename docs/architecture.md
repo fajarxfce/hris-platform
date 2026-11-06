@@ -39,6 +39,11 @@ The [original owned-room inventory](collaboration/space-original-room-inventory.
 
 The [organization DIRECT sync scope](collaboration/space-room-sync-scope.md) now provides bounded immutable participant-owned room metadata and a deterministic original-identity digest. Peer offboarding does not remove owned history. Current sync admission, separately retained original room inventory and provider dispatch remain required.
 
+[Explicit group bootstrap replacement](collaboration/space-bootstrap-supersession.md)
+uses the existing monotonic gateway head to fence late original operations and returns
+a complete effect descriptor with the replacement's own credentials. Original command
+fingerprints remain unchanged. Durable Mobile handoff and SDK adoption remain separate.
+
 ## Deployment and modules
 
 One modular monolith serves a single organization group with multiple companies. API and worker roles share code and PostgreSQL. The React application consumes the same versioned API as the future Compose client.

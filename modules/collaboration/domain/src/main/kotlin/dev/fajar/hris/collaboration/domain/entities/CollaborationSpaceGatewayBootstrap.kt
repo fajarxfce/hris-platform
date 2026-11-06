@@ -11,6 +11,7 @@ class CollaborationSpaceGatewayBootstrap(
     val matrixUserId: String,
     val matrixDeviceId: String,
     val tokens: CollaborationSpaceGatewayTokens,
+    val replacement: CollaborationSpaceGatewayReplacementReceipt? = null,
 ) {
     override fun toString() = "CollaborationSpaceGatewayBootstrap(<redacted>)"
 }

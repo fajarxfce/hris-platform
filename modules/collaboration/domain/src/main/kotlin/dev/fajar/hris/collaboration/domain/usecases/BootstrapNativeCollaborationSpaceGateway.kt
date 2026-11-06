@@ -42,6 +42,7 @@ class BootstrapNativeCollaborationSpaceGateway(
         expectedDeviceVersion: Long,
         expectedGatewayVersion: Long?,
         client: ClientVersion?,
+        supersedes: CollaborationSpaceGatewayBootstrapIntent? = null,
     ): Result<CollaborationSpaceGatewayBootstrap> {
         if (actor.companyId != null)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_scope_required"))
@@ -55,6 +56,21 @@ class BootstrapNativeCollaborationSpaceGateway(
         )
             return changed()
         val currentClient = requireNotNull(client)
+        if (supersedes != null) {
+            val replacement =
+                CollaborationSpaceGatewayBootstrapIntent(
+                    operationId,
+                    spaceId,
+                    actor.accountId,
+                    parentId,
+                    deviceId,
+                    expectedDeviceVersion,
+                    expectedGatewayVersion,
+                    currentClient,
+                )
+            val valid = validateCollaborationSpaceBootstrapSupersession(supersedes, replacement)
+            if (valid is Result.Failed) return valid
+        }
         val key =
             OperationKey(
                 "collaboration.space_gateway_bootstrap",
@@ -67,7 +83,21 @@ class BootstrapNativeCollaborationSpaceGateway(
                     expectedGatewayVersion?.toString() ?: "initial",
                     currentClient.platform.name,
                     currentClient.build.toString(),
-                ),
+                ) +
+                    if (supersedes == null) emptyList()
+                    else
+                        listOf(
+                            "supersedes:v1",
+                            supersedes.operationId.toString(),
+                            supersedes.spaceId.toString(),
+                            supersedes.accountId.toString(),
+                            supersedes.nativeSessionId.toString(),
+                            supersedes.deviceId.toString(),
+                            supersedes.expectedDeviceVersion.toString(),
+                            supersedes.expectedGatewayVersion?.toString() ?: "initial",
+                            supersedes.client.platform.name,
+                            supersedes.client.build.toString(),
+                        ),
             )
         val started = clock.instant()
         return transactions.run(actor) {
@@ -105,6 +135,7 @@ class BootstrapNativeCollaborationSpaceGateway(
                     device.matrixUserId,
                     device.matrixDeviceId,
                     tokens,
+                    supersedes?.let { CollaborationSpaceGatewayReplacementReceipt(it, operationId) },
                 )
 
             fun admission(): Result<CollaborationSpaceAdmission> {
@@ -282,11 +313,18 @@ class BootstrapNativeCollaborationSpaceGateway(
                             ChangeRecord(
                                 "collaboration_space_device",
                                 deviceId,
-                                "collaboration.space_gateway_bootstrapped",
+                                if (supersedes == null) "collaboration.space_gateway_bootstrapped"
+                                else "collaboration.space_gateway_bootstrap_replaced",
                                 mapOf(
                                     "spaceId" to spaceId.toString(),
                                     "gatewayVersion" to next.version.toString(),
-                                ),
+                                ) +
+                                    if (supersedes == null) emptyMap()
+                                    else
+                                        mapOf(
+                                            "supersededOperationId" to
+                                                supersedes.operationId.toString()
+                                        ),
                             ),
                         )
                     }

@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Current: explicit bootstrap replacement accepted — 6 November 2026
+
+Merge2db3f35e is pushed. Ten Kotlin files now implement explicit bootstrap replacement,
+with the existing monotonic gateway head fencing original CAS/replay. The normal
+bootstrap fingerprint is unchanged; a replacement has its own operation/receipt and
+returns the complete superseded effect descriptor plus its new gateway. No original
+receipt is invented, no reverse original-operation lock added, and no new schema/DI.
+[Contract](collaboration/space-bootstrap-supersession.md),
+[evidence](measurements/collaboration-space-bootstrap-supersession-2026-11-06.json).
+
+Gate81290 PASSED303.216s:38 fresh cases, zero failures/errors/skips,8,637 stable inputs.
+Policy4/data13/API19/worker2 cover actual races, repeated lost responses, real maintenance
+cleanup of one replay, raised minimum-build policy, rollback/cancellation and HTTP proof.
+Existing ordinary bootstrap regressions and both worker application contexts pass;
+complete worker144 remains separately accepted in merge2db3f35e. Format, architecture
+and image checks pass. Prepared .work input is historical; never reapply it over HEAD.
+
+Mobile transport3d666135 is pushed. Focused46 and final root/Android/browser gates pass,
+with the first format-only failed run retained honestly. Its initial CI control42277469255
+and native42277469245 are running; audit those exact-head artifacts after completion,
+not old source results or a new redispatch. No protocol run was triggered by this change.
+
+Mobile now has eleven APPLIED, uncommitted raw storage files for atomic archiveAndInsert.
+The original exact record remains immutable with a local successor link; no remote
+completion is asserted. Repeat returns false and requires explicit retained reconciliation.
+Actual-store observer coverage checks there is no intermediate empty projection.
+Focused core gate9852 is the ONLY heavy local job; do not build/run an emulator alongside
+it. After raw acceptance, implement and validate the encrypted HRIS linked-intent consumer
+and owning preparation/replay, then port only generic storage to Starter. Preserve
+inherited access/MFA denial when old restriction writes failed, including another build
+update before HTTP. Private-store possession, hard-parent recovery and SDK adoption remain
+required before group UI/background routing. Continue media/voice/calls/meet; all54 groups open.
+
+Phone50/live10485916/schema116.1 and Starter578d97a remain unchanged. Group V117–137
+remain unshipped. The user's long-pending send report remains OPEN. Read-only19:04UTC
+logs from both Android UIDs retain no new Chat/crash lines after50; no new phone-send
+result is known. Keep original emulator data/keys; all owned emulators are stopped.
+No phone UI, new send, SDK publication, deployment or phone installation occurred.
+Announce every later phone install and use explicit serial/--install-only. Push each commit.
+
 ## Current: organization branch reconciled with shipped fixes — 6 November 2026
 
 This worktree is `feat/communication-space`, merging Main

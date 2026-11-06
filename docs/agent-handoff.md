@@ -1,36 +1,41 @@
 # Agent continuation — HRIS workspace
 
-## Mobile send-order repair active; shared navigation port accepted — 6 November 2026
+## Mobile release43 accepted; queue recovery remains active — 6 November 2026
 
-PHONE NOW42, APK SHA09eea50a9ad0ef1f3b1294ba2e1fceb4503e418d3d6e795029c205c08376259f.
-Announced then installed08:06UTC, verified43.702s, data and identity preserved,
-no UI action. Mobilee74c613f records eight reviewed forward/Back emulator videos,
-retained offline/online chat and release evidence. Do not repeat this install or
-launch/drive the user's phone. Both original-data emulators are stopped.
+Mobile46bec39a fixes the false interrupted-save banner and pending BBB moving above
+confirmed AAA. Full local gate passed6,983 fresh cases, Android/lint0 and Web.
+Release43 built from that exact source and passed retained-data offline/online
+Bima emulator first/repeat entry, all three screenshots reviewed. APK SHA
+639a5454496813a9ad4fa70294a4fbb5364df8473658468662a199167fd970bf.
+PHONE STILL42: bounded ADB reconnects time out;43 is ready, not installed. Do not
+rebuild it. Announce every install, then use Mobile's exact accepted artifact with
+--install-only; never launch/drive the phone UI. Mobile56f48bd8 records acceptance.
 
-Latest reports take priority: pending BBB moves above confirmed AAA, and normal
-local submissions display interrupted-save feedback. Mobile fixes both presentation
-behaviors; focused16 cases pass, including sequential acknowledgements with
-client/server clock skew. Closed StageMessage/DeliverMessages diagnostics are
-added without changing queue policy. Actual long pending remains under diagnosis.
-Mobile full gate97634 is the ONLY heavy local job;43 is only prepared, not built
-or installed. Follow its current handoff before another build/emulator. After its
-gate, commit/push, build/inspect43, then announce and install-only on the phone.
+Long pending diagnosis continues. Mobile0757067f retains a reproduced worker test:
+the fake SDK accepts an event but retains its native transaction after losing the
+response. First-message recovery completes; the next message blocks QueueUnresolved.
+Real encrypted stores and actual application worker are used, but this is not a
+native/phone root-cause proof. SDK settlement draft is separate, not shipping.
+Follow Mobile's current handoff before building or editing its SDK worktree.
+Only current heavy job is the new queue core test85403's follow-up core-2; no emulator
+active. The raw-event candidate described below excludes this new queue draft.
 
-Starter exact navigation port e39747c passes local root/Android/Web (71 fresh
-cases, lint0 errors/44 warnings) and Apple42185888342 (129 cases/34 suites, artifact
-13489600174 digest verified). Starter578d97a records/pushes acceptance. No redispatch
-or Starter phone install. Mobile motion Native42183953532 also passes; all six
-native result groups/cleanup and381 cases verified. Prior27cff Apple42181039404
-passes1,626 cases; these runs predate the new send-order fix.
+Mobile4629aad9 records accepted isolated raw-event consumption. Paired arm64/x86_64
+AAR SHA94d907f139a7484bd687b538d8cfce3e90478daa2ab93b9835d9aa8a606becae,
+consumer build486.129s/lint0; provider b5707215cb144219bf2899cc6e5d6884 passed55.429s,
+both browser cases/native E2EE/refresh/logical IDs/offline invitee and cleanup.
+The fixture requires emulator-5560; initial serial and boot setup failures are
+retained separately. Owned fresh-data emulator564348 stopped09:35:40UTC. Bima data,
+phone and live Platform runtime untouched. Shipping SDK dependency unchanged;
+32-bit/Apple/minified and HRIS native edit recovery remain pending.
 
-SDK x86_64 driver95397 FINISHED901.084s; exact paired Kotlin and16KiB native ELF
-verified. Both arm64/x86_64 JNI files are in the isolated wrapper. Two-ABI AAR and
-native consumer remain unexecuted; shipping SDK dependency unchanged. Resume after
-the send issue, then native edit proof, domain-owned history paging and all54 PRD
-groups.32-bit and Apple SDK pairs remain pending. Runtime stays LIVE10485916 /
-schema116.1; no Platform product/deployment change. Never replay rollout or accepted
-Forward publications.
+Starter navigation e39747c passes local root/Android/Web71 cases and Apple129
+cases; Starter578d97a records acceptance. Mobile46bec39a Native42191546121 and
+Control42191546066 running at09:33UTC; do not dispatch duplicates. Earlier motion
+native/Apple evidence predates the send fix. Continue queue recovery, native edit,
+domain-owned history paging and all54 PRD groups. Platform remains
+LIVE10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1 unchanged. Never replay
+rollout or accepted Forward publications.
 
 
 ## Mobile release 41 installed; communications implementation continues — 6 November 2026

@@ -12,15 +12,15 @@ Data/login remain; phone UI was not launched. Emulator stopped with keys/data in
 
 The user explicitly reports release 47 STILL PENDING for a long time. New app-only
 logs show DeliverMessages QueueUnresolved. Do not claim resolved or ask again.
-Mobile 5826a6d6 records release acceptance and the next reproduced problem: a first
-ACK is not durable until the whole send window ends. Progressive callback changes
-are currently UNCOMMITTED; focused green-1 session 41182 is the only heavy local
+Mobile 6c9e3cc9 records release acceptance and the next reproduced problem: a first
+ACK is not durable until the whole send window ends. Progressive callbacks and closed mapping classifications are UNCOMMITTED; the
+first-receipt regression passed, and full gate session 91409 is the only heavy local
 job. Follow Mobile handoff/current .work result before touching source or starting
 another build/emulator. More precise closed mapping diagnostics are also needed.
 
 Exact release-46/source 00a51e14 native CI passed on both ARM64 and x86_64 (386 cases/
 67 suites each), both protocol modes passed 14 checks with cleanup, portable passed
-4,249/461, and Apple remains pending. Native SDK 2 is immutable and already public;
+4,249/461, Apple passed 1,646/181 plus iOS host build. Native SDK 2 is immutable and already public;
 never republish or replace its assets. Release 44 remains rejected.
 
 Platform source remains 4dc8c9d15cde42160f93096325360a7aeff65204; no backend runtime

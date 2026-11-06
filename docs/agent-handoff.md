@@ -1,6 +1,35 @@
 # Agent continuation — HRIS workspace
 
-## Mobile SDK 2 and phone release 46 accepted — 6 November 2026
+## Current: Mobile 47 installed; phone pending remains open — 6 November 2026
+
+Mobile source [074087d7](https://github.com/fajarxfce/hris-mobile/commit/074087d7)
+fixes latest-head ACK recovery with a failing-then-passing encrypted-store regression.
+Its full gate passed 5,283 fresh cases/622 suites and lint zero. Release 47 built in
+102.699s and passed retained Bima-store offline/online room-entry acceptance, then
+installed on 10.77.77.3:5555 at 14:13:15 UTC in 59.807s. Exact device APK SHA:
+3e9c265984ba902d751aaa95966e054e86f97301610958b1a47f8dc1be2adcbe.
+Data/login remain; phone UI was not launched. Emulator stopped with keys/data intact.
+
+The user explicitly reports release 47 STILL PENDING for a long time. New app-only
+logs show DeliverMessages QueueUnresolved. Do not claim resolved or ask again.
+Mobile 5826a6d6 records release acceptance and the next reproduced problem: a first
+ACK is not durable until the whole send window ends. Progressive callback changes
+are currently UNCOMMITTED; focused green-1 session 41182 is the only heavy local
+job. Follow Mobile handoff/current .work result before touching source or starting
+another build/emulator. More precise closed mapping diagnostics are also needed.
+
+Exact release-46/source 00a51e14 native CI passed on both ARM64 and x86_64 (386 cases/
+67 suites each), both protocol modes passed 14 checks with cleanup, portable passed
+4,249/461, and Apple remains pending. Native SDK 2 is immutable and already public;
+never republish or replace its assets. Release 44 remains rejected.
+
+Platform source remains 4dc8c9d15cde42160f93096325360a7aeff65204; no backend runtime
+change here. Live remains 10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1.
+Never replay accepted Forward sends/publications or the live rollout. Starter stays
+578d97a; no HRIS queue-policy port. All 54 PRD groups remain active. Every future
+phone installation requires advance notice, explicit serial and install-only/no UI.
+
+## Prior checkpoint: Mobile SDK 2 and phone release 46 accepted — 6 November 2026
 
 Current Mobile checkpoint is [e456e156](https://github.com/fajarxfce/hris-mobile/commit/e456e156),
 with release 46 built from pushed source 00a51e14. The normal public dependency is

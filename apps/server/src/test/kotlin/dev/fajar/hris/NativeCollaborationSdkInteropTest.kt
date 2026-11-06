@@ -415,6 +415,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "Local queue settlement must never request server redaction",
             )
             val applicationReads = trace.applicationAdmissions()
+            writePrivate(
+                directory.resolve("history-admission.json"),
+                trace.historyAdmissionEvidence(),
+            )
             assertTrue(
                 listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 10 }
             )

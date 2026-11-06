@@ -1,30 +1,40 @@
 # Agent continuation — HRIS workspace
 
-## Current: Mobile SDK refresh retry fix; native rebuild — 6 November 2026
+## Current: native cached-history admission fixture accepted — 6 November 2026
 
-Mobile [411b323c](https://github.com/fajarxfce/hris-mobile/commit/411b323c) commits a
-validated Matrix SDK patch for the reproduced Bima emulator token-boundary error.
-The actual gateway returned refresh200 then429/rotation_too_soon. Upstream SDK
-incorrectly treated the transient refresh as session rejection and any wrapped
-refresh as an expired queue token. The patch retains Retry-After and forwards its
-structured error through existing FFI types; genuine denials remain authoritative.
-5core policy tests,18HTTP refresh integration cases,2FFI cases and3Python driver
-cases pass. Red evidence and exact12-file patch reconstruction are recorded in
-Mobile docs/measurements/collaboration-sdk-refresh-retry-2026-11-06.json.
+This commit changes test instrumentation only. Sourcecf28 Mobile CI failed both
+native ABIs because the trace expected a network context request despite a cached
+SDK window, and old absolute admission counts included the sender's final admission
+that the injected progressive-ACK projection failure now precedes. The corrected
+trace compares history admission with the actual send checkpoint, retains two
+heads, proves post-history/provider admission and keeps page bounds/positions.
+It records closed integer checkpoints before assertions; no IDs or message bodies.
+[Validation and failed attempts](measurements/collaboration-cached-history-admission-2026-11-06.json).
 
-Shipping staysSDK2; phone remains48 with one request to open Bima pending. Old
-per-message pending remains unclassified; do not confuse emulator root cause with
-full phone resolution. Original Bima store is retained and emulator stopped.
-Only heavy local job is ARM64 SDK build25579, Mobile
-.work/chat-refresh-boundary-2026-11-06/android-arm64. Its12pinned SDK source inputs
-are FROZEN. After it passes, x86_64/ARMv7/x86, binding parity, candidate packaging,
-actual token-boundary and normal release acceptance remain before the next phone
-update. No published SDK asset or production backend was modified.
+Seven positive/negative trace tests plus format/architecture pass33.540s. Native
+SDK2 x86_64 final run63241/native-sdk2-3 passes both scenarios174.389s on12,459
+unchanged inputs and the exact Mobile proof APK SHA
+e4db3b5d0912bafe3c9384a756271bb3680ebbe43d8d10a8c3c3d0ce86c6557c.
+Each sends three encrypted events exactly once, zero redactions, survives process
+death and offline recovery, then cleans up. First/head/recovery/final permission
+counts are2/3/22/25; provider checkpoints5/6/7/9. Keep rejected native-1 and native-2
+evidence; their three-head and absolute-four assumptions were wrong. This is not
+physical-phone pending acceptance and not yet SDK3 runtime acceptance.
 
-Platform live10485916/schema116.1 and Starter578d97a remain unchanged. Keep all54
-PRD groups active, follow Mobile current handoff, never replay accepted sends,
-rollouts or SDK publication. Future phone installs require advance notice,
-explicit serial and --install-only/no UI.
+Owned fixture emulator3181930/startTicks165755158 stopped16:05:06UTC; original Bima
+emulator is also stopped with its data/keys intact. No heavy job remains here.
+Mobile has a fully built four-ABI SDK3 refresh-backoff candidate, unshipped and
+unpublished. AAR SHA1e6871785970f8652759f57b4d59229aa16ac9a198309cedc13b5ac64168cadc.
+Next follow Mobile's current handoff: build candidate49, prove its token-boundary
+and retained-store behavior, accept SDK3 native recovery, then immutable publication
+and normal shipping gates. Pin this fixture revision in Mobile's native workflow
+with the SDK3 dependency switch, avoiding a redundant SDK2 CI dispatch.
+
+Phone remains48, with one optional Bima-open question pending; its app was not
+running16:00UTC last check. Never repeat the answered47 question or drive phone UI.
+Future phone installs require advance notice, explicit serial, --install-only.
+Live Platform10485916/schema116.1 and Starter578d97a are unchanged. No deployment,
+accepted Forward send, or SDK1/2 publication may replay. All54PRD groups remain active.
 
 ## Prior checkpoint: Mobile 48 installed; retained pending diagnosis next — 6 November 2026
 

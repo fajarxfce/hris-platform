@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Current: Mobile handoff validated; Starter port running — 6 November 2026
+
+Backend implementation344211f83ed85e381f0002519c727a544efa7d8b remains accepted and pushed;
+its38-case supersession gate and merge2db3f35e evidence below are unchanged. No Group
+code, schema, deployment, SDK publication or accepted-send rerun in this checkpoint.
+
+Mobile7ef01cd57caad50f7bdb7ebee782c7cc45413bcf is pushed: raw atomic archiveAndInsert,
+real encrypted linked-intent storage, explicit replacement preparation and durable replay.
+Raw95 and consumer72 pass. Complete Mobile44869 PASSED723.803s:5,941 fresh tests,
+zero failures/errors/skips,4,228 stable inputs; root, browser, Android/proof, actual DI,
+format/architecture and lint0 pass. Original uncertainty/local successor links remain
+separate from received replacement proofs. Known denial and original SDK namespace are
+preserved. See Mobile docs/collaboration-space-bootstrap-handoff.md and its evidence.
+
+The exact11 generic database files are APPLIED in Starter after six base hashes and five
+new paths were verified. Starter30376 is the ONLY heavy local gate (root/database/browser/
+Android/Web); no other local build or emulator until it ends. No Starter port commit/CI yet.
+First7ef Mobile CIcontrol42282707724/native42282707833 is queued behind preceding3d666
+control42277469255 (portable success, Apple running) and native42277469245 (emulators running).
+Audit exact completed first-source artifacts; do not redispatch or relabel older evidence.
+
+NEXT: finish/record/push Starter, obtain its first-source Apple verification, then continue
+private-store possession/inventory, hard-parent recovery, old-runtime freeze/drain/adoption,
+organization runtime/UI/background routing and all54 PRD groups. Group V117–137 remain
+unshipped and disabled; live10485916/schema116.1 unchanged. Phone50 remains installed;
+its long-pending-send report is still OPEN. Passive19:29UTC UID audit retains no new
+post-install Chat/crash lines, which is not a phone-send result. No phone UI/installation/
+new sends occurred. Preserve Bima emulator userdata/sidecars/keys; all emulators stopped.
+
+
 ## Current: explicit bootstrap replacement accepted — 6 November 2026
 
 Merge2db3f35e is pushed. Ten Kotlin files now implement explicit bootstrap replacement,

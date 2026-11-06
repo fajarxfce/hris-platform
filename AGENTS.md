@@ -8,6 +8,11 @@ For continuation across the three repositories, first read [docs/agent-handoff.m
 - Datasources implement contracts, perform raw I/O, return raw values/DTOs, and preserve technical exceptions. Never datasource-to-datasource dependencies or application policy.
 - Repositories coordinate datasource contracts and map values/errors into domain Result. Never repository-to-repository dependencies or UI state.
 - Use cases coordinate repositories and own policy and transaction boundaries. Never use-case-to-use-case calls. Reuse named pure domain policies where appropriate.
+- Keep screen/HTTP/worker adapters focused on their entry-point state and use-case
+  results. Business retry, provisioning and reconciliation workflows belong in use
+  cases coordinating repositories and pure policies. Do not conceal misplaced
+  responsibilities in generic helpers, utilities or controllers. Extract a component
+  only when it has a clear role and lifetime; method count alone is not the goal.
 - HTTP controllers and worker adapters invoke use cases. DI belongs in one configuration entry point per module; use constructors. Keep feature endpoints in their module.
 - Centralize repeated technical error mapping in named public safe functions. Acquisition and mapping share the boundary. Preserve cancellation/interruption and failure classification. No hidden retry, permission, session, or lifecycle policy in safe functions.
 - TransactionRunner must roll back on a failed Result. Business writes, audit, outbox, and idempotency receipts commit atomically where required. External delivery happens after commit.

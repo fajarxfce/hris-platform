@@ -235,5 +235,50 @@
     "Fixture-only change; does not resolve or prove physical-phone pending delivery.",
     "SDK3 runtime acceptance remains separate.",
     "The confirmed-native scenario constructs a server-accepted event beside its paused original; it is not a literal lost-HTTP-response injection."
-  ]
+  ],
+  "sdk3Arm64": {
+    "startedAt": "2026-11-06T16:30:18.679593+00:00",
+    "elapsedSeconds": 251.177,
+    "exitCode": 0,
+    "sourceFiles": 12459,
+    "sourcesUnchanged": true,
+    "apkSha256": "538dc2ba390867d90579c897a237ac80a7f3cf97efaafefac1acad8606a35cc4",
+    "apkUnchanged": true,
+    "counts": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "resultSha256": "f0110ccf747de0821ea3a53c630c4ec3c4bdc4b70bd3e0ab94530407247a1bb9",
+    "fixtureCommit": "62ee11818a4928b2598d046c7b3283bf3e416554",
+    "scenarios": [
+      {
+        "passed": true,
+        "cleanup": true,
+        "sdkAccessRenewed": true,
+        "coldHistoryRecoveredOffline": true,
+        "gatewayUnavailableAfterProcessDeath": true,
+        "encryptedSendCount": 3,
+        "nativeRedactionRequests": 0,
+        "retainedConfirmedQueueScenario": false,
+        "confirmedNativeQueueRestored": null,
+        "confirmedNativeQueueSettledOffline": null,
+        "confirmedNativeQueueRetryNoop": null
+      },
+      {
+        "passed": true,
+        "cleanup": true,
+        "sdkAccessRenewed": true,
+        "coldHistoryRecoveredOffline": true,
+        "gatewayUnavailableAfterProcessDeath": true,
+        "encryptedSendCount": 3,
+        "nativeRedactionRequests": 0,
+        "retainedConfirmedQueueScenario": true,
+        "confirmedNativeQueueRestored": true,
+        "confirmedNativeQueueSettledOffline": true,
+        "confirmedNativeQueueRetryNoop": true
+      }
+    ]
+  }
 }

@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Mobile SDK 2 and phone release 46 accepted — 6 November 2026
+
+Current Mobile checkpoint is [e456e156](https://github.com/fajarxfce/hris-mobile/commit/e456e156),
+with release 46 built from pushed source 00a51e14. The normal public dependency is
+matrix-sdk-26.10.23-hris.2, published once as immutable prerelease 436496933 after
+retained-store and actual ARM64 recovery acceptance. SDK 1 and rejected release 44
+must not be installed or republished. See Mobile's current handoff for all artifact
+hashes and native scopes; the older SDK-distribution checkpoint below is historical.
+
+Release 46 is now installed on 10.77.77.3:5555 after advance notice, install-only,
+without launching phone UI. Exact device APK SHA matches
+11ef605c8f92f69d7d2e9599feec9591bf041c69a331d344225974800df6e8e8.
+Data/app identity/first-install time remain. Retained Bima emulator passed repeated
+offline and online room entry and stopped 13:25:39 UTC with its original keys/data.
+The available-phone question is answered. One optional ordered-send/pending feedback
+question is outstanding; physical-phone send latency has not been measured.
+
+Platform source/fixtures remain 4dc8c9d15cde42160f93096325360a7aeff65204 before this
+docs-only checkpoint. Actual SDK 2 ARM64 fixture ran both existing scenarios in
+254.246s with three encrypted sends and zero redactions per case, two process
+restarts, offline settlement and repeat no-op. No production source changed.
+The exact Mobile 00a51e14 CI runs are still being audited: 42224141387 (now both
+ARM64 and x86_64), 42224141654 (protocol), 42224141378 (portable/Apple).
+Do not redispatch accepted old runs or replace SDK assets.
+
+Only heavy local job is Mobile's history-completion-domain-2026-11-06/full-1,
+session 87727. It validates a new domain-owned history-end scan; implementation is
+not yet accepted/committed. Do not overlap an emulator/build or alter its inputs.
+Follow Mobile's current handoff and .work result before starting another local gate.
+All 54 PRD groups remain active. Starter stays 578d97a; no HRIS-specific policy port.
+Live Platform remains 10485916ee02850cf913793398f7ef3dd1e09afb/schema116.1. Never
+replay accepted Forward publications or that rollout.
+
 ## Confirmed native queue recovery accepted; SDK distribution next — 6 November 2026
 
 Mobile1f6613f0 preserves the accepted21-file application/Android recovery candidate

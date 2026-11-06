@@ -1,5 +1,34 @@
 # Agent continuation — HRIS workspace
 
+## Document retirement ordering gate corrected — 6 November 2026
+
+FullCI42129516710 exact49ec completed with11 passing jobs, backend8 failed the
+reference/retirement ordering test, and2 dependent integrations skipped. Both
+previous Havana-midnight cases passed. Verified artifact13463318718 and failing
+XML show the leading reference unexpectedly returned422 after retirement won.
+The test paused company client admission before the document lock, so HTTP order
+did not establish the intended lock order. Two test-only files now pause AFTER
+the real exclusive document lock and observe the competing attempt before release.
+All original outcome assertions remain; finally releases before executor teardown.
+No product or database guard was changed.
+[Evidence](measurements/document-retirement-ordering-2026-11-06.json).
+Focused retirement1 PASS13 fresh/98.581s, zero failures/errors/skips,
+8,243 unchanged inputs, image/format/architecture checks passed; driver72152 drained.
+NEXT commit/push, dispatch one new full Verify on that exact head, audit all14 jobs.
+Do not rerun49ec or deploy its prepared scripts. .work/chat-edit-release-2026-11-05
+contains UNEXECUTED package/image/deployment scripts still tied to failed49ec;
+update/review against the new accepted CI before use. They switch API/worker only,
+verify JRE timezone and retain schema116.1 with backup/image rollback.
+
+Mobile0e5270a8 is pushed:11-file edit preparation accepted185 focused/5,015 full,
+lint0. Prior169ee9dc edit evidence accepted4,995 full. The28 outbox drafts have
+NOW BEEN APPLIED and formatted on Mobile; no build/tests yet. Do not reapply them.
+Finish edit queue/storage/native content/recovery/retirement tests and optimistic
+room projection/editor UI, then native proof/release and all54 PRD groups.
+No local heavy job remains after72152 drain. Phone40 unchanged; emulators stopped
+and keys/data retained. Starter bce2012 complete. Live54b/schema116.1 retains
+push/callback/delivery/workerFCM ON, SMTP OFF. No rollout or migration performed.
+
 ## Normalized image full CI dispatched — 5 November 2026
 
 Product `49ec23e0d73f9c7e19d2ba19aa6927633e04bbd1` is pushed. Full Verify

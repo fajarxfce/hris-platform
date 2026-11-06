@@ -13,9 +13,11 @@ Mobilee74c613f records the complete safe delivery evidence and limitations.
 PHONE NOW42, APK SHA09eea50a9ad0ef1f3b1294ba2e1fceb4503e418d3d6e795029c205c08376259f.
 Announced then installed08:06UTC, verified43.702s, data and identity preserved,
 no UI action. Never repeat this completed install. Both owned emulators stopped
-with original keys/data retained. Starter owns the only heavy local job18630,
-root/Android/Web validation of the exact three generic motion files. Its Apple
-scope follows a tested commit once. Follow Mobile's latest handoff before builds.
+with original keys/data retained. Starter e39747c ports the exact three generic
+files; root/Android/Web PASS272.990s,71 fresh cases, lint0 errors/44 warnings.
+Apple scope42185888342 was dispatched once on e39747c and is running.
+Mobile SDK x86_64 driver95397 is now the ONLY heavy local job, child13949/
+startTicks162936862 since08:11UTC. Follow Mobile's latest handoff before builds.
 
 The notification fixture correction27cff22a passes local/native two-phase recovery;
 no production deadline/assertion changed. SDK arm64 AAR970ea462 is built/verified

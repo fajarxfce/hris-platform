@@ -1,5 +1,27 @@
 # Agent continuation — HRIS workspace
 
+## Mobile first-frame acceptance and native build — 6 November 2026
+
+Mobile91902546 implements bounded visible-room preparation;891e41e7 records its
+acceptance and continuation. Six Android recordings show bubbles during first and
+repeat transitions for the prepared conversation, including offline process starts.
+Full Mobile checks passed2,299 fresh cases/lint0; first-entry gaps0/0/−33ms. Other
+unprepared destinations still use guarded local reads. Phone remains build40.
+
+NDK28.2.13676358, Rust1.96.0 Android targets and cargo-ndk4.1.2 are now installed.
+The SDK raw-event patch passed nine Rust cases; actual arm64 release compilation
+is active as Mobile driver42167, child3264835/startTicks162095421. All emulators are
+stopped with original data/keys preserved. Do not overlap another heavy local job
+or alter that SDK worktree. Follow Mobile/docs/agent-handoff.md for live status.
+No new SDK AAR, native-edit consumer acceptance, phone install or server rollout yet.
+
+This repo's ef8a41b3 adds only safe native-test failure stages (118 tests pass).
+Mobile CI a5f0e06c pins it; native42168989689 runs and919 native42170117581 is pending.
+Do not duplicate dispatch. LIVE remains10485916/schema116.1. No deployment is needed
+for these test/docs changes. Never replay accepted Forward publications.
+Starterdd40d24 accepted the shared MVI port locally and on Apple. Continue native
+edit proof, phone update, the layer audit and all54 PRD groups.
+
 ## Native driver diagnosis and Mobile rendering — 6 November 2026
 
 The native HRIS test driver now records a bounded failureStage from its own

@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Current: original key reader candidate; Mobile first CI accepted — 6 November 2026
+
+Group program344211f8 remains accepted and unchanged. V117–137 remain unshipped/disabled;
+live10485916/schema116.1 unchanged. No backend code, rollout or new message in this update.
+Follow the [current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md)
+(checkpointd90278b9) before starting local work. It supersedes older active-job references below.
+
+Mobile first7ef control42282707724/native42282707833 both PASSED:4,345 portable,1,747
+Apple and395 cases per Android ABI; actual iOS host and encrypted/native/worker/notification
+proofs pass. Digest-verified evidence is committed. First35df control42288555007/native
+42288554801 are now running, not to be redispatched. Starter0ff7e59 remains accepted locally
+and on Apple; no new generic starter port applies to this HRIS private-store capability.
+
+The new read-only private-account SDK candidate passed11 cipher,6 SQLite and1 FFI cases.
+ARM64 and x86_64 binaries now pass with all1,214 inputs unchanged, the same nine Kotlin
+files and exact entry-point/16KiB alignment checks. Separate candidate manifest pins19
+sources and five patches. SDK3 shipping artifacts/dependency remain unchanged and immutable.
+SDK4 has not been published. ARMv7 57560 is the ONLY heavy local job; x86, complete AAR,
+actual paired Android consumer and product gates follow sequentially. No emulator is active.
+
+Mobile's isolated possession checkout prepares22 Kotlin files with15 new cases and explicit
+layer/resource ownership; format and74-module architecture checks pass, compilation/runtime
+acceptance still pending. Native consumer and fresh owned AVD5564 are prepared, not started.
+Preserve original Bima data/sidecars/keys. Phone50 stays installed and pending-send report OPEN;
+20:52 UTC passive logs retained no new Chat/crash lines, not a successful send. No phone UI.
+Continue original-parent recovery, freeze/drain/adoption, organization routing and all54 PRD
+groups. Push each commit; announce every later explicit-serial install-only phone update.
+
 ## Current: Mobile inventory accepted; native key reader next — 6 November 2026
 
 Backend program 344211f83ed85e381f0002519c727a544efa7d8b remains unchanged and accepted.

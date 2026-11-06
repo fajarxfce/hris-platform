@@ -1,6 +1,32 @@
 # Agent continuation — HRIS workspace
 
-## Current: Mobile 48 installed; retained pending diagnosis next — 6 November 2026
+## Current: Mobile SDK refresh retry fix; native rebuild — 6 November 2026
+
+Mobile [411b323c](https://github.com/fajarxfce/hris-mobile/commit/411b323c) commits a
+validated Matrix SDK patch for the reproduced Bima emulator token-boundary error.
+The actual gateway returned refresh200 then429/rotation_too_soon. Upstream SDK
+incorrectly treated the transient refresh as session rejection and any wrapped
+refresh as an expired queue token. The patch retains Retry-After and forwards its
+structured error through existing FFI types; genuine denials remain authoritative.
+5core policy tests,18HTTP refresh integration cases,2FFI cases and3Python driver
+cases pass. Red evidence and exact12-file patch reconstruction are recorded in
+Mobile docs/measurements/collaboration-sdk-refresh-retry-2026-11-06.json.
+
+Shipping staysSDK2; phone remains48 with one request to open Bima pending. Old
+per-message pending remains unclassified; do not confuse emulator root cause with
+full phone resolution. Original Bima store is retained and emulator stopped.
+Only heavy local job is ARM64 SDK build25579, Mobile
+.work/chat-refresh-boundary-2026-11-06/android-arm64. Its12pinned SDK source inputs
+are FROZEN. After it passes, x86_64/ARMv7/x86, binding parity, candidate packaging,
+actual token-boundary and normal release acceptance remain before the next phone
+update. No published SDK asset or production backend was modified.
+
+Platform live10485916/schema116.1 and Starter578d97a remain unchanged. Keep all54
+PRD groups active, follow Mobile current handoff, never replay accepted sends,
+rollouts or SDK publication. Future phone installs require advance notice,
+explicit serial and --install-only/no UI.
+
+## Prior checkpoint: Mobile 48 installed; retained pending diagnosis next — 6 November 2026
 
 Mobile source [cf28a7c4](https://github.com/fajarxfce/hris-mobile/commit/cf28a7c4)
 implements progressive per-message receipt persistence and fixed queue mapping

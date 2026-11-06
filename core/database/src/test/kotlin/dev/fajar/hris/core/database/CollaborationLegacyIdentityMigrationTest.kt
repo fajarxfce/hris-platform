@@ -16,7 +16,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 
 @Testcontainers
 class CollaborationLegacyIdentityMigrationTest {
-    @Container val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+    @Container
+    val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
 
     private inner class Fixture {
         val source = DriverManagerDataSource(postgres.jdbcUrl, postgres.username, postgres.password)

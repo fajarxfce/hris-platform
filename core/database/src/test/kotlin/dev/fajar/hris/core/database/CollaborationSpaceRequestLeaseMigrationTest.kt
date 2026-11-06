@@ -17,7 +17,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 
 @Testcontainers
 class CollaborationSpaceRequestLeaseMigrationTest {
-    @Container val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+    @Container
+    val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
 
     @Test
     fun groupSlotsEnforceScopeCurrentParentGatewayAndExactBoundedPurpose() {

@@ -64,6 +64,7 @@ class RecoverySetTest(unittest.TestCase):
         self.assertEqual(sql, recovery.envelope_query(118))
         self.assertEqual(sql, recovery.envelope_query(119))
         self.assertEqual(sql, recovery.envelope_query(120))
+        self.assertEqual(sql, recovery.envelope_query('116.1'))
         self.assertIn("hris:matrix-push:v1:", sql)
         self.assertIn("FROM collaboration_push_bindings", sql)
         self.assertIn("native_session_id::text", sql)
@@ -136,9 +137,9 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("LIMIT 100001", sql)
 
     def test_schema_gate_accepts_reviewed_group_credentials_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, '116.1'):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 138, None, 'invalid'):
+        for schema in (58, 138, None, 'invalid', '116.2', '115.1', 116.1, '116.1.1', '1' * 65):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

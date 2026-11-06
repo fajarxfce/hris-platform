@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-06",
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/DocumentLockProbeConfiguration.kt": "285c7ddd2690cdebd83d195e1c5ecb0a4364aa0cd85f8854d4711946a45f2bab",
+    "apps/server/src/test/kotlin/dev/fajar/hris/DocumentRetirementReferenceHttpTest.kt": "378558878e62c81af906f01d424087dc1e99bbc7af5468f2e8607235b8e4c966"
+  },
+  "failedCi": {
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42129516710",
+    "headSha": "49ec23e0d73f9c7e19d2ba19aa6927633e04bbd1",
+    "passedJobs": 11,
+    "failedJob": "backend (8)",
+    "skippedJobs": 2,
+    "failure": "DocumentRetirementReferenceHttpTest.expenseRegistrationAndRetirementSerializeInBothOrders expected leading reference200, received422 expense_receipt_unavailable",
+    "artifactId": 13463318718,
+    "artifactSha256": "973d9027f8f4db15bf19016f80722a3d72eed4c73fa4d96805db7e862a1c3af8",
+    "githubDigestVerified": true
+  },
+  "diagnosis": "AccountLockProbe paused company client admission before the document lock. Request order did not establish document-lock ownership.",
+  "change": "Pause only after acquiring the real exclusive company document lock and observe the competing lock attempt before release. Both original outcome orders/assertions remain; release occurs before executor teardown. Production behavior unchanged.",
+  "focused": {
+    "startedAt": "2026-11-06T00:00:50.182777+00:00",
+    "elapsedSeconds": 98.581,
+    "exitCode": 0,
+    "sourceFiles": 8243,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skipped": [],
+    "reports": {
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.DocumentRetirementReferenceHttpTest.xml": {
+        "sha256": "e52e5462c217bb1be8bbaa9c6b01aa06332f62ab83c6b8a86f03c7e32d9ca930",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.DocumentRetirementSecurityHttpTest.xml": {
+        "sha256": "d38df048522070d37878b0825cce60ab566ec02b93235842f11c03e0238b0daa",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.DocumentRetirementHttpTest.xml": {
+        "sha256": "fb4c277e74db1c6466e344a8ad9d20301a648b5a82282aa4cfa20b00067d364a",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  }
+}

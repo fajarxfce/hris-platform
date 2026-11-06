@@ -1,5 +1,75 @@
 # Agent continuation — HRIS workspace
 
+## Current: organization branch reconciled with shipped fixes — 6 November 2026
+
+This worktree is `feat/communication-space`, merging Main
+`8bad394e0b317c3a2d939d10c4f0ece95693a46d` into
+`28bcf2a4626d87ab1ee7c5479438045910d5a6a0`. The source merge is accepted;
+organization migrations V117–137 remain unshipped. Shared collaboration DI retains
+both organization services and company summary services. Recovery tooling accepts
+ordered V116.1 alongside V117–137 without changing encrypted purposes or contexts.
+
+Python migration/recovery26 passes. Baseline gate60730 PASSED5,343.291s:1,226 fresh
+cases, zero failures/errors, one existing opt-in elapsed-retention skip,8,631 stable
+inputs. Database131/domain156/data677/delivery24/API94/FULL-worker144 are archived.
+Format, architecture, image and migration/recovery checks pass. The60 Group-only
+fixtures then switched to the immutable catalog property; pin-gate99906 PASSED
+305.542s:20 cases, no failures/errors/skips,8,631 stable inputs. All affected test
+sources compiled; two DB migrations, gateway bootstrap and both worker contexts ran.
+API/product sources were unchanged by pin alignment; complete baseline evidence is
+kept separately. [Evidence](measurements/collaboration-space-reconciliation-2026-11-06.json).
+
+Phone `10.77.77.3:5555` has Mobile release50 from implementation `f04c0864`,
+delivery records `9edd6883`. The announced install-only preserved signer, application
+identity and data; no phone UI was driven. APK SHA256:
+`215217d1a8f1228b4be526164efa79d75b5c647ad8980367735ea5aa2a1ce898`.
+It uses published immutable Matrix SDK3 and keeps expired workspace admission from
+turning into a retained permission denial. The user's long-pending send report is
+OPEN: owned Bima offline/online history acceptance does not prove their phone send.
+All owned emulators are stopped; retain original userdata, sidecars, keys and parents.
+Do not reuse historical process IDs below. Announce every later phone install,
+specify its serial and use `--install-only`; never launch or drive the phone UI.
+
+Live Platform remains `10485916ee02850cf913793398f7ef3dd1e09afb`, schema116.1.
+Starter remains `578d97a`. Do not deploy the organization schema as part of this
+merge, repeat accepted Forward sends, or republish SDK assets. Mobile source
+`f04c0864` protocol CI is accepted; its native and Apple/control CI audits are now
+accepted at Mobile9e985385 (all first runs, no redispatch). Follow the current
+[Mobile record](https://github.com/fajarxfce/hris-mobile/blob/9edd6883/docs/agent-handoff.md)
+and retained
+[Main merge-parent record](https://github.com/fajarxfce/hris-platform/blob/8bad394e0b317c3a2d939d10c4f0ece95693a46d/docs/agent-handoff.md)
+for shipped company-chat evidence. Earlier entries below are historical.
+
+A ten-file implementation/test candidate remains ONLY in .work/reconcile-main-
+2026-11-06/supersession-prepared, with four base hashes. Apply it only after this
+merge is committed, using apply-prepared.py. [Design under validation](collaboration/space-bootstrap-supersession.md)
+uses the existing undeletable monotonic gateway head and a complete returned effect
+descriptor, without an original lookup or fabricated acknowledgment. Candidate code
+has not compiled or run. run-supersession-gate.py covers pure policy, actual races/
+rollback, ordinary bootstrap regression and actual API/worker contexts. No DI binding
+changes are planned; complete merged worker acceptance above remains distinct.
+
+Mobile replacement transport focused46 passed123.870s/4,218 stable inputs. Its full
+root/Android/browser gate98494 is now the only heavy local job. Keep Mobile inputs
+frozen and do not start Group tests or an emulator until it ends. Mobile also retains
+an eleven-file raw archiveAndInsert candidate outside source: atomic original archive
+plus successor insertion, no invented remote completion. Apply after its transport
+commit, then validate the actual HRIS consumer before a generic Starter port. Durable
+linked intent, inherited-denial preservation and original SDK adoption are still next.
+
+After committing this accepted merge, implement explicit original/replacement bootstrap
+recovery: expired credential replay or a new actual build cannot erase an uncertain
+original operation. Preserve exact original payload/build and fence late originals
+transactionally. Never acquire the original operation lock under the account guard
+because normal bootstrap takes those locks in the opposite order. Null gateway
+metadata alone cannot establish that the original will not apply. Then complete
+private-store possession/parent recovery, bounded freeze/drain and adoption of the
+original SDK store, organization UI and typed background push/reply ownership.
+Calls, video and meetings still need product implementation; all54 PRD groups remain
+open. Continue the authorized long run, preserve layer ownership and push every
+atomic commit. Physical iPhone testing is waived; Apple compilation and actual
+PushKit/CallKit acceptance remain distinct claims.
+
 ## All four fictional receivers ready; forwarding resumes — 5 November 2026
 
 Phone release36 is installed from Mobilea26a1248 (delivery docsa5bc4190),

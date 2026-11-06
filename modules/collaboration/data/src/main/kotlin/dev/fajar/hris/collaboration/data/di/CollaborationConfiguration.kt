@@ -584,6 +584,69 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun collaborationSummaryReadSource(sql: DSLContext): CollaborationSummaryReadDataSource =
+        PostgresCollaborationSummaryReadDataSource(sql)
+
+    @Bean
+    fun collaborationSummaryReads(
+        source: CollaborationSummaryReadDataSource
+    ): CollaborationSummaryReadRepository = StoredCollaborationSummaryReadRepository(source)
+
+    @Bean
+    fun collaborationSummaryCursors(
+        crypto: IdentityTokenDataSource
+    ): CollaborationSummaryCursorRepository = EncryptedCollaborationSummaryCursorRepository(crypto)
+
+    @Bean
+    fun syncNativeCollaborationSummaries(
+        summaries: CollaborationSummaryReadRepository,
+        cursors: CollaborationSummaryCursorRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        SyncNativeCollaborationSummaries(
+            summaries,
+            cursors,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun collaborationSummaryProjectionSource(
+        sql: DSLContext
+    ): CollaborationSummaryProjectionDataSource =
+        PostgresCollaborationSummaryProjectionDataSource(sql)
+
+    @Bean
+    fun collaborationSummaryProjections(
+        source: CollaborationSummaryProjectionDataSource
+    ): CollaborationSummaryProjectionRepository =
+        StoredCollaborationSummaryProjectionRepository(source)
+
+    @Bean
+    fun refreshCollaborationSummaries(
+        projections: CollaborationSummaryProjectionRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = RefreshCollaborationSummaries(projections, transactions, clock)
+
+    @Bean
     fun collaborationPushQueueSource(sql: DSLContext): CollaborationPushQueueDataSource =
         PostgresCollaborationPushQueueDataSource(sql)
 

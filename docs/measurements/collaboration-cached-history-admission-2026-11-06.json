@@ -1,0 +1,284 @@
+{
+  "date": "2026-11-06",
+  "status": "accepted_fixture_correction",
+  "productionCodeChanged": false,
+  "mobileProgramSource": "cf28a7c4dac0a523df6d47fa82e115be340ea1e5",
+  "sdk": "26.10.23-hris.2",
+  "nativeAbi": "x86_64",
+  "cause": [
+    "Event-focused history can be served from the SDK cache without a context HTTP request.",
+    "The intentional early progressive-ACK projection failure precedes final send readmission, making old absolute history/provider admission counts invalid."
+  ],
+  "correction": [
+    "Require two history-head reads with fresh admission relative to the original send and between heads.",
+    "Require readmission after history and distinct admission before provider pagination; preserve cursor/size bounds and per-page admission.",
+    "Retain bounded integer admission checkpoints before test assertions."
+  ],
+  "unit": {
+    "startedAt": "2026-11-06T15:57:59.095746+00:00",
+    "elapsedSeconds": 33.54,
+    "exitCode": 0,
+    "sourceFiles": 12459,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.NativeSdkHistoryAdmissionTraceTest.xml": {
+        "sha256": "65dc9cfef682c2ce92375eb40c19506c0292bb912e9303ed110f2d9381aed74b",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "native": {
+    "startedAt": "2026-11-06T16:01:48.508942+00:00",
+    "elapsedSeconds": 174.389,
+    "exitCode": 0,
+    "sourceFiles": 12459,
+    "sourcesUnchanged": true,
+    "apkSha256": "e4db3b5d0912bafe3c9384a756271bb3680ebbe43d8d10a8c3c3d0ce86c6557c",
+    "apkUnchanged": true,
+    "counts": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "reports": {
+      "TEST-dev.fajar.hris.NativeCollaborationSdkInteropTest.xml": {
+        "sha256": "aa1b002376368c10b1dde58339d1467fc305ff1c83bb6a251d05a53b6a6ba512",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "passed": true,
+      "encryptedSendCount": 3,
+      "nativeRedactionRequests": 0,
+      "retainedConfirmedQueueScenario": false,
+      "processRestartedAfterAck": true,
+      "processRestartedAfterCompletion": true,
+      "coldHistoryRecoveredOffline": true,
+      "gatewayUnavailableAfterProcessDeath": true,
+      "applicationAdmittedAroundHistory": true,
+      "admittedHistoryHeads": true
+    },
+    {
+      "passed": true,
+      "encryptedSendCount": 3,
+      "nativeRedactionRequests": 0,
+      "retainedConfirmedQueueScenario": true,
+      "confirmedNativeQueueRestored": true,
+      "confirmedNativeQueueSettledOffline": true,
+      "confirmedNativeQueueRetryNoop": true,
+      "processRestartedAfterAck": true,
+      "processRestartedAfterCompletion": true,
+      "coldHistoryRecoveredOffline": true,
+      "gatewayUnavailableAfterProcessDeath": true,
+      "applicationAdmittedAroundHistory": true,
+      "admittedHistoryHeads": true
+    }
+  ],
+  "failedAttempts": [
+    {
+      "name": "native-sdk2-1",
+      "startedAt": "2026-11-06T15:48:47.044849+00:00",
+      "elapsedSeconds": 175.648,
+      "counts": {
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "sourcesUnchanged": true,
+      "reason": "Initial three-head assumption rejected."
+    },
+    {
+      "name": "native-sdk2-2",
+      "startedAt": "2026-11-06T15:53:43.791151+00:00",
+      "elapsedSeconds": 149.143,
+      "counts": {
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "sourcesUnchanged": true,
+      "reason": "Absolute first-head count four rejected; actual count is three after the interrupted progressive ACK."
+    }
+  ],
+  "admissions": [
+    {
+      "headReads": 2,
+      "beforeSend": {
+        "device": 2,
+        "conversation": 2,
+        "room": 2,
+        "failures": 0
+      },
+      "beforeHeads": [
+        {
+          "device": 3,
+          "conversation": 3,
+          "room": 3,
+          "failures": 0
+        },
+        {
+          "device": 22,
+          "conversation": 22,
+          "room": 22,
+          "failures": 0
+        }
+      ],
+      "afterHistory": {
+        "device": 25,
+        "conversation": 25,
+        "room": 25,
+        "failures": 0
+      },
+      "providerPages": 4,
+      "beforeProviderPages": [
+        {
+          "device": 5,
+          "conversation": 5,
+          "room": 5,
+          "failures": 0
+        },
+        {
+          "device": 6,
+          "conversation": 6,
+          "room": 6,
+          "failures": 0
+        },
+        {
+          "device": 7,
+          "conversation": 7,
+          "room": 7,
+          "failures": 0
+        },
+        {
+          "device": 9,
+          "conversation": 9,
+          "room": 9,
+          "failures": 0
+        }
+      ]
+    },
+    {
+      "headReads": 2,
+      "beforeSend": {
+        "device": 2,
+        "conversation": 2,
+        "room": 2,
+        "failures": 0
+      },
+      "beforeHeads": [
+        {
+          "device": 3,
+          "conversation": 3,
+          "room": 3,
+          "failures": 0
+        },
+        {
+          "device": 20,
+          "conversation": 20,
+          "room": 20,
+          "failures": 0
+        }
+      ],
+      "afterHistory": {
+        "device": 23,
+        "conversation": 23,
+        "room": 23,
+        "failures": 0
+      },
+      "providerPages": 4,
+      "beforeProviderPages": [
+        {
+          "device": 5,
+          "conversation": 5,
+          "room": 5,
+          "failures": 0
+        },
+        {
+          "device": 6,
+          "conversation": 6,
+          "room": 6,
+          "failures": 0
+        },
+        {
+          "device": 7,
+          "conversation": 7,
+          "room": 7,
+          "failures": 0
+        },
+        {
+          "device": 9,
+          "conversation": 9,
+          "room": 9,
+          "failures": 0
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Fixture-only change; does not resolve or prove physical-phone pending delivery.",
+    "SDK3 runtime acceptance remains separate.",
+    "The confirmed-native scenario constructs a server-accepted event beside its paused original; it is not a literal lost-HTTP-response injection."
+  ],
+  "sdk3Arm64": {
+    "startedAt": "2026-11-06T16:30:18.679593+00:00",
+    "elapsedSeconds": 251.177,
+    "exitCode": 0,
+    "sourceFiles": 12459,
+    "sourcesUnchanged": true,
+    "apkSha256": "538dc2ba390867d90579c897a237ac80a7f3cf97efaafefac1acad8606a35cc4",
+    "apkUnchanged": true,
+    "counts": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "resultSha256": "f0110ccf747de0821ea3a53c630c4ec3c4bdc4b70bd3e0ab94530407247a1bb9",
+    "fixtureCommit": "62ee11818a4928b2598d046c7b3283bf3e416554",
+    "scenarios": [
+      {
+        "passed": true,
+        "cleanup": true,
+        "sdkAccessRenewed": true,
+        "coldHistoryRecoveredOffline": true,
+        "gatewayUnavailableAfterProcessDeath": true,
+        "encryptedSendCount": 3,
+        "nativeRedactionRequests": 0,
+        "retainedConfirmedQueueScenario": false,
+        "confirmedNativeQueueRestored": null,
+        "confirmedNativeQueueSettledOffline": null,
+        "confirmedNativeQueueRetryNoop": null
+      },
+      {
+        "passed": true,
+        "cleanup": true,
+        "sdkAccessRenewed": true,
+        "coldHistoryRecoveredOffline": true,
+        "gatewayUnavailableAfterProcessDeath": true,
+        "encryptedSendCount": 3,
+        "nativeRedactionRequests": 0,
+        "retainedConfirmedQueueScenario": true,
+        "confirmedNativeQueueRestored": true,
+        "confirmedNativeQueueSettledOffline": true,
+        "confirmedNativeQueueRetryNoop": true
+      }
+    ]
+  }
+}

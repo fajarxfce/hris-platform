@@ -1,0 +1,309 @@
+{
+  "recordedAt": "2026-11-05T12:02:04.564547+00:00",
+  "phoneRelease": 34,
+  "mobileSource": "745e5a0256904453992e5e864bdd59e373de9513",
+  "liveBackend": "11a98115abeeb2ff67f879785fbf8d6c7aceb0d1",
+  "userReportsStillPending": true,
+  "passiveFailure": {
+    "durationSeconds": 45,
+    "passiveReadOnly": true,
+    "http": [
+      {
+        "operation": "GET_History",
+        "status": 200,
+        "count": 8
+      },
+      {
+        "operation": "GET_HrisApi",
+        "status": 200,
+        "count": 112
+      },
+      {
+        "operation": "GET_Matrix_rooms_context",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "operation": "GET_Sync",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "operation": "POST_Join",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "operation": "PUT_Send",
+        "status": 403,
+        "count": 4
+      },
+      {
+        "operation": "Unmatched",
+        "status": 200,
+        "count": 1
+      }
+    ],
+    "failures": [
+      {
+        "operation": "PUT_Send",
+        "category": "collaboration_recipient_unavailable",
+        "count": 4
+      }
+    ]
+  },
+  "before": {
+    "readAt": "2026-11-05T11:50:04.937426+00:00",
+    "readOnly": true,
+    "fictionalSamplesOnly": true,
+    "rows": [
+      {
+        "sample": 1,
+        "isBima": false,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 2,
+        "isBima": true,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 3,
+        "isBima": false,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 4,
+        "isBima": false,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      }
+    ]
+  },
+  "bimaFirebase": {
+    "completedAt": "2026-11-05T11:53:21.070250+00:00",
+    "fictionalSample": 2,
+    "firebaseEmailPasswordReady": true,
+    "normalAuditedHrisIdentityLink": true,
+    "temporaryOperatorSessionRevoked": true,
+    "mailSent": false,
+    "phoneTouched": false,
+    "chatDeviceReady": false
+  },
+  "bimaDevice": {
+    "readAt": "2026-11-05T11:59:41.101698+00:00",
+    "fictionalSample": 2,
+    "activeDevices": 1,
+    "confirmedKeyPublications": 1
+  },
+  "physicalSendAccepted": true,
+  "recipientPlaintextInspected": false,
+  "keysRetained": true,
+  "backendGuardChanged": false,
+  "forwardingStash": "bfdef2ce9641173e0ff68528f8982c5bab15bf72",
+  "next": [
+    "Fix Mobile older-history end restoration after room recreation; regression reproduced with room metadata.",
+    "Retain Bima SDK/OS data and native parent; no cleanup revocation or data reset.",
+    "Investigate initial device-key publication before any provider room exists: sample1 completed product device/bootstrap setup but has zero key publications and no provider room request. Preserve sample1 data; samples3/4 remain unactivated.",
+    "Resume stashed forwarding after urgent history fix, full gates and generic Starter port."
+  ],
+  "limits": [
+    "No packet, token, raw request path or message body persisted by the passive trace.",
+    "Peer UI confirms eight message rows and no decryption placeholder; message contents were not logged or manually inspected.",
+    "All54 PRD groups remain open."
+  ],
+  "lastUpdatedAt": "2026-11-05T12:37:24.403001+00:00",
+  "userConfirmation": {
+    "at": "2026-11-05T12:02:36Z",
+    "result": "Previously pending messages sent"
+  },
+  "recipientVisibleRows": {
+    "readAt": "2026-11-05T12:12:06.867251+00:00",
+    "ownedEmulatorOnly": true,
+    "release": 34,
+    "messageRows": 8,
+    "textNodeCounts": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "decryptionPlaceholderRows": 0,
+    "messageBodiesRetained": false
+  },
+  "otherSampleFirebaseLinks": [
+    {
+      "completedAt": "2026-11-05T12:02:05.586342+00:00",
+      "fictionalSample": 1,
+      "firebaseEmailPasswordReady": true,
+      "normalAuditedHrisIdentityLink": true,
+      "temporaryOperatorSessionRevoked": true,
+      "mailSent": false,
+      "phoneTouched": false,
+      "chatDeviceReady": false
+    },
+    {
+      "completedAt": "2026-11-05T12:03:09.448615+00:00",
+      "fictionalSample": 3,
+      "firebaseEmailPasswordReady": true,
+      "normalAuditedHrisIdentityLink": true,
+      "temporaryOperatorSessionRevoked": true,
+      "mailSent": false,
+      "phoneTouched": false,
+      "chatDeviceReady": false
+    },
+    {
+      "completedAt": "2026-11-05T12:03:57.868765+00:00",
+      "fictionalSample": 4,
+      "firebaseEmailPasswordReady": true,
+      "normalAuditedHrisIdentityLink": true,
+      "temporaryOperatorSessionRevoked": true,
+      "mailSent": false,
+      "phoneTouched": false,
+      "chatDeviceReady": false
+    }
+  ],
+  "latestReadiness": {
+    "readAt": "2026-11-05T12:31:31.421488+00:00",
+    "readOnly": true,
+    "fictionalSamplesOnly": true,
+    "rows": [
+      {
+        "sample": 1,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 2,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 1
+      },
+      {
+        "sample": 3,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      },
+      {
+        "sample": 4,
+        "activeDevices": 0,
+        "confirmedKeyPublications": 0
+      }
+    ]
+  },
+  "newEmptyRoom": {
+    "readAt": "2026-11-05T12:33:35.391453+00:00",
+    "sample": 1,
+    "readOnly": true,
+    "directConversations": 1,
+    "requestedProviderRooms": 0,
+    "boundProviderRooms": 0
+  },
+  "initialDeviceSync": {
+    "source": "a26a124837637831655d19cc9dc89c1929e65e02",
+    "recordedAt": "2026-11-05T13:29:41.467924+00:00",
+    "sourceValidated": true,
+    "fullGateSeconds": 521.721,
+    "freshCases": 3664,
+    "sourceFiles": 4077,
+    "failures": 0,
+    "serverGuardUnchanged": true,
+    "sample1BeforeCandidate": {
+      "activeDevices": 1,
+      "confirmedKeyPublications": 0,
+      "directConversations": 1,
+      "requestedProviderRooms": 0,
+      "boundProviderRooms": 0,
+      "deviceIdentitySha256": "2aaf0fdea20f5e691e10c667c7f22bfaf8a75d35cab9d1d9324eff3569cd9da0",
+      "publicationIdentitySha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "sample": 1,
+      "readAt": "2026-11-05T13:15:39.988204+00:00",
+      "readOnly": true,
+      "fictionalAccountOnly": true
+    },
+    "release36NativeAcceptance": "pending",
+    "phoneVersionCode": 35,
+    "appleCi": {
+      "id": 42036083914,
+      "source": "a26a124837637831655d19cc9dc89c1929e65e02",
+      "status": "in_progress",
+      "url": "https://github.com/fajarxfce/hris-mobile/actions/runs/42036083914"
+    }
+  },
+  "allFictionalReceiversReady": {
+    "readAt": "2026-11-05T13:52:43.627505+00:00",
+    "readOnly": true,
+    "fictionalSamplesOnly": true,
+    "rows": [
+      {
+        "sample": 1,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 1
+      },
+      {
+        "sample": 2,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 1
+      },
+      {
+        "sample": 3,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 1
+      },
+      {
+        "sample": 4,
+        "activeDevices": 1,
+        "confirmedKeyPublications": 1
+      }
+    ]
+  },
+  "newReceiverProductSetup": {
+    "3": {
+      "sample": 3,
+      "startedAt": "2026-11-05T13:45:39.981774+00:00",
+      "ownedEmulatorOnly": true,
+      "messageSent": false,
+      "actions": [
+        "Skip",
+        "PT Contoh Nusantara",
+        "Chat",
+        "New chat",
+        "Karyawan Demo",
+        "Chat on this device",
+        "Activate chat",
+        "Activate chat",
+        "Open chat"
+      ],
+      "normalProductSetupCompleted": true,
+      "finishedAt": "2026-11-05T13:47:17.928602+00:00"
+    },
+    "4": {
+      "sample": 4,
+      "startedAt": "2026-11-05T13:50:10.939386+00:00",
+      "ownedEmulatorOnly": true,
+      "messageSent": false,
+      "actions": [
+        "Skip",
+        "PT Contoh Nusantara",
+        "Chat",
+        "New chat",
+        "Karyawan Demo",
+        "Chat on this device",
+        "Activate chat",
+        "Activate chat",
+        "Open chat"
+      ],
+      "normalProductSetupCompleted": true,
+      "finishedAt": "2026-11-05T13:51:38.194875+00:00"
+    }
+  },
+  "phoneVersionCode": 36,
+  "latestMobileDeliveryCommit": "a5bc4190",
+  "fictionalDeviceStateRecordedAt": "2026-11-05T13:55:14.161542+00:00"
+}

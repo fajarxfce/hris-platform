@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-11-05T20:45:28.562523+00:00",
+  "readOnly": true,
+  "services": {
+    "api": {
+      "image": "sha256:ff8885b7bc664f4df74efc15695bed9d95945b6c53928967304fcf0cc7d6b78c",
+      "startedAt": "2026-11-05T10:23:32.661195964Z",
+      "flags": {
+        "HRIS_COLLABORATION_PUSH_ENABLED": "true",
+        "HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED": "true",
+        "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED": "true",
+        "HRIS_MAIL_ENABLED": "false"
+      },
+      "matchesRenderedCompose": true
+    },
+    "worker": {
+      "image": "sha256:2a3a785e9c0e3ea4d69d8f0034173da2f4e5ae62b123f7892c6be97eec0ad92d",
+      "startedAt": "2026-11-05T10:23:32.458512667Z",
+      "flags": {
+        "HRIS_COLLABORATION_PUSH_ENABLED": "true",
+        "HRIS_COLLABORATION_PUSH_CALLBACK_ENABLED": "true",
+        "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED": "true",
+        "HRIS_FCM_ENABLED": "true",
+        "HRIS_MAIL_ENABLED": "false"
+      },
+      "matchesRenderedCompose": true
+    }
+  },
+  "correction": "Recent handoff statements saying chat pushOFF were stale. Running API and worker and rendered compose all have push, callback, and delivery enabled. Worker FCM is enabled; SMTP is disabled. Preserve the running configuration. This inspection does not claim a new end-to-end notification-delivery test."
+}

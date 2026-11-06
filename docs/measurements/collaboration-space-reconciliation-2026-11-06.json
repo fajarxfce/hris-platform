@@ -1,0 +1,377 @@
+{
+  "date": "2026-11-06",
+  "status": "merge-source-accepted-with-separate-fixture-pin-followup",
+  "merge": {
+    "branch": "feat/communication-space",
+    "organizationParent": "28bcf2a4626d87ab1ee7c5479438045910d5a6a0",
+    "mainParent": "8bad394e0b317c3a2d939d10c4f0ece95693a46d"
+  },
+  "baseline": {
+    "startedAt": "2026-11-06T17:15:59.998448+00:00",
+    "elapsedSeconds": 5343.291,
+    "exitCode": 0,
+    "sourceFiles": 8631,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 1226,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "scopes": {
+      "core/database": {
+        "suites": 35,
+        "tests": 131,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "suites": 36,
+        "tests": 156,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "suites": 98,
+        "tests": 677,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery": {
+        "suites": 5,
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "suites": 5,
+        "tests": 94,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "suites": 31,
+        "tests": 144,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "inputManifestSha256": "3b366c068ef40a7760a85167d34525e4eeccfbce895c32c8d759376681d3f24e",
+    "reportManifestSha256": "601cda36a96a9fb2e2b70b6bc52df29fd063dfbdeb854d7db2c56a57fa2deb1a",
+    "checks": [
+      "core database tests",
+      "collaboration domain/data/delivery tests",
+      "selected native server contexts and summary/identity/history HTTP cases",
+      "complete worker tests",
+      "containerImageCheck",
+      "formatCheck",
+      "architectureCheck",
+      "databaseRecoveryCheck",
+      "recoverySetCheck",
+      "core database migrationVersionTest"
+    ],
+    "skipped": {
+      "suite": "ReportExportElapsedRetentionTest",
+      "reason": "Existing opt-in real elapsed-hour acceptance requires HRIS_RUN_ELAPSED_RETENTION=true; not enabled by this merge gate."
+    }
+  },
+  "pythonMigrationRecovery": {
+    "workingDirectory": "tool",
+    "command": "python3 -m unittest test_migration_versions test_recovery_set",
+    "tests": 26,
+    "failures": 0,
+    "earlierRootInvocation": "Import errors only; no tests executed."
+  },
+  "fixtureAlignment": {
+    "files": 60,
+    "scope": "Test initialization only; 18 database, 38 collaboration data and 4 worker fixtures. No API fixture changes.",
+    "catalogAndPreviousTagImageIdenticalAtRead": true,
+    "validation": "passed",
+    "onlyImageExpressionAndFormattingChanged": true,
+    "appliedManifestSha256": "92aab0ebf3907cd3c314290e2d3166bb64e5083f17e06cd337548332101d0684",
+    "followup": {
+      "startedAt": "2026-11-06T18:48:48.688293+00:00",
+      "elapsedSeconds": 305.542,
+      "exitCode": 0,
+      "sourceFiles": 8631,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "scope": [
+        "CollaborationSpaceGatewayMigrationTest",
+        "CollaborationSpaceRecipientMigrationTest",
+        "NativeCollaborationSpaceGatewayBootstrapTest",
+        "CollaborationSpaceProvisioningContextTest",
+        "CollaborationSpaceRoomContextTest",
+        "containerImageCheck",
+        "formatCheck",
+        "architectureCheck"
+      ],
+      "inputManifestSha256": "86c4d4609f0ab4a9a91418ef08c992ccef6f6c1dc24c32eeb037c3dbc6110962",
+      "reportManifestSha256": "f0f71114f04f148f4408d90299c7478be576cd81516fe2fd0b7d89fc8c789efc"
+    },
+    "changedFixtures": {
+      "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationSpaceScheduledInteropTest.kt": {
+        "beforeSha256": "1318e73bdeee4f7cb28680d727de3a1ad5949ef9199d5b2d192e38976cfa8aef",
+        "afterSha256": "3b704622d28109f61bd6767250a612d00bb38463109d42766c5a2941095f01a0"
+      },
+      "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationSpaceProvisioningContextTest.kt": {
+        "beforeSha256": "dd7ad15ce6466e422b0b885e3dd6bd036d2e802a8b490ff428325b21ba3214ff",
+        "afterSha256": "692ba84e45707cce6105c931676720a6fa413ff6f032277488de80cdcb5868d6"
+      },
+      "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationSpaceRoomContextTest.kt": {
+        "beforeSha256": "ed02558e61f9c646e42b4172fad2c1de4d4f86bf6c6580ed660d4e3b0d5df022",
+        "afterSha256": "9c9e57011d7c7160b7ab167741b4558d43091d9f50212cfb4c6b765e1c03ca38"
+      },
+      "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationSpaceRoomScheduledInteropTest.kt": {
+        "beforeSha256": "df5aff22a5a239e211c5577ef4757a00f861a99c27f17d15a750ae107cf6c049",
+        "afterSha256": "db772847a753acb7228918a26d91d5f13f011134360a73cea38e697156a4fcea"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceDirectoryMigrationTest.kt": {
+        "beforeSha256": "0867f31e1014d1e232615e96945b7ffe8a10b65fe092beda703c98b483e3b449",
+        "afterSha256": "a88a32a0712e31e60c87fa4bca86ab9e612de95fdbbeca6abfcd9a5a0ca9b741"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationLegacyIdentityMigrationTest.kt": {
+        "beforeSha256": "e442c12abf5976345319263bbc71c2e17785202951528eff8b7932291c80d829",
+        "afterSha256": "a67285eb75442c438cea79d71f4f04c312781d950fdcfd5bcad10cfd8efe05aa"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceIdentityMigrationTest.kt": {
+        "beforeSha256": "e8ebf254f64259f129f24d42b8985874a7dfebe77ac20cea7c4a77c93d1868f0",
+        "afterSha256": "0a78154f2156bd04f4643c4360921b3a21eacf042089374a5ae0b59dfa3e6d0e"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceDeviceMigrationTest.kt": {
+        "beforeSha256": "9d8c601483296d91402ed4e020e96b80642e9b8a3b7550d25c59caa0584b724a",
+        "afterSha256": "c18b1aedd7e0cdb54e15058b513d8728306e7a63485891e7710187edd1beb048"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceCredentialMigrationTest.kt": {
+        "beforeSha256": "bbcfc1cc62ace2edd86f9dcbdd54f7f53121ced96acdb97c8a060a103e5eb993",
+        "afterSha256": "fd73ea6390faef8018b242c7ab73d05ea05281b20b164b29012dd9b48560401f"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceProvisioningMigrationTest.kt": {
+        "beforeSha256": "d22dc15a889eb0f41c9702dc8ef100ebd6b57bd3d80593fa43c07b9384c5de81",
+        "afterSha256": "1accc9c31465f377ccc09f64e1861f01be2ad39fb96e1c32661bfdb0bb700997"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationLegacyRuntimeMigrationTest.kt": {
+        "beforeSha256": "54ca448f9aecb6bb2046b3994c7015797ccdcd590786d337412b2679cedbb4ae",
+        "afterSha256": "0c8d03111e50e76dee3d2019642adf05d88af68bff70f2bc76dcfbf4079c8516"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationLegacyRuntimeCompletionMigrationTest.kt": {
+        "beforeSha256": "c4cb6f566a7ee4e2be9e0adf82f52f84baa9402783ea8c90384e865f381760bb",
+        "afterSha256": "78648eb385405a79e32ac1713b15e9bf9f8bd983cdf57d58d5bde04090292462"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceGatewayMigrationTest.kt": {
+        "beforeSha256": "51536c5a5094db867433b5b447888de524828531c170949be7d3efdcb539c043",
+        "afterSha256": "9345cf148b951c4dfab4ab79bab89c656e53b35c859d13927b5637378c965144"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRequestLeaseMigrationTest.kt": {
+        "beforeSha256": "7ed2dd391156cf76ce347f0d92029ec7b85924a6422ac0fb77c377efcf7863f7",
+        "afterSha256": "e39d456900eb263d4e8752dfc8f5400104f0c7c8053fe73b8bd58cc91836cc56"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceKeyMigrationTest.kt": {
+        "beforeSha256": "b861d64451ef3a85f2450e723f2d566ba7f4b042ad2c184f191c99a32729745f",
+        "afterSha256": "215af4287bb23278635ae5915ea3280cb19ccd2a5abb9addf7a528b44f205087"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceConversationMigrationTest.kt": {
+        "beforeSha256": "b90c66e06558bd1ce6619f51f83d0195a5afe1ca1b496c1f3e37a3805bc345d8",
+        "afterSha256": "0193e09c798168b199197338441dabd7735ab9d34e6743d789a5a1b1cf57143c"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRoomMigrationTest.kt": {
+        "beforeSha256": "f1f8ab5fe5520b6193cfbae7b6648da31e877d82e26ab3719dbd6a6585473ff1",
+        "afterSha256": "5bf0205d6ae09a000d388ebcffa650e8b956b5ed7dcad4cbe899fe7a12376002"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationOriginalPairRouteMigrationTest.kt": {
+        "beforeSha256": "192e03de5ac6c4de322a8241516173a73803f1cc9cc189c373c035f2078df8ec",
+        "afterSha256": "a435afe91086612076ae3a39e024deb56ef0119046b0ac5cc4ca6fb26b9120db"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRoomPeerRecoveryMigrationTest.kt": {
+        "beforeSha256": "fa2a92fdfcf758afbd9a0fa9f97d4b0cba6037c6ac593f83a6d9eceb043dc8fc",
+        "afterSha256": "88f0765f67d2391562a2e1061e8ab3eef67c478754ce1e0e998a13fb3d1d3967"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRoomRequestSlotMigrationTest.kt": {
+        "beforeSha256": "4d6bbc3347539a1d8b29603a1e0ad87f9998cdfa47d5810c01f4dd8e9e8bde66",
+        "afterSha256": "6e75ae2667d8275d0aeb962d8c40cb8f36e60356cd3d6f3bb30a07e6c92a77e8"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRecipientMigrationTest.kt": {
+        "beforeSha256": "3275e66c5d5c07a85ddeb253380a114eb6e7971d741335d8925c2e691aca29e7",
+        "afterSha256": "bafa980be5b5db7bc2d145aa73b663653b3fb630cecaaf99b3f4b6bf951ef481"
+      },
+      "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpacePushBindingMigrationTest.kt": {
+        "beforeSha256": "2c24647204a066e6694597abf70da2057b710d8b8447957186cda1e2a6fbdea1",
+        "afterSha256": "f2011e38f78efa7a5628e4f4515b1f371157cadd183d76cc82e0ba9b2f49e63c"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceDirectoryTest.kt": {
+        "beforeSha256": "b19475d33b82e365ea1134923550cc6c367c87da7c2d38589b4a7b62968f2280",
+        "afterSha256": "9fbd57ec38e11357944e8c1847e936d3acae9771a9cddcde340544cd0214d0c6"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationLegacyDeviceRepositoryTest.kt": {
+        "beforeSha256": "f119cdd342a57c1f12e58a82e0d3cba86fab6b2d4ed0ab1ad9f720c11e7f2d7e",
+        "afterSha256": "a7af72cada974eec4bf1955d9a527cc47dabf68e8e4c6d3cb00192743b4c1b84"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceIdentityRepositoryTest.kt": {
+        "beforeSha256": "206635b45c33b5f659fdf0c8198b8a31ca595254bfd50f8f0376cb890dc562a9",
+        "afterSha256": "d5c2831ad4c23a59cd54a74a71b53820c6cb3e97e74263555823c912c89f17f5"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceIdentitySelectionTest.kt": {
+        "beforeSha256": "bfa481e63c5bb10f23c78ded0a16598b8fcca0a89bdc42640f67ab6b7d110b25",
+        "afterSha256": "1744c1d21b698ec3f120579f46d627deeacf03f961b08fa4a1c22c9eb0d432f9"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationLegacyParentRepositoryTest.kt": {
+        "beforeSha256": "8b6240d3e0dd5288acc9197bf6e3b378b7098210f124d737ec0e0fe7c6bcab75",
+        "afterSha256": "45d2bb95b432920b62a214c28d15c16d6904a7b8350707a514930ebd78de0d59"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceDeviceRepositoryTest.kt": {
+        "beforeSha256": "bc6f61d34d244d697a6f89527850571a185c1ec9a38be11cfc301eccb79cf158",
+        "afterSha256": "dbc9f76fc8c4764516c35cacc173fe0df85894d123715a92ad7b37fdd5f86ff2"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceDeviceRegistrationTest.kt": {
+        "beforeSha256": "0e1e0869b9021b0dbedbf08626fe776b107c369fe3253872f2e76c74dbfb03c4",
+        "afterSha256": "bb54f0fbf80e864feb6ea38fecd5760e1f112670ce3aeb812ea2278b20390b8b"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceProviderStorageTest.kt": {
+        "beforeSha256": "058a2cbfd631d968622f92cf27c08e94c76e6975c79b96d268e3e74f9481cefd",
+        "afterSha256": "ceacc80c4609465a19cbb0cd546522d1aea15f6ebd770d2200ca8120fcf95073"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceProvisioningStorageTest.kt": {
+        "beforeSha256": "191fc6b1fd867fac22d7b034ba5fc53769acd0b5e94f9a0b3596a52e04c9bf88",
+        "afterSha256": "a288e8564315f8215580ff78dd07822fd1802a17df0e24b64eee0cd138091b86"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRetryTest.kt": {
+        "beforeSha256": "86dc1aba635f5d43b0307bcae8e312e6eeea3d20a6a2629c66739a3b1d674730",
+        "afterSha256": "12e0cb9f8a0c617d2c1a217c2532ab2732e3e3af36857618cdbb5da8276e1218"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceWorkerPublicationTest.kt": {
+        "beforeSha256": "67219e86cae4b055c88b04d8a38a35008237e6215a9b4f07deb3345c36070ff4",
+        "afterSha256": "5d21e2612574c363d71d2dc28121d71c687a00a596cf73a35db67b3ab48d6b05"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationLegacyRuntimeStorageTest.kt": {
+        "beforeSha256": "5812781d1a6a737e19c2e7e1ba0cfaa4feeae9e6c75542f27ea74dab6f14a14b",
+        "afterSha256": "3f9586497d2e28eb0b8f7b091d05e572e0d293f1e3bf260509fc6366fac1c950"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceGatewaySessionTest.kt": {
+        "beforeSha256": "5c01894a8178b7aadc3655c1f27cea248045c561302d4ef629d068176f69e3f0",
+        "afterSha256": "1a71d55a6ac2558b4cee2aad5e196b3c79378d56497ff0908ff347bbea552b15"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceGatewayBootstrapTest.kt": {
+        "beforeSha256": "fa778007afb08a0b236673403d03c6b3a78a1a841788368a4b6004da4773df9e",
+        "afterSha256": "7a1d6545211ed00dfb454b8c0f51e0661f6576d5c1ccc30ac55ca7e0d801d788"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceGatewayRefreshTest.kt": {
+        "beforeSha256": "d41a46ea6f961331009e2932ce89ef0caa652a8b2b33f8b46055aae0e63ecb38",
+        "afterSha256": "31be41ca176b1e7d400bb5afc096154ec9084a8724f5c9d30f88c6040b4809a9"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceRequestRepositoryTest.kt": {
+        "beforeSha256": "9d85580fa244b3b793b121c02170c78728db4a0517031415e31419db98948635",
+        "afterSha256": "349b7609bf2d573e519e4847d5244468b82bf0115ff3b65ec199d093d3ff7187"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceProviderRenewalTest.kt": {
+        "beforeSha256": "d51ee1b396c61f2d50b7422b499af12bc84d44f53212684edb4f7336e921cb6c",
+        "afterSha256": "e25d7238f7c11195d36039dcbafef107cf4cf103f71acb27a3a6a148672a1cfb"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceGatewayAccessTest.kt": {
+        "beforeSha256": "d5b294af5c8f439b46481f428b44b7e2f0b4eff5e42d1050b0017d85571612f6",
+        "afterSha256": "5df25faf8f248a83d8d1786a836dc3c4b4764bdf4d19c466a069b986ccf8c3dd"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceKeyRepositoryTest.kt": {
+        "beforeSha256": "7a2bab5d051db87e2510acf0564e62ddd713a7824258d8a66dde69cf231c5eea",
+        "afterSha256": "71230a27783409d532b251f2187c41f7ceb30d89232703fdb18cbc9e519242ff"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceKeyUploadTest.kt": {
+        "beforeSha256": "059b7f13bbc8ea8d8dc34336328c27af2b6559f0657aef822bbe361481a7b263",
+        "afterSha256": "0509236d98ce3afecf500476a8cccf4fef8005cc15277789f7623f41de069f6e"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceConversationRepositoryTest.kt": {
+        "beforeSha256": "781feae46fabe6c880cbb41774727f46438325951ac881bc29ba2b42acb2714f",
+        "afterSha256": "a0b3f78d8f7bdada6329ca8926bd9762d10464aa32dcb7dec71653fb83789cd5"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceDirectTest.kt": {
+        "beforeSha256": "63a076d4b9d42ec1bbc728fb18a458cd137e2d0895da0991c0bc9201e655ef85",
+        "afterSha256": "aeb00b1d81a7f774b9d0006c836ca45cebc3993267bdee872614a99c38d29df1"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceRoomRepositoryTest.kt": {
+        "beforeSha256": "a564021715590289927fe7a460f1c742698a616e5515ca461ade7c8906e184b9",
+        "afterSha256": "c18b83467e952548d92c9394898ee4eadfc71864949d98777a9ff202f0a05370"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRoomTest.kt": {
+        "beforeSha256": "d01c7bf3bd8c17964f995a481d2af0f53d5b8d4498a60318109ec8960d42bfb1",
+        "afterSha256": "6ce8a3d22a1a76ec199b13eb57cf392b3a40d8d2b6195f07fbaaa3fb64903cd3"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceRoomWorkerTest.kt": {
+        "beforeSha256": "272014177e0153b3f75297565ff589a7ddab17b43845c23bbcc9c731d1e16fcb",
+        "afterSha256": "b8aab232ecbebf5e3befdfb4f35d2815507190d7b44283613accd3e0806e17d3"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceRecipientPostgresTest.kt": {
+        "beforeSha256": "153d49b3726787f88399efe6eee1c46a2a1ae72431e0bcb2e85c5b715121b0e6",
+        "afterSha256": "86a45c5b30bea08aedb640fd2b2b00d4b6133592db05e11ec2aaddd1e350f607"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceKeyQueryTest.kt": {
+        "beforeSha256": "c98468b7ed45518d6c5f4e377bfa29214eecde2952d69463cc07de681d191ca5",
+        "afterSha256": "54c50bb7c854d292f4e8e3c3d89939dd7595fb988a215fcaff17544b28b82265"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceToDeviceTest.kt": {
+        "beforeSha256": "34e2883bd38bfbfe021d865a73f0252e24714db2a8b80e2fa730c1b731c5e159",
+        "afterSha256": "99f8ec5c61ca48afe27a63b4a8c19aea346d257cd8d80b91a7a71b45b56b7a93"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceBoundRoomRepositoryTest.kt": {
+        "beforeSha256": "0ff5116297749493bc69db7761561982f76460aff3a683b02d10ff24d3fd56fc",
+        "afterSha256": "68e281c2bb2cb267890e982f13a117da03f70027546faf5da5caaf6b886f5e82"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRoomMessageTest.kt": {
+        "beforeSha256": "63f05d0d1bcff7a1bfb11ff0ee784917114be4f7f50ea1cc6999493d31de42e9",
+        "afterSha256": "b1dd3b723c2f916421337677ddc4f214789e60cb30cc46e69bee1389a20164e7"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRoomHistoryTest.kt": {
+        "beforeSha256": "956a9aa8c8f9c03bc1166ecdfd819df15397e97ee864be867e8a305ef0425271",
+        "afterSha256": "531464b43de744b9b7abca84b2ddfa4ab3f6823fdc722d9fb64110c1d14594c9"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceSyncTest.kt": {
+        "beforeSha256": "6566475056cce53f4360f67bb93b5da5f500c4fdd2e8717c9e3455c2ce7a65e9",
+        "afterSha256": "44430510f7b5e197ae1644c79864cb9950f5a11d881801d0f5a443c920169b1d"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceMetadataTest.kt": {
+        "beforeSha256": "c9d14a223e85e64151ac64eb5167ee9c28727d25fe94d247d10c762888a7421f",
+        "afterSha256": "5184dbd2914882ab70a325bbfa49cac186d12cd7ee9d9019d616e4729efa3e2f"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpacePushBindingStorageTest.kt": {
+        "beforeSha256": "212758ba9625e49787193dea7ab83ea4febda79be685a13513c64559aeab8b46",
+        "afterSha256": "1adbaa4f0d45b747103a3876de245c32fbe93ff6f950133a2fc7f7cce039c173"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpacePusherTest.kt": {
+        "beforeSha256": "f2112d4e91970de946c2beaff1c1a85531d9ba18209914ff502df4464640c7cc",
+        "afterSha256": "c57eb60e5c605d3c483ffd1e37defb0b3dec0dee758993fe4b67c5fd17e84c27"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpacePushQueueTest.kt": {
+        "beforeSha256": "5bf29b97d13aefc6d6ee8ea67cbf8ab5502539be7d61435f0436371bb7d31539",
+        "afterSha256": "edaf2b6d986868588baaa1f5e90ef4fd7963c94ef37777a9f4b228f316212da7"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpacePushAdmissionTest.kt": {
+        "beforeSha256": "5ef381d3aac83e4230acf3299f907dbf91b59d7e3a6eab5bee5be9d2f236dd27",
+        "afterSha256": "2637292d82af4fa5fb24b433bc5c54fa5201bd222cef13a451990a3d3c4e3ef9"
+      },
+      "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpacePushDeliveryTest.kt": {
+        "beforeSha256": "25c4a287559e905bd1573913a36b1a82d8bdabbe334838878a45cff041a7e4e5",
+        "afterSha256": "b566d21bbd3d1b6ddb199476be1e7e4389df8e0cb6597814b2ac85499a581367"
+      }
+    }
+  },
+  "runtime": {
+    "livePlatform": "10485916ee02850cf913793398f7ef3dd1e09afb",
+    "liveSchema": "116.1",
+    "organizationMigrations": "117-137 unshipped",
+    "organizationFeatureEnabled": false,
+    "phoneRelease": 50,
+    "phonePendingSendResolved": false,
+    "newMessagesSent": 0,
+    "newSdkPublication": false,
+    "liveRollout": false
+  }
+}

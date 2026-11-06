@@ -13,6 +13,7 @@ import sys
 import time
 from urllib.error import URLError
 from urllib.request import urlopen
+from container_images import postgres_image
 from dashboard_mail_fixture import DashboardMailFixture
 from dashboard_storage_fixture import DashboardStorageFixture
 from dashboard_fcm_fixture import worker_fcm_environment
@@ -76,7 +77,7 @@ def main():
         "--env-file", str(environment_file), "-e", "POSTGRES_USER=fixture_migrator", "-e", "POSTGRES_DB=hris_browser",
         "-p", "127.0.0.1::5432", "--mount",
         f"type=bind,src={initialization},dst=/docker-entrypoint-initdb.d/10-runtime.sql,readonly",
-        "postgres:18.6-alpine",
+        postgres_image(),
     ])
     if not re.fullmatch(r"[0-9a-f]{12,64}", created):
         raise RuntimeError("Unexpected fixture container identifier")

@@ -7,6 +7,9 @@ plugins {
 }
 
 val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val postgresImage = catalog.findVersion("postgres-image").get().requiredVersion
+
+require(Regex("postgres:[a-zA-Z0-9._-]+@sha256:[0-9a-f]{64}").matches(postgresImage))
 
 kotlin {
     jvmToolchain(21)
@@ -24,6 +27,9 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    // Testcontainers 2.0.5 treats a combined tag/digest's tag as part of the repository.
+    // Docker's digest-only spelling selects the identical image and preserves compatibility checks.
+    systemProperty("hris.postgres.image", "postgres@" + postgresImage.substringAfter('@'))
     maxParallelForks = 1
     maxHeapSize = "768m"
     testLogging {

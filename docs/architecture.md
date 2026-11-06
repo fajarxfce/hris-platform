@@ -240,6 +240,10 @@ observations on visibility or scope replacement. See [approval history](approval
 
 JDK 21, Spring Boot 4.1, Kotlin 2.3, Spring MVC, PostgreSQL 18, Flyway, and jOOQ. Gradle conventions own toolchain and quality configuration; the version catalog owns versions. jOOQ is generated from migrations against PostgreSQL. OpenAPI is reviewed and validated in CI.
 
+[PostgreSQL image pins](database-images.md) keep fixture, code-generation and
+deployment timezone snapshots aligned. Java/PostgreSQL timezone upgrades require
+joint scheduling validation; mutable image tags are not an upgrade policy.
+
 Administration owns a bounded ephemeral worker-integration registry. Each worker
 adapter owns one identity and a cancellable fixed-delay reporter; its use case
 coordinates immutable bound flags and registry repositories in a transaction.

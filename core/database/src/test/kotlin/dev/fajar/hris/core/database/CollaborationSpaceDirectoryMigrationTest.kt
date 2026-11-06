@@ -17,7 +17,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 
 @Testcontainers
 class CollaborationSpaceDirectoryMigrationTest {
-    @Container val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+    @Container
+    val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
 
     private class Fixture(val source: DriverManagerDataSource) {
         val sql = JdbcTemplate(source)

@@ -1,0 +1,20 @@
+{
+  "purpose": "Retain the bounded driver stage when owned native SDK instrumentation fails, without exception messages, command arguments, credentials or fixture contents.",
+  "validation": {
+    "command": "python3 -m unittest discover -s tool -p 'test_collaboration*.py'",
+    "tests": 118,
+    "failures": 0,
+    "secondsReported": 0.207
+  },
+  "sourceHashes": {
+    "tool/collaboration_hris_native.py": "31a2386286e956f6adbd1d4ea4df2ddc7a656e52aad28448a509830b7cdbccd5",
+    "tool/test_collaboration_hris_native.py": "3483839ef3b82839fdcf54c9aae1ec11f12fde92c0267241bdcb6a573a09f7be"
+  },
+  "firstAttempt": {
+    "tests": 118,
+    "failures": 1,
+    "reason": "The unexpected-exit test supplied a complete empty JSON object, which correctly entered completion validation. The fixture now supplies incomplete JSON so it actually exercises process exit without a completion file."
+  },
+  "newNativeExchangeRun": false,
+  "liveServerChanged": false
+}

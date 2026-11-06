@@ -1,5 +1,33 @@
 # Delivery and validation
 
+## Organization branch reconciliation accepted — 6 November 2026
+
+Merge Main `8bad394e` into organization branch `28bcf2a4`. Shared DI retains both
+organization runtime and company summary services. Recovery schema comparison is
+ordered for V116.1 and V117–137; existing encrypted formats stay unchanged.
+`python3 -m unittest test_migration_versions test_recovery_set` from `tool/` passes
+26 cases. The first invocation from the repository root failed imports because
+`tool` is not a package; it did not execute those tests. Merged API, complete worker,
+database and collaboration gate60730 passed5,343.291s:1,226 fresh cases, zero failures/
+errors and one existing opt-in elapsed-retention skip,8,631 stable inputs. Formatting,
+architecture, image pins and migration/recovery checks also passed. Sixty Group test
+fixtures have since been aligned with the shared immutable image property; their
+focused follow-up99906 passes305.542s:20 cases, no failures/errors/skips,8,631 unchanged
+inputs. It compiles all touched test sources and exercises DB migrations, bootstrap
+and both worker contexts. The original full gate and follow-up are reported separately.
+[Reconciliation evidence](measurements/collaboration-space-reconciliation-2026-11-06.json).
+
+Mobile release50 is installed in place on the user phone with no UI driving;
+[delivery evidence](https://github.com/fajarxfce/hris-mobile/blob/9edd6883/docs/measurements/collaboration-release50-2026-11-06.json).
+Its 7,086-case local gate and retained Bima history smoke cover company chat only.
+The user's phone pending-send report remains open. Live Platform remains
+`10485916`/schema116.1; organization V117–137 remains unshipped. SDK3 publication and
+accepted company native proofs must not be repeated simply to reconcile this branch.
+The complete shipped Main history remains in the
+[merge parent](https://github.com/fajarxfce/hris-platform/blob/8bad394e0b317c3a2d939d10c4f0ece95693a46d/docs/delivery.md).
+Earlier entries below retain this branch's historical evidence, not current device
+or rollout state. Current next work is in [agent handoff](agent-handoff.md).
+
 ## Main and Mobile native quoted reply proof — 5 November 2026
 
 Mobile [36e78206](https://github.com/fajarxfce/hris-mobile/commit/36e78206d792ac68a38585b80e17234d0e691b22)

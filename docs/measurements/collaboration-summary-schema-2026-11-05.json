@@ -1,0 +1,237 @@
+{
+  "recordedAt": "2026-11-05T17:42:00.666333+00:00",
+  "migration": "116.1",
+  "scope": "Raw queues, versioned owner summaries, existing after-commit journal capture and migration/recovery tools. No projection worker, HTTP delta endpoint, client delta or rollout yet.",
+  "runs": {
+    "schema1": {
+      "startedAt": "2026-11-05T17:29:35.145800+00:00",
+      "elapsedSeconds": 115.787,
+      "exitCode": 1,
+      "sourceFiles": 8216,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 9,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSummaryMigrationTest.xml": {
+          "sha256": "f112777c5341f7a6bc5d8e8bd1ad64704b5c4b92d6be9088bd56f03dd976dcae",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSummaryIsolationTest.xml": {
+          "sha256": "7831a188b6d9453b20b64e8259cf6ee3ca5a6b5f9200eddae1c6ec75292068ee",
+          "tests": 8,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "sourceManifestSha256": "dc5583d0896f93946e452df36c74f692b087746a6ffcc651ba25377faeda0d0c"
+    },
+    "schema2": {
+      "startedAt": "2026-11-05T17:32:32.761433+00:00",
+      "elapsedSeconds": 58.237,
+      "exitCode": 0,
+      "sourceFiles": 8216,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSummaryMigrationTest.xml": {
+          "sha256": "4b1c1429b7df450975622ed1e95988a9acaf11a63ce8dc75dea7ba2b15f73f77",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSummaryIsolationTest.xml": {
+          "sha256": "a56ee58b212d946d09a3b3d2363ba2e340737798dd177d5237f6b99d2bd2d44f",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "sourceManifestSha256": "7d4b689d24a3045aaf466067679d41d578462fdbdba525708cc42c97ca2506b2"
+    },
+    "schema3": {
+      "startedAt": "2026-11-05T17:36:33.568897+00:00",
+      "elapsedSeconds": 229.29,
+      "exitCode": 0,
+      "sourceFiles": 8216,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 64,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "modules/sync/domain/build/test-results/test/TEST-dev.fajar.hris.sync.domain.SyncCollectionPolicyTest.xml": {
+          "sha256": "515c1362e3a5da41fd0d67d61de4f6bfa13a8929206d82b958faa7e5e07fc334",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/sync/domain/build/test-results/test/TEST-dev.fajar.hris.sync.domain.SyncCursorPolicyTest.xml": {
+          "sha256": "f92cdbbff857f3911ddcf31b199183116094f0daa5c05067330d1eaffcc8f060",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/sync/domain/build/test-results/test/TEST-dev.fajar.hris.sync.domain.SelfProfileCollectionPolicyTest.xml": {
+          "sha256": "48184a3da8076d366923555e07892a277cbc59f84f72e7531dd9714fcaa33a2f",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/sync/data/build/test-results/test/TEST-dev.fajar.hris.sync.data.SyncCursorCodecTest.xml": {
+          "sha256": "4f4f398f2ee7219b932c5f123e4676c478bba8b03c9a98a047fcc2c10b594fbc",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CalendarSyncMigrationTest.xml": {
+          "sha256": "c89019deeae06f2699c3de54092edae66a481a796f447dcfcd64b22b7ccb8617",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationAvailabilityMigrationTest.xml": {
+          "sha256": "82f6d49dc561b182c616af48c779fd3288d1aa2ea71323355c1808239713818b",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationDeviceMigrationTest.xml": {
+          "sha256": "885286697f57682a30a13fe7419c15055fe2b1dd33977fa5dd7c2307b59ff406",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationDirectMigrationTest.xml": {
+          "sha256": "57b0aa44b3246e75f786581c551b3938112cafb573f30ea82ce0e15c6df0797c",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSummaryIsolationTest.xml": {
+          "sha256": "9779940ccfe3f48e3ecedc015ee7639a4638c6ebdc2763ea1abc87a416076bae",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSummaryMigrationTest.xml": {
+          "sha256": "eff6c1d6810e89890bc2690b33141f096eb6bfbf4e0c2a942fcede953a7a6769",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.DatabaseFailureTest.xml": {
+          "sha256": "f7de7dc4be76e54a8b586237ef68441ebfd8ff0d840a71e793994bcc6310e112",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.DocumentMetadataMigrationTest.xml": {
+          "sha256": "a9ecf4cc38aad128fbfa907380d4b9995383b2b3568ca0379c06f19cbc20094c",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.LeaveAccountMigrationTest.xml": {
+          "sha256": "b1effb312e69ce0b7cda63e3ef6c0ebbd879f720aea6f5dfd708963e7f3ab4dd",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.LeaveCarryMigrationTest.xml": {
+          "sha256": "24a0f3454ebcaa82d43d1280d7cb1ef27419e33a01a827bb297ff3f5c187782c",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest.xml": {
+          "sha256": "e61aefbf0133d686bc69d7a32fae1893d236667562a974762a38da95cab410be",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PayrollSettlementMigrationTest.xml": {
+          "sha256": "475842d9d1c100e68372cd16a8e32ff3a9cf479c3c82e46c7a9f963949ccdf3d",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest.xml": {
+          "sha256": "0731142222f3f47926912e2fa16e99e3bd4745fd94fe4b2a53550d791f168fe7",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PlatformAuditMigrationTest.xml": {
+          "sha256": "d1239b2a8cca8736d1f406a763e5f7bf6650c3b017a50ff095b4e9311b2f5f11",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.PostgresIsolationTest.xml": {
+          "sha256": "305c0408f9ec9e896abd2fc1397858b64278ac6ec92f11d95b54c80fe19691f4",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.RosterResetMigrationTest.xml": {
+          "sha256": "5c39b9e5f031c58091ee92f7c4dacfd6d6eb308e3c9f4712b913a766eec8e4f2",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.AttendanceSyncMigrationTest.xml": {
+          "sha256": "08ed13874467f1cced6d4bf16384d7a673561edc465286f519c215adea2acd39",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "sourceManifestSha256": "5704d9c3596d79029817f570a00cdff28d4fe3e1cbaf92ce389b654b07578654"
+    }
+  },
+  "initialFailure": "Two negative fixtures expected raw exceptions despite PostgresTransactionRunner returning Result.Failed. Corrected to exact typed failures; no SQL guard weakened.",
+  "python": "Five migration ordering tests; recovery set tool uses the same bounded version parser and unchanged reviewed encrypted-envelope query at116.1. All selected Gradle tool checks passed in schema3.",
+  "liveBackend": "11a98115/schema116 unchanged",
+  "retention": "Offboarding does not withdraw retained direct identity. A versioned tombstone is supported by raw storage; no new withdrawal command or policy is claimed."
+}

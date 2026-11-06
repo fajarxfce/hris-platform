@@ -31,7 +31,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 
 @Testcontainers
 class CollaborationSpaceProviderStorageTest {
-    @Container val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+    @Container
+    val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
     private val oldKey = Base64.getEncoder().encodeToString(ByteArray(32) { 11 })
     private val newKey = Base64.getEncoder().encodeToString(ByteArray(32) { 29 })
     private val oldKeys = parseIdentityKeyring("old", "old:$oldKey")

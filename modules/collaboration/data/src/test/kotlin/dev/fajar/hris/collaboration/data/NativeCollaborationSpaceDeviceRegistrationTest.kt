@@ -40,7 +40,10 @@ import tools.jackson.databind.ObjectMapper
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NativeCollaborationSpaceDeviceRegistrationTest {
     companion object {
-        @Container @JvmStatic val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+        @Container
+        @JvmStatic
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
     }
 
     private lateinit var owner: JdbcTemplate

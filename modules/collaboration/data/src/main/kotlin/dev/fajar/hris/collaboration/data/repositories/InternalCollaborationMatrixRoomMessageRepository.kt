@@ -15,6 +15,7 @@ class InternalCollaborationMatrixRoomMessageRepository(
         bearer: String,
         deadline: Instant,
     ): Result<String> = safeMatrixProviderCall {
+        require(message.replyToEventId == null || message.replacesEventId == null)
         val content =
             buildMap<String, Any> {
                 put("algorithm", "m.megolm.v1.aes-sha2")
@@ -22,6 +23,12 @@ class InternalCollaborationMatrixRoomMessageRepository(
                 put("session_id", message.sessionId)
                 message.senderKey?.let { put("sender_key", it) }
                 message.deviceId?.let { put("device_id", it) }
+                message.replyToEventId?.let {
+                    put("m.relates_to", mapOf("m.in_reply_to" to mapOf("event_id" to it)))
+                }
+                message.replacesEventId?.let {
+                    put("m.relates_to", mapOf("rel_type" to "m.replace", "event_id" to it))
+                }
             }
         val response =
             source.sendRoomMessage(roomId, message.transactionId, content, bearer, deadline)

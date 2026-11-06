@@ -7,10 +7,34 @@ import time
 import unittest
 from unittest.mock import MagicMock, patch
 
-from collaboration_hris_native import app_write_script, checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
+from collaboration_hris_native import app_write_script, disconnect_owned_gateway, checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
 
 
 class HrisNativeDriverTest(unittest.TestCase):
+    def test_disconnect_removes_only_the_exact_owned_mapping(self):
+        native = MagicMock(port=18200)
+        native.command.side_effect = ["fixture tcp:18200 tcp:18200\nfixture tcp:18300 tcp:18300\n", "", "fixture tcp:18300 tcp:18300\n"]
+        disconnect_owned_gateway(native)
+        self.assertIsNone(native.port)
+        self.assertEqual(native.command.call_args_list[1].args, ("reverse", "--remove", "tcp:18200"))
+
+    def test_disconnect_rejects_replaced_or_missing_mapping_without_removal(self):
+        for mappings in ["", "fixture tcp:18200 tcp:18300\n", "fixture tcp:18200 tcp:18200\nfixture tcp:18200 tcp:18200\n"]:
+            native = MagicMock(port=18200)
+            native.command.return_value = mappings
+            with self.assertRaises(RuntimeError):
+                disconnect_owned_gateway(native)
+            self.assertEqual(native.port, 18200)
+            native.command.assert_called_once_with("reverse", "--list")
+
+    def test_disconnect_keeps_cleanup_ownership_when_removal_is_uncertain(self):
+        for after in ["fixture tcp:18200 tcp:18200\n", RuntimeError("read failed")]:
+            native = MagicMock(port=18200)
+            native.command.side_effect = ["fixture tcp:18200 tcp:18200\n", "", after]
+            with self.assertRaises(RuntimeError):
+                disconnect_owned_gateway(native)
+            self.assertEqual(native.port, 18200)
+
     def evidence(self):
         return {"encryptedBothDirections": True, "logicalIdsPreserved": True, "syncMode": "classic",
                 "protectedStoreReopened": True, "missingRecordPreserved": True,
@@ -35,6 +59,9 @@ class HrisNativeDriverTest(unittest.TestCase):
                 "historyRuntimeReopened": True,
                 "ackBeforeJournalRecovered": True,
                 "completionCleanupRecovered": True,
+                "coldHistoryRecoveredOffline": True,
+                "gatewayUnavailableAfterProcessDeath": True,
+                "quotedReplyDecrypted": True, "quotedReplyRecovered": True, "quotedReplyRecoveredOffline": True,
                 "ackSenderEventId": "$third", "ackTransaction": "ack-transaction",
                 "historyWindow": {"originals": 2, "unavailable": 0, "extractionNanos": 100, "modelCharacters": 100, "originalCharacters": 100},
                 "senderEventId": "$first", "recipientEventId": "$second",
@@ -60,6 +87,30 @@ class HrisNativeDriverTest(unittest.TestCase):
                             ("ackTransaction", "first-transaction")):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
+
+    def test_quoted_reply_requires_decryption_recovery_and_cold_history(self):
+        proof = self.evidence()
+        for name in ["quotedReplyDecrypted", "quotedReplyRecovered", "quotedReplyRecoveredOffline"]:
+            with self.subTest(name=name, missing=True), self.assertRaises(ValueError):
+                proof_evidence({k: v for k, v in proof.items() if k != name})
+            for value in (False, None, 1, "true", [], {}):
+                with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                    proof_evidence(proof | {name: value})
+
+    def test_confirmed_queue_scenario_requires_each_strict_true_flag(self):
+        names = ("confirmedNativeQueueRestored", "confirmedNativeQueueSettledOffline", "confirmedNativeQueueRetryNoop")
+        proof = self.evidence() | dict.fromkeys(names, True)
+        self.assertEqual(proof, proof_evidence(proof, True))
+        self.assertEqual(self.evidence(), proof_evidence(proof, False))
+        for name in names:
+            with self.subTest(name=name, missing=True), self.assertRaises(ValueError):
+                proof_evidence({k: v for k, v in proof.items() if k != name}, True)
+            for value in (False, None, 1, "true", [], {}):
+                with self.subTest(name=name, value=value), self.assertRaises(ValueError):
+                    proof_evidence(proof | {name: value}, True)
+        for mode in (None, 1, "true", [], {}):
+            with self.subTest(mode=mode), self.assertRaises(ValueError):
+                proof_evidence(proof, mode)
 
     def test_local_read_intent_recovery_requires_each_strict_true_flag(self):
         proof = self.evidence()
@@ -136,7 +187,7 @@ class HrisNativeDriverTest(unittest.TestCase):
 
     def fixture(self, root, base="http://127.0.0.1:43210"):
         private_json(root / "fixture.json", {"baseUrl": base})
-        native = MagicMock(adb="owned-adb", serial="emulator-5560")
+        native = MagicMock(adb="owned-adb", serial="emulator-5560", port=18200)
         native.cleanup.return_value = True
         native.bind.return_value = {"apkSha256": "fictional"}
         process = MagicMock()
@@ -159,8 +210,14 @@ class HrisNativeDriverTest(unittest.TestCase):
         private_json(root / "resume.json", {"ready": True})
         native.process_id.side_effect = [101, None, 202, 202, None, 303, 303, None, 404]
         reads = 0
+        gateway_mapped = True
         def command(*arguments):
-            nonlocal reads
+            nonlocal reads, gateway_mapped
+            if arguments == ("reverse", "--list"):
+                return "fixture tcp:18200 tcp:18200\n" if gateway_mapped else ""
+            if arguments == ("reverse", "--remove", "tcp:18200"):
+                gateway_mapped = False
+                return ""
             if arguments[:3] == ("shell", "am", "force-stop"):
                 return ""
             name = Path(arguments[-1]).stem
@@ -178,7 +235,7 @@ class HrisNativeDriverTest(unittest.TestCase):
                 return json.dumps(restored or {"transactionId": "first-transaction", "processId": 202})
             if name == "gateway-acknowledged":
                 return json.dumps(acknowledged or {"transactionId": "ack-transaction", "processId": 202,
-                                                  "ackObserved": True, "receiptAbsent": True})
+                                                  "ackObserved": True, "receiptAbsent": True, "quotedReplyDecrypted": True})
             if name == "gateway-ack-restored":
                 return json.dumps(ack_restored or {"transactionId": "ack-transaction", "processId": 303})
             if name == "gateway-completed":
@@ -236,15 +293,15 @@ class HrisNativeDriverTest(unittest.TestCase):
             self.assertFalse((root / "native-staged.json").exists())
 
     def test_ack_checkpoint_requires_observed_ack_and_absent_journal(self):
-        checkpoint = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True}
+        checkpoint = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True, "quotedReplyDecrypted": True}
         self.assertEqual({"processId": 202, "transactionId": "ack-transaction"},
                          checkpoint_evidence(checkpoint | {"eventId": "$untrusted"}, acknowledged=True))
-        for name, wrong in (("ackObserved", 1), ("receiptAbsent", False), ("receiptAbsent", "true")):
+        for name, wrong in (("ackObserved", 1), ("receiptAbsent", False), ("receiptAbsent", "true"), ("quotedReplyDecrypted", False), ("quotedReplyDecrypted", 1)):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 checkpoint_evidence(checkpoint | {name: wrong}, acknowledged=True)
 
     def test_ack_requires_its_original_process_and_a_new_transaction_before_death(self):
-        base = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True}
+        base = {"processId": 202, "transactionId": "ack-transaction", "ackObserved": True, "receiptAbsent": True, "quotedReplyDecrypted": True}
         for change in ({"processId": 101}, {"transactionId": "first-transaction"}, {"receiptAbsent": False}):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
@@ -357,6 +414,34 @@ class HrisNativeDriverTest(unittest.TestCase):
                 self.assertTrue(result["cleanup"])
                 self.assertNotIn("private-fixture", json.dumps(result))
                 self.assertEqual(type(error).__name__, result["failureCategory"])
+                self.assertEqual(stage, result["failureStage"])
+
+    def test_unexpected_process_exit_retains_only_the_owned_driver_stage(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native, process = self.fixture(root)
+            native.command.return_value = "{"
+            process.poll.return_value = 1
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value)
+            self.assertTrue(result["cleanup"])
+            self.assertEqual("RuntimeError", result["failureCategory"])
+            self.assertEqual("awaiting_initial_process", result["failureStage"])
+            self.assertNotIn("owned-adb", json.dumps(result))
+
+    def test_invalid_recovery_cannot_report_another_stage_or_private_message(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native, process = self.fixture(root)
+            self.handshake(root, native, restored={
+                "transactionId": "first-transaction", "processId": 101,
+                "failureStage": "private-fixture", "message": "private-fixture",
+            })
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value)
+            self.assertTrue(result["cleanup"])
+            self.assertEqual("validating_queue_restore", result["failureStage"])
+            self.assertNotIn("private-fixture", json.dumps(result))
 
     def test_success_requires_valid_receipts_and_completed_cleanup(self):
         for cleaned in (True, False):

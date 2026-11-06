@@ -30,7 +30,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @Testcontainers
 class CollaborationPushBindingStorageTest {
     companion object {
-        @Container @JvmStatic val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+        @Container
+        @JvmStatic
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
         lateinit var owner: JdbcTemplate
         private val oldKey = Base64.getEncoder().encodeToString(ByteArray(32) { 18 })
         private val newKey = Base64.getEncoder().encodeToString(ByteArray(32) { 43 })

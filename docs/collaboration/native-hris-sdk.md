@@ -1,5 +1,10 @@
 # Android SDK through the HRIS gateway
 
+[Rejected SDK authentication and original-gateway recovery](native-sdk-auth-recovery.md) now has an actual Android/API/PG/Synapse proof alongside normal access renewal.
+
+[Original SDK access renewal](native-sdk-access-renewal.md) now exercises expiry
+after store restoration while retaining encrypted history and queued transactions.
+
 ## Android incoming gaps beyond the SDK window validated — 2 November 2026
 
 [Evidence](../measurements/chat-incoming-history-waves-2026-11-02.json) verifies three

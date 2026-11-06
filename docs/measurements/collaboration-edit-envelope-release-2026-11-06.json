@@ -1,0 +1,216 @@
+{
+  "source": "10485916ee02850cf913793398f7ef3dd1e09afb",
+  "ci": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/42139174304",
+    "headSha": "10485916ee02850cf913793398f7ef3dd1e09afb",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "dashboard (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (5)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (6)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (7)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (8)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "packages": {
+    "verified": true,
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42139174304",
+    "headSha": "10485916ee02850cf913793398f7ef3dd1e09afb",
+    "stagedAt": "2026-11-06T01:25:44.126725+00:00",
+    "elapsedSeconds": 33.908,
+    "packages": [
+      {
+        "role": "api",
+        "artifactId": 13468495220,
+        "archiveSha256": "9f99c91158cf200eff913911dea1f6744eb187ecb06e53cdf4f45e0c983a5a17",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-edit-release-2026-11-05/packages/api/apps-server.jar",
+        "sha256": "45dfbc10d141c02f61d12fa36c798b2703deec9b1b802e6ac573405a1ea189b1",
+        "bytes": 98700805
+      },
+      {
+        "role": "worker",
+        "artifactId": 13468515150,
+        "archiveSha256": "553dd0e5ccfed5e50004873fe12ad9361fa5d95ea6fcb1b431fac60be223a6f6",
+        "githubArchiveDigestVerified": true,
+        "path": ".work/chat-edit-release-2026-11-05/packages/worker/apps-worker.jar",
+        "sha256": "7b5968bec4da6e7a21f1963de6170e09bd4bf0dc58bbe5cc4fb540efa5a95706",
+        "bytes": 78770874
+      }
+    ]
+  },
+  "images": {
+    "success": true,
+    "source": "10485916ee02850cf913793398f7ef3dd1e09afb",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/42139174304",
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:edit-envelope-10485916",
+        "image": "sha256:ab5a5e1faa3a102aac73c2a450d6235b2d718f07aeeeb1870d542ce8865d48ba",
+        "packageSha256": "45dfbc10d141c02f61d12fa36c798b2703deec9b1b802e6ac573405a1ea189b1",
+        "packageBytes": 98700805,
+        "runtimeUser": "10001:10001"
+      },
+      "worker": {
+        "tag": "hris-dev-worker:edit-envelope-10485916",
+        "image": "sha256:0ca5c11dcf43c0d458265a17efcf210f4f923f793df88408ce471cd711f7e947",
+        "packageSha256": "7b5968bec4da6e7a21f1963de6170e09bd4bf0dc58bbe5cc4fb540efa5a95706",
+        "packageBytes": 78770874,
+        "runtimeUser": "10001:10001"
+      }
+    },
+    "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+    "dockerfileSha256": "c25d8f22fa916d04eadbd4ebf4c4fc3802c40474b23f55f9d9c801475cbd7c47",
+    "existingServicesUnchanged": true,
+    "buildLibsUnchanged": true,
+    "originalOverlaySha256": "bd9ced2702a3ebd9255c71a4406dc156d56c5406626836d65f34454438bfee4c",
+    "candidateOverlaySha256": "6e6884d87eb412659c3b37fc68576646437a11554c833a0a231afbd515524499",
+    "elapsedSeconds": 21.696
+  },
+  "runtime": {
+    "success": true,
+    "source": "10485916ee02850cf913793398f7ef3dd1e09afb",
+    "schema": "116.1",
+    "migrationStarted": false,
+    "startedAt": "2026-11-06T01:28:32.202685+00:00",
+    "applicationsStoppedAt": "2026-11-06T01:28:34.262398+00:00",
+    "existingTablesPreserved": 203,
+    "originalMigrationHistoryPreserved": true,
+    "checkpointFiles": {
+      "database.dump": {
+        "bytes": 1975468,
+        "sha256": "da4a72165edc758763e71054731dd99a2e8812d95f0176c49ca1cff21d8a4725"
+      },
+      "roles.sql": {
+        "bytes": 1729,
+        "sha256": "d09a57417d4bf0a6519306f1f9997051628d9bf09bd77c25fad2dbacbb0450ae"
+      }
+    },
+    "api": {
+      "container": "b20028091ea69b6b3c8157a53300dadd240bce04d44542f98e2da709afae85cf",
+      "image": "sha256:ab5a5e1faa3a102aac73c2a450d6235b2d718f07aeeeb1870d542ce8865d48ba",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "worker": {
+      "container": "01590afd592596329e92fb8fffb89291515f8dbb1f0853e8470828db3e22b846",
+      "image": "sha256:0ca5c11dcf43c0d458265a17efcf210f4f923f793df88408ce471cd711f7e947",
+      "runtimeUser": "10001:10001",
+      "restartCount": 0
+    },
+    "summaryProjection": {
+      "pairs": 7,
+      "records": 14,
+      "duePairs": 0,
+      "pendingPublications": 0,
+      "published": 14
+    },
+    "schemaVerifiedAfterStartup": true,
+    "apiHealthy": true,
+    "providerHealthy": true,
+    "privateTlsValidationStatus": 400,
+    "untrustedDirectCallbacks": [
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "127.0.0.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": false,
+        "status": 403
+      },
+      {
+        "listener": "10.77.77.1",
+        "forgedForwardingHeaders": true,
+        "status": 403
+      }
+    ],
+    "untrustedProxyStatus": 403,
+    "chatPushEnabled": true,
+    "smtpEnabled": false,
+    "hostProviderPortsPublished": false,
+    "existingDatabaseAndStorageContainersPreserved": true,
+    "existingEnvironmentAndIdentityKeysPreserved": true,
+    "dashboardUnchanged": true,
+    "oldImagesRetained": true,
+    "proxy": {
+      "container": "19245d3d651eec1833c12b1f843b42d83b1e1d3a3fc0061095671086ae7ac67c",
+      "image": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+      "runtimeUser": "10001:10001"
+    },
+    "matrix": {
+      "container": "00188dc9022bc1df24525c7ec7f92a5c8299a9cf69ea0297052047b5b885f42f",
+      "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+    },
+    "elapsedSeconds": 19.227
+  },
+  "mobileRelease": {
+    "installedVersionCode": 40,
+    "editEditorAccepted": false,
+    "nativeEncryptedEditExchangeAccepted": false
+  },
+  "retained": {
+    "schema": "116.1",
+    "databaseAndProviderContainers": true,
+    "credentialsAndIdentityKeys": true,
+    "phoneAndEmulatorData": true,
+    "acceptedForwardPublicationsNotRepeated": true
+  }
+}

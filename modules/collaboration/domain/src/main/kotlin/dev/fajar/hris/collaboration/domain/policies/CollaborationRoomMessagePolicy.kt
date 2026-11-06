@@ -16,7 +16,13 @@ fun validateCollaborationRoomMessage(message: CollaborationRoomMessage): Result<
             message.senderKey?.let { decoded(it, 32) == null } == true ||
             message.deviceId?.let {
                 it.length !in 1..128 || it.any { char -> char.code !in 33..126 }
-            } == true
+            } == true ||
+            (message.replyToEventId != null && message.replacesEventId != null) ||
+            listOfNotNull(message.replyToEventId, message.replacesEventId).any {
+                it.length !in 2..255 ||
+                    !it.startsWith('$') ||
+                    it.any { char -> char.code !in 33..126 }
+            }
     )
         Result.Failed(Failure(FailureKind.VALIDATION, "invalid_collaboration_room_message"))
     else Result.Success(Unit)

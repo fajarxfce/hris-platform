@@ -1,0 +1,70 @@
+{
+  "platformCommit": "d322c12a32be736fbf660319e3515227218157fb",
+  "mobileCommit": "36e78206d792ac68a38585b80e17234d0e691b22",
+  "startedAt": "2026-11-05T10:11:02.623134+00:00",
+  "seconds": 229.141,
+  "exitCode": 1,
+  "inputsUnchanged": true,
+  "mobileInputsUnchanged": true,
+  "counts": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "junitSha256": "5e579a473a429fc00ac9ae00ff9f8c83ddea917f6cb18d62fd329b8a7aab4074",
+  "workerJarSha256": "64654564bb34b855f5fa9bc1d05387486900d4386a6b1ce25c30fd1c5f7735bf",
+  "mobileArtifacts": [
+    {
+      "file": "product1.apk",
+      "package": "dev.fajar.hris.mobile.dev",
+      "sha256": "58a8318982f3ebe3b473afef1e733c524aea657caeffa22b083e558170f225b8",
+      "bytes": 103863697,
+      "debuggable": true,
+      "abis": [
+        "x86_64"
+      ],
+      "signatureVerified": true
+    },
+    {
+      "file": "peer1.apk",
+      "package": "dev.fajar.hris.collaboration.proof",
+      "sha256": "5c7ba2561f55ed05e983a5fc51ea1e1be4977920a81aafb03883e2eeb5ce20ed",
+      "bytes": 103881093,
+      "debuggable": true,
+      "abis": [
+        "x86_64"
+      ],
+      "signatureVerified": true
+    }
+  ],
+  "driver": {
+    "passed": false,
+    "phoneTouched": false,
+    "failedStage": "setting_up_product",
+    "failureCategory": "TimeoutExpired",
+    "failureFrames": [
+      "collaboration_product_fcm.py:setup_product:42",
+      "collaboration_product_device.py:command:69",
+      "subprocess.py:run:557",
+      "subprocess.py:communicate:1221",
+      "subprocess.py:_communicate:2154",
+      "subprocess.py:_check_timeout:1268"
+    ],
+    "elapsedSeconds": 168.058,
+    "cleanedUp": true,
+    "deviceCleanedUp": true,
+    "peerCleanedUp": true,
+    "failureScreenshotSaved": false,
+    "failureUiSaved": true
+  },
+  "cleanupIndependentlyVerified": true,
+  "fixtureCredentialsRemoved": true,
+  "uiObservation": "Login controls visible in captured UI tree; no screenshot accepted. No crash/ANR markers in captured diagnostic log. Timeout is at the ADB text-input operation; no product send was attempted.",
+  "sourceImageUse": "Driver copies the source into a disposable image; no new source-image hash comparison is claimed.",
+  "driverRegressionTests": {
+    "tests": 25,
+    "failures": 0,
+    "seconds": 0.013
+  }
+}

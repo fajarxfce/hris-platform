@@ -13,18 +13,21 @@ import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
 
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_NATIVE_APK", matches = ".+")
 @Import(NativeSdkGatewayTraceConfiguration::class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(
     properties =
         [
@@ -63,9 +66,20 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
         @JvmStatic @AfterAll fun closeMatrix() = provider.close()
     }
 
+    // Each Spring context/trace has its own provider data and login limits as well.
+    @AfterEach fun closeScenarioProvider() = provider.close()
+
     @Test
     @Timeout(value = 8, unit = TimeUnit.MINUTES)
-    fun actualAndroidSdkExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission() {
+    fun actualAndroidSdkRenewsAccessAndExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission() =
+        proveExchange(retainConfirmedNativeQueue = false)
+
+    @Test
+    @Timeout(value = 8, unit = TimeUnit.MINUTES)
+    fun confirmedNativeOriginalIsSettledOfflineAfterProcessDeathWithoutAnotherSend() =
+        proveExchange(retainConfirmedNativeQueue = true)
+
+    private fun proveExchange(retainConfirmedNativeQueue: Boolean) {
         val owner = native()
         val sender = sdkOwner(owner)
         val recipient = sdkOwner(sdkPeer(owner))
@@ -81,7 +95,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     at.plusSeconds(60),
                 )
             )
-        assertInstanceOf(Result.Success::class.java, providerLogin)
+        assertInstanceOf(
+            Result.Success::class.java,
+            providerLogin,
+            (providerLogin as? Result.Failed)?.failure?.code,
+        )
         val created =
             rooms.create(
                 CollaborationMatrixDirectRoom(
@@ -137,6 +155,7 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             fixture,
             mapOf(
                 "baseUrl" to "http://127.0.0.1:$port",
+                "retainConfirmedNativeQueue" to retainConfirmedNativeQueue,
                 // This disposable API credential stays in private fixture input, never proof
                 // artifacts.
                 "sender" to (sender.session + ("hrisAccessToken" to owner.access)),
@@ -215,6 +234,44 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 trace.earlyEncryptedSendCount(),
                 "SDK sent before explicit queue admission",
             )
+            val renewingOwners = listOf(sender, recipient)
+            for (sdk in renewingOwners) assertEquals(
+                sdk.session.getValue("gatewayVersion").toLong(),
+                gatewayVersion(sdk),
+            )
+            // Inject server-side credential age after restoration of the original SDK stores.
+            // Android wall time stays unchanged; the fixed server clock also keeps the existing
+            // bounded refresh replay available for the independent ciphertext verifier below.
+            clock.set(
+                renewingOwners
+                    .maxOf { java.time.Instant.parse(it.session.getValue("accessExpiresAt")) }
+                    .plusSeconds(1)
+            )
+            val renewalDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(45)
+            while (
+                renewingOwners.any {
+                    gatewayVersion(it) != it.session.getValue("gatewayVersion").toLong() + 1
+                } ||
+                    trace.snapshot().count {
+                        it["method"] == "POST" &&
+                            it["route"] == "/_matrix/client/v3/refresh" &&
+                            it["status"] == 200
+                    } < 2
+            ) {
+                if (!process.isAlive) fail<Nothing>(diagnostic(directory))
+                if (System.nanoTime() >= renewalDeadline)
+                    fail<Nothing>("Original SDK access renewal exceeded its deadline")
+                Thread.sleep(100)
+            }
+            assertEquals(
+                2,
+                trace.snapshot().count {
+                    it["method"] == "POST" &&
+                        it["route"] == "/_matrix/client/v3/refresh" &&
+                        it["status"] == 200
+                },
+                "Both original SDK owners must refresh through the HRIS gateway",
+            )
             trace.interruptNextRetainedSync()
             val interruptionDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(25)
             while (!trace.syncInterrupted()) {
@@ -238,6 +295,21 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 "SDK failed to retry with its retained cursor",
             )
             val proof = result.path("proof")
+            val confirmedQueueEvidence =
+                if (retainConfirmedNativeQueue)
+                    listOf(
+                            "confirmedNativeQueueRestored",
+                            "confirmedNativeQueueSettledOffline",
+                            "confirmedNativeQueueRetryNoop",
+                        )
+                        .associateWith { name ->
+                            assertTrue(
+                                proof.path(name).isBoolean && proof.path(name).booleanValue(),
+                                name,
+                            )
+                            true
+                        }
+                else emptyMap()
             for ((type, minimum) in mapOf("m.read" to 1, "m.read.private" to 4)) {
                 assertTrue(
                     trace.snapshot().count {
@@ -287,6 +359,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "ackBeforeJournalRecovered",
                     "processRestartedAfterAck",
                     "completionCleanupRecovered",
+                    "coldHistoryRecoveredOffline",
+                    "gatewayUnavailableAfterProcessDeath",
+                    "quotedReplyDecrypted",
+                    "quotedReplyRecovered",
+                    "quotedReplyRecoveredOffline",
                     "processRestartedAfterCompletion",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
@@ -301,23 +378,28 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 trace.heldRoomSendCount(),
                 "Unadmitted room attempted an encrypted send",
             )
+            // No fixture refresh is sent until native exchange, restarts and assertions finish.
+            // These requests replay the original successful SDK refresh; they may not rotate again.
+            val renewedSender = replaySdkRefresh(sender)
+            val renewedRecipient = replaySdkRefresh(recipient)
             verifyCiphertext(
-                sender,
+                renewedSender,
                 room,
                 proof.path("senderEventId").asString(),
                 sender.session.getValue("userId"),
             )
             verifyCiphertext(
-                recipient,
+                renewedRecipient,
                 room,
                 proof.path("recipientEventId").asString(),
                 recipient.session.getValue("userId"),
             )
             verifyCiphertext(
-                sender,
+                renewedSender,
                 room,
                 proof.path("ackSenderEventId").asString(),
                 sender.session.getValue("userId"),
+                replyToEventId = proof.path("senderEventId").asString(),
             )
             assertEquals(
                 3,
@@ -328,7 +410,15 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 },
                 "Original, reply and acknowledged message must each send once",
             )
+            assertTrue(
+                trace.snapshot().none { "/redact/" in it["route"].toString() },
+                "Local queue settlement must never request server redaction",
+            )
             val applicationReads = trace.applicationAdmissions()
+            writePrivate(
+                directory.resolve("history-admission.json"),
+                trace.historyAdmissionEvidence(),
+            )
             assertTrue(
                 listOf("device", "conversation", "room").all { applicationReads.getValue(it) >= 10 }
             )
@@ -356,6 +446,9 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 mapOf(
                     "passed" to true,
                     "encryptedBothDirections" to true,
+                    "sdkAccessRenewed" to true,
+                    "sameGatewayAfterRenewal" to true,
+                    "verificationUsedRefreshReplay" to true,
                     "logicalIdsPreserved" to true,
                     "cleanup" to true,
                     "protectedStoreReopened" to true,
@@ -396,8 +489,14 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "ackBeforeJournalRecovered" to true,
                     "processRestartedAfterAck" to true,
                     "completionCleanupRecovered" to true,
+                    "coldHistoryRecoveredOffline" to true,
+                    "gatewayUnavailableAfterProcessDeath" to true,
+                    "quotedReplyDecrypted" to true,
+                    "quotedReplyRecovered" to true,
+                    "quotedReplyRecoveredOffline" to true,
                     "processRestartedAfterCompletion" to true,
                     "encryptedSendCount" to 3,
+                    "nativeRedactionRequests" to 0,
                     "admittedProviderPages" to true,
                     "historyWindow" to history,
                     "applicationAdmittedBeforeSend" to true,
@@ -408,7 +507,8 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "syncInterruptedAfterRestart" to true,
                     "syncRetriedWithRetainedCursor" to true,
                     "artifact" to result.path("artifact"),
-                ),
+                    "retainedConfirmedQueueScenario" to retainConfirmedNativeQueue,
+                ) + confirmedQueueEvidence,
             )
         } finally {
             val interrupted = Thread.interrupted()
@@ -425,13 +525,58 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     writePrivate(directory.resolve("gateway-trace.json"), trace.snapshot())
                 } finally {
                     Files.deleteIfExists(fixture)
+                    clock.followSystemTime()
                     if (interrupted) Thread.currentThread().interrupt()
                 }
             }
         }
     }
 
-    private fun verifyCiphertext(owner: SdkOwner, room: String, event: String, sender: String) {
+    private fun gatewayVersion(owner: SdkOwner): Long =
+        requireNotNull(
+            database()
+                .queryForObject(
+                    "select version from collaboration_gateway_sessions where id=? and native_session_id=? and device_id=? and revoked_at is null",
+                    Long::class.java,
+                    UUID.fromString(owner.session.getValue("gatewaySessionId")),
+                    owner.native.session,
+                    owner.device,
+                )
+        )
+
+    private fun replaySdkRefresh(owner: SdkOwner): SdkOwner {
+        val expected = owner.session.getValue("gatewayVersion").toLong() + 1
+        assertEquals(expected, gatewayVersion(owner))
+        val response =
+            owner.native.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/refresh"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Content-Type", "application/json")
+                    .POST(
+                        HttpRequest.BodyPublishers.ofString(
+                            json.writeValueAsString(
+                                mapOf("refresh_token" to owner.session.getValue("refreshToken"))
+                            )
+                        )
+                    )
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(200, response.statusCode(), "Original SDK refresh replay failed")
+        val value = json.readTree(response.body())
+        val access = value.path("access_token").asString()
+        assertTrue(access.isNotBlank() && access != owner.session.getValue("accessToken"))
+        assertEquals(expected, gatewayVersion(owner), "Verification replay rotated a gateway")
+        return SdkOwner(owner.native, owner.device, owner.session + ("accessToken" to access))
+    }
+
+    private fun verifyCiphertext(
+        owner: SdkOwner,
+        room: String,
+        event: String,
+        sender: String,
+        replyToEventId: String? = null,
+    ) {
         fun encode(value: String) =
             java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8)
         val response =
@@ -453,6 +598,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
         assertEquals(sender, value.path("sender").asString())
         assertFalse(value.path("content").has("body"))
         assertTrue(value.path("content").path("ciphertext").isString)
+        val relation = value.path("content").path("m.relates_to")
+        if (replyToEventId == null) assertFalse(value.path("content").has("m.relates_to"))
+        else
+            assertEquals(replyToEventId, relation.path("m.in_reply_to").path("event_id").asString())
     }
 
     private fun writePrivate(path: Path, value: Any) {

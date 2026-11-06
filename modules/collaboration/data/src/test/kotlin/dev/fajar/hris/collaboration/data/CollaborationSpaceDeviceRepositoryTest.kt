@@ -27,7 +27,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CollaborationSpaceDeviceRepositoryTest {
     companion object {
-        @Container @JvmStatic val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+        @Container
+        @JvmStatic
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
     }
 
     private lateinit var owner: JdbcTemplate

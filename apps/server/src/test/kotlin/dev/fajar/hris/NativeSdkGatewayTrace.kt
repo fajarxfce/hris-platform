@@ -23,6 +23,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val encryptedSendAllowed = AtomicBoolean()
     private val earlyEncryptedSends = AtomicInteger()
     private val acceptedEncryptedSends = AtomicInteger()
+    private val rejectNextEncrypted = AtomicBoolean()
+    private val rejectedEncryptedSends = AtomicInteger()
     private val heldRoom = AtomicReference<String?>()
     private val heldRoomSends = AtomicInteger()
     private val applicationDeviceReads = AtomicInteger()
@@ -35,9 +37,9 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val applicationRoomReads = AtomicInteger()
     private val applicationAdmissionFailures = AtomicInteger()
     private val applicationBeforeSend = AtomicInteger(-1)
+    private val applicationAdmissionAtSend = AtomicReference<Map<String, Int>?>(null)
     private val headReads = AtomicInteger()
     private val headAdmissions = mutableListOf<Map<String, Int>>()
-    private val applicationAtHistory = AtomicReference<Map<String, Int>?>(null)
     private val providerPages = AtomicInteger()
     private val providerAdmissions = mutableListOf<Map<String, Int>>()
     private val providerPositions = mutableListOf<Boolean>()
@@ -48,6 +50,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 providerAdmissions.toList() to providerPositions.toList()
             }
         val before = pages.firstOrNull() ?: return false
+        val firstHead =
+            synchronized(headAdmissions) { headAdmissions.firstOrNull() } ?: return false
         val after = applicationAdmissions()
         return providerPages.get() in 3..4 &&
             pages.size == providerPages.get() &&
@@ -59,7 +63,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             after.getValue("failures") == 0 &&
             pages.all { it.getValue("failures") == 0 } &&
             listOf("device", "conversation", "room").all {
-                before.getValue(it) >= 6 &&
+                // Re-admit after the first history window, then admit the provider page.
+                before.getValue(it) >= firstHead.getValue(it) + 2 &&
                     after.getValue(it) > pages.last().getValue(it) &&
                     pages.zipWithNext().all { (a, b) -> b.getValue(it) > a.getValue(it) }
             }
@@ -87,14 +92,17 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     fun admittedHistoryHeads(): Boolean {
         val heads = synchronized(headAdmissions) { headAdmissions.toList() }
         val before = heads.firstOrNull() ?: return false
+        val send = applicationAdmissionAtSend.get() ?: return false
         val after = applicationAdmissions()
         return headReads.get() == 2 &&
             heads.size == 2 &&
             heads.all { it.getValue("failures") == 0 } &&
             after.getValue("failures") == 0 &&
             listOf("device", "conversation", "room").all {
-                before.getValue(it) >= 4 &&
-                    heads.last().getValue(it) > before.getValue(it) &&
+                // The interrupted progressive ACK need not finish the sender's final admission.
+                // History must nevertheless acquire fresh admission after the original send.
+                before.getValue(it) > send.getValue(it) &&
+                    heads.zipWithNext().all { (a, b) -> b.getValue(it) > a.getValue(it) } &&
                     after.getValue(it) > heads.last().getValue(it)
             }
     }
@@ -102,14 +110,29 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     fun applicationAdmittedBeforeSend() = applicationBeforeSend.get() == 1
 
     fun applicationAdmittedAroundHistory(): Boolean {
-        val before = applicationAtHistory.get() ?: return false
+        // The second head read recovers a staged message after process death. It must
+        // start at the current head; its event-focused window may already be cached.
+        // A network /context request is therefore neither required nor proof of admission.
+        val before = synchronized(headAdmissions) { headAdmissions.getOrNull(1) } ?: return false
+        val send = applicationAdmissionAtSend.get() ?: return false
         val after = applicationAdmissions()
         return before.getValue("failures") == 0 &&
             after.getValue("failures") == 0 &&
             listOf("device", "conversation", "room").all {
-                before.getValue(it) >= 4 && after.getValue(it) > before.getValue(it)
+                before.getValue(it) > send.getValue(it) && after.getValue(it) > before.getValue(it)
             }
     }
+
+    fun historyAdmissionEvidence(): Map<String, Any> =
+        mapOf(
+            "headReads" to headReads.get(),
+            "beforeSend" to applicationAdmissionAtSend.get().orEmpty(),
+            "beforeHeads" to synchronized(headAdmissions) { headAdmissions.toList() },
+            "afterHistory" to applicationAdmissions(),
+            "providerPages" to providerPages.get(),
+            "beforeProviderPages" to
+                synchronized(providerAdmissions) { providerAdmissions.toList() },
+        )
 
     fun holdRoom(roomId: String) {
         require(roomId.startsWith('!') && roomId.length in 2..255)
@@ -141,6 +164,12 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     fun earlyEncryptedSendCount() = earlyEncryptedSends.get()
 
     fun acceptedEncryptedSendCount() = acceptedEncryptedSends.get()
+
+    fun rejectNextEncryptedSend() {
+        check(rejectNextEncrypted.compareAndSet(false, true))
+    }
+
+    fun rejectedEncryptedSendCount() = rejectedEncryptedSends.get()
 
     private fun recordApplicationAdmission(
         request: HttpServletRequest,
@@ -208,12 +237,6 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             }
         }
         if (
-            request.method == "GET" &&
-                request.requestURI.matches(Regex("/_matrix/client/v3/rooms/[^/]+/context/[^/]+"))
-        ) {
-            applicationAtHistory.compareAndSet(null, applicationAdmissions())
-        }
-        if (
             request.method == "PUT" &&
                 request.requestURI.matches(encryptedSendRoute) &&
                 !encryptedSendAllowed.get()
@@ -221,6 +244,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
             earlyEncryptedSends.updateAndGet { minOf(it + 1, 512) }
         }
         if (request.method == "PUT" && request.requestURI.matches(encryptedSendRoute)) {
+            applicationAdmissionAtSend.compareAndSet(null, applicationAdmissions())
             applicationBeforeSend.compareAndSet(
                 -1,
                 if (
@@ -240,6 +264,19 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 ContentCachingRequestWrapper(request, 65_536)
             else null
         try {
+            if (
+                request.method == "PUT" &&
+                    request.requestURI.matches(encryptedSendRoute) &&
+                    rejectNextEncrypted.compareAndSet(true, false)
+            ) {
+                rejectedEncryptedSends.incrementAndGet()
+                response.status = 403
+                response.contentType = "application/json"
+                response.writer.write(
+                    """{"errcode":"M_FORBIDDEN","error":"fixture send rejection"}"""
+                )
+                return
+            }
             val cursor =
                 if (request.method == "GET" && request.requestURI == "/_matrix/client/v3/sync")
                     request.getParameter("since")?.let {
@@ -329,6 +366,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 "unstable",
                 "versions",
                 "capabilities",
+                "refresh",
                 "sync",
                 "keys",
                 "upload",
@@ -345,6 +383,7 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                 "context",
                 "event",
                 "send",
+                "redact",
                 "sendToDevice",
                 "m.room.encrypted",
                 "m.direct",

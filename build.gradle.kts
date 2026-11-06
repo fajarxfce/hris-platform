@@ -10,6 +10,11 @@ val formatter by
 
 dependencies { formatter(libs.ktfmt) }
 
+tasks.register<Exec>("containerImageCheck") {
+    group = "verification"
+    commandLine("python3", "tool/container_images.py")
+}
+
 tasks.register<Exec>("architectureCheck") {
     group = "verification"
     commandLine("python3", "tool/check_architecture.py")
@@ -109,6 +114,7 @@ tasks.register<JavaExec>("format") {
 
 tasks.named("check") {
     dependsOn(
+        "containerImageCheck",
         "architectureCheck",
         "formatCheck",
         "databaseRecoveryCheck",

@@ -22,7 +22,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 /** Actual root RLS/queue transactions; no callback is allowed to acquire any transport token. */
 @Testcontainers
 class CollaborationSpacePushAdmissionTest {
-    @Container val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+    @Container
+    val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
 
     @Test
     fun pendingCapabilityRetainsOwnedEventAndRetriesWithoutDuplicateRevision() {

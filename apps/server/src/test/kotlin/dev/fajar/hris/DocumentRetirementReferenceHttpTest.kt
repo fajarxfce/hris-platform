@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
-@Import(AccountLockProbeConfiguration::class)
+@Import(DocumentLockProbeConfiguration::class)
 class DocumentRetirementReferenceHttpTest : ExpenseSubmissionApiFixture() {
-    @Autowired private lateinit var accountProbe: AccountLockProbe
+    @Autowired private lateinit var documentProbe: DocumentLockProbe
 
     @Test
     fun expenseRegistrationAndRetirementSerializeInBothOrders() {
@@ -94,20 +94,28 @@ class DocumentRetirementReferenceHttpTest : ExpenseSubmissionApiFixture() {
                     UUID.randomUUID(),
                 )
             }
-            val barrier = AccountLockProbe.Barrier(admin)
-            accountProbe.current.set(barrier)
+            val barrier = DocumentLockProbe.Barrier(initial.company)
+            documentProbe.current.set(barrier)
             try {
                 Executors.newFixedThreadPool(2).use { pool ->
                     val leading =
                         pool.submit<java.net.http.HttpResponse<String>> {
                             if (first == "reference") save() else retire()
                         }
-                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
                     val trailing =
-                        pool.submit<java.net.http.HttpResponse<String>> {
-                            if (first == "reference") retire() else save()
+                        try {
+                            assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                            pool
+                                .submit<java.net.http.HttpResponse<String>> {
+                                    if (first == "reference") retire() else save()
+                                }
+                                .also {
+                                    assertTrue(barrier.competing.await(5, TimeUnit.SECONDS))
+                                    assertFalse(it.isDone)
+                                }
+                        } finally {
+                            barrier.release.countDown()
                         }
-                    barrier.release.countDown()
                     val one = leading.get(15, TimeUnit.SECONDS)
                     val two = trailing.get(15, TimeUnit.SECONDS)
                     assertEquals(200, one.statusCode(), one.body())
@@ -119,7 +127,7 @@ class DocumentRetirementReferenceHttpTest : ExpenseSubmissionApiFixture() {
                 }
             } finally {
                 barrier.release.countDown()
-                accountProbe.current.set(null)
+                documentProbe.current.set(null)
             }
             val review = get(f.admin, "$path/revisions/$receipt/retirement")
             assertEquals(200, review.statusCode(), review.body())

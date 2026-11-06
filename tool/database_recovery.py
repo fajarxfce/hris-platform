@@ -178,7 +178,7 @@ def load_backup(directory):
                 or manifest["bootstrapRole"] != "hris_migrator" or manifest["rolePasswordsIncluded"] is not False):
             raise ValueError()
         image = manifest["postgresImage"]
-        if not re.fullmatch(r"postgres:(?:18\.[0-9]+-alpine)|postgres@sha256:[a-f0-9]{64}", image):
+        if not re.fullmatch(r"postgres(?::18\.[0-9]+-alpine(?:@sha256:[a-f0-9]{64})?|@sha256:[a-f0-9]{64})", image):
             raise ValueError()
         for name, limit in (("database.dump", MAX_ARCHIVE_BYTES), ("roles.sql", MAX_ROLES_BYTES)):
             path = private_file(directory / name, limit)

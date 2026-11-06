@@ -7,8 +7,11 @@ import tempfile
 import time
 import uuid
 from xml.sax.saxutils import escape
+from container_images import postgres_image
+from migration_versions import ordered_migrations
 
 classpath, destination, migration_dir = sys.argv[1:]
+migrations = ordered_migrations(Path(migration_dir))
 container = "hris-schema-" + uuid.uuid4().hex[:12]
 docker = ["docker"]
 if subprocess.run(docker + ["info"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
@@ -20,7 +23,7 @@ def run(*args, **kwargs):
 try:
     run("run", "--rm", "-d", "--name", container, "--label", "dev.fajar.hris=codegen",
         "-e", "POSTGRES_PASSWORD=codegen-only", "-e", "POSTGRES_DB=hris",
-        "-p", "127.0.0.1::5432", "postgres:18.6-alpine", stdout=subprocess.DEVNULL)
+        "-p", "127.0.0.1::5432", postgres_image(), stdout=subprocess.DEVNULL)
     for attempt in range(90):
         if subprocess.run(docker + ["exec", "-e", "PGPASSWORD=codegen-only", container, "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "hris", "-c", "select 1"],
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:
@@ -28,7 +31,7 @@ try:
         time.sleep(0.25)
     else:
         raise RuntimeError("Temporary PostgreSQL did not start")
-    for migration in sorted(Path(migration_dir).glob("V*__*.sql"), key=lambda p: int(p.name.split("__")[0][1:])):
+    for migration in migrations:
         # Match Flyway's per-migration transaction, including SET LOCAL and schema guards.
         run("exec", "-i", container, "psql", "-U", "postgres", "-d", "hris", "-v", "ON_ERROR_STOP=1", "--single-transaction", "-f", "-",
             input=migration.read_bytes(), stdout=subprocess.DEVNULL)

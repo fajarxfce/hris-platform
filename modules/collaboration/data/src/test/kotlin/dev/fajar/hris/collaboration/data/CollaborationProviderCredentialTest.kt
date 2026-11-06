@@ -37,7 +37,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 @Testcontainers
 class CollaborationProviderCredentialTest {
     companion object {
-        @Container @JvmStatic val postgres = PostgreSQLContainer("postgres:18.6-alpine")
+        @Container
+        @JvmStatic
+        val postgres =
+            PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
         private lateinit var admin: DriverManagerDataSource
         private lateinit var sql: JdbcTemplate
         private lateinit var databaseName: String

@@ -131,12 +131,13 @@ References checked during planning:
 - https://developer.android.com/develop/connectivity/telecom/voip-app/telecom
 - https://developer.apple.com/documentation/pushkit/responding-to-voip-notifications-from-pushkit
 
-## Quoted reply continuation
+## Reconciled reply envelope — 6 November 2026
 
-Main [d4f34140](https://github.com/fajarxfce/hris-platform/commit/d4f34140a1dd71388bd434de64e3f514f491f482) validates
-the exact encrypted reply envelope. This worktree still requires the source port and
-its own provider/API/worker gate. Mobile draft/outbox/history/UI and native acceptance
-are in progress; no Group reply acceptance is claimed.
+[Bounded reply metadata](quoted-reply-envelope.md) from the company branch is now
+present in this source merge. It retains admission and performs no implicit target
+lookup. Group-specific provider/API/full-worker and actual native recovery gates
+must pass before this branch's integration is accepted. Mobile release50 acceptance
+covers the company runtime; it does not prove product adoption of the group runtime.
 
 ## Mobile quoted intent continuation
 

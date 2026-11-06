@@ -1,5 +1,45 @@
 # Agent continuation — HRIS workspace
 
+## Current: Mobile inventory accepted; native key reader next — 6 November 2026
+
+Backend program 344211f83ed85e381f0002519c727a544efa7d8b remains unchanged and accepted.
+No Group code, schema, live rollout, SDK publication or message rerun in this checkpoint.
+V117–137 remain unshipped/disabled; live 10485916/schema 116.1 remains unchanged.
+
+Mobile 35dfec8223d184757486d0086791f50928e9eb45 is pushed. Its original SDK file/protected-
+record inventory passed 43 focused cases in 215.601 seconds and 5,405 complete fresh cases
+in 610.974 seconds (zero failures/errors/skips, 4,239 stable inputs, Android lint zero).
+Root, Android host/proof compilation, browser, assembly/lint and architecture/format pass.
+The use case validates local account and immutable original registration before/after I/O;
+the raw datasource only opens an existing owner lock and never creates SDK directories.
+File/record presence does not prove private keys or authorize enrollment/adoption. See
+[Mobile contract](https://github.com/fajarxfce/hris-mobile/blob/35dfec8223d184757486d0086791f50928e9eb45/docs/collaboration-space-sdk-inventory.md).
+
+The preceding atomic handoff in Mobile 7ef01cd5 is accepted locally. Its generic Starter
+port 0ff7e59 and audit docs ad7e747 are pushed; local 280 cases and first Apple run 42283698949
+passed 138 cases including nine handoff cases, actual iOS host and associations. Do not
+redispatch. Mobile transport 3d666135 first CI is now accepted: 4,315 portable, 1,679 Apple,
+395 per Android ABI, actual iOS host and native/worker/notification proofs. First 7ef01cd5
+control 42282707724/native 42282707833 still run; audit their exact artifacts on completion.
+
+NEXT active work: isolated SDK candidate /home/fajar/hris/.worktrees/matrix-sdk-inventory-
+2026-11-06 reads the existing encrypted private account through the SDK codec and read-only
+SQLite, including committed WAL content. It creates no cipher/account and returns only
+public identity. Its bounded-cipher suite passed 11 cases in 8.232 seconds. SQLite gate
+55706 is the ONLY heavy local job; FFI, new binary/bindings and real consumer checks remain.
+This is unpublished candidate source, not changed shipping SDK 3. Never modify/rebuild/
+republish accepted SDK 3 merely to reconcile evidence. Preserve the original SDK checkout.
+After possession, continue native hard-parent recovery, freeze/drain/adoption, organization
+foreground/background/push routing and all 54 communications groups.
+
+Phone 50 stays installed; the user's long-pending report remains OPEN. Latest passive
+20:12:51 UTC UID log read retained no new Chat/crash diagnostics and is not a successful
+phone-send result. No phone UI, install or new sends occurred. Keep original Bima data,
+sidecars and keys. All owned emulators are stopped. Keep the existing optional question
+pending; announce every later install and use the explicit serial with --install-only.
+Push every commit and record concrete validation/remaining work in Git.
+
+
 ## Current: Mobile handoff validated; Starter port running — 6 November 2026
 
 Backend implementation344211f83ed85e381f0002519c727a544efa7d8b remains accepted and pushed;

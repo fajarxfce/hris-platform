@@ -14,14 +14,25 @@ inputs, format/architecture and API bootJar. No native message replay. Exact sou
 class and artifact evidence are in
 [diagnostics](collaboration/gateway-rejection-diagnostics.md).
 
-NEXT: commit/push this atomic change, stage the exact accepted API jar and update only
-the API image in the existing development overlay. Preserve worker, Matrix/provider,
-TLS, DB/schema116.1, storage, flags and every key. Record rollback image/overlay and
-health; no migration is involved. Then observe actual rejection reasons without
-launching the phone. Mobile's12-file interrupted-credential/read-path candidate has
-67 focused cases and accepted two-ABI SDK proof; its final full-2 gate remains next.
-One heavy local job at a time; push every commit and do not displace first pending CI.
+Commit061cac310de6aba27fd6f1e3568509ba1c7cee8f is pushed. API-only deployment2246
+PASSED10.689s at01:04:56UTC. Exact image5f16b55ac8d6e69846f2483b547f27bd1364708c2837b94deeee08d2e2ee0af7
+contains accepted JAR9effb126c99decafae3caf94caee6ac6385db67beaa3e39c354d54eb25f7146e.
+Worker remains10485916; provider/TLS/DB/schema116.1/storage/environment stayed unchanged.
+The API is healthy. A root-owned Docker verification copy required correcting that
+new local file's ownership; the same built image was verified without rebuilding.
+Rollback overlay/image and measured evidence are in
+[release](measurements/collaboration-gateway-diagnostics-release-2026-11-07.json).
+First source CI42321745141 is running; preserve/audit it, never redispatch for evidence.
 
+NEXT: observe actual MatrixGatewayRejected finite reason codes after this deployment;
+no agent phone UI action or new message. No fresh rejection had appeared at01:05UTC.
+Mobile full96083 under rotation-handover-next/full-2 is the ONLY heavy local job.
+Its67 focused cases and actual two-ABI native mechanism pass; keep Mobile source frozen.
+Original Mobile transport nativeCI42313584318 and fd05 protocolCI42318790936 failed;
+original logs are being audited under Mobile .work/ci-failures-2026-11-07, not rerun.
+Mobilefd05 first control42318790930 remains pending/native42318790943 is running.
+Preserve those pending first-source runs. Continue actual phone403 recovery and all54
+communications PRD groups, with atomic pushes and announced install-only updates.
 
 ## Current: release50 delivered; recipient remains eligible offline — 6 November 2026
 

@@ -19,3 +19,9 @@ No SDK send replay, schema change or worker graph change was required.
 The original phone pending report remains open until the actual rejection is
 identified and corrected. Diagnostic delivery is recorded separately from source
 validation; it does not claim successful message delivery.
+
+API-only development delivery passed10.689s from061cac31. The exact verified image
+retains the existing Java base, environment and schema116.1; worker, provider, storage
+and database containers stayed unchanged. A root-owned local Docker copy required an
+ownership correction during image verification; the same image was retained.
+[Delivery evidence](../measurements/collaboration-gateway-diagnostics-release-2026-11-07.json).

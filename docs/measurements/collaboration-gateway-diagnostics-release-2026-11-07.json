@@ -1,0 +1,60 @@
+{
+  "recordedAt": "2026-11-07T01:06:09.204898+00:00",
+  "source": "061cac310de6aba27fd6f1e3568509ba1c7cee8f",
+  "apiArtifact": {
+    "path": ".work/gateway-rejection-2026-11-07/accepted-api.jar",
+    "sha256": "9effb126c99decafae3caf94caee6ac6385db67beaa3e39c354d54eb25f7146e",
+    "bytes": 98701824,
+    "diagnosticClassSha256": "7fb331ee5e4edcce1dc484f4fad7046cdb753d82d5e1d8d315814b2a8928e49b",
+    "nestedModuleSha256": "2d706914cf6d59b762e57ecca80f50c7c7c4b0826e9b1163833b80657388212b",
+    "diagnosticPresent": true
+  },
+  "apiImage": "sha256:5f16b55ac8d6e69846f2483b547f27bd1364708c2837b94deeee08d2e2ee0af7",
+  "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+  "imageStagingFirstAttempt": {
+    "at": "2026-11-07T01:03:48.896442+00:00",
+    "stage": "image-jar-verification",
+    "failureClass": "PermissionError",
+    "reason": "sudo docker cp created the owned verification copy under root; changed ownership of that exact new local file only.",
+    "imageBuilt": true,
+    "imageJarMatchesAccepted": true,
+    "liveDeploymentStarted": false,
+    "imageRebuildRequired": false
+  },
+  "imageRebuiltAfterCopyFix": false,
+  "deployment": {
+    "startedAt": "2026-11-07T01:04:45.562871+00:00",
+    "source": "061cac310de6aba27fd6f1e3568509ba1c7cee8f",
+    "success": true,
+    "schema": "116.1",
+    "migrationStarted": false,
+    "phoneUiDriven": false,
+    "newMessagesSent": 0,
+    "apiContainer": "b4c4124cdd304ea06e1f3798b7140f515c53b650be25ee92d2e20fa493fd612a",
+    "apiImage": "sha256:5f16b55ac8d6e69846f2483b547f27bd1364708c2837b94deeee08d2e2ee0af7",
+    "apiHealthy": true,
+    "otherServicesUnchanged": true,
+    "environmentUnchanged": true,
+    "schemaUnchanged": true,
+    "rollbackTag": "hris-dev-api:before-gateway-rejection-20261107T010243",
+    "rollbackOverlaySha256": "6e6884d87eb412659c3b37fc68576646437a11554c833a0a231afbd515524499",
+    "elapsedSeconds": 10.689
+  },
+  "sourceValidation": "collaboration-gateway-rejection-diagnostics-2026-11-07.json",
+  "firstSourceCi": {
+    "head": "061cac310de6aba27fd6f1e3568509ba1c7cee8f",
+    "runs": [
+      {
+        "conclusion": "",
+        "databaseId": 42321745141,
+        "headSha": "061cac310de6aba27fd6f1e3568509ba1c7cee8f",
+        "status": "in_progress",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/42321745141",
+        "workflowName": "Collaboration control"
+      }
+    ],
+    "redispatched": false
+  },
+  "workerSourceUnchanged": "10485916ee02850cf913793398f7ef3dd1e09afb",
+  "originalPhonePendingResolved": false
+}

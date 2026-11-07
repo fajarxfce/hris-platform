@@ -4,6 +4,42 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
+## Current native room receipt recovery — 7 November 2026
+
+Group `4e1b5b90` is accepted/pushed. Its native read-only original-room receipt
+endpoint and shared API/FULL worker graph passed504.080s:238 cases, zero failures/
+errors, one existing elapsed-retention skip,8,619 unchanged inputs, format/architecture.
+The initial run failed only an incorrect expected401 for an unauthenticated POST;
+existing403 protection was retained. [Contract/results](https://github.com/fajarxfce/hris-platform/blob/4e1b5b90/docs/collaboration/native-room-receipt-recovery.md).
+Underlying original reader `f7268950` passed175 domain/database cases. The endpoint
+reads original evidence under current participant/native admission; no provider or
+room creation, original-parent revival, migration rollout or new phone build.
+
+Mobile `777d6215` stores original72a first CI outcomes: both native ABIs509/82 passed
+with immutableSDK4 and original held-queue recovery; control failed the old app test
+fake, already corrected by e8fc7844. Both first e8fc control42360096500/native42360096584
+are IN_PROGRESS. Only heavy local job93348 is Mobile room-receipt focused-1,11 frozen
+source/test files. If it passes, complete required root/Android/lint gate; don't start
+another build/emulator concurrently. Group has ONE uncommitted actual refresh/write
+characterization test prepared; its check has not run and must wait for Mobile gates.
+
+Before durable dispatch, resolve initial proof capture: native credential responses
+and Mobile session storage omit native version, but the current room operation key
+hashes the ACTUAL bearer version/build. Authentication refresh can therefore change
+the committed fingerprint before the first response. Do not guess original proof.
+Characterize actual HTTP refresh/write, then implement an explicit stable versioned
+intent or authoritative persisted descriptor without rewriting legacy receipts.
+Absence remains uncertain and requires explicit fencing before replacement. Continue
+owning original encrypted-message delivery/history, parent recovery, product routing
+and all54 PRD groups; none is complete. Group V117-137 remains disabled/unshipped.
+
+Phone53 latency stays OPEN. Bima has published keys and need not stay online; the
+accepted controlled mixed-room result does not reproduce its20s-2min delay. Latest
+bounded phone reconnect10:10-10:11UTC timed out; no UI was driven, no new message or
+APK was sent. Keep the existing optional feedback pending without asking again.
+LiveAPI2e75fe1e/worker10485916/schema116.1, immutableSDK4, original data/keys/IDs and
+Starterb11437a remain unchanged. Read Mobile's newest handoff for subsequent progress.
+
 ## Current native conversation/room continuation — 7 November 2026
 
 Mobile e8fc784489e32136a0b47d0df5778af8fee562e5 is accepted/pushed on both branches.

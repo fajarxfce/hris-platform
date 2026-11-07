@@ -35,12 +35,19 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
    purged-parent resolution, exact Recorded/Fenced echo, original-key header, no-store,
    bounds/OpenAPI/disabled graph pass. [HTTP contract](collaboration/native-room-request-fence-http.md).
    All Group jobs are reaped; no shared module DI change after dcdaf220 FULL worker proof.
-2. ELEVEN Mobile candidates are isolated under Mobile `.work/space-room-request-fence-2026-11-07`;
-   NOT applied/tested. Verify baseline hashes, apply/format, run focused44 transport/binding
-   cases, then root/Android host/release lint,14 selected actual Browser fence/receipt
-   cases and shared Wasm via its prepared full-check.py. The candidate includes8 new Ktor
-   cases. HTTP503 maps to Service. No durable fence storage/successor linkage exists.
-3. Implement durable exact fence capture before atomic original/successor linkage.
+2. Mobile transport fe3992f1 and durable evidence fc0034ed are accepted/pushed. Transport
+   passed44 focused/3,671 full cases. Durable storage passed65 focused/217.124s and3,697
+   full cases/455 suites/513.19s; a report audit caught zero selected Browser policy
+   cases, and supplemental82617 passed all6/26.512s on identical4,398 inputs. Zero
+   failures/errors/skips/lint; root/Android host/quality/shared Wasm and actual Browser
+   storage are accepted. [Storage contract](https://github.com/fajarxfce/hris-mobile/blob/fc0034ed/docs/collaboration-space-room-fence-storage.md).
+   NINE owning-resolution Mobile files are applied/FROZEN, NOT accepted. Sole heavy
+   job21909 runs `.work/space-room-request-resolution-2026-11-07/focused-1` (91 cases).
+   Then required full root/Android/actual Browser64/shared Wasm. It reads terminal facts
+   locally, marks the same attempt before one finite original fence call, uses normalized
+   stored CAS and bounded observed-result capture. No successor/archive/provider action.
+   Reap before editing frozen source or starting another compiler/emulator.
+3. Validate owning exact fence capture, then implement atomic original/successor linkage.
    A null receipt, timeout, denial or changed native parent never authorizes replacement.
    Continue Room projection/recovery, original SDK delivery/history, native-parent
    recovery, product routing and all54 PRD groups:3 in progress/51 planned/none complete.
@@ -49,20 +56,15 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
 
 ## Other repositories and CI
 
-Mobile recovery `feat/chat-recovery-20261107` is59ff2109; primary
-`feat/communications` is31e618cc89e2ca0cce38bcb62ccd95b8533c88c0, including Open335e3914.
-Its full local gate passed3,669 fresh cases/452 suites505.461s,4,393 stable inputs,
-zero failures/errors/skips/lint. Original Open uses normalized persisted marks for
-exact CAS, captures outcomes and materializes canonical metadata before archival.
+Mobile recovery `feat/chat-recovery-20261107` is fc0034ed; primary remains
+fe3992f1426712bf23964bf5aea68ad382f1b624. First fe control42380244144/native42380243983
+are PENDING behind first31e control42376025279/native42376025306, which both run.
+Preserve both first fe runs before another primary promotion; recovery work continues.
+First1d9493df control42372520573/native42372520624 are fully audited SUCCESS: Apple2,028/
+230, portable4,923/546, each native543/86, exactSDK4 keys/IDs/cleanup and14 metadata/
+13 preparation cases verified. Prior3b3/79/fb/e8 remain accepted; no provider reruns.
 [Mobile continuation](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
-
-First31e control42376025279/native42376025306 remain PENDING behind first1d9493df
-control42372520573/native42372520624, which both started. At13:38UTC1d portable passed;
-Apple and both Android jobs were still running. Preserve both first31e runs before
-another primary promotion. Recovery branch work can continue. First3b3 control/native
-are fully audited SUCCESS: Apple2,001/228, portable4,869/542 and each native543/86,
-SDK4 keys/IDs and cleanup verified. Do not rerun providers merely to audit artifacts.
-Starterb11437a is unchanged; no HRIS policy port. Main checkpointe5793ca5 is docs only.
+Starterb11437a remains unchanged; no HRIS policy port. Main checkpoint06dc66fb is docs only.
 
 ## Runtime, phone and original data
 
@@ -73,7 +75,8 @@ Google binding, original stores and message transaction IDs. No new phone APK is
 Phone10.77.77.3:5555 remains on release53, source08545820c0b58f46d784971e71ceb207dd628c0f,
 UID10962 retained. APK SHA994d161ade3455745157d0793475b5091d67e968af909bda7a282dce163152c6.
 Latency is OPEN; latest bounded ADB retry11:41UTC timed out. No more ADB retries this
-turn and no repeated feedback question. Bima's06:42UTC audit confirmed existing keys;
+turn and no repeated feedback question. Fresh14:00UTC audit confirms existing Bima keys;
+14:04UTC still admits one confirmed receiving device despite expired interactive access;
 he need not remain online for sender server acceptance. That does not prove the cause
 or fix for the physical phone's20s–2min delay. Use the owned emulator for interaction.
 Announce each authorized install, explicit serial and --install-only; never drive phone UI.

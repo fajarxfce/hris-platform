@@ -5,6 +5,39 @@ and the linked contracts. Earlier checkpoints are retained verbatim in
 [history through native room fencing](agent-handoff-history-through-room-fence-2026-11-07.md).
 Their running-job and next-step statements are historical; use this current queue.
 
+## Current cross-repository continuation — 7 November2026,19:02UTC
+
+Mobile recoverycd7fc023 is pushed; primarybb106154 includes the accepted first-layout
+bubble fix. Both95 original CI runs started before promotion. Preserve bb106154 first
+control42403266288/native42403266310 until both start. Phone and original stopped Bima
+emulator remain validated release55, with pending/draft inbox previews fixed and all
+keys/data/original send IDs retained. New viewport fix is not yet in an APK; keyboard
+and end-to-end latency remain open. [Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
+
+Source3308 first CI artifacts are audited: Apple2,154/237, portable5,175/560 and native
+553/87 per ABI, all zero failures/errors/skips. ExactSDK4, original queue/key continuity
+and cleanup pass; the synthetic queue proof sends zero provider messages and does not
+activate live Group. No extra sends or rebuilds were performed for this audit.
+
+Standalone inspector f71f308/4b61dfb is pushed. Core42/Ktor39 plus viewer16 cases pass
+locally, with Android AAR and Apple/Wasm compilation. Two synthetic UI screenshots were
+inspected. No Apple/device/browser UI runtime acceptance, release or host integration.
+All three first private CI runs were blocked before any steps by GitHub billing. Repo
+visibility question remains unanswered; do not make it public without an answer.
+
+An actual Matrix HTTP observer and FFI are implemented in the isolated Rust worktree
+`../.worktrees/matrix-sdk-http-observer-2026-11-07` (resolve from workspace root).
+Core-2 passed15 tests after fixing a fixture that destroyed its client during request
+cancellation. Sole heavy local job40646 is ffi-1; no compiler/emulator may overlap.
+No generated binding, new SDK artifact/release or app capture acceptance yet. SDK4
+and frozen inventories are unchanged. Continue reusable observed timing/adapter,
+Mobile validation/install, starter integration and durable composer work.
+
+Live API2e75fe1e/worker10485916/schema116.1 remain unchanged. Group V117–138 undeployed,
+organization routing disabled; accepted Group source and Starterb11437a unchanged.
+Original Room-dispatch and all54 PRD groups remain active (3 in progress/51 planned/
+none complete). Current running jobs in older entries below are historical.
+
 ## Current mobile priority — 7 November 2026, 18:13 UTC
 
 Mobile release55 is validated and installed in place on the authorized phone, without

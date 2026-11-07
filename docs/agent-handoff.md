@@ -1,47 +1,44 @@
 # Agent continuation — HRIS workspace
 
-## Accepted original queue matching and native packaging — 7 November 2026
+## Accepted mixed-room delivery diagnosis — 7 November 2026
 
-Mobile program `032697ea` matches complete original SDK queues to immutable commands
-and completions under current admission. Full root/Android/browser validation passed
-5,538 fresh cases in 649 suites (512.73 seconds), with 4,320 unchanged inputs and no
-failures/errors/skips or Android lint findings. No original IDs, keys or queue states
-were rewritten. Its continuation document is now concise; prior entries remain in Git.
+Mobile `ca76e87d` is pushed and Platform `1de67d71` is committed; its narrow actual SDK4/application-worker experiment
+passed. One READY room with no published recipient key received a real403. A new
+original command in the ready room reached local Sent1,316ms after queue return,
+journal observation1,321ms and immutable completion1,815ms, with one encrypted200.
+The ready recipient's SDK had already closed. The unavailable original/ID remained
+retained without a receipt. This warm-runtime case did NOT reproduce the phone's
+20-second to2-minute delay and justifies no production timeout/retry/writer change.
+[Contract and continuation](https://github.com/fajarxfce/hris-platform/blob/1de67d71/docs/collaboration/mixed-room-delivery-diagnosis.md),
+[measurement](https://github.com/fajarxfce/hris-platform/blob/1de67d71/docs/measurements/collaboration-mixed-room-delivery-2026-11-07.json).
 
-Mobile `9deb55bf93314622967231c9de8ab695c775faeb` is accepted and pushed to temporary
-and primary branches. The proof NDK is pinned in the version catalog and installed
-before CI build. The existing strict SDK4 validator runs before emulator startup,
-with actual native hashes recorded even on rejection. Full local root/proof Android
-validation passed 5,373 fresh cases in 754 suites (1,364.389 seconds), 4,324 unchanged
-inputs, zero failures/errors/skips and lint errors; proof retains 49 existing warnings.
-Exact workflow Python accepted the built x86_64 APK and rejected a separate local copy
-containing the published unstripped SDK4 library. Both accepted stripped ABI hashes
-were reproduced from the same immutable AAR. No SDK rebuild or new provider send.
-[Evidence](https://github.com/fajarxfce/hris-mobile/blob/9deb55bf/docs/collaboration-sdk4-packaging-ci.md).
+Mobile gate31449 passed134.102s/20fresh cases/4,325 unchanged inputs, zero failures/
+errors/skips/lint errors;49 existing warnings. Backend compile64777 passed31.020s
+including format/architecture after a retained test-only missing URI encoder. Four
+Python validator cases passed. Actual native48997 passed149.551s/one case/no skips;
+all source/APK hashes and immutable SDK4 stayed exact. The fresh emulator and its
+transport are stopped; all sessions are reaped. No phone/Bima data or175-message
+history rerun was involved. Platform owns two new test fixtures and two driver files;
+Mobile owns three proof files. No production policy/DI or Starter changes.
 
-No local heavy job or emulator is active. First9deb control42354718734 is PENDING
-behind05de Apple; native42354718728 and protocol42354718729 are running. Preserve the
-first pending control before another primary source promotion. First1bb control is
-fully accepted; first05de native failed before installation because CI could not strip
-the library. Original logs/digests are retained, with failed APK bytes explicitly unknown.
+NEXT continue original organization queue delivery/publication, native-parent recovery,
+product routing and all54 PRD groups. Mobile032697ea's complete original queue matcher
+and owning read are accepted; actual original delivery remains absent. Preserve current
+recipient admission, published group room binding and V132 canonical pairs. History
+access and queue matches grant no sending authority. Group e45a4313/V117–137 remain
+disabled/unshipped; liveAPI2e75fe1e/worker10485916/schema116.1 are unchanged.
 
-NEXT implement a narrow controlled mixed-room delivery experiment: one READY room has
-no eligible key-published recipient device, another does. Measure actual queue, server
-acceptance, durable receipt and observable sent-state milestones without changing
-production timeout or writer policy first. Use the existing native fixture contracts,
-without rerunning the accepted 175-message history scenario merely for timing.
-[Diagnosis plan](https://github.com/fajarxfce/hris-mobile/blob/9deb55bf/docs/collaboration-mixed-room-delivery-diagnosis.md).
-The user was told this experiment follows packaging acceptance. No new experiment
-source/result is accepted yet. Continue original organization delivery/publication,
-native-parent recovery, product routing and all54 PRD groups afterward.
+Bima Demo has one active device,50one-time keys and a fallback. He need not stay online.
+Phone53 latency remains OPEN, with its existing optional question pending. Passive UID
+log08:38:32UTC still has zero post-install diagnostics, not delivery evidence. Preserve
+original userdata, sidecars, keys and pending identities. Install-only phone rules remain.
 
-Phone53 latency remains OPEN and its optional feedback request is already pending.
-Bima Demo has an active device, 50 one-time keys and a fallback; he need not stay online.
-Phone52 matched200 to Bima and repeated403s to another room without an eligible device.
-Latest passive phone53 log was empty, not delivery evidence. Preserve original Bima
-userdata/keys/IDs, immutable SDK4 and install-only phone rules. Starterb11437a is accepted.
-Group source e45a4313, disabled/unshipped V117–137, liveAPI2e75fe1e/worker10485916/schema116.1
-are unchanged. The earlier timestamped sections below are historical checkpoints.
+Mobile primary9deb55bf retains accepted SDK4 packaging. First control42354718734 and
+native42354718728 have STARTED; protocol42354718729 is SUCCESS with artifact audit still
+pending. First1bb control and05de protocol were fully accepted; first05de native failed
+pre-install because CI could not strip the library, now corrected locally by the pinned
+NDK. Keep original CI evidence and audit the new jobs without rerunning accepted sends.
+Starterb11437a is clean/pushed. Earlier dated sections below are historical checkpoints.
 
 ## Current queue reconciliation and notification correction — 7 November 2026
 

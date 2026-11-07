@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Mobile inspector locally accepted — 07 November 2026, 22:21 UTC
+
+Mobile52df4ee1 is pushed on feat/network-inspector-20261107. Dev API/Firebase/OIDC Ktor
+clients and the raw Android Matrix observer feed a separately owned shared viewer in
+Account → Settings. Full local gate38121 passed5,645 fresh cases on4,424 unchanged
+app inputs in617.945s; root check, Android host/release compilation/lint, Wasm/iOS
+source compilation, formatting, architecture and detekt pass. Eight inspector cases
+cover account/container lifetime and UI ownership. Exact initial failures remain in
+Mobile docs/measurements/network-inspector-host-local-2026-11-07.json.
+
+The sole local heavy job34797 builds APK57 from this pushed source, with private
+inspectora8d7d60 and unpublished pairedSDK5. Mobile and inspector inputs/HEAD are frozen
+until reaped; no emulator. Phone and original stopped Bima emulator remain56 with all
+original userdata/keys. Do not install57 before actual capture/continuity acceptance.
+Build57 scripts live in Mobile .work/release-phone-2026-11-07-build57; verify the package,
+then test the one original-account send, actual Ktor/Matrix capture and cold offline
+history. Notify before --install-only phone update. App capture/overhead still pending.
+
+be2fe021 first control42414100643/native42414100684 are fully audited: Apple2194/241,
+portable5284/571, native560/88 per ABI; zero failures/errors/skips. Original queues/keys
+and six independent HRIS scenario cleanups per ABI pass. Apple SDK source6866251a
+records proof42418364475 success:4macOS Swift/native cases, exact request counts and
+cleanup, reusing43verified generated files. No iPhone app or library Apple bridge yet.
+
+SDK4 is immutable. Library and SDK5 are unpublished; visibility question unanswered.
+Keep primaryMobilebe2fe021 healthy. Starterb11437a is unchanged. Continue actual capture/
+overhead, validated installs, reusable Starter port, composer/latency and all54PRDgroups
+(3in progress/51planned, none complete). API2e75fe1e, worker10485916, schema116.1 and
+Group routing remain unchanged; V117–138 undeployed. Mobile current handoff owns exact
+state. Older running-process notes below are historical.
+
 ## Release 56 / actual inspector reset — 07 November 2026, 21:39 UTC
 
 Mobile796585ad records the installed56 (sourcebe2fe021, immutableSDK4). Phone update

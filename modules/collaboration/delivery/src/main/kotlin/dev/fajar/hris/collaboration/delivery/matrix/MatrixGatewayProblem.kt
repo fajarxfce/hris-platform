@@ -27,7 +27,16 @@ private val gatewayRejectionReasons =
         "recent_authentication_required",
     )
 
-fun matrixGatewayProblem(failure: Failure): ResponseEntity<Any> {
+enum class MatrixGatewayOperation(val label: String) {
+    General("general"),
+    RoomSend("room_send"),
+    ToDevice("to_device"),
+}
+
+fun matrixGatewayProblem(
+    failure: Failure,
+    operation: MatrixGatewayOperation = MatrixGatewayOperation.General,
+): ResponseEntity<Any> {
     val (status, code) =
         when (failure.kind) {
             FailureKind.UNAUTHENTICATED -> 401 to "M_UNKNOWN_TOKEN"
@@ -41,8 +50,9 @@ fun matrixGatewayProblem(failure: Failure): ResponseEntity<Any> {
         }
     if (status == 403)
         gatewayRejectionLogger.warn(
-            "MatrixGatewayRejected status=403 reason={}",
+            "MatrixGatewayRejected status=403 reason={} operation={}",
             failure.code.takeIf { it in gatewayRejectionReasons } ?: "other",
+            operation.label,
         )
     val body =
         buildMap<String, Any> {

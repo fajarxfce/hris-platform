@@ -1,0 +1,119 @@
+{
+  "recordedAt": "2026-11-07T01:19:10.148883+00:00",
+  "baselineSource": "e953893456cea35d873e722acac447d36ccd56af",
+  "gate": {
+    "startedAt": "2026-11-07T01:16:47.917270+00:00",
+    "elapsedSeconds": 81.557,
+    "exitCode": 0,
+    "sourceFiles": 8244,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skipped": [],
+    "reports": {
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+        "sha256": "e0d10c6bf8cc0cdb5610dab3f00db7e65647b17604728133fe6b6731ab31492e",
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushCallbackExecutorTest.xml": {
+        "sha256": "d97b56d2993a38e467a5e5a6cc281cc619697d74ecb22d7d20f2ae9ebe68c7bf",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushCallbackSourcesTest.xml": {
+        "sha256": "a5ab9d2aa6a64f4f688e584bcf16648b8134882acdcd172c5a74045309056848",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushNotificationTest.xml": {
+        "sha256": "a600b0656adba50be56cb087f0c27dedb2112edd23de2185829ebff3f2ed319f",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixRoomReplyRequestTest.xml": {
+        "sha256": "606971d0116e6d24c310b3c734f2bd46e635af168204b46e8b23f08176875990",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixGatewayDiagnosticsTest.xml": {
+        "sha256": "2dac139759c60aa1187f84d71c43fc830cf29473c620775251c200ccf532b89b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "artifact": {
+    "path": ".work/gateway-operation-2026-11-07/accepted-api.jar",
+    "sha256": "b77fc179817e12166b7ecf2528dec23099e9ebd6747630cbf394bcc4f02c82c8",
+    "bytes": 98703693,
+    "diagnosticClassSha256": "3e4dc4be901d45a67db3748fb8dad99f3101c52b0953a858922d5d0537e7c962",
+    "nestedModuleSha256": "73333b58f8b1e02430a1273942d9829c45c0ab38f2490cdf2ba9df8bb4731e6c",
+    "diagnosticPresent": true
+  },
+  "observedRejection": {
+    "recordedAt": "2026-11-07T01:14:45.943706+00:00",
+    "apiSource": "061cac310de6aba27fd6f1e3568509ba1c7cee8f",
+    "rows": [
+      {
+        "at": "2026-11-07T01:07:27.203Z",
+        "reason": "endpoint_unavailable"
+      },
+      {
+        "at": "2026-11-07T01:07:27.203Z",
+        "reason": "endpoint_unavailable"
+      },
+      {
+        "at": "2026-11-07T01:07:33.467Z",
+        "reason": "collaboration_recipient_unavailable"
+      }
+    ],
+    "phoneUiDriven": false,
+    "messagesSent": 0
+  },
+  "deviceMetadata": {
+    "at": "2026-11-07T01:17:47.006451+00:00",
+    "readOnly": true,
+    "observations": [
+      {
+        "role": "caller",
+        "devices": 2,
+        "activeDevices": 2,
+        "hardLiveDevices": 1,
+        "revokedParentDevices": 1,
+        "expiredParentDevices": 0
+      },
+      {
+        "role": "sample2",
+        "devices": 1,
+        "activeDevices": 1,
+        "hardLiveDevices": 1,
+        "revokedParentDevices": 0,
+        "expiredParentDevices": 0
+      }
+    ],
+    "providerKeysFetched": false,
+    "phoneUiDriven": false,
+    "messagesSent": 0
+  },
+  "scope": "Closed route operation labels only; no authorization or response behavior change.",
+  "deploymentStarted": false,
+  "phonePendingResolved": false,
+  "nativeSendReplay": false
+}

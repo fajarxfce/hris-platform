@@ -1,5 +1,23 @@
 # Agent continuation — HRIS workspace
 
+## Current — finite recipient rejection, route diagnosis accepted — 7 November 2026
+
+API061cac31 observed collaboration_recipient_unavailable at01:07:33UTC. Exact route
+and target remain unresolved. Caller has2device records,1withrevoked parent; Bima
+has1hard-live device. The read-only original-pair recipient view admits1confirmed
+device each. Never reactivate a revoked parent or bypass target/key checks.
+
+Typed room_send/to_device/general HTTP diagnostic labels passed gate20819:52cases,
+81.557s,8,244 unchanged inputs, API bootJar/format/architecture. Source is this
+commit. No HTTP or authorization changes, no native send replay. API-only delivery
+is next under .work/gateway-operation-2026-11-07; live worker/schema stay10485916/116.1.
+Mobile34d507bc is pushed on temporaryfeat/chat-recovery-20261107: interrupted store
+handover passed5,512 fresh full cases plus actual two-ABI mechanism, no sends.
+Primary Mobilefd05control42318790930 still pending; preserve it before fast-forward.
+No heavy local build/emulator is active. Bounded passive phone target observation
+65623 lasts5minutes; it stores only private routing metadata, never bodies/tokens.
+Phone52 original pending remains OPEN. Continue original CI audit and all54 groups.
+
 ## Current — phone52 native queue403; bounded diagnostics accepted — 7 November 2026
 
 The [current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md)

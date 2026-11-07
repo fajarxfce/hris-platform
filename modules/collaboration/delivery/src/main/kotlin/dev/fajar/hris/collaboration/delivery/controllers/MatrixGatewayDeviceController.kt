@@ -1,5 +1,6 @@
 package dev.fajar.hris.collaboration.delivery.controllers
 
+import dev.fajar.hris.collaboration.delivery.matrix.MatrixGatewayOperation
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.delivery.requests.matrixDirectMetadataRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyClaimRequest
@@ -54,6 +55,7 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
             request,
             { matrixRoomMessageRequest(transactionId, it) },
             reader = envelopeParser,
+            diagnosticOperation = MatrixGatewayOperation.RoomSend,
         ) { token, correlation, message ->
             device.sendRoomMessage(token, correlation, roomId, message).map {
                 mapOf("event_id" to it)
@@ -170,6 +172,7 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
             { matrixToDeviceRequest(transactionId, it) },
             1_048_576,
             envelopeParser,
+            diagnosticOperation = MatrixGatewayOperation.ToDevice,
         ) { token, correlation, envelope ->
             device.sendToDevice(token, correlation, envelope).map { emptyMap<String, Any>() }
         }
@@ -179,6 +182,7 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
         decode: (JsonNode) -> T,
         maximumBytes: Int = 65536,
         reader: JsonMapper = parser,
+        diagnosticOperation: MatrixGatewayOperation = MatrixGatewayOperation.General,
         operation: (String, UUID, T) -> Result<Map<String, Any>>,
     ): ResponseEntity<Any> {
         if (request.queryString != null) return problem(400, "M_INVALID_PARAM")
@@ -225,7 +229,7 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
             }
         val correlation = request.getAttribute("hris.correlationId") as? UUID ?: UUID.randomUUID()
         return when (val result = operation(header.substring(7), correlation, input)) {
-            is Result.Failed -> matrixGatewayProblem(result.failure)
+            is Result.Failed -> matrixGatewayProblem(result.failure, diagnosticOperation)
             is Result.Success ->
                 ResponseEntity.ok().header("Cache-Control", "no-store").body(result.value)
         }

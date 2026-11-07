@@ -25,3 +25,12 @@ retains the existing Java base, environment and schema116.1; worker, provider, s
 and database containers stayed unchanged. A root-owned local Docker copy required an
 ownership correction during image verification; the same image was retained.
 [Delivery evidence](../measurements/collaboration-gateway-diagnostics-release-2026-11-07.json).
+
+The next diagnostic revision distinguishes `room_send`, `to_device` and `general`
+using a typed route label. No URL or target identity enters the log. Existing52
+delivery/API cases pass in81.557s with8,244 stable inputs. The server has observed
+`collaboration_recipient_unavailable`; the exact operation/target remains unknown.
+Read-only metadata finds one current device and one revoked-parent device for the
+caller, while Bima retains one current device. This is a hypothesis about stale
+recipient metadata, not proof of the actual failed request.
+[Operation evidence](../measurements/collaboration-gateway-operation-diagnostics-2026-11-07.json).

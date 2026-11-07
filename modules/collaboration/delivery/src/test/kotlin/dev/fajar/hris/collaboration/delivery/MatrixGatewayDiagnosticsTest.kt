@@ -1,5 +1,6 @@
 package dev.fajar.hris.collaboration.delivery
 
+import dev.fajar.hris.collaboration.delivery.matrix.MatrixGatewayOperation
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.core.domain.Failure
 import dev.fajar.hris.core.domain.FailureKind
@@ -31,7 +32,7 @@ class MatrixGatewayDiagnosticsTest {
             assertEquals("collaboration_recipient_unavailable", body["org.hris.error_code"])
             assertEquals("no-store", response.headers.cacheControl)
             assertEquals(
-                "MatrixGatewayRejected status=403 reason=collaboration_recipient_unavailable",
+                "MatrixGatewayRejected status=403 reason=collaboration_recipient_unavailable operation=general",
                 appender.list.single().formattedMessage,
             )
 
@@ -39,11 +40,24 @@ class MatrixGatewayDiagnosticsTest {
             assertEquals(403, unknown.statusCode.value())
             assertEquals("private-code", (unknown.body as Map<*, *>)["org.hris.error_code"])
             assertEquals(
-                "MatrixGatewayRejected status=403 reason=other",
+                "MatrixGatewayRejected status=403 reason=other operation=general",
                 appender.list.last().formattedMessage,
             )
             matrixGatewayProblem(Failure(FailureKind.UNAVAILABLE, "private-unavailable"))
             assertEquals(2, appender.list.size)
+            for (operation in
+                listOf(MatrixGatewayOperation.RoomSend, MatrixGatewayOperation.ToDevice)) {
+                val classified =
+                    matrixGatewayProblem(
+                        Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable"),
+                        operation,
+                    )
+                assertEquals(response.body, classified.body)
+                assertEquals(
+                    "MatrixGatewayRejected status=403 reason=collaboration_recipient_unavailable operation=${operation.label}",
+                    appender.list.last().formattedMessage,
+                )
+            }
             for (event in appender.list) {
                 assertFalse(event.formattedMessage.contains("private-"))
                 assertNull(event.throwableProxy)

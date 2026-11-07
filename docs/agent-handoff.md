@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Current queue continuity and original metadata — 7 November 2026, 06:30 UTC
+
+Mobile f361f535f4b0b61feb1982e78b128d5cb4d206ae is accepted and pushed on feat/chat-recovery-20261107.
+Actual SDK4 preserves two original paused transactions through cancelled schema4 adoption,
+process death and offline restoration on x86_64 and ARM64. Both exact logical guards,
+physical provenance/private keys and replay invariance passed. Native134.91s; final
+source check62.841s with4,305stable inputs,0fresh XML (reused), proof lint0errors/49
+existing warnings and Detekt0. Both emulator fixtures were removed; owned process and
+transport are stopped. CI now includes this proof for both ABIs.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/f361f535f4b0b61feb1982e78b128d5cb4d206ae/docs/collaboration-space-original-queue-native.md).
+Original failed fixture attempts remain preserved; no actual delivery/phone latency claim.
+
+ONLY heavy local job37256 is Mobile original-conversation-metadata/focused-1. Twelve
+applied source/test files are frozen: native read-only original inventory/exact lookup,
+composite company/conversation coordinates, immutable pair and separate room provenance,
+strict page exhaustion and bounded/cancellable transport. It is not yet accepted; read
+Mobile's active handoff before another build. Owning acquisition, encrypted publication,
+immutable app-command matching and product routing follow separately. No Space/company
+substitution or SDK/device re-enrollment is permitted.
+
+Primary Mobile remains1bb572eb to preserve FIRST pending control42344998885/native
+42344999033. Its protocol42344998987 passed14checks each in classic85.257s and native
+70.653s; artifacts13563243938/13563097555 and all14 pinned Platforme0dbb567 source hashes
+are verified. FIRSTa48 control42342142245/native42342142282 remain running; retain/audit
+its original x86 failure after completion. FIRST2509 Apple1881/215 and portable4629/516
+are accepted, with original notification failure/counterevidence retained. No reruns
+of accepted provider sends or SDK publication.
+
+Starter03ebcde and Group programe45a4313 remain unchanged. Live API2e75fe1e,
+worker10485916/schema116.1 and disabled/unshipped V117–137 are unchanged. Phone53 still
+needs latency feedback; Bima has an eligible device/key and need not remain online.
+Never drive phone UI, reset original Bima data or replace its pending transaction IDs.
+Continue all54 communications groups and push every atomic commit.
+
 ## Current cross-repository execution — 7 November 2026, 05:42 UTC
 
 Mobile a48c59f1 is accepted and pushed to both working and primary branches. The

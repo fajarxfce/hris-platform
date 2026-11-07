@@ -59,3 +59,10 @@ domain/API/OpenAPI checks and the full 127-case worker suite (126 active, one ex
 opt-in skip), including native transport, independent employee accounts, cross-company
 directory visibility with denied HR access, revocation, exact receipts, safe status,
 default-disabled deployment and generated contract validation.
+
+## Original publication observation
+
+[Publication preflight](legacy-publication-preflight.md) checks actual signed original
+provider keys before Mobile stages an existing private store. Its POST is an ephemeral
+observation with no idempotency key or returned bearer; it cannot freeze, activate or
+adopt a device. Existing same-parent guards and disabled-by-default rollout remain.

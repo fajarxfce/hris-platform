@@ -1,5 +1,15 @@
 # Delivery and validation
 
+## Original publication preflight — 7 November 2026
+
+186 domain/data and236 API/full-worker cases pass, with zero failures/errors and one
+existing elapsed-retention opt-in skip. Format/architecture pass and final8,613 inputs
+are stable. The read-only publication observation preserves existing native-parent
+guards, original signed identity, and all runtime/SDK state. [Contract](collaboration/legacy-publication-preflight.md)
+and [measurements](measurements/collaboration-legacy-publication-preflight-2026-11-07.json)
+retain failed fixture attempts and precise acceptance. V117–137 remain unshipped;
+Mobile owning adoption and phone pending latency work continue.
+
 ## Explicit organization bootstrap replacement — 6 November 2026
 
 The existing guarded bootstrap now accepts an explicit original descriptor in a

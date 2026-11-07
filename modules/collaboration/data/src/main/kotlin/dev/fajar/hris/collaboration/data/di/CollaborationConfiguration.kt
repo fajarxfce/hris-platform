@@ -244,6 +244,40 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun verifyNativeCollaborationLegacyPublication(
+        registry: CollaborationSpaceDeviceRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        runtimes: CollaborationLegacyRuntimeRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        matrix: CollaborationSpaceMatrixRepository,
+        keys: CollaborationMatrixKeyRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        VerifyNativeCollaborationLegacyPublication(
+            registry,
+            legacyParents,
+            selections,
+            runtimes,
+            spaces,
+            sessions,
+            identities,
+            matrix,
+            keys,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
     fun freezeNativeCollaborationLegacyRuntime(
         registry: CollaborationSpaceDeviceRepository,
         legacyParents: CollaborationLegacyParentRepository,

@@ -1,0 +1,101 @@
+{
+  "recordedAt": "2026-11-07T02:04:51.768857+00:00",
+  "base": "1a315331488801fd2a68aa4a12fa260bc51b8ed0",
+  "sources": {
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationLegacyPublicationController.kt": "a8f98d1e5af4818ac2ec29c9bb60b617c37d105be4b8631b3243fea74143acd9",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/VerifyCollaborationLegacyPublicationRequest.kt": "5ba348a4396e9aa2ea59cc91637f9a59b5ae09dbbc3ca57f16f5b916ed07bf84",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationLegacyPublication.kt": "19970eaba8971b346e1b0016e980a7d065571351da0757d04f2d2e85409977dd",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/VerifyNativeCollaborationLegacyPublication.kt": "850b773b63b8a9a22bfc5a1efdd3e58dca2eb552977034247823f5d34e6960aa",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ApiContractHttpTest.kt": "156524ef63e24371459f930d57680f6b918d702a54df8c132b6210d805708cf0",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt": "3124670b165fadc0cafa005499f3d4818e095968821db994bfdd33b09241d2e1",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceDisabledConfigurationTest.kt": "478baa62ac4dcb3c6357e9200719133af2eb5ca6f07c1273fe7b2207198b39c2",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "705b185ac1a5885f5a23189646a6bdedb35bf2bff1528eae48d3cf32992431a2",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceDeviceRegistrationTest.kt": "9d7d1f8e985311131f3f913c3fbbd86a3cdfdc7cb8f0620224e8ed98f325efc7"
+  },
+  "checks": {
+    "domain-data-1": {
+      "startedAt": "2026-11-07T01:43:44.393130+00:00",
+      "elapsedSeconds": 20.981,
+      "exitCode": 1,
+      "sourceFiles": 8611,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 160,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": []
+    },
+    "domain-data-2": {
+      "startedAt": "2026-11-07T01:48:18.595382+00:00",
+      "elapsedSeconds": 81.721,
+      "exitCode": 0,
+      "sourceFiles": 8611,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 186,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": []
+    },
+    "contexts-1": {
+      "startedAt": "2026-11-07T01:52:33.939190+00:00",
+      "elapsedSeconds": 141.771,
+      "exitCode": 1,
+      "sourceFiles": 8613,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 92,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": []
+    },
+    "contexts-2": {
+      "startedAt": "2026-11-07T01:55:23.164828+00:00",
+      "elapsedSeconds": 552.463,
+      "exitCode": 0,
+      "sourceFiles": 8613,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 236,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "skipped": [
+        {
+          "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+        }
+      ]
+    }
+  },
+  "retainedFailures": {
+    "domain-data-1": "Fixture used copy on intentionally non-data credential class; corrected only fixture constructor calls. Domain160cases passed before test compilation failed.",
+    "contexts-1": "Cookie POST without CSRF is rejected before transport resolution with access_denied. Corrected test expected code; production behavior unchanged."
+  },
+  "behavior": [
+    "Fresh current native/group/client/MFA admission before provider I/O and after both outcomes",
+    "Real PostgreSQL no-freeze and revocation/deadline races",
+    "Exact signed canonical original fingerprint; missing or mismatched keys rejected",
+    "Network I/O outside database transactions",
+    "No provider candidate logout, no key upload, no SDK access, no mutation receipt, no runtime writes",
+    "Bounded private metadata response; OpenAPI request/admission contract",
+    "Disabled API plus actual API and full worker shared DI contexts"
+  ],
+  "liveDeployment": false,
+  "schemaChanged": false,
+  "organizationFeatureEnabled": false,
+  "phoneChanged": false,
+  "remaining": [
+    "Owning Mobile publication/freeze/drain/adoption orchestration",
+    "Separate revoked-original-parent recovery",
+    "Group routing/background/push activation and acceptance",
+    "Physical pending-message latency correction and remaining54PRD groups"
+  ]
+}

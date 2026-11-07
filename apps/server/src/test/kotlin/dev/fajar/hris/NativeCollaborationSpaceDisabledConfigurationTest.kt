@@ -49,6 +49,8 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
                     """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
                 "$base/native-device/retry" to
                     """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0,"expectedProvisioningRevision":0}""",
+                "$base/native-device/legacy-runtime/publication" to
+                    """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0,"fingerprint":"${"a".repeat(64)}"}""",
                 "$base/native-device/legacy-runtime/freeze" to
                     """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0,"fingerprint":"${"a".repeat(64)}"}""",
                 "$base/native-device/legacy-runtime/drain?deviceId=${UUID.randomUUID()}&expectedDeviceVersion=0&fingerprint=${"a".repeat(64)}" to

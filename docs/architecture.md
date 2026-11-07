@@ -1,5 +1,10 @@
 # Architecture
 
+[Original publication preflight](collaboration/legacy-publication-preflight.md) reads
+actual signed provider keys under fresh native/group admission before Mobile stages
+its existing private store. It writes no runtime or device authority; owning adoption
+and separate revoked-parent recovery remain required.
+
 [Native selected identity metadata](collaboration/space-identity-read.md) reads the
 already retained provider user without selecting, enrolling or granting device
 authority; it lets Mobile match the correct original SDK user.

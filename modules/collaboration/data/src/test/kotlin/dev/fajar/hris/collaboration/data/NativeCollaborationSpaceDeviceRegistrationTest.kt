@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.*
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
 import dev.fajar.hris.collaboration.domain.repositories.*
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
@@ -1055,6 +1056,302 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
         }
     }
 
+    @Test
+    fun publicationPreflightReadsActualReservedKeysWithoutFreezingOrPublishingCredentials() {
+        val p = PublicationFixture()
+        repeat(2) {
+            val result = success(p.verify())
+            assertEquals(space, result.spaceId)
+            assertEquals(p.target.id, result.deviceId)
+            assertEquals(0L, result.deviceVersion)
+            assertEquals(p.legacy, result.original)
+            assertEquals(p.fingerprint, result.fingerprint)
+            assertEquals(p.f.clock.at, result.observedAt)
+            assertEquals(p.f.clock.at.plusSeconds(30), result.expiresAt)
+            assertNull(p.f.frozen(p.legacy))
+            p.f.freezeCounts(0, 0, 0)
+            p.f.counts(1, 1, 1)
+        }
+        assertEquals(2, p.logins)
+        assertEquals(2, p.keyReads)
+    }
+
+    @Test
+    fun publicationPreflightCanRecheckAnExactFrozenTargetWithoutChangingItsIntent() {
+        val p = PublicationFixture()
+        success(p.f.freeze(UUID.randomUUID(), p.target.id, fingerprint = p.fingerprint))
+        val frozen = p.f.frozen(p.legacy)
+        success(p.verify())
+        assertEquals(frozen, p.f.frozen(p.legacy))
+        p.f.freezeCounts(1, 1, 1)
+        p.f.counts(1, 1, 1)
+    }
+
+    @Test
+    fun publicationPreflightRejectsForeignOwnersTargetsVersionsAndBuildsBeforeProviderIo() {
+        val p = PublicationFixture()
+        for (result in
+            listOf(
+                p.verify(request = p.f.actor.copy(companyId = p.f.company)),
+                p.verify(request = p.f.actor.copy(accountId = UUID.randomUUID())),
+                p.verify(parent = p.f.parent()),
+                p.verify(nativeVersion = 1),
+                p.verify(requestedSpace = UUID.randomUUID()),
+                p.verify(device = UUID.randomUUID()),
+                p.verify(deviceVersion = 1),
+                p.verify(requestedFingerprint = "b".repeat(64)),
+                p.verify(build = client.copy(build = 27)),
+                p.verify(build = null),
+            )) assertInstanceOf(Result.Failed::class.java, result)
+        assertEquals(0, p.logins)
+        assertEquals(0, p.keyReads)
+        p.f.freezeCounts(0, 0, 0)
+    }
+
+    @Test
+    fun publicationPreflightWithholdsLateProviderSuccessAndFailureAfterRevocation() {
+        for (phase in listOf("login", "keys", "completion")) for (outage in listOf(false, true)) {
+            val p = PublicationFixture()
+            val revoke = {
+                owner.update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    p.f.session,
+                )
+                Unit
+            }
+            when (phase) {
+                "login" -> p.onLogin = revoke
+                "keys" -> p.onKeys = revoke
+                else -> p.onCompletion = revoke
+            }
+            if (outage && phase == "login") p.loginFailure = p.outage
+            if (outage && phase == "keys") p.keyResult = Result.Failed(p.outage)
+            val result = p.verify()
+            assertInstanceOf(Result.Failed::class.java, result)
+            assertNotEquals(p.outage.code, (result as Result.Failed).failure.code)
+            assertEquals(if (phase == "login") 0 else 1, p.keyReads)
+            p.f.freezeCounts(0, 0, 0)
+            p.f.counts(1, 1, 1)
+        }
+    }
+
+    @Test
+    fun publicationPreflightFencesConcurrentFreezeAndPreservesTheOriginalOutcome() {
+        val p = PublicationFixture()
+        p.onKeys = {
+            success(p.f.freeze(UUID.randomUUID(), p.target.id, fingerprint = p.fingerprint))
+            Unit
+        }
+        failure(p.verify(), "collaboration_admission_changed")
+        val frozen = p.f.frozen(p.legacy)
+        p.onKeys = {}
+        success(p.verify())
+        assertEquals(frozen, p.f.frozen(p.legacy))
+        p.f.freezeCounts(1, 1, 1)
+    }
+
+    @Test
+    fun publicationPreflightRequiresSignedCanonicalKeysAndTheExactOriginalFingerprint() {
+        val p = PublicationFixture()
+        val other = MatrixKeyFixture(p.keys.userId, p.keys.deviceId)
+        for (keys in
+            listOf(
+                null,
+                p.keys.device.copy(signatures = emptyMap()),
+                p.keys.device.copy(deviceId = "HRIS_" + compact(UUID.randomUUID())),
+                p.keys.device.copy(userId = "@other:$server"),
+                other.device,
+            )) {
+            p.keyResult = Result.Success(keys)
+            failure(p.verify(), "collaboration_provider_invalid_response")
+        }
+        p.keyResult = Result.Failed(p.outage)
+        failure(p.verify(), p.outage.code)
+        p.f.freezeCounts(0, 0, 0)
+        p.f.counts(1, 1, 1)
+    }
+
+    @Test
+    fun publicationPreflightRejectsInvalidProviderCredentialsBeforeKeyLookup() {
+        val p = PublicationFixture()
+        for (candidate in
+            listOf(
+                p.credential(userId = "@other:$server"),
+                p.credential(deviceId = "HRIS_" + compact(UUID.randomUUID())),
+                p.credential(accessToken = ""),
+                p.credential(accessToken = "private\nvalue"),
+                p.credential(expiresAt = p.f.clock.at),
+                p.credential(expiresAt = p.f.clock.at.plusSeconds(601)),
+            )) {
+            p.candidate = candidate
+            failure(p.verify(), "collaboration_provider_invalid_response")
+        }
+        assertEquals(0, p.keyReads)
+        p.f.freezeCounts(0, 0, 0)
+    }
+
+    @Test
+    fun publicationPreflightKeepsTheOriginalDeadlineAndPropagatesInterruption() {
+        for (phase in listOf("login", "keys")) {
+            val p = PublicationFixture()
+            val expire = { p.f.clock.at = p.f.clock.at.plusSeconds(30) }
+            if (phase == "login") p.onLogin = expire else p.onKeys = expire
+            failure(p.verify(), "collaboration_admission_changed")
+            p.f.freezeCounts(0, 0, 0)
+        }
+        val p = PublicationFixture()
+        p.onLogin = { Thread.currentThread().interrupt() }
+        try {
+            assertThrows(InterruptedException::class.java) { p.verify() }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(0, p.keyReads)
+        p.f.freezeCounts(0, 0, 0)
+    }
+
+    private inner class PublicationFixture {
+        val f = Fixture()
+        private val originalDevice = UUID.randomUUID()
+        val keys =
+            MatrixKeyFixture(
+                "@hris_${compact(f.company)}_${compact(f.account)}:$server",
+                "HRIS_${compact(originalDevice)}",
+            )
+        val fingerprint =
+            success(validateCollaborationDeviceKeys(keys.device, keys.userId, keys.deviceId))
+        val legacy = f.activeLegacy(originalDevice, fingerprint)
+        val target: MutationReceipt
+        val outage = Failure(FailureKind.UNAVAILABLE, "fixture_provider_outage")
+        var loginFailure: Failure? = null
+        var candidate: CollaborationMatrixCredential? = null
+        var keyResult: Result<CollaborationMatrixDeviceKeys?> = Result.Success(keys.device)
+        var onLogin: () -> Unit = {}
+        var onKeys: () -> Unit = {}
+        var onCompletion: () -> Unit = {}
+        var logins = 0
+        var keyReads = 0
+
+        init {
+            f.select()
+            target =
+                success(f.register(UUID.randomUUID(), legacy = legacy, fingerprint = fingerprint))
+        }
+
+        fun credential(
+            userId: String = keys.userId,
+            deviceId: String = keys.deviceId,
+            accessToken: String = "fixture-provider-token",
+            expiresAt: Instant = f.clock.at.plusSeconds(300),
+        ) = CollaborationMatrixCredential(userId, deviceId, accessToken, expiresAt)
+
+        private val providerIo =
+            object : CollaborationSpaceMatrixRepository {
+                override fun login(
+                    request: CollaborationSpaceMatrixLogin
+                ): Result<CollaborationMatrixCredential> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(f.account, request.accountId)
+                    assertEquals(legacy, request.retainedDevice)
+                    assertEquals(target.id, request.deviceId)
+                    assertEquals(space, request.spaceId)
+                    logins++
+                    onLogin()
+                    return loginFailure?.let { Result.Failed(it) }
+                        ?: Result.Success(candidate ?: credential())
+                }
+            }
+
+        private val providerKeys =
+            object : CollaborationMatrixKeyRepository {
+                override fun ownDeviceKeys(
+                    userId: String,
+                    deviceId: String,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixDeviceKeys?> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    assertEquals(keys.userId, userId)
+                    assertEquals(keys.deviceId, deviceId)
+                    assertTrue(deadline <= now.plusSeconds(30))
+                    keyReads++
+                    onKeys()
+                    return keyResult
+                }
+
+                override fun claimKeys(
+                    request: CollaborationMatrixKeyClaim,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyClaimResult> = error("Preflight cannot claim keys")
+
+                override fun deviceKeys(
+                    request: CollaborationMatrixKeyQuery,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyQueryResult> =
+                    error("Preflight cannot query another device")
+
+                override fun upload(
+                    request: CollaborationMatrixKeyUpload,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyCounts> = error("Preflight cannot upload keys")
+            }
+
+        fun verify(
+            request: Actor = f.actor,
+            parent: UUID = f.session,
+            nativeVersion: Long = 0,
+            requestedSpace: UUID = space,
+            device: UUID = target.id,
+            deviceVersion: Long = 0,
+            requestedFingerprint: String = fingerprint,
+            build: ClientVersion? = client,
+        ): Result<CollaborationLegacyPublication> {
+            var calls = 0
+            val transactions =
+                object : TransactionRunner {
+                    override fun <T> run(actor: Actor, operation: () -> Result<T>): Result<T> {
+                        if (++calls == 4) onCompletion()
+                        return f.transactions.run(actor, operation)
+                    }
+                }
+            return VerifyNativeCollaborationLegacyPublication(
+                    f.registry,
+                    f.legacyParents,
+                    f.selections,
+                    f.runtimes,
+                    f.spaces,
+                    f.sessions,
+                    f.identities,
+                    providerIo,
+                    providerKeys,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    f.clock,
+                )
+                .execute(
+                    request,
+                    parent,
+                    nativeVersion,
+                    requestedSpace,
+                    build,
+                    device,
+                    deviceVersion,
+                    requestedFingerprint,
+                )
+        }
+    }
+
     private inner class Fixture {
         val account = UUID.randomUUID()
         val company = UUID.randomUUID()
@@ -1172,8 +1469,10 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
             return id
         }
 
-        fun activeLegacy(): CollaborationLegacyDevicePosition {
-            val device = UUID.randomUUID()
+        fun activeLegacy(
+            device: UUID = UUID.randomUUID(),
+            fingerprint: String = "a".repeat(64),
+        ): CollaborationLegacyDevicePosition {
             val at = now.minusSeconds(30).toString()
             owner.update(
                 "insert into collaboration_devices(company_id,id,account_id,platform,label,state,version,created_at,updated_at) values(?,?,?,'ANDROID','Fictional','PROVISIONING',0,?::timestamptz,?::timestamptz)",
@@ -1212,7 +1511,7 @@ class NativeCollaborationSpaceDeviceRegistrationTest {
                 company,
                 device,
                 account,
-                "a".repeat(64),
+                fingerprint,
                 at,
             )
             return CollaborationLegacyDevicePosition(company, device)

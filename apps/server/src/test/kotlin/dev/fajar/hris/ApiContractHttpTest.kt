@@ -46,6 +46,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/native-device/retry" to "post",
                 "$base/native-device/bootstrap" to "post",
                 "$base/native-device/provider/renew" to "post",
+                "$base/native-device/legacy-runtime/publication" to "post",
                 "$base/native-device/legacy-runtime/freeze" to "post",
                 "$base/native-device/legacy-runtime/drain" to "get",
             )
@@ -63,9 +64,41 @@ class ApiContractHttpTest : PeopleApiFixture() {
                     .map { it.propertyNames().toSet() }
                     .toSet(),
             )
-            if (method == "post") assertTrue(operation["x-hris-idempotency-key"].asBoolean())
+            if (path.endsWith("/legacy-runtime/publication")) {
+                assertFalse(operation.path("x-hris-idempotency-key").asBoolean())
+                assertTrue(
+                    operation["parameters"].iterator().asSequence().none {
+                        it["name"].asString() == "Idempotency-Key"
+                    }
+                )
+            } else if (method == "post") assertTrue(operation["x-hris-idempotency-key"].asBoolean())
         }
         val schemas = api["components"]["schemas"]
+        val publication = schemas["VerifyCollaborationLegacyPublicationRequest"]
+        assertEquals(
+            setOf("deviceId", "expectedDeviceVersion", "fingerprint"),
+            publication["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(
+            999998L,
+            publication["properties"]["expectedDeviceVersion"]["maximum"].asLong(),
+        )
+        assertEquals(
+            "^[a-f0-9]{64}$",
+            publication["properties"]["fingerprint"]["pattern"].asString(),
+        )
+        assertEquals(
+            setOf(
+                "spaceId",
+                "deviceId",
+                "deviceVersion",
+                "original",
+                "fingerprint",
+                "observedAt",
+                "expiresAt",
+            ),
+            schemas["CollaborationLegacyPublication"]["properties"].propertyNames().toSet(),
+        )
         val roomRequest = schemas["RequestCollaborationSpaceRoomRequest"]
         assertEquals(
             setOf(

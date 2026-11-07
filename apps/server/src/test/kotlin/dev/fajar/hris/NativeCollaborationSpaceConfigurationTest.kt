@@ -542,6 +542,72 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun legacyPublicationPreflightRequiresCurrentNativeTargetAndLeavesRuntimeUntouchedOnOutage() {
+        val n = groupNative()
+        val original = seedGroupLegacy(n)
+        val base = groupBase(n)
+        assertEquals(200, groupCall(n, "$base/identity", post = true).statusCode())
+        val registration =
+            groupCall(
+                n,
+                "$base/native-device",
+                groupRegistration() +
+                    mapOf(
+                        "origin" to "LEGACY",
+                        "legacy" to mapOf("companyId" to n.fixture.company, "deviceId" to original),
+                        "legacyKeyFingerprint" to "a".repeat(64),
+                    ),
+            )
+        assertEquals(200, registration.statusCode(), registration.body())
+        val target = json.readTree(registration.body())["id"].asString()
+        val path = "$base/native-device/legacy-runtime/publication"
+        val input =
+            mapOf(
+                "deviceId" to target,
+                "expectedDeviceVersion" to 0,
+                "fingerprint" to "a".repeat(64),
+            )
+        for (missing in input.keys) {
+            assertEquals(400, groupCall(n, path, input - missing, operation = null).statusCode())
+        }
+        failure(groupCall(n, path, input, build = "27"), 403, "client_update_required")
+        failure(groupCall(n, path, input, platform = "WEB"), 422, "invalid_client_version")
+        assertEquals(403, groupCall(n, path, input, token = null, cookies = false).statusCode())
+        failure(groupCall(n, path, input, token = null), 403, "access_denied")
+        failure(
+            groupCall(n, path, input + ("deviceId" to UUID.randomUUID())),
+            503,
+            "collaboration_admission_changed",
+        )
+        val status = json.readTree(groupCall(n, "$base/native-device").body())
+        repeat(2) {
+            // Provider connection is unavailable. A read needs no operation receipt and never
+            // freezes.
+            failure(
+                groupCall(n, path, input, operation = null),
+                503,
+                "collaboration_provider_unavailable",
+            )
+        }
+        assertEquals(status, json.readTree(groupCall(n, "$base/native-device").body()))
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_legacy_runtime where account_id=?",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                n.fixture.account,
+            )
+        failure(groupCall(n, path, input, operation = null), 403, "collaboration_access_denied")
+    }
+
+    @Test
     fun groupRetainedFreezeAndDrainExposeExactOwnedTarget() {
         val n = groupNative()
         val original = seedGroupLegacy(n)

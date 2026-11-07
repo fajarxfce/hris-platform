@@ -4,6 +4,38 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
+## Current cross-repository continuation — 7 November2026,19:30UTC
+
+Standalone inspector dfebf666 is accepted/pushed: native observed timing, distinct
+header/body outcomes, fenced buffered starts and explicit incomplete/lost capture.
+All126 local cases pass (core66/Ktor39/Compose21), including six desktop UI cases;
+Android AAR and Apple/Wasm compile. No Apple/native/browser UI runtime acceptance.
+First CI42405812195 ran zero steps due to GitHub billing. Repository remains private;
+visibility question is pending. No library release or application integration yet.
+
+Rust observer source bce66311 is accepted/pushed on Mobile's isolated SDK branch.
+15 Rust tests, FFI and Wasm compile pass. Sole heavy job93078 builds the first ARM64
+native/binding candidate in
+`/home/fajar/hris/.worktrees/matrix-sdk-http-observer-2026-11-07/.work/http-observer-2026-11-07/android-arm64-1`.
+Rust inputs remain FROZEN until reaped; no overlapping compiler/emulator. SDK4 is
+unchanged. Inspector common Matrix adapter/13 tests are written but UNACCEPTED and
+must wait for the build before their compiler check. Actual binding adapter, paired
+ABIs/Apple, real capture/overhead and integration remain.
+
+Mobile95 first control42399395125 is artifact-audited: Apple2,194/241 and portable
+5,281/570, zero failures/errors/skips. Native42399395077 remains in progress.
+Primarybb106154 first control42403266288 is running and native42403266310 pending;
+preserve both before further primary promotion. Phone/stopped original Bima emulator
+remain55 with all original data/keys/IDs. Pending/draft inbox fix is installed; the
+accepted first-layout bubble fix awaits APK56. Composer keyboard and latency remain.
+[Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
+
+Live API2e75fe1e/worker10485916/schema116.1 remain unchanged; V117–138 undeployed and
+organization routing disabled. Starterb11437a unchanged. Continue original54-group
+communications/Room dispatch (3 in progress/51 planned/none complete). Historical
+job statements below are superseded. The absolute Rust path above corrects the older
+relative path, which was wrong when interpreted from the workspace root.
+
 ## Current cross-repository continuation — 7 November2026,19:02UTC
 
 Mobile recoverycd7fc023 is pushed; primarybb106154 includes the accepted first-layout

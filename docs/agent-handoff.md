@@ -4,7 +4,7 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current — 7 November 2026, 03:01UTC
+## Current — 7 November 2026, 03:30UTC
 
 Release53/source08545820c0b58f46d784971e71ceb207dd628c0f is INSTALLED on the authorized
 phone. The user asked whether Bima lacks keys: matched Bima send returnedHTTP200 and
@@ -27,24 +27,38 @@ userdata/sidecars/keys retained;5562 stopped02:50:13. Phone install-only passed1
 at02:52:45UTC, sameUID10962/first-install and exactAPKhash. Passive audit02:53 had zero
 post-install lines; silence proves no delivery. Mobile release53 measurement has details.
 
-Starter0002d102ba2dab693aef4173ab7b958d39ab7d03 is accepted/pushed: four exact generic
-worker files plus Apple worker CI targets,90fresh tests/29suites/245.086s,1,024stable
-inputs, zero failures/errors, zero lint errors/44existing warnings. FIRST Apple
-42331840556 is running; no repeat dispatch. HRIS application policy stays in Mobile.
+Mobile c1410b31229541844b0d215d81faede385b432d6 is committed/pushed to the temporary
+and primary communications branches. Original-publication transport and explicit
+read-only POST authentication replay passed full67784 in830.513s:6,096fresh cases/
+753suites,4,271stable inputs, zero failures/errors/skips/lint/Detekt. Ordinary unsafe
+requests retain their guards. The first two failed focused attempts are recorded.
+No provider write, SDK modification or activation follows from transport acceptance.
 
-ONLY heavy local job82879 is Mobile legacy-publication-transport/focused-1. Nine
-APPLIED Kotlin source/test files are UNCOMMITTED and FROZEN. Four new cases cover
-fresh bounded publication observation, exact identity/version/fingerprint, finite
-native rotation/rejection and cancellation. No emulator is active. Full gate follows
-focused acceptance; never start another local build meanwhile. Owning migration and
-all54PRD groups remain unfinished. Group e45a4313 preflight is accepted/pushed with
-186domain/data and236API/full-worker cases, one existing opt-in skip; V117–137 disabled.
+Starter0002d102 generic worker port's FIRST Apple42331840556 PASSED and is audited:
+154cases/37suites,including16worker cases,zero failures/errors/skips; actual simulator
+app and associations passed. The accepted Mobile two-file generic network change is
+now APPLIED to Starter with Apple network targets; ONLY heavy local job61036 runs
+.work/read-only-post-port-2026-11-07/check-1. Keep Starter source/CI inputs frozen.
+Do not start another build or emulator until this job completes.
 
-Mobiletemporary7c1a7293 includes separately pushed CI worker coverage. Primary52ca0720
-is docs above runtime08545820. First085 control42330502891 is pending; preserve it before
-another primary SOURCE push. Native42330503083/protocol42330502995 run. Precedingee
-native42323799725 passed444cases perABI; protocol42323799691 passed14checks per mode;
-control42323799690 was still running. Exact original artifacts are audited in Mobile.
+Mobile owning AdvanceCollaborationSpaceRuntimeTransfer is APPLIED/UNCOMMITTED and
+not yet tested. It joins publication preflight to existing-only SDK stop/join/private
+proof/durable target, current admission, same-operation freeze and one drain read.
+Fourteen domain cases and an application DI assertion are prepared. It uses elapsed
+request time against the server publication interval without mixing device clocks.
+No product activation or SDK adoption; current source is only a candidate until its
+focused/full gates pass. Private work: .work/runtime-transfer-flow-2026-11-07.
+
+First085 control42330502891 remains IN_PROGRESS. Its native42330503083 PASSED446cases/
+74suites EACHABI, and protocol42330502995 PASSED14checks eachmode; original artifacts
+were downloaded/digest-verified. Prior ee control also accepted4448portable+1794Apple.
+New c141 first control42333989403 is PENDING; preserve it before another primary source
+push. Native42333989369 is running. Current Mobile handoff/measurements are authoritative.
+
+Group e45a4313 preflight remains accepted with186domain/data and236API/full-worker
+cases, one existing opt-in skip; V117–137 remain disabled/unshipped. Owning adoption,
+changed/revoked original-parent recovery, organization routing and all54PRD groups are
+unfinished. Continue the authorized long run with one heavy local job at a time.
 
 Live API2e75fe1e/image3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524,
 worker10485916/schema116.1/provider/storage are unchanged. SDK4 is immutable. Push each

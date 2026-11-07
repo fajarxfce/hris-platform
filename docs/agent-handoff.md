@@ -4,67 +4,61 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current — 7 November 2026, 03:30UTC
+## Current cross-repository execution — 7 November 2026, 04:19UTC
 
-Release53/source08545820c0b58f46d784971e71ceb207dd628c0f is INSTALLED on the authorized
-phone. The user asked whether Bima lacks keys: matched Bima send returnedHTTP200 and
-he has one confirmed eligible device. He need not remain online. Four matched403
-room_send failures belong to another owned room with zero registered peer devices.
-Physical latency remains OPEN; an optional new-build question is pending. No agent
-phone UI or new sends. [Diagnosis](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
+Mobile c70fe7cb is accepted/pushed on temporary feat/chat-recovery-20261107. Its
+logical Space registry keeps the original physical slot/device/owner and excludes
+all legacy lookup/borrow/handover paths. HR-company switches/denials retain a Space
+resource; native-parent changes or exact-space removal retire it. Invalidated gates
+cannot regain authority when a prior parent returns. Focused38cases/72.926s and
+full445fresh/69suites/132.579s passed with4,284stable inputs,zero failures/errors/skips/
+lint/Detekt. No actual SDK adoption or organization activation in that accepted slice.
 
-Mobile08545820 fixes foreground wake waiting behind WorkManager retry. Full7,436fresh
-cases/967suites/1,056.119s passed with4,270 stable inputs and zero lint/Detekt findings.
-Actual WorkManager proof passed70.507s: synthetic durable wake436ms while old retry/
-appended BLOCKED job remained, lifecycle stop/restart accepted, owned fixture cleaned.
-It proves scheduling behavior, not actual phone message latency. No SDK publication.
+Mobile primary780624a4 includes accepted owning transfer41870f77, explicit diagnostic
+failure outcomec50a8983 and strict original-store adoption credentials780624a4.
+Combined full86974 passed3,159fresh/454suites/466.159s with4,282stable inputs,zero all.
+Original passphrase/Matrix identity/credentials/handover/queued transaction IDs remain.
+FIRST780 control42336761340/native42336761242 are PENDING; preserve before the next
+primary source push. Atomic next source commits go to the temporary branch meanwhile.
 
-Release53 built259.896s with pushed source/HEAD frozen. Exact signed/nondebuggable
-ARM64APK121,022,760bytes SHA994d161ade3455745157d0793475b5091d67e968af909bda7a282dce163152c6
-passed original Bima52→53 update, four offline/online room entries(11visible rows),
-clock+3900s/restoration,30s process stability and inspected screenshots. Original
-userdata/sidecars/keys retained;5562 stopped02:50:13. Phone install-only passed126.87s
-at02:52:45UTC, sameUID10962/first-install and exactAPKhash. Passive audit02:53 had zero
-post-install lines; silence proves no delivery. Mobile release53 measurement has details.
+ONLY heavy local job33252 is Mobile space-runtime-adoption-next/focused-1. FOURTEEN
+source/test/DI files are APPLIED/UNCOMMITTED/FROZEN. Candidate existing-only acquisition
+requires original lock/cache/nonempty state+crypto files without CREATE or repairs;
+the shared native opener selects an explicit credential namespace, verifies original
+private identity before credential staging and after paused restore, and returns a
+logical Space lease. Cancellation/late-parent/write failure cases and actual DI
+single-owner coverage are being tested. No live caller; native emulator acceptance,
+owning fresh admission/publication and product routing remain required. No emulator.
+Read current Mobile handoff and .work/space-runtime-adoption-next-2026-11-07 results
+before starting any build; no concurrent heavy job.
 
-Mobile c1410b31229541844b0d215d81faede385b432d6 is committed/pushed to the temporary
-and primary communications branches. Original-publication transport and explicit
-read-only POST authentication replay passed full67784 in830.513s:6,096fresh cases/
-753suites,4,271stable inputs, zero failures/errors/skips/lint/Detekt. Ordinary unsafe
-requests retain their guards. The first two failed focused attempts are recorded.
-No provider write, SDK modification or activation follows from transport acceptance.
+Starter f25cb3de4d8f18a7cf95ec956dea5a7485f92623 is pushed. Two exact generic observability
+files from Mobile passed293fresh/93suites/295.556s;1,025stable inputs,zero failures/
+errors/skips/Detekt/lint errors,44oldwarnings,Android/productionWeb success. FIRST changed
+source Apple42337213669 is IN_PROGRESS. Original first Apple42334504381/sourcefdbff51
+FAILED the unchanged network sample assertion expected[Failed,Cancelled],actual[null,Cancelled].
+191cases/48suites,1failure; all3new read-only POST cases passed. Original verified
+artifact13559650754SHA d7d3ad4c308a9537cc6901c1f35cdf60d4ac563b9ee3203ca68497bf770d9028
+remains recorded. No rerun or precise Native compiler cause claim. Prior worker0002d102
+first Apple42331840556 passed154cases/37suites plus actual simulator app/associations.
 
-Starter0002d102 generic worker port's FIRST Apple42331840556 PASSED and is audited:
-154cases/37suites,including16worker cases,zero failures/errors/skips; actual simulator
-app and associations passed. The accepted Mobile two-file generic network change is
-now APPLIED to Starter with Apple network targets; ONLY heavy local job61036 runs
-.work/read-only-post-port-2026-11-07/check-1. Keep Starter source/CI inputs frozen.
-Do not start another build or emulator until this job completes.
+Mobile FIRSTc141 native42333989369 is accepted/audited450cases/74suites EACHABI,zero all;
+artifacts13559688618(ARM)/13559428045(x86) have verified GitHub digests. Its control
+42333989403 has portable SUCCESS, Apple IN_PROGRESS. Prior085 control/native/protocol
+are all accepted with original artifacts retained. SDK4 publication is immutable.
 
-Mobile owning AdvanceCollaborationSpaceRuntimeTransfer is APPLIED/UNCOMMITTED and
-not yet tested. It joins publication preflight to existing-only SDK stop/join/private
-proof/durable target, current admission, same-operation freeze and one drain read.
-Fourteen domain cases and an application DI assertion are prepared. It uses elapsed
-request time against the server publication interval without mixing device clocks.
-No product activation or SDK adoption; current source is only a candidate until its
-focused/full gates pass. Private work: .work/runtime-transfer-flow-2026-11-07.
+Release53/source085 remains installed on10.77.77.3:5555, sameUID10962/first-install,
+original Bima data/keys/sidecars retained. Bima has one confirmed eligible device and
+matchedHTTP200; four403s belong to another room with zero registered peer devices.
+He need not remain online. Physical pending latency remains OPEN, optional feedback
+pending; silence proves no delivery. No phone UI or new agent sends. Announce each
+install, explicit serial and --install-only; do not reset or fabricate acknowledgment.
 
-First085 control42330502891 remains IN_PROGRESS. Its native42330503083 PASSED446cases/
-74suites EACHABI, and protocol42330502995 PASSED14checks eachmode; original artifacts
-were downloaded/digest-verified. Prior ee control also accepted4448portable+1794Apple.
-New c141 first control42333989403 is PENDING; preserve it before another primary source
-push. Native42333989369 is running. Current Mobile handoff/measurements are authoritative.
-
-Group e45a4313 preflight remains accepted with186domain/data and236API/full-worker
-cases, one existing opt-in skip; V117–137 remain disabled/unshipped. Owning adoption,
-changed/revoked original-parent recovery, organization routing and all54PRD groups are
-unfinished. Continue the authorized long run with one heavy local job at a time.
-
-Live API2e75fe1e/image3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524,
-worker10485916/schema116.1/provider/storage are unchanged. SDK4 is immutable. Push each
-atomic commit, announce each explicitserial10.77.77.3:5555 install-only update; no phone
-UI, resets, replacement sends or fabricated acknowledgement. Read current Mobile
-handoff before starting builds; private work files supplement the tracked contracts.
+Group e45a4313 stays accepted with186domain/data and236API/full-worker cases,one prior
+opt-in skip. V117–137 remain disabled/unshipped. Live API2e75fe1e/worker10485916/schema116.1
+is unchanged. Original-store native adoption, changed/revoked-parent recovery, root
+routing and all54PRD groups remain unfinished. Continue authorized long run and push
+every atomic commit. Current Mobile contracts/measurements supersede older notes below.
 
 ## Accepted latest work
 

@@ -40,15 +40,16 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
    failures/errors/skips/lint; root/Android host/quality/shared Wasm and64 explicitly
    verified Browser cases. It captures exact original results under current ownership,
    keeps send attempts stable and preserves denial through cancellation. [Contract](https://github.com/fajarxfce/hris-mobile/blob/0d10c395/docs/collaboration-space-room-request-resolution.md).
-   Prior transportfe3992f1 and durable storagefc0034ed remain accepted. ELEVEN next
-   atomic handoff source/test files are applied/FROZEN and NOT accepted. Sole heavy
-   job40440 runs Mobile `.work/space-room-successor-2026-11-07/focused-1` (102 expected
-   cases), then full root/Android/Browser75/sharedWasm. Exact original ciphertext and
-   authenticated forward/back links use existing raw archiveAndInsert; nine new actual
-   storage/two policy cases plus explicit fakes are included. Reap before editing
-   frozen source or starting another compiler/emulator. No owning successor, SDK,
-   product caller or APK activation yet. Mobile recovery checkpoint2d6d2fb3 records this.
-3. Validate atomic original/successor storage, then implement current-admitted Room preparation/dispatch.
+   Prior transportfe3992f1 and durable storagefc0034ed remain accepted. Atomic handoff
+   source98ef15a6 is now accepted/pushed on recovery: eleven source/test files retain
+   exact original ciphertext and authenticated predecessor/successor links using the
+   existing raw archiveAndInsert. Focused40440 passed102 cases/216.321s; full45951
+   passed3,777 fresh cases/460 suites/511.466s on4,406 unchanged inputs, zero failures/
+   errors/skips/lint. Root, Android host/release lint, quality/shared Wasm and75 actual
+   Browser cases passed. Desktop SQLite/Browser IndexedDB execute the30 storage and8
+   policy cases. All jobs reaped. No owning successor, SDK/product caller or APK yet.
+   [Atomic storage contract](https://github.com/fajarxfce/hris-mobile/blob/98ef15a6/docs/collaboration-space-room-successor.md).
+3. Implement current-admitted Room preparation/dispatch after accepted atomic storage.
    A null receipt, timeout, denial or changed native parent never authorizes replacement.
    Continue Room projection/recovery, original SDK delivery/history, native-parent
    recovery, product routing and all54 PRD groups:3 in progress/51 planned/none complete.
@@ -58,7 +59,7 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
 ## Other repositories and CI
 
 Accepted Mobile source0d10c395fb0c637d27344d037d63961a1af9bd80 is on both recovery and
-primary; recovery doc checkpoint is2d6d2fb3. First control42383612502/native42383612567
+primary; recovery source is98ef15a6. First control42383612502/native42383612567
 are PENDING behind running firstfe control42380244144/native42380243983. Preserve both
 new first runs before another primary promotion; recovery work may continue.
 First Open source31e control42376025279/native42376025306 are fully audited SUCCESS:

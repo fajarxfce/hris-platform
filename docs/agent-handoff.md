@@ -4,45 +4,42 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current owning room request fence — 7 November 2026
+## Current native fence and HTTP validation — 7 November 2026
 
-V138 storagec6937843 is accepted/pushed: immutable actor/original-operation evidence,
-exact stable-v2 lock and receipt exclusion,7 actual migration cases, parent purge and
-pg_dump/restore. Initial34560 passed24 cases315.431s but17 old writer tests still used133;
-after that fixture moved to138,4436 passed all17 in213.004s. Both had8,626 stable inputs,
-zero failures/errors/skips and quality passed; jOOQ generated/compiled. Recovery26 cases
-pass with unchanged encrypted envelopes and initial future-schema failure retained.
-[Contract/results](https://github.com/fajarxfce/hris-platform/blob/c6937843/docs/collaboration/room-request-fence-storage.md).
+Group dcdaf220 is accepted/pushed:14-file native fence integration over accepted V138
+storagec6937843. Typed raw/repository mapping verifies the original fingerprint;
+current native/group/pair admission owns original receipt or immutable fence resolution.
+Stable writers retain device/provider admission and reject a fence before any writes.
+Four real writer/fence commit/rollback races, parent purge/replay, independent actor
+namespaces and late denial/clock/cancellation rollback pass. Focused49421 passed195
+cases319.052s; API + FULL worker71315 passed241 cases540.839s, zero failures/errors and
+one existing opt-in elapsed-retention skip. Both used8,635 unchanged inputs and quality
+passed. All those jobs are reaped. [Native contract and exact evidence](https://github.com/fajarxfce/hris-platform/blob/dcdaf220/docs/collaboration/native-room-request-fence.md).
+Group's handoff is now concise; its full previous8,580 lines remain in linked Git history.
 
-FOURTEEN Group Kotlin files are applied/FROZEN, NOT accepted. Sole heavy job49421 runs
-.work/room-request-fence-native-2026-11-07/focused-1: domain tests,27 actual native room
-transaction cases and4 mapper cases, format/architecture. Typed fence repository/raw
-source verifies the original stable fingerprint; owning native fence returns Recorded
-or Fenced, keeps current parent/group/pair admission and final transaction checks, and
-never needs the original device/provider. Stable writer checks the exact fence after
-current admission and before any queue/receipt write; earlier lookup errors are held
-until admitted. Four actual ordered writer/fence commit/rollback races, response replay,
-parent purge, current denial, invalid scope, separate actor namespaces and rollback at
-late clock/denial/cancellation boundaries are under test. Shared DI changed: after focused
-passes, run prepared context-check.py with API and FULL worker tests. No HTTP endpoint,
-Mobile successor or rollout exists yet. Do not edit frozen inputs or start another
-heavy job. No live services/schema, phone, original SDK data or message IDs changed.
+Sole heavy job57183 now runs Group `.work/room-request-fence-http-2026-11-07/http-1`.
+SIX HTTP files are applied/FROZEN, NOT accepted: `/room/requests/fence`, required original
+Idempotency-Key, exact full original echo and Recorded/Fenced result; API refresh,
+replacement/purge, bounds/no-store/OpenAPI/disabled tests. Shared module DI is unchanged
+by this HTTP slice; prior FULL worker proof is retained. Do not edit frozen Group inputs
+or start a second heavy job. Accept/push HTTP before Mobile integration.
 
-Mobile primary31e618cc89e2ca0cce38bcb62ccd95b8533c88c0 includes accepted Open335e3914:
-3,669 full cases/452 suites505.461s on4,393 stable inputs, actual Browser domain/storage,
-Android/root/quality, zero failures/errors/skips/lint. Its first control42376025279 and
-native42376025306 are PENDING behind running first1d42372520573/42372520624; preserve
-these before another primary promotion. First3b3 control/native are fully accepted:
-Apple2,001/228, portable4,869/542, native543/86 each, SDK4 keys/IDs and cleanup verified.
-No provider reruns to audit CI. Starterb11437a unchanged. Phone53 latency remains OPEN;
-Bima has keys and need not remain online for sender server acceptance. Last bounded ADB
-retry11:41UTC timed out; no new phone logs/build/UI driving or repeated feedback question.
+ELEVEN Mobile candidates in `.work/space-room-request-fence-2026-11-07` are isolated,
+NOT applied/tested: typed evidence/policy/native transport/shared full-echo mapping and
+8 Ktor regressions. Verify baselines before applying after Group HTTP passes. Mobile
+recovery checkpoint59ff2109 is pushed, primary31e618cc unchanged with accepted Open335e3914
+(3,669 cases505.461s). First31e control42376025279/native42376025306 remain PENDING behind
+running first1d42372520573/42372520624. At13:38UTC1d portable passed; Apple and both Android
+jobs were still running. Preserve first pending runs before another primary promotion.
+First3b3 control/native are fully audited SUCCESS; no provider reruns to audit CI.
 
-Continue owned fence validation and typed native HTTP, Mobile durable exact evidence
-before successor linkage, Room projection/recovery, original SDK delivery/history,
-native-parent recovery and product routing/all54 (3 in progress/51 planned/none complete).
-LiveAPI2e75fe1e/worker10485916/schema116.1 stay; V117–138 are unshipped. Previous entries
-below are historical and superseded for job ownership by this section.
+Next: typed HTTP/Mobile acceptance, durable exact evidence before atomic successor
+linkage, Room projection/recovery, original SDK delivery/history, native-parent recovery,
+product routing and all54 PRD groups (3 in progress/51 planned/none complete). Starterb11437a
+unchanged. No live rollout: API2e75fe1e/worker10485916/schema116.1 stay; V117–138 unshipped.
+Phone53 latency remains OPEN. Bima has keys and need not stay online for sender acceptance;
+that does not diagnose/fix its20s–2min delay. Latest ADB11:41UTC timeout, no further retries
+this turn or repeated feedback question. Original keys/stores/message IDs unchanged.
 
 ## Latest mobile command continuation — 7 November 2026
 

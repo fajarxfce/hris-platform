@@ -1,5 +1,25 @@
 # Agent continuation — HRIS workspace
 
+## Current stable native room HTTP — 7 November 2026
+
+Six HTTP source/test files are accepted: stable /room/requests writer and read-only
+/room/requests/receipts/read, typed input/output, actual two-refresh/upgrade/replacement-
+parent recovery, one queue, private actor/legacy isolation, bounds/OpenAPI/disabled state.
+Gate98418/http-1 passed97 cases192.018s on8,624 stable inputs, zero failures/errors/skips,
+format/architecture passed. No DI constructor change; API contexts ran and prior full
+worker graph acceptance4e1b5b90 is retained. [Contract/results](collaboration/native-room-stable-intent.md).
+Stable domaina6be53b1 previously passed181 cases213.656s. All Group jobs are reaped.
+
+Mobile stable intent transport is being implemented; no build is running. Its latest
+committed programfb514281 is accepted; checkpoint5238c156 records e8fc first control/native
+fully audited SUCCESS (Apple1,960/223, portable4,787/532, each native528/84, immutableSDK4).
+First fb control42363807332/native42363807289 have BOTH started; audit on completion.
+NEXT finish/validate/push Mobile transport, then durable open/room commands, finite
+explicit absence fencing and owning original SDK delivery/history. Continue native
+parent recovery, product routing and all54 PRD groups. Preserve old operation/message
+IDs; metadata receipts grant no SDK/content authority. V117-137 remain disabled,
+live services/schema, phone53 and original data unchanged. Phone latency stays OPEN.
+
 ## Current stable room request domain — 7 November 2026
 
 Eight source/test/compatibility files are accepted: explicit stable request intent

@@ -1,0 +1,61 @@
+{
+  "baseHead": "a6be53b1532c26be0a7bb13b578e105547977955",
+  "sources": {
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/ReadCollaborationSpaceRoomIntentReceiptRequest.kt": "9ce8677c03e8e0a9505471ab3ecd1b7c42f24c0d769071fc4bd9e376bdae8396",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationSpaceRoomIntentReceiptResponse.kt": "7431ee95c667cb8c3cca707c258205c21e8dfa1e42a589bbba5d5af4b9311f95",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ApiContractHttpTest.kt": "d01f663d1d9fdf1769f54344f5898480fd6a12cfb35d0360aa41b61d732b7274",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt": "1a03d0ff2dc45b5e727e4c43c0c1526fff2cd562adbf14e8858360b83405e270",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceDisabledConfigurationTest.kt": "a45dcff613457fe253a44357912a88dd3e4479bc338c480b40f2ead4d197d6b1",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationSpaceRoomController.kt": "9cbffc3475a60cc5687ad6a1bb972e41ebb8ba082717cd55437dadd9827ae7d3"
+  },
+  "accepted": {
+    "startedAt": "2026-11-07T10:41:25.813546+00:00",
+    "elapsedSeconds": 192.018,
+    "exitCode": 0,
+    "sourceFiles": 8624,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 97,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skipped": [],
+    "reports": {
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+        "sha256": "cd8103e07b589a76e8fde85aafce96406de83054e305b0f923bd49a813ea573a",
+        "tests": 25,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceDisabledConfigurationTest.xml": {
+        "sha256": "d4b4df76371ec204bf7d3f950d4998a27d4c4b7acaa536dbba07a14804450f02",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.ApiContractHttpTest.xml": {
+        "sha256": "e7de788911dd3314ece1c12a547b6f543032dc18ee4b7f45172e51e6cdc13d24",
+        "tests": 70,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "observed": [
+    "First stable request after actual native refresh succeeds without original native proof fields.",
+    "Second real rotation and newer build replay the same receipt and retain one room queue.",
+    "New parent reads the original intent receipt after revocation of the old parent.",
+    "Legacy namespace and peer actor cannot read the stable actor receipt.",
+    "Current peer denial overrides changed input; absence stays read-only.",
+    "OpenAPI, bounds, unauthenticated/missing-idempotency protection and disabled native routes pass."
+  ],
+  "workerGraph": "No DI constructor change. Full worker graph previously passed in4e1b5b90; this gate runs actual API contexts only.",
+  "limits": [
+    "No durable Mobile command, absence fence, live rollout or phone acceptance.",
+    "No provider or schema mutation outside controlled test fixtures."
+  ]
+}

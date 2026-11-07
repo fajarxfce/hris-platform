@@ -592,6 +592,140 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun stableRoomIntentSurvivesActualRefreshUpgradeAndReplacementParentWithoutNativeProofInput() {
+        val (a, refreshToken) = exchangeRoomNative(groupNative())
+        val b = groupNative()
+        val base = groupBase(a)
+        val device = activeGroupFixture(a, base)
+        activeGroupFixture(b, base)
+        val opened =
+            groupCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = json.readTree(opened.body())["id"].asString()
+        val room = "$base/direct-conversations/$conversation/room"
+        val write = "$room/requests"
+        val read = "$write/receipts/read"
+        val operation = UUID.randomUUID()
+        val input = mapOf("deviceId" to device.toString(), "expectedDeviceVersion" to 1)
+        val original = input + mapOf("operationId" to operation.toString())
+        val (rotated, nextRefresh) = refreshRoomNative(a, refreshToken)
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from native_sessions where id=?",
+                    Long::class.java,
+                    a.session,
+                ),
+        )
+        val absent = groupCall(rotated, read, original, operation = null, cookies = false)
+        assertEquals(200, absent.statusCode(), absent.body())
+        assertTrue(json.readTree(absent.body())["receipt"].isNull)
+        val written = groupCall(rotated, write, input, operation = operation, cookies = false)
+        assertEquals(200, written.statusCode(), written.body())
+        val upgraded =
+            groupCall(rotated, write, input, operation = operation, build = "29", cookies = false)
+        assertEquals(200, upgraded.statusCode(), upgraded.body())
+        assertEquals(json.readTree(written.body()), json.readTree(upgraded.body()))
+        val (again, _) = refreshRoomNative(rotated, nextRefresh)
+        val replay =
+            groupCall(again, write, input, operation = operation, build = "29", cookies = false)
+        assertEquals(200, replay.statusCode(), replay.body())
+        assertEquals(json.readTree(written.body()), json.readTree(replay.body()))
+        val observed =
+            groupCall(again, read, original, operation = null, build = "29", cookies = false)
+        assertEquals(200, observed.statusCode(), observed.body())
+        assertEquals("no-store", observed.headers().firstValue("Cache-Control").orElse(""))
+        val receipt = json.readTree(observed.body())
+        assertEquals(setOf("accountId", "original", "receipt"), receipt.propertyNames().toSet())
+        assertEquals(a.fixture.account.toString(), receipt["accountId"].asString())
+        assertEquals(json.readTree(written.body()), receipt["receipt"])
+        assertEquals(
+            setOf(
+                "operationId",
+                "spaceId",
+                "conversationId",
+                "deviceId",
+                "expectedDeviceVersion",
+                "expectedRequestRevision",
+                "expectedRequestAccountId",
+            ),
+            receipt["original"].propertyNames().toSet(),
+        )
+        val legacy =
+            groupCall(
+                again,
+                "$room/receipts/read",
+                original +
+                    mapOf(
+                        "nativeSessionId" to a.session.toString(),
+                        "nativeSessionVersion" to 1,
+                        "platform" to "ANDROID",
+                        "clientBuild" to 28,
+                    ),
+                operation = null,
+            )
+        assertEquals(200, legacy.statusCode(), legacy.body())
+        assertTrue(json.readTree(legacy.body())["receipt"].isNull)
+        val privateRead = groupCall(b, read, original, operation = null)
+        assertEquals(200, privateRead.statusCode(), privateRead.body())
+        assertTrue(json.readTree(privateRead.body())["receipt"].isNull)
+        failure(
+            groupCall(
+                again,
+                read,
+                original + mapOf("expectedDeviceVersion" to 2),
+                operation = null,
+            ),
+            409,
+            "operation_payload_mismatch",
+        )
+        val (replacement, _) = exchangeRoomNative(again)
+        database().update("update native_sessions set revoked_at=now() where id=?", a.session)
+        val recovered =
+            groupCall(replacement, read, original, operation = null, build = "29", cookies = false)
+        assertEquals(200, recovered.statusCode(), recovered.body())
+        assertEquals(receipt, json.readTree(recovered.body()))
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation in ('collaboration.space_room_setup','collaboration.space_room_setup.v2')",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        failure(
+            groupCall(
+                replacement,
+                read,
+                original + mapOf("expectedDeviceVersion" to 2),
+                operation = null,
+            ),
+            403,
+            "collaboration_peer_unavailable",
+        )
+    }
+
+    @Test
     fun nativeRoomReceiptAbsenceIsReadOnlyAndRequiresCompleteBoundedOriginalInput() {
         val a = groupNative()
         val b = groupNative()
@@ -1914,6 +2048,124 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
                     "select count(*) from collaboration_space_direct_conversations where created_by=?",
                     Int::class.java,
                     a.fixture.account,
+                ),
+        )
+    }
+
+    private fun exchangeRoomNative(n: Native): Pair<Native, String> {
+        val response =
+            command(
+                n.fixture.browser,
+                "/api/v1/auth/native/exchange",
+                """{"deviceName":"Stable room intent fixture"}""",
+                n.fixture.csrf,
+                UUID.randomUUID(),
+            )
+        assertEquals(200, response.statusCode(), response.body())
+        val body = json.readTree(response.body())
+        return Native(
+            n.fixture,
+            UUID.fromString(body["sessionId"].asString()),
+            body["accessToken"].asString(),
+        ) to body["refreshToken"].asString()
+    }
+
+    private fun refreshRoomNative(n: Native, token: String): Pair<Native, String> {
+        Thread.sleep(11_000)
+        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+        val response =
+            groupCall(
+                n,
+                "/api/v1/auth/native/refresh",
+                mapOf("refreshToken" to token),
+                token = null,
+                cookies = false,
+            )
+        assertEquals(200, response.statusCode(), response.body())
+        val body = json.readTree(response.body())
+        assertEquals(n.session.toString(), body["sessionId"].asString())
+        assertFalse(body.has("nativeSessionVersion"))
+        return Native(n.fixture, n.session, body["accessToken"].asString()) to
+            body["refreshToken"].asString()
+    }
+
+    @Test
+    fun stableReceiptReadBoundsInputAndLeavesUncertainAbsenceWithoutAnyOperation() {
+        val a = groupNative()
+        val b = groupNative()
+        val base = groupBase(a)
+        val opened =
+            groupCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = json.readTree(opened.body())["id"].asString()
+        val room = "$base/direct-conversations/$conversation/room/requests"
+        val path = "$room/receipts/read"
+        val input =
+            mapOf(
+                "operationId" to UUID.randomUUID().toString(),
+                "deviceId" to UUID.randomUUID().toString(),
+                "expectedDeviceVersion" to 0,
+            )
+        val absent = groupCall(a, path, input, operation = null, cookies = false)
+        assertEquals(200, absent.statusCode(), absent.body())
+        assertTrue(json.readTree(absent.body())["receipt"].isNull)
+        assertEquals(
+            400,
+            groupCall(a, path, input - "expectedDeviceVersion", operation = null).statusCode(),
+        )
+        assertEquals(
+            400,
+            groupCall(a, path, input + mapOf("operationId" to "bad"), operation = null).statusCode(),
+        )
+        for (invalid in
+            listOf(
+                input + mapOf("deviceId" to UUID(0, 0).toString()),
+                input + mapOf("expectedDeviceVersion" to -1),
+                input + mapOf("expectedDeviceVersion" to 1_000_000),
+                input + mapOf("expectedRequestRevision" to 0),
+                input + mapOf("expectedRequestAccountId" to b.fixture.account.toString()),
+            )) {
+            failure(
+                groupCall(a, path, invalid, operation = null),
+                422,
+                "invalid_collaboration_room_operation",
+            )
+        }
+        assertEquals(400, groupCall(a, room, input - "operationId", operation = null).statusCode())
+        assertEquals(
+            403,
+            groupCall(a, path, input, operation = null, token = null, cookies = false).statusCode(),
+        )
+        failure(
+            groupCall(a, path, input, operation = null, build = "27"),
+            403,
+            "client_update_required",
+        )
+        assertEquals(
+            413,
+            groupCall(a, path, input + mapOf("unused" to "x".repeat(1_048_577)), operation = null)
+                .statusCode(),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.space_room_setup.v2'",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
                 ),
         )
     }

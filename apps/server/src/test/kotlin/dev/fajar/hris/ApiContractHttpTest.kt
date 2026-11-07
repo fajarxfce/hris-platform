@@ -39,6 +39,8 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations/{conversationId}/room" to "get",
                 "$base/direct-conversations/{conversationId}/room" to "post",
                 "$base/direct-conversations/{conversationId}/room/receipts/read" to "post",
+                "$base/direct-conversations/{conversationId}/room/requests" to "post",
+                "$base/direct-conversations/{conversationId}/room/requests/receipts/read" to "post",
                 "$base/legacy-conversations" to "get",
                 "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
@@ -102,6 +104,35 @@ class ApiContractHttpTest : PeopleApiFixture() {
         )
         val roomRequest = schemas["RequestCollaborationSpaceRoomRequest"]
         val originalReceipt = schemas["ReadCollaborationSpaceRoomReceiptRequest"]
+        val stableReceipt = schemas["ReadCollaborationSpaceRoomIntentReceiptRequest"]
+        assertEquals(
+            setOf("operationId", "deviceId", "expectedDeviceVersion"),
+            stableReceipt["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(
+            999999L,
+            stableReceipt["properties"]["expectedDeviceVersion"]["maximum"].asLong(),
+        )
+        assertEquals(
+            setOf("accountId", "original", "receipt"),
+            schemas["NativeCollaborationSpaceRoomIntentReceiptResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+        assertEquals(
+            setOf(
+                "operationId",
+                "spaceId",
+                "conversationId",
+                "deviceId",
+                "expectedDeviceVersion",
+                "expectedRequestRevision",
+                "expectedRequestAccountId",
+            ),
+            schemas["OriginalCollaborationSpaceRoomRequestIntentResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
         assertEquals(
             setOf(
                 "operationId",

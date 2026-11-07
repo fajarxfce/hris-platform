@@ -34,8 +34,27 @@ current denial and both-protocol cancellation/competing uncommitted writers. Fir
 compilation failed due to a test preparation name replacement; the original provider
 preparation call was restored. No production authentication or provider policy changed.
 
-Next expose explicit native `/room/requests` and read-only `/room/requests/receipts/read`
-routes, with strict input/output and real refresh/write/replay/replacement-parent HTTP
-acceptance. Then implement durable Mobile intent commands and finite owning recovery.
+## Native HTTP
+
+`POST /api/v1/collaboration/spaces/{spaceId}/direct-conversations/{conversationId}/room/requests`
+uses stablev2 intent and requires `Idempotency-Key`. Its body retains device/version and
+the complete optional observed request account/revision. Actual native credentials and
+client headers provide current admission. No native version is guessed or supplied.
+
+`POST .../room/requests/receipts/read` is read-only, without an idempotency header. It
+accepts the operation UUID and same immutable body; responds with current actor account,
+complete original seven-field intent and nullable `{id, version}` receipt. No credentials
+or current content authority are returned. Original native-proof routes are unchanged.
+
+[HTTP acceptance](../measurements/collaboration-space-room-stable-http-2026-11-07.json)
+passed97 cases in192.018s on8,624 unchanged inputs with zero failures/errors/skips and
+format/architecture passed. Actual tests perform two native refreshes with real11-second
+cooldowns, preserve the first receipt after an app upgrade, recover through a new parent
+after old-parent revocation, and retain one queue/receipt. Peer/legacy isolation, uncertain
+absence, current denial dominance, invalid input/size bounds, required headers, OpenAPI
+and disabled routes also pass. DI constructors remain unchanged; this gate validates API
+contexts, with prior full worker graph acceptance retained from4e1b5b90.
+
+Next finish Mobile stable intent transport, durable commands and finite owning recovery.
 Absence fencing, original SDK delivery/history, parent recovery and product routing remain
 unfinished. V117-137 remains disabled/unshipped; no migration or new phone build is included.

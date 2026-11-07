@@ -37,6 +37,10 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
                 "$base/direct-conversations" to null,
                 "$base/direct-conversations/${UUID.randomUUID()}" to null,
                 "$base/direct-conversations" to "{\"peerAccountId\":\"${UUID.randomUUID()}\"}",
+                "$base/direct-conversations/${UUID.randomUUID()}/room/requests" to
+                    """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
+                "$base/direct-conversations/${UUID.randomUUID()}/room/requests/receipts/read" to
+                    """{"operationId":"${UUID.randomUUID()}","deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
                 "$base/direct-conversations/${UUID.randomUUID()}/room/receipts/read" to
                     """{"operationId":"${UUID.randomUUID()}","nativeSessionId":"${UUID.randomUUID()}","nativeSessionVersion":0,"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0,"platform":"ANDROID","clientBuild":28}""",
                 "$base/legacy-conversations" to null,

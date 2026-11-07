@@ -1,0 +1,147 @@
+{
+  "observations": {
+    "at": "2026-11-07T01:54:31.937929+00:00",
+    "readOnly": true,
+    "observedRooms": [
+      {
+        "roomIndex": 1,
+        "isOriginalBimaRoom": false,
+        "callerOwnsRoom": true,
+        "statuses": [
+          {
+            "at": "2026-11-07T01:49:18.302179+00:00",
+            "status": 403
+          },
+          {
+            "at": "2026-11-07T01:50:21.436399+00:00",
+            "status": 403
+          },
+          {
+            "at": "2026-11-07T01:52:18.020329+00:00",
+            "status": 403
+          },
+          {
+            "at": "2026-11-07T01:52:24.326078+00:00",
+            "status": 403
+          }
+        ],
+        "peer": [
+          {
+            "eligible": 0,
+            "confirmed": 0
+          },
+          {
+            "active": true,
+            "chatPermission": true,
+            "activeMembership": true,
+            "devices": 0
+          }
+        ]
+      },
+      {
+        "roomIndex": 2,
+        "isOriginalBimaRoom": true,
+        "callerOwnsRoom": true,
+        "statuses": [
+          {
+            "at": "2026-11-07T01:49:13.032230+00:00",
+            "status": 200
+          }
+        ],
+        "peer": [
+          {
+            "eligible": 1,
+            "confirmed": 1
+          },
+          {
+            "active": true,
+            "chatPermission": true,
+            "activeMembership": true,
+            "devices": 1
+          }
+        ]
+      }
+    ],
+    "phoneUiDriven": false,
+    "newAgentMessages": 0
+  },
+  "capture": {
+    "durationSeconds": 300.022,
+    "requests": 5,
+    "bimaRoomSendAccepted": 1,
+    "otherRoomSendRejected": 4,
+    "headersRetained": false,
+    "ciphertextRetained": false,
+    "tokensRetained": false,
+    "privateRoutingMetadataCommitted": false
+  },
+  "originalFirstControlCi": {
+    "recordedAt": "2026-11-07T01:52:53.067454+00:00",
+    "run": 42323441241,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/42323441241",
+    "source": "2e75fe1ee88b5766259fc3efd3ab7f21e70d621a",
+    "conclusion": "success",
+    "artifactId": 13555095559,
+    "artifactSha256": "d0b51f1fad4f7897d0c933b066ff797aa8045e56571bbcd17dc1a99a98693d39",
+    "githubDigestVerified": true,
+    "counts": {
+      "tests": 708,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 8
+    },
+    "suites": 113,
+    "skipped": [
+      {
+        "class": "dev.fajar.hris.NativeCollaborationScheduledInteropTest",
+        "name": "androidWorkManagerRestoresConstrainedIntentAfterOrdinaryProcessDeath()"
+      },
+      {
+        "class": "dev.fajar.hris.NativeCollaborationSdkAuthInteropTest",
+        "name": "actualSdkRecoversRejectedRefreshOnTheOriginalGatewayWithoutReplacingPrivateKeys()"
+      },
+      {
+        "class": "dev.fajar.hris.NativeCollaborationSdkInteropTest",
+        "name": "actualAndroidSdkRenewsAccessAndExchangesEncryptedMessagesThroughCurrentHrisGatewayAdmission()"
+      },
+      {
+        "class": "dev.fajar.hris.NativeCollaborationSdkInteropTest",
+        "name": "confirmedNativeOriginalIsSettledOfflineAfterProcessDeathWithoutAnotherSend()"
+      },
+      {
+        "class": "dev.fajar.hris.NativeCollaborationWorkerInteropTest",
+        "name": "actualApplicationWorkerRetainsCancelledDraftAcrossDeathAndSendsIndependentIntentOnce()"
+      },
+      {
+        "class": "dev.fajar.hris.NativeCollaborationWorkerInteropTest",
+        "name": "actualApplicationWorkerRestoresQueuedIntentAfterProcessDeathAndSendsOnce()"
+      },
+      {
+        "class": "dev.fajar.hris.NativeCollaborationWorkerInteropTest",
+        "name": "actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce()"
+      },
+      {
+        "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+        "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+      }
+    ],
+    "jobs": [
+      {
+        "name": "authority-and-storage",
+        "conclusion": "success"
+      },
+      {
+        "name": "company-settings",
+        "conclusion": "success"
+      }
+    ],
+    "remaining": "Physical pending message investigation remains open. This audits the original first control run; it does not claim successful employee sends."
+  },
+  "interpretation": "HTTP403 belongs to another owned room whose peer has no registered chat device. Original Bima room returned HTTP200. This does not establish prompt UI completion or resolve older pending messages.",
+  "next": "Android delivery enqueue uses APPEND_OR_REPLACE. An unfinished retrying request delays later requests; implement foreground delivery signals while retaining bounded durable background work.",
+  "installedPhoneBuild": 52,
+  "liveApiSource": "2e75fe1ee88b5766259fc3efd3ab7f21e70d621a",
+  "liveSchema": "116.1",
+  "phoneUiDriven": false,
+  "agentMessagesSent": 0
+}

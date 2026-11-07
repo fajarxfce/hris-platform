@@ -40,3 +40,17 @@ The typed operation diagnostic is live from2e75fe1e. API-only activation passed
 contains accepted JARb77fc179817e12166b7ecf2528dec23099e9ebd6747630cbf394bcc4f02c82c8.
 Schema116.1, worker10485916 and all other services/configuration remain unchanged.
 [Delivery](../measurements/collaboration-gateway-operation-release-2026-11-07.json).
+
+At01:48–01:52UTC the typed diagnostic identifies `room_send`. Five-minute passive
+phone observation captured one HTTP200 for the original Bima room and four HTTP403
+for a different owned room. Read-only exact-room lookup confirms Bima has one
+confirmed eligible device; the other peer has none. The earlier revoked-self-device
+hypothesis is not the cause of these captured failures. No token, ciphertext or
+private routing identity is committed. [Matched evidence](../measurements/collaboration-phone52-room-rejection-2026-11-07.json).
+
+Android currently appends new delivery jobs behind retrying WorkManager jobs.
+The user reports20-second to2-minute pending on new messages. Mobile foreground
+scheduling is being corrected; HTTP200 alone does not establish prompt UI receipts.
+Original first source control42323441241 passed and its artifact13555095559 is
+verified:708 cases/113 suites,0failures/errors and8 declared opt-in skips,
+SHAd0b51f1fad4f7897d0c933b066ff797aa8045e56571bbcd17dc1a99a98693d39.

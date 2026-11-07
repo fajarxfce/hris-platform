@@ -23,9 +23,10 @@ format/architecture/Detekt. Sole heavy job77406 now runs Mobile
 Mobile inputs or start another compiler/emulator. No durable evidence/successor/product
 caller or new APK exists. Candidate directories are historical after application.
 
-First1d9493df control42372520573/native42372520624 both completed SUCCESS. Read-only
-original artifact audit85452 is active in Mobile `.work/space-conversation-preparation-first-ci-2026-11-07`.
-Do not relabel this as artifact acceptance before inspecting it; no provider reruns.
+First1d9493df control42372520573/native42372520624 both completed SUCCESS. Original
+artifact audit85452 is reaped and accepted in Mobile2c4aec75: Apple2,028/230, portable
+4,923/546, each native543/86, immutableSDK4 hashes/keys/IDs/cleanup and actual14 metadata/
+13 preparation cases per Apple/Desktop/Browser verified. No provider reruns.
 First31e618cc control42376025279/native42376025306 have BOTH STARTED as of14:00UTC;
 there is no longer a pending-first-run barrier for a later primary promotion. Its
 Open335e3914 implementation retains its locally accepted3,669-case proof. Existing
@@ -34,7 +35,9 @@ Open335e3914 implementation retains its locally accepted3,669-case proof. Existi
 Fresh read-only Bima audit at14:00:00.714160UTC confirms1 active device/provider binding,
 1 device key,50 signed one-time keys and1 fallback. No key values, private keys, provider
 login, message send, phone access or state mutation. [Sanitized evidence](measurements/collaboration-bima-recipient-keys-2026-11-07.json).
-Bima need not remain online for sender server acceptance, but this metadata does not
+Follow-up14:04:40UTC confirms1 currently eligible and publication-confirmed recipient
+device for the exact retained peer, with a live hard parent lifetime despite expired
+interactive access. Bima need not remain online for sender server acceptance, but this metadata does not
 establish or fix the phone's20s–2min delay. Phone53 latency stays OPEN; no new phone
 logs after the11:41UTC ADB timeout and no repeated feedback question. Preserve all
 original keys/stores/message IDs and use install-only for any future announced update.

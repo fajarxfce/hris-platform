@@ -1,41 +1,40 @@
 # Agent continuation — HRIS workspace
 
-## Current metadata owner and notification investigation — 7 November 2026
+## Current queue reconciliation and notification correction — 7 November 2026
 
-Mobile b7f39b3856d94a93d3786c1dae6a4f29ad104222 is accepted and pushed to the temporary
-feat/chat-recovery-20261107 branch. Original metadata list/exact reads now have a
-finite native-session owner, isolated bounded page capture, exact provenance checks
-and denial retention through cancellation/failed persistence. No selected HR company
-is required and metadata success cannot reopen a denied content projection. Full
-root/Android/browser validation passed5,498fresh/645suites in530.638s,4,314unchanged
-inputs,zero failures/errors/skips/lint/Detekt; focused18/3 includes9new lifecycle cases.
-[Contract](https://github.com/fajarxfce/hris-mobile/blob/b7f39b3856d94a93d3786c1dae6a4f29ad104222/docs/collaboration-space-original-conversation-reads.md).
+Mobile program11e2b36bb6be72089d17418ce68e9edfe03c0e9c and checkpoint8f4e4d15 are pushed
+on feat/chat-recovery-20261107. The Android notification source now explicitly cancels
+after confirmed neutral publication/reply grace while preserving OS fallback and actual
+absence checks. Red native reproduced delayed-expiry failure; green native156.823s
+passed18raw/4runtime,3ordinary process deaths and5actions including SystemUI Reply.
+Three screenshots were inspected; own card/editor/keyboard disappeared, unrelated
+system card remained. No phone/provider/Bima action. Starterb11437a ports the one exact
+Android source with independent root/Android/lint64.236s,1,025stable inputs,reused XML,
+zero errors/44oldwarnings. Common/Apple source unchanged; no unrelated simulator rerun.
 
-ONLY heavy local job64220 is Mobile notification-retirement-timing/check-red-1.
-Three proof/driver/test files are frozen; the production adapter is still unchanged.
-FIRST1bb ARM job128328168549 failed raw replacement with a neutral card still visible
-at1217ms despite a600ms OS timeout (permission enabled,interactive,notidle/notpowersave).
-Verified original artifact13564229568 retains486host cases/77suites and the diagnostic.
-The new controlled regression postpones only the same neutral card's OS expiry to60s
-and requires explicit removal/namespace-clear. First reproduce against the old source,
-then retain the public600ms process-death fallback and test explicit removal after
-reply-history grace, including actual SystemUI absence. Precise original OS scheduling
-cause is not established. Read Mobile handoff/results before any build/emulator.
-Generic production correction returns to Starter only after Mobile native acceptance.
+ONLY heavy local job12666 is Mobile space-original-queue-reconciliation/focused-3.
+Eight source/test/DI files are applied/uncommitted/FROZEN. Ten pure matching cases pass,
+including128originals, strict whole-snapshot matching and immutable completion proof.
+First focused run failed only LongMethod while10tests passed; coherent provenance/ID
+preflight now passes quality. The owning read coordinates repositories with current
+native setup admission and original hard deadline, not metadata recovery's closed-gate
+exception. HTTP denials survive cancellation/failed persistence; native credential
+rejection does not become a group denial. Current owning/lifecycle/app-DI acceptance
+and full root/Android/browser gate remain pending. Read Mobile handoff before any build.
 
-Primary remains05de0bf6. FIRST control42348626104/native42348626124 remain PENDING;
-preserve before another primary-source promotion. Protocol42348626066 and FIRST1bb
-control/native are running. FIRSTa48 control is fully audited/pushed in Mobile:
-Apple1900/216,portable4667/518,zero all/digests verified. Keep all original failures.
+FIRST1bb native42344999033 is fully audited FAILED: x86492/80 and actual native proofs
+succeeded, ARM486host/77 then raw neutral-card expiry failure. Both artifacts/digests
+retained; no accepted-send rerun. FIRST05de native42348626124 is running; control
+42348626104 remains PENDING behind1bb control42344998885. Preserve before another primary
+promotion. Protocol42348626066 passed14checks each with14pinned Platform source hashes.
 
-Bima read-only06:42:18 audit confirmed1ACTIVE device,50initial keys and1fallback.
-No raw key material/claims/sends. Phone53 optional feedback/latency remain OPEN;
-passive07:00 audit has no post-install logs, which is not delivery evidence. No phone
-UI, original Bima file/transaction reset, accepted-provider-send rerun or SDK4 rebuild.
-Next immutable original queue/command reconciliation, owning publication/history,
-parent recovery, product routing and all54groups remain. Starter03ebcde, Group program
-e45a4313, live API2e75fe1e/worker10485916/schema116.1 and disabled V117–137 unchanged.
-Earlier timestamped entries below are history. Push every atomic commit.
+Bima has1active device/50initial keys/1fallback from read-only06:42audit. Phone53 latency
+and optional feedback remain OPEN; silence in the07:00logs is not delivery proof.
+Continue exact original queue/command matching, actual old-message delivery, logical
+publication/history, parent recovery, product routing and all54groups. Group program
+e45a4313, liveAPI2e75fe1e/worker10485916/schema116.1 and disabled/unshipped V117–137 stay
+unchanged. Preserve original Bima userdata/keys/IDs and immutable SDK4. Earlier entries
+below are history. Push every atomic commit; explicit install-only phone updates only.
 
 ## Current queue continuity and original metadata — 7 November 2026, 06:30 UTC
 

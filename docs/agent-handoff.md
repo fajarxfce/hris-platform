@@ -1,46 +1,44 @@
 # Agent continuation — HRIS workspace
 
-## Current original conversation replay and room fence — 7 November 2026
+## Current owning room request fence — 7 November 2026
 
-Mobile335e3914 is accepted/pushed on recovery:12 source/test files preserve original
-Open intent, read normalized durable marks for exact CAS, capture observed outcomes
-through bounded cancellation and publish canonical metadata before archive. Full69888
-passed3,669 fresh cases/452 suites505.461s on4,393 unchanged inputs, zero failures/errors/
-skips/lint. Root, Android host,25 actual Browser domain cases,3 actual Browser real-storage
-cases, shared Wasm and quality passed. Focused34 passed; earlier real SQLite normalization
-failure is preserved. All Mobile builds are reaped. No product caller, SDK send or APK.
-[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/335e3914/docs/collaboration-space-conversation-open-replay.md).
-Prior preparation1d9493df and canonical metadataaa700e37 are accepted.
+V138 storagec6937843 is accepted/pushed: immutable actor/original-operation evidence,
+exact stable-v2 lock and receipt exclusion,7 actual migration cases, parent purge and
+pg_dump/restore. Initial34560 passed24 cases315.431s but17 old writer tests still used133;
+after that fixture moved to138,4436 passed all17 in213.004s. Both had8,626 stable inputs,
+zero failures/errors/skips and quality passed; jOOQ generated/compiled. Recovery26 cases
+pass with unchanged encrypted envelopes and initial future-schema failure retained.
+[Contract/results](https://github.com/fajarxfce/hris-platform/blob/c6937843/docs/collaboration/room-request-fence-storage.md).
 
-V138 fence storage is now locally accepted: five source/test/recovery files, immutable
-actor/original-operation evidence and same-lock stable receipt exclusion. Gate34560
-passed24 cases315.431s; its7 new migration cases used138 but17 existing writer cases
-still used133. That fixture was upgraded; gate4436 passed all17 writer cases213.004s
-on138. Both runs had8,626 stable inputs, zero failures/errors/skips, format/architecture
-passed; first generated/compiled jOOQ. Python recovery26 cases passed after future-schema
-expectation correction. Exact evidence preserves this distinction. [Contract/results](collaboration/room-request-fence-storage.md).
-ALL local jobs are reaped; no heavy build or emulator runs. No domain fence repository/
-use case/HTTP/successor or rollout exists. Next implement typed repository mapping,
-current native owning admission and explicit writer rejection, then native HTTP and
-Mobile durable linkage. Detailed reviewed boundaries are in the original fence plan;
-private next-domain-http.md is supplementary. No second schema or fake MutationReceipt.
+FOURTEEN Group Kotlin files are applied/FROZEN, NOT accepted. Sole heavy job49421 runs
+.work/room-request-fence-native-2026-11-07/focused-1: domain tests,27 actual native room
+transaction cases and4 mapper cases, format/architecture. Typed fence repository/raw
+source verifies the original stable fingerprint; owning native fence returns Recorded
+or Fenced, keeps current parent/group/pair admission and final transaction checks, and
+never needs the original device/provider. Stable writer checks the exact fence after
+current admission and before any queue/receipt write; earlier lookup errors are held
+until admitted. Four actual ordered writer/fence commit/rollback races, response replay,
+parent purge, current denial, invalid scope, separate actor namespaces and rollback at
+late clock/denial/cancellation boundaries are under test. Shared DI changed: after focused
+passes, run prepared context-check.py with API and FULL worker tests. No HTTP endpoint,
+Mobile successor or rollout exists yet. Do not edit frozen inputs or start another
+heavy job. No live services/schema, phone, original SDK data or message IDs changed.
 
-First3b3 control42369792173/native42369792184 are SUCCESS and fully audited in Mobile:
-Apple2,001/228, portable4,869/542, native543/86 perABI, zero failures/errors/skips;
-immutableSDK4 and original queue33.483s x86/80.188s ARM preserve keys/IDs and cleanup.
-Mobile primary is31e618cc89e2ca0cce38bcb62ccd95b8533c88c0 (Open source335e3914 included).
-Its first control42376025279/native42376025306 are PENDING behind both running first1d
-control42372520573/native42372520624. Preserve these pending runs before another primary
-promotion. Mobile recovery may continue. No provider scenarios rerun for CI audit.
+Mobile primary31e618cc89e2ca0cce38bcb62ccd95b8533c88c0 includes accepted Open335e3914:
+3,669 full cases/452 suites505.461s on4,393 stable inputs, actual Browser domain/storage,
+Android/root/quality, zero failures/errors/skips/lint. Its first control42376025279 and
+native42376025306 are PENDING behind running first1d42372520573/42372520624; preserve
+these before another primary promotion. First3b3 control/native are fully accepted:
+Apple2,001/228, portable4,869/542, native543/86 each, SDK4 keys/IDs and cleanup verified.
+No provider reruns to audit CI. Starterb11437a unchanged. Phone53 latency remains OPEN;
+Bima has keys and need not remain online for sender server acceptance. Last bounded ADB
+retry11:41UTC timed out; no new phone logs/build/UI driving or repeated feedback question.
 
-Continue owning fence/HTTP, Room request projection/recovery,
-original SDK delivery/history, native-parent recovery, product routing and all54 PRD
-groups (3 in progress/51 planned/none complete). Phone53 latency stays OPEN: last bounded
-ADB reconnect11:41UTC timed out, no new phone logs/build/UI driving. Bima has published
-keys and need not stay online for sender server acceptance; do not claim the20s–2min
-phone delay resolved or repeat the pending feedback question. LiveAPI2e75fe1e/worker
-10485916/schema116.1 stay unchanged; V117–138 remain unshipped. Preserve original Bima
-private data/sidecars/keys/message IDs, SDK4 and Starterb11437a. This supersedes older jobs.
+Continue owned fence validation and typed native HTTP, Mobile durable exact evidence
+before successor linkage, Room projection/recovery, original SDK delivery/history,
+native-parent recovery and product routing/all54 (3 in progress/51 planned/none complete).
+LiveAPI2e75fe1e/worker10485916/schema116.1 stay; V117–138 are unshipped. Previous entries
+below are historical and superseded for job ownership by this section.
 
 ## Latest mobile command continuation — 7 November 2026
 

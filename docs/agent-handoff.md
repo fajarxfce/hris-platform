@@ -4,39 +4,44 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current — 7 November 2026, 01:59UTC
+## Current — 7 November 2026, 02:31UTC
 
-Phone52/sourcefd05 remains installed, original pending report OPEN. User reports
-new messages sometimes take20seconds–2minutes. They reopened Bima; passive logs at
-01:48/49 match native QueueRetained/Send ApiForbidden with server room_send denial.
-A300.022s observer captured FIVE actual requests: original Bima roomHTTP200 once,
-a different owned roomHTTP403 four times. Exact read-only room mapping finds Bima
-one confirmed eligible device; other peer zero registered devices. Prior speculation
-about an old revoked self-device does NOT explain these captured failures. No phone
-UI/sends or queue resets. [Evidence](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
+Phone52/sourcefd05 is installed; original pending latency report remains OPEN. The
+user asked whether Bima lacks keys. Actual observed Bima room send succeeded HTTP200;
+Bima has one confirmed eligible device and need not remain online. Four matched403
+room_send failures belong to ANOTHER owned room whose peer has no registered device.
+The old revoked-self-device hypothesis does not explain these requests. No phone UI,
+agent sends or queue/key resets. [Evidence](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
 
-Concrete Android scheduling defect: DELIVERY_KEY uses WorkManagerAPPEND_OR_REPLACE;
-new requests wait behind an earlier retrying job. Mobile temporary branch376a5096
-now has UNCOMMITTED foreground-delivery changes, three common scheduling regressions,
-Android lifecycle ownership and bounded collapsed background slots. No new tests,
-APK or successful latency claim yet. Do not start another heavy job until Group ends.
+ONLY heavy local job24248 is Mobile foreground-chat-delivery/full-1. Ten changed
+production/test/build files are FROZEN: conflated foreground delivery wake, process
+STARTED-owned worker, coalesced background slots and actual WorkManager test scenario.
+16focused worker cases passed; first Android gate failed only two missing dependency
+verification entries. Their exact bytes match Google Maven HTTPS artifacts; strict
+verification stays enabled. Full gate has passed646 app tests and more than4,000
+fresh cases so far; it is NOT complete. No emulator is active, no release53 built.
 
-ONLY heavy local job84534 is Group publication-preflight contexts-2. Its API suite
-passes; FULL worker tests now run. Group source frozen. Domain/data186cases/81.721s
-passed. First domain gate had fixture compile errors; first context gate expected
-wrong cookie/CSRF failure code, now corrected test only. V117–137 still disabled.
+After full acceptance, run prepared native-1/run.py full-1 using fresh owned5560,
+record/push, then release53 exact build and original Bima5562 offline/online acceptance.
+Announce each explicitserial10.77.77.3:5555 install-only update, never phone UI.
+Phone ADB is currently reachable. Reusable four-file Starter port is prepared only;
+Mobile proof precedes applying it. Publication transport has nine prepared source/test
+files under Mobile.work/legacy-publication-transport-2026-11-07, NOT applied or tested.
+
+Group e45a4313 is committed/pushed: original-key publication preflight passed186domain/
+data and236API/full-worker cases, zero failures/errors, one existing opt-in skip,
+8,613 stable inputs. V117–137 stay unshipped/disabled. Owning recovery/adoption remains.
 
 Live API2e75fe1ee88b5766259fc3efd3ab7f21e70d621a/image
-3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524 is healthy;
-worker10485916/schema116.1/provider/storage unchanged. First2e75 control42323441241
-is now fully audited708cases/113suites/8declaredopt-ins; artifact13555095559 digest
-matches GitHub. No redeployment needed for this diagnosis.
+3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524 is unchanged;
+worker10485916/schema116.1/provider/storage unchanged. First2e75control42323441241
+is accepted/audited708cases/113suites/8declaredopt-ins, artifact13555095559 verified.
 
-Mobilefd05 firstnative42318790943 PASSED437cases/73suites on EACH ABI; original
-artifacts13555660087/13555370007 downloaded and digest-verified under Mobile
-.work/queue-diagnostics-ci-2026-11-07. Control42318790930 still running.
-Firstee control42323799690 remains pending; native42323799725 has started.
-Preserve pending first source control before another primary-source promotion.
+Mobilefd05 first control42318790930 PASSED/audited4,436portable/478suites plus1,788Apple/
+197, zero failures/errors/skips; native42318790943 is accepted437cases/73suites EACH ABI.
+Firstee control42323799690/native42323799725 now RUNNING, so the next accepted source
+may be promoted without displacing those first runs. Protocol42323799691 PASSED/audited
+14checks per mode, both original artifacts/digests and cleanup verified. SDK4 immutable.
 
 ## Accepted latest work
 
@@ -53,15 +58,15 @@ Main inputs unchanged. Priority succeeded in one pass; incoming restored176 orig
 across11 passes/reopens. The exact fresh emulator5560/PID2936535/startTicks169172211
 was stopped and transport absent; original Bima store/phone untouched. This did NOT
 reproduce the first x86 CI failure or identify its cause. [Evidence](measurements/collaboration-native-storage-investigation-2026-11-07.json).
-That native job is complete; see the current active Group gate above.
+That native job is complete; see the current active Mobile gate above.
 
 Mobile **34d507bc** preserves strictschema3 handover after actual interrupted
 credential replacement, without inventing initialized=true or changing private keys.
 67 focused and5,512 fresh full cases/513.264s pass; actual SDK two-ABI mechanism
 passed132.367s with zero sends. Owning publication/adoption still required.
 Mobile primary isee338fb3/source34d507bc; temporary branch376a5096 is ahead. Preserve
-firstee control42323799690 and native42323799725 pending runs before another primary
-source push. Protocol42323799691 is running. Exact IDs in Mobile work evidence.
+the firstee control42323799690 and native42323799725 original evidence. Both are now
+running; protocol42323799691 passed/audited. Exact IDs in Mobile work evidence.
 
 ## First-source CI
 
@@ -73,22 +78,17 @@ source push. Protocol42323799691 is running. Exact IDs in Mobile work evidence.
 - Mobile15facc91/control42313584270 accepted:4,436 portable/478 suites and1,788 Apple/
   197 suites,0failures/errors/skips. Native42313584318 had one x86 priority storage
   failure out of419 cases; ARM64 passed419. Original failure remains recorded.
-- Mobilefd05 control42318790930/native42318790943 running; protocol42318790936 failed
+- Mobilefd05 control42318790930/native42318790943 passed/audited; protocol42318790936 failed
   native SDK image acquisition before tests. Classic14 checks passed. Preserve/audit
   original first runs; never silently replace failed or pending evidence.
 
 ## Next implementation
 
 Group worktree /home/fajar/hris/.worktrees/communication-space isfeat/communication-space,
-1a315331/docs, program344211f8 unchanged. V117–137 remains unshipped/disabled.
-Finish the current admitted provider-publication preflight gate before local irreversible staging.
-AdvanceCollaborationSpaceProvisioning already reads actual keys but waits for DRAINING
-first, so cannot serve pre-stage verification. Use existing provider repositories,
-current root/native/group/client/MFA admission, exact original PROVISIONING target,
-canonical keys/fingerprint and before/after revalidation outside network transactions.
-Return no bearer, upload, registration, SDK ownership, freeze or ACTIVE state. Never
-logout losing same-device provider candidates. Preserve existing same-parent guards;
-revoked/changed native parent needs a separate explicit recovery workflow.
+e45a4313 accepted/pushed. Publication preflight reads exact original signed provider
+keys under before/after admission without SQL across network, any mutation or logout.
+V117–137 remains unshipped/disabled. Mobile transport is prepared only as described
+above. Current parent guards remain; changed/revoked parent needs explicit recovery.
 Then wire durable Mobile stop/join/target, admitted freeze/drain/adoption and group
 routing/background/push. All54 PRD groups remain3in_progress/51planned; calls, meetings,
 remaining chat features and backup are unfinished. This is not completion.

@@ -35,19 +35,20 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
    purged-parent resolution, exact Recorded/Fenced echo, original-key header, no-store,
    bounds/OpenAPI/disabled graph pass. [HTTP contract](collaboration/native-room-request-fence-http.md).
    All Group jobs are reaped; no shared module DI change after dcdaf220 FULL worker proof.
-2. Mobile transport fe3992f1 and durable evidence fc0034ed are accepted/pushed. Transport
-   passed44 focused/3,671 full cases. Durable storage passed65 focused/217.124s and3,697
-   full cases/455 suites/513.19s; a report audit caught zero selected Browser policy
-   cases, and supplemental82617 passed all6/26.512s on identical4,398 inputs. Zero
-   failures/errors/skips/lint; root/Android host/quality/shared Wasm and actual Browser
-   storage are accepted. [Storage contract](https://github.com/fajarxfce/hris-mobile/blob/fc0034ed/docs/collaboration-space-room-fence-storage.md).
-   NINE owning-resolution Mobile files are applied/FROZEN, NOT accepted. Sole heavy
-   job21909 runs `.work/space-room-request-resolution-2026-11-07/focused-1` (91 cases).
-   Then required full root/Android/actual Browser64/shared Wasm. It reads terminal facts
-   locally, marks the same attempt before one finite original fence call, uses normalized
-   stored CAS and bounded observed-result capture. No successor/archive/provider action.
-   Reap before editing frozen source or starting another compiler/emulator.
-3. Validate owning exact fence capture, then implement atomic original/successor linkage.
+2. Mobile owning resolution0d10c395 is accepted/pushed to recovery and primary.
+   Focused91/219.787s and full3,755/460/525.629s on4,405 unchanged inputs pass with zero
+   failures/errors/skips/lint; root/Android host/quality/shared Wasm and64 explicitly
+   verified Browser cases. It captures exact original results under current ownership,
+   keeps send attempts stable and preserves denial through cancellation. [Contract](https://github.com/fajarxfce/hris-mobile/blob/0d10c395/docs/collaboration-space-room-request-resolution.md).
+   Prior transportfe3992f1 and durable storagefc0034ed remain accepted. ELEVEN next
+   atomic handoff source/test files are applied/FROZEN and NOT accepted. Sole heavy
+   job40440 runs Mobile `.work/space-room-successor-2026-11-07/focused-1` (102 expected
+   cases), then full root/Android/Browser75/sharedWasm. Exact original ciphertext and
+   authenticated forward/back links use existing raw archiveAndInsert; nine new actual
+   storage/two policy cases plus explicit fakes are included. Reap before editing
+   frozen source or starting another compiler/emulator. No owning successor, SDK,
+   product caller or APK activation yet. Mobile recovery checkpoint2d6d2fb3 records this.
+3. Validate atomic original/successor storage, then implement current-admitted Room preparation/dispatch.
    A null receipt, timeout, denial or changed native parent never authorizes replacement.
    Continue Room projection/recovery, original SDK delivery/history, native-parent
    recovery, product routing and all54 PRD groups:3 in progress/51 planned/none complete.
@@ -56,15 +57,18 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
 
 ## Other repositories and CI
 
-Mobile recovery `feat/chat-recovery-20261107` is fc0034ed; primary remains
-fe3992f1426712bf23964bf5aea68ad382f1b624. First fe control42380244144/native42380243983
-are PENDING behind first31e control42376025279/native42376025306, which both run.
-Preserve both first fe runs before another primary promotion; recovery work continues.
-First1d9493df control42372520573/native42372520624 are fully audited SUCCESS: Apple2,028/
-230, portable4,923/546, each native543/86, exactSDK4 keys/IDs/cleanup and14 metadata/
-13 preparation cases verified. Prior3b3/79/fb/e8 remain accepted; no provider reruns.
+Accepted Mobile source0d10c395fb0c637d27344d037d63961a1af9bd80 is on both recovery and
+primary; recovery doc checkpoint is2d6d2fb3. First control42383612502/native42383612567
+are PENDING behind running firstfe control42380244144/native42380243983. Preserve both
+new first runs before another primary promotion; recovery work may continue.
+First Open source31e control42376025279/native42376025306 are fully audited SUCCESS:
+Apple2,056/232, portable4,979/550, each native543/86, zero failures/errors/skips. Actual
+25 Open/3 storage cases per Apple/Desktop/Browser, immutableSDK4 hashes/keys/IDs and
+cleanup verified. Original queue20.779s x86/74.454s ARM sends zero; separate six HRIS
+scenarios retain exact[1,3,3,176,176,176] sends and cleanup. No provider reruns. Earlier
+1d/3b3/79/fb/e8 remain accepted; this older CI does not replace new fence/owning source CI.
 [Mobile continuation](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
-Starterb11437a remains unchanged; no HRIS policy port. Main checkpoint06dc66fb is docs only.
+Starterb11437a remains unchanged; no HRIS policy port. Main1005340a is a docs checkpoint.
 
 ## Runtime, phone and original data
 

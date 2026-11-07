@@ -11,19 +11,19 @@ First control42366357406/native42366357400 are pending behind fb514281's running
 control42363807332/native42363807289; preserve original first runs before another
 primary promotion. Recovery-branch work may continue without replacing pending runs.
 
-Sole local heavy job33920 is Mobile durable conversation commands/focused-1. TEN
-new Kotlin files are frozen: immutable open/stable-room intent, pure transition
-policy, strict encrypted codec and raw CommandStore repository, plus real Desktop/
-Browser/Apple storage contracts and pure tests. These changes are NOT yet accepted
-or committed. After focused, run required root/Android/lint plus browser storage/
-policy and shared Wasm compilation. Do not overlap any compiler or emulator.
-Archive exact encrypted recorded results only after owning local projection; no
-archive scans, lost-key recreation, uncertain replacement or fake message ACK.
+Mobile focused71754 passed21 cases/190.699s on4,369 unchanged inputs, zero
+failures/errors/skips, format/architecture/Detekt. First33920 failed test compilation
+because fixture read/raw names collided with existing history methods; renamed
+readCommand/rawCommand and retained that failed run. Sole heavy job18016 now runs
+Mobile full-1: root check, Android host/release lint, actual browser command storage/
+policy and shared Wasm compilation. TEN Kotlin files remain FROZEN/uncommitted.
+No compiler/emulator may overlap. Archive exact recorded ciphertext only after
+owning projection; no lost-key recreation or uncertain replacement. [Fence design](collaboration/native-room-request-fencing-plan.md).
 
 NEXT accept durable commands, owning finite dispatch and explicit server fencing,
 original SDK delivery/history, native-parent recovery, product routing and all54
 PRD groups (none complete). V117–137 remain disabled/unshipped. Phone53 latency stays
-OPEN, Bima has keys and need not remain online; no new APK/phone UI driving. Live
+OPEN (bounded ADB reconnect timed out again by11:09UTC), Bima has keys and need not remain online; no new APK/phone UI driving. Live
 services/schema, original Bima data/keys/IDs, SDK4 and Starterb11437a remain unchanged.
 This section supersedes older running-job statements retained below as history.
 

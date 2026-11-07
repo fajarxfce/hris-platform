@@ -4,42 +4,45 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current native fence and HTTP validation — 7 November 2026
+## Current Mobile fence transport validation — 7 November 2026
 
-Group dcdaf220 is accepted/pushed:14-file native fence integration over accepted V138
-storagec6937843. Typed raw/repository mapping verifies the original fingerprint;
-current native/group/pair admission owns original receipt or immutable fence resolution.
-Stable writers retain device/provider admission and reject a fence before any writes.
-Four real writer/fence commit/rollback races, parent purge/replay, independent actor
-namespaces and late denial/clock/cancellation rollback pass. Focused49421 passed195
-cases319.052s; API + FULL worker71315 passed241 cases540.839s, zero failures/errors and
-one existing opt-in elapsed-retention skip. Both used8,635 unchanged inputs and quality
-passed. All those jobs are reaped. [Native contract and exact evidence](https://github.com/fajarxfce/hris-platform/blob/dcdaf220/docs/collaboration/native-room-request-fence.md).
-Group's handoff is now concise; its full previous8,580 lines remain in linked Git history.
+Group native dcdaf220 and HTTP cf885a1c are accepted/pushed. Native focused195 cases/
+319.052s and API/FULL worker241/540.839s pass with one existing opt-in retention skip;
+8,635 stable inputs. HTTP corrected42852 passes99/202.31s on8,637 stable inputs, zero
+failures/errors/skips and quality passed. First57183 had one wrong fixture expectation:
+missing participant provider identities return peer_unavailable before device admission.
+The corrected expectation preserves production policy. All Group jobs are reaped.
+[Native/HTTP contract](https://github.com/fajarxfce/hris-platform/blob/cf885a1c/docs/collaboration/native-room-request-fence-http.md).
+Group's current handoff is concise, with full8,580-line history retained separately.
 
-Sole heavy job57183 now runs Group `.work/room-request-fence-http-2026-11-07/http-1`.
-SIX HTTP files are applied/FROZEN, NOT accepted: `/room/requests/fence`, required original
-Idempotency-Key, exact full original echo and Recorded/Fenced result; API refresh,
-replacement/purge, bounds/no-store/OpenAPI/disabled tests. Shared module DI is unchanged
-by this HTTP slice; prior FULL worker proof is retained. Do not edit frozen Group inputs
-or start a second heavy job. Accept/push HTTP before Mobile integration.
+ELEVEN Mobile source/test files are applied/FROZEN, NOT yet accepted. Focused12497 passed
+44 transport/binding cases187.108s,4,398 stable inputs, no failures/errors/skips and
+format/architecture/Detekt. Sole heavy job77406 now runs Mobile
+`.work/space-room-request-fence-2026-11-07/full-1`: root, Android host/release lint,
+14 selected Browser fence/receipt cases, shared Wasm and quality. Do not edit frozen
+Mobile inputs or start another compiler/emulator. No durable evidence/successor/product
+caller or new APK exists. Candidate directories are historical after application.
 
-ELEVEN Mobile candidates in `.work/space-room-request-fence-2026-11-07` are isolated,
-NOT applied/tested: typed evidence/policy/native transport/shared full-echo mapping and
-8 Ktor regressions. Verify baselines before applying after Group HTTP passes. Mobile
-recovery checkpoint59ff2109 is pushed, primary31e618cc unchanged with accepted Open335e3914
-(3,669 cases505.461s). First31e control42376025279/native42376025306 remain PENDING behind
-running first1d42372520573/42372520624. At13:38UTC1d portable passed; Apple and both Android
-jobs were still running. Preserve first pending runs before another primary promotion.
-First3b3 control/native are fully audited SUCCESS; no provider reruns to audit CI.
+First1d9493df control42372520573/native42372520624 both completed SUCCESS. Read-only
+original artifact audit85452 is active in Mobile `.work/space-conversation-preparation-first-ci-2026-11-07`.
+Do not relabel this as artifact acceptance before inspecting it; no provider reruns.
+First31e618cc control42376025279/native42376025306 have BOTH STARTED as of14:00UTC;
+there is no longer a pending-first-run barrier for a later primary promotion. Its
+Open335e3914 implementation retains its locally accepted3,669-case proof. Existing
+3b3/79/fb/e8 first runs remain fully audited. Starterb11437a is unchanged.
 
-Next: typed HTTP/Mobile acceptance, durable exact evidence before atomic successor
+Fresh read-only Bima audit at14:00:00.714160UTC confirms1 active device/provider binding,
+1 device key,50 signed one-time keys and1 fallback. No key values, private keys, provider
+login, message send, phone access or state mutation. [Sanitized evidence](measurements/collaboration-bima-recipient-keys-2026-11-07.json).
+Bima need not remain online for sender server acceptance, but this metadata does not
+establish or fix the phone's20s–2min delay. Phone53 latency stays OPEN; no new phone
+logs after the11:41UTC ADB timeout and no repeated feedback question. Preserve all
+original keys/stores/message IDs and use install-only for any future announced update.
+
+Next accept Mobile transport, durable exact fence evidence before atomic successor
 linkage, Room projection/recovery, original SDK delivery/history, native-parent recovery,
-product routing and all54 PRD groups (3 in progress/51 planned/none complete). Starterb11437a
-unchanged. No live rollout: API2e75fe1e/worker10485916/schema116.1 stay; V117–138 unshipped.
-Phone53 latency remains OPEN. Bima has keys and need not stay online for sender acceptance;
-that does not diagnose/fix its20s–2min delay. Latest ADB11:41UTC timeout, no further retries
-this turn or repeated feedback question. Original keys/stores/message IDs unchanged.
+product routing and all54 groups (3 in progress/51 planned/none complete). Live
+API2e75fe1e/worker10485916/schema116.1 remain; V117–138 are unshipped. No live rollout.
 
 ## Latest mobile command continuation — 7 November 2026
 

@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+## Installed inspector57 and ongoing Starter/timing work —     7 November 2026, 22:55 UTC
+
+Mobile e500691f records accepted APK57, installed on the phone and original Bima
+emulator with unchanged app identity/data. One actual Matrix send returned HTTP200
+in239ms (240ms body transfer); the same bubble was pending by2.876s and sent by5.071s
+in coarse UI polling. Actual API/Matrix capture, filters, Clear and cold offline
+history/preview passed. See Mobile docs/measurements/network-inspector-host-device-2026-11-07.json.
+The emulator is stopped; phone57 is current. No repeated send or phone UI action here.
+
+Starter feat/network-inspector-20261107 remains uncommitted. Its check-1 stopped after
+a Firebase trailing-lambda compatibility compile failure (335 other fresh cases passed).
+The parameter order is corrected; check-2/47979 is the ONLY heavy job, with Starter and
+private-library inputs frozen. Root checks and8inspector/2Firebase cases passed; its
+web lockfile requires the3new local inspector packages. Finish and reap check-2, verify
+that lockfile delta, then repeat the complete gate. No emulator/compiler overlap.
+
+Mobile now has an UNTESTED feat/chat-send-timing-20261107 candidate frome500691f:
+closed-field measurements for local draft/prepare/queue/confirm phases, generic typed
+result observation,7new tests and the Firebase parameter correction. No delivery,
+queue, draft or composer behavior has been changed. Check scripts are in
+.work/chat-send-timing-2026-11-07; release58 scripts only (noAPK or acceptance) are in
+.work/release-phone-2026-11-07-build58. Run focused/full gates after Starter is reaped,
+commit/push accepted atomic changes, then measure one original-account send on the
+owned emulator. Notify before any later --install-only phone update.
+
+Private inspector58877fe adds accepted consumer documentation; production remainsa8d7d60.
+SDK5/library remain unpublished and the visibility question remains unanswered. Do not
+promote unpublished dependencies to primaryMobilebe2fe021. Continue Starter, measured
+composer/latency fixes, Apple binding/overhead and all54PRDgroups; none newly complete.
+API2e75fe1e/worker10485916/schema116.1 unchanged; V117–138 undeployed, Group routing off.
+Read the current Mobile/Starter handoffs and owned job results before another heavy job.
+
 ## Mobile inspector locally accepted — 07 November 2026, 22:21 UTC
 
 Mobile52df4ee1 is pushed on feat/network-inspector-20261107. Dev API/Firebase/OIDC Ktor

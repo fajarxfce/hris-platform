@@ -1,38 +1,60 @@
 # Agent continuation — HRIS workspace
 
-## Current cross-repository execution — 7 November 2026, 03:30UTC
+## Current cross-repository execution — 7 November 2026, 04:19UTC
 
-Group e45a4313 remains accepted/pushed; publication preflight and V117–137 are disabled/
-unshipped. The older checkpoint below retains historical job references. Read Main
-2af46918 and the current Mobile handoff before starting any builds. Live API2e75fe1e/
-worker10485916/schema116.1 stays unchanged; SDK4 is immutable.
+Mobile c70fe7cb is accepted/pushed on temporary feat/chat-recovery-20261107. Its
+logical Space registry keeps the original physical slot/device/owner and excludes
+all legacy lookup/borrow/handover paths. HR-company switches/denials retain a Space
+resource; native-parent changes or exact-space removal retire it. Invalidated gates
+cannot regain authority when a prior parent returns. Focused38cases/72.926s and
+full445fresh/69suites/132.579s passed with4,284stable inputs,zero failures/errors/skips/
+lint/Detekt. No actual SDK adoption or organization activation in that accepted slice.
 
-Mobile c1410b31 publication transport plus explicit read-only POST auth replay is now
-accepted and pushed to primary/temporary communications branches:6,096fresh cases/
-753suites/830.513s,4,271stable inputs, zero failures/errors/skips/lint/Detekt. The first
-gate had two failed assertions revealing absent read-only POST replay; the second
-had a new test compile error. Neither failure was expected or erased. Final core and
-transport regressions passed. Ordinary unsafe/streaming requests retain their guards.
+Mobile primary780624a4 includes accepted owning transfer41870f77, explicit diagnostic
+failure outcomec50a8983 and strict original-store adoption credentials780624a4.
+Combined full86974 passed3,159fresh/454suites/466.159s with4,282stable inputs,zero all.
+Original passphrase/Matrix identity/credentials/handover/queued transaction IDs remain.
+FIRST780 control42336761340/native42336761242 are PENDING; preserve before the next
+primary source push. Atomic next source commits go to the temporary branch meanwhile.
 
-Release53/source085 remains installed. Bima has confirmed keys and a matchedHTTP200;
-the matched403 failures belong to another room with no registered peer device. The
-physical latency report remains OPEN awaiting optional feedback. No phone UI or new
-agent sends. Original Bima data and all sidecars/keys are retained.
+ONLY heavy local job33252 is Mobile space-runtime-adoption-next/focused-1. FOURTEEN
+source/test/DI files are APPLIED/UNCOMMITTED/FROZEN. Candidate existing-only acquisition
+requires original lock/cache/nonempty state+crypto files without CREATE or repairs;
+the shared native opener selects an explicit credential namespace, verifies original
+private identity before credential staging and after paused restore, and returns a
+logical Space lease. Cancellation/late-parent/write failure cases and actual DI
+single-owner coverage are being tested. No live caller; native emulator acceptance,
+owning fresh admission/publication and product routing remain required. No emulator.
+Read current Mobile handoff and .work/space-runtime-adoption-next-2026-11-07 results
+before starting any build; no concurrent heavy job.
 
-Starter0002d102 FIRST Apple42331840556 passed154cases/37suites,including16worker cases,
-zero failures/errors/skips; exact artifact digest verified. Generic network source
-from accepted Mobile c1410b31 is now applied in Starter. ONLY heavy job61036 runs its
-read-only-post-port/check-1. Keep Starter inputs frozen; no concurrent build/emulator.
+Starter f25cb3de4d8f18a7cf95ec956dea5a7485f92623 is pushed. Two exact generic observability
+files from Mobile passed293fresh/93suites/295.556s;1,025stable inputs,zero failures/
+errors/skips/Detekt/lint errors,44oldwarnings,Android/productionWeb success. FIRST changed
+source Apple42337213669 is IN_PROGRESS. Original first Apple42334504381/sourcefdbff51
+FAILED the unchanged network sample assertion expected[Failed,Cancelled],actual[null,Cancelled].
+191cases/48suites,1failure; all3new read-only POST cases passed. Original verified
+artifact13559650754SHA d7d3ad4c308a9537cc6901c1f35cdf60d4ac563b9ee3203ca68497bf770d9028
+remains recorded. No rerun or precise Native compiler cause claim. Prior worker0002d102
+first Apple42331840556 passed154cases/37suites plus actual simulator app/associations.
 
-Mobile owning AdvanceCollaborationSpaceRuntimeTransfer is applied but UNCOMMITTED/
-UNTESTED. It joins fresh provider observation, exact SDK stop/join/private proof and
-durable target, current admission, same-operation freeze and one drain read. Fourteen
-domain cases and DI coverage are prepared. No live caller or adoption. First c141
-control42333989403 is PENDING and must be preserved before another primary source
-push. Prior085control runs; its native446cases EACHABI and protocol14checks eachmode
-are accepted/audited. Owning adoption, changed/revoked parent recovery, organization
-routing and all54groups remain open. Continue work and push each atomic commit.
+Mobile FIRSTc141 native42333989369 is accepted/audited450cases/74suites EACHABI,zero all;
+artifacts13559688618(ARM)/13559428045(x86) have verified GitHub digests. Its control
+42333989403 has portable SUCCESS, Apple IN_PROGRESS. Prior085 control/native/protocol
+are all accepted with original artifacts retained. SDK4 publication is immutable.
 
+Release53/source085 remains installed on10.77.77.3:5555, sameUID10962/first-install,
+original Bima data/keys/sidecars retained. Bima has one confirmed eligible device and
+matchedHTTP200; four403s belong to another room with zero registered peer devices.
+He need not remain online. Physical pending latency remains OPEN, optional feedback
+pending; silence proves no delivery. No phone UI or new agent sends. Announce each
+install, explicit serial and --install-only; do not reset or fabricate acknowledgment.
+
+Group e45a4313 stays accepted with186domain/data and236API/full-worker cases,one prior
+opt-in skip. V117–137 remain disabled/unshipped. Live API2e75fe1e/worker10485916/schema116.1
+is unchanged. Original-store native adoption, changed/revoked-parent recovery, root
+routing and all54PRD groups remain unfinished. Continue authorized long run and push
+every atomic commit. Current Mobile contracts/measurements supersede older notes below.
 
 ## Current — 7 November 2026, 02:05UTC: original publication preflight accepted
 

@@ -1,5 +1,33 @@
 # Agent continuation — HRIS Platform organization chat
 
+## Mobile inspector continuation — 07 November 2026, 20:18 UTC
+
+Mobile recovery7d8ef8aa is pushed; primarybb106154 remains accepted. Phone and original
+stopped Bima emulator remain55, with pending/draft inbox previews and offline renewal.
+The first-layout viewport fix awaits56; composer/latency and original54 PRD groups remain
+active. Source95 native first CI is now fully audited and recorded in Mobile Git.
+
+SDK observer branch feat/matrix-http-observer-20261107 at2f45785f owns pinned Android
+and paired Apple candidates. ARM64 native/generated wrapper compiled; first Android
+CI42408652180 has four ABI jobs, with ARMv7 already downloaded/digest/source/ELF/API
+verified. First Apple CI42408920984 is building. ShippingSDK4 remains unchanged.
+Actual paths: /home/fajar/hris/.worktrees/mobile-matrix-http-observer-2026-11-07 and
+/home/fajar/hris/.worktrees/matrix-sdk-http-observer-2026-11-07.
+
+Private inspector main388a1cb stays portable. Branch feat/matrix-rust-bindings-20261107
+at2752c5d has the actual Android adapter,13 passing host cases and a compiled five-scenario
+native HTTP instrumentation fixture. Device-4 passed19.273s/38 stable inputs; all local
+compiler jobs are reaped and no emulator runs. Native runtime is NOT accepted yet: the
+current candidate APK is ARM64, and the routine emulator needs the matching x86_64 ABI.
+Private CI billing/visibility question remains unresolved. No SDK5/library publication,
+Mobile host capture, new phone install or Starter port is claimed.
+
+Next audit/package the remaining ABI artifacts, run the actual observer fixture, wire
+Mobile capture/viewer, verify retained original sends/overhead and deliver a validated APK;
+then port reusable integration and continue communications. This does not activate Group
+routing or deploy schema117–138. Live API2e75fe1e/worker10485916/schema116.1 stay unchanged.
+Preserve original device keys/queues and frozen SDK4 inventories.
+
 Read [architecture](architecture.md), [product](product.md), [delivery](delivery.md)
 and the linked contracts. Earlier checkpoints are retained verbatim in
 [history through native room fencing](agent-handoff-history-through-room-fence-2026-11-07.md).

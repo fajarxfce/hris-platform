@@ -4,44 +4,53 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current — 7 November 2026, 02:31UTC
+## Current — 7 November 2026, 03:01UTC
 
-Phone52/sourcefd05 is installed; original pending latency report remains OPEN. The
-user asked whether Bima lacks keys. Actual observed Bima room send succeeded HTTP200;
-Bima has one confirmed eligible device and need not remain online. Four matched403
-room_send failures belong to ANOTHER owned room whose peer has no registered device.
-The old revoked-self-device hypothesis does not explain these requests. No phone UI,
-agent sends or queue/key resets. [Evidence](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
+Release53/source08545820c0b58f46d784971e71ceb207dd628c0f is INSTALLED on the authorized
+phone. The user asked whether Bima lacks keys: matched Bima send returnedHTTP200 and
+he has one confirmed eligible device. He need not remain online. Four matched403
+room_send failures belong to another owned room with zero registered peer devices.
+Physical latency remains OPEN; an optional new-build question is pending. No agent
+phone UI or new sends. [Diagnosis](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
 
-ONLY heavy local job24248 is Mobile foreground-chat-delivery/full-1. Ten changed
-production/test/build files are FROZEN: conflated foreground delivery wake, process
-STARTED-owned worker, coalesced background slots and actual WorkManager test scenario.
-16focused worker cases passed; first Android gate failed only two missing dependency
-verification entries. Their exact bytes match Google Maven HTTPS artifacts; strict
-verification stays enabled. Full gate has passed646 app tests and more than4,000
-fresh cases so far; it is NOT complete. No emulator is active, no release53 built.
+Mobile08545820 fixes foreground wake waiting behind WorkManager retry. Full7,436fresh
+cases/967suites/1,056.119s passed with4,270 stable inputs and zero lint/Detekt findings.
+Actual WorkManager proof passed70.507s: synthetic durable wake436ms while old retry/
+appended BLOCKED job remained, lifecycle stop/restart accepted, owned fixture cleaned.
+It proves scheduling behavior, not actual phone message latency. No SDK publication.
 
-After full acceptance, run prepared native-1/run.py full-1 using fresh owned5560,
-record/push, then release53 exact build and original Bima5562 offline/online acceptance.
-Announce each explicitserial10.77.77.3:5555 install-only update, never phone UI.
-Phone ADB is currently reachable. Reusable four-file Starter port is prepared only;
-Mobile proof precedes applying it. Publication transport has nine prepared source/test
-files under Mobile.work/legacy-publication-transport-2026-11-07, NOT applied or tested.
+Release53 built259.896s with pushed source/HEAD frozen. Exact signed/nondebuggable
+ARM64APK121,022,760bytes SHA994d161ade3455745157d0793475b5091d67e968af909bda7a282dce163152c6
+passed original Bima52→53 update, four offline/online room entries(11visible rows),
+clock+3900s/restoration,30s process stability and inspected screenshots. Original
+userdata/sidecars/keys retained;5562 stopped02:50:13. Phone install-only passed126.87s
+at02:52:45UTC, sameUID10962/first-install and exactAPKhash. Passive audit02:53 had zero
+post-install lines; silence proves no delivery. Mobile release53 measurement has details.
 
-Group e45a4313 is committed/pushed: original-key publication preflight passed186domain/
-data and236API/full-worker cases, zero failures/errors, one existing opt-in skip,
-8,613 stable inputs. V117–137 stay unshipped/disabled. Owning recovery/adoption remains.
+Starter0002d102ba2dab693aef4173ab7b958d39ab7d03 is accepted/pushed: four exact generic
+worker files plus Apple worker CI targets,90fresh tests/29suites/245.086s,1,024stable
+inputs, zero failures/errors, zero lint errors/44existing warnings. FIRST Apple
+42331840556 is running; no repeat dispatch. HRIS application policy stays in Mobile.
 
-Live API2e75fe1ee88b5766259fc3efd3ab7f21e70d621a/image
-3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524 is unchanged;
-worker10485916/schema116.1/provider/storage unchanged. First2e75control42323441241
-is accepted/audited708cases/113suites/8declaredopt-ins, artifact13555095559 verified.
+ONLY heavy local job82879 is Mobile legacy-publication-transport/focused-1. Nine
+APPLIED Kotlin source/test files are UNCOMMITTED and FROZEN. Four new cases cover
+fresh bounded publication observation, exact identity/version/fingerprint, finite
+native rotation/rejection and cancellation. No emulator is active. Full gate follows
+focused acceptance; never start another local build meanwhile. Owning migration and
+all54PRD groups remain unfinished. Group e45a4313 preflight is accepted/pushed with
+186domain/data and236API/full-worker cases, one existing opt-in skip; V117–137 disabled.
 
-Mobilefd05 first control42318790930 PASSED/audited4,436portable/478suites plus1,788Apple/
-197, zero failures/errors/skips; native42318790943 is accepted437cases/73suites EACH ABI.
-Firstee control42323799690/native42323799725 now RUNNING, so the next accepted source
-may be promoted without displacing those first runs. Protocol42323799691 PASSED/audited
-14checks per mode, both original artifacts/digests and cleanup verified. SDK4 immutable.
+Mobiletemporary7c1a7293 includes separately pushed CI worker coverage. Primary52ca0720
+is docs above runtime08545820. First085 control42330502891 is pending; preserve it before
+another primary SOURCE push. Native42330503083/protocol42330502995 run. Precedingee
+native42323799725 passed444cases perABI; protocol42323799691 passed14checks per mode;
+control42323799690 was still running. Exact original artifacts are audited in Mobile.
+
+Live API2e75fe1e/image3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524,
+worker10485916/schema116.1/provider/storage are unchanged. SDK4 is immutable. Push each
+atomic commit, announce each explicitserial10.77.77.3:5555 install-only update; no phone
+UI, resets, replacement sends or fabricated acknowledgement. Read current Mobile
+handoff before starting builds; private work files supplement the tracked contracts.
 
 ## Accepted latest work
 
@@ -64,9 +73,9 @@ Mobile **34d507bc** preserves strictschema3 handover after actual interrupted
 credential replacement, without inventing initialized=true or changing private keys.
 67 focused and5,512 fresh full cases/513.264s pass; actual SDK two-ABI mechanism
 passed132.367s with zero sends. Owning publication/adoption still required.
-Mobile primary isee338fb3/source34d507bc; temporary branch376a5096 is ahead. Preserve
-the firstee control42323799690 and native42323799725 original evidence. Both are now
-running; protocol42323799691 passed/audited. Exact IDs in Mobile work evidence.
+Source history and original CI failures remain recorded; the current checkpoint above
+supersedes those historical branch heads. No previously accepted native send was rerun
+just for logs.
 
 ## First-source CI
 
@@ -87,14 +96,15 @@ running; protocol42323799691 passed/audited. Exact IDs in Mobile work evidence.
 Group worktree /home/fajar/hris/.worktrees/communication-space isfeat/communication-space,
 e45a4313 accepted/pushed. Publication preflight reads exact original signed provider
 keys under before/after admission without SQL across network, any mutation or logout.
-V117–137 remains unshipped/disabled. Mobile transport is prepared only as described
+V117–137 remains unshipped/disabled. Mobile transport is applied and under the focused gate described
 above. Current parent guards remain; changed/revoked parent needs explicit recovery.
 Then wire durable Mobile stop/join/target, admitted freeze/drain/adoption and group
 routing/background/push. All54 PRD groups remain3in_progress/51planned; calls, meetings,
 remaining chat features and backup are unfinished. This is not completion.
 
-Starter /home/fajar/hris/compose-fluent-starter staysb37f8c8/docs/source5fb4eca3;
-local490 fresh and Apple138 cases accepted. HRIS-specific recovery belongs in Mobile.
+Starter /home/fajar/hris/compose-fluent-starter is0002d10, accepted locally as above;
+first Apple42331840556 is running. Prior138 Apple cases remain separate accepted history.
+HRIS-specific recovery belongs in Mobile.
 SDK4 release437093395/tagmatrix-sdk-26.10.23-hris.4 is immutable; NEVER republish.
 
 ## Persistent constraints

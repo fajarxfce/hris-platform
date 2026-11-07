@@ -69,5 +69,47 @@ Mobile durable commands must retain original native version, actual platform/bui
 and complete body as well as operation/space/peer. Preparation and recovery belong
 in use cases coordinating repositories; raw receipt lookup remains datasource I/O.
 V117–137 stays disabled until these paths, original delivery and product admission
-are accepted. No production source, DI, migration or provider behavior changes in
-this internal acquisition increment, apart from sharing the unchanged writer fingerprint.
+are accepted. The internal acquisition adds a domain reader and shares the unchanged
+writer fingerprint; it introduces no migration or provider behavior change.
+
+## Native HTTP integration
+
+`POST /api/v1/collaboration/spaces/{spaceId}/direct-conversations/{conversationId}/room/receipts/read`
+is an authenticated metadata read. It requires no `Idempotency-Key` and creates no
+operation receipt, room request or provider work. The actual native bearer and
+`X-HRIS-Client-*` headers identify current admission. The body retains the ORIGINAL
+operation ID, native parent ID/version, device/version, platform/build and paired
+optional request account/revision. The route supplies original space/conversation.
+
+The response contains current `accountId`, the complete original descriptor and a
+nullable `{id, version}` receipt. Current participant removal or policy denial still
+wins. The response uses `Cache-Control: no-store`; it contains no credentials or
+provider grant. UUID/type validation and the shared 1 MiB native JSON limit apply.
+Versions are 0..999999, build is positive, original platform is Android/iOS and the
+retry tuple is either complete or absent. OpenAPI marks this POST as non-mutating
+for idempotency metadata. Existing missing-bearer POST protection returns403; a
+revoked native bearer returns401.
+
+The actual API tests recover the same receipt under a newer build and a replacement
+parent after original-parent revocation, prove private actor scope and unchanged
+receipt/queue counts, and cover absence, invalid input, policy/peer denial, request
+size and disabled configuration. Shared DI requires both actual API and FULL worker
+contexts. [HTTP/context acceptance](../measurements/collaboration-space-room-receipt-http-2026-11-07.json)
+passed in504.080s on8,619 unchanged inputs:238 cases, zero failures/errors and one
+preexisting elapsed-retention skip. Format and architecture passed. The first gate
+failed one incorrect expected401; production authentication was unchanged.
+
+## Initial dispatch proof is still a prerequisite
+
+Mobile's native credential/session model and the server's native token response do
+not expose the native session version. Authentication can rotate a bearer while
+preserving a POST body; the existing room writer hashes the actual authenticated
+version and client build. A locally assumed pre-send version is therefore not a
+valid durable original descriptor. The explicit reader only handles a COMPLETE,
+correct original proof; it does not solve initial proof capture.
+
+Before a durable owning caller, characterize real native refresh followed by the
+first room write. Introduce an explicit stable intent contract/versioned namespace
+or authoritative retained operation descriptor, preserving existing fingerprints
+and receipts. Do not decode opaque tokens, guess versions, weaken current admission
+or silently replace an uncertain original. No new endpoint or group schema is live.

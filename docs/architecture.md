@@ -3,7 +3,8 @@
 [Original room receipt acquisition](collaboration/native-room-receipt-recovery.md)
 matches the immutable request fingerprint under current native/group admission.
 Receipt metadata survives original-parent purge; absence remains uncertain and grants
-no replacement request, SDK or content authority. HTTP integration remains separate.
+no replacement request, SDK or content authority. The native read-only HTTP route and shared API/full worker graphs are validated;
+initial durable proof capture remains separate.
 
 [Original publication preflight](collaboration/legacy-publication-preflight.md) reads
 actual signed provider keys under fresh native/group admission before Mobile stages

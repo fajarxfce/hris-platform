@@ -1,11 +1,17 @@
 package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.administration.domain.entities.ClientRequest
+import dev.fajar.hris.administration.domain.entities.ClientVersion
+import dev.fajar.hris.collaboration.delivery.requests.ReadCollaborationSpaceRoomReceiptRequest
 import dev.fajar.hris.collaboration.delivery.requests.RequestCollaborationSpaceRoomRequest
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceRoomReceiptResponse
+import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomObservedAttempt
+import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomOperation
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomView
 import dev.fajar.hris.collaboration.domain.usecases.ReadNativeCollaborationSpaceRoom
+import dev.fajar.hris.collaboration.domain.usecases.ReadNativeCollaborationSpaceRoomReceipt
 import dev.fajar.hris.collaboration.domain.usecases.RequestNativeCollaborationSpaceRoom
-import dev.fajar.hris.core.domain.Actor
+import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.core.http.*
 import dev.fajar.hris.identity.delivery.security.*
 import java.util.UUID
@@ -18,6 +24,7 @@ import org.springframework.web.bind.annotation.*
 class NativeCollaborationSpaceRoomController(
     private val request: RequestNativeCollaborationSpaceRoom,
     private val status: ReadNativeCollaborationSpaceRoom,
+    private val readReceipt: ReadNativeCollaborationSpaceRoomReceipt,
 ) {
     @PostMapping(consumes = ["application/json"])
     fun request(
@@ -64,4 +71,48 @@ class NativeCollaborationSpaceRoomController(
                 client.version,
             )
             .response()
+
+    @PostMapping("/receipts/read", consumes = ["application/json"])
+    fun readReceipt(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @PathVariable spaceId: UUID,
+        @PathVariable conversationId: UUID,
+        @RequestBody input: ReadCollaborationSpaceRoomReceiptRequest,
+    ): NativeCollaborationSpaceRoomReceiptResponse {
+        if ((input.expectedRequestRevision == null) != (input.expectedRequestAccountId == null))
+            return Result.Failed(
+                    Failure(FailureKind.VALIDATION, "invalid_collaboration_room_operation")
+                )
+                .response()
+        val original =
+            CollaborationSpaceRoomOperation(
+                input.operationId,
+                spaceId,
+                conversationId,
+                input.nativeSessionId,
+                input.nativeSessionVersion,
+                input.deviceId,
+                input.expectedDeviceVersion,
+                input.expectedRequestRevision?.let {
+                    CollaborationSpaceRoomObservedAttempt(
+                        requireNotNull(input.expectedRequestAccountId),
+                        it,
+                    )
+                },
+                ClientVersion(input.platform, input.clientBuild),
+            )
+        val observed =
+            readReceipt
+                .execute(
+                    actor,
+                    identity.sessionId,
+                    identity.sessionVersion,
+                    client.version,
+                    original,
+                )
+                .response()
+        return NativeCollaborationSpaceRoomReceiptResponse(actor.accountId, observed)
+    }
 }

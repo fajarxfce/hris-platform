@@ -38,6 +38,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations/{conversationId}" to "get",
                 "$base/direct-conversations/{conversationId}/room" to "get",
                 "$base/direct-conversations/{conversationId}/room" to "post",
+                "$base/direct-conversations/{conversationId}/room/receipts/read" to "post",
                 "$base/legacy-conversations" to "get",
                 "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
@@ -64,7 +65,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                     .map { it.propertyNames().toSet() }
                     .toSet(),
             )
-            if (path.endsWith("/legacy-runtime/publication")) {
+            if (path.endsWith("/legacy-runtime/publication") || path.endsWith("/receipts/read")) {
                 assertFalse(operation.path("x-hris-idempotency-key").asBoolean())
                 assertTrue(
                     operation["parameters"].iterator().asSequence().none {
@@ -100,6 +101,47 @@ class ApiContractHttpTest : PeopleApiFixture() {
             schemas["CollaborationLegacyPublication"]["properties"].propertyNames().toSet(),
         )
         val roomRequest = schemas["RequestCollaborationSpaceRoomRequest"]
+        val originalReceipt = schemas["ReadCollaborationSpaceRoomReceiptRequest"]
+        assertEquals(
+            setOf(
+                "operationId",
+                "nativeSessionId",
+                "nativeSessionVersion",
+                "deviceId",
+                "expectedDeviceVersion",
+                "platform",
+                "clientBuild",
+            ),
+            originalReceipt["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(
+            999999L,
+            originalReceipt["properties"]["nativeSessionVersion"]["maximum"].asLong(),
+        )
+        assertEquals(
+            setOf("accountId", "original", "receipt"),
+            schemas["NativeCollaborationSpaceRoomReceiptResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+        assertEquals(
+            setOf(
+                "operationId",
+                "spaceId",
+                "conversationId",
+                "nativeSessionId",
+                "nativeSessionVersion",
+                "deviceId",
+                "expectedDeviceVersion",
+                "expectedRequestRevision",
+                "expectedRequestAccountId",
+                "platform",
+                "clientBuild",
+            ),
+            schemas["OriginalCollaborationSpaceRoomOperationResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
         assertEquals(
             setOf(
                 "deviceId",

@@ -1899,6 +1899,32 @@ class CollaborationConfiguration {
     ) = ClaimCollaborationSpaceRooms(rooms, policy, provider)
 
     @Bean
+    fun readNativeCollaborationSpaceRoomReceipt(
+        operations: OperationRepository,
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReadNativeCollaborationSpaceRoomReceipt(
+            operations,
+            rooms,
+            conversations,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
     fun settleCollaborationSpaceRoomFailure(
         rooms: CollaborationSpaceRoomRepository,
         identities: IdentityRepository,

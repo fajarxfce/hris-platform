@@ -1,6 +1,35 @@
 # Agent continuation — HRIS workspace
 
-## Current original room receipt acquisition — 7 November 2026
+## Current native receipt endpoint — 7 November 2026
+
+The native original-room receipt POST and shared DI are accepted. Session24490/http-2
+passed504.080s on8,619 stable inputs:238 cases, zero failures/errors and one existing
+ReportExportElapsedRetentionTest skip. Actual API and FULL worker contexts passed,
+as did format/architecture. Prior52094/http-1 had93/94 passing; one missing-bearer POST
+expected401 incorrectly, corrected to the existing403 without changing security.
+[Contract and evidence](collaboration/native-room-receipt-recovery.md). Seven Kotlin
+files add bounded input/exact output, current admission, private actor receipts,
+replacement-parent/new-build recovery and actual HTTP/OpenAPI/disabled-state tests.
+No provider/queue mutation, migration, rollout or new APK. All Group sessions reaped.
+
+ONLY heavy local job is Mobile receipt transport focused-1; read its .work result and
+handoff before starting another build. Eleven Mobile source/test files are frozen.
+Group original descriptor readerf7268950 remains accepted. Before durable live sends,
+resolve initial proof capture: native tokens do not expose their version, and auth
+refresh can change the version used by the first POST. Characterize actual refresh/
+write and introduce a stable versioned intent or authoritative retained descriptor;
+do not guess versions, spoof old headers or rewrite original fingerprints. Missing
+receipt remains uncertain and cannot authorize a replacement without explicit fencing.
+Then owning original-message delivery/history, parent recovery, product routing and
+all54 PRD groups. V117-137 remain disabled; live services and phone53 are unchanged.
+
+Mobile original72a native42358423298 passed both ABIs509/82, immutableSDK4 and offline
+held-original proof. Its control42358423232 FAILED the old app-test fake, already fixed
+in e8fc7844. All original artifacts/failure evidence are committed in Mobile777d6215.
+e8fc first control42360096500/native42360096584 are IN_PROGRESS. Latest bounded phone
+reconnect10:10-10:11UTC timed out; no new phone evidence or UI interaction.
+
+## Prior original room receipt acquisition — 7 November 2026
 
 Six Kotlin files implement internal original receipt acquisition and its unchanged
 writer fingerprint policy. Gate53824 passed175 fresh domain/database cases in197.492s,

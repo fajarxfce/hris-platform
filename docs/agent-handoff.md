@@ -6,58 +6,58 @@ Do not repeat accepted releases, SDK publication or native sends just for eviden
 
 ## Current Mobile room recovery — 7 November 2026
 
-Mobile durable fence source fc0034ed is accepted and pushed to recovery. Six Kotlin
-files retain exact Room-only non-execution evidence, unchanged request/key/v1 legacy
-outcomes, schema2 only for Fenced, and terminal CAS without archive/successor permission.
-Focused99362 passed65 cases/217.124s; full22532 passed3,697 fresh cases/455 suites/
-513.19s on4,398 unchanged inputs, zero failures/errors/skips/lint. The audit caught a
-Browser policy filter selecting zero tests; supplemental82617 explicitly passed all6
-missing cases/26.512s on identical source. Original successful reports are retained.
-Actual Desktop/Browser each ran21 command-storage,3 Open-storage,8 fence-transport and
-6 policy cases. Root/Android host/quality/shared Wasm passed. All storage jobs reaped.
-[Mobile contract](https://github.com/fajarxfce/hris-mobile/blob/fc0034ed/docs/collaboration-space-room-fence-storage.md).
+Mobile owning resolution0d10c395fb0c637d27344d037d63961a1af9bd80 is accepted and pushed
+to recovery and primary. Nine source/test files retain original intent/attempts,
+read terminal facts locally, mark normalized durable state before one finite native
+resolution and capture observed results within2s of cancellation. Global denial stays
+gated; a peer denial does not close other contacts. Focused21909 passed91/219.787s;
+full28463 passed3,755 fresh cases/460 suites/525.629s on4,405 unchanged inputs, zero
+failures/errors/skips/lint. Root/Android host/quality/shared Wasm and64 explicitly
+verified Browser cases passed. Actual22 domain/4 SQLite and IndexedDB cases passed.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/0d10c395/docs/collaboration-space-room-request-resolution.md).
+Earlier durable Fenced sourcefc0034ed passed65 focused/3,697 full and6 supplemental
+Browser policy cases after audit caught a filter selecting zero. Exact old requests,
+keys and schema1 outcomes remain; only new fences use outcome schema2. All old jobs reaped.
 
-NINE next Mobile owning-resolution source/test files are applied/FROZEN and NOT accepted.
-Only heavy job21909 runs `.work/space-room-request-resolution-2026-11-07/focused-1`:
-91 expected cases with actual DI, then required full root/Android/64 actual selected
-Browser cases/shared Wasm. It reads terminal facts locally, marks the same send-attempt
-count before one finite current-native original fence call, reads normalized stored
-marks for exact CAS, and captures observed evidence with a2s cancellation budget.
-It retains global denial without closing all contacts for a peer denial. No old-device
-login, successor/archive/SDK action, product caller or new APK. Do not edit frozen
-inputs or overlap another compiler/emulator; inspect/reap21909 before dependent work.
+ELEVEN atomic Room handoff source/test files are applied/FROZEN and NOT accepted.
+Sole heavy job40440 runs Mobile `.work/space-room-successor-2026-11-07/focused-1`
+(102 expected cases), then required full root/Android host/release lint/75 explicitly
+selected Browser cases/shared Wasm. It uses existing raw archiveAndInsert to retain
+exact original ciphertext and authenticated forward/back links, with one replacement.
+Nine new real-storage cases/two policy cases and explicit repository fakes are included.
+Do not edit frozen source or overlap another compiler/emulator; reap40440 first.
+No owning successor preparation, SDK action, product routing or new APK exists yet.
+[Design](https://github.com/fajarxfce/hris-mobile/blob/0d10c395/docs/collaboration-space-room-successor-plan.md).
+Mobile current recovery checkpoint2d6d2fb3 records this active job.
 
-Group native dcdaf220 and HTTP cf885a1c are accepted/pushed. Native focused195 cases/
-319.052s and API/FULL worker241/540.839s pass with one existing opt-in retention skip;
-8,635 stable inputs. Corrected HTTP42852 passes99/202.31s on8,637 stable inputs, zero
-failures/errors/skips/quality. First57183's incorrect fixture expectation is retained:
-missing provider identities reject the writer with peer_unavailable before device
-admission. No production policy weakening. All Group jobs are reaped. V117–138 unshipped.
-[Server contract](https://github.com/fajarxfce/hris-platform/blob/cf885a1c/docs/collaboration/native-room-request-fence-http.md).
+First0d10 control42383612502/native42383612567 are PENDING behind firstfe
+control42380244144/native42380243983, which both run. Preserve both new first runs
+before another primary promotion. First Open source31e control42376025279/native
+42376025306 are fully audited SUCCESS: Apple2,056/232, portable4,979/550, each native
+543/86, zero failures/errors/skips. Actual25 Open/3 storage cases per Apple/Desktop/
+Browser, SDK4 hashes/keys/IDs/cleanup and original queue20.779s x86/74.454s ARM verified.
+Original queue sends zero; separate six HRIS scenarios retain exact[1,3,3,176,176,176]
+sends and accepted cleanup. No provider reruns. Prior1d/3b3/79/fb/e8 first CI remains
+accepted. Older source CI does not replace first fence/owning-resolution source CI.
 
-Mobile primary remains fe3992f1426712bf23964bf5aea68ad382f1b624. First control42380244144/
-native42380243983 remain PENDING behind first31e control42376025279/native42376025306,
-which are running. Preserve both first fe runs before promoting another primary head.
-First1d9493df control42372520573/native42372520624 are fully audited SUCCESS in2c4aec75:
-Apple2,028/230, portable4,923/546, each native543/86, exactSDK4 hashes/keys/IDs/cleanup
-and14 metadata/13 preparation cases verified. Prior3b3/79/fb/e8 runs remain accepted.
-Do not rerun provider scenarios merely to audit artifacts. Starterb11437a unchanged.
+Group checkpoint2a841ce3 retains accepted native dcdaf220/HTTP cf885a1c and V138
+storagec6937843. Native focused195/319.052s, API/FULL worker241/540.839s pass with one
+existing opt-in skip. Corrected HTTP99/202.31s on8,637 stable inputs passes; initial
+wrong fixture expectation is retained. All Group jobs are reaped. V117–138 unshipped.
+Starterb11437a remains unchanged. Live API2e75fe1e/worker10485916/schema116.1 unchanged.
 
-Fresh read-only Bima audit14:00UTC confirms1 active device/provider binding,1 device
-key,50 signed one-time keys and1 fallback. Follow-up14:04UTC confirms1 currently
-eligible publication-confirmed receiving device despite expired interactive access,
-with a live hard parent. [Evidence](measurements/collaboration-bima-recipient-keys-2026-11-07.json).
-Earlier matched phone52 logs show original Bima room HTTP200 and4 HTTP403 on another
-owned room with no recipient device. [Matched logs](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
-Bima need not remain online for sender server acceptance, but neither finding proves
-or fixes phone53's20s–2min delay. No new phone logs since11:41UTC ADB timeout; no repeated
-feedback question or phone UI driving. Preserve original stores/keys/transaction IDs.
-Any later validated install remains announced, explicit serial and install-only.
+Phone53 latency remains OPEN; no new APK, logs after11:41UTC ADB timeout, UI driving
+or repeated question. Preserve original stores/keys/message IDs. Fresh14:00/14:04
+read-only Bima audits confirm published keys and one eligible confirmed device despite
+expired interactive access. Earlier exact room matching shows BimaHTTP200 and4 HTTP403
+for another owned room with no recipient device. These do not prove or fix physical
+20s–2min pending. [Bima evidence](measurements/collaboration-bima-recipient-keys-2026-11-07.json),
+[matched logs](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
+Any later validated install is announced, explicit serial and install-only.
 
-Next validate owning resolution, then atomic exact original/successor linkage, Room
-projection/recovery, original SDK delivery/history, native-parent recovery, product
-routing and all54 groups (3 in progress/51 planned/none complete). Live API2e75fe1e,
-worker10485916 and schema116.1 remain. Sections below are historical checkpoints.
+After atomic storage, continue admitted Room preparation/dispatch/projection, original
+SDK delivery/history, native-parent recovery, product routing and all54 groups
+(3 in progress/51 planned/none complete). Sections below are historical checkpoints.
 
 ## Latest mobile command continuation — 7 November 2026
 

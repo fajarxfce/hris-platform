@@ -30,6 +30,7 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
         val n = native()
         val root = "/api/v1/collaboration/spaces"
         val base = "$root/${UUID.randomUUID()}"
+        val fenceOperation = UUID.randomUUID()
         val paths =
             listOf(
                 "$root/current" to null,
@@ -39,6 +40,8 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
                 "$base/direct-conversations" to "{\"peerAccountId\":\"${UUID.randomUUID()}\"}",
                 "$base/direct-conversations/${UUID.randomUUID()}/room/requests" to
                     """{"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
+                "$base/direct-conversations/${UUID.randomUUID()}/room/requests/fence" to
+                    """{"operationId":"$fenceOperation","deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
                 "$base/direct-conversations/${UUID.randomUUID()}/room/requests/receipts/read" to
                     """{"operationId":"${UUID.randomUUID()}","deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0}""",
                 "$base/direct-conversations/${UUID.randomUUID()}/room/receipts/read" to
@@ -73,7 +76,12 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
             else
                 request
                     .header("Content-Type", "application/json")
-                    .header("Idempotency-Key", UUID.randomUUID().toString())
+                    .header(
+                        "Idempotency-Key",
+                        (if (path.endsWith("/requests/fence")) fenceOperation
+                            else UUID.randomUUID())
+                            .toString(),
+                    )
                     .POST(java.net.http.HttpRequest.BodyPublishers.ofString(body))
             failure(
                 n.fixture.browser.send(

@@ -2,8 +2,8 @@
 
 Status: [V138 storage and database exclusion](room-request-fence-storage.md) are now
 locally validated. [Owning native admission and repository mapping](native-room-request-fence.md)
-are also accepted locally, including shared API/FULL worker contexts. No fence HTTP
-endpoint, live migration or replacement authority is activated. The remaining integration follows this design. The accepted
+are also accepted locally, including shared API/FULL worker contexts. [Typed HTTP resolution](native-room-request-fence-http.md) is now locally validated.
+No live migration or Mobile replacement authority is activated. The remaining integration follows this design. The accepted
 stable request/receipt contract remains [separate](native-room-stable-intent.md).
 
 ## Problem and result

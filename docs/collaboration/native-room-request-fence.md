@@ -47,7 +47,7 @@ The mapper cases include technical cancellation/interruption and corrupt records
 The existing native API, disabled API, OpenAPI and FULL worker gate passed 241
 cases in 540.839 seconds on the same 8,635 unchanged inputs, with zero failures
 or errors and one existing opt-in elapsed-retention skip. Formatting and architecture
-passed again. [Exact sources and reports](../measurements/collaboration-room-request-fence-native-2026-11-07.json). HTTP transport, durable Mobile evidence/successor linkage,
-room projection and product routing are separate next steps. The group feature
+passed again. [Exact sources and reports](../measurements/collaboration-room-request-fence-native-2026-11-07.json). [Native HTTP transport](native-room-request-fence-http.md) is now validated. Durable
+Mobile evidence/successor linkage, room projection and product routing remain next. The group feature
 remains disabled and schema 138 is not deployed; live schema is 116.1. Physical-phone
 send latency remains unresolved. Original SDK keys and message IDs are unchanged.

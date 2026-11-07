@@ -1,0 +1,106 @@
+{
+  "scope": "Native original-room request resolution endpoint, exact response contract and current-session recovery; no rollout or Mobile successor",
+  "parentCommit": "dcdaf220984898d96f2f85a33c26e00a572633b2",
+  "sources": {
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationSpaceRoomController.kt": "d37910d25be5f6e68f2e1fcf201ef1837ee5c2a090e55aae48091cd9a7114c7d",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/FenceCollaborationSpaceRoomRequest.kt": "cf0160420d744209c08318b762e6eaccac6c17d7bf5bdc462ce95dd22c62a88e",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/responses/NativeCollaborationSpaceRoomRequestResolutionResponse.kt": "cecd7b5b5c440d2053dc0f9fdea31bbbc1cc5f9bbe2f2cb7aaee49b92eade20a",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt": "a18563f44c807e0cbaf39a5f545ff0bd2d62ab06235e4829582aef74c5ac1bb1",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceDisabledConfigurationTest.kt": "ce14c1feed0e542dbcb72e0a982c84af6d108754631d7b8cc16f5dda193f339c",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ApiContractHttpTest.kt": "320908ddfafce59cf1b6ae2b1001da0edf733c5834ce971bf3e6f2125e13d3ca"
+  },
+  "runs": {
+    "http-1": {
+      "startedAt": "2026-11-07T13:45:38.492236+00:00",
+      "elapsedSeconds": 179.991,
+      "exitCode": 1,
+      "sourceFiles": 8637,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 99,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+          "sha256": "d8f8eb54e0a0c5a0cfce9ae7aa0f31ee032bacee11c5ca69d7ec8d54e37660de",
+          "tests": 27,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceDisabledConfigurationTest.xml": {
+          "sha256": "5aaa0a155288ccb7c01e9304a61f7d16c86c405c1221dea22c36c5c6b592b3af",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.ApiContractHttpTest.xml": {
+          "sha256": "daa676bd914fb7666a079114da012e16f206d5adce6262025a9e2ea8c2261a65",
+          "tests": 70,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "sourceManifestSha256": "7bcf6c9df7ff3cb24bfc394ee447b67b47efe050d1c14b3d69e43668b1d80801",
+      "resultSha256": "59e9b576aeaeabc49e6008e254642adaf73e256341949e8d0f21ab0f7a328042",
+      "stdoutSha256": "24d4d3d05d227030a492406ce52b6237930dfa038bf08bfccfb840f84495279b",
+      "stderrSha256": "a3020ee0b1485097eda88743e749bc59dabea6815a626e703ebeb1d9f6477392"
+    },
+    "http-2": {
+      "startedAt": "2026-11-07T13:49:54.625706+00:00",
+      "elapsedSeconds": 202.31,
+      "exitCode": 0,
+      "sourceFiles": 8637,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 99,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.ApiContractHttpTest.xml": {
+          "sha256": "698bc90b745db057cc870dc5f7f207a435b714b050a61b6bad1eb63e8b3195d6",
+          "tests": 70,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceDisabledConfigurationTest.xml": {
+          "sha256": "a7ad6b7bf9f341457fc9fbc706704768844466465a3a77d935e5ef59d18c0424",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+          "sha256": "bd3a6205e4e2cbbe0ece8ab6602cdfa361daf13acae76bb55467619badaa069c",
+          "tests": 27,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "sourceManifestSha256": "5c5d5cf3a9920dd1a40d3be016021761f579a81d725b22e73d4d605df5c5e7d8",
+      "resultSha256": "157f4afcdfde711be55a8a2d816236ee90a3d89faa39cfc8ddae2646563b8dd2",
+      "stdoutSha256": "d1eba52acdd61ce7deca8344b76f02ba2b7deadaf64e6eef90388529c15c2a5b",
+      "stderrSha256": "39d8379348d8979039373859622f7ad14e5b5735ed70bc8b368d199a1ee3e3b0"
+    }
+  },
+  "onlySourceChangeBetweenGates": [
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt"
+  ],
+  "priorFailure": "One HTTP fixture expected generic access denial for a writer with no selected participant provider identities; actual existing policy returns collaboration_peer_unavailable. Corrected test expectation only; production admission preserved.",
+  "validationLimits": {
+    "worker": "Shared DI unchanged by HTTP slice; dcdaf220 retains accepted FULL worker/API241-case gate",
+    "request": "Existing API request body ceiling is1MiB; this is not a new4KiB server request cap. Fixed response fields are measured below4KiB.",
+    "client": "Eleven Mobile candidates remain unapplied/untested; no durable successor or product route yet",
+    "live": "V117-138 unshipped, live116.1 and phone53 unchanged; physical latency open"
+  }
+}

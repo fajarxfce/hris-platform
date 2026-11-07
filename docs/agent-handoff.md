@@ -28,17 +28,18 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
 
 ## Next work
 
-1. SIX Group HTTP candidates are prepared under `.work/room-request-fence-http-2026-11-07`.
-   They are NOT applied/tested. Verify baseline hashes before applying; add the typed
-   `/room/requests/fence` route with original `Idempotency-Key` and exact full echo.
-   The candidates already include real HTTP refresh/replacement/purge, Recorded/Fenced,
-   current denial, input bounds, no-store/OpenAPI/default-disabled tests. Run its
-   `check.py http-1` after formatting. Shared module DI is unchanged by this next slice;
-   retain this completed FULL worker evidence and validate API contexts again.
-2. ELEVEN Mobile transport/domain/test candidates are isolated under Mobile
-   `.work/space-room-request-fence-2026-11-07`; NOT applied/tested. Accept Group HTTP first,
-   verify baselines, then test typed exact evidence and original idempotency across auth
-   refresh. HTTP503 maps to Service. No durable fence storage/successor linkage exists.
+1. SIX Group HTTP files are now locally accepted. Corrected42852/http-2 passed99 cases
+   in202.31s,8,637 stable inputs, zero failures/errors/skips, format/architecture.
+   First57183/http-1 retained one fixture expectation failure (actual unselected-provider
+   rejection is peer_unavailable). No production admission change. Actual refreshed/new/
+   purged-parent resolution, exact Recorded/Fenced echo, original-key header, no-store,
+   bounds/OpenAPI/disabled graph pass. [HTTP contract](collaboration/native-room-request-fence-http.md).
+   All Group jobs are reaped; no shared module DI change after dcdaf220 FULL worker proof.
+2. ELEVEN Mobile candidates are isolated under Mobile `.work/space-room-request-fence-2026-11-07`;
+   NOT applied/tested. Verify baseline hashes, apply/format, run focused44 transport/binding
+   cases, then root/Android host/release lint,14 selected actual Browser fence/receipt
+   cases and shared Wasm via its prepared full-check.py. The candidate includes8 new Ktor
+   cases. HTTP503 maps to Service. No durable fence storage/successor linkage exists.
 3. Implement durable exact fence capture before atomic original/successor linkage.
    A null receipt, timeout, denial or changed native parent never authorizes replacement.
    Continue Room projection/recovery, original SDK delivery/history, native-parent
@@ -48,7 +49,7 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
 
 ## Other repositories and CI
 
-Mobile recovery `feat/chat-recovery-20261107` is c119792e; primary
+Mobile recovery `feat/chat-recovery-20261107` is59ff2109; primary
 `feat/communications` is31e618cc89e2ca0cce38bcb62ccd95b8533c88c0, including Open335e3914.
 Its full local gate passed3,669 fresh cases/452 suites505.461s,4,393 stable inputs,
 zero failures/errors/skips/lint. Original Open uses normalized persisted marks for
@@ -61,7 +62,7 @@ Apple and both Android jobs were still running. Preserve both first31e runs befo
 another primary promotion. Recovery branch work can continue. First3b3 control/native
 are fully audited SUCCESS: Apple2,001/228, portable4,869/542 and each native543/86,
 SDK4 keys/IDs and cleanup verified. Do not rerun providers merely to audit artifacts.
-Starterb11437a is unchanged; no HRIS policy port. Main checkpoint2a1e4a0b is docs only.
+Starterb11437a is unchanged; no HRIS policy port. Main checkpointe5793ca5 is docs only.
 
 ## Runtime, phone and original data
 

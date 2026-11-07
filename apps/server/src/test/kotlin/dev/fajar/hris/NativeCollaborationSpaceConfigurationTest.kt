@@ -627,6 +627,24 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
         assertTrue(json.readTree(absent.body())["receipt"].isNull)
         val written = groupCall(rotated, write, input, operation = operation, cookies = false)
         assertEquals(200, written.statusCode(), written.body())
+        val stoppedOperation = UUID.randomUUID()
+        val stoppedOriginal = input + mapOf("operationId" to stoppedOperation.toString())
+        val stopped =
+            groupCall(
+                rotated,
+                "$write/fence",
+                stoppedOriginal,
+                operation = stoppedOperation,
+                cookies = false,
+            )
+        assertEquals(200, stopped.statusCode(), stopped.body())
+        assertEquals("FENCED", json.readTree(stopped.body())["state"].asString())
+        failure(
+            groupCall(rotated, write, input, operation = stoppedOperation, cookies = false),
+            409,
+            "collaboration_room_request_fenced",
+        )
+
         val upgraded =
             groupCall(rotated, write, input, operation = operation, build = "29", cookies = false)
         assertEquals(200, upgraded.statusCode(), upgraded.body())
@@ -690,6 +708,38 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             groupCall(replacement, read, original, operation = null, build = "29", cookies = false)
         assertEquals(200, recovered.statusCode(), recovered.body())
         assertEquals(receipt, json.readTree(recovered.body()))
+        val resolved =
+            groupCall(
+                replacement,
+                "$write/fence",
+                original,
+                operation = operation,
+                build = "29",
+                cookies = false,
+            )
+        assertEquals(200, resolved.statusCode(), resolved.body())
+        assertEquals("no-store", resolved.headers().firstValue("Cache-Control").orElse(""))
+        val resolution = json.readTree(resolved.body())
+        assertEquals(
+            setOf("accountId", "original", "state", "receipt", "fence"),
+            resolution.propertyNames().toSet(),
+        )
+        assertEquals("RECORDED", resolution["state"].asString())
+        assertEquals(receipt["accountId"], resolution["accountId"])
+        assertEquals(receipt["original"], resolution["original"])
+        assertEquals(receipt["receipt"], resolution["receipt"])
+        assertTrue(resolution["fence"].isNull)
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_request_fences where account_id=? and operation_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                    operation,
+                ),
+        )
+
         assertEquals(
             1,
             database()
@@ -2149,6 +2199,283 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             413,
             groupCall(a, path, input + mapOf("unused" to "x".repeat(1_048_577)), operation = null)
                 .statusCode(),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.space_room_setup.v2'",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
+                ),
+        )
+    }
+
+    @Test
+    fun nativeFenceIsExactPrivateEvidenceAcrossRefreshAndOriginalParentPurge() {
+        val (a, refreshToken) = exchangeRoomNative(groupNative())
+        val b = groupNative()
+        val outsider = groupNative()
+        val base = groupBase(a)
+        val opened =
+            groupCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = json.readTree(opened.body())["id"].asString()
+        val room = "$base/direct-conversations/$conversation/room/requests"
+        val path = "$room/fence"
+        val operation = UUID.randomUUID()
+        val original =
+            mapOf(
+                "operationId" to operation.toString(),
+                "deviceId" to UUID.randomUUID().toString(),
+                "expectedDeviceVersion" to 0,
+                "expectedRequestAccountId" to b.fixture.account.toString(),
+                "expectedRequestRevision" to 0,
+            )
+        val first = groupCall(a, path, original, operation = operation, cookies = false)
+        assertEquals(200, first.statusCode(), first.body())
+        assertEquals("no-store", first.headers().firstValue("Cache-Control").orElse(""))
+        assertTrue(first.body().toByteArray().size < 4096)
+        val evidence = json.readTree(first.body())
+        assertEquals(
+            setOf("accountId", "original", "state", "receipt", "fence"),
+            evidence.propertyNames().toSet(),
+        )
+        assertEquals(a.fixture.account.toString(), evidence["accountId"].asString())
+        assertEquals("FENCED", evidence["state"].asString())
+        assertTrue(evidence["receipt"].isNull)
+        assertEquals(setOf("id", "createdAt"), evidence["fence"].propertyNames().toSet())
+        assertNotEquals(UUID(0, 0), UUID.fromString(evidence["fence"]["id"].asString()))
+        assertEquals(0, Instant.parse(evidence["fence"]["createdAt"].asString()).nano % 1000)
+        assertEquals(
+            json.readTree(
+                json.writeValueAsString(
+                    original +
+                        mapOf(
+                            "spaceId" to base.substringAfterLast('/'),
+                            "conversationId" to conversation,
+                        )
+                )
+            ),
+            evidence["original"],
+        )
+        val replay = groupCall(a, path, original, operation = operation, cookies = false)
+        assertEquals(200, replay.statusCode(), replay.body())
+        assertEquals(evidence, json.readTree(replay.body()))
+        // Neither participant selected a provider identity; fencing grants no room authority.
+        failure(
+            groupCall(a, room, original - "operationId", operation = operation),
+            403,
+            "collaboration_peer_unavailable",
+        )
+        failure(
+            groupCall(outsider, path, original, operation = operation),
+            404,
+            "collaboration_conversation_not_found",
+        )
+        val (rotated, _) = refreshRoomNative(a, refreshToken)
+        val refreshed =
+            groupCall(rotated, path, original, operation = operation, build = "29", cookies = false)
+        assertEquals(200, refreshed.statusCode(), refreshed.body())
+        assertEquals(evidence, json.readTree(refreshed.body()))
+        val (replacement, _) = exchangeRoomNative(rotated)
+        database().update("update native_sessions set revoked_at=now() where id=?", a.session)
+        assertEquals(1, database().update("delete from native_sessions where id=?", a.session))
+        val recovered =
+            groupCall(
+                replacement,
+                path,
+                original,
+                operation = operation,
+                build = "29",
+                cookies = false,
+            )
+        assertEquals(200, recovered.statusCode(), recovered.body())
+        assertEquals(evidence, json.readTree(recovered.body()))
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_devices where account_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_request_fences where account_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_request_fences where account_id=?",
+                    Int::class.java,
+                    outsider.fixture.account,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=? and operation='collaboration.space_room_setup.v2'",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
+                ),
+        )
+        val changed = original + mapOf("expectedDeviceVersion" to 1)
+        failure(
+            groupCall(replacement, path, changed, operation = operation),
+            409,
+            "operation_payload_mismatch",
+        )
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        failure(
+            groupCall(replacement, path, changed, operation = operation),
+            403,
+            "collaboration_peer_unavailable",
+        )
+        failure(
+            groupCall(replacement, path, original, operation = operation),
+            403,
+            "collaboration_peer_unavailable",
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_request_fences where account_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+    }
+
+    @Test
+    fun nativeFenceRequiresMatchingOriginalHeaderCompleteBoundsAndCurrentNativeTransport() {
+        val a = groupNative()
+        val b = groupNative()
+        val base = groupBase(a)
+        val opened =
+            groupCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = json.readTree(opened.body())["id"].asString()
+        val path = "$base/direct-conversations/$conversation/room/requests/fence"
+        val operation = UUID.randomUUID()
+        val original =
+            mapOf(
+                "operationId" to operation.toString(),
+                "deviceId" to UUID.randomUUID().toString(),
+                "expectedDeviceVersion" to 0,
+            )
+        assertEquals(400, groupCall(a, path, original, operation = null).statusCode())
+        for (missing in listOf("operationId", "deviceId", "expectedDeviceVersion")) {
+            assertEquals(
+                400,
+                groupCall(a, path, original - missing, operation = operation).statusCode(),
+            )
+        }
+        assertEquals(
+            400,
+            groupCall(a, path, original + mapOf("operationId" to "bad"), operation = operation)
+                .statusCode(),
+        )
+        failure(
+            groupCall(a, path, original, operation = UUID.randomUUID()),
+            422,
+            "invalid_collaboration_room_operation",
+        )
+        for (invalid in
+            listOf(
+                original + mapOf("deviceId" to UUID(0, 0).toString()),
+                original + mapOf("expectedDeviceVersion" to -1),
+                original + mapOf("expectedDeviceVersion" to 1_000_000),
+                original + mapOf("expectedRequestRevision" to 0),
+                original + mapOf("expectedRequestAccountId" to b.fixture.account.toString()),
+                original +
+                    mapOf(
+                        "expectedRequestAccountId" to b.fixture.account.toString(),
+                        "expectedRequestRevision" to 1_000_000,
+                    ),
+                original +
+                    mapOf(
+                        "expectedRequestAccountId" to UUID.randomUUID().toString(),
+                        "expectedRequestRevision" to 0,
+                    ),
+            )) {
+            failure(
+                groupCall(a, path, invalid, operation = operation),
+                422,
+                "invalid_collaboration_room_operation",
+            )
+        }
+        assertEquals(
+            403,
+            groupCall(a, path, original, operation = operation, token = null, cookies = false)
+                .statusCode(),
+        )
+        assertEquals(
+            403,
+            groupCall(a, path, original, operation = operation, token = null).statusCode(),
+        )
+        failure(
+            groupCall(a, path, original, operation = operation, build = "27"),
+            403,
+            "client_update_required",
+        )
+        assertEquals(
+            413,
+            groupCall(
+                    a,
+                    path,
+                    original + mapOf("unused" to "x".repeat(1_048_577)),
+                    operation = operation,
+                )
+                .statusCode(),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_request_fences where account_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
         )
         assertEquals(
             0,

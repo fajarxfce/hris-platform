@@ -41,6 +41,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations/{conversationId}/room/receipts/read" to "post",
                 "$base/direct-conversations/{conversationId}/room/requests" to "post",
                 "$base/direct-conversations/{conversationId}/room/requests/receipts/read" to "post",
+                "$base/direct-conversations/{conversationId}/room/requests/fence" to "post",
                 "$base/legacy-conversations" to "get",
                 "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
@@ -105,6 +106,37 @@ class ApiContractHttpTest : PeopleApiFixture() {
         val roomRequest = schemas["RequestCollaborationSpaceRoomRequest"]
         val originalReceipt = schemas["ReadCollaborationSpaceRoomReceiptRequest"]
         val stableReceipt = schemas["ReadCollaborationSpaceRoomIntentReceiptRequest"]
+        val fenceRequest = schemas["FenceCollaborationSpaceRoomRequest"]
+        assertEquals(
+            setOf("operationId", "deviceId", "expectedDeviceVersion"),
+            fenceRequest["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(
+            999999L,
+            fenceRequest["properties"]["expectedDeviceVersion"]["maximum"].asLong(),
+        )
+        assertEquals(
+            setOf("accountId", "original", "state", "receipt", "fence"),
+            schemas["NativeCollaborationSpaceRoomRequestResolutionResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+        assertEquals(
+            setOf("RECORDED", "FENCED"),
+            schemas["NativeCollaborationSpaceRoomRequestResolutionResponse"]["properties"]["state"][
+                    "enum"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("id", "createdAt"),
+            schemas["CollaborationSpaceRoomRequestFenceResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+
         assertEquals(
             setOf("operationId", "deviceId", "expectedDeviceVersion"),
             stableReceipt["required"].iterator().asSequence().map { it.asString() }.toSet(),

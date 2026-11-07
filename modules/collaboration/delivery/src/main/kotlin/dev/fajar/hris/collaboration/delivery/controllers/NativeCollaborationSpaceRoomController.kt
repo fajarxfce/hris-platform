@@ -2,16 +2,19 @@ package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.administration.domain.entities.ClientVersion
+import dev.fajar.hris.collaboration.delivery.requests.FenceCollaborationSpaceRoomRequest
 import dev.fajar.hris.collaboration.delivery.requests.ReadCollaborationSpaceRoomIntentReceiptRequest
 import dev.fajar.hris.collaboration.delivery.requests.ReadCollaborationSpaceRoomReceiptRequest
 import dev.fajar.hris.collaboration.delivery.requests.RequestCollaborationSpaceRoomRequest
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceRoomIntentReceiptResponse
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceRoomReceiptResponse
+import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceRoomRequestResolutionResponse
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomObservedAttempt
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomOperation
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomRequestFormat
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomRequestIntent
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomView
+import dev.fajar.hris.collaboration.domain.usecases.FenceNativeCollaborationSpaceRoomRequest
 import dev.fajar.hris.collaboration.domain.usecases.ReadNativeCollaborationSpaceRoom
 import dev.fajar.hris.collaboration.domain.usecases.ReadNativeCollaborationSpaceRoomReceipt
 import dev.fajar.hris.collaboration.domain.usecases.RequestNativeCollaborationSpaceRoom
@@ -29,6 +32,7 @@ class NativeCollaborationSpaceRoomController(
     private val request: RequestNativeCollaborationSpaceRoom,
     private val status: ReadNativeCollaborationSpaceRoom,
     private val readReceipt: ReadNativeCollaborationSpaceRoomReceipt,
+    private val fenceRequest: FenceNativeCollaborationSpaceRoomRequest,
 ) {
     @PostMapping(consumes = ["application/json"])
     fun request(
@@ -84,6 +88,51 @@ class NativeCollaborationSpaceRoomController(
             )
             .response()
             .toResponse()
+
+    @PostMapping("/requests/fence", consumes = ["application/json"])
+    fun fenceIntent(
+        actor: Actor,
+        @AuthenticationPrincipal identity: NativeIdentity,
+        client: ClientRequest,
+        @PathVariable spaceId: UUID,
+        @PathVariable conversationId: UUID,
+        @RequestHeader("Idempotency-Key") operation: UUID,
+        @RequestBody input: FenceCollaborationSpaceRoomRequest,
+    ): NativeCollaborationSpaceRoomRequestResolutionResponse {
+        if (
+            operation != input.operationId ||
+                (input.expectedRequestRevision == null) != (input.expectedRequestAccountId == null)
+        )
+            return Result.Failed(
+                    Failure(FailureKind.VALIDATION, "invalid_collaboration_room_operation")
+                )
+                .response()
+        val original =
+            CollaborationSpaceRoomRequestIntent(
+                input.operationId,
+                spaceId,
+                conversationId,
+                input.deviceId,
+                input.expectedDeviceVersion,
+                input.expectedRequestRevision?.let {
+                    CollaborationSpaceRoomObservedAttempt(
+                        requireNotNull(input.expectedRequestAccountId),
+                        it,
+                    )
+                },
+            )
+        val resolution =
+            fenceRequest
+                .execute(
+                    actor,
+                    identity.sessionId,
+                    identity.sessionVersion,
+                    client.version,
+                    original,
+                )
+                .response()
+        return NativeCollaborationSpaceRoomRequestResolutionResponse(resolution)
+    }
 
     @PostMapping("/requests/receipts/read", consumes = ["application/json"])
     fun readIntentReceipt(

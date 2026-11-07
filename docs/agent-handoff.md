@@ -4,30 +4,38 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current owning conversation command continuation — 7 November 2026
+## Current canonical conversation continuation — 7 November 2026
 
-Mobilec8c952af is accepted/pushed on recovery: encrypted open/stable-room commands,
-exact CAS/archives and key custody, real SQLite/IndexedDB tests. Full18016 passed3,598
-fresh cases/447 suites813.971s on4,369 unchanged inputs, zero failures/errors/skips/
-lint issues, root/Android host/Browser/quality/shared Wasm. All storage jobs reaped.
-[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/c8c952af/docs/collaboration-space-conversation-commands.md).
+Mobile3b3a5d81 is accepted/pushed to recovery and primary: local command observation
+under account/login/API ownership. Full49430 passed3,593 fresh cases/447 suites466.030s
+on4,371 unchanged inputs, zero failures/errors/skips/lint. Actual Browser observation,
+root/Android host/quality/shared Wasm and application bindings passed; all jobs reaped.
+[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/3b3a5d81/docs/collaboration-space-conversation-observation.md).
+Prior durable storagec8c952af passed3,598 cases/447 suites813.971s, SQLite/IndexedDB.
 
-Sole heavy local job73246 is Mobile owning command observation/focused-1: FOUR files
-applied/FROZEN, seven ownership/lifetime cases plus actual factory/application DI
-resolution. Not accepted yet. Follow Mobile's current handoff before any build;
-next required root/Android/lint/Browser/shared Wasm gate is already prepared.
-After acceptance, owning prepare/replay, canonical local projection and explicit
-[server fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md),
-then original SDK delivery/history, native-parent recovery, product routing/all54.
+Sole heavy local job15306 is Mobile canonical conversation metadata/focused-1.
+TEN Kotlin files are applied/FROZEN, not yet accepted: native-parent-free immutable
+facts, atomic conversation/peer indexes, keyed lookup tokens and existing guarded
+history-key namespace. Fourteen real database cases plus application DI are running.
+See Mobile's current handoff before any build/emulator. No product caller or new APK.
+Next finish its full root/Android/lint/Browser gate, then owning prepare/replay,
+projection-before-archive, explicit server fence, original SDK delivery/history,
+native-parent recovery, product routing/all54 (3 in progress,51 planned,none complete).
+[Server fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md).
 
-First fb native42363807289 is SUCCESS/audited: each ABI537/85, immutableSDK4 and
-artifact digests verified; original queue continuity24.827s x86/80.993s ARM with zero
-provider sends, preserved keys/IDs and cleanup. Mobileac8ac15d retains public evidence.
-fb control42363807332 remains running; first79b native42366357400 has started while
-control42366357406 remains pending. Preserve that first pending run before promotion.
-Phone53 latency remains OPEN, latest10s ADB retry timed out by11:09UTC. No new APK,
-phone UI, SDK publication, migration or live deployment. V117–137 stay disabled and
-original Bima data/keys/message IDs remain. This section supersedes older job states.
+First3b3 control42369792173/native42369792184 are PENDING behind running79b
+control42366357406/native42366357400. Preserve first pending runs before another
+primary promotion. Recovery code work may continue. First fb control/native are both
+SUCCESS and fully audited: portable4,805/534, Apple1,969/224, each ABI537/85, zero
+failures/errors/skips, immutableSDK4 and original digests retained. No provider reruns.
+
+Phone53 latency remains OPEN: last bounded ADB retry11:41UTC timed out, no new logs,
+APK or phone UI driving. Bima has published device/one-time/fallback keys and need not
+remain online for sender server acceptance. Current evidence does not explain or
+resolve the phone's20s–2min delay. Keep existing optional feedback pending; no repeat.
+LiveAPI2e75fe1e/worker10485916/schema116.1 remain unchanged; V117–137 stay disabled.
+Original Bima data/sidecars/keys/message IDs, SDK4 and Starterb11437a remain unchanged.
+This section supersedes older job states retained below as history.
 
 ## Latest mobile command continuation — 7 November 2026
 

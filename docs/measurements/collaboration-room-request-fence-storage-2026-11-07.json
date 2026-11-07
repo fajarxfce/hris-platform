@@ -1,0 +1,138 @@
+{
+  "scope": "V138 immutable account/original-operation room request fence storage, stable receipt exclusion, exact-lock concurrency and recovery projection; no endpoint or rollout",
+  "parentCommit": "ae71dcd61c0247a4544183bcb01cb991da62e92c",
+  "sources": {
+    "core/database/src/main/resources/db/migration/V138__collaboration_space_room_request_fences.sql": "7afcf7baf3925c52a1358975925dee48dc4e5ecca45b2ec98ce343008db5d251",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationSpaceRoomRequestFenceMigrationTest.kt": "649f6786d3eb6785277fc27d1bd3cb94ff2583128aaa71a76bc7d589032f014c",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRoomTest.kt": "cfa33b1e439fa909b6fcb0776cb5b071900b160a8617c75f9d5d2a7faad5f61d",
+    "tool/recovery_set.py": "2c9f192e8c82a851e4e4c306235cbcf332bb239a9723390ed5fa85ba1432fffe",
+    "tool/test_recovery_set.py": "2455e5d477eca96a52711754fbd1d91db019c1c999ac273d373a68c854b8703a"
+  },
+  "runs": {
+    "storage-1": {
+      "startedAt": "2026-11-07T13:06:52.326147+00:00",
+      "elapsedSeconds": 315.431,
+      "exitCode": 0,
+      "sourceFiles": 8626,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRoomTest.xml": {
+          "sha256": "8a45d5c629db7b03b92d7157eb84f6dbf0699ee1ef96074e2706e196cc624f24",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core/database/build/test-results/test/TEST-dev.fajar.hris.core.database.CollaborationSpaceRoomRequestFenceMigrationTest.xml": {
+          "sha256": "c825176b4948052c2479fc956f6aff9e6e51a91ec2bf28d91be62fbf667ede4c",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "gradleArguments": [
+        ":core:database:test",
+        "--tests",
+        "*CollaborationSpaceRoomRequestFenceMigrationTest",
+        ":modules:collaboration:data:test",
+        "--tests",
+        "*NativeCollaborationSpaceRoomTest",
+        ":formatCheck",
+        ":architectureCheck",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        "-Pkotlin.compiler.execution.strategy=in-process"
+      ],
+      "sourceManifestSha256": "74f24b8e678da34d1a27c7e07e913b2d20ccaa8e52175f0b26fedf648f3ad22f",
+      "resultSha256": "b06d0353a07603fc0336fa369018b2814f6be8fccdc4702069de8ab123db2e3b",
+      "stdoutSha256": "459e28a8ff15f59bfd32fb434d2791c4c8c56bdbe6700d8ca2f550d3a34be081",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "storage-2": {
+      "startedAt": "2026-11-07T13:12:36.514076+00:00",
+      "elapsedSeconds": 213.004,
+      "exitCode": 0,
+      "sourceFiles": 8626,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "reports": {
+        "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRoomTest.xml": {
+          "sha256": "9fac067c8f87a6f15f5428992f5da13b11593012d74ee8ccaf7b2f6141a3d1b5",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "gradleArguments": [
+        ":core:database:test",
+        "--tests",
+        "*CollaborationSpaceRoomRequestFenceMigrationTest",
+        ":modules:collaboration:data:test",
+        "--tests",
+        "*NativeCollaborationSpaceRoomTest",
+        ":formatCheck",
+        ":architectureCheck",
+        "--no-daemon",
+        "--no-parallel",
+        "--max-workers=1",
+        "-Dorg.gradle.jvmargs=-Xmx1536m",
+        "-Pkotlin.compiler.execution.strategy=in-process"
+      ],
+      "sourceManifestSha256": "0c934d182e70f13b65783026449a1ac18921f8a38fc14ead0b0926986ca290ca",
+      "resultSha256": "ee1ab04fa93bef45d61917c1e8fe7305e557d886038086777a841a7883308dca",
+      "stdoutSha256": "bc46062ef74b782ee0f5116645728f51c011a904c3adb7e7cce80dbe4d102f62",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "onlySourceChangeBetweenGates": [
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRoomTest.kt"
+  ],
+  "validationLimits": {
+    "storage-1": "Seven migration cases used138; seventeen old writer cases used133, prompting the follow-up.",
+    "storage-2": "All seventeen old stable/legacy room writer and receipt cases run against138. Seven migration cases reused unchanged.",
+    "di": "No shared DI constructor changes; no new API/worker gate claimed.",
+    "jooq": "Generated and compiled during storage-1, reused unchanged during storage-2.",
+    "live": "No migration deployed; live116.1/phone53 unchanged, reported latency unresolved."
+  },
+  "recovery": {
+    "at": "2026-11-07T13:06:36.928754+00:00",
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_migration_versions",
+      "test_recovery_set"
+    ],
+    "cwd": "tool",
+    "elapsedSeconds": 0.114,
+    "exitCode": 0,
+    "sources": {
+      "tool/recovery_set.py": "2c9f192e8c82a851e4e4c306235cbcf332bb239a9723390ed5fa85ba1432fffe",
+      "tool/test_recovery_set.py": "2455e5d477eca96a52711754fbd1d91db019c1c999ac273d373a68c854b8703a"
+    },
+    "priorRun": {
+      "cases": 26,
+      "failures": 1,
+      "elapsedSeconds": 0.014,
+      "reason": "Existing envelope projection test still treated newly supported schema138 as unknown; corrected to139"
+    },
+    "cases": 26
+  }
+}

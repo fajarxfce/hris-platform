@@ -714,7 +714,7 @@ class NativeCollaborationSpaceRoomTest {
         val pair = listOf(s.account, peer).sortedBy(UUID::toString)
 
         init {
-            Flyway.configure().dataSource(s.source).target("133").load().migrate()
+            Flyway.configure().dataSource(s.source).target("138").load().migrate()
             s.owner.execute(
                 "grant select,insert,update,delete on all tables in schema public to space_gateway_fixture,space_gateway_worker"
             )

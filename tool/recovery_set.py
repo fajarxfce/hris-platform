@@ -66,7 +66,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V133 retains per-participant room recovery metadata without a new encryption envelope.
 # V136 retains separate group push capabilities with their original device metadata.
 # V137 adds opaque group wake metadata without changing any encrypted envelope.
-MAX_SCHEMA = (137,)
+# V138 retains immutable room request non-execution metadata; no encrypted envelope.
+MAX_SCHEMA = (138,)
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL

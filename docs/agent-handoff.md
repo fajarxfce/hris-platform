@@ -12,25 +12,28 @@ failure is preserved. All Mobile builds are reaped. No product caller, SDK send 
 [Contract/results](https://github.com/fajarxfce/hris-mobile/blob/335e3914/docs/collaboration-space-conversation-open-replay.md).
 Prior preparation1d9493df and canonical metadataaa700e37 are accepted.
 
-Sole heavy local job34560 runs Group .work/room-request-fence-2026-11-07/storage-1.
-FOUR source/test/recovery files are applied/FROZEN, NOT accepted: V138 immutable actor/
-original-operation fence, same original stable-v2 lock and receipt/fence exclusion,
-seven real migration cases (isolation, strict bounds, cancellation/rollback, competing
-writers and pg_dump/restore), plus recovery schema138 without new encrypted envelopes.
-It also runs existing NativeCollaborationSpaceRoomTest, format and architecture.
-Python recovery26 cases passed0.114s after an old unknown-future138 assertion was corrected
-to139; the initial failure is retained. Candidate files are historical applied copies.
-No domain fence repository/use case/HTTP/successor or rollout exists. Read Mobile's
-current handoff before any build/emulator; no second heavy job or frozen Group edits.
-[Original fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md).
+V138 fence storage is now locally accepted: five source/test/recovery files, immutable
+actor/original-operation evidence and same-lock stable receipt exclusion. Gate34560
+passed24 cases315.431s; its7 new migration cases used138 but17 existing writer cases
+still used133. That fixture was upgraded; gate4436 passed all17 writer cases213.004s
+on138. Both runs had8,626 stable inputs, zero failures/errors/skips, format/architecture
+passed; first generated/compiled jOOQ. Python recovery26 cases passed after future-schema
+expectation correction. Exact evidence preserves this distinction. [Contract/results](collaboration/room-request-fence-storage.md).
+ALL local jobs are reaped; no heavy build or emulator runs. No domain fence repository/
+use case/HTTP/successor or rollout exists. Next implement typed repository mapping,
+current native owning admission and explicit writer rejection, then native HTTP and
+Mobile durable linkage. Detailed reviewed boundaries are in the original fence plan;
+private next-domain-http.md is supplementary. No second schema or fake MutationReceipt.
 
-First3b3 native42369792184 is SUCCESS; original artifact audit is starting. Its control
-42369792173 still runs Apple (portable passed). First1d native42372520624 has started,
-but control42372520573 remains PENDING: preserve before another primary promotion.
-Mobile primary stays1d9493df; Open335e3914 needs its own subsequent first source CI.
-First79b control/native remain fully audited SUCCESS in Mobile8579a0de, SDK4 hashes match.
+First3b3 control42369792173/native42369792184 are SUCCESS and fully audited in Mobile:
+Apple2,001/228, portable4,869/542, native543/86 perABI, zero failures/errors/skips;
+immutableSDK4 and original queue33.483s x86/80.188s ARM preserve keys/IDs and cleanup.
+Mobile primary is31e618cc89e2ca0cce38bcb62ccd95b8533c88c0 (Open source335e3914 included).
+Its first control42376025279/native42376025306 are PENDING behind both running first1d
+control42372520573/native42372520624. Preserve these pending runs before another primary
+promotion. Mobile recovery may continue. No provider scenarios rerun for CI audit.
 
-Continue accepting V138 storage, owning fence/HTTP, Room request projection/recovery,
+Continue owning fence/HTTP, Room request projection/recovery,
 original SDK delivery/history, native-parent recovery, product routing and all54 PRD
 groups (3 in progress/51 planned/none complete). Phone53 latency stays OPEN: last bounded
 ADB reconnect11:41UTC timed out, no new phone logs/build/UI driving. Bima has published

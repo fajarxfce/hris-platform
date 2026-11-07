@@ -1,7 +1,8 @@
 # Non-execution evidence for original room requests
 
-Status: design for the next increment. No fence endpoint, storage table, production
-migration or replacement authority is implemented by this document. The accepted
+Status: [V138 storage and database exclusion](room-request-fence-storage.md) are now
+locally validated. No owning fence endpoint, live migration or replacement authority
+is activated. The remaining integration follows this design. The accepted
 stable request/receipt contract remains [separate](native-room-stable-intent.md).
 
 ## Problem and result

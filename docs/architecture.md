@@ -1,5 +1,9 @@
 # Architecture
 
+[Room request non-execution storage](collaboration/room-request-fence-storage.md)
+retains immutable original-operation evidence and excludes stable receipt/fence
+coexistence under the original transaction lock. Owning native admission remains separate.
+
 [Stable room request intent](collaboration/native-room-stable-intent.md) separates
 immutable business identity from current native authentication while retaining the
 original receipt protocol. Stable native HTTP is validated; durable Mobile dispatch remains separate.

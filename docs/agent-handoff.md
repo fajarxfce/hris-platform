@@ -1,5 +1,36 @@
 # Agent continuation — HRIS Platform organization chat
 
+## Release 56 / actual inspector reset — 07 November 2026, 21:39 UTC
+
+Mobile796585ad records the installed56 (sourcebe2fe021, immutableSDK4). Phone update
+55→56 retained UID/data/first-install identity and exact APK hash, --install-only with
+no UI automation. Actual original-account send stays above the composer; cold offline
+history/list re-entry passes. Keyboard save/handoff and phone latency remain unresolved.
+Mobile docs/measurements/collaboration-release56-2026-11-07.json owns exact evidence.
+
+Private inspectora8d7d60 is pushed:226 local cases plus all6 real x86_64 JNI scenarios,
+including Clear while the exact HTTP response is held. Earlier reset failures came from
+assuming one SDK operation equals one HTTP request; only the fixture changed. Native
+bytes and transport semantics remain unchanged. No SDK5 or library publication yet;
+Apple corrected firstCI42413788416 runs, visibility question remains unanswered.
+
+Mobile has unaccepted host integration on feat/network-inspector-20261107: separate
+composite checkout, SDK5 candidate, Dev Ktor/Matrix capture, Settings viewer and explicit
+account/container lifetime. First check4818 failed at missing inherited plugin checksum;
+32 previously verified library metadata entries imported, current sole heavy job83983
+checks focused-2. No emulator runs. Do not compile elsewhere until it is reaped. Both
+Mobile and inspector sources are frozen. No host capture/overhead or Starter acceptance.
+Mobile first be2 portable artifact13591491540 is audited5284cases/571suites, zero failures;
+Apple and Android first jobs remain in progress. Primary remainsbe2fe021.
+
+Continue host/native Apple acceptance, actual capture and overhead, composer/latency,
+validated installs, Starter port and all54 original PRD groups (3 in progress/51 planned,
+none complete). API2e75fe1e, worker10485916, schema116.1 and disabled Group routing stay
+unchanged. V117–138 remain undeployed. Read Mobile current handoff and .work/inspector-host-
+2026-11-07 before resuming; original userdata/keys/queues must be retained.
+
+
+
 ## Inspector / Mobile checkpoint — 07 November 2026, 21:06 UTC
 
 Mobile primary and feat/network-inspector-20261107 are be2fe021, pushed. Optional Android

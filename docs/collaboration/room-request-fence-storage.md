@@ -51,8 +51,9 @@ projection as 137. Its 26 cases pass; the initial future-schema expectation fail
 and its correction to 139 are retained.
 [Source hashes and exact runs](../measurements/collaboration-room-request-fence-storage-2026-11-07.json).
 
-Dedicated repository mapping, current native owning fence admission, typed HTTP,
-Mobile durable fence/successor linkage and room projection remain required. A null
+[Repository mapping and current native owning fence admission](native-room-request-fence.md)
+are now validated with API/FULL worker integration. Typed HTTP, Mobile durable
+fence/successor linkage and room projection remain required. A null
 receipt, timeout or denial is still uncertain. This migration is not deployed; live
 schema stays 116.1 and organization routing stays disabled. It does not establish
 physical-phone message latency or change the original SDK keys/message IDs.

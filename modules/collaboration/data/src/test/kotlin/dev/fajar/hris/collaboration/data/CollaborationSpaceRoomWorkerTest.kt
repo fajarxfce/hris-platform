@@ -550,6 +550,9 @@ class CollaborationSpaceRoomWorkerTest {
                 f.sessions,
                 f.identities,
                 f.operations,
+                StoredCollaborationSpaceRoomRequestFenceRepository(
+                    PostgresCollaborationSpaceRoomRequestFenceDataSource(f.sql)
+                ),
                 journal,
                 s.transactions,
                 IdentitySecurityPolicy(),

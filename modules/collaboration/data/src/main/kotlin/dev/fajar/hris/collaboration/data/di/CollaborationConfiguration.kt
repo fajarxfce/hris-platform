@@ -1824,6 +1824,48 @@ class CollaborationConfiguration {
     ): CollaborationSpaceRoomRepository = StoredCollaborationSpaceRoomRepository(source)
 
     @Bean
+    fun collaborationSpaceRoomRequestFenceSource(
+        sql: DSLContext
+    ): CollaborationSpaceRoomRequestFenceDataSource =
+        PostgresCollaborationSpaceRoomRequestFenceDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceRoomRequestFenceRepository(
+        source: CollaborationSpaceRoomRequestFenceDataSource
+    ): CollaborationSpaceRoomRequestFenceRepository =
+        StoredCollaborationSpaceRoomRequestFenceRepository(source)
+
+    @Bean
+    fun fenceNativeCollaborationSpaceRoomRequest(
+        fences: CollaborationSpaceRoomRequestFenceRepository,
+        operations: OperationRepository,
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        FenceNativeCollaborationSpaceRoomRequest(
+            fences,
+            operations,
+            rooms,
+            conversations,
+            spaces,
+            sessions,
+            identities,
+            journal,
+            transactions,
+            policy,
+            security,
+            clock,
+        )
+
+    @Bean
     fun requestNativeCollaborationSpaceRoom(
         rooms: CollaborationSpaceRoomRepository,
         conversations: CollaborationSpaceConversationRepository,
@@ -1837,6 +1879,7 @@ class CollaborationConfiguration {
         sessions: NativeSessionRepository,
         identities: IdentityRepository,
         operations: OperationRepository,
+        fences: CollaborationSpaceRoomRequestFenceRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
@@ -1857,6 +1900,7 @@ class CollaborationConfiguration {
             sessions,
             identities,
             operations,
+            fences,
             journal,
             transactions,
             security,

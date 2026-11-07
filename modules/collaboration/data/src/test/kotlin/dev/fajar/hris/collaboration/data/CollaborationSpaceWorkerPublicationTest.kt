@@ -4266,6 +4266,9 @@ class CollaborationSpaceWorkerPublicationTest {
                     sessions,
                     identities,
                     operations,
+                    StoredCollaborationSpaceRoomRequestFenceRepository(
+                        PostgresCollaborationSpaceRoomRequestFenceDataSource(sql)
+                    ),
                     journal,
                     transactions,
                     IdentitySecurityPolicy(),

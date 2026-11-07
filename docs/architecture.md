@@ -1,5 +1,9 @@
 # Architecture
 
+[Native original room-request recovery](collaboration/native-room-request-fence.md)
+resolves retained receipts or immutable non-execution evidence under current admission.
+The owning transaction stays separate from HTTP, Mobile successors and SDK delivery.
+
 [Room request non-execution storage](collaboration/room-request-fence-storage.md)
 retains immutable original-operation evidence and excludes stable receipt/fence
 coexistence under the original transaction lock. Owning native admission remains separate.

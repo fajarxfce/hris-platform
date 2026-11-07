@@ -27,6 +27,7 @@ class RequestNativeCollaborationSpaceRoom(
     private val sessions: NativeSessionRepository,
     private val identities: IdentityRepository,
     private val operations: OperationRepository,
+    private val fences: CollaborationSpaceRoomRequestFenceRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
@@ -90,7 +91,6 @@ class RequestNativeCollaborationSpaceRoom(
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
-            if (replay is Result.Failed) return@run replay
             val guard = rooms.lock(spaceId, conversationId)
             if (guard is Result.Failed) return@run guard
             val readConversation = conversations.find(spaceId, actor.accountId, conversationId)
@@ -278,6 +278,25 @@ class RequestNativeCollaborationSpaceRoom(
                     if (it.provider != initial.provider) observationChanged()
                     else Result.Success(Unit)
                 }
+            if (replay is Result.Failed) return@run finalAdmission().flatMap { replay }
+            if (format == CollaborationSpaceRoomRequestFormat.STABLE_INTENT) {
+                val retained = fences.find(actor.accountId, operationId)
+                if (retained is Result.Failed) return@run finalAdmission().flatMap { retained }
+                val fence = (retained as Result.Success).value
+                if (fence != null) {
+                    val code =
+                        if (
+                            fence.accountId == actor.accountId &&
+                                validCollaborationSpaceRoomRequestFence(fence) &&
+                                collaborationSpaceRoomReceiptKey(fence.original) == key
+                        )
+                            "collaboration_room_request_fenced"
+                        else "operation_payload_mismatch"
+                    return@run finalAdmission().flatMap {
+                        Result.Failed(Failure(FailureKind.CONFLICT, code))
+                    }
+                }
+            }
             val readIntent = rooms.intent(spaceId, actor.accountId, conversationId)
             if (readIntent is Result.Failed) return@run readIntent
             var intent = (readIntent as Result.Success).value

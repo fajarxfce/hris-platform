@@ -703,6 +703,328 @@ class NativeCollaborationSpaceRoomTest {
         }
     }
 
+    @Test
+    fun fencedOriginalReplaysExactlyBlocksStableWriterAndKeepsLegacyNamespace() {
+        val f = Fixture()
+        val original = f.stable()
+        val before = f.counts()
+        val first = success(f.fence(original)) as CollaborationSpaceRoomRequestResolution.Fenced
+        assertEquals(f.s.account, first.accountId)
+        assertEquals(original, first.original)
+        assertEquals(f.f.clock.instant(), first.evidence.createdAt)
+        assertEquals(first, success(f.fence(original)))
+        val after = f.counts()
+        for (table in before.keys - setOf("audit_entries", "outbox_events")) assertEquals(
+            before[table],
+            after[table],
+        )
+        assertEquals(1, f.fenceRows().size)
+        assertEquals(
+            first.evidence,
+            success(f.s.tx { f.fences().find(f.s.account, original.operationId) }),
+        )
+        assertEquals(
+            "collaboration_room_request_fenced",
+            (f.open(
+                    original.operationId,
+                    format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT,
+                ) as Result.Failed)
+                .failure
+                .code,
+        )
+        assertEquals(after, f.counts())
+        success(f.open(original.operationId))
+        assertEquals(first, success(f.fence(original)))
+        assertEquals(1, f.fenceRows().size)
+    }
+
+    @Test
+    fun committedStableReceiptWinsWithoutAFenceOrAnotherJournalEntry() {
+        val f = Fixture()
+        val original = f.stable()
+        val receipt =
+            success(
+                f.open(
+                    original.operationId,
+                    format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT,
+                )
+            )
+        val before = f.counts()
+        val resolved =
+            success(f.fence(original)) as CollaborationSpaceRoomRequestResolution.Recorded
+        assertEquals(original, resolved.original)
+        assertEquals(f.s.account, resolved.accountId)
+        assertEquals(receipt.copy(replayed = true), resolved.receipt)
+        assertEquals(resolved, success(f.fence(original)))
+        assertTrue(f.fenceRows().isEmpty())
+        assertEquals(before, f.counts())
+    }
+
+    @Test
+    fun replacementParentCanFenceAndRecoverWithoutAnyOriginalDeviceOrProviderBinding() {
+        val f = Fixture()
+        val original = f.stable().copy(deviceId = UUID.randomUUID())
+        val replacement = UUID.randomUUID()
+        f.s.owner.update(
+            "insert into native_sessions(id,account_id,refresh_hash,authenticated_at,expires_at,credential_version,access_expires_at,created_at,rotated_at) select ?,account_id,?,authenticated_at,expires_at,credential_version,access_expires_at,created_at,rotated_at from native_sessions where id=?",
+            replacement,
+            replacement.toString().replace("-", "").repeat(2),
+            f.s.parent,
+        )
+        f.s.owner.update("delete from native_sessions where id=?", f.s.parent)
+        assertNull(success(f.s.tx { f.f.registry.findBound(f.s.space, f.s.account, replacement) }))
+        val first =
+            success(f.fence(original, currentParent = replacement))
+                as CollaborationSpaceRoomRequestResolution.Fenced
+        val rows = f.fenceRows()
+        assertEquals(first, success(f.fence(original, currentParent = replacement)))
+        assertEquals(
+            first.evidence,
+            success(f.s.tx { f.fences().find(f.s.account, original.operationId) }),
+        )
+        assertEquals(rows, f.fenceRows())
+        assertInstanceOf(Result.Failed::class.java, f.fence(original))
+        assertEquals(0, f.counts().getValue("operation_receipts"))
+        assertEquals(0, f.counts().getValue("collaboration_space_room_provisioning"))
+    }
+
+    @Test
+    fun currentDenialPrecedesOriginalFencePayloadConflictAndWriterDisclosure() {
+        val f = Fixture()
+        val original = f.stable()
+        success(f.fence(original))
+        val changed = original.copy(expectedDeviceVersion = 2)
+        val before = f.counts()
+        val fences = f.fenceRows()
+        assertEquals("operation_payload_mismatch", (f.fence(changed) as Result.Failed).failure.code)
+        f.revokePeer()
+        assertEquals(
+            "collaboration_peer_unavailable",
+            (f.fence(changed) as Result.Failed).failure.code,
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.open(original.operationId, format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT),
+        )
+        f.grantPeer()
+        val untouched =
+            object : CollaborationSpaceRoomRequestFenceRepository by f.fences() {
+                override fun find(
+                    accountId: UUID,
+                    operationId: UUID,
+                ): Result<CollaborationSpaceRoomRequestFence?> = error("Denied before fence lookup")
+            }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.fence(changed, client = f.f.client.copy(build = 4), fences = untouched),
+        )
+        f.s.owner.update("update native_sessions set revoked_at=now() where id=?", f.s.parent)
+        assertInstanceOf(Result.Failed::class.java, f.fence(changed, fences = untouched))
+        assertEquals(before, f.counts())
+        assertEquals(fences, f.fenceRows())
+    }
+
+    @Test
+    fun failedCancelledExpiredAndRolledBackFenceJournalsLeaveNoEvidence() {
+        val f = Fixture()
+        val before = f.counts()
+        val started = f.f.clock.instant()
+        for (phase in 0..5) {
+            var peerDenied = false
+            val conversations =
+                object : CollaborationSpaceConversationRepository by f.conversations {
+                    override fun member(
+                        spaceId: UUID,
+                        accountId: UUID,
+                    ): Result<CollaborationSpaceMember?> =
+                        if (peerDenied) Result.Success(null)
+                        else f.conversations.member(spaceId, accountId)
+                }
+            val journal =
+                object : ChangeJournalRepository {
+                    override fun record(actor: Actor, change: ChangeRecord): Result<Unit> {
+                        val saved = f.f.journal.record(actor, change)
+                        when (phase) {
+                            0 ->
+                                return Result.Failed(
+                                    Failure(FailureKind.CONFLICT, "fixture_rejected")
+                                )
+                            1 -> throw CancellationException("fixture fence response")
+                            2 -> throw InterruptedException("fixture fence response")
+                            3 -> f.f.clock.at = started.plusSeconds(30)
+                            4 -> f.f.clock.at = started.minusSeconds(1)
+                            5 -> peerDenied = true
+                        }
+                        return saved
+                    }
+                }
+            try {
+                when (phase) {
+                    1 ->
+                        assertThrows(CancellationException::class.java) {
+                            f.fence(f.stable(), journal = journal, conversations = conversations)
+                        }
+                    2 ->
+                        assertThrows(InterruptedException::class.java) {
+                            f.fence(f.stable(), journal = journal, conversations = conversations)
+                        }
+                    else ->
+                        assertInstanceOf(
+                            Result.Failed::class.java,
+                            f.fence(f.stable(), journal = journal, conversations = conversations),
+                        )
+                }
+            } finally {
+                f.f.clock.at = started
+            }
+            assertTrue(f.fenceRows().isEmpty())
+            assertEquals(before, f.counts())
+        }
+    }
+
+    @Test
+    fun invalidScopeCannotReachFenceStorageAndParticipantsKeepIndependentOperationNamespaces() {
+        val f = Fixture()
+        val original = f.stable()
+        val untouched =
+            object : CollaborationSpaceRoomRequestFenceRepository by f.fences() {
+                override fun find(
+                    accountId: UUID,
+                    operationId: UUID,
+                ): Result<CollaborationSpaceRoomRequestFence?> = error("Rejected before storage")
+            }
+        for (changed in
+            listOf(
+                original.copy(operationId = UUID(0, 0)),
+                original.copy(deviceId = UUID(0, 0)),
+                original.copy(spaceId = UUID.randomUUID()),
+                original.copy(conversationId = UUID.randomUUID()),
+                original.copy(expectedDeviceVersion = 1_000_000),
+                original.copy(
+                    expectedAttempt = CollaborationSpaceRoomObservedAttempt(UUID.randomUUID(), 0)
+                ),
+            )) assertInstanceOf(Result.Failed::class.java, f.fence(changed, fences = untouched))
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.fence(original, fences = untouched, actor = f.s.actor.copy(companyId = f.s.company)),
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.fence(original, fences = untouched, actor = f.peerActor),
+        )
+        assertTrue(f.fenceRows().isEmpty())
+        val own = success(f.fence(original)) as CollaborationSpaceRoomRequestResolution.Fenced
+        val peer =
+            success(f.fence(original, actor = f.peerActor, currentParent = f.peerParent))
+                as CollaborationSpaceRoomRequestResolution.Fenced
+        assertEquals(f.s.account, own.accountId)
+        assertEquals(f.peer, peer.accountId)
+        assertNotEquals(own.evidence.id, peer.evidence.id)
+        assertEquals(own, success(f.fence(original)))
+        assertEquals(2, f.fenceRows().size)
+    }
+
+    @Test
+    fun committedOriginalWriterReturnsItsReceiptToTheWaitingFence() =
+        assertNativeFenceSerialization(false, false)
+
+    @Test
+    fun rolledBackOriginalWriterAllowsOnlyTheWaitingFenceToCommit() =
+        assertNativeFenceSerialization(false, true)
+
+    @Test
+    fun committedFenceExplicitlyRejectsTheWaitingOriginalWriter() =
+        assertNativeFenceSerialization(true, false)
+
+    @Test
+    fun rolledBackFenceAllowsOnlyTheWaitingOriginalWriterToCommit() =
+        assertNativeFenceSerialization(true, true)
+
+    private fun assertNativeFenceSerialization(fenceFirst: Boolean, rollbackFirst: Boolean) {
+        val f = Fixture()
+        val original = f.stable()
+        val held = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val entering = CountDownLatch(1)
+        val pool = Executors.newFixedThreadPool(2)
+        try {
+            val journal =
+                object : ChangeJournalRepository {
+                    override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                        f.f.journal.record(actor, change).flatMap {
+                            held.countDown()
+                            check(release.await(10, TimeUnit.SECONDS))
+                            if (rollbackFirst)
+                                Result.Failed(Failure(FailureKind.CONFLICT, "fixture_rollback"))
+                            else Result.Success(Unit)
+                        }
+                }
+            val first =
+                pool.submit<Result<*>> {
+                    if (fenceFirst) f.fence(original, journal = journal)
+                    else
+                        f.open(
+                            original.operationId,
+                            journal = journal,
+                            format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT,
+                        )
+                }
+            assertTrue(held.await(10, TimeUnit.SECONDS))
+            val operations =
+                object : OperationRepository by f.f.operations {
+                    override fun lockAndReplay(
+                        actor: Actor,
+                        key: OperationKey,
+                    ): Result<MutationReceipt?> {
+                        entering.countDown()
+                        return f.f.operations.lockAndReplay(actor, key)
+                    }
+                }
+            val second =
+                pool.submit<Result<*>> {
+                    if (fenceFirst)
+                        f.open(
+                            original.operationId,
+                            format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT,
+                            operations = operations,
+                        )
+                    else f.fence(original, operations = operations)
+                }
+            assertTrue(entering.await(10, TimeUnit.SECONDS))
+            assertThrows(TimeoutException::class.java) { second.get(200, TimeUnit.MILLISECONDS) }
+            release.countDown()
+            val firstResult = first.get(10, TimeUnit.SECONDS)
+            val secondResult = second.get(10, TimeUnit.SECONDS)
+            if (rollbackFirst) {
+                assertInstanceOf(Result.Failed::class.java, firstResult)
+                assertInstanceOf(Result.Success::class.java, secondResult)
+            } else {
+                assertInstanceOf(Result.Success::class.java, firstResult)
+                if (fenceFirst)
+                    assertEquals(
+                        "collaboration_room_request_fenced",
+                        (secondResult as Result.Failed).failure.code,
+                    )
+                else
+                    assertInstanceOf(
+                        CollaborationSpaceRoomRequestResolution.Recorded::class.java,
+                        (secondResult as Result.Success).value,
+                    )
+            }
+            val fenced = if (rollbackFirst) !fenceFirst else fenceFirst
+            assertEquals(if (fenced) 1 else 0, f.fenceRows().size)
+            assertEquals(if (fenced) 0 else 1, f.counts().getValue("operation_receipts"))
+            assertEquals(
+                if (fenced) 0 else 1,
+                f.counts().getValue("collaboration_space_room_provisioning"),
+            )
+        } finally {
+            release.countDown()
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+        }
+    }
+
     private inner class Fixture {
         val f = SpaceGatewayBootstrapFixture(postgres)
         val s = f.storage
@@ -773,7 +1095,10 @@ class NativeCollaborationSpaceRoomTest {
                 PostgresCollaborationSpaceConversationDataSource(f.sql)
             )
 
-        fun command(journal: ChangeJournalRepository = f.journal) =
+        fun command(
+            journal: ChangeJournalRepository = f.journal,
+            operations: OperationRepository = f.operations,
+        ) =
             RequestNativeCollaborationSpaceRoom(
                 rooms,
                 conversations,
@@ -786,7 +1111,10 @@ class NativeCollaborationSpaceRoomTest {
                 f.spaces,
                 f.sessions,
                 f.identities,
-                f.operations,
+                operations,
+                StoredCollaborationSpaceRoomRequestFenceRepository(
+                    PostgresCollaborationSpaceRoomRequestFenceDataSource(f.sql)
+                ),
                 journal,
                 s.transactions,
                 IdentitySecurityPolicy(),
@@ -801,10 +1129,11 @@ class NativeCollaborationSpaceRoomTest {
             journal: ChangeJournalRepository = f.journal,
             parentVersion: Long = 0,
             client: ClientVersion = f.client,
+            operations: OperationRepository = f.operations,
             format: CollaborationSpaceRoomRequestFormat =
                 CollaborationSpaceRoomRequestFormat.NATIVE_PROOF,
         ) =
-            command(journal)
+            command(journal, operations)
                 .execute(
                     s.actor,
                     s.parent,
@@ -872,6 +1201,46 @@ class NativeCollaborationSpaceRoomTest {
                     f.identities,
                     s.transactions,
                     policy,
+                    IdentitySecurityPolicy(),
+                    f.clock,
+                )
+                .execute(actor, currentParent, currentVersion, client, original)
+
+        fun stable(operation: UUID = UUID.randomUUID()) =
+            CollaborationSpaceRoomRequestIntent(operation, s.space, conversation, s.device, 1, null)
+
+        fun fences() =
+            StoredCollaborationSpaceRoomRequestFenceRepository(
+                PostgresCollaborationSpaceRoomRequestFenceDataSource(f.sql)
+            )
+
+        fun fenceRows() =
+            s.owner.queryForList(
+                "select * from collaboration_space_room_request_fences order by operation_id"
+            )
+
+        fun fence(
+            original: CollaborationSpaceRoomRequestIntent,
+            currentParent: UUID = s.parent,
+            currentVersion: Long = 0,
+            client: ClientVersion = f.client,
+            operations: OperationRepository = f.operations,
+            fences: CollaborationSpaceRoomRequestFenceRepository = fences(),
+            conversations: CollaborationSpaceConversationRepository = this.conversations,
+            journal: ChangeJournalRepository = f.journal,
+            actor: Actor = s.actor,
+        ) =
+            FenceNativeCollaborationSpaceRoomRequest(
+                    fences,
+                    operations,
+                    rooms,
+                    conversations,
+                    f.spaces,
+                    f.sessions,
+                    f.identities,
+                    journal,
+                    s.transactions,
+                    CollaborationSpacePolicy(true, 5, 5),
                     IdentitySecurityPolicy(),
                     f.clock,
                 )

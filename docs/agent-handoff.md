@@ -1,38 +1,47 @@
 # Agent continuation — HRIS workspace
 
-## Original queue matching accepted; native CI packaging — 7 November 2026
+## Accepted original queue matching and native packaging — 7 November 2026
 
-Mobile `032697ea` is committed/pushed on `feat/chat-recovery-20261107`. Exact original
-SDK inventory now matches immutable application commands/completions under a finite
-current-native admission read, without rewriting original namespaces or granting send.
-Full local validation passed 5,538 fresh cases in 649 suites (512.73 seconds), 4,320
-unchanged inputs, zero failures/errors/skips and Android lint findings. Ten pure cases,
-ten owning lifecycle cases and actual application DI are covered. Mobile handoff is
-now concise; all prior entries were archived verbatim with links.
-[Contract](https://github.com/fajarxfce/hris-mobile/blob/032697ea/docs/collaboration-space-original-queue-reconciliation.md).
+Mobile program `032697ea` matches complete original SDK queues to immutable commands
+and completions under current admission. Full root/Android/browser validation passed
+5,538 fresh cases in 649 suites (512.73 seconds), with 4,320 unchanged inputs and no
+failures/errors/skips or Android lint findings. No original IDs, keys or queue states
+were rewritten. Its continuation document is now concise; prior entries remain in Git.
 
-ONLY heavy local job15900 runs Mobile native-sdk4-packaging-ci/check-1. Three source
-files are applied/uncommitted and frozen. First05de native42348626124 failed both ABIs
-before fixture installation: strict SDK4 hash validation rejected libraries that CI
-reported it could not strip. Both493 host cases passed; original APK bytes were not
-uploaded. Original logs/artifacts are audited. The exact immutable AAR plus local NDK
-28.2.13676358 reproduces both accepted stripped hashes. Candidate pins the proof NDK,
-installs it before CI build and moves the same APK validator before emulator startup.
-No SDK rebuild or relaxed digest acceptance. Read Mobile handoff before starting work.
+Mobile `9deb55bf93314622967231c9de8ab695c775faeb` is accepted and pushed to temporary
+and primary branches. The proof NDK is pinned in the version catalog and installed
+before CI build. The existing strict SDK4 validator runs before emulator startup,
+with actual native hashes recorded even on rejection. Full local root/proof Android
+validation passed 5,373 fresh cases in 754 suites (1,364.389 seconds), 4,324 unchanged
+inputs, zero failures/errors/skips and lint errors; proof retains 49 existing warnings.
+Exact workflow Python accepted the built x86_64 APK and rejected a separate local copy
+containing the published unstripped SDK4 library. Both accepted stripped ABI hashes
+were reproduced from the same immutable AAR. No SDK rebuild or new provider send.
+[Evidence](https://github.com/fajarxfce/hris-mobile/blob/9deb55bf/docs/collaboration-sdk4-packaging-ci.md).
 
-First1bb control42344998885 is fully audited SUCCESS (Apple1,900/216, portable4,667/518,
-zero failures/errors/skips). First05de control42348626104 has started; primary remains
-05de until the packaging correction is accepted. Preserve later first pending runs.
-Original provider sends are not repeated merely to recreate evidence.
+No local heavy job or emulator is active. First9deb control42354718734 is PENDING
+behind05de Apple; native42354718728 and protocol42354718729 are running. Preserve the
+first pending control before another primary source promotion. First1bb control is
+fully accepted; first05de native failed before installation because CI could not strip
+the library. Original logs/digests are retained, with failed APK bytes explicitly unknown.
 
-Phone53 latency remains OPEN. Bima Demo has an active device, 50 one-time keys and one
-fallback; he need not stay online. Phone52 HTTP200 matched Bima, while repeated403s
-matched another room without a recipient device. Passive07:38 phone53 logs were empty,
-which proves no latency outcome. Existing optional feedback remains pending. No phone
-UI, new messages, original Bima files/IDs, live API or schema changes. Starterb11437a
-notification port is accepted. Group source e45a4313/V117–137 disabled stay unchanged.
-Continue current-authority original delivery, history publication, parent recovery,
-product routing and all54 PRD groups. Earlier timestamped sections below are history.
+NEXT implement a narrow controlled mixed-room delivery experiment: one READY room has
+no eligible key-published recipient device, another does. Measure actual queue, server
+acceptance, durable receipt and observable sent-state milestones without changing
+production timeout or writer policy first. Use the existing native fixture contracts,
+without rerunning the accepted 175-message history scenario merely for timing.
+[Diagnosis plan](https://github.com/fajarxfce/hris-mobile/blob/9deb55bf/docs/collaboration-mixed-room-delivery-diagnosis.md).
+The user was told this experiment follows packaging acceptance. No new experiment
+source/result is accepted yet. Continue original organization delivery/publication,
+native-parent recovery, product routing and all54 PRD groups afterward.
+
+Phone53 latency remains OPEN and its optional feedback request is already pending.
+Bima Demo has an active device, 50 one-time keys and a fallback; he need not stay online.
+Phone52 matched200 to Bima and repeated403s to another room without an eligible device.
+Latest passive phone53 log was empty, not delivery evidence. Preserve original Bima
+userdata/keys/IDs, immutable SDK4 and install-only phone rules. Starterb11437a is accepted.
+Group source e45a4313, disabled/unshipped V117–137, liveAPI2e75fe1e/worker10485916/schema116.1
+are unchanged. The earlier timestamped sections below are historical checkpoints.
 
 ## Current queue reconciliation and notification correction — 7 November 2026
 

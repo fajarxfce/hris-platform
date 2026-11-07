@@ -9,8 +9,11 @@ device each. Never reactivate a revoked parent or bypass target/key checks.
 
 Typed room_send/to_device/general HTTP diagnostic labels passed gate20819:52cases,
 81.557s,8,244 unchanged inputs, API bootJar/format/architecture. Source is this
-commit. No HTTP or authorization changes, no native send replay. API-only delivery
-is next under .work/gateway-operation-2026-11-07; live worker/schema stay10485916/116.1.
+commit2e75fe1e. No HTTP or authorization changes, no native send replay. API-only
+activation91549 PASSED11.048s at01:20:40UTC; exact image/JAR and rollback are in
+[delivery](measurements/collaboration-gateway-operation-release-2026-11-07.json).
+Worker/schema stay10485916/116.1. FirstCI42323441241 is running, preserve/audit it.
+No new rejections observed at01:21:39UTC. Work directory .work/gateway-operation-2026-11-07.
 Mobile34d507bc is pushed on temporaryfeat/chat-recovery-20261107: interrupted store
 handover passed5,512 fresh full cases plus actual two-ABI mechanism, no sends.
 Primary Mobilefd05control42318790930 still pending; preserve it before fast-forward.

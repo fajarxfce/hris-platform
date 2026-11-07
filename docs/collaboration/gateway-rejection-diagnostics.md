@@ -34,3 +34,9 @@ Read-only metadata finds one current device and one revoked-parent device for th
 caller, while Bima retains one current device. This is a hypothesis about stale
 recipient metadata, not proof of the actual failed request.
 [Operation evidence](../measurements/collaboration-gateway-operation-diagnostics-2026-11-07.json).
+
+The typed operation diagnostic is live from2e75fe1e. API-only activation passed
+11.048s at01:20:40UTC; image3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524
+contains accepted JARb77fc179817e12166b7ecf2528dec23099e9ebd6747630cbf394bcc4f02c82c8.
+Schema116.1, worker10485916 and all other services/configuration remain unchanged.
+[Delivery](../measurements/collaboration-gateway-operation-release-2026-11-07.json).

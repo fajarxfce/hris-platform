@@ -4,38 +4,38 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current canonical conversation continuation — 7 November 2026
+## Current original Open replay continuation — 7 November 2026
 
-Mobile aa700e37 is accepted/pushed to recovery: canonical native-parent-free metadata
-with atomic encrypted conversation/peer indexes and existing guarded history-key custody.
-Full33894 passed 3,614 fresh cases / 448 suites in 476.855s on 4,380 unchanged inputs;
-zero failures/errors/skips/lint. Root, Android host, quality, all 14 actual Browser
-storage cases and shared Wasm passed. All metadata jobs reaped. No new APK or caller.
-[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/aa700e37/docs/collaboration-space-conversation-metadata.md).
+Mobile1d9493df is accepted/pushed to recovery and primary: finite opening preparation
+recovers same-peer original/canonical facts, admits only new intent and reconciles
+lost local insertion responses. Full36411 passed 3,626 fresh cases / 449 suites in
+491.548s on 4,385 unchanged inputs; zero failures/errors/skips/lint. Root, Android host,
+quality,13 actual Browser cases/shared Wasm passed. All preparation jobs are reaped.
+[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/1d9493df/docs/collaboration-space-conversation-preparation.md).
+Prior canonical metadata aa700e37 passed3,614 cases, actual SQLite/IndexedDB and key custody.
 
-SEVEN Mobile owning Open preparation files are now applied/FROZEN. Sole heavy local
-job50437 runs focused-1: thirteen domain cases plus actual application binding.
-They recover a same-peer original or canonical ID before allocating a new operation,
-preserve known denial for new setup and reconcile exact-ID lost insertion replies.
-Not accepted yet. Read Mobile's current handoff before any build/emulator. Next required
-full gate is prepared; then owning replay/projection-before-archive, explicit server
-fence, original SDK delivery/history, native-parent recovery, product routing/all54
-(3 in progress, 51 planned, none complete).
+EIGHT original Open replay files are now applied/FROZEN in Mobile. Sole heavy job15001
+runs focused-1:24 new domain cases, existing command policy and app binding. Not yet
+accepted. Current native owner/original stable operation, durable marking, bounded
+outcome capture through cancellation, pair/global denial separation, exact canonical
+publication before archive, no SDK or message ACK. Full gate is prepared. Read Mobile's
+current handoff before any build/emulator; no second heavy job or frozen-source edits.
+Next complete owning replay validation, then room request receipts/fencing, original
+SDK delivery/history, native-parent recovery and product routing/all54. No group complete.
 [Server fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md).
 
-Accepted observation3b3a5d81 is on both branches; first control42369792173/native42369792184
-remain PENDING behind running79b control42366357406/native42366357400. Preserve those
-first pending runs before primary promotion. At12:13UTC 79b portable and x86 native
-jobs passed; Apple application host and ARM native jobs still run. Audit original
-artifacts after completion. First fb control/native are already fully audited SUCCESS;
-no accepted provider scenarios are rerun just for evidence.
+First1d control42372520573/native42372520624 are PENDING behind running first3b3
+control42369792173/native42369792184. Preserve first pending runs before primary push.
+First79b control/native are SUCCESS and fully audited in Mobile8579a0de: Apple1,975/225,
+portable4,817/536, each native543/86, zero failures/errors/skips. SDK4 bytes match;
+original queue continuity31.255s x86/77.166s ARM preserves keys/IDs, zero provider sends,
+full cleanup. Separate native HRIS scenarios passed; no accepted provider reruns.
 
 Phone53 latency remains OPEN. Last bounded ADB retry11:41UTC timed out, no new logs,
-APK or phone UI driving. Bima has device/one-time/fallback keys and need not remain
-online for sender server acceptance. Current evidence does not explain or resolve
-the phone's20s–2min delay. Existing optional feedback stays pending; no repeat question.
-LiveAPI2e75fe1e/worker10485916/schema116.1 remain unchanged; V117–137 stay disabled.
-Original Bima data/sidecars/keys/message IDs, SDK4 and Starterb11437a remain unchanged.
+APK or phone UI driving. Bima has published keys and need not remain online for sender
+server acceptance. Do not claim the20s–2min phone delay resolved or repeat the pending
+feedback question. LiveAPI2e75fe1e/worker10485916/schema116.1 remain unchanged; V117–137
+stay disabled. Original Bima data/sidecars/keys/message IDs, SDK4 and Starterb11437a remain.
 This section supersedes older job states retained below as history.
 
 ## Latest mobile command continuation — 7 November 2026

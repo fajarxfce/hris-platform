@@ -1,0 +1,80 @@
+{
+  "recordedAt": "2026-11-07T01:01:21.855990+00:00",
+  "baselineSource": "f4a2424d",
+  "liveSourceBefore": "10485916ee02850cf913793398f7ef3dd1e09afb",
+  "gate": {
+    "startedAt": "2026-11-07T00:59:02.085166+00:00",
+    "elapsedSeconds": 82.676,
+    "exitCode": 0,
+    "sourceFiles": 8244,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skipped": [],
+    "reports": {
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+        "sha256": "33705ba338aa4be2c03a4915e7471dc92f86c677058c413bf271cf55105e863d",
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushCallbackExecutorTest.xml": {
+        "sha256": "8afe3d057c14baffeca4649b6c7cb7e3ec6060ef3869e955842491149bfab4d9",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushCallbackSourcesTest.xml": {
+        "sha256": "ec0417e7ce6db671a27376e104d66377c13b52bb67c887d4b2a98d0f1bd7f8ff",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixPushNotificationTest.xml": {
+        "sha256": "8772b523e4becae1263a747014632b509de4673aa5eb95f2e5bfb658d0d89a11",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixRoomReplyRequestTest.xml": {
+        "sha256": "b2123df5390f9ea24a28168fe67bf5102cc47bca5829b2411bf7b850236e43e7",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery/build/test-results/test/TEST-dev.fajar.hris.collaboration.delivery.MatrixGatewayDiagnosticsTest.xml": {
+        "sha256": "20e23900f4dff7a6d724f77a1de00c0fb750f8b5f125169b4c4e4c7f971b0fb2",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "artifact": {
+    "path": ".work/gateway-rejection-2026-11-07/accepted-api.jar",
+    "sha256": "9effb126c99decafae3caf94caee6ac6385db67beaa3e39c354d54eb25f7146e",
+    "bytes": 98701824,
+    "diagnosticClassSha256": "7fb331ee5e4edcce1dc484f4fad7046cdb753d82d5e1d8d315814b2a8928e49b",
+    "nestedModuleSha256": "2d706914cf6d59b762e57ecca80f50c7c7c4b0826e9b1163833b80657388212b",
+    "diagnosticPresent": true
+  },
+  "phoneEvidence": {
+    "versionCode": 52,
+    "retainedAndSendFailure": "ApiForbidden",
+    "atUtc": "2026-11-07T00:48:07Z",
+    "resolved": false
+  },
+  "scope": "Finite server-side 403 reason diagnostics; API behavior and authorization unchanged.",
+  "deploymentStarted": false,
+  "nativeSendReplay": false
+}

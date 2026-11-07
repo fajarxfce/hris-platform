@@ -3,8 +3,29 @@ package dev.fajar.hris.collaboration.delivery.matrix
 import dev.fajar.hris.core.domain.Failure
 import dev.fajar.hris.core.domain.FailureKind
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import tools.jackson.databind.ObjectMapper
+
+private val gatewayRejectionLogger = LoggerFactory.getLogger("dev.fajar.hris.collaboration.gateway")
+
+private val gatewayRejectionReasons =
+    setOf(
+        "client_update_required",
+        "client_version_required",
+        "collaboration_access_denied",
+        "collaboration_direct_metadata_unavailable",
+        "collaboration_peer_unavailable",
+        "collaboration_recipient_unavailable",
+        "collaboration_room_creator_required",
+        "company_access_denied",
+        "company_module_disabled",
+        "company_required",
+        "mfa_required",
+        "mfa_setup_required",
+        "platform_scope_required",
+        "recent_authentication_required",
+    )
 
 fun matrixGatewayProblem(failure: Failure): ResponseEntity<Any> {
     val (status, code) =
@@ -18,6 +39,11 @@ fun matrixGatewayProblem(failure: Failure): ResponseEntity<Any> {
             FailureKind.UNAVAILABLE -> 503 to "M_UNKNOWN"
             else -> 500 to "M_UNKNOWN"
         }
+    if (status == 403)
+        gatewayRejectionLogger.warn(
+            "MatrixGatewayRejected status=403 reason={}",
+            failure.code.takeIf { it in gatewayRejectionReasons } ?: "other",
+        )
     val body =
         buildMap<String, Any> {
             put("errcode", code)
@@ -35,6 +61,7 @@ fun matrixGatewayProblem(failure: Failure): ResponseEntity<Any> {
 }
 
 fun writeMatrixGatewayDenied(response: HttpServletResponse, json: ObjectMapper) {
+    gatewayRejectionLogger.warn("MatrixGatewayRejected status=403 reason=endpoint_unavailable")
     response.status = 403
     response.contentType = "application/json"
     response.setHeader("Cache-Control", "no-store")

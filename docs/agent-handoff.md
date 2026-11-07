@@ -1,5 +1,28 @@
 # Agent continuation — HRIS workspace
 
+## Current — phone52 native queue403; bounded diagnostics accepted — 7 November 2026
+
+The [current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/communications/docs/agent-handoff.md)
+supersedes all older phone/SDK/job references below. Phone52 is installed, SDK4 is
+immutable, and the original pending report remains OPEN. Passive52 logs now classify
+retained/send failure as ApiForbidden(403), without its HRIS-specific reason.
+
+The HTTP response adapter now logs only finite known rejection reasons (unknown codes
+become `other`), with no request/identity/token/body/parameters. Response and access
+policy are unchanged. Gate45346 passed52 delivery/API cases in82.676s,8,244 stable
+inputs, format/architecture and API bootJar. No native message replay. Exact source,
+class and artifact evidence are in
+[diagnostics](collaboration/gateway-rejection-diagnostics.md).
+
+NEXT: commit/push this atomic change, stage the exact accepted API jar and update only
+the API image in the existing development overlay. Preserve worker, Matrix/provider,
+TLS, DB/schema116.1, storage, flags and every key. Record rollback image/overlay and
+health; no migration is involved. Then observe actual rejection reasons without
+launching the phone. Mobile's12-file interrupted-credential/read-path candidate has
+67 focused cases and accepted two-ABI SDK proof; its final full-2 gate remains next.
+One heavy local job at a time; push every commit and do not displace first pending CI.
+
+
 ## Current: release50 delivered; recipient remains eligible offline — 6 November 2026
 
 Phone `10.77.77.3:5555` has Mobile release50/programf04c0864, installed in place

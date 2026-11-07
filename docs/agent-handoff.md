@@ -5,6 +5,53 @@ and the linked contracts. Earlier checkpoints are retained verbatim in
 [history through native room fencing](agent-handoff-history-through-room-fence-2026-11-07.md).
 Their running-job and next-step statements are historical; use this current queue.
 
+## Current mobile priority — 7 November 2026, 16:12 UTC
+
+Mobile recovery and primary both include c760c6c7: Room preparation is accepted
+(128 focused cases; 3,829 full cases/462 suites, zero failures/errors/skips/lint).
+Atomic handoff98ef15a6 and owning resolution0d10c395 remain accepted. No new APK.
+First c760 control42387719940 has started; native42387719927 is still pending.
+Preserve that first native run before the next primary promotion. First0d control
+42383612502 succeeded (artifact audit pending); native42383612567 still runs.
+Firstfe control42380244144/native42380243983 are fully audited: Apple2,064/233,
+portable4,995/552, each native551/87, exact immutableSDK4 and cleanup verified.
+[Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
+
+User's additive priorities are pending-message previews in the chat list, retained
+drafts, roughly10-second send acknowledgement, new bubbles appearing late/under the
+composer, and a Chucker-like CROSS-PLATFORM inspector including Matrix Rust traffic.
+If custom inspector code is needed, create its own reusable Git repository. Existing
+Chucker/Ktor-only interception does not capture Rust HTTP. Library/adapter evaluation
+continues; no inspector/repository has been implemented yet. These requests do not
+cancel the remaining communications/54-group PRD work.
+
+The user explicitly authorized sending real test chats ourselves. One message was
+sent from the ORIGINAL Bima emulator to Karyawan Demo using the exact phone release53
+APK at15:49:26.104527UTC. UI polling first observed pending5.534s and Sent7.799s;
+these are polling bounds, not exact ACK times. Actual video shows a transient duplicate
+outgoing bubble before convergence. Do not attribute all concurrent HTTP calls or
+endpoint_unavailable403 logs to this send. Original device/keys/IDs/data are retained;
+no reset, cloned SDK store or phone UI driving. Emulator5562/PID295446 was stopped
+at15:56:48UTC. Its inactive backup is EVIDENCE ONLY and must never be restored after
+this send. Private records: Mobile .work/phone53-self-send-2026-11-07; do not publish
+raw chat/logs. New ADB connect31740 at15:41UTC timed out and was reaped.
+
+Mobile's ELEVEN-file pending-preview increment is uncommitted/FROZEN. ObserveInbox
+shares one bounded local command observer, combines latest original sends with owned
+history/drafts, retains existing denial/cancellation gates, and exposes compact clock
+icons. Focused74307 passed50 cases/266.430s on4,412 unchanged inputs, zero failures/
+errors/skips; three synthetic layout captures were opened and reviewed. Sole heavy
+job95262 now runs .work/chat-inbox-pending-2026-11-07/full-1. Reap and inspect it before
+editing those sources. No compiler/emulator overlap. Accept, commit and push this
+increment, then fix the real echo/viewport issue and deliver a validated build54.
+
+Live API2e75fe1e/worker10485916/schema116.1 remain unchanged. Group native dcdaf220,
+HTTP cf885a1c and V138 c6937843 remain accepted; V117–138 are undeployed and organization
+routing disabled. Starterb11437a is unchanged. After these user-visible fixes continue
+original Room dispatch, published binding/projection, original SDK delivery/history,
+native-parent recovery, product routing and all54 groups (3 in progress/51 planned/
+none complete). Push every atomic commit and announce each install-only phone update.
+
 ## Accepted work — 7 November 2026
 
 V138 storage c6937843 is accepted/pushed, but not deployed. It retains immutable
@@ -49,14 +96,14 @@ pass. Neither fence nor setup receipt grants SDK authority or message acknowledg
    Browser cases passed. Desktop SQLite/Browser IndexedDB execute the30 storage and8
    policy cases. All jobs reaped. No owning successor, SDK/product caller or APK yet.
    [Atomic storage contract](https://github.com/fajarxfce/hris-mobile/blob/98ef15a6/docs/collaboration-space-room-successor.md).
-3. Implement current-admitted Room preparation/dispatch after accepted atomic storage.
+3. After the current Mobile priority above, implement original Room dispatch after accepted preparationc760c6c7.
    A null receipt, timeout, denial or changed native parent never authorizes replacement.
    Continue Room projection/recovery, original SDK delivery/history, native-parent
    recovery, product routing and all54 PRD groups:3 in progress/51 planned/none complete.
 4. Push every atomic implementation/test/doc commit. Routine work and pushes are
    authorized. Validate reusable foundation changes in Mobile before any Starter port.
 
-## Other repositories and CI
+## Earlier repository and CI checkpoint (superseded above)
 
 Accepted Mobile source0d10c395fb0c637d27344d037d63961a1af9bd80 is on both recovery and
 primary; recovery source is98ef15a6. First control42383612502/native42383612567

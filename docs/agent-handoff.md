@@ -4,7 +4,54 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current cross-repository execution — 7 November 2026, 04:59 UTC
+## Current cross-repository execution — 7 November 2026, 05:42 UTC
+
+Mobile a48c59f1 is accepted and pushed to both working and primary branches. The
+owning admission flow checks the current native parent, durable setup, original
+handover and device/gateway before publishing readiness. Normal token refresh may
+advance the gateway version while its identity and hard deadline stay fixed. The
+previous exact-version candidate warning is superseded. Full local validation passed
+5,646 fresh cases / 658 suites in 543.951s with 4,296 unchanged inputs and no failures,
+errors, skips, lint or Detekt findings.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/a48c59f1c72892c37abb5bcccf64e3e4417e6ed8/docs/collaboration-space-runtime-admission.md).
+
+Mobile f21f340a adds accepted notification diagnostics, pushed to the temporary
+feat/chat-recovery-20261107 branch. Actual isolated Android notification, process-death
+reply and System UI action proof passed in171.988s; 33 Python cases passed. The final
+Gradle gate reused XML results, with zero errors and49 proof lint warnings. Its owned
+emulator is stopped. Production notification code/timeouts and immutable SDK4 are
+unchanged. No phone UI or provider sends were involved.
+
+ONLY heavy local job61572 is Mobile space-original-queue/focused-1, ten source/test
+files applied and FROZEN. It adds a bounded paused-queue observation addressed by exact
+logical runtime identity, preserving original physical binding/device/bootstrap and
+transaction content. This is NOT yet accepted; read Mobile's current result before
+starting another heavy job. Native original pending-transaction proof, delivery,
+ongoing admission/recovery and product/root integration remain unfinished.
+
+FIRST a48 control42342142245/native42342142282 remain PENDING; preserve them before
+another primary source push. FIRST2509 control42340255503/native42340255481 are still
+running. Its x86 job128306127745 already failed the same notification removal check
+(IOException at confirmRemoved:228); the original log is retained with digest
+ aa4b6775f6c66ac86a32937deaed0ccf7d0a64288df24a643e1de2c77812d316.
+The first780 failure is also retained; no timing cause or repair is established.
+FIRST2509 protocol42340255483 is audited:14 checks in each mode, both digests verified
+against the workflow's pinned Platforme0dbb567 source. No accepted send was rerun.
+
+Starter03ebcde remains pushed with its accepted f25cb3de observability port and first
+Apple197/50 evidence. Original Starter failure/counterevidence remain recorded.
+Release53 is installed on the authorized phone, same UID10962. Passive05:34:41 audit
+again found no post-install logs; this establishes no latency result. Bima already
+has an eligible device/key and a matched200, and need not stay online. Other-room
+zero-peer-device403s are separate. Optional feedback remains pending; never drive
+phone UI. Announce each install and use the exact serial with --install-only.
+
+Group program e45a4313 remains accepted, V117–137 disabled/unshipped. Live API2e75fe1e,
+worker10485916/schema116.1 are unchanged. All54 PRD groups remain unfinished. Preserve
+original Bima userdata/keys/sidecars and transaction IDs; never republish SDK4. Continue
+the long run and push each atomic commit.
+
+## Historical cross-repository checkpoint — 7 November 2026, 04:59 UTC
 
 Mobile2509c9dda373f9eb7b9babc854c67d732b17c6cd is accepted and pushed to both
 feat/chat-recovery-20261107 and feat/communications. It restores actual original SDK

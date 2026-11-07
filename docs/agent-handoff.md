@@ -19,16 +19,15 @@ Earlier durable Fenced sourcefc0034ed passed65 focused/3,697 full and6 supplemen
 Browser policy cases after audit caught a filter selecting zero. Exact old requests,
 keys and schema1 outcomes remain; only new fences use outcome schema2. All old jobs reaped.
 
-ELEVEN atomic Room handoff source/test files are applied/FROZEN and NOT accepted.
-Sole heavy job40440 runs Mobile `.work/space-room-successor-2026-11-07/focused-1`
-(102 expected cases), then required full root/Android host/release lint/75 explicitly
-selected Browser cases/shared Wasm. It uses existing raw archiveAndInsert to retain
-exact original ciphertext and authenticated forward/back links, with one replacement.
-Nine new real-storage cases/two policy cases and explicit repository fakes are included.
-Do not edit frozen source or overlap another compiler/emulator; reap40440 first.
-No owning successor preparation, SDK action, product routing or new APK exists yet.
-[Design](https://github.com/fajarxfce/hris-mobile/blob/0d10c395/docs/collaboration-space-room-successor-plan.md).
-Mobile current recovery checkpoint2d6d2fb3 records this active job.
+Atomic Room handoff98ef15a6 is accepted/pushed on Mobile recovery: eleven source/test
+files preserve original ciphertext and authenticated predecessor/successor links in
+existing raw archiveAndInsert. Focused40440 passed102 cases/216.321s; full45951 passed
+3,777 fresh cases/460 suites/511.466s on4,406 unchanged inputs, zero failures/errors/
+skips/lint. Root, Android host/release lint, quality/shared Wasm and75 explicitly
+verified Browser cases passed. Actual30 storage and8 policy cases ran on Desktop
+SQLite and Browser IndexedDB. All jobs are reaped. No owning successor preparation,
+SDK action, product routing or new APK is added.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/98ef15a6/docs/collaboration-space-room-successor.md).
 
 First0d10 control42383612502/native42383612567 are PENDING behind firstfe
 control42380244144/native42380243983, which both run. Preserve both new first runs
@@ -40,7 +39,7 @@ Original queue sends zero; separate six HRIS scenarios retain exact[1,3,3,176,17
 sends and accepted cleanup. No provider reruns. Prior1d/3b3/79/fb/e8 first CI remains
 accepted. Older source CI does not replace first fence/owning-resolution source CI.
 
-Group checkpoint2a841ce3 retains accepted native dcdaf220/HTTP cf885a1c and V138
+Group checkpoint32a124b4 retains accepted native dcdaf220/HTTP cf885a1c and V138
 storagec6937843. Native focused195/319.052s, API/FULL worker241/540.839s pass with one
 existing opt-in skip. Corrected HTTP99/202.31s on8,637 stable inputs passes; initial
 wrong fixture expectation is retained. All Group jobs are reaped. V117–138 unshipped.
@@ -55,7 +54,7 @@ for another owned room with no recipient device. These do not prove or fix physi
 [matched logs](measurements/collaboration-phone52-room-rejection-2026-11-07.json).
 Any later validated install is announced, explicit serial and install-only.
 
-After atomic storage, continue admitted Room preparation/dispatch/projection, original
+After accepted atomic storage, continue admitted Room preparation/dispatch/projection, original
 SDK delivery/history, native-parent recovery, product routing and all54 groups
 (3 in progress/51 planned/none complete). Sections below are historical checkpoints.
 

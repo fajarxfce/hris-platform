@@ -1,38 +1,43 @@
 # Agent continuation — HRIS workspace
 
-## Current original Open replay continuation — 7 November 2026
+## Current original conversation replay and room fence — 7 November 2026
 
-Mobile1d9493df is accepted/pushed to recovery and primary: finite opening preparation
-recovers same-peer original/canonical facts, admits only new intent and reconciles
-lost local insertion responses. Full36411 passed 3,626 fresh cases / 449 suites in
-491.548s on 4,385 unchanged inputs; zero failures/errors/skips/lint. Root, Android host,
-quality,13 actual Browser cases/shared Wasm passed. All preparation jobs are reaped.
-[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/1d9493df/docs/collaboration-space-conversation-preparation.md).
-Prior canonical metadata aa700e37 passed3,614 cases, actual SQLite/IndexedDB and key custody.
+Mobile335e3914 is accepted/pushed on recovery:12 source/test files preserve original
+Open intent, read normalized durable marks for exact CAS, capture observed outcomes
+through bounded cancellation and publish canonical metadata before archive. Full69888
+passed3,669 fresh cases/452 suites505.461s on4,393 unchanged inputs, zero failures/errors/
+skips/lint. Root, Android host,25 actual Browser domain cases,3 actual Browser real-storage
+cases, shared Wasm and quality passed. Focused34 passed; earlier real SQLite normalization
+failure is preserved. All Mobile builds are reaped. No product caller, SDK send or APK.
+[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/335e3914/docs/collaboration-space-conversation-open-replay.md).
+Prior preparation1d9493df and canonical metadataaa700e37 are accepted.
 
-EIGHT original Open replay files are now applied/FROZEN in Mobile. Sole heavy job15001
-runs focused-1:24 new domain cases, existing command policy and app binding. Not yet
-accepted. Current native owner/original stable operation, durable marking, bounded
-outcome capture through cancellation, pair/global denial separation, exact canonical
-publication before archive, no SDK or message ACK. Full gate is prepared. Read Mobile's
-current handoff before any build/emulator; no second heavy job or frozen-source edits.
-Next complete owning replay validation, then room request receipts/fencing, original
-SDK delivery/history, native-parent recovery and product routing/all54. No group complete.
-[Server fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md).
+Sole heavy local job34560 runs Group .work/room-request-fence-2026-11-07/storage-1.
+FOUR source/test/recovery files are applied/FROZEN, NOT accepted: V138 immutable actor/
+original-operation fence, same original stable-v2 lock and receipt/fence exclusion,
+seven real migration cases (isolation, strict bounds, cancellation/rollback, competing
+writers and pg_dump/restore), plus recovery schema138 without new encrypted envelopes.
+It also runs existing NativeCollaborationSpaceRoomTest, format and architecture.
+Python recovery26 cases passed0.114s after an old unknown-future138 assertion was corrected
+to139; the initial failure is retained. Candidate files are historical applied copies.
+No domain fence repository/use case/HTTP/successor or rollout exists. Read Mobile's
+current handoff before any build/emulator; no second heavy job or frozen Group edits.
+[Original fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md).
 
-First1d control42372520573/native42372520624 are PENDING behind running first3b3
-control42369792173/native42369792184. Preserve first pending runs before primary push.
-First79b control/native are SUCCESS and fully audited in Mobile8579a0de: Apple1,975/225,
-portable4,817/536, each native543/86, zero failures/errors/skips. SDK4 bytes match;
-original queue continuity31.255s x86/77.166s ARM preserves keys/IDs, zero provider sends,
-full cleanup. Separate native HRIS scenarios passed; no accepted provider reruns.
+First3b3 native42369792184 is SUCCESS; original artifact audit is starting. Its control
+42369792173 still runs Apple (portable passed). First1d native42372520624 has started,
+but control42372520573 remains PENDING: preserve before another primary promotion.
+Mobile primary stays1d9493df; Open335e3914 needs its own subsequent first source CI.
+First79b control/native remain fully audited SUCCESS in Mobile8579a0de, SDK4 hashes match.
 
-Phone53 latency remains OPEN. Last bounded ADB retry11:41UTC timed out, no new logs,
-APK or phone UI driving. Bima has published keys and need not remain online for sender
-server acceptance. Do not claim the20s–2min phone delay resolved or repeat the pending
-feedback question. LiveAPI2e75fe1e/worker10485916/schema116.1 remain unchanged; V117–137
-stay disabled. Original Bima data/sidecars/keys/message IDs, SDK4 and Starterb11437a remain.
-This section supersedes older job states retained below as history.
+Continue accepting V138 storage, owning fence/HTTP, Room request projection/recovery,
+original SDK delivery/history, native-parent recovery, product routing and all54 PRD
+groups (3 in progress/51 planned/none complete). Phone53 latency stays OPEN: last bounded
+ADB reconnect11:41UTC timed out, no new phone logs/build/UI driving. Bima has published
+keys and need not stay online for sender server acceptance; do not claim the20s–2min
+phone delay resolved or repeat the pending feedback question. LiveAPI2e75fe1e/worker
+10485916/schema116.1 stay unchanged; V117–138 remain unshipped. Preserve original Bima
+private data/sidecars/keys/message IDs, SDK4 and Starterb11437a. This supersedes older jobs.
 
 ## Latest mobile command continuation — 7 November 2026
 

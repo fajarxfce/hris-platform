@@ -4,6 +4,39 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
+## Current stable room request contract — 7 November 2026
+
+Groupd37459fd is accepted/pushed. Stable native /room/requests and read-only
+/room/requests/receipts/read passed97 actual API cases192.018s on8,624 stable inputs,
+no failures/errors/skips, format/architecture. Two real native refreshes, upgrade,
+replacement-parent recovery, original receipt, one queue and private actor/protocol
+isolation are verified. [Contract/evidence](https://github.com/fajarxfce/hris-platform/blob/d37459fd/docs/collaboration/native-room-stable-intent.md).
+Underlying a6be53b1 stable domain passed181 cases213.656s. Legacy fingerprints remain
+unchanged; v2 keys contain business intent while current native/device/client/peer
+admission stays enforced. No DI constructor change; prior full worker acceptance
+4e1b5b90 remains relevant. No migration rollout or provider/phone/SDK mutation.
+
+Sole heavy local job92668 is Mobile space-room-stable-intent/focused-1; ELEVEN Kotlin
+source/test files applied/FROZEN. It switches room writing to explicit stable v2 and
+adds bounded current-owner receipt read, retaining the older full-proof reader.
+After focused acceptance run required root/Android/lint gate before commit/push.
+Then implement durable open/room commands, finite explicit absence fencing, original
+SDK delivery/history, parent recovery, product routing and all54 PRD groups. Missing
+receipt stays uncertain; no replacement ID or acknowledged message is invented.
+
+Mobileprogramfb514281 and checkpoint5238c156 are pushed; program is on both branches.
+Original e8fc first control/native are fully audited SUCCESS: Apple1,960/223,
+portable4,787/532, each native528/84, zero failures/errors/skips and immutableSDK4.
+Original artifacts/digests preserved. First fb control42363807332/native42363807289
+have BOTH started; audit original results on completion. No accepted sends rerun.
+
+Phone53 latency stays OPEN; Bima has published keys and need not stay online. Latest
+bounded reconnect timed out10:10-10:11UTC, with no new phone evidence. Keep existing
+optional feedback pending; no repeated question, phone UI driving or new APK.
+LiveAPI2e75fe1e/worker10485916/schema116.1, disabled V117-137, original Bima userdata/
+sidecars/keys/transaction IDs and Starterb11437a remain unchanged. Read Mobile's latest
+handoff and running result before another build/emulator. All Group jobs are reaped.
+
 ## Current native room receipt recovery — 7 November 2026
 
 Group `4e1b5b90` is accepted/pushed. Its native read-only original-room receipt

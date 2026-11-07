@@ -1,5 +1,22 @@
 # Agent continuation — HRIS workspace
 
+## Current — native proof storage context; phone52 still pending — 7 November 2026
+
+The proof driver accepts bounded optional recentStorageFailures categories/code
+frames.13 native-device and34 HRIS driver tests plus architecture pass. This is
+proof tooling only; no Kotlin application/DI, live runtime or retry behavior change.
+[Contract](collaboration/native-proof-storage-diagnostics.md). The original x86_64
+priority Storage_Unclassified failure is unresolved; ARM64 passing is insufficient.
+
+ONLY heavy local job: Mobile29087 under .work/native-storage-diagnostic-2026-11-07/gate-1.
+It validates the instrumented proof and root check. Keep its source frozen; no emulator.
+Mobileee338fb3 (source34d507bc) is pushed to primary after both fd05 first gates started.
+New first CI must be recorded/preserved before a further source push.15facc91 control
+is now accepted:4,436 portable and1,788 Apple tests; original artifacts are downloaded.
+The5minute passive phone capture completed with zero requests. No UI or sends were
+performed. LiveAPI2e75fe1e/worker10485916/schema116.1 unchanged, finite route diagnostics
+ready. Continue pending diagnosis, failed native case and all54 communications groups.
+
 ## Current — finite recipient rejection, route diagnosis accepted — 7 November 2026
 
 API061cac31 observed collaboration_recipient_unavailable at01:07:33UTC. Exact route

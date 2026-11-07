@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-11-07T01:26:28.513082+00:00",
+  "baselineSource": "f26f953e8fc008579702d5fddb7d9ac93ab1a994",
+  "fileSha256": {
+    "tool/collaboration_native_device.py": "b2c55d413aaf587ef59585cf285d564df147d1b7036eff277d4ee7df17747958",
+    "tool/test_collaboration_native_device.py": "c1ca03d2604571eecfc2e680f4c0137dc91c1ee732e2eed80a3a4c996d0e36f2"
+  },
+  "tests": {
+    "nativeDevice": 13,
+    "hrisNativeDrivers": 34,
+    "failures": 0,
+    "architecturePassed": true
+  },
+  "scope": "Backward-compatible bounded recent storage categories and code frames in proof evidence only.",
+  "nativeFailureResolved": false,
+  "liveDeploymentChanged": false
+}

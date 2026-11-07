@@ -4,6 +4,32 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
+## Current native conversation/room continuation — 7 November 2026
+
+Mobile e8fc784489e32136a0b47d0df5778af8fee562e5 is accepted/pushed on both branches.
+Native group conversation/open and room request/status transport passed 3,530 fresh
+cases/439 suites in416.326s,4,349 stable inputs and zero failures/errors/skips/Android
+release lint issues. The app test fake now implements the original writer contract.
+No Group product caller or new APK. First e8fc control42360096500/native42360096584 are
+PENDING: preserve them before another primary promotion. Prior72a control/native still
+run; protocol42358423295 is fully audited (14 checks and14pinned source hashes each).
+
+Group c80432eb adds the accepted original-room-proof characterization: all6 native
+room database cases pass118.329s with quality checks and8,613 stable inputs. Native
+rotation or actual build change prevents replay of a previously committed fingerprint,
+while current room metadata stays readable and the original request remains untouched.
+[Evidence/next contract](https://github.com/fajarxfce/hris-platform/blob/c80432eb/docs/collaboration/native-room-receipt-recovery.md).
+
+NEXT explicit original room receipt acquisition under current native/group/participant
+admission, then durable Mobile open/room commands with original proof descriptors.
+A missing receipt does not prove rejection or fence late work. Keep uncertainty and
+original operation; no fake ACK or replacement encrypted-message transaction. Continue
+owning original delivery/history, parent recovery, product routing and all54groups.
+Live services/schema, disabledV117–137, SDK4 and Starterb11437a remain unchanged.
+Phone53 latency remains OPEN; latest passive read failed ADB offline and one bounded
+reconnect timed out. No UI driving/new message. No heavy job or emulator remains.
+Earlier checkpoints below are historical; read the current Mobile/Group handoffs.
+
 ## Current original writer and CI — 7 November 2026
 
 Mobile `72a70e8c29b7a7b55e193fd23a914ac83109585b` is accepted and pushed to

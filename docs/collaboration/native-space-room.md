@@ -27,6 +27,11 @@ The caller's own private head starts at zero or increments its own previous revi
 it never rewrites the other participant's private proof. Active work cannot be stolen.
 Completed bound rooms cannot be retried. Old operation replay returns its original
 receipt after fresh admission, even if another participant now owns the public head.
+That replay also requires the original native parent/version and actual platform/build
+fingerprint. An unchanged JSON body is insufficient after rotation or upgrade; the
+operation returns `operation_payload_mismatch` and retains its original uncertainty.
+[Original receipt recovery](native-room-receipt-recovery.md) records the actual
+database characterization and the remaining explicit recovery requirement.
 
 A mutation receipt identifies the conversation and the observed/created request
 revision; that number is not a global cross-participant version. Read status for the

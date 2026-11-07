@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Current native room transport and replay — 7 November 2026
+
+Mobile e8fc784489e32136a0b47d0df5778af8fee562e5 is accepted and pushed to both
+branches: 22 source/test files; 3,530 fresh cases/439 suites,416.326s,4,349 stable
+inputs, no failures/errors/skips/Android release lint issues. This includes an old
+app-runtime test fake missing the new original writer method, now corrected. No
+product caller or new APK. First e8fc control42360096500/native42360096584 are PENDING;
+preserve them before another primary promotion. Prior72a control/native still run;
+protocol42358423295 is audited:14 checks each, all pinned sources match, native91.638s
+and classic69.285s. Starterb11437a and live services/schema are unchanged.
+
+Group86925 is COMPLETE/REAPED: all6 native room database cases passed118.329s,
+8,613 unchanged inputs, no failures/errors/skips, format/architecture passed.
+One test file characterizes the existing immutable operation fingerprint: changed
+native version or actual build conflicts while current room metadata stays readable;
+stale original proof is denied and no original request/business counts change.
+[Evidence and next implementation](collaboration/native-room-receipt-recovery.md).
+
+NEXT implement explicit original room receipt acquisition under fresh native/group/
+participant admission, then durable Mobile commands and finite owning recovery.
+Retain the complete original proof descriptor. Missing receipt alone cannot fence a
+late original; do not generate replacements or fake completion. Continue original
+SDK delivery/publication, parent recovery, product routing and all54 PRD groups.
+No heavy local job or emulator remains. Phone53 latency is OPEN; latest passive ADB
+read failed offline and a bounded reconnect timed out. Do not repeat the pending
+feedback question or drive the phone. Prior checkpoints below are historical.
+
 ## Current original writer and CI — 7 November 2026
 
 Mobile `72a70e8c29b7a7b55e193fd23a914ac83109585b` is accepted and pushed to

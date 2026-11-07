@@ -1,5 +1,6 @@
 package dev.fajar.hris.collaboration.data
 
+import dev.fajar.hris.administration.domain.entities.ClientVersion
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.*
 import dev.fajar.hris.collaboration.domain.entities.*
@@ -56,6 +57,39 @@ class NativeCollaborationSpaceRoomTest {
         val status = success(f.read())
         assertEquals(CollaborationSpaceProvisioningState.QUEUED, status.provisioning!!.state)
         assertNull(status.room)
+    }
+
+    @Test
+    fun recordedRoomRequestRetainsItsOriginalFingerprintAcrossNativeRotationAndBuildChanges() {
+        val f = Fixture()
+        val operation = UUID.randomUUID()
+        success(f.open(operation))
+        val originalStatus = success(f.read())
+        val originalCounts = f.counts()
+
+        val newBuild = f.open(operation, client = f.f.client.copy(build = f.f.client.build + 1))
+        assertEquals("operation_payload_mismatch", (newBuild as Result.Failed).failure.code)
+        assertEquals(originalCounts, f.counts())
+
+        // Native refresh increments this version. Retained operation input must not be rewritten.
+        assertEquals(
+            1,
+            f.s.owner.update(
+                "update native_sessions set version=1 where id=? and version=0",
+                f.s.parent,
+            ),
+        )
+        assertEquals(originalStatus, success(f.read(parentVersion = 1)))
+        val rotated = f.open(operation, parentVersion = 1)
+        assertEquals("operation_payload_mismatch", (rotated as Result.Failed).failure.code)
+        assertInstanceOf(Result.Failed::class.java, f.open(operation))
+        assertEquals(originalCounts, f.counts())
+        val retained =
+            success(f.s.tx { f.rooms.provisioning(f.s.space, f.s.account, f.conversation) })!!
+        assertEquals(0L, retained.request.nativeSessionVersion)
+        assertEquals(f.f.client, retained.request.client)
+        assertEquals(0L, retained.request.revision)
+        assertEquals(originalStatus, success(f.read(parentVersion = 1)))
     }
 
     @Test
@@ -322,19 +356,21 @@ class NativeCollaborationSpaceRoomTest {
             operation: UUID = UUID.randomUUID(),
             revision: Long? = null,
             journal: ChangeJournalRepository = f.journal,
+            parentVersion: Long = 0,
+            client: ClientVersion = f.client,
         ) =
             command(journal)
                 .execute(
                     s.actor,
                     s.parent,
-                    0,
+                    parentVersion,
                     s.space,
                     operation,
                     conversation,
                     s.device,
                     1,
                     revision,
-                    f.client,
+                    client,
                     revision?.let { s.account },
                 )
 
@@ -342,6 +378,7 @@ class NativeCollaborationSpaceRoomTest {
             actor: Actor = s.actor,
             parent: UUID = s.parent,
             rooms: CollaborationSpaceRoomRepository = this.rooms,
+            parentVersion: Long = 0,
         ) =
             ReadNativeCollaborationSpaceRoom(
                     rooms,
@@ -355,7 +392,7 @@ class NativeCollaborationSpaceRoomTest {
                     IdentitySecurityPolicy(),
                     f.clock,
                 )
-                .execute(actor, parent, 0, s.space, conversation, f.client)
+                .execute(actor, parent, parentVersion, s.space, conversation, f.client)
 
         fun revokePeer() {
             s.owner.update(

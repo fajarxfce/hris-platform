@@ -1,0 +1,41 @@
+{
+  "at": "2026-11-07T09:33:04.071304+00:00",
+  "scope": "Existing native room operation fingerprint characterization; no production or DI changes",
+  "sourceSha256": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceRoomTest.kt": "5b1cc334e93f12397d520c4a18cf603b5cd719e109bfa4acf5eaf28f6b1b9f84"
+  },
+  "validation": {
+    "startedAt": "2026-11-07T09:30:13.632172+00:00",
+    "elapsedSeconds": 118.329,
+    "exitCode": 0,
+    "sourceFiles": 8613,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skipped": [],
+    "reports": {
+      "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.NativeCollaborationSpaceRoomTest.xml": {
+        "sha256": "be9a70795a6951cb61c19cdcb5f8aab7ae6948dca3b446cbaf8f4871fcc91d1b",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "observations": [
+    "Same original operation and same proof replays the recorded receipt.",
+    "The same operation with a new actual client build returns operation_payload_mismatch without writes.",
+    "After native session version advances, current room metadata remains readable; the old operation with the new version conflicts.",
+    "The stale original native proof cannot regain authority; original request/native version/client/revision remain unchanged."
+  ],
+  "limits": [
+    "This is current behavior, not an implemented original receipt recovery route.",
+    "No provider I/O, device installation, schema change or Group rollout.",
+    "A missing receipt cannot by itself fence a late original request."
+  ]
+}

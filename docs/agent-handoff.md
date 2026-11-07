@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Latest mobile command continuation — 7 November 2026
+
+Mobile `79b41269475c396cbef28a2c1424681c4cb57409` is accepted and pushed to both
+branches: stable v2 room writer/current-owner receipt reader, 36 focused cases and
+3,560 full fresh cases/443 suites/366.186s, 4,359 unchanged inputs, zero failures,
+errors, skips or Android release lint issues. Legacy original-proof read remains.
+[Mobile contract](https://github.com/fajarxfce/hris-mobile/blob/79b41269/docs/collaboration-space-room-stable-intent.md).
+First control42366357406/native42366357400 are pending behind fb514281's running
+control42363807332/native42363807289; preserve original first runs before another
+primary promotion. Recovery-branch work may continue without replacing pending runs.
+
+Sole local heavy job33920 is Mobile durable conversation commands/focused-1. TEN
+new Kotlin files are frozen: immutable open/stable-room intent, pure transition
+policy, strict encrypted codec and raw CommandStore repository, plus real Desktop/
+Browser/Apple storage contracts and pure tests. These changes are NOT yet accepted
+or committed. After focused, run required root/Android/lint plus browser storage/
+policy and shared Wasm compilation. Do not overlap any compiler or emulator.
+Archive exact encrypted recorded results only after owning local projection; no
+archive scans, lost-key recreation, uncertain replacement or fake message ACK.
+
+NEXT accept durable commands, owning finite dispatch and explicit server fencing,
+original SDK delivery/history, native-parent recovery, product routing and all54
+PRD groups (none complete). V117–137 remain disabled/unshipped. Phone53 latency stays
+OPEN, Bima has keys and need not remain online; no new APK/phone UI driving. Live
+services/schema, original Bima data/keys/IDs, SDK4 and Starterb11437a remain unchanged.
+This section supersedes older running-job statements retained below as history.
+
 ## Current stable native room HTTP — 7 November 2026
 
 Six HTTP source/test files are accepted: stable /room/requests writer and read-only

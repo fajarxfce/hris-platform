@@ -1,6 +1,58 @@
 # Agent continuation — HRIS workspace
 
-## Current cross-repository execution — 7 November 2026, 04:19UTC
+## Current cross-repository execution — 7 November 2026, 04:59 UTC
+
+Mobile2509c9dda373f9eb7b9babc854c67d732b17c6cd is accepted and pushed to both
+feat/chat-recovery-20261107 and feat/communications. It restores actual original SDK
+keys under logical organization ownership without creating replacement files.
+Two-ABI SDK4/Keystore proof passed139.411s through interrupted credential staging,
+process death and exact replay. Full local11355 passed5,604fresh/656suites/544.194s,
+4,291stable inputs,zero failures/errors/skips/lint/Detekt. Its first failed native
+bulk-lookup assertion is retained; corrected source excludes every legacy lookup.
+Only key and queue namespace continuity are proved, not actual pending delivery.
+[Mobile contract](https://github.com/fajarxfce/hris-mobile/blob/2509c9dda373f9eb7b9babc854c67d732b17c6cd/docs/collaboration-space-runtime-adoption.md).
+
+ONLY heavy local job63714 is Mobile space-runtime-admission-flow/focused-1. Twelve
+program/test/DI files are uncommitted and FROZEN. The owning finite admission flow,
+metadata-only readiness, late-resource cleanup and atomic gateway generation guard
+are under test. Earlier registry-before99848 reproduced two stale-attempt failures
+in11cases/41.622s. The new guard must retain the exact newer slot before any drain.
+IMPORTANT review found backend RefreshNativeCollaborationSpaceGateway increments
+version on ordinary token refresh. The candidate exact version equality therefore
+needs correction after the active gate finishes, with a rotation regression; do not
+publish or activate that candidate. No emulator or phone UI; check current Mobile
+handoff and local results before starting another heavy job.
+
+FIRST2509 native42340255481/protocol42340255483 are IN_PROGRESS; control42340255503
+is PENDING behind first780 control42336761340. Preserve that first pending control.
+First780 native42336761242 FAILED: ARM463/77 and x86host457/74 cases all passed;
+x86 raw notification absence confirmation threw IOException before later native
+checks. Digests/artifacts13561286168/13560642322 and log are recorded. Cause remains
+open; no rerun. Firstc141 control42333989403 is now accepted:4,488portable/482suites,
+1,814Apple/199suites,zero all,verified artifacts13560471120/13559924669. Its native
+run passed450cases/74suites EACHABI. Original first-run evidence remains authoritative.
+
+Starterf25cb3de exact observability port is accepted. First Apple42337213669 passed
+197cases/50suites plus simulator app and associations; artifact13560653234 digest
+cd808d95bc5c189cbbff52220e2f1b71be1b7b663df691fa37712d83926406b2 is verified.
+Docs03ebcde are pushed. Prior first Applefdbff51 failure remains recorded; Mobilec141
+passed the original assertion without the explicit catch. No deterministic Native
+compiler cause is established. Generic fixes return to Starter; HRIS ownership stays
+in Mobile.
+
+Release53 remains installed, sameUID10962. Passive phone audit04:50:29 reached both
+profiles but retained no post-install logs or fatals; silence proves no delivery.
+Bima has a confirmed eligible device/key and matched200;403s belonged to another
+room with no peer devices. Physical pending latency is OPEN and optional feedback
+pending. Preserve original Bima userdata/sidecars/keys. Announce every phone install,
+explicit serial10.77.77.3:5555, --install-only; never drive the phone UI.
+
+Group e45a4313 remains accepted;V117–137 disabled/unshipped. LiveAPI2e75fe1e/
+worker10485916/schema116.1 unchanged. SDK4 immutable; never republish. Owning runtime
+admission, original pending delivery, hard-parent recovery, root/product routing and
+all54PRD groups remain unfinished. Continue long run and push each atomic commit.
+
+## Historical cross-repository checkpoint — 7 November 2026, 04:19UTC
 
 Mobile c70fe7cb is accepted/pushed on temporary feat/chat-recovery-20261107. Its
 logical Space registry keeps the original physical slot/device/owner and excludes

@@ -1,30 +1,37 @@
 # Agent continuation — HRIS workspace
 
-## Current cross-repository execution — 7 November 2026
+## Current cross-repository execution — 7 November 2026, 03:30UTC
 
-Group implementation e45a4313 remains accepted/pushed; original publication preflight
-and V117–137 are still disabled/unshipped. The checkpoint below retains its accepted
-results; its old active-job references are historical. Main dd72d6bb and the current
-Mobile handoff carry newer execution state. Always check those before starting builds.
+Group e45a4313 remains accepted/pushed; publication preflight and V117–137 are disabled/
+unshipped. The older checkpoint below retains historical job references. Read Main
+2af46918 and the current Mobile handoff before starting any builds. Live API2e75fe1e/
+worker10485916/schema116.1 stays unchanged; SDK4 is immutable.
 
-Mobile release53/source08545820 is installed after7,436 full tests, actual WorkManager
-proof and four original Bima offline/online entries. Same phone UID/data/keys retained,
-no phone UI driven. Bima has confirmed keys; matched403 sends belong to another room
-with no registered peer device. Physical pending latency remains open awaiting user
-feedback. Starter0002d10 generic worker port passed90fresh tests; FIRST Apple42331840556
-is running. Do not cancel/repeat it. SDK4 is immutable.
+Mobile c1410b31 publication transport plus explicit read-only POST auth replay is now
+accepted and pushed to primary/temporary communications branches:6,096fresh cases/
+753suites/830.513s,4,271stable inputs, zero failures/errors/skips/lint/Detekt. The first
+gate had two failed assertions revealing absent read-only POST replay; the second
+had a new test compile error. Neither failure was expected or erased. Final core and
+transport regressions passed. Ordinary unsafe/streaming requests retain their guards.
 
-ONLY heavy local job62485 is Mobile legacy-publication-transport/focused-2. Eleven
-source/test files are UNCOMMITTED and FROZEN. First focused gate had two expected
-capability failures: plain POST without a command key was not automatically replayed
-after authentication refresh. The actual read-only publication endpoint now explicitly
-opts into one repeatable-body replay, with three generic network regressions preserving
-ordinary POST/stream/PATCH restrictions and cancellation. Four new transport cases
-remain intact. Full validation and a generic Starter network port follow acceptance.
-No emulator or other local build may run alongside62485. Live Main API2e75fe1e/worker
-10485916/schema116.1 remains unchanged. Owning recovery/adoption and all54PRD groups
-remain unfinished. Push every commit and announce every explicit-serial install-only
-phone update. No resets, replacement sends or manufactured acknowledgements.
+Release53/source085 remains installed. Bima has confirmed keys and a matchedHTTP200;
+the matched403 failures belong to another room with no registered peer device. The
+physical latency report remains OPEN awaiting optional feedback. No phone UI or new
+agent sends. Original Bima data and all sidecars/keys are retained.
+
+Starter0002d102 FIRST Apple42331840556 passed154cases/37suites,including16worker cases,
+zero failures/errors/skips; exact artifact digest verified. Generic network source
+from accepted Mobile c1410b31 is now applied in Starter. ONLY heavy job61036 runs its
+read-only-post-port/check-1. Keep Starter inputs frozen; no concurrent build/emulator.
+
+Mobile owning AdvanceCollaborationSpaceRuntimeTransfer is applied but UNCOMMITTED/
+UNTESTED. It joins fresh provider observation, exact SDK stop/join/private proof and
+durable target, current admission, same-operation freeze and one drain read. Fourteen
+domain cases and DI coverage are prepared. No live caller or adoption. First c141
+control42333989403 is PENDING and must be preserved before another primary source
+push. Prior085control runs; its native446cases EACHABI and protocol14checks eachmode
+are accepted/audited. Owning adoption, changed/revoked parent recovery, organization
+routing and all54groups remain open. Continue work and push each atomic commit.
 
 
 ## Current — 7 November 2026, 02:05UTC: original publication preflight accepted

@@ -4,6 +4,31 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
+## Current owning conversation command continuation — 7 November 2026
+
+Mobilec8c952af is accepted/pushed on recovery: encrypted open/stable-room commands,
+exact CAS/archives and key custody, real SQLite/IndexedDB tests. Full18016 passed3,598
+fresh cases/447 suites813.971s on4,369 unchanged inputs, zero failures/errors/skips/
+lint issues, root/Android host/Browser/quality/shared Wasm. All storage jobs reaped.
+[Contract/results](https://github.com/fajarxfce/hris-mobile/blob/c8c952af/docs/collaboration-space-conversation-commands.md).
+
+Sole heavy local job73246 is Mobile owning command observation/focused-1: FOUR files
+applied/FROZEN, seven ownership/lifetime cases plus actual factory/application DI
+resolution. Not accepted yet. Follow Mobile's current handoff before any build;
+next required root/Android/lint/Browser/shared Wasm gate is already prepared.
+After acceptance, owning prepare/replay, canonical local projection and explicit
+[server fence design](https://github.com/fajarxfce/hris-platform/blob/e131495e/docs/collaboration/native-room-request-fencing-plan.md),
+then original SDK delivery/history, native-parent recovery, product routing/all54.
+
+First fb native42363807289 is SUCCESS/audited: each ABI537/85, immutableSDK4 and
+artifact digests verified; original queue continuity24.827s x86/80.993s ARM with zero
+provider sends, preserved keys/IDs and cleanup. Mobileac8ac15d retains public evidence.
+fb control42363807332 remains running; first79b native42366357400 has started while
+control42366357406 remains pending. Preserve that first pending run before promotion.
+Phone53 latency remains OPEN, latest10s ADB retry timed out by11:09UTC. No new APK,
+phone UI, SDK publication, migration or live deployment. V117–137 stay disabled and
+original Bima data/keys/message IDs remain. This section supersedes older job states.
+
 ## Latest mobile command continuation — 7 November 2026
 
 Mobile `79b41269475c396cbef28a2c1424681c4cb57409` is accepted and pushed to both

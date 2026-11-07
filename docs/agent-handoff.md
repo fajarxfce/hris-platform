@@ -1,5 +1,31 @@
 # Agent continuation — HRIS Platform organization chat
 
+## Inspector / Mobile checkpoint — 07 November 2026, 21:06 UTC
+
+Mobile primary and feat/network-inspector-20261107 are be2fe021, pushed. Optional Android
+HTTP observation now has explicit client-owned cancellation/disposal;534 fresh Android
+cases including7 new ownership cases pass. Root check/Wasm/quality/lint pass and5013
+same-source first-run reports were reused. Full bb106 first CI artifacts are audited in
+Mobile Git. New be2 first control42414100643/native42414100684 runs are in progress.
+
+Inspector private branch9e710f0 already passed five actual x86_64 JNI/HTTP scenarios and
+13 host cases against the full four-ABI SDK5 candidate. SDK5 is packaged but UNPUBLISHED;
+SDK4 is unchanged. Source branch9673eb1f corrects an Apple-only archive-symbol grouping
+bug. Three exact Rust unit cases pass; first corrected Apple CI42413788416 runs. Original
+Apple42408920984 failed at linking; no Apple/native acceptance is claimed.
+
+Sole local heavy job42291 checks the new inspector reset/close and dynamic Ktor/Matrix
+capture-lifetime increment. Its sources are frozen until reaped; no emulator runs.
+Mobile host integration remains pending. The private-public visibility question remains
+unanswered; do not copy private library source into public Mobile or change visibility.
+Phone and original stopped Bima emulator remain55. Build56 scripts are staged for the
+accepted viewport fix but no56 build, acceptance or installation exists yet. Continue
+validated phone updates, real inspector capture/overhead, composer handoff/latency, Starter
+port and all54 original PRD groups. No group complete;3 in progress/51 planned. Existing
+live API2e75fe1e, worker10485916, schema116.1 and disabled Group routing are unchanged.
+V117–138 remain undeployed. Mobile docs/agent-handoff.md owns the exact current steps.
+
+
 ## Mobile inspector continuation — 07 November 2026, 20:18 UTC
 
 Mobile recovery7d8ef8aa is pushed; primarybb106154 remains accepted. Phone and original

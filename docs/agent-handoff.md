@@ -1,5 +1,44 @@
 # Agent continuation — HRIS workspace
 
+## Current — 7 November 2026: preflight still required; Main/Mobile diagnosis active
+
+Group program344211f8 remains unchanged, V117–137 unshipped/disabled. This header
+supersedes the stale SDK3/phone50/job references below. Follow the current Mobile
+handoff, including its temporaryfeat/chat-recovery-20261107 branch376a5096; primary
+is ee338fb3/source34d507bc. SDK4 is immutable/published, phone52 installed and original
+pending remains OPEN. Starterb37f8c8/source5fb4eca3 is accepted and unchanged.
+Main source940c181c contains proof diagnostics only above liveAPI2e75fe1e; worker
+10485916/schema116.1 and all provider/storage/configuration remain unchanged.
+
+Mobile interrupted credential handover preserves strictschema3/false initialization
+with the exact target and original private store.67 focused and5,512 full cases,
+actual two-ABI SDK mechanism and no-send continuity passed. The owning flow remains
+absent. Original hard-parent recovery must not weaken existing same-parent guards.
+
+NEXT Group capability: an admitted provider-publication preflight before Mobile
+irreversibly stages the original store. AdvanceCollaborationSpaceProvisioning already
+reads actual provider keys, but observeRetained waits for DRAINING first; it cannot
+serve the required pre-stage check. Add a separate finite use case/HTTP observation
+that admits current root/native/group/client/MFA and exact PROVISIONING legacy target,
+reads actual provider keys via existing provider repositories, validates canonical
+user/device and immutable fingerprint, then revalidates the complete observation.
+No SQL transaction spans provider I/O. Return no bearer, no upload/registration,
+no SDK ownership, no freeze and no ACTIVE state. Public fingerprint alone is not
+private possession. Preserve existing same-parent admission; revoked/changed native
+parent requires its separate explicit recovery flow. A cancelled/late provider login
+must never be logged out because that destroys winning same-device keys/tokens.
+This is the next design constraint, NOT an implemented capability or accepted test.
+
+ONLY heavy local job83374: Main.work/native-storage-diagnostic-2026-11-07/native-1,
+repeating ONLY the failed frozen-draft/priority worker scenario with new diagnostics.
+Fresh emulator5560/PID2936535/startTicks169172211 uses Mobile's separate owned
+native-storage-diagnostic directory, never original Bima5562data. Main/Mobile inputs
+are frozen until it ends. Native priority stage passed; full incoming history still
+runs as01:35UTC. Original CI x86Storage failure remains unresolved; ARM64 passed.
+No phone UI or new employee message. Preserve firstee control42323799690 and native
+42323799725 pending runs; don't displace them with another primary source push.
+Continue phone403 diagnosis, preflight/owning adoption and all54 PRD groups.
+
 ## Current: original key reader candidate; Mobile first CI accepted — 6 November 2026
 
 Group program344211f8 remains accepted and unchanged. V117–137 remain unshipped/disabled;

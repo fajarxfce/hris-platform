@@ -1,5 +1,10 @@
 # Architecture
 
+[Original room receipt acquisition](collaboration/native-room-receipt-recovery.md)
+matches the immutable request fingerprint under current native/group admission.
+Receipt metadata survives original-parent purge; absence remains uncertain and grants
+no replacement request, SDK or content authority. HTTP integration remains separate.
+
 [Original publication preflight](collaboration/legacy-publication-preflight.md) reads
 actual signed provider keys under fresh native/group admission before Mobile stages
 its existing private store. It writes no runtime or device authority; owning adoption

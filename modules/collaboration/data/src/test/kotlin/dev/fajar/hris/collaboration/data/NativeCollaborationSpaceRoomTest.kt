@@ -1,5 +1,6 @@
 package dev.fajar.hris.collaboration.data
 
+import dev.fajar.hris.administration.domain.entities.ClientPlatform
 import dev.fajar.hris.administration.domain.entities.ClientVersion
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.*
@@ -130,6 +131,303 @@ class NativeCollaborationSpaceRoomTest {
             assertEquals(before, f.counts(), mode)
             f.f.clock.at = start
             if (mode == "peer") f.grantPeer()
+        }
+    }
+
+    @Test
+    fun explicitReceiptReadUsesCurrentAdmissionAndKeepsOriginalProofAfterRotation() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        val recorded = success(f.open(original.operationId))
+        val before = f.counts()
+        f.s.owner.update("update native_sessions set version=1 where id=?", f.s.parent)
+        val recovered =
+            success(
+                f.receipt(
+                    original,
+                    currentVersion = 1,
+                    client = f.f.client.copy(build = 6),
+                    policy = CollaborationSpacePolicy(true, 6, 6),
+                )
+            )
+        assertEquals(original, recovered.original)
+        assertEquals(recorded.copy(replayed = true), recovered.receipt)
+        assertInstanceOf(Result.Failed::class.java, f.receipt(original))
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.receipt(original, currentVersion = 1, policy = CollaborationSpacePolicy(true, 6, 6)),
+        )
+        assertEquals(before, f.counts())
+        val retained =
+            success(f.s.tx { f.rooms.provisioning(f.s.space, f.s.account, f.conversation) })!!
+        assertEquals(0L, retained.request.nativeSessionVersion)
+        assertEquals(original.client, retained.request.client)
+    }
+
+    @Test
+    fun originalReceiptSurvivesRevocationAndPurgeWithoutRevivingItsParent() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        val recorded = success(f.open(original.operationId))
+        val replacement = UUID.randomUUID()
+        f.s.owner.update(
+            "insert into native_sessions(id,account_id,refresh_hash,authenticated_at,expires_at,credential_version,access_expires_at,created_at,rotated_at) select ?,account_id,?,authenticated_at,expires_at,credential_version,access_expires_at,created_at,rotated_at from native_sessions where id=?",
+            replacement,
+            replacement.toString().replace("-", "").repeat(2),
+            f.s.parent,
+        )
+        f.s.owner.update("update native_sessions set revoked_at=now() where id=?", f.s.parent)
+        assertEquals(
+            recorded.copy(replayed = true),
+            success(f.receipt(original, currentParent = replacement)).receipt,
+        )
+        assertInstanceOf(Result.Failed::class.java, f.receipt(original))
+        f.s.owner.update("delete from native_sessions where id=?", f.s.parent)
+        val afterPurge = f.counts()
+        assertEquals(
+            recorded.copy(replayed = true),
+            success(f.receipt(original, currentParent = replacement)).receipt,
+        )
+        assertEquals(afterPurge, f.counts())
+        assertEquals(
+            0,
+            f.s.owner.queryForObject(
+                "select count(*) from native_sessions where id=?",
+                Int::class.java,
+                f.s.parent,
+            ),
+        )
+    }
+
+    @Test
+    fun completeOriginalFingerprintIsRequiredAndAnAbsentReceiptCannotFenceLateWork() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        val empty = f.counts()
+        val missing = success(f.receipt(original))
+        assertEquals(original, missing.original)
+        assertNull(missing.receipt)
+        assertEquals(empty, f.counts())
+        val recorded = success(f.open(original.operationId))
+        assertEquals(recorded.copy(replayed = true), success(f.receipt(original)).receipt)
+        val before = f.counts()
+        for (changed in
+            listOf(
+                original.copy(nativeSessionId = UUID.randomUUID()),
+                original.copy(nativeSessionVersion = 1),
+                original.copy(deviceId = UUID.randomUUID()),
+                original.copy(expectedDeviceVersion = 2),
+                original.copy(client = original.client.copy(build = 6)),
+                original.copy(expectedAttempt = CollaborationSpaceRoomObservedAttempt(f.peer, 0)),
+            )) assertEquals(
+            "operation_payload_mismatch",
+            (f.receipt(changed) as Result.Failed).failure.code,
+        )
+        assertEquals(before, f.counts())
+    }
+
+    @Test
+    fun aPeerCannotReadAnotherActorsReceiptAndInvalidDescriptorsCannotReachItsStore() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        success(f.open(original.operationId))
+        val before = f.counts()
+        assertNull(
+            success(f.receipt(original, actor = f.peerActor, currentParent = f.peerParent)).receipt
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.receipt(original, actor = f.s.actor.copy(companyId = f.s.company)),
+        )
+        val noRead =
+            object : OperationRepository by f.f.operations {
+                override fun lockAndReplay(
+                    actor: Actor,
+                    key: OperationKey,
+                ): Result<MutationReceipt?> = error("Invalid descriptor reached receipt storage")
+            }
+        val nil = UUID(0, 0)
+        for (invalid in
+            listOf(
+                original.copy(operationId = nil),
+                original.copy(spaceId = nil),
+                original.copy(conversationId = nil),
+                original.copy(nativeSessionId = nil),
+                original.copy(deviceId = nil),
+                original.copy(nativeSessionVersion = -1),
+                original.copy(nativeSessionVersion = 1_000_000),
+                original.copy(expectedDeviceVersion = -1),
+                original.copy(expectedDeviceVersion = 1_000_000),
+                original.copy(expectedAttempt = CollaborationSpaceRoomObservedAttempt(nil, 0)),
+                original.copy(
+                    expectedAttempt = CollaborationSpaceRoomObservedAttempt(f.peer, 1_000_000)
+                ),
+                original.copy(client = original.client.copy(platform = ClientPlatform.WEB)),
+                original.copy(client = original.client.copy(build = 0)),
+            )) assertEquals(
+            "invalid_collaboration_room_operation",
+            (f.receipt(invalid, operations = noRead) as Result.Failed).failure.code,
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.receipt(original, operations = noRead, policy = CollaborationSpacePolicy(false, 5, 5)),
+        )
+        assertEquals(before, f.counts())
+    }
+
+    @Test
+    fun aStoredReceiptForAnotherConversationOrAnInvalidRevisionCannotBePublished() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        val before = f.counts()
+        for (corrupted in
+            listOf(
+                MutationReceipt(UUID.randomUUID(), 0),
+                MutationReceipt(f.conversation, -1),
+                MutationReceipt(f.conversation, 1_000_000),
+            )) {
+            val source =
+                object : OperationRepository by f.f.operations {
+                    override fun lockAndReplay(
+                        actor: Actor,
+                        key: OperationKey,
+                    ): Result<MutationReceipt?> = Result.Success(corrupted)
+                }
+            assertEquals(
+                "collaboration_room_provisioning_changed",
+                (f.receipt(original, operations = source) as Result.Failed).failure.code,
+            )
+        }
+        assertEquals(before, f.counts())
+    }
+
+    @Test
+    fun currentDenialAndCapturedDeadlineOverrideSuccessfulAndFailedReceiptAcquisition() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        success(f.open(original.operationId))
+        val before = f.counts()
+        f.revokePeer()
+        for (query in listOf(original, original.copy(nativeSessionVersion = 1))) {
+            assertEquals(
+                "collaboration_peer_unavailable",
+                (f.receipt(query) as Result.Failed).failure.code,
+            )
+        }
+        f.grantPeer()
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.receipt(original, currentParent = f.peerParent),
+        )
+        val start = f.f.clock.instant()
+        for (query in listOf(original, original.copy(nativeSessionVersion = 1))) {
+            val slow =
+                object : OperationRepository by f.f.operations {
+                    override fun lockAndReplay(
+                        actor: Actor,
+                        key: OperationKey,
+                    ): Result<MutationReceipt?> {
+                        val acquired = f.f.operations.lockAndReplay(actor, key)
+                        f.f.clock.at = start.plusSeconds(30)
+                        return acquired
+                    }
+                }
+            assertEquals(
+                "collaboration_room_provisioning_changed",
+                (f.receipt(query, operations = slow) as Result.Failed).failure.code,
+            )
+            f.f.clock.at = start
+        }
+        var reads = 0
+        val late =
+            object : CollaborationSpaceConversationRepository by f.conversations {
+                override fun member(
+                    spaceId: UUID,
+                    accountId: UUID,
+                ): Result<CollaborationSpaceMember?> {
+                    val acquired = f.conversations.member(spaceId, accountId)
+                    if (++reads == 3) f.f.clock.at = start.plusSeconds(30)
+                    return acquired
+                }
+            }
+        assertEquals(
+            "collaboration_room_provisioning_changed",
+            (f.receipt(original, conversations = late) as Result.Failed).failure.code,
+        )
+        f.f.clock.at = start
+        assertEquals(before, f.counts())
+    }
+
+    @Test
+    fun receiptReadPreservesCancellationAndWaitsForAnOriginalUncommittedWriter() {
+        val f = Fixture()
+        val original = f.original(UUID.randomUUID())
+        val before = f.counts()
+        for (interrupted in listOf(false, true)) {
+            val cancelled =
+                object : OperationRepository by f.f.operations {
+                    override fun lockAndReplay(
+                        actor: Actor,
+                        key: OperationKey,
+                    ): Result<MutationReceipt?> {
+                        f.f.operations.lockAndReplay(actor, key)
+                        if (interrupted) throw InterruptedException("fictional receipt read")
+                        throw CancellationException("fictional receipt read")
+                    }
+                }
+            if (interrupted)
+                assertThrows(InterruptedException::class.java) {
+                    f.receipt(original, operations = cancelled)
+                }
+            else
+                assertThrows(CancellationException::class.java) {
+                    f.receipt(original, operations = cancelled)
+                }
+            assertEquals(before, f.counts())
+        }
+        val held = CountDownLatch(1)
+        val finish = CountDownLatch(1)
+        val reading = CountDownLatch(1)
+        val pool = Executors.newFixedThreadPool(2)
+        try {
+            val journal =
+                object : ChangeJournalRepository {
+                    override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                        f.f.journal.record(actor, change).map {
+                            held.countDown()
+                            assertTrue(finish.await(10, TimeUnit.SECONDS))
+                        }
+                }
+            val writer =
+                pool.submit<Result<MutationReceipt>> {
+                    f.open(original.operationId, journal = journal)
+                }
+            assertTrue(held.await(10, TimeUnit.SECONDS))
+            val operations =
+                object : OperationRepository by f.f.operations {
+                    override fun lockAndReplay(
+                        actor: Actor,
+                        key: OperationKey,
+                    ): Result<MutationReceipt?> {
+                        reading.countDown()
+                        return f.f.operations.lockAndReplay(actor, key)
+                    }
+                }
+            val reader =
+                pool.submit<Result<CollaborationSpaceRoomReceiptObservation>> {
+                    f.receipt(original, operations = operations)
+                }
+            assertTrue(reading.await(10, TimeUnit.SECONDS))
+            assertThrows(TimeoutException::class.java) { reader.get(200, TimeUnit.MILLISECONDS) }
+            finish.countDown()
+            assertEquals(
+                success(writer.get(10, TimeUnit.SECONDS)).copy(replayed = true),
+                success(reader.get(10, TimeUnit.SECONDS)).receipt,
+            )
+        } finally {
+            finish.countDown()
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
         }
     }
 
@@ -393,6 +691,43 @@ class NativeCollaborationSpaceRoomTest {
                     f.clock,
                 )
                 .execute(actor, parent, parentVersion, s.space, conversation, f.client)
+
+        fun original(operation: UUID) =
+            CollaborationSpaceRoomOperation(
+                operation,
+                s.space,
+                conversation,
+                s.parent,
+                0,
+                s.device,
+                1,
+                null,
+                f.client,
+            )
+
+        fun receipt(
+            original: CollaborationSpaceRoomOperation,
+            currentParent: UUID = s.parent,
+            currentVersion: Long = 0,
+            client: ClientVersion = f.client,
+            operations: OperationRepository = f.operations,
+            conversations: CollaborationSpaceConversationRepository = this.conversations,
+            actor: Actor = s.actor,
+            policy: CollaborationSpacePolicy = CollaborationSpacePolicy(true, 5, 5),
+        ) =
+            ReadNativeCollaborationSpaceRoomReceipt(
+                    operations,
+                    rooms,
+                    conversations,
+                    f.spaces,
+                    f.sessions,
+                    f.identities,
+                    s.transactions,
+                    policy,
+                    IdentitySecurityPolicy(),
+                    f.clock,
+                )
+                .execute(actor, currentParent, currentVersion, client, original)
 
         fun revokePeer() {
             s.owner.update(

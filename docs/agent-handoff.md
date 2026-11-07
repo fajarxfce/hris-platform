@@ -1,5 +1,26 @@
 # Agent continuation — HRIS workspace
 
+## Current original room receipt acquisition — 7 November 2026
+
+Six Kotlin files implement internal original receipt acquisition and its unchanged
+writer fingerprint policy. Gate53824 passed175 fresh domain/database cases in197.492s,
+8,617 stable inputs, no failures/errors/skips, format/architecture passed. Initial
+reader7273 passed11 database cases in173.240s. Current13 database cases cover native
+rotation/minimum-build upgrade, old-parent revocation/purge, full fingerprint matching,
+uncertain absence, peer isolation, corrupt receipt guards, cancellation and a competing
+uncommitted original writer. Current denials/deadlines override either lookup outcome.
+All sessions are reaped; no heavy job/emulator remains.
+[Contract/evidence](collaboration/native-room-receipt-recovery.md).
+
+NEXT expose the internal reader through a bounded native read-only endpoint, with
+current headers distinct from the original descriptor. DI wiring must validate actual
+API and full worker contexts. Then Mobile transport/durable original commands and
+finite owning recovery; absent-original handoff still needs explicit fencing and
+retained uncertainty. No new operation on timeout, old-parent revival or false receipt.
+Continue original encrypted-message delivery/history, parent recovery, product routing
+and all54 PRD groups. V117–137 remains disabled; live services/phone/SDK4 unchanged.
+Mobilee8fc first control42360096500/native42360096584 remain PENDING; preserve both.
+
 ## Current native room transport and replay — 7 November 2026
 
 Mobile e8fc784489e32136a0b47d0df5778af8fee562e5 is accepted and pushed to both

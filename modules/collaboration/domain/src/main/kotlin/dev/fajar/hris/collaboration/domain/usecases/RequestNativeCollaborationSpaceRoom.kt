@@ -67,21 +67,23 @@ class RequestNativeCollaborationSpaceRoom(
         val currentClient = requireNotNull(client)
         val started = clock.instant()
         val key =
-            OperationKey(
-                "collaboration.space_room_setup",
-                operationId,
-                listOf(
-                    spaceId.toString(),
-                    conversationId.toString(),
-                    parentId.toString(),
-                    parentVersion.toString(),
-                    deviceId.toString(),
-                    expectedDeviceVersion.toString(),
-                    expectedRequestRevision?.toString() ?: "initial",
-                    expectedRequestAccountId?.toString() ?: "initial",
-                    currentClient.platform.name,
-                    currentClient.build.toString(),
-                ),
+            collaborationSpaceRoomOperationKey(
+                CollaborationSpaceRoomOperation(
+                    operationId,
+                    spaceId,
+                    conversationId,
+                    parentId,
+                    parentVersion,
+                    deviceId,
+                    expectedDeviceVersion,
+                    expectedRequestRevision?.let {
+                        CollaborationSpaceRoomObservedAttempt(
+                            requireNotNull(expectedRequestAccountId),
+                            it,
+                        )
+                    },
+                    currentClient,
+                )
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)

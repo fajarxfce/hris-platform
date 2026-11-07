@@ -20,9 +20,33 @@ preserve original bodies and idempotency keys, but that alone cannot recover an
 already committed fingerprint under changed authentication. Do not interpret a
 mocked credential replay as such proof. Keep the original uncertainty and ID.
 
-## Next implementation
+## Accepted internal acquisition
 
-Add an explicit read of an **original** operation receipt under current native,
+`ReadNativeCollaborationSpaceRoomReceipt` now reads the actor-owned original receipt
+with the complete immutable operation descriptor. The request writer and reader
+share a pure operation-key policy with the unchanged persisted field order and two
+`initial` sentinels. Its metadata includes the original native version and actual
+platform/build; these values never replace current authentication or client headers.
+
+The use case acquires operation then room then ordered account then current native
+guards. It checks current security, organization and both participants before returning
+either a receipt, absence or lookup failure. The captured thirty-second deadline is
+checked after waits and dependent acquisitions, including rollback of clock time.
+Provider availability, old device existence and original-parent liveness do not grant
+or prevent this owned metadata read. No provider or device operation is performed.
+
+[Acceptance](../measurements/collaboration-space-room-receipt-read-2026-11-07.json):
+175 domain/database cases pass in197.492s,8,617 unchanged inputs, no failures/errors/
+skips and format/architecture passed. Thirteen actual PostgreSQL cases cover original
+rotation, current minimum build upgrade, old-parent revocation/purge, account isolation,
+corrupted receipts, cancellation, late denial/deadline and a concurrent uncommitted
+writer. The original11-case reader pass173.240s is retained separately. Missing receipt
+still permits a delayed original to commit; it is explicitly not a rejection or fence.
+All sessions are reaped. No HTTP route or application DI binding is added yet.
+
+## Next integration
+
+Expose the accepted read of an **original** operation receipt under current native,
 security, organization and participant admission. Retain and validate the complete
 original descriptor, then compare the exact original fingerprint in the actor-owned
 receipt store. Return only public original-request/receipt metadata. Do not revive
@@ -46,4 +70,4 @@ and complete body as well as operation/space/peer. Preparation and recovery belo
 in use cases coordinating repositories; raw receipt lookup remains datasource I/O.
 V117–137 stays disabled until these paths, original delivery and product admission
 are accepted. No production source, DI, migration or provider behavior changes in
-this characterization increment.
+this internal acquisition increment, apart from sharing the unchanged writer fingerprint.

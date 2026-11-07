@@ -46,6 +46,8 @@ class RequestNativeCollaborationSpaceRoom(
         expectedRequestRevision: Long?,
         client: ClientVersion?,
         expectedRequestAccountId: UUID? = null,
+        format: CollaborationSpaceRoomRequestFormat =
+            CollaborationSpaceRoomRequestFormat.NATIVE_PROOF,
     ): Result<MutationReceipt> {
         if (actor.companyId != null)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_scope_required"))
@@ -67,7 +69,8 @@ class RequestNativeCollaborationSpaceRoom(
         val currentClient = requireNotNull(client)
         val started = clock.instant()
         val key =
-            collaborationSpaceRoomOperationKey(
+            collaborationSpaceRoomRequestKey(
+                format,
                 CollaborationSpaceRoomOperation(
                     operationId,
                     spaceId,
@@ -83,7 +86,7 @@ class RequestNativeCollaborationSpaceRoom(
                         )
                     },
                     currentClient,
-                )
+                ),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)

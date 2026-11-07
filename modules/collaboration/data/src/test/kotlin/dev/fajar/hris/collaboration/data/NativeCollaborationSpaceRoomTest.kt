@@ -26,6 +26,125 @@ class NativeCollaborationSpaceRoomTest {
     val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
 
     @Test
+    fun stableIntentSurvivesFirstWriteAfterRotationAndLaterUpgradeWithoutGuessingProof() {
+        val f = Fixture()
+        val operation = UUID.randomUUID()
+        val original =
+            CollaborationSpaceRoomRequestIntent(
+                operation,
+                f.s.space,
+                f.conversation,
+                f.s.device,
+                1,
+                null,
+            )
+        f.s.owner.update("update native_sessions set version=1 where id=?", f.s.parent)
+        val receipt =
+            success(
+                f.open(
+                    operation,
+                    parentVersion = 1,
+                    format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT,
+                )
+            )
+        val first = f.counts()
+        val build = f.f.client.copy(build = 6)
+        f.s.owner.update("update native_sessions set version=2 where id=?", f.s.parent)
+        assertEquals(
+            receipt.copy(replayed = true),
+            success(
+                f.open(
+                    operation,
+                    parentVersion = 2,
+                    client = build,
+                    format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT,
+                )
+            ),
+        )
+        val read = success(f.receipt(original, currentVersion = 2, client = build))
+        assertEquals(original, read.original)
+        assertEquals(receipt.copy(replayed = true), read.receipt)
+        assertEquals(first, f.counts())
+        assertNull(
+            success(f.receipt(f.original(operation), currentVersion = 2, client = build)).receipt
+        )
+        val request =
+            success(f.s.tx { f.rooms.provisioning(f.s.space, f.s.account, f.conversation) })!!
+                .request
+        assertEquals(1L, request.nativeSessionVersion)
+        assertEquals(f.f.client, request.client)
+        assertEquals(first, f.counts())
+    }
+
+    @Test
+    fun stableReceiptRetainsUncertainAbsenceAndCurrentDenialOverridesChangedPayload() {
+        val f = Fixture()
+        val operation = UUID.randomUUID()
+        val original =
+            CollaborationSpaceRoomRequestIntent(
+                operation,
+                f.s.space,
+                f.conversation,
+                f.s.device,
+                1,
+                null,
+            )
+        val before = f.counts()
+        assertNull(success(f.receipt(original)).receipt)
+        assertEquals(before, f.counts())
+        val receipt =
+            success(f.open(operation, format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT))
+        val written = f.counts()
+        assertEquals(receipt.copy(replayed = true), success(f.receipt(original)).receipt)
+        val changed = original.copy(expectedDeviceVersion = 2)
+        assertEquals(
+            "operation_payload_mismatch",
+            (f.receipt(changed) as Result.Failed).failure.code,
+        )
+        f.revokePeer()
+        assertEquals(
+            "collaboration_peer_unavailable",
+            (f.receipt(changed) as Result.Failed).failure.code,
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.open(operation, format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT),
+        )
+        assertEquals(written, f.counts())
+    }
+
+    @Test
+    fun legacyAndStableReceiptsWithTheSameUuidNeverAliasEachOther() {
+        val f = Fixture()
+        val operation = UUID.randomUUID()
+        val original =
+            CollaborationSpaceRoomRequestIntent(
+                operation,
+                f.s.space,
+                f.conversation,
+                f.s.device,
+                1,
+                null,
+            )
+        val legacy = success(f.open(operation))
+        val first = f.counts()
+        assertNull(success(f.receipt(original)).receipt)
+        assertEquals(first, f.counts())
+        assertEquals(
+            legacy,
+            success(f.open(operation, format = CollaborationSpaceRoomRequestFormat.STABLE_INTENT)),
+        )
+        val after = f.counts()
+        assertEquals(first.getValue("operation_receipts") + 1, after.getValue("operation_receipts"))
+        for (table in first.keys - "operation_receipts") assertEquals(first[table], after[table])
+        assertEquals(legacy.copy(replayed = true), success(f.receipt(original)).receipt)
+        assertEquals(
+            legacy.copy(replayed = true),
+            success(f.receipt(f.original(operation))).receipt,
+        )
+    }
+
+    @Test
     fun nativeRequestAndReplayRetainOneIntentAndQueueWithoutProviderIo() {
         val f = Fixture()
         val operation = UUID.randomUUID()
@@ -359,9 +478,29 @@ class NativeCollaborationSpaceRoomTest {
     }
 
     @Test
-    fun receiptReadPreservesCancellationAndWaitsForAnOriginalUncommittedWriter() {
+    fun receiptReadPreservesCancellationAndWaitsForAnOriginalUncommittedWriter() =
+        assertReceiptReadWaitsForWriter(CollaborationSpaceRoomRequestFormat.NATIVE_PROOF)
+
+    @Test
+    fun stableReceiptReadPreservesCancellationAndWaitsForItsOriginalUncommittedWriter() =
+        assertReceiptReadWaitsForWriter(CollaborationSpaceRoomRequestFormat.STABLE_INTENT)
+
+    private fun assertReceiptReadWaitsForWriter(format: CollaborationSpaceRoomRequestFormat) {
         val f = Fixture()
-        val original = f.original(UUID.randomUUID())
+        val operation = UUID.randomUUID()
+        val original: CollaborationSpaceRoomReceiptDescriptor =
+            when (format) {
+                CollaborationSpaceRoomRequestFormat.NATIVE_PROOF -> f.original(operation)
+                CollaborationSpaceRoomRequestFormat.STABLE_INTENT ->
+                    CollaborationSpaceRoomRequestIntent(
+                        operation,
+                        f.s.space,
+                        f.conversation,
+                        f.s.device,
+                        1,
+                        null,
+                    )
+            }
         val before = f.counts()
         for (interrupted in listOf(false, true)) {
             val cancelled =
@@ -400,7 +539,7 @@ class NativeCollaborationSpaceRoomTest {
                 }
             val writer =
                 pool.submit<Result<MutationReceipt>> {
-                    f.open(original.operationId, journal = journal)
+                    f.open(original.operationId, journal = journal, format = format)
                 }
             assertTrue(held.await(10, TimeUnit.SECONDS))
             val operations =
@@ -414,7 +553,13 @@ class NativeCollaborationSpaceRoomTest {
                     }
                 }
             val reader =
-                pool.submit<Result<CollaborationSpaceRoomReceiptObservation>> {
+                pool.submit<
+                    Result<
+                        CollaborationSpaceRoomReceiptObservation<
+                            CollaborationSpaceRoomReceiptDescriptor
+                        >
+                    >
+                > {
                     f.receipt(original, operations = operations)
                 }
             assertTrue(reading.await(10, TimeUnit.SECONDS))
@@ -656,6 +801,8 @@ class NativeCollaborationSpaceRoomTest {
             journal: ChangeJournalRepository = f.journal,
             parentVersion: Long = 0,
             client: ClientVersion = f.client,
+            format: CollaborationSpaceRoomRequestFormat =
+                CollaborationSpaceRoomRequestFormat.NATIVE_PROOF,
         ) =
             command(journal)
                 .execute(
@@ -670,6 +817,7 @@ class NativeCollaborationSpaceRoomTest {
                     revision,
                     client,
                     revision?.let { s.account },
+                    format,
                 )
 
         fun read(
@@ -705,8 +853,8 @@ class NativeCollaborationSpaceRoomTest {
                 f.client,
             )
 
-        fun receipt(
-            original: CollaborationSpaceRoomOperation,
+        fun <T : CollaborationSpaceRoomReceiptDescriptor> receipt(
+            original: T,
             currentParent: UUID = s.parent,
             currentVersion: Long = 0,
             client: ClientVersion = f.client,

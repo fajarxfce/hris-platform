@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Current stable room request domain — 7 November 2026
+
+Eight source/test/compatibility files are accepted: explicit stable request intent
+namespacev2, unchanged original fingerprint, typed shared admitted receipt reader,
+writer format and concrete legacy HTTP response. Gate91487/domain-2 passed181 fresh
+cases (164 domain/17 database)213.656s on8,622 stable inputs, no failures/errors/skips,
+delivery compilation and format/architecture passed. First39808/domain-1 stopped at
+compilation because a name replacement changed the existing provider preparation call;
+restoring that call fixed it. All Group sessions are reaped.
+[Contract and evidence](collaboration/native-room-stable-intent.md).
+
+NEXT apply the THREE prepared HTTP files under .work/room-stable-intent-http-2026-11-07,
+checking baseline hashes first. They are NOT applied, tested or accepted. Add real HTTP
+native refresh/first write/replay/new-parent receipt coverage, OpenAPI/disabled-route
+checks, then validate API contexts. DI constructors have not changed. Stable endpoint
+integration precedes durable Mobile commands, finite fenced handoff, original SDK
+message delivery/history, parent recovery, product routing and all54 PRD groups.
+No migration, provider/SDK change, rollout or new phone build. V117-137 stays disabled.
+
+Mobile programfb514281 and checkpoint131723d5 are pushed; program is on both branches.
+Full3,548 cases/441 suites365.793s passed with0lint issues. FIRST fb control42363807332
+and native42363807289 are pending behind e8fc runs; preserve before primary promotion.
+e8fc native42360096584 just completed SUCCESS; read-only artifact audit53880 is running.
+Its control42360096500 remains IN_PROGRESS. Phone53 latency and existing feedback are
+OPEN; Bima has keys and need not stay online. Live services and original data remain.
+
 ## Current initial room proof characterization — 7 November 2026
 
 Actual HTTP native-refresh/first-write characterization passed23 cases131.606s,

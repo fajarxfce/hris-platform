@@ -8,21 +8,21 @@ data class CollaborationSpaceRoomObservedAttempt(val accountId: UUID, val revisi
 
 /** Complete original idempotency descriptor. It contains no native/provider credential. */
 data class CollaborationSpaceRoomOperation(
-    val operationId: UUID,
-    val spaceId: UUID,
-    val conversationId: UUID,
+    override val operationId: UUID,
+    override val spaceId: UUID,
+    override val conversationId: UUID,
     val nativeSessionId: UUID,
     val nativeSessionVersion: Long,
     val deviceId: UUID,
     val expectedDeviceVersion: Long,
-    val expectedAttempt: CollaborationSpaceRoomObservedAttempt?,
+    override val expectedAttempt: CollaborationSpaceRoomObservedAttempt?,
     val client: ClientVersion,
-) {
+) : CollaborationSpaceRoomReceiptDescriptor {
     override fun toString() = "CollaborationSpaceRoomOperation([metadata])"
 }
 
 /** Receipt absence remains uncertain; it cannot fence a delayed original or authorize a retry. */
-data class CollaborationSpaceRoomReceiptObservation(
-    val original: CollaborationSpaceRoomOperation,
+data class CollaborationSpaceRoomReceiptObservation<T : CollaborationSpaceRoomReceiptDescriptor>(
+    val original: T,
     val receipt: MutationReceipt?,
 )

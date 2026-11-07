@@ -23,13 +23,13 @@ class ReadNativeCollaborationSpaceRoomReceipt(
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
 ) {
-    fun execute(
+    fun <T : CollaborationSpaceRoomReceiptDescriptor> execute(
         actor: Actor,
         currentParentId: UUID,
         currentParentVersion: Long,
         currentClient: ClientVersion?,
-        original: CollaborationSpaceRoomOperation,
-    ): Result<CollaborationSpaceRoomReceiptObservation> {
+        original: T,
+    ): Result<CollaborationSpaceRoomReceiptObservation<T>> {
         if (actor.companyId != null)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_scope_required"))
         val available = validateCollaborationSpaceClient(currentClient, policy)
@@ -37,7 +37,7 @@ class ReadNativeCollaborationSpaceRoomReceipt(
         if (
             currentParentId == UUID(0, 0) ||
                 currentParentVersion < 0 ||
-                !validCollaborationSpaceRoomOperation(original)
+                !validCollaborationSpaceRoomReceiptDescriptor(original)
         )
             return Result.Failed(
                 Failure(FailureKind.VALIDATION, "invalid_collaboration_room_operation")
@@ -46,7 +46,7 @@ class ReadNativeCollaborationSpaceRoomReceipt(
         return transactions.run(actor) {
             // Match the writer's lock order. Do not disclose even a failed lookup before admission.
             val receipt =
-                operations.lockAndReplay(actor, collaborationSpaceRoomOperationKey(original))
+                operations.lockAndReplay(actor, collaborationSpaceRoomReceiptKey(original))
             val roomGuard = rooms.lock(original.spaceId, original.conversationId)
             if (roomGuard is Result.Failed) return@run roomGuard
             val found =

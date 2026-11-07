@@ -7,7 +7,7 @@ import java.util.UUID
 
 class NativeCollaborationSpaceRoomReceiptResponse(
     val accountId: UUID,
-    observation: CollaborationSpaceRoomReceiptObservation,
+    observation: CollaborationSpaceRoomReceiptObservation<CollaborationSpaceRoomOperation>,
 ) {
     val original = OriginalCollaborationSpaceRoomOperationResponse(observation.original)
     val receipt = observation.receipt?.toResponse()

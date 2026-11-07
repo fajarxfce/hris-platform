@@ -1,5 +1,9 @@
 # Architecture
 
+[Stable room request intent](collaboration/native-room-stable-intent.md) separates
+immutable business identity from current native authentication while retaining the
+original receipt protocol. Stable HTTP and durable Mobile dispatch remain separate.
+
 [Original room receipt acquisition](collaboration/native-room-receipt-recovery.md)
 matches the immutable request fingerprint under current native/group admission.
 Receipt metadata survives original-parent purge; absence remains uncertain and grants

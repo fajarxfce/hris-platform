@@ -15,3 +15,11 @@ Thirteen native-device tests, thirty-four HRIS driver tests and architecture che
 pass. Bounds, invalid frames/categories, privacy and detached output are tested.
 No live deployment or native send was performed for this parser change.
 [Evidence](../measurements/collaboration-native-storage-diagnostic-parser-2026-11-07.json).
+
+The previously failed frozen-draft/priority worker case passed locally in350.485s
+with the new diagnostic APK, one test and original assertions intact. It recovered
+original transactions, priority history and all incoming history on fresh owned
+x86_64 emulator5560, then removed the fixture and stopped its exact emulator.
+Main/Mobile source inputs and APK remained unchanged. The original CI failure was
+not reproduced and its cause remains unresolved; this result does not repair the
+phone's pending messages. [Investigation](../measurements/collaboration-native-storage-investigation-2026-11-07.json).

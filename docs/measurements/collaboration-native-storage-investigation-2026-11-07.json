@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-11-07T01:37:51.415598+00:00",
+  "startedAt": "2026-11-07T01:30:29.433401+00:00",
+  "seconds": 350.485,
+  "platformSource": "940c181c735ad687dd78cd6cfaad8cf7814b34f2",
+  "mobileSource": "376a50960f8676c9ae16c6bba4fcabc916a588ed",
+  "test": "NativeCollaborationWorkerInteropTest.actualApplicationWorkerRecoversFrozenOnlyDraftAfterProcessDeathAndSendsOnce",
+  "counts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sourcesUnchanged": true,
+  "artifactUnchanged": true,
+  "artifact": {
+    "path": ".work/native-storage-diagnostic-2026-11-07/accepted-proof.apk",
+    "bytes": 430997516,
+    "sha256": "4b62c4999cbde3d78c44e020d493e588d909f494ec307cd059d4d377e9ae197d",
+    "sdk": "26.10.23-hris.4",
+    "nativeSha256": {
+      "x86_64": "55bde5be2080c3e42a2ece6053f94231d27165cc39698c89c50e36ecbdb2909a",
+      "arm64-v8a": "5df0419b7f1a5dd5d934b0cce3846a439812581e35f86defe3c2098f29260d34"
+    },
+    "nativeBytesMatchAcceptedProof": true
+  },
+  "proofSha256": "923cc94e49533b576e3e24fbdf0cc5fe6114f7a0750567a3c7a9fc7023fa3e21",
+  "cleanup": true,
+  "emulatorStopped": {
+    "pid": 2936535,
+    "serial": "emulator-5560",
+    "stopped": true,
+    "signalSent": true,
+    "transportAbsent": true,
+    "seconds": 1.805
+  },
+  "checks": {
+    "frozenDraftRecovered": true,
+    "outboxEmptyBeforeRecovery": true,
+    "draftConfirmedCleared": true,
+    "encryptedReceived": true,
+    "senderRuntimeRestoredByWorker": true,
+    "originalHistoryAcquired": true,
+    "completionRetired": true,
+    "repeatedWorkerComplete": true,
+    "foregroundHistoryPaged": true,
+    "foregroundStoppedHistoryRetained": true,
+    "passes": 1,
+    "historyPages": 11,
+    "providerReferences": 186,
+    "pendingStateReferences": 10
+  },
+  "priority": {
+    "priorityWithoutOutbox": true,
+    "priorityWithoutSelection": true,
+    "priorityQueueRetainedAfterReopen": true,
+    "priorityOriginalRetainedAfterReopen": true,
+    "priorityOldestOfflineEventRecovered": true,
+    "priorityRuntimeReleased": true,
+    "priorityTraversalUnchanged": true,
+    "priorityGlobalWakeRetained": true,
+    "priorityHintCompleted": true,
+    "priorityPasses": 1,
+    "prioritySavedOriginals": 12
+  },
+  "incoming": {
+    "incomingWithoutOutbox": true,
+    "incomingWithoutSelection": true,
+    "incomingFreshNativeAdmission": true,
+    "incomingOriginalAfterOfflineSeed": true,
+    "incomingHistoryRetainedAfterReopen": true,
+    "incomingRuntimeReleased": true,
+    "incomingAllOriginalsRecovered": true,
+    "incomingTraversalRetainedAfterReopen": true,
+    "incomingBrowseUnchanged": true,
+    "incomingPasses": 11,
+    "incomingSavedOriginals": 176,
+    "incomingContainerReopens": 11
+  },
+  "originalBimaStoreTouched": false,
+  "phoneTouched": false,
+  "originalCiFailureReproduced": false,
+  "originalCiFailureCauseResolved": false,
+  "phonePendingResolved": false,
+  "scope": "One previously failed worker scenario with original assertions; fixture-only diagnostic changes, no shipping runtime policy change."
+}

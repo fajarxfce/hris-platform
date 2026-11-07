@@ -469,6 +469,129 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun firstRoomWriteAfterNativeRefreshUsesAnUnexposedVersionInItsOriginalFingerprint() {
+        val source = groupNative()
+        val b = groupNative()
+        val exchanged =
+            command(
+                source.fixture.browser,
+                "/api/v1/auth/native/exchange",
+                """{"deviceName":"Room proof capture fixture"}""",
+                source.fixture.csrf,
+                UUID.randomUUID(),
+            )
+        assertEquals(200, exchanged.statusCode(), exchanged.body())
+        val credentials = json.readTree(exchanged.body())
+        val a =
+            Native(
+                source.fixture,
+                UUID.fromString(credentials["sessionId"].asString()),
+                credentials["accessToken"].asString(),
+            )
+        assertFalse(credentials.has("version"))
+        assertFalse(credentials.has("nativeSessionVersion"))
+        val base = groupBase(a)
+        val device = activeGroupFixture(a, base)
+        activeGroupFixture(b, base)
+        val opened =
+            groupCall(
+                a,
+                "$base/direct-conversations",
+                mapOf("peerAccountId" to b.fixture.account.toString()),
+            )
+        assertEquals(200, opened.statusCode(), opened.body())
+        val conversation = json.readTree(opened.body())["id"].asString()
+        val path = "$base/direct-conversations/$conversation/room"
+        val operation = UUID.randomUUID()
+        val input = mapOf("deviceId" to device.toString(), "expectedDeviceVersion" to 1)
+        assertEquals(
+            0L,
+            database()
+                .queryForObject(
+                    "select version from native_sessions where id=?",
+                    Long::class.java,
+                    a.session,
+                ),
+        )
+        // Room persistence checks PostgreSQL wall time; advancing only the app clock is invalid.
+        Thread.sleep(11_000)
+        clock.set(Instant.now().truncatedTo(ChronoUnit.MICROS))
+        val refreshed =
+            groupCall(
+                a,
+                "/api/v1/auth/native/refresh",
+                mapOf("refreshToken" to credentials["refreshToken"].asString()),
+                token = null,
+                cookies = false,
+            )
+        assertEquals(200, refreshed.statusCode(), refreshed.body())
+        val response = json.readTree(refreshed.body())
+        assertFalse(response.has("version"))
+        assertFalse(response.has("nativeSessionVersion"))
+        assertEquals(a.session.toString(), response["sessionId"].asString())
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from native_sessions where id=?",
+                    Long::class.java,
+                    a.session,
+                ),
+        )
+        val rotated = Native(a.fixture, a.session, response["accessToken"].asString())
+        val written = groupCall(rotated, path, input, operation = operation)
+        assertEquals(200, written.statusCode(), written.body())
+        val before =
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                )
+        val assumedOriginal =
+            input +
+                mapOf(
+                    "operationId" to operation.toString(),
+                    "nativeSessionId" to a.session.toString(),
+                    "nativeSessionVersion" to 0,
+                    "platform" to "ANDROID",
+                    "clientBuild" to 28,
+                )
+        failure(
+            groupCall(rotated, "$path/receipts/read", assumedOriginal, operation = null),
+            409,
+            "operation_payload_mismatch",
+        )
+        val actual =
+            groupCall(
+                rotated,
+                "$path/receipts/read",
+                assumedOriginal + mapOf("nativeSessionVersion" to 1),
+                operation = null,
+            )
+        assertEquals(200, actual.statusCode(), actual.body())
+        assertEquals(json.readTree(written.body()), json.readTree(actual.body())["receipt"])
+        assertEquals(
+            before,
+            database()
+                .queryForObject(
+                    "select count(*) from operation_receipts where actor_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_room_provisioning where conversation_id=?::uuid",
+                    Int::class.java,
+                    conversation,
+                ),
+        )
+    }
+
+    @Test
     fun nativeRoomReceiptAbsenceIsReadOnlyAndRequiresCompleteBoundedOriginalInput() {
         val a = groupNative()
         val b = groupNative()

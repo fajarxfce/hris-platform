@@ -113,3 +113,20 @@ first room write. Introduce an explicit stable intent contract/versioned namespa
 or authoritative retained operation descriptor, preserving existing fingerprints
 and receipts. Do not decode opaque tokens, guess versions, weaken current admission
 or silently replace an uncertain original. No new endpoint or group schema is live.
+
+[Actual initial proof-capture characterization](../measurements/collaboration-space-room-proof-capture-2026-11-07.json)
+passed all23 native HTTP cases in131.606s on8,619 stable inputs, with no failures/
+errors/skips and format/architecture passed. The test waits11 real seconds to honor
+the native rotation cooldown and keep PostgreSQL wall time coherent. Native version
+advances0→1 through actual HTTP refresh, but neither credential response exposes it.
+The first room write succeeds under version1; assumed version0 receipt acquisition
+conflicts while exact version1 returns the unchanged receipt. All queue/receipt counts
+remain unchanged by reads. Prior fixture compilation/cooldown/future-clock failures
+are retained; none caused a production security or time-policy change.
+
+The selected next contract keeps `collaboration.space_room_setup` unchanged and
+introduces `collaboration.space_room_setup.v2`, hashing only space/conversation,
+device/version and optional observed request account/revision. Current native proof
+and actual build still govern admission. An explicit domain request-intent descriptor
+must remain distinct from the existing provider-room candidate. New native routes,
+bounded receipt acquisition and durable Mobile commands follow their own acceptance.

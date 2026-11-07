@@ -1,0 +1,112 @@
+{
+  "baseHead": "4e1b5b90d199dee215da22cbb8c4f7ed0f11c988",
+  "source": "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationSpaceConfigurationTest.kt",
+  "sourceSha256": "415795c22e11ee61ee1d70556639eb965f885272487864ab86bb671cb4662c90",
+  "accepted": {
+    "startedAt": "2026-11-07T10:29:46.778607+00:00",
+    "elapsedSeconds": 131.606,
+    "exitCode": 0,
+    "sourceFiles": 8619,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skipped": [],
+    "reports": {
+      "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+        "sha256": "2bc93e0dabedcfb63002e0b618745ee606387f3cfce4d6b793a136549727bf84",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "priorAttempts": [
+    {
+      "result": {
+        "startedAt": "2026-11-07T10:23:07.720449+00:00",
+        "elapsedSeconds": 18.612,
+        "exitCode": 1,
+        "sourceFiles": 8619,
+        "sourcesUnchanged": true,
+        "counts": {
+          "tests": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "skipped": [],
+        "reports": {}
+      },
+      "cause": "Test fixture omitted its required group base argument; compilation stopped before tests."
+    },
+    {
+      "result": {
+        "startedAt": "2026-11-07T10:24:28.852513+00:00",
+        "elapsedSeconds": 106.487,
+        "exitCode": 1,
+        "sourceFiles": 8619,
+        "sourcesUnchanged": true,
+        "counts": {
+          "tests": 23,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "skipped": [],
+        "reports": {
+          "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+            "sha256": "cccf048dcef42ed0725ae8c2956c18dab7bf7b4229bcb382b7a16c017bf1063c",
+            "tests": 23,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "cause": "Actual native refresh rejected immediate rotation with native_refresh_too_soon (10-second policy)."
+    },
+    {
+      "result": {
+        "startedAt": "2026-11-07T10:26:41.181965+00:00",
+        "elapsedSeconds": 109.067,
+        "exitCode": 1,
+        "sourceFiles": 8619,
+        "sourcesUnchanged": true,
+        "counts": {
+          "tests": 23,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "skipped": [],
+        "reports": {
+          "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationSpaceConfigurationTest.xml": {
+            "sha256": "0454b2e3cdb89c8ba87a50ee9ccff2ad785e7a9987f866b48f0d789469bd8ce7",
+            "tests": 23,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "cause": "Advancing only the application clock made room created_at future to PostgreSQL wall time; the room trigger correctly rejected it."
+    }
+  ],
+  "observed": [
+    "Actual native exchange/refresh responses omit native session version.",
+    "After a real 11-second wait and actual HTTP refresh, native database version advances0 to1.",
+    "The first original room POST commits under actual version1 with the original business body.",
+    "Reading with an assumed version0 returns operation_payload_mismatch; exact version1 returns the original receipt.",
+    "Receipt reads do not change operation counts or the single room queue."
+  ],
+  "next": "Use an explicit stable business-intent namespace while preserving the original native-proof namespace and current admission. Never guess opaque token versions.",
+  "limits": [
+    "Test-only characterization, no provider I/O or production policy change.",
+    "This does not reproduce or resolve phone53 message latency."
+  ]
+}

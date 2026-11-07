@@ -1,5 +1,33 @@
 # Agent continuation — HRIS workspace
 
+## Current initial room proof characterization — 7 November 2026
+
+Actual HTTP native-refresh/first-write characterization passed23 cases131.606s,
+8,619 stable inputs, no failures/errors/skips, format/architecture passed. The server
+advances native version0→1 through actual refresh but does not expose that version;
+the first room POST commits, assumed original0 conflicts, exact1 recovers the same
+receipt without queue/receipt writes. A real11s wait keeps app/database clocks aligned.
+Three failed fixture attempts (missing argument, cooldown, app-only future clock)
+are retained in [the contract/evidence](collaboration/native-room-receipt-recovery.md).
+No production policy change or phone latency acceptance. All characterization sessions
+are reaped; the stable domain candidate below has not been applied/tested yet.
+
+NEXT apply the8 prepared domain/test/compatibility files in .work/room-stable-intent-
+2026-11-07 only after verifying every baseline hash; run its domain/data/delivery gate.
+They preserve original fingerprints and introduce explicit stable request-intent v2,
+with typed shared receipt admission, new pure/actual-database cases and both-protocol
+cancellation/competing-writer coverage. The new type is CollaborationSpaceRoomRequestIntent;
+CollaborationSpaceRoomIntent already means the provider room candidate. No new stable
+HTTP route or Mobile durable caller yet. Then implement those, finite fenced handoff,
+original SDK delivery/history, parent recovery, product routing and all54 groups.
+
+Mobilefb514281 is accepted/pushed to both branches:11 files, full3,548 cases/441 suites
+365.793s,4,354 stable inputs, no failures/errors/skips/lint findings. Complete original
+proof read transport only, no product caller/APK. FIRST new control42363807332/native
+42363807289 are PENDING behind e8fc running control42360096500/native42360096584;
+preserve both pending runs before another Mobile primary promotion. Live services,
+phone53, immutableSDK4 and disabled V117-137 remain unchanged. Main checkpoint e79b82c7.
+
 ## Current native receipt endpoint — 7 November 2026
 
 The native original-room receipt POST and shared DI are accepted. Session24490/http-2

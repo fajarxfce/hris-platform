@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Current cross-repository execution — 7 November 2026
+
+Group implementation e45a4313 remains accepted/pushed; original publication preflight
+and V117–137 are still disabled/unshipped. The checkpoint below retains its accepted
+results; its old active-job references are historical. Main dd72d6bb and the current
+Mobile handoff carry newer execution state. Always check those before starting builds.
+
+Mobile release53/source08545820 is installed after7,436 full tests, actual WorkManager
+proof and four original Bima offline/online entries. Same phone UID/data/keys retained,
+no phone UI driven. Bima has confirmed keys; matched403 sends belong to another room
+with no registered peer device. Physical pending latency remains open awaiting user
+feedback. Starter0002d10 generic worker port passed90fresh tests; FIRST Apple42331840556
+is running. Do not cancel/repeat it. SDK4 is immutable.
+
+ONLY heavy local job62485 is Mobile legacy-publication-transport/focused-2. Eleven
+source/test files are UNCOMMITTED and FROZEN. First focused gate had two expected
+capability failures: plain POST without a command key was not automatically replayed
+after authentication refresh. The actual read-only publication endpoint now explicitly
+opts into one repeatable-body replay, with three generic network regressions preserving
+ordinary POST/stream/PATCH restrictions and cancellation. Four new transport cases
+remain intact. Full validation and a generic Starter network port follow acceptance.
+No emulator or other local build may run alongside62485. Live Main API2e75fe1e/worker
+10485916/schema116.1 remains unchanged. Owning recovery/adoption and all54PRD groups
+remain unfinished. Push every commit and announce every explicit-serial install-only
+phone update. No resets, replacement sends or manufactured acknowledgements.
+
+
 ## Current — 7 November 2026, 02:05UTC: original publication preflight accepted
 
 Group now implements a finite admitted original-publication observation before

@@ -4,51 +4,46 @@ This is the active checkpoint. [Historical handoff](agent-handoff-history-throug
 retains prior entries verbatim. Read the current Mobile handoff before starting builds.
 Do not repeat accepted releases, SDK publication or native sends just for evidence.
 
-## Current mobile priority — 7 November 2026, 17:37 UTC
+## Current mobile priority — 7 November 2026, 18:13 UTC
 
-Mobile3308a93fc352c511032ed20d5b470274342a7a4a is accepted/pushed to recovery and
-primary. SDK local Sent echoes can already have a server event ID without remote
-JSON; their provenance now reaches presentation so only the original durable row
-is shown. Focused35 cases/183.799s; full3,784 fresh cases/459 suites/609.149s,
-4,412 unchanged inputs, zero failures/errors/skips/lint and35 actual Browser cases.
-[Authoritative Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
+Mobile release55 is validated and installed in place on the authorized phone, without
+launching its UI or clearing data. Source95e35b9d, ARM64/nondebuggable devRelease1.0.0,
+exact immutableSDK4 and existing dev signer. The actual original Bima emulator proves
+pending/draft previews across cold offline restarts and automatic original-message
+reconnect without a foreground rescue. Online Sent observed5.232s, reconnect5.326s
+(coarse UI polling, not a transport benchmark). Four screenshots and the first6s/4fps
+of both send videos were inspected. Keyboard dismissal and initial clipped bubble
+remain open. Emulator is now STOPPED55 with original data/keys/new send IDs intact;
+phone55. Never restore54/53/pre-send backups. [Exact evidence](https://github.com/fajarxfce/hris-mobile/blob/f7ba99f5/docs/measurements/collaboration-release55-2026-11-07.json).
 
-The next seven-file Mobile candidate renews only the captured workspace when chat
-work encounters stale authority. Focused82722 passed52 cases/5 suites/376.389s on
-4,414 unchanged inputs: offline Retry retains the original command, later renewal
-sends once, module denial never opens SDK, replacement/cancellation retain ownership.
-CI now includes these workspace/worker tests. Sole heavy job60955 is the full gate;
-Mobile source is FROZEN until reaped. No emulator or other compiler may overlap.
-Do not infer actual runtime recovery from these source tests; the next APK must prove it.
+Mobile recovery f7ba99f5 is pushed with the current handoff. Renewal95e35b9d passed
+full5,229 fresh cases/657 suites, zero failures/errors/skips/lint and40 actual Browser
+cases before building. Primary is95e35b9d; its first control42399395125/native42399395077
+are pending. Preserve both until started before another primary promotion. Both3308
+first runs are running. Source700 first artifacts are audited: Apple2,152/237,
+portable5,171/560, native553/87 per ABI; zero failures/errors/skips, exact SDK4, original
+keys/IDs and cleanup. Synthetic queue continuity makes zero provider sends and does
+not establish live Group activation.
 
-Release54 is NOT accepted/installed on the phone. Original Bima emulator54 proved
-pending/draft previews across cold offline restart, but the original offline send
-only resumed after foreground re-entry and briefly duplicated. Six video storyboards
-also show keyboard dismissal and initial bubble clipping. Preserve that failed probe;
-no backup restore, key reset, replacement IDs or repeated baseline sends. Original
-emulator remains STOPPED54; phone53. Live API2e75fe1e/worker10485916/schema116.1 unchanged.
+Sole heavy local job9523 runs Mobile viewport baseline-1. Only the new three-case UI
+test is applied; production page remains unchanged to check the regression first.
+Mobile build inputs are FROZEN until reaped; no compiler/emulator overlap. Then apply
+and validate the staged page candidate, inspect first-layout screenshots, and continue
+the composer/real Matrix HTTP inspector work. [Authoritative Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-recovery-20261107/docs/agent-handoff.md).
 
-Mobile3308 first control42396219062/native42396218957 are pending; preserve both until
-started before another primary promotion. Their700 predecessors have both started.
-First0d control42383612502/native42383612567 are now artifact-audited: Apple2,098/235,
-portable5,063/556, native551/87 on each ARM64/x86_64, zero failures/errors/skips.
-SHA digests match GitHub. Both native proofs retain immutableSDK4/original keys/IDs,
-cleanup and offline queue continuity (zero provider sends; not live Group acceptance).
-Explicit inapplicable false flags are preserved; do not relabel them as passed.
+Reusable inspector PRIVATE main f5bc5f3 is pushed. Core42/Ktor39 local cases pass on
+JVM/Android host/actual Wasm, with AAR and Apple klib compilation. Both first private
+CI runs failed before any steps because GitHub billing/spending-limit blocked them;
+zero Apple runtime/CI tests ran. Public-visibility question remains unanswered. No
+viewer, actual Matrix observer, body capture/export, consumer integration or release.
+SDK observer design84f60d4d is pushed in its isolated Mobile branch; reconstructed
+Rust SDK4 baseline matches19 pinned hashes, no new observer code/artifacts yet.
 
-Reusable inspector https://github.com/fajarxfce/kmp-network-inspector is PRIVATE,
-main a0f04f6 pushed. Metadata core42 local JVM/Android-host/Wasm cases and assembly
-pass. First CI42394553310 ran no steps because GitHub account billing/spending limit
-blocked it. User approval to make the new library public is pending; do not change
-visibility without an answer. Ktor metadata adapter and13 common test methods are
-being prepared, NOT compiled/accepted. No release, viewer, actual Matrix Rust HTTP
-bridge or app integration. SDK4 stays immutable; observer requires a new version.
-
-Group native dcdaf220/HTTP cf885a1c/V138 c6937843 remain accepted; V117–138 undeployed,
-organization routing disabled. Starterb11437a unchanged. User-facing repairs and
-inspector do not replace original Room dispatch, published binding, SDK continuity
-and all54 PRD groups (3 in progress/51 planned/none complete). Push each atomic
-commit; announce validated phone installs and use explicit serial with --install-only.
+Live API2e75fe1e/worker10485916/schema116.1 unchanged. Group native dcdaf220/HTTP cf885a1c/
+V138 c6937843 remain accepted; V117–138 undeployed, organization routing disabled.
+Starterb11437a unchanged. Repairs/inspector do not replace original Room dispatch,
+published binding, SDK continuity and all54 PRD groups (3 in progress/51 planned/none
+complete). Push atomic commits; deliver validated updates with --install-only.
 
 ## Latest mobile command continuation — 7 November 2026
 

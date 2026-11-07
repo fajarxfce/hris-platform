@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## Original queue matching accepted; native CI packaging — 7 November 2026
+
+Mobile `032697ea` is committed/pushed on `feat/chat-recovery-20261107`. Exact original
+SDK inventory now matches immutable application commands/completions under a finite
+current-native admission read, without rewriting original namespaces or granting send.
+Full local validation passed 5,538 fresh cases in 649 suites (512.73 seconds), 4,320
+unchanged inputs, zero failures/errors/skips and Android lint findings. Ten pure cases,
+ten owning lifecycle cases and actual application DI are covered. Mobile handoff is
+now concise; all prior entries were archived verbatim with links.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/032697ea/docs/collaboration-space-original-queue-reconciliation.md).
+
+ONLY heavy local job15900 runs Mobile native-sdk4-packaging-ci/check-1. Three source
+files are applied/uncommitted and frozen. First05de native42348626124 failed both ABIs
+before fixture installation: strict SDK4 hash validation rejected libraries that CI
+reported it could not strip. Both493 host cases passed; original APK bytes were not
+uploaded. Original logs/artifacts are audited. The exact immutable AAR plus local NDK
+28.2.13676358 reproduces both accepted stripped hashes. Candidate pins the proof NDK,
+installs it before CI build and moves the same APK validator before emulator startup.
+No SDK rebuild or relaxed digest acceptance. Read Mobile handoff before starting work.
+
+First1bb control42344998885 is fully audited SUCCESS (Apple1,900/216, portable4,667/518,
+zero failures/errors/skips). First05de control42348626104 has started; primary remains
+05de until the packaging correction is accepted. Preserve later first pending runs.
+Original provider sends are not repeated merely to recreate evidence.
+
+Phone53 latency remains OPEN. Bima Demo has an active device, 50 one-time keys and one
+fallback; he need not stay online. Phone52 HTTP200 matched Bima, while repeated403s
+matched another room without a recipient device. Passive07:38 phone53 logs were empty,
+which proves no latency outcome. Existing optional feedback remains pending. No phone
+UI, new messages, original Bima files/IDs, live API or schema changes. Starterb11437a
+notification port is accepted. Group source e45a4313/V117–137 disabled stay unchanged.
+Continue current-authority original delivery, history publication, parent recovery,
+product routing and all54 PRD groups. Earlier timestamped sections below are history.
+
 ## Current queue reconciliation and notification correction — 7 November 2026
 
 Mobile program11e2b36bb6be72089d17418ce68e9edfe03c0e9c and checkpoint8f4e4d15 are pushed

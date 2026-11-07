@@ -1,5 +1,35 @@
 # Agent continuation — HRIS workspace
 
+## Current original writer and CI — 7 November 2026
+
+Mobile `72a70e8c29b7a7b55e193fd23a914ac83109585b` is accepted and pushed to
+both working and primary branches. It retains the original SDK queue writer under
+logical organization ownership, keeping the DIFFERENT original physical device ID
+intact. Full local checks passed 3,512 fresh cases/441 suites; actual SDK4 x86 and
+ARM64 adoption/restart/offline proofs passed. Partial or changed resume inventories
+are rejected and closing drains the exact writer. No delivery caller is added yet.
+[Contract and evidence](https://github.com/fajarxfce/hris-mobile/blob/72a70e8c/docs/collaboration-space-original-writer.md).
+
+NEXT implement Mobile group direct-conversation/open and room request/status
+transport plus durable original commands before the owning delivery use case.
+Preserve exact legacy coordinates, canonical pair routing and current participant
+admission; an original queue match alone is not sending authority. Then receipt/
+history publication, native-parent recovery, product routing and all 54 PRD groups.
+
+Prior Mobile `9deb55bf` first control/native/protocol runs are fully audited SUCCESS:
+Apple 1,941 cases, portable 4,749, each native ABI 499; zero failures/errors/skips.
+Both native library hashes remain immutable SDK4. New first `72a70e8c` runs have
+started: control42358423232, native42358423298, protocol42358423295. Preserve first
+pending runs and audit their original artifacts. Mobile checkpoint `cd3dcac4` stores
+the completed audit. No accepted provider scenario was rerun for evidence.
+
+Bima has published keys and need not remain online. Mixed-room delivery accepted
+below does not reproduce the phone's 20-second to 2-minute delay. Phone53 feedback
+remains pending; no new phone build or UI driving. Original data/keys/IDs, SDK4,
+live API/worker/schema, Group e45a4313 and disabled V117–137 remain unchanged.
+Starter b11437a remains accepted/pushed. The sections below retain earlier history;
+read Mobile's current handoff before starting a heavy local job.
+
 ## Accepted mixed-room delivery diagnosis — 7 November 2026
 
 Mobile `ca76e87d` is pushed and Platform `1de67d71` is committed; its narrow actual SDK4/application-worker experiment

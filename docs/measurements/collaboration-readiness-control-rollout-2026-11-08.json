@@ -1,0 +1,36 @@
+{
+  "success": true,
+  "startedAt": "2026-11-08T23:36:11.237610+00:00",
+  "source": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+  "migrationStarted": true,
+  "appsChanged": true,
+  "readinessControlEnabled": false,
+  "nativeWakeAccepted": false,
+  "phoneTouched": false,
+  "backupVerified": true,
+  "only116_3And116_4Applied": true,
+  "confirmedPublicationsPreserved": 9,
+  "apps": {
+    "api": {
+      "container": "f602281217244974c80b57480a04eaa6b53bf9e75254b46d6e9d1f2db48bae4b",
+      "image": "sha256:5ce02e6302e416cfce50fd4ebb4e2100642e921230420b86f9bfbaa4c271da4e",
+      "startedAt": "2026-11-08T23:36:21.058013589Z"
+    },
+    "worker": {
+      "container": "2bb3cd5af734d09e15e35f5df80e7a1d1f4666a465e4e52e1664dd64c46a8438",
+      "image": "sha256:3a86bd672b6f78c497328d65cd2475cf216dd8c4caec2935dead9b683f4a16ba",
+      "startedAt": "2026-11-08T23:36:20.822888426Z"
+    }
+  },
+  "otherServicesUnchanged": true,
+  "protectedConfigurationUnchanged": true,
+  "apiHealthy": true,
+  "databaseErrorsObserved": false,
+  "finalSchema": "116.4",
+  "elapsedSeconds": 30.353,
+  "recordedAt": "2026-11-08T23:38:23.736922+00:00",
+  "session": 68999,
+  "sessionReaped": true,
+  "scope": "Controlled development deployment with Matrix readiness controls disabled. Native77/control delivery not yet accepted; existing FCM configuration retained.",
+  "stagingEvidence": "collaboration-readiness-control-staging-2026-11-08.json"
+}

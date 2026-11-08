@@ -104,3 +104,11 @@ Do not apply117–138 or replace device keys. After native77 retains its account
 public identity, explicitly enable the worker for controlled development proof
 with that fictional sender's push registration disabled. This preparation is not
 native signal-delivery acceptance or a communications PRD completion.
+
+
+The disabled development rollout is now [accepted](../measurements/collaboration-readiness-control-rollout-2026-11-08.json):
+both e558a686 images are live on116.4, with nine existing confirmed publications
+preserved and no other service/config change. The control flag stays off. Native
+acceptance uses a separately packaged fictional peer so the earlier peer's
+first-activation guard, keys and outputs remain intact. Do not remove that guard
+or reuse its bootstrap to make a second test appear fresh.

@@ -1,5 +1,36 @@
 # Agent continuation — HRIS workspace
 
+## Dev116.4 and both V2 images live; control OFF — 8 November 2026, 23:38 UTC
+
+Deployment68999 REAPED PASS30.353s. Live API/worker now sourcee558a686,
+images5ce02e63/3a86bd67, schema116.4. Only116.3/116.4 applied; nine confirmed
+publications preserved. Fresh online backup verified, API healthy, no database
+errors, all other services/protected config unchanged. Readiness control remains
+OFF; existing FCM readiness unchanged.117–138 remain unapplied.
+[Evidence](measurements/collaboration-readiness-control-rollout-2026-11-08.json).
+Image-only rollback to prior API1aea/worker52aaccaa is compatibility-checked; keep
+both rollback tags and the additive116.4 schema. Do not erase journals or keys.
+
+Mobile0fb27978 source/77 package is accepted; docs2dbe604b records it. No77 native
+install or control delivery proof yet. Sole current compiler28272 builds a separate
+`dev.fajar.hris.collaboration.readiness77` debug peer, x86_64 only, from unchanged
+accepted product inputs. It must be verified/reaped before starting the emulator.
+The old proof package has a retained first-activation guard and old private keys:
+DO NOT bypass/remove its marker or rebootstrap that recipient. A separate package
+keeps both the old peer and its fixture outputs intact. No product source change.
+
+Next complete the new peer package verification, then run Mobile's private sender
+copy and fictional-recipient preparation. Boot the complete retained76 clone,
+install77 in place, verify account/public identity, and only then run the prepared
+controlled enable-control.py against this exact deployment. Disable this fictional
+sender's push registration before the one new Control77 send. Require quiet waiting,
+committed publication/revision, one Matrix scheduling diagnostic, unchanged sender
+PID and exactly one encrypted server event. Native proof remains unaccepted.
+Never replay Readiness76 211625 or Draft66; Bima74 metadata stays preserved.
+Phone70/no new availability unchanged. Continue missed-signal/reconnect/interrupted
+activation, startup optional-key traffic/history UI and all54 PRD groups; push commits.
+
+
 ## V2 images and isolated116.4 rollout checks accepted — 8 November 2026, 23:35 UTC
 
 Both final e558a686 JARs are packaged and byte-verified in staged images:

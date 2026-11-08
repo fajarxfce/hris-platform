@@ -38,3 +38,23 @@ No migration ran. The rollback image and overlay are retained. Mobile adoption i
 still under test, and no latency improvement is claimed. Mobile67 measured
 2,663 ms before its encrypted request and197 ms to headers in one emulator sample.
 Reducing metadata requests must be verified against the accepted combined release.
+
+## Recipient readiness
+
+The response now includes recipientReady, computed from the bounded existing
+eligible-device projection using the same pure readiness policy as room sending.
+The pair's account guards are acquired in stable ID order. Empty or unconfirmed
+devices return false without hiding retained room metadata. Receiver short-token
+expiry and offline status do not remove confirmed eligible keys; hard expiry,
+revocation or loss of active chat access do. Failed or malformed projection reads
+cannot claim readiness, and caller expiry still overrides late results.
+
+Clients use false to retain blocked originals instead of scheduling transient
+retries. Actual sending retains independent gateway admission. This additive fact
+does not implement a readiness event feed or create receiver keys.
+
+[Readiness validation](../measurements/collaboration-recipient-readiness-2026-11-08.json)
+passes226 active cases (one existing opt-in retention skip), including receiver
+publication/offline/revocation, late acquisition and interruption, HTTP/OpenAPI,
+both application dependency graphs, boot JAR, format and architecture. All8,259
+source inputs remained unchanged. Deployment and Mobile device acceptance are next.

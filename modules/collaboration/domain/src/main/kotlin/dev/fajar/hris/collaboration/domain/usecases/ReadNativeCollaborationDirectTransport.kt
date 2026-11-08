@@ -28,6 +28,7 @@ class ReadNativeCollaborationDirectTransport(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
+    private val recipients: CollaborationRecipientRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -53,14 +54,28 @@ class ReadNativeCollaborationDirectTransport(
             // Room writers take their resource guard before policy/account guards too.
             val roomGuard = rooms.lock(company, conversationId)
             if (roomGuard is Result.Failed) return@run roomGuard
+            // Resolve immutable pair coordinates before taking account guards in stable order.
+            // Admission below still takes precedence over this read's result.
+            val found = conversations.find(company, conversationId)
+            val pair = (found as? Result.Success)?.value
+            val accountIds =
+                if (
+                    pair?.id == conversationId &&
+                        pair.companyId == company &&
+                        actor.accountId in setOf(pair.firstAccountId, pair.secondAccountId)
+                )
+                    setOf(pair.firstAccountId, pair.secondAccountId)
+                else setOf(actor.accountId)
             val policyGuard = policies.lock(company, shared = true)
             if (policyGuard is Result.Failed) return@run policyGuard
             val companyGuard = companies.lock(company, shared = true)
             if (companyGuard is Result.Failed) return@run companyGuard
             val memberGuard = members.lock(company, shared = true)
             if (memberGuard is Result.Failed) return@run memberGuard
-            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
-            if (accountGuard is Result.Failed) return@run accountGuard
+            for (accountId in accountIds.sortedBy { it.toString() }) {
+                val accountGuard = identities.lockAccount(accountId, shared = true)
+                if (accountGuard is Result.Failed) return@run accountGuard
+            }
             val locked = sessions.lock(sessionId, actor.accountId)
             if (locked is Result.Failed) return@run locked
             val parent = (locked as Result.Success).value
@@ -85,7 +100,7 @@ class ReadNativeCollaborationDirectTransport(
                 }
             val admitted = admission()
             if (admitted is Result.Failed) return@run admitted
-            val result = read(company, actor.accountId, sessionId, client, conversationId)
+            val result = read(company, actor.accountId, sessionId, client, conversationId, found)
             // Expiry after acquisition also overrides missing/failed metadata results.
             admission().flatMap { result }
         }
@@ -97,8 +112,8 @@ class ReadNativeCollaborationDirectTransport(
         session: UUID,
         client: ClientVersion,
         conversationId: UUID,
+        found: Result<CollaborationDirectConversation?>,
     ): Result<CollaborationDirectTransport> {
-        val found = conversations.find(company, conversationId)
         if (found is Result.Failed) return found
         val conversation = (found as Result.Success).value
         if (
@@ -151,6 +166,19 @@ class ReadNativeCollaborationDirectTransport(
             return Result.Failed(
                 Failure(FailureKind.UNAVAILABLE, "collaboration_room_provisioning_changed")
             )
+        val peer =
+            if (conversation.firstAccountId == account) conversation.secondAccountId
+            else conversation.firstAccountId
+        val available = recipients.devices(company, setOf(peer), clock.instant())
+        if (available is Result.Failed) return available
+        val ready =
+            collaborationRecipientReady(
+                company,
+                peer,
+                clock.instant(),
+                (available as Result.Success).value,
+            )
+        if (ready is Result.Failed) return ready
         return Result.Success(
             CollaborationDirectTransport(
                 company,
@@ -164,6 +192,7 @@ class ReadNativeCollaborationDirectTransport(
                 conversation.secondAccountId,
                 binding.matrixRoomId,
                 binding.provisioningVersion,
+                (ready as Result.Success).value,
             )
         )
     }

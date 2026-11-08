@@ -1,5 +1,48 @@
 # Agent continuation — HRIS workspace
 
+## Recipient readiness server source accepted — 8 November 2026, 13:11 UTC
+
+Gate8527 REAPED PASS483.453s:227 reported/226 active, zero failures/errors,
+one existing opt-in retention skip;8,259 source inputs unchanged. Pure policy2,
+registration/direct+encrypted11, HTTP4, OpenAPI69, delivery18, worker122 pass,
+as do bootJar/format/architecture. Five production Kotlin files and three tests
+are accepted. [Evidence](measurements/collaboration-recipient-readiness-2026-11-08.json).
+
+Commit/push source, then stage/deploy the compatible additive API-only change using
+.work/recipient-readiness-2026-11-08 scripts and exact artifact. No migration,
+worker/Group/provider/key/data change. LiveAPI remains e8d1d24f until rollout acceptance.
+Mobile3225 is now the sole compiler, recipient-readiness/focused-1; eleven Kotlin
+inputs are frozen. Phone/original stopped emulator69, release70 still held.
+User asked proper first-use behavior: local retained waiting state, automatic
+recipient-device key setup and event-driven delivery wake remain required; metadata
+alone is not that event feature. Preserve original messages and UNSENT Draft66.
+
+## Actual phone recipient loop found — 8 November 2026, 12:58 UTC
+
+Read [verified root cause and pending fix](collaboration/recipient-readiness-investigation.md).
+Phone69 passive jobs15747/20480/43287 are REAPED: actual rejected room's peer has
+zero devices, despite active account/membership/chat permission. Bima is eligible;
+do not reset or re-enroll it. Current API e8d1d24f returns transport metadata200,
+then room_send403 recipient_unavailable; Mobile retries it as delivery_pending.
+No phone UI, send, key change or DB write was performed. Private captures reside
+in Mobile `.work/phone-transport-loop-2026-11-08`.
+
+Platform has UNCOMMITTED/UNVALIDATED recipient readiness source: a new pure policy,
+DirectTransport boolean, shared room-send readiness policy, guarded transport peer
+read, DI and constructor fixture. Tests still need updating/adding. No server build
+or deployment has run. Keep schema116.1 and worker/Group flags unchanged.
+
+Sole compiler is Mobile81263 lazy-queue-timeline/full-1; its seven Kotlin inputs and
+library are frozen. Starter has an UNTESTED exact enum-only port (WorkspaceRead,
+LocalAccessRead) from accepted Mobile69, with prepared local-read-timing-port check.
+Do not start another compiler or emulator until Mobile gate is reaped.
+
+Phone and stopped Bima image remain69. Mobile70 is explicitly HELD by
+HOLD_FOR_RECIPIENT_FIX.txt; do not package/install timeline-only work. Finish backend
+readiness and Mobile retry classification plus original-preserving device acceptance
+first. Original54PRD work persists. Last synthetic original Tes69 acquire123003 and
+UNSENT Draft66 092041 must never be replayed/sent respectively.
+
 ## Direct transport API deployed — 8 November 2026, 10:52 UTC
 
 API e8d1d24f is healthy after the accepted compatible API-only rollout. Stage76434

@@ -150,6 +150,7 @@ class NativeCollaborationRoomLookupHttpTest : NativeGatewaySdkFixture() {
                 "secondAccountId",
                 "matrixRoomId",
                 "roomProvisioningVersion",
+                "recipientReady",
             ),
             value.propertyNames().toSet(),
         )
@@ -161,11 +162,42 @@ class NativeCollaborationRoomLookupHttpTest : NativeGatewaySdkFixture() {
         assertEquals("ANDROID", value["platform"].asString())
         assertEquals(conversation.toString(), value["conversationId"].asString())
         assertEquals(room, value["matrixRoomId"].asString())
+        assertFalse(value["recipientReady"].asBoolean())
         failure(transport(sdkPeer(n), conversation), 404, "collaboration_conversation_not_found")
         failure(transport(native(), conversation), 404, "collaboration_conversation_not_found")
         failure(transport(peer, conversation), 503, "collaboration_device_unavailable")
+        val peerRegistration = register(peer)
+        assertEquals(200, peerRegistration.statusCode())
+        val peerDevice = UUID.fromString(json.readTree(peerRegistration.body())["id"].asString())
+        database()
+            .update(
+                "update collaboration_devices set state='ACTIVE',version=version+1,updated_at=now() where id=?",
+                peerDevice,
+            )
+        database()
+            .update(
+                "insert into collaboration_device_key_publications(company_id,device_id,account_id,fingerprint,version,reserved_at) values(?,?,?,?,0,now())",
+                n.fixture.company,
+                peerDevice,
+                peer.fixture.account,
+                "a".repeat(64),
+            )
+        assertFalse(json.readTree(transport(n, conversation).body())["recipientReady"].asBoolean())
+        database()
+            .update(
+                "update collaboration_device_key_publications set version=1,published_at=now() where device_id=?",
+                peerDevice,
+            )
+        database()
+            .update(
+                "update native_sessions set access_expires_at=now()-interval '1 hour',mfa_verified_at=null where id=?",
+                peer.session,
+            )
+        assertTrue(json.readTree(transport(n, conversation).body())["recipientReady"].asBoolean())
         database().update("update accounts set active=false where id=?", peer.fixture.account)
-        assertEquals(200, transport(n, conversation).statusCode())
+        val departed = transport(n, conversation)
+        assertEquals(200, departed.statusCode())
+        assertFalse(json.readTree(departed.body())["recipientReady"].asBoolean())
         database()
             .update(
                 "update collaboration_devices set state='REVOKED',revoked_at=now(),version=version+1,updated_at=now() where id=?",

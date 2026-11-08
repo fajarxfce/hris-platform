@@ -351,6 +351,7 @@ class CollaborationConfiguration {
         service: CollaborationServicePolicy,
         provider: CollaborationMatrixPolicy,
         clock: Clock,
+        recipients: CollaborationRecipientRepository,
     ) =
         ReadNativeCollaborationDirectTransport(
             conversations,
@@ -366,6 +367,7 @@ class CollaborationConfiguration {
             service,
             provider,
             clock,
+            recipients,
         )
 
     @Bean

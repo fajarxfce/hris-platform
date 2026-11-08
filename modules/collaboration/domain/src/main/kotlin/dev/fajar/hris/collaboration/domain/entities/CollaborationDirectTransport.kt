@@ -15,4 +15,5 @@ data class CollaborationDirectTransport(
     val secondAccountId: UUID,
     val matrixRoomId: String,
     val roomProvisioningVersion: Long,
+    val recipientReady: Boolean,
 )

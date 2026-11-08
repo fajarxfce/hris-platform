@@ -669,7 +669,15 @@ class AccessNativeCollaborationMatrixDevice(
             prepareQuery(initial, CollaborationMatrixKeyQuery(mapOf(peerUser to emptyList())))
         if (resolved is Result.Failed) return resolved
         val targets = (resolved as Result.Success).value
-        if (targets.devices.values.none { it.publicationConfirmed })
+        val ready =
+            collaborationRecipientReady(
+                initial.companyId,
+                peer,
+                clock.instant(),
+                targets.devices.values,
+            )
+        if (ready is Result.Failed) return ready
+        if (!(ready as Result.Success).value)
             return Result.Failed(
                 Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
             )

@@ -22,6 +22,7 @@ import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatri
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomMessageRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationSecretStorageRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationPushBindingRepository
@@ -7235,6 +7236,7 @@ class NativeCollaborationRegistrationTest {
                 pushBindings,
                 providerPush,
                 nativePush,
+                DisabledCollaborationSecretStorageRepository(),
             )
 
         fun pushHandler(

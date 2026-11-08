@@ -27,7 +27,8 @@ class HttpMatrixClientDataSource(
     MatrixRoomAccessDataSource,
     MatrixRoomHistoryDataSource,
     MatrixRoomMessageDataSource,
-    MatrixPusherDataSource {
+    MatrixPusherDataSource,
+    MatrixSecretStorageDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder(
@@ -49,6 +50,28 @@ class HttpMatrixClientDataSource(
         require(maximumConcurrent in 1..128)
         require(client.followRedirects() == HttpClient.Redirect.NEVER)
         require(client.connectTimeout().orElse(Duration.ofSeconds(6)) <= Duration.ofSeconds(5))
+    }
+
+    override fun defaultKey(userId: String, token: String, deadline: Instant): JsonNode? {
+        require(
+            userId.length in 1..255 && userId.startsWith('@') && userId.all { it.code in 33..126 }
+        )
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/user/${segment(userId)}/account_data/m.secret_storage.default_key",
+                "GET",
+                null,
+                token,
+                deadline,
+                maximumResponseBytes = 4096,
+            )
+        if (
+            response.statusCode() == 404 &&
+                parse(response).path("errcode").asString() == "M_NOT_FOUND"
+        )
+            return null
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
     }
 
     override fun setPusher(body: Map<String, Any?>, token: String, deadline: Instant): JsonNode {

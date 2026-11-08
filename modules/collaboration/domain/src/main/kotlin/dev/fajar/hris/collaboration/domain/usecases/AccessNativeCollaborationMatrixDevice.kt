@@ -45,7 +45,34 @@ class AccessNativeCollaborationMatrixDevice(
     private val pushBindings: CollaborationPushBindingRepository,
     private val providerPush: CollaborationMatrixPusherRepository,
     private val nativePush: NativePushRegistrationRepository,
+    private val secretStorage: CollaborationSecretStorageRepository,
 ) {
+    fun secretStorageDefaultKey(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+    ): Result<CollaborationSecretStorageDefaultKey> =
+        admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ ->
+                if (userId == expectedUser(initial)) Result.Success(Unit)
+                else
+                    Result.Failed(
+                        Failure(FailureKind.FORBIDDEN, "collaboration_account_data_unavailable")
+                    )
+            },
+        ) { exchange, _ ->
+            exchange
+                .exchange { bearer, deadline -> secretStorage.defaultKey(userId, bearer, deadline) }
+                .flatMap {
+                    it?.let { key -> Result.Success(key) }
+                        ?: Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "collaboration_account_data_not_found")
+                        )
+                }
+        }
+
     fun ensurePusher(token: String, correlationId: UUID): Result<Unit> {
         if (!service.pushEnabled) return pushUnavailable()
         return admitted(

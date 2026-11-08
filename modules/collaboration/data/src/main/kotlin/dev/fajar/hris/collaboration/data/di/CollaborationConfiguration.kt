@@ -445,6 +445,13 @@ class CollaborationConfiguration {
         } ?: DisabledCollaborationMatrixRepository()
 
     @Bean
+    fun collaborationSecretStorage(
+        clients: ObjectProvider<MatrixSecretStorageDataSource>
+    ): CollaborationSecretStorageRepository =
+        clients.ifAvailable?.let { InternalCollaborationSecretStorageRepository(it) }
+            ?: DisabledCollaborationSecretStorageRepository()
+
+    @Bean
     fun collaborationMatrixRooms(
         clients: ObjectProvider<MatrixRoomDataSource>,
         provider: CollaborationMatrixPolicy,
@@ -633,6 +640,7 @@ class CollaborationConfiguration {
         pushBindings: CollaborationPushBindingRepository,
         providerPush: CollaborationMatrixPusherRepository,
         nativePush: NativePushRegistrationRepository,
+        secretStorage: CollaborationSecretStorageRepository,
     ) =
         AccessNativeCollaborationMatrixDevice(
             gateway,
@@ -664,6 +672,7 @@ class CollaborationConfiguration {
             pushBindings,
             providerPush,
             nativePush,
+            secretStorage,
         )
 
     @Bean

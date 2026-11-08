@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Secret-storage GET accepted; notification shortcut in progress — 8 November 2026, 00:11 UTC
+
+The user reports repeated403 at their own m.secret_storage.default_key endpoint.
+The old gateway denies this route. New exact GET preserves provider404 M_NOT_FOUND,
+empty{} and a bounded public key ID, with own-user/current native admission before
+and after provider I/O. No secret writes, recipient eligibility or ACK behavior changes.
+See docs/collaboration/secret-storage-probe.md and both dated measurement files.
+
+Gate2 passed179 active cases: API36/worker122/data3/delivery18. One existing opt-in
+elapsed-export case was skipped. Its final format check failed only at a test import
+order. Gate3/44445 is reapedPASS25.992s,8254stable inputs; that import order is the sole
+change after tests. Initial missing-import compile failure is retained as gate1.
+All API/worker dependency graphs were exercised; no further identical tests needed.
+Build jar/artifact and frozen inputs are in .work/matrix-secret-storage-2026-11-08.
+Commit/push this increment, stage a rollback-preserving API-only schema116.1 update,
+then verify actual SDK behavior. No live change has occurred at this checkpoint.
+
+Read-only recent API logs contain272 endpoint_unavailable and22 recipient_unavailable
+room_send rejections. The55s passive phone sample captured no active traffic. Corrected
+actor/company-scoped SQL confirms Bima and3other enrolled demo peers remain eligible;
+one other conversation peer has no enrolled device. This does NOT prove which room
+caused the22 failures or establish latency causality. The invalid first query context
+is explicitly retained/excluded. Original Bima keys/userdata and phone58 are intact.
+
+Starter2b012e5 generic typed-result timing port is accepted and pushed; no work remains
+for that unchanged port. Public inspector26e43a6 addresses clean-CI dependency BOM,
+run42427888790 still in progress. SDK5/library remain unpublished. Mobile has an
+UNACCEPTED Android notification shortcut plus shared navigation handoff, currently
+checking focused-1 as the ONLY local compiler (no emulator); its new library adapter
+has two real OS fixture scenarios awaiting compilation/runtime. Do not start another
+compiler/emulator. Use TMPDIR=/home/fajar/hris/.work/build-tmp to avoid filling RAM.
+
+Phone/original stopped emulator are58. Next deliver validated59 with actual notification
+tap acceptance, finish actual secret probe/repeated-request and send latency diagnosis,
+then reusable Starter port, Apple inspector/distribution and all54 original PRD groups.
+No group complete. API2e75fe1e/worker10485916/schema116.1 remain live; V117–138 and Group
+routing remain undeployed. Read current Mobile/Inspector states before changing them.
+
 ## Installed inspector57 and ongoing Starter/timing work —     7 November 2026, 22:55 UTC
 
 Mobile e500691f records accepted APK57, installed on the phone and original Bima

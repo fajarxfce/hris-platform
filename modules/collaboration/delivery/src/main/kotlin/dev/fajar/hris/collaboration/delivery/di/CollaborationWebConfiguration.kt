@@ -84,6 +84,11 @@ class CollaborationWebConfiguration {
                 .permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/user/*/account_data/m.direct")
                 .permitAll()
+            it.requestMatchers(
+                    HttpMethod.GET,
+                    "/_matrix/client/v3/user/*/account_data/m.secret_storage.default_key",
+                )
+                .permitAll()
             it.requestMatchers(HttpMethod.PUT, "/_matrix/client/v3/user/*/account_data/m.direct")
                 .permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/account/whoami").permitAll()

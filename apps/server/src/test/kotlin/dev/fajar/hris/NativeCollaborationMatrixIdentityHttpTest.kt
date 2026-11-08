@@ -551,18 +551,19 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
     }
 
-    private fun directMetadata(
+    private fun accountData(
         n: Native,
         token: String?,
         user: String,
         body: String? = null,
         suffix: String = "",
+        eventType: String = "m.direct",
     ): HttpResponse<String> {
         val encoded = java.net.URLEncoder.encode(user, java.nio.charset.StandardCharsets.UTF_8)
         val request =
             HttpRequest.newBuilder(
                     URI(
-                        "http://127.0.0.1:$port/_matrix/client/v3/user/$encoded/account_data/m.direct$suffix"
+                        "http://127.0.0.1:$port/_matrix/client/v3/user/$encoded/account_data/$eventType$suffix"
                     )
                 )
                 .timeout(Duration.ofSeconds(15))
@@ -576,6 +577,97 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun secretStorageDefaultKeyPreservesAbsentEmptyAndPresentWithoutAllowingWrites() {
+        val n = native()
+        val (_, token) = enroll(n)
+        val user =
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test"
+        val before = provider.defaultKeyReads.get()
+        try {
+            provider.defaultKeyResponse.set(
+                404 to mapOf("errcode" to "M_NOT_FOUND", "error" to "absent")
+            )
+            val absent = accountData(n, token, user, eventType = "m.secret_storage.default_key")
+            assertEquals(404, absent.statusCode(), absent.body())
+            assertEquals("M_NOT_FOUND", json.readTree(absent.body()).path("errcode").asString())
+            for (body in listOf(emptyMap(), mapOf("key" to "fixture-default-key"))) {
+                provider.defaultKeyResponse.set(200 to body)
+                val present =
+                    accountData(n, token, user, eventType = "m.secret_storage.default_key")
+                assertEquals(200, present.statusCode(), present.body())
+                assertEquals(json.valueToTree(body), json.readTree(present.body()))
+                assertEquals("no-store", present.headers().firstValue("Cache-Control").orElse(""))
+            }
+            assertEquals(
+                403,
+                accountData(n, token, user, "{}", eventType = "m.secret_storage.default_key")
+                    .statusCode(),
+            )
+            assertEquals(
+                403,
+                accountData(n, token, user, eventType = "m.secret_storage.key.private").statusCode(),
+            )
+            assertEquals(before + 3, provider.defaultKeyReads.get())
+        } finally {
+            provider.defaultKeyResponse.set(404 to mapOf("errcode" to "M_NOT_FOUND"))
+        }
+    }
+
+    @Test
+    fun secretStorageReadRechecksOwnerAndRevocationAndRejectsMalformedTransport() {
+        val n = native()
+        val (_, token) = enroll(n)
+        val user =
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test"
+        val before = provider.defaultKeyReads.get()
+        for (invalid in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+            401,
+            accountData(n, invalid, user, eventType = "m.secret_storage.default_key").statusCode(),
+        )
+        assertEquals(
+            403,
+            accountData(
+                    n,
+                    token,
+                    user.replace(n.fixture.account.toString().replace("-", ""), "0".repeat(32)),
+                    eventType = "m.secret_storage.default_key",
+                )
+                .statusCode(),
+        )
+        assertEquals(
+            400,
+            accountData(
+                    n,
+                    token,
+                    user,
+                    suffix = "?extra=1",
+                    eventType = "m.secret_storage.default_key",
+                )
+                .statusCode(),
+        )
+        assertEquals(before, provider.defaultKeyReads.get())
+        provider.onDefaultKey.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val revoked = accountData(n, token, user, eventType = "m.secret_storage.default_key")
+            assertEquals(401, revoked.statusCode(), revoked.body())
+            assertEquals(before + 1, provider.defaultKeyReads.get())
+            assertEquals(
+                401,
+                accountData(n, token, user, eventType = "m.secret_storage.default_key").statusCode(),
+            )
+            assertEquals(before + 1, provider.defaultKeyReads.get())
+        } finally {
+            provider.onDefaultKey.set(null)
+        }
+    }
+
+    @Test
     fun directMetadataReadsAndConfirmsOnlyTheCurrentHrisOwnedMap() {
         val n = native()
         val (device, token) = enroll(n)
@@ -584,35 +676,35 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         fun user(account: UUID) =
             "@hris_${n.fixture.company.toString().replace("-", "")}_${account.toString().replace("-", "")}:matrix.example.test"
         val expected = json.writeValueAsString(mapOf(user(peer) to listOf(room)))
-        val current = directMetadata(n, token, user(n.fixture.account))
+        val current = accountData(n, token, user(n.fixture.account))
         assertEquals(200, current.statusCode(), current.body())
         assertEquals(json.readTree(expected), json.readTree(current.body()))
         assertEquals("no-store", current.headers().firstValue("Cache-Control").orElse(""))
         repeat(2) {
-            val confirmed = directMetadata(n, token, user(n.fixture.account), expected)
+            val confirmed = accountData(n, token, user(n.fixture.account), expected)
             assertEquals(200, confirmed.statusCode(), confirmed.body())
             assertTrue(json.readTree(confirmed.body()).isEmpty)
         }
-        val changed = directMetadata(n, token, user(n.fixture.account), "{}")
+        val changed = accountData(n, token, user(n.fixture.account), "{}")
         assertEquals(409, changed.statusCode(), changed.body())
         assertEquals(
             "collaboration_direct_metadata_managed",
             json.readTree(changed.body()).path("org.hris.error_code").asString(),
         )
-        assertEquals(403, directMetadata(n, token, user(peer)).statusCode())
+        assertEquals(403, accountData(n, token, user(peer)).statusCode())
         val other = native()
         val (_, otherToken) = enroll(other)
-        assertEquals(403, directMetadata(other, otherToken, user(n.fixture.account)).statusCode())
+        assertEquals(403, accountData(other, otherToken, user(n.fixture.account)).statusCode())
         assertEquals(
             json.readTree(expected),
-            json.readTree(directMetadata(n, token, user(n.fixture.account)).body()),
+            json.readTree(accountData(n, token, user(n.fixture.account)).body()),
         )
         database()
             .update(
                 "update native_sessions set revoked_at=now(),version=version+1 where id=?",
                 n.session,
             )
-        assertEquals(401, directMetadata(n, token, user(n.fixture.account), expected).statusCode())
+        assertEquals(401, accountData(n, token, user(n.fixture.account), expected).statusCode())
     }
 
     @Test
@@ -621,7 +713,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val (_, token) = enroll(n)
         val user =
             "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test"
-        assertEquals(200, directMetadata(n, token, user, "{}").statusCode())
+        assertEquals(200, accountData(n, token, user, "{}").statusCode())
         for (body in
             listOf(
                 "[]",
@@ -630,13 +722,13 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 "{\"@peer\":[\"!a\",\"!a\"]}",
                 "{\"@peer\":[\"!a\"],\"@peer\":[\"!b\"]}",
                 "{} {}",
-            )) assertEquals(400, directMetadata(n, token, user, body).statusCode())
-        assertEquals(413, directMetadata(n, token, user, " ".repeat(1_048_577)).statusCode())
-        assertEquals(401, directMetadata(n, null, user).statusCode())
-        assertEquals(401, directMetadata(n, null, user, "{}").statusCode())
-        assertEquals(401, directMetadata(n, n.access, user, "{}").statusCode())
-        assertEquals(400, directMetadata(n, token, user, suffix = "?extra=1").statusCode())
-        assertEquals(400, directMetadata(n, token, user, "{}", "?extra=1").statusCode())
+            )) assertEquals(400, accountData(n, token, user, body).statusCode())
+        assertEquals(413, accountData(n, token, user, " ".repeat(1_048_577)).statusCode())
+        assertEquals(401, accountData(n, null, user).statusCode())
+        assertEquals(401, accountData(n, null, user, "{}").statusCode())
+        assertEquals(401, accountData(n, n.access, user, "{}").statusCode())
+        assertEquals(400, accountData(n, token, user, suffix = "?extra=1").statusCode())
+        assertEquals(400, accountData(n, token, user, "{}", "?extra=1").statusCode())
     }
 
     @Test
@@ -1942,6 +2034,12 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val keyClaims = AtomicInteger()
         val encryptedSends = AtomicInteger()
         val roomSends = AtomicInteger()
+        val defaultKeyReads = AtomicInteger()
+        val defaultKeyResponse =
+            AtomicReference<Pair<Int, Map<String, String>>>(
+                404 to mapOf("errcode" to "M_NOT_FOUND")
+            )
+        val onDefaultKey = AtomicReference<(() -> Unit)?>(null)
         val lastRoomCiphertext = AtomicReference<tools.jackson.databind.JsonNode>()
         val onRoomSend = AtomicReference<(() -> Unit)?>(null)
         val onEncryptedSend = AtomicReference<(() -> Unit)?>(null)
@@ -1985,6 +2083,32 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             server.executor = executor
             server.createContext("/") { request ->
                 try {
+                    if (
+                        request.requestURI.path.endsWith(
+                            "/account_data/m.secret_storage.default_key"
+                        )
+                    ) {
+                        val identity =
+                            requireNotNull(
+                                credentials[
+                                    request.requestHeaders
+                                        .getFirst("Authorization")
+                                        .removePrefix("Bearer ")]
+                            )
+                        assertEquals("GET", request.requestMethod)
+                        assertEquals(
+                            "/_matrix/client/v3/user/${identity["user_id"]}/account_data/m.secret_storage.default_key",
+                            request.requestURI.path,
+                        )
+                        defaultKeyReads.incrementAndGet()
+                        onDefaultKey.get()?.invoke()
+                        val (status, body) = defaultKeyResponse.get()
+                        val bytes = parser.writeValueAsBytes(body)
+                        request.responseHeaders.add("Content-Type", "application/json")
+                        request.sendResponseHeaders(status, bytes.size.toLong())
+                        request.responseBody.write(bytes)
+                        return@createContext
+                    }
                     val response =
                         when (request.requestURI.path) {
                             "/_matrix/client/v3/login" -> {

@@ -137,3 +137,12 @@ context pinned to schema116.2, with the missing/default flag and every required
 capability disabled in turn. Both boot JARs, API contexts, current key/push
 registration, queue/delivery, formatting and architecture passed. These are source
 and isolated PostgreSQL results, not actual FCM or native waiting-sender acceptance.
+
+[Rollout preparation](../measurements/collaboration-readiness-preparation-2026-11-08.json)
+verifies the staged worker image against the accepted JAR. A current online backup
+was restored on an internal network and migrated explicitly from116.1 to116.2:
+203 old tables and the original migration history were unchanged, with no historical
+publication backfill. The current API1aea and worker10485916 images also started and
+ran scheduled database work on that migrated copy without database errors; API health
+returned200. External delivery was disabled. Fixtures were removed. Live schema,
+images and readiness configuration remain unchanged.

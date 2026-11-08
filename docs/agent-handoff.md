@@ -1,5 +1,38 @@
 # Agent continuation — HRIS workspace
 
+## Readiness image and migration compatibility prepared — 8 November 2026, 20:57 UTC
+
+Implementation52aaccaa is pushed and clean apart from this documentation checkpoint.
+Its full356-case gate and staged JAR fingerprints remain valid. Worker image
+`hris-dev-worker:readiness-52aaccaa` is
+sha256:59885ca23e6775a84ce556347091375726f2c5562eda3e2222507a1e70fe6764.
+Stage37859 passed12.457s; online backup15778 passed1.034s; isolated upgrade95389
+passed18.369s preserving203 old tables/history; old-runtime17073 passed48.160s with
+API health200 and no database errors. All sessions are REAPED and temporary resources
+removed. [Evidence](measurements/collaboration-readiness-preparation-2026-11-08.json).
+
+No live migration or image/flag update occurred. LiveAPI1aea, worker10485916 and
+schema116.1 remain. The legacy worker has no OCI revision label; its exact image ID
+matches the accepted10485916 build manifest. New worker52aaccaa has the verified
+revision label and exact accepted JAR. Private staging/backup/upgrade/compatibility
+scripts and evidence are under `.work/readiness-wake-2026-11-08`; backups remain
+outside Git. Future rollout checks should bind to source52aaccaa and its unchanged
+source manifest, allowing later documentation-only commits without relabelling code.
+
+Mobile prepared a complete isolated clone of the ORIGINAL first-account76 fixture
+at `.work/readiness-native-2026-11-08/sender`. All four data/metadata files were hash
+matched before boot and matching AVD engine-version files retained. Qualification86822
+passed43.248s: original package76 and fictional account Home visible, actual screenshot
+reviewed, zero send/install gestures, originals unchanged; emulator stopped/reaped.
+This is fixture preparation, NOT post-commit wake or Bima76 acceptance. Original
+Bima74 metadata recovery remains unresolved. Phone70 and Starter remain unchanged.
+
+Next finish the reviewed isolated116.2/worker dev rollout and controlled waiting-sender
+proof, then missed-hint/interrupted activation recovery. A newly created fictional
+recipient must own separate complete AVD/key/version metadata. Never wipe a shared
+AVD, send Draft66, replay old test originals, reset existing chat keys or drive phone UI.
+Continue the authorized long run and push each commit. All54 PRD groups remain open.
+
 ## Readiness full source gate accepted; native wake and rollout remain — 8 November 2026, 20:43 UTC
 
 The V116.2/domain/data/worker implementation is ready for commit/push and NOT deployed. Dedicated

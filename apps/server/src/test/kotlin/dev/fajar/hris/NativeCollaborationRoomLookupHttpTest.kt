@@ -117,6 +117,111 @@ class NativeCollaborationRoomLookupHttpTest : NativeGatewaySdkFixture() {
         failure(lookup(n, "!unknown"), 401, "native_session_invalid")
     }
 
+    @Test
+    fun transportReturnsCurrentDeviceAndPublishedRoomInOneUncachedNativeRead() {
+        val n = native()
+        val peer = sdkPeer(n)
+        val registered = register(n)
+        assertEquals(200, registered.statusCode())
+        val device = UUID.fromString(json.readTree(registered.body())["id"].asString())
+        database()
+            .update(
+                "update collaboration_devices set state='ACTIVE',version=version+1,updated_at=now() where id=?",
+                device,
+            )
+        val conversation = UUID.randomUUID()
+        val room = "!transport:matrix.example.test"
+        publishSdkRoom(n, device, peer.fixture.account, room, conversation)
+        val response = transport(n, conversation)
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        assertTrue(response.headers().firstValue("Set-Cookie").isEmpty)
+        val value = json.readTree(response.body())
+        assertEquals(
+            setOf(
+                "companyId",
+                "accountId",
+                "nativeSessionId",
+                "deviceId",
+                "deviceVersion",
+                "platform",
+                "conversationId",
+                "firstAccountId",
+                "secondAccountId",
+                "matrixRoomId",
+                "roomProvisioningVersion",
+            ),
+            value.propertyNames().toSet(),
+        )
+        assertEquals(n.fixture.company.toString(), value["companyId"].asString())
+        assertEquals(n.fixture.account.toString(), value["accountId"].asString())
+        assertEquals(n.session.toString(), value["nativeSessionId"].asString())
+        assertEquals(device.toString(), value["deviceId"].asString())
+        assertEquals(1, value["deviceVersion"].asInt())
+        assertEquals("ANDROID", value["platform"].asString())
+        assertEquals(conversation.toString(), value["conversationId"].asString())
+        assertEquals(room, value["matrixRoomId"].asString())
+        failure(transport(sdkPeer(n), conversation), 404, "collaboration_conversation_not_found")
+        failure(transport(native(), conversation), 404, "collaboration_conversation_not_found")
+        failure(transport(peer, conversation), 503, "collaboration_device_unavailable")
+        database().update("update accounts set active=false where id=?", peer.fixture.account)
+        assertEquals(200, transport(n, conversation).statusCode())
+        database()
+            .update(
+                "update collaboration_devices set state='REVOKED',revoked_at=now(),version=version+1,updated_at=now() where id=?",
+                device,
+            )
+        failure(transport(n, conversation), 503, "collaboration_device_unavailable")
+    }
+
+    @Test
+    fun transportPreservesNativeTransportPolicyAndSessionDenials() {
+        val n = native()
+        val conversation = UUID.randomUUID()
+        assertEquals(401, transport(n, conversation, token = null).statusCode())
+        failure(
+            get(
+                n.fixture.browser,
+                "${n.fixture.root}/collaboration/direct-conversations/$conversation/transport",
+            ),
+            403,
+            "invalid_session_transport",
+        )
+        failure(transport(n, conversation, platform = "WEB"), 422, "invalid_client_version")
+        assertEquals(
+            200,
+            save(n.fixture, changes = mapOf("disabledModules" to listOf("COLLABORATION")))
+                .statusCode(),
+        )
+        failure(transport(n, conversation), 403, "company_module_disabled")
+        database()
+            .update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                n.session,
+            )
+        failure(transport(n, conversation), 401, "native_session_invalid")
+    }
+
+    private fun transport(
+        n: Native,
+        conversation: UUID,
+        token: String? = n.access,
+        platform: String = "ANDROID",
+    ): HttpResponse<String> {
+        val path = "${n.fixture.root}/collaboration/direct-conversations/$conversation/transport"
+        val builder =
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path"))
+                .timeout(Duration.ofSeconds(15))
+                .header("X-HRIS-Client-Platform", platform)
+                .header("X-HRIS-Client-Build", "1")
+        token?.let { builder.header("Authorization", "Bearer $it") }
+        return if (token == null)
+            HttpClient.newHttpClient().use {
+                it.send(builder.GET().build(), HttpResponse.BodyHandlers.ofString())
+            }
+        else n.fixture.browser.send(builder.GET().build(), HttpResponse.BodyHandlers.ofString())
+    }
+
     private fun path(n: Native, room: String?) =
         "${n.fixture.root}/collaboration/direct-conversations/summary-by-room" +
             (room?.let { "?roomId=" + URLEncoder.encode(it, UTF_8) } ?: "")

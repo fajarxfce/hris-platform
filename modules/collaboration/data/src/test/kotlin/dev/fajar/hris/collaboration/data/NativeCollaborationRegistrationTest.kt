@@ -5313,6 +5313,212 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun directTransportRetainsOwnedCoordinatesWithoutCreatingJobsOrProviderIo() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val event = f.pushRoom(room.parent, room.device)
+        val conversation =
+            success(
+                    f.transactions.run(f.actor) {
+                        f.roomScopes()
+                            .find(
+                                requireNotNull(f.actor.companyId),
+                                f.account,
+                                "proof.invalid",
+                                event.roomId,
+                            )
+                    }
+                )!!
+                .conversationId
+        val tables =
+            listOf("background_jobs", "operation_receipts", "audit_entries", "outbox_events")
+        val before = tables.associateWith(f::rows)
+        repeat(2) {
+            val value =
+                success(
+                    f.directTransport().execute(f.actor, room.parent, 0, room.client, conversation)
+                )
+            assertEquals(f.actor.companyId, value.companyId)
+            assertEquals(f.account, value.accountId)
+            assertEquals(room.parent, value.nativeSessionId)
+            assertEquals(room.device, value.deviceId)
+            assertEquals(1L, value.deviceVersion)
+            assertEquals(event.roomId, value.matrixRoomId)
+            assertEquals(conversation, value.conversationId)
+            assertTrue(f.account in setOf(value.firstAccountId, value.secondAccountId))
+        }
+        assertEquals(before, tables.associateWith(f::rows))
+        assertEquals(
+            "collaboration_room_not_ready",
+            failed(
+                f.directTransport().execute(f.actor, room.parent, 0, room.client, room.conversation)
+            ),
+        )
+    }
+
+    @Test
+    fun directTransportRejectsSubstitutedDeviceOwnershipAndPlatform() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val original =
+            success(
+                f.transactions.run(f.actor) {
+                    f.registry.findBound(requireNotNull(f.actor.companyId), f.account, room.parent)
+                }
+            )!!
+        val changed =
+            listOf(
+                original.copy(companyId = UUID.randomUUID()),
+                original.copy(accountId = UUID.randomUUID()),
+                original.copy(nativeSessionId = UUID.randomUUID()),
+                original.copy(platform = CollaborationPlatform.IOS),
+                original.copy(state = CollaborationDeviceState.PROVISIONING),
+                original.copy(state = CollaborationDeviceState.REVOKED),
+                original.copy(revokedAt = f.clock.at),
+            )
+        for (device in changed) {
+            val registry =
+                object : CollaborationRegistryRepository by f.registry {
+                    override fun findBound(
+                        companyId: UUID,
+                        accountId: UUID,
+                        nativeSessionId: UUID,
+                    ): Result<CollaborationDevice?> = Result.Success(device)
+                }
+            assertEquals(
+                "collaboration_device_unavailable",
+                failed(
+                    f.directTransport(registry = registry)
+                        .execute(f.actor, room.parent, 0, room.client, room.conversation)
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun directTransportRechecksExpiryAfterMissingAndFailedAcquisition() {
+        for (failRead in listOf(false, true)) {
+            val room = DirectRoomFixture()
+            val f = room.f
+            val rooms =
+                object : CollaborationDirectRoomRepository by f.directRooms {
+                    override fun binding(
+                        companyId: UUID,
+                        conversationId: UUID,
+                    ): Result<CollaborationDirectRoomBinding?> {
+                        f.clock.at = f.clock.at.plusSeconds(901)
+                        return if (failRead)
+                            Result.Failed(
+                                Failure(FailureKind.UNAVAILABLE, "fixture_storage_unavailable")
+                            )
+                        else Result.Success(null)
+                    }
+                }
+            assertEquals(
+                "native_session_invalid",
+                failed(
+                    f.directTransport(rooms = rooms)
+                        .execute(f.actor, room.parent, 0, room.client, room.conversation)
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun directTransportRejectsForeignOrMismatchedPublishedRoomAndLateSuccess() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val event = f.pushRoom(room.parent, room.device)
+        val conversation =
+            success(
+                    f.transactions.run(f.actor) {
+                        f.roomScopes()
+                            .find(
+                                requireNotNull(f.actor.companyId),
+                                f.account,
+                                "proof.invalid",
+                                event.roomId,
+                            )
+                    }
+                )!!
+                .conversationId
+        val original =
+            success(
+                f.transactions.run(f.actor) {
+                    f.directRooms.binding(requireNotNull(f.actor.companyId), conversation)
+                }
+            )!!
+        val changed =
+            listOf(
+                original.copy(companyId = UUID.randomUUID()),
+                original.copy(conversationId = UUID.randomUUID()),
+                original.copy(accountId = UUID.randomUUID()),
+                original.copy(jobId = UUID.randomUUID()),
+                original.copy(provisioningVersion = original.provisioningVersion + 1),
+                original.copy(matrixServerName = "foreign.invalid"),
+                original.copy(matrixRoomId = "invalid"),
+                original.copy(matrixRoomId = "!line\n"),
+                original.copy(matrixRoomId = "!" + "x".repeat(255)),
+            )
+        for (binding in changed) {
+            val rooms =
+                object : CollaborationDirectRoomRepository by f.directRooms {
+                    override fun binding(
+                        companyId: UUID,
+                        conversationId: UUID,
+                    ): Result<CollaborationDirectRoomBinding?> = Result.Success(binding)
+                }
+            assertEquals(
+                "collaboration_room_provisioning_changed",
+                failed(
+                    f.directTransport(rooms = rooms)
+                        .execute(f.actor, room.parent, 0, room.client, conversation)
+                ),
+            )
+        }
+        val late =
+            object : CollaborationDirectRoomRepository by f.directRooms {
+                override fun binding(
+                    companyId: UUID,
+                    conversationId: UUID,
+                ): Result<CollaborationDirectRoomBinding?> {
+                    f.clock.at = f.clock.at.plusSeconds(901)
+                    return Result.Success(original)
+                }
+            }
+        assertEquals(
+            "native_session_invalid",
+            failed(
+                f.directTransport(rooms = late)
+                    .execute(f.actor, room.parent, 0, room.client, conversation)
+            ),
+        )
+    }
+
+    @Test
+    fun directTransportPropagatesInterruptedAcquisition() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val rooms =
+            object : CollaborationDirectRoomRepository by f.directRooms {
+                override fun binding(
+                    companyId: UUID,
+                    conversationId: UUID,
+                ): Result<CollaborationDirectRoomBinding?> =
+                    throw InterruptedException("fixture transport cancellation")
+            }
+        try {
+            assertThrows(InterruptedException::class.java) {
+                f.directTransport(rooms = rooms)
+                    .execute(f.actor, room.parent, 0, room.client, room.conversation)
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(0, f.rows("collaboration_direct_room_bindings"))
+    }
+
+    @Test
     fun directRoomWorkerRecoversLostCreateResponseWithoutDuplicateRoomOrLogout() {
         val room = DirectRoomFixture()
         success(room.request())
@@ -7006,6 +7212,26 @@ class NativeCollaborationRegistrationTest {
                 IdentitySecurityPolicy(),
                 CollaborationServicePolicy(true),
                 provider,
+                clock,
+            )
+
+        fun directTransport(
+            rooms: CollaborationDirectRoomRepository = directRooms,
+            registry: CollaborationRegistryRepository = this.registry,
+        ) =
+            ReadNativeCollaborationDirectTransport(
+                direct,
+                rooms,
+                registry,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
                 clock,
             )
 

@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Direct transport source accepted — 8 November 2026, 10:49 UTC
+
+Six Kotlin files add one native device/direct-room metadata read in a guarded transaction.
+No migration, provider I/O, retry, cached permission or gateway bypass. Existing endpoints
+remain. [Contract](collaboration/direct-transport.md) / [exact evidence](measurements/collaboration-direct-transport-2026-11-08.json).
+Gate-1/session32674 is REAPED PASS438.185s,8,257 unchanged inputs,218 active cases and one
+unrelated existing opt-in elapsed retention skip; zero failures/errors. PostgreSQL5,
+HTTP4/OpenAPI69,delivery18,worker122,bootJar/format/architecture pass. Commit/push this
+accepted endpoint with evidence. It is NOT DEPLOYED and is not a measured latency fix.
+
+Mobile10d104ca records release67 installed in place on the phone after original-emulator
+acceptance. Same-host tap-to-request2663ms,headers197ms,local handoff90ms/scheduling2ms.
+Counter180s has zero403 and one encrypted200; own default-key401x2 then404x2 with one
+successful refresh. Original messages/keys and the UNSENT66 synthetic draft are preserved.
+No phone UI driven, no emulator running. Starterad3aa93 is pushed and accepted280fresh/
+zero all for the exact generic timing port; its checker76787/push13862 are REAPED.
+
+Mobile now has UNCOMMITTED Stage/Deliver one-request transport adoption and cross-platform
+API/repository/policy tests. Its focused gate is the sole owned heavy compiler; read the
+current private note for its session. Enter/history still use their original reads.
+No68APK or new runtime send exists. After Mobile focused/full acceptance, commit/push,
+stage a rollback-preserving compatible API-only rollout on existing schema116.1, then
+probe one NEW68 original on the retained emulator and announce any phone install-only.
+Do not reset original data, resend previous test messages or drive the phone UI.
+LiveAPI3a7909a6/worker10485916/GroupOFF/V117–138undeployed remain unchanged. Original54
+PRD groups, SDK/library publication, nativeApple Matrix and overhead work remain open.
+
 ## Mobile66 probe; server remains unchanged — 8 November 2026, 09:46 UTC
 
 Live API3a7909a6 and the existing secret-storage GET admission are unchanged. Mobile

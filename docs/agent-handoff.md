@@ -1,5 +1,22 @@
 # Agent continuation — HRIS workspace
 
+## Secret-storage API deployed — 8 November 2026, 00:13 UTC
+
+API3a7909a6 is now live, healthy and schema116.1 unchanged. API-only rollout28867
+passed17.037s; exact accepted JAR/image, runtime user/env/ports and all other service
+identities are verified. Worker10485916, Synapse, provider database, app database,
+keys/configuration and Group routing are unchanged. Stage83346 passed16.582s; both
+sessions are reaped. Rollback image/overlay are retained. No device UI, messages,
+key reset or migration was performed. See matrix-secret-storage-deployment measurement.
+Actual SDK probe/request-count and send-latency acceptance remain pending; do not
+infer that the reported pending queue is fixed just because the route is supported.
+
+Mobile notification focused-1/52684 remains the ONLY local compiler. Mobile+library
+sources are frozen until reaped. No emulator runs; phone/original Bima remain58.
+Public inspector run42427888790 failed both jobs; inspect its retained logs before
+editing the frozen library. Continue notification59, actual secret probe and original
+pending requests; the remaining54PRD groups are still active, none newly complete.
+
 ## Secret-storage GET accepted; notification shortcut in progress — 8 November 2026, 00:11 UTC
 
 The user reports repeated403 at their own m.secret_storage.default_key endpoint.

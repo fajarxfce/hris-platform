@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Readiness domain WIP; Mobile cold-start ownership fix under test — 8 November 2026, 19:16 UTC
+
+Three untracked, UNVALIDATED and UNBOUND domain files are present:
+`entities/CollaborationReadinessWake.kt`,
+`repositories/CollaborationReadinessWakeRepository.kt`, and
+`usecases/FanOutCollaborationReadiness.kt` under the collaboration domain package.
+They begin finite committed-publication fanout with target-scoped queue append plus
+checkpoint transactions. They have no datasource, migration, bindings, worker or
+new tests yet. Do not deploy or claim them accepted. LiveAPI1aea/schema116.1 and
+worker10485916 remain unchanged;117–138 must remain undeployed.
+
+Mobile75 first activation created/published one device in8.455s after ordinary login
+and company selection. Its first cold restart captured StoreBusy: activation's raw
+inventory/private-key inspection raced background runtime file ownership. Mobile
+9b93175e records the actual failed native gate. The original keys/account/images are
+preserved; both emulators stopped, phone still70. No new message was sent. Mobile
+has an uncommitted scoped inspection reservation and race/cancellation tests; its
+sole compiler33255 is `.work/runtime-inspection-2026-11-08/focused-1`.
+
+Finish Mobile focused/full/native repair before further heavy jobs. Then complete
+this readiness WIP using the committed outbox design below, including actual PG
+rollback/RLS/checkpoint/lease tests and both application contexts. No server wake,
+missed-hint recovery, new SDK publication, native Apple or PRD completion is claimed.
+
 ## Mobile account-preservation proof and committed-wake design — 8 November 2026, 18:21 UTC
 
 Live API1aea32288656d3c4e372d6950311b4c43ce5bcdc/schema116.1 and the worker remain

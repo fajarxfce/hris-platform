@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Readiness source candidate prepared; Mobile full gate running — 8 November 2026, 19:46 UTC
+
+UNVALIDATED source now includes V116.2, the domain contracts/orchestration,
+raw SQL datasource/repository, default-off worker/settings/DI and pure/PG/worker
+context/lifecycle regressions. Fifteen source files are modified or untracked;
+no formatter/compiler/test or live server change has run. Prepared guarded runner:
+`.work/readiness-wake-2026-11-08/check.py` (`format-*`, `focused-*`, then full gate).
+Review [candidate contract](collaboration/recipient-readiness-wake.md). Actual
+PostgreSQL expiry/reclaim/budget and full current-admission cases still need review.
+The migration must remain isolated from117–138. LiveAPI1aea/schema116.1 and
+worker10485916 remain unchanged.
+
+Mobile05201355 is pushed. Its139-test focused inspection-ownership gate passed;
+sole compiler83151 is runtime-inspection/full-1. Mobile application/library inputs
+are frozen. Main76 scripts are held pending the full gate, then exact source push,
+packaging and two preserved-device native gates: original first-account75 image,
+then original Bima74 image. No new sends, enrollment, key resets or phone UI.
+The76 packaging script's copied version75 argument was corrected before execution.
+Both emulators are stopped and phone remains70; no new availability response.
+
+Finish Mobile full/native76, port accepted generic worker to Starter, then validate
+and complete this server candidate plus missed-hint recovery. The historical71
+Storage root, post-commit sender wake, native Apple, cloud recovery and all54
+collaboration PRD groups remain open. Do not claim any of them complete.
+
+
 ## Readiness domain WIP; Mobile cold-start ownership fix under test — 8 November 2026, 19:16 UTC
 
 Three untracked, UNVALIDATED and UNBOUND domain files are present:

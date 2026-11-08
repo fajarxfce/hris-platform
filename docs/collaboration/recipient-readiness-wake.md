@@ -1,6 +1,6 @@
 # Committed recipient readiness wake
 
-Implementation design, not a deployed capability. The current API reports
+Implementation candidate, not validated or deployed. The current API reports
 `recipientReady` and blocks encrypted submission to an unavailable recipient.
 The next step must wake an already waiting sender after the recipient's first
 public-key publication commits, without restarting a timed transport loop.
@@ -73,3 +73,29 @@ Live schema is116.1. Any readiness migration must be isolated and compatible wit
 that schema; migrations117–138 remain undeployed. A source change or migration file
 is not rollout approval evidence. Preserve original keys, messages and device data
 through native acceptance. Calls, meetings and cloud key-backup recovery remain separate.
+
+## Candidate source — 8 November 2026
+
+V116.2 captures a first-publication outbox row in the original transaction and
+retains one job per company/device. It does not backfill earlier publications.
+A restricted metadata view lists only existing direct peers with push bindings
+published before the immutable cutoff. The view owner has no pusher-secret column
+grants; an actual worker session plus publisher/company scope is required.
+
+`FanOutCollaborationReadiness` acquires at most four jobs and processes one page of
+eight targets per lease. Each target's opaque queue append and exact checkpoint
+advance share that target's transaction. Current push admission remains owned by
+`HandleCollaborationPush`. Successful progress resets the job's retry count; eight
+consecutive failed claims, a one-day expiry, 60-second token-fenced leases and a
+20-second task budget bound recovery. A publisher cannot extend or replace an
+active lease. Queue-wide capacity is16, and each worker owns two execution slots
+with no waiting task queue.
+
+The new worker is disabled unless `HRIS_COLLABORATION_READINESS_ENABLED=true` and
+all existing chat/provider/push-delivery flags permit it. This flag must remain off
+until isolated V116.2 and source/native acceptance succeed. No117–138 rollout is
+implied. Source currently includes unexecuted pure transaction/cancellation/lost
+response tests, PostgreSQL migration/RLS/cursor/queue tests and actual worker
+context/lifecycle tests. Formatter, compiler and test gates have NOT run because
+Mobile owns the sole heavy-process slot. Client missed-hint/interrupted activation
+recovery and actual original-sender post-commit resumption remain unfinished.

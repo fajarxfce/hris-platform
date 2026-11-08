@@ -1,7 +1,8 @@
 # Committed recipient readiness wake
 
 Implementation has passed focused and full source checks and is deployed on dev
-for controlled acceptance. Native sender resumption remains pending. The current API reports
+for controlled acceptance. The first native case resumed its original after delayed FCM delivery; prompt foreground
+resumption and broader recovery acceptance remain pending. The current API reports
 `recipientReady` and blocks encrypted submission to an unavailable recipient.
 The next step must wake an already waiting sender after the recipient's first
 public-key publication commits, without restarting a timed transport loop.
@@ -148,3 +149,20 @@ returned200. External delivery was disabled. Fixtures were removed. The subseque
 applied only116.2 and replaced the worker with source52aaccaa, enabling readiness
 for controlled acceptance. The existing API, other services and eight confirmed
 key publications were preserved. Actual sender resumption remains to be proven.
+
+
+## Actual first-publication result
+
+The [first controlled native case](../measurements/collaboration-readiness-native-2026-11-08.json)
+committed a recipient's keys and queued exactly one target hint in0.465seconds.
+FCM accepted one delivery attempt, but the device's Google push connection stalled
+until a missed-heartbeat reconnect. The original sender resumed once about2.6seconds
+after the OS finally dispatched that same NORMAL hint, with unchanged process and
+keys. The140-second prompt-wake gate remains failed: provider acceptance preceded
+actual delivery by roughly297seconds. These cross-clock intervals are approximate.
+The underlying network/provider reason for the stalled socket was not established.
+
+This demonstrates why post-commit FCM is a useful recovery path but is insufficient
+as the sole foreground readiness signal. Add a scoped application-owned observation
+path with authoritative commit/current-admission checks and missed-event recovery;
+do not convert every silent signal to HIGH or restart timed transport polling.

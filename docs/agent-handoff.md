@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Real first publication and delayed sender resumption — 8 November 2026, 21:29 UTC
+
+The live116.2/worker52aaccaa publication path ran once for a new fictional recipient.
+Keys committed21:17:45.467; one scoped job queued an opaque sender hint0.465s later;
+FCM accepted one attempt21:17:46.683. The native140-second prompt-wake gate FAILED.
+Google's device push connection stalled until a missed-heartbeat close/reconnect;
+NORMAL push reached the unchanged sender process21:22:44.018. Its same retained
+original reached Synapse exactly once21:22:46.735, about2.646s after OS dispatch.
+[Evidence](measurements/collaboration-readiness-native-2026-11-08.json). This proves
+functional post-commit fanout/eventual recovery for one fixture, not timely delivery.
+Underlying network/provider cause of the Google socket stall remains unproven.
+
+Mobile04c35cc0 records exact evidence and all failed gates. No keys, messages or phone
+were reset; temporary diagnostic root was after the failed gate and restored. An
+ignored HIGH diagnostic came AFTER the original event and cannot explain its send.
+Both crypto stores and full device backup remain. All compiler/emulator/capture
+sessions stopped/reaped. Original Bima74 metadata recovery still unresolved; phone70
+unchanged. Live API1aea and worker52aaccaa/schema116.2 remain;117–138 not applied.
+
+Next implement an explicitly owned foreground recipient-change path independent of
+FCM latency, preserving authoritative commit checks, current admission, finite work
+and original identity. Review actual Matrix device-change observation and scoped
+HRIS control-stream alternatives before choosing; never drive business policy from
+inspector events or restore timed transport loops. Client missed-hint/interrupted
+activation and all54 communications PRD groups remain. Continue long run/push commits.
+
+
 ## Readiness worker deployed for controlled dev acceptance — 8 November 2026, 21:01 UTC
 
 The guarded rollout completed successfully in22.521s. Live schema is116.2; only

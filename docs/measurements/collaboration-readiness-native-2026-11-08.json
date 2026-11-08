@@ -1,0 +1,47 @@
+{
+  "source": "52aaccaa45adc3647f3a7e6fb983d9d9c2a13d13",
+  "schema": "116.2",
+  "publicationAndPush": {
+    "publishedAt": "2026-11-08T21:17:45.467292+00:00",
+    "jobCount": 1,
+    "jobCompleted": true,
+    "targetAdvanced": true,
+    "hintRevision": 1,
+    "deliveredRevision": 1,
+    "providerAttempts": 1,
+    "opaqueHint": true,
+    "queueDelaySeconds": 0.465,
+    "fcmAcknowledgedAt": "2026-11-08T21:17:46.682968+00:00",
+    "normalPushReceivedAt": "2026-11-08T21:22:44.018+00:00",
+    "normalPushDispatchedAt": "2026-11-08T21:22:44.089+00:00",
+    "providerAcceptedToDeviceReceivedSeconds": 297.335,
+    "deviceDispatchToEncryptedEventSeconds": 2.646,
+    "timingLimit": "Device/host UTC timestamps were not independently calibrated; cross-clock intervals are approximate."
+  },
+  "boundedProbe": {
+    "deadlineSeconds": 140,
+    "accepted": false,
+    "failureCategory": "TimeoutError",
+    "instrumentationReaped": true,
+    "peerComplete": true,
+    "peerSamePrivateIdentityVerifiedByScenario": true,
+    "newPeerMessagesSent": 0
+  },
+  "eventualOriginalResumptionObserved": true,
+  "original": {
+    "messageSha256": "7c8b1ccf88c523271c8b1a581a340a90c190397c4dae8784dbf6ca920a3cb7b3",
+    "sendGestures": 1,
+    "newSendGesturesDuringRecovery": 0,
+    "oneUiOriginal": true,
+    "sameProductProcess": true,
+    "pendingBeforePublication": true,
+    "quietSeconds": 62.184,
+    "sentObservedAt": "2026-11-08T21:25:07.055128+00:00",
+    "encryptedProviderEvents": 1,
+    "providerReceivedAt": "2026-11-08T21:22:46.735+00:00"
+  },
+  "timelyNativeWakeAccepted": false,
+  "phoneTouched": false,
+  "mobileEvidence": "https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/measurements/collaboration-readiness-native-2026-11-08.json",
+  "limit": "One owned fictional first-publication case; foreground latency remains unacceptable when Google delivery stalls. No Apple, background killed-process or missed-event acceptance."
+}

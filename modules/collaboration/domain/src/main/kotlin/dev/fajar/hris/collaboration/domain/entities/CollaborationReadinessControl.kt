@@ -10,6 +10,7 @@ data class CollaborationReadinessControl(
     val nativeSessionId: UUID,
     val deviceId: UUID,
     val publishedAtEpochMillis: Long,
+    val publicationRevision: Long,
 ) {
     override fun toString() = "CollaborationReadinessControl(<redacted>)"
 }

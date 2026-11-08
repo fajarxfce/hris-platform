@@ -17,6 +17,7 @@ fun collaborationReadinessAdmission(
     effective: EffectiveClientPolicy,
     now: Instant,
 ): CollaborationReadinessAdmission? {
+    if (control.publicationRevision <= 0 || control.publishedAtEpochMillis <= 0) return null
     val publication = Instant.ofEpochMilli(control.publishedAtEpochMillis)
     if (publication > now || publication.plusSeconds(86400) <= now) return null
     if (access == null || parent == null || device == null || gateway == null || keys == null)
@@ -77,6 +78,7 @@ fun collaborationReadinessAdmission(
             keys.version != 1L ||
             keys.publishedAt == null ||
             keys.reservedAt > keys.publishedAt ||
+            keys.reservedAt < device.createdAt ||
             keys.publishedAt.toEpochMilli() > control.publishedAtEpochMillis ||
             keys.fingerprint.length != 64 ||
             keys.fingerprint.any { it !in '0'..'9' && it !in 'a'..'f' }

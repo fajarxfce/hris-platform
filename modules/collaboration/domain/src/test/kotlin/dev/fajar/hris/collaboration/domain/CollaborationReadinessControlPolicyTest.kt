@@ -15,13 +15,35 @@ class CollaborationReadinessControlPolicyTest {
             UUID.randomUUID(),
             UUID.randomUUID(),
             1_794_171_600_123L,
+            1L,
         )
+
+    @Test
+    fun revisionIsAnExactPositiveLongAndLegacyUnorderedControlsAreRejected() {
+        val wire = collaborationReadinessControlContent(control)
+        for (bad in listOf("0", "-1", "01", "+1", "1.0", "9223372036854775808")) {
+            assertNull(readCollaborationReadinessControl(wire + ("publication_revision" to bad)))
+        }
+        val last = control.copy(publicationRevision = Long.MAX_VALUE)
+        assertEquals(
+            last,
+            readCollaborationReadinessControl(collaborationReadinessControlContent(last)),
+        )
+        assertNull(
+            readCollaborationReadinessControl(
+                (wire - "publication_revision") + ("schema_version" to "1")
+            )
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            collaborationReadinessControlContent(control.copy(publicationRevision = 0))
+        }
+    }
 
     @Test
     fun exactRoundTripHasNoMessageOrKeyAndRedactsDiagnostics() {
         val wire = collaborationReadinessControlContent(control)
         assertEquals(control, readCollaborationReadinessControl(wire))
-        assertEquals(8, wire.size)
+        assertEquals(9, wire.size)
         assertEquals(
             control.publishedAtEpochMillis + 86_400_000,
             wire.getValue("expires_at").toLong(),
@@ -43,7 +65,7 @@ class CollaborationReadinessControlPolicyTest {
         for ((name, value) in
             listOf(
                 "body" to "unexpected plaintext",
-                "schema_version" to "2",
+                "schema_version" to "1",
                 "schema_version" to "01",
                 "published_at" to "01",
                 "published_at" to "-1",

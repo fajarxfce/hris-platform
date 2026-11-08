@@ -32,4 +32,6 @@ data class CollaborationReadinessCheckpoint(
     val lease: CollaborationReadinessLease,
     val publicationCutoff: Instant,
     val after: CollaborationReadinessPosition?,
+    /** Present only on V2 Matrix controls; the independent FCM journal has no such cursor. */
+    val publicationRevision: Long? = null,
 )

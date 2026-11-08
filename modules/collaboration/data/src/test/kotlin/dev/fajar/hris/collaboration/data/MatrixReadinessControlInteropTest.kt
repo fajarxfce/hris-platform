@@ -42,6 +42,7 @@ class MatrixReadinessControlInteropTest {
                     UUID.randomUUID(),
                     owner.deviceId,
                     f.clock.instant().toEpochMilli(),
+                    1L,
                 )
             fun send() =
                 InternalCollaborationMatrixReadinessRepository(

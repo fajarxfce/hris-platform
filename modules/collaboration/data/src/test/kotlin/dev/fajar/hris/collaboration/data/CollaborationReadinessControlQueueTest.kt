@@ -68,14 +68,43 @@ class CollaborationReadinessControlQueueTest {
                     Int::class.java,
                 ),
             )
+            val legacy = Fixture(0)
+            success(legacy.publish())
+            val oldControl =
+                owner.queryForList(
+                    "select to_jsonb(c)::text as snapshot from collaboration_readiness_controls c"
+                )
+            Flyway.configure().dataSource(source).target("116.4").load().migrate()
+            assertEquals(
+                oldControl,
+                owner.queryForList(
+                    "select (to_jsonb(c)-'publication_revision')::text as snapshot from collaboration_readiness_controls c"
+                ),
+            )
+            assertEquals(
+                1,
+                owner.queryForObject(
+                    "select count(*) from collaboration_readiness_controls where publication_revision is null",
+                    Int::class.java,
+                ),
+            )
+            assertEquals(
+                0,
+                owner.queryForObject(
+                    "select count(*) from collaboration_readiness_revisions",
+                    Int::class.java,
+                ),
+            )
             for (role in
                 listOf("readiness_control_api_fixture", "readiness_control_worker_fixture")) {
                 owner.execute(
                     "grant select,insert,update,delete on all tables in schema public to $role"
                 )
             }
+            assertTrue(success(Runtime(true).claim()).isEmpty())
+            owner.execute("truncate collaboration_readiness_controls")
             assertEquals(
-                1,
+                2,
                 owner.queryForObject(
                     "select count(*) from collaboration_readiness_wakes",
                     Int::class.java,
@@ -95,6 +124,133 @@ class CollaborationReadinessControlQueueTest {
         // Fixture owner only. Runtime roles have no TRUNCATE authority.
         owner.execute(
             "truncate collaboration_readiness_controls,collaboration_readiness_wakes,collaboration_push_hints"
+        )
+    }
+
+    @Test
+    fun publicationRevisionFollowsCommitOrderEvenWhenTimestampsAreReversedAndRollbackLeavesNoWake() {
+        for (rollback in listOf(false, true)) {
+            val f = Fixture(0)
+            val older = Participant(f.company, f.now.minusSeconds(3))
+            val held = CountDownLatch(1)
+            val release = CountDownLatch(1)
+            val secondEntering = CountDownLatch(1)
+            val pool = Executors.newFixedThreadPool(2)
+            try {
+                val first =
+                    pool.submit<Result<Unit>> {
+                        f.publish(
+                            rollback = rollback,
+                            beforeCommit = {
+                                held.countDown()
+                                check(release.await(5, TimeUnit.SECONDS))
+                            },
+                        )
+                    }
+                assertTrue(held.await(5, TimeUnit.SECONDS))
+                val second =
+                    pool.submit<Result<Unit>> {
+                        older.runtime.run(older.actor) {
+                            older.runtime.sql.update(
+                                "update collaboration_device_key_publications set version=1,published_at=? where company_id=? and device_id=?",
+                                f.now.minusSeconds(2).atOffset(ZoneOffset.UTC),
+                                f.company,
+                                older.device,
+                            )
+                            secondEntering.countDown()
+                            older.runtime.sql.update(
+                                "insert into outbox_events(id,company_id,actor_id,event_type,resource_id,payload) values(?,?,?,'collaboration.device_keys_published',?,'{}')",
+                                UUID.randomUUID(),
+                                f.company,
+                                older.account,
+                                older.device,
+                            )
+                            Result.Success(Unit)
+                        }
+                    }
+                assertTrue(secondEntering.await(5, TimeUnit.SECONDS))
+                assertThrows(TimeoutException::class.java) {
+                    second.get(150, TimeUnit.MILLISECONDS)
+                }
+                assertEquals(0, f.count("collaboration_readiness_controls"))
+                assertEquals(0, f.count("collaboration_readiness_revisions"))
+                release.countDown()
+                val firstResult = first.get(5, TimeUnit.SECONDS)
+                if (rollback) assertInstanceOf(Result.Failed::class.java, firstResult)
+                else success(firstResult)
+                success(second.get(5, TimeUnit.SECONDS))
+                val rows =
+                    owner.queryForList(
+                        "select publisher_account_id,publication_revision,publication_cutoff from collaboration_readiness_controls where company_id=? order by publication_revision",
+                        f.company,
+                    )
+                assertEquals(if (rollback) 1 else 2, rows.size)
+                assertEquals(older.account, rows.last()["publisher_account_id"])
+                assertEquals(if (rollback) 1L else 2L, rows.last()["publication_revision"])
+                if (!rollback) {
+                    assertEquals(f.publisher.account, rows.first()["publisher_account_id"])
+                    assertTrue(
+                        (rows.first()["publication_cutoff"] as java.sql.Timestamp).after(
+                            rows.last()["publication_cutoff"] as java.sql.Timestamp
+                        )
+                    )
+                    success(f.repeatEvent())
+                    assertEquals(
+                        2L,
+                        owner.queryForObject(
+                            "select revision from collaboration_readiness_revisions where company_id=?",
+                            Long::class.java,
+                            f.company,
+                        ),
+                    )
+                    assertEquals(
+                        1L,
+                        owner.queryForObject(
+                            "select publication_revision from collaboration_readiness_controls where company_id=? and publisher_device_id=?",
+                            Long::class.java,
+                            f.company,
+                            f.publisher.device,
+                        ),
+                    )
+                }
+            } finally {
+                release.countDown()
+                pool.shutdownNow()
+                assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS))
+            }
+        }
+    }
+
+    @Test
+    fun runtimeCannotReadOrAlterThePublicationCounterEvenWithBroadTableGrants() {
+        val f = Fixture(0)
+        success(f.publish())
+        val worker = Runtime(true)
+        success(
+            worker.run(f.publisher.actor) {
+                assertEquals(
+                    0,
+                    worker.sql.queryForObject(
+                        "select count(*) from collaboration_readiness_revisions",
+                        Int::class.java,
+                    ),
+                )
+                assertEquals(
+                    0,
+                    worker.sql.update(
+                        "update collaboration_readiness_revisions set revision=revision+1"
+                    ),
+                )
+                Result.Success(Unit)
+            }
+        )
+        assertEquals(
+            1L,
+            owner.queryForObject(
+                "select revision from collaboration_readiness_revisions where company_id=?",
+                Long::class.java,
+                f.company,
+            ),
         )
     }
 
@@ -418,6 +574,7 @@ class CollaborationReadinessControlQueueTest {
                 "attempts=0",
                 "lease_token=gen_random_uuid()",
                 "publisher_account_id=gen_random_uuid()",
+                "publication_revision=publication_revision+1",
             )) {
             assertInstanceOf(
                 Result.Failed::class.java,

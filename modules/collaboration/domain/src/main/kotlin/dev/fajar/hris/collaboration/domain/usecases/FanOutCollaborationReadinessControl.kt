@@ -55,7 +55,13 @@ class FanOutCollaborationReadinessControl(
             step(deadline) {
                 transactions.run(publisher) {
                     queue.find(lease, false).flatMap { checkpoint ->
-                        if (checkpoint == null || checkpoint.lease != lease) return@flatMap lost()
+                        if (
+                            checkpoint == null ||
+                                checkpoint.lease != lease ||
+                                checkpoint.publicationRevision == null ||
+                                checkpoint.publicationRevision <= 0
+                        )
+                            return@flatMap lost()
                         queue.targets(checkpoint, 8).flatMap { targets ->
                             val positions = targets.map { it.position }
                             if (
@@ -85,6 +91,7 @@ class FanOutCollaborationReadinessControl(
                     target.nativeSessionId,
                     target.position.deviceId,
                     expected.publicationCutoff.toEpochMilli(),
+                    checkNotNull(expected.publicationRevision),
                 )
             val prepared =
                 withTarget(expected, control, deadline) { admission, credential ->

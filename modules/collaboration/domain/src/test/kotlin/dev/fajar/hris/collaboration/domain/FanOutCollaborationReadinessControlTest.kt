@@ -295,7 +295,7 @@ class FanOutCollaborationReadinessControlTest {
                 UUID.randomUUID(),
                 now.plusSeconds(60),
             )
-        var checkpoint = CollaborationReadinessCheckpoint(lease, now.minusSeconds(5), null)
+        var checkpoint = CollaborationReadinessCheckpoint(lease, now.minusSeconds(5), null, 1L)
         val participants = (1..size).map { Participant(now, lease.companyId, it) }
         val targets =
             participants.map {
@@ -325,6 +325,7 @@ class FanOutCollaborationReadinessControlTest {
                 peer.parent.id,
                 peer.device.id,
                 checkpoint.publicationCutoff.toEpochMilli(),
+                checkNotNull(checkpoint.publicationRevision),
             )
 
         private fun participant() =

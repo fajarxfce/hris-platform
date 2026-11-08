@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+## Commit-ordered readiness revisions checked — 8 November 2026, 22:32 UTC
+
+V116.4 and the strict nine-field V2 control pass122 focused cases in151.554s and
+296 full fresh cases in552.754s, zero failures/errors, one existing opt-in retention
+skip. Final8292 source inputs stayed fixed; actual API/worker contexts, full worker
+suite, both JARs, format and architecture passed. Sessions95556/63843/64995 REAPED.
+[Evidence](measurements/collaboration-readiness-revisions-2026-11-08.json).
+
+The per-company counter is locked through publication commit. Actual competing
+transactions prove reversed timestamps remain correctly ordered and rollback cannot
+publish a phantom revision. Repeat capture preserves the old event/revision. The
+counter is the final shared guard: audit precedes outbox capture; publishKeys only
+rechecks captured admission/deadline afterward. Future writers must preserve that
+order. V116.3 remains checksum-stable; legacy rows retain null revision and are not
+claimable by V2. No historical backfill or FCM queue changes. The final partial due
+index was added after focused testing and is included in the full gate.
+
+No deployment: live schema116.2/API1aea/worker52aaccaa unchanged, Matrix readiness
+control flag false;117–138 remain unapplied. Repackage using final committed source
+before rollout. Next finish the native client-owned SDK5 listener and encrypted
+coalesced revision receipt, test stale callbacks/cancellation/lost responses, then
+isolated schema upgrade/old-image compatibility and controlled native delivery.
+Mobile currently has uncommitted domain/storage consumer work, not an accepted APK.
+No phone availability or install; phone70 unchanged. Bima74 metadata preserved and
+unrecovered. Starter665b9cd remains accepted. Continue all54 PRD and push each commit.
+
+
 ## Independent Matrix readiness journal checked — 8 November 2026, 22:12 UTC
 
 V116.3/domain/data/worker source passes focused119 cases in147.211s and full294 fresh

@@ -77,6 +77,7 @@ class StoredCollaborationReadinessControlQueueRepository(
             checkpoint.publicationCutoff.atOffset(UTC),
             checkpoint.after?.accountId,
             checkpoint.after?.deviceId,
+            requireNotNull(checkpoint.publicationRevision).also { require(it > 0) },
         )
 
     private fun checkpoint(
@@ -99,6 +100,7 @@ class StoredCollaborationReadinessControlQueueRepository(
             ),
             row.publicationCutoff.toInstant(),
             after,
+            requireNotNull(row.publicationRevision).also { require(it > 0) },
         )
     }
 }

@@ -16,15 +16,17 @@ private val CONTROL_FIELDS =
         "device_id",
         "published_at",
         "expires_at",
+        "publication_revision",
     )
 
-/** Fixed v1 wire shape; no caller-selected event type, room, user, text or transaction. */
+/** Fixed v2 wire shape; revisions follow publication commit order, not event timestamps. */
 fun collaborationReadinessControlContent(
     control: CollaborationReadinessControl
 ): Map<String, String> {
     require(control.publishedAtEpochMillis in 1..MAX_PUBLICATION_MILLIS)
+    require(control.publicationRevision > 0)
     return mapOf(
-        "schema_version" to "1",
+        "schema_version" to "2",
         "event_id" to control.eventId.toString(),
         "company_id" to control.companyId.toString(),
         "account_id" to control.accountId.toString(),
@@ -32,6 +34,7 @@ fun collaborationReadinessControlContent(
         "device_id" to control.deviceId.toString(),
         "published_at" to control.publishedAtEpochMillis.toString(),
         "expires_at" to (control.publishedAtEpochMillis + LIFETIME_MILLIS).toString(),
+        "publication_revision" to control.publicationRevision.toString(),
     )
 }
 
@@ -39,7 +42,9 @@ fun collaborationReadinessControlContent(
 fun readCollaborationReadinessControl(
     content: Map<String, String>
 ): CollaborationReadinessControl? {
-    if (content.keys != CONTROL_FIELDS || content["schema_version"] != "1") return null
+    if (content.keys != CONTROL_FIELDS || content["schema_version"] != "2") return null
+    val revision = content["publication_revision"]?.toLongOrNull() ?: return null
+    if (revision <= 0 || content["publication_revision"] != revision.toString()) return null
     val published = content["published_at"]?.toLongOrNull() ?: return null
     if (
         published !in 1..MAX_PUBLICATION_MILLIS ||
@@ -63,5 +68,6 @@ fun readCollaborationReadinessControl(
         id("native_session_id") ?: return null,
         id("device_id") ?: return null,
         published,
+        revision,
     )
 }

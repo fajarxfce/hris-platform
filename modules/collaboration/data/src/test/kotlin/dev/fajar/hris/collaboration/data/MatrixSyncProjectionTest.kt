@@ -71,6 +71,7 @@ class MatrixSyncProjectionTest {
                 UUID.randomUUID(),
                 owner.deviceId,
                 1_794_171_600_123L,
+                1L,
             )
         val content = collaborationReadinessControlContent(control)
         fun hint(value: Map<String, Any> = content, sender: String = user(owner.accountId)) =
@@ -95,7 +96,7 @@ class MatrixSyncProjectionTest {
                 hint(content + ("device_id" to UUID.randomUUID().toString())),
                 hint(content + ("native_session_id" to "")),
                 hint(content + ("published_at" to 1_794_171_600_123L)),
-                hint(content + ("schema_version" to "2")),
+                hint(content + ("schema_version" to "1")),
                 hint(content + ("body" to "must not escape")),
                 hint(content - "expires_at"),
                 hint(content + ("event_id" to "x".repeat(4096))),

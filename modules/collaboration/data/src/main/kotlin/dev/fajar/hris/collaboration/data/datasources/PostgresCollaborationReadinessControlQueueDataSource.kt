@@ -45,6 +45,7 @@ class PostgresCollaborationReadinessControlQueueDataSource(private val sql: DSLC
                 T.LEASE_TOKEN.eq(lease.token),
                 T.LEASE_UNTIL.eq(lease.until),
                 T.PUBLICATION_CUTOFF.eq(checkpoint.publicationCutoff),
+                T.PUBLICATION_REVISION.eq(requireNotNull(checkpoint.publicationRevision)),
                 T.AFTER_ACCOUNT_ID.isNotDistinctFrom(checkpoint.afterAccountId),
                 T.AFTER_DEVICE_ID.isNotDistinctFrom(checkpoint.afterDeviceId),
             )
@@ -92,6 +93,7 @@ class PostgresCollaborationReadinessControlQueueDataSource(private val sql: DSLC
     private fun fence(checkpoint: CollaborationReadinessCheckpointData): Condition =
         fence(checkpoint.lease)
             .and(W.PUBLICATION_CUTOFF.eq(checkpoint.publicationCutoff))
+            .and(W.PUBLICATION_REVISION.eq(requireNotNull(checkpoint.publicationRevision)))
             .and(W.AFTER_ACCOUNT_ID.isNotDistinctFrom(checkpoint.afterAccountId))
             .and(W.AFTER_DEVICE_ID.isNotDistinctFrom(checkpoint.afterDeviceId))
 

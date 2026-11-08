@@ -62,7 +62,7 @@ class CollaborationReadinessControlContextTest {
                         "spring.datasource.username" to "hris_worker_test",
                         "spring.datasource.password" to "worker-fixture-only",
                         "spring.flyway.enabled" to "true",
-                        "spring.flyway.target" to "116.3",
+                        "spring.flyway.target" to "116.4",
                         "spring.flyway.url" to postgres.jdbcUrl,
                         "spring.flyway.user" to postgres.username,
                         "spring.flyway.password" to postgres.password,

@@ -15,24 +15,37 @@ it uses that target's existing provider credential. No service bot, new login,
 replacement device or private-key reset is needed. The public Matrix gateway
 continues to accept only its existing encrypted to-device send shape.
 
-The eight-field v1 content contains the immutable publication event, target
-company/account/native session/device, publication time and its one-day expiry.
+The nine-field V2 content contains the immutable publication event and revision,
+target company/account/native session/device, publication time and its one-day expiry.
 All values have canonical bounded encodings. The existing sync projection accepts
 only this exact shape, from the syncing user's own identity, for its exact current
 company/account/device. It discards foreign or malformed controls without losing
 the rest of the encrypted sync response. Native-parent/time admission remains
 required in the consumer. The hint grants no chat content or send authority.
 
+V116.4 increments a company-scoped counter while capturing the control journal.
+That counter's row lock lasts through the publication transaction's commit or
+rollback, after its own device/key guards and audit insert. No further repository
+guard is acquired after the outbox insert. Revisions therefore follow commit
+order even when publication timestamps are reversed. A received higher revision
+subsumes lower committed publications in one full owned recovery sweep. The client
+must durably retain that wake before advancing its local requested revision.
+
 The deterministic transaction includes the publication and target device IDs.
 Synapse's transaction cache can disappear on provider restart; provider acceptance
 is not an exactly-once guarantee. The client must deduplicate retained controls and
-reconcile existing local originals. A missed callback must be recoverable through
+reconcile existing local originals. It can retain a bounded checkpoint per owned
+company/device/native family instead of an ever-growing event-ID set. A missed callback must be recoverable through
 startup/connectivity work over those same originals.
 
 ## Independent delivery ownership
 
 V116.3 captures a separate Matrix checkpoint in the first-publication transaction,
-alongside the existing FCM checkpoint. There is no backfill. Keeping progress
+alongside the existing FCM checkpoint. V116.4 adds immutable commit-ordered revisions
+without changing V116.3's checksum or assigning historical revisions. Legacy V1
+journals remain retained and are excluded from V2 claims; the due index has the same
+predicate. The earlier V1 transport was never enabled on the live development server.
+Keeping progress
 independent prevents an unavailable provider from delaying FCM, or notification
 permission from excluding an active device. Its restricted view selects published
 devices of pre-existing direct peers, with at most eight targets per stable page.
@@ -52,7 +65,7 @@ without progress, 60-second leases, one-day expiry, two-second deferral and a
 failure budget. FCM keeps its existing independent capacity of 16. The application
 owns two execution threads with no waiting task queue and two timer threads per
 enabled readiness worker. Explicit `HRIS_COLLABORATION_READINESS_CONTROL_ENABLED`
-defaults off and also requires worker, collaboration and Matrix. Push/FCM is not
+defaults off, requires schema116.4, and also requires worker, collaboration and Matrix. Push/FCM is not
 required. Keep it disabled until source/context/migration/native gates pass.
 
 The native consumer is still pending. Its runtime must attach the SDK listener before sync starts and release it

@@ -20,6 +20,7 @@ data class CollaborationReadinessCheckpointData(
     val publicationCutoff: OffsetDateTime,
     val afterAccountId: UUID?,
     val afterDeviceId: UUID?,
+    val publicationRevision: Long? = null,
 )
 
 interface CollaborationReadinessWakeDataSource {

@@ -167,7 +167,7 @@ class InternalCollaborationMatrixSyncRepository(
                         // target's own provider identity may carry a bounded opaque hint.
                         if (sender != ownUser) return@mapNotNull null
                         val content = envelope.path("content")
-                        if (!content.isObject || content.size() != 8) return@mapNotNull null
+                        if (!content.isObject || content.size() != 9) return@mapNotNull null
                         val fields = linkedMapOf<String, String>()
                         for ((name, value) in content.properties()) {
                             if (!value.isString || value.asString().length > 36)

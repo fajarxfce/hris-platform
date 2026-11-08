@@ -24,3 +24,15 @@ messages and repeated requests require separate device observation: recent logs
 also contain `room_send` rejections for unavailable recipients. Bima's original
 enrolled device and published key remain eligible while its emulator is stopped.
 See [investigation](../measurements/matrix-secret-storage-investigation-2026-11-08.json).
+
+
+Build 60 has now exercised the deployed route through the actual Android SDK and
+inspector. In a controlled 180-second original-account emulator sample, the four
+reads were two 401 responses, one successful refresh, and two 404 responses. There
+were zero 403 responses, eleven successful syncs, and one encrypted message send
+with HTTP 200. Inspector response/transfer time for that send was 243 ms. The mobile
+retry correction separately prevents passive SDK echo changes from bypassing its
+application backoff. [Actual observed counts](../measurements/matrix-secret-storage-device-2026-11-08.json).
+
+The validated build is installed on the phone without resetting its data. This is
+not yet a measurement of phone pending latency; composer/keyboard work continues.

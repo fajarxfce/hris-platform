@@ -1,5 +1,22 @@
 # Agent continuation — HRIS workspace
 
+## Actual SDK probe accepted; Mobile 60 installed — 8 November 2026
+
+Live API 3a7909a6 is unchanged. Original Android emulator build 60 exercised the
+own-user default-key GET: two 401, successful refresh, then two 404; no 403 in the
+controlled 180-second window. One encrypted send returned 200 (243 ms in inspector),
+eleven sync requests succeeded. No account/key reset. [Counts and scope](measurements/matrix-secret-storage-device-2026-11-08.json).
+Phone installation 60 is confirmed with original identity/data and no UI automation.
+Mobile cbe133ef also stops passive SDK echo updates from resetting delivery backoff.
+Do not infer that all historical room-send denials or phone pending latency are fixed.
+
+Worker 10485916/schema 116.1/Group routing remain unchanged; V117–138 are undeployed.
+The sole compiler is now Starter notification port check-2/session6244. No emulator
+runs. Mobile has an unaccepted composer-outbox storage increment; no new APK after60.
+Continue its checks and use-case/UI adoption after the Starter gate. Read the current
+Mobile/Starter handoffs before starting another compiler. Original54 PRD groups remain
+3 in progress/51 planned; none newly complete. Push each accepted commit.
+
 ## Secret-storage API deployed — 8 November 2026, 00:13 UTC
 
 API3a7909a6 is now live, healthy and schema116.1 unchanged. API-only rollout28867

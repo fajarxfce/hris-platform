@@ -1,5 +1,25 @@
 # Agent continuation — HRIS workspace
 
+## Readiness worker deployed for controlled dev acceptance — 8 November 2026, 21:01 UTC
+
+The guarded rollout completed successfully in22.521s. Live schema is116.2; only
+V116.2 was applied after a fresh verified online backup. Eight existing confirmed
+key-publication rows remain. Worker source52aaccaa/image
+sha256:59885ca23e6775a84ce556347091375726f2c5562eda3e2222507a1e70fe6764
+is running with readiness enabled for this dev acceptance. API remains1aea3228;
+all six other services and protected configuration remain unchanged. API health200,
+no observed database/startup errors, rollback image retained. No117–138 migration.
+[Deployment evidence](measurements/collaboration-readiness-deployment-2026-11-08.json).
+
+This is not native wake acceptance. Mobile63ed91a4 retains the qualified isolated
+sender76 clone, stopped with no new send. Next create one fictional recipient and
+prove an original queued message resumes on the committed key-publication hint,
+then address missed-hint/interrupted activation. Preserve every original device;
+Bima74 encrypted metadata recovery remains unresolved and Starter port is held.
+Phone remains70; no new availability, phone UI or installation. Continue the
+long run and push every commit. All54 communications PRD groups remain open.
+
+
 ## Readiness image and migration compatibility prepared — 8 November 2026, 20:57 UTC
 
 Implementation52aaccaa is pushed and clean apart from this documentation checkpoint.

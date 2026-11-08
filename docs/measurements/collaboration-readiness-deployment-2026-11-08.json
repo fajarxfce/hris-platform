@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-11-08T21:04:36.456019+00:00",
+  "deployment": {
+    "startedAt": "2026-11-08T21:01:02.375944+00:00",
+    "success": true,
+    "source": "52aaccaa45adc3647f3a7e6fb983d9d9c2a13d13",
+    "migrationStarted": true,
+    "workerChanged": true,
+    "nativeWakeAccepted": false,
+    "phoneTouched": false,
+    "backupVerified": true,
+    "only116_2Applied": true,
+    "confirmedPublicationsPreserved": 8,
+    "workerImage": "sha256:59885ca23e6775a84ce556347091375726f2c5562eda3e2222507a1e70fe6764",
+    "workerContainer": "50e2884868f883087eb35329f5e68f5207dea2923172377c893d4bd28e543fc8",
+    "readinessEnabledForDevAcceptance": true,
+    "otherServicesUnchanged": true,
+    "protectedConfigurationUnchanged": true,
+    "apiHealthy": true,
+    "databaseErrorsObserved": false,
+    "rollbackTag": "hris-dev-worker:before-readiness-20261108T204615",
+    "finalSchema": "116.2",
+    "elapsedSeconds": 22.521
+  },
+  "apiSource": "1aea32288656d3c4e372d6950311b4c43ce5bcdc",
+  "resultSha256": "354ff58a907cd21e02c6816d76e3b4c3ab74344719872219de448b81484436f3",
+  "scriptSha256": "ea429caf0c7eed2eea974a21e66c0e456d4f5bd2df693ea7b0d41d08cc242797",
+  "scope": "Controlled dev readiness acceptance rollout, not completion of native sender wake. Existing API and other services retained; migrations117\u2013138 not applied.",
+  "remaining": [
+    "Actual post-commit waiting-sender resumption and absent-push paths",
+    "Client interrupted-activation/connectivity recovery",
+    "Original Bima74 encrypted-device recovery",
+    "Calls, meetings, cloud key backup and all54 PRD groups"
+  ]
+}

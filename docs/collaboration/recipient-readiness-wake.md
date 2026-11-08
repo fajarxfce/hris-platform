@@ -1,7 +1,7 @@
 # Committed recipient readiness wake
 
-Implementation has passed focused and full source checks; deployment and native
-sender-resumption acceptance remain pending. The current API reports
+Implementation has passed focused and full source checks and is deployed on dev
+for controlled acceptance. Native sender resumption remains pending. The current API reports
 `recipientReady` and blocks encrypted submission to an unavailable recipient.
 The next step must wake an already waiting sender after the recipient's first
 public-key publication commits, without restarting a timed transport loop.
@@ -84,8 +84,8 @@ renewal; do not wake every blocked message on every sync response or token refre
 - Interrupted first activation, process restart, missing push and offline originals.
 - Worker and API dependency-injection contexts, alongside existing push delivery tests.
 
-Live schema is116.1. Any readiness migration must be isolated and compatible with
-that schema; migrations117–138 remain undeployed. A source change or migration file
+Live schema is116.2 after the explicitly targeted readiness migration; its
+compatibility with116.1 runtimes was tested. Migrations117–138 remain undeployed. A source change or migration file
 is not rollout approval evidence. Preserve original keys, messages and device data
 through native acceptance. Calls, meetings and cloud key-backup recovery remain separate.
 
@@ -111,8 +111,8 @@ active lease. Queue-wide capacity is16, and each worker owns two execution slots
 with no waiting task queue.
 
 The new worker is disabled unless `HRIS_COLLABORATION_READINESS_ENABLED=true` and
-all existing chat/provider/push-delivery flags permit it. This flag must remain off
-until isolated V116.2 and source/native acceptance succeed. No117–138 rollout is
+all existing chat/provider/push-delivery flags permit it. The default remains off; dev enables it for controlled native acceptance after
+the isolated migration/source gates. Broader rollout still requires native acceptance. No117–138 rollout is
 implied. Focused domain/lifecycle tests passed, followed by thirteen actual
 PostgreSQL migration/RLS/cursor/queue cases and formatting/architecture checks.
 Full API/worker context and existing-delivery regression checks also passed.
@@ -144,5 +144,7 @@ was restored on an internal network and migrated explicitly from116.1 to116.2:
 203 old tables and the original migration history were unchanged, with no historical
 publication backfill. The current API1aea and worker10485916 images also started and
 ran scheduled database work on that migrated copy without database errors; API health
-returned200. External delivery was disabled. Fixtures were removed. Live schema,
-images and readiness configuration remain unchanged.
+returned200. External delivery was disabled. Fixtures were removed. The subsequent [dev deployment](../measurements/collaboration-readiness-deployment-2026-11-08.json)
+applied only116.2 and replaced the worker with source52aaccaa, enabling readiness
+for controlled acceptance. The existing API, other services and eight confirmed
+key publications were preserved. Actual sender resumption remains to be proven.

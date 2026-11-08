@@ -24,6 +24,7 @@ class HttpMatrixClientDataSource(
     MatrixRoomDataSource,
     MatrixKeyDataSource,
     MatrixToDeviceDataSource,
+    MatrixReadinessControlDataSource,
     MatrixRoomAccessDataSource,
     MatrixRoomHistoryDataSource,
     MatrixRoomMessageDataSource,
@@ -162,6 +163,27 @@ class HttpMatrixClientDataSource(
             text(body, "device_id", 128),
             guest.asBoolean(),
         )
+    }
+
+    override fun sendReadinessControl(
+        transactionId: String,
+        body: Map<String, Any>,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(transactionId.matches(Regex("hris_ready_[a-f0-9-]{36}_[a-f0-9-]{36}")))
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/sendToDevice/dev.fajar.hris.recipient_ready/${segment(transactionId)}",
+                "PUT",
+                body,
+                token,
+                deadline,
+                maximumRequestBytes = 4096,
+                maximumResponseBytes = 4096,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
     }
 
     override fun sendEncrypted(

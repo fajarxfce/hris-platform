@@ -161,7 +161,34 @@ class InternalCollaborationMatrixSyncRepository(
                     objectNode(envelope)
                     val sender = text(envelope, "sender", 255)
                     if (sender !in allowedUsers) return@mapNotNull null
-                    if (text(envelope, "type", 128) != "m.room.encrypted") return@mapNotNull null
+                    val type = text(envelope, "type", 128)
+                    if (type == COLLABORATION_READINESS_CONTROL_TYPE) {
+                        // The public gateway cannot send this clear event type. Only the
+                        // target's own provider identity may carry a bounded opaque hint.
+                        if (sender != ownUser) return@mapNotNull null
+                        val content = envelope.path("content")
+                        if (!content.isObject || content.size() != 8) return@mapNotNull null
+                        val fields = linkedMapOf<String, String>()
+                        for ((name, value) in content.properties()) {
+                            if (!value.isString || value.asString().length > 36)
+                                return@mapNotNull null
+                            fields[name] = value.asString()
+                        }
+                        val control =
+                            readCollaborationReadinessControl(fields) ?: return@mapNotNull null
+                        if (
+                            control.companyId != owner.companyId ||
+                                control.accountId != owner.accountId ||
+                                control.deviceId != owner.deviceId
+                        )
+                            return@mapNotNull null
+                        return@mapNotNull mapOf(
+                            "sender" to sender,
+                            "type" to type,
+                            "content" to fields,
+                        )
+                    }
+                    if (type != "m.room.encrypted") return@mapNotNull null
                     val content = envelope.path("content")
                     objectNode(content)
                     if (content.path("algorithm").asString() != "m.olm.v1.curve25519-aes-sha2")

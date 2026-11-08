@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Matrix readiness control transport checked — 8 November 2026, 21:50 UTC
+
+The fixed internal self-to-device protocol and sync projection pass89 fresh cases,
+zero failures/errors/skips in56.903s,8279 stable inputs, format and architecture.
+Actual Synapse wakes a25-second sync within the5-second test bound, retains an
+unacknowledged control, deduplicates the same transaction across bearer replacement,
+and replays it after provider restart. Client durable deduplication is mandatory.
+[Contract](collaboration/readiness-control.md), [evidence](measurements/collaboration-readiness-control-transport-2026-11-08.json).
+No native SDK listener or product latency acceptance is claimed.
+
+First gate89378 failed after fixture restart: the test retained a datasource bound
+to the previous dynamic Docker port. Reacquired raw fixture configuration while
+retaining identity/cursor; final60184 logs origin changed=true and passes. Both
+sessions and formatter84551/59987 are REAPED; no compiler/emulator remains. No retry
+was added to production transport. Shared DI is unchanged at this checkpoint.
+
+Next add an independently durable Matrix publication checkpoint alongside FCM,
+ordered current target/native/provider admission and bounded post-commit delivery.
+Published target selection must work without notification permission. Then attach
+the existing SDK5 custom-to-device listener with exact client ownership and consume
+deduplicated hints through a domain wake use case, preserving original queues.
+Existing FCM, startup/connectivity and interrupted-activation recovery remain.
+Keep rollout disabled until source/context/migration/native gates pass. No live
+schema/API/worker or phone change; Bima74 metadata remains preserved/unrecovered.
+Mobile705387b0 records accepted generic Starter665b9cd port. Continue all54 PRD.
+
 ## Real first publication and delayed sender resumption — 8 November 2026, 21:29 UTC
 
 The live116.2/worker52aaccaa publication path ran once for a new fictional recipient.

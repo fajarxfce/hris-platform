@@ -1,5 +1,9 @@
 # Architecture
 
+[Recipient readiness controls](collaboration/readiness-control.md) use a fixed
+internal Matrix to-device shape. They carry no chat content or send authority;
+publication delivery and native wake admission have separate owners.
+
 ## Deployment and modules
 
 One modular monolith serves a single organization group with multiple companies. API and worker roles share code and PostgreSQL. The React application consumes the same versioned API as the future Compose client.

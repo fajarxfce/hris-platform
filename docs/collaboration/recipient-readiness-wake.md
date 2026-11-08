@@ -1,9 +1,24 @@
 # Committed recipient readiness wake
 
-Implementation candidate, not validated or deployed. The current API reports
+Implementation has passed focused and full source checks; deployment and native
+sender-resumption acceptance remain pending. The current API reports
 `recipientReady` and blocks encrypted submission to an unavailable recipient.
 The next step must wake an already waiting sender after the recipient's first
 public-key publication commits, without restarting a timed transport loop.
+
+## First-device keys and recovery are separate
+
+An employee with no enrolled chat device cannot receive E2EE room keys yet. Keep
+the sender's original encrypted-local command waiting without transport polling.
+The recipient's admitted first sign-in/company selection creates identity keys on
+that device and publishes public keys automatically. The server never creates or
+backs up private identity keys on the employee's behalf.
+
+An established device/store missing private keys is a recovery case, not evidence
+that it is safe to replace them. Preserve its identity and retained commands until
+recovery/re-enrollment is explicitly authorized. An absent Matrix
+`m.secret_storage.default_key` is optional backup/recovery metadata; its404 alone
+neither means that the device lacks encryption keys nor permits a new identity.
 
 ## Reuse the committed outbox
 
@@ -78,6 +93,10 @@ through native acceptance. Calls, meetings and cloud key-backup recovery remain 
 
 V116.2 captures a first-publication outbox row in the original transaction and
 retains one job per company/device. It does not backfill earlier publications.
+A dedicated non-login capture role owns the trigger. Its insert and conflict-read
+rights cover publication coordinates only, not worker lease tokens/checkpoints,
+outbox payloads, update or delete. Publisher/company RLS remains enforced inside
+the trigger. Ordinary API callers cannot read the jobs or mutate their progress.
 A restricted metadata view lists only existing direct peers with push bindings
 published before the immutable cutoff. The view owner has no pusher-secret column
 grants; an actual worker session plus publisher/company scope is required.
@@ -94,8 +113,27 @@ with no waiting task queue.
 The new worker is disabled unless `HRIS_COLLABORATION_READINESS_ENABLED=true` and
 all existing chat/provider/push-delivery flags permit it. This flag must remain off
 until isolated V116.2 and source/native acceptance succeed. No117–138 rollout is
-implied. Source currently includes unexecuted pure transaction/cancellation/lost
-response tests, PostgreSQL migration/RLS/cursor/queue tests and actual worker
-context/lifecycle tests. Formatter, compiler and test gates have NOT run because
-Mobile owns the sole heavy-process slot. Client missed-hint/interrupted activation
-recovery and actual original-sender post-commit resumption remain unfinished.
+implied. Focused domain/lifecycle tests passed, followed by thirteen actual
+PostgreSQL migration/RLS/cursor/queue cases and formatting/architecture checks.
+Full API/worker context and existing-delivery regression checks also passed.
+Client missed-hint/interrupted activation recovery and actual original-sender
+post-commit resumption remain unfinished.
+
+The initial PostgreSQL gate failed at publication capture: `INSERT ON CONFLICT`
+also applies SELECT RLS. An isolated PostgreSQL reproduction confirmed SQLState
+42501 with insert-only RLS, and success with a scoped conflict-read policy.
+The correction grants that read to the dedicated trigger role rather than to
+ordinary publishers. Tests preserve API invisibility and the capture role's
+column restrictions. A subsequent failure used a nanosecond fixture timestamp
+where the existing push-binding contract requires microseconds; fixing the fixture
+also separated late-binding and late-conversation cutoff cases. Production timestamp
+validation was retained. Earlier failed results remain recorded in private evidence.
+
+[Validation evidence](../measurements/collaboration-readiness-wake-2026-11-08.json)
+records the full 498.672-second gate: 356 fresh cases, zero failures/errors and one
+existing opt-in elapsed-retention test skipped. All 8,272 source/config inputs
+stayed unchanged. The full worker suite includes the actual readiness application
+context pinned to schema116.2, with the missing/default flag and every required
+capability disabled in turn. Both boot JARs, API contexts, current key/push
+registration, queue/delivery, formatting and architecture passed. These are source
+and isolated PostgreSQL results, not actual FCM or native waiting-sender acceptance.

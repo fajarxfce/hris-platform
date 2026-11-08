@@ -97,6 +97,35 @@ class CollaborationConfiguration {
     ): CollaborationPushQueueRepository = StoredCollaborationPushQueueRepository(source)
 
     @Bean
+    fun collaborationReadinessWakeSource(sql: DSLContext): CollaborationReadinessWakeDataSource =
+        PostgresCollaborationReadinessWakeDataSource(sql)
+
+    @Bean
+    fun collaborationReadinessWakes(
+        source: CollaborationReadinessWakeDataSource
+    ): CollaborationReadinessWakeRepository = StoredCollaborationReadinessWakeRepository(source)
+
+    @Bean
+    fun fanOutCollaborationReadiness(
+        wakes: CollaborationReadinessWakeRepository,
+        bindings: CollaborationPushBindingRepository,
+        pushes: CollaborationPushQueueRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        FanOutCollaborationReadiness(
+            wakes,
+            bindings,
+            pushes,
+            transactions,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun handleCollaborationPush(
         bindings: CollaborationPushBindingRepository,
         queue: CollaborationPushQueueRepository,

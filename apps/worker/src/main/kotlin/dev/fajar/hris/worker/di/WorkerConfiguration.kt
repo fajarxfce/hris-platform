@@ -536,6 +536,69 @@ class WorkerConfiguration {
         )
 
     @Bean
+    fun collaborationReadinessSettings() =
+        dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings()
+
+    @Bean
+    fun collaborationReadinessTasks(
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings
+    ) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-chat-readiness-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            // The current SQL statement has its own15-second bound after interruption.
+            setAwaitTerminationSeconds(20)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun collaborationReadinessTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-chat-readiness-control-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_READINESS_ENABLED",
+                "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED",
+                "HRIS_FCM_ENABLED",
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+                "HRIS_COLLABORATION_PUSH_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun collaborationReadinessWorker(
+        handle: dev.fajar.hris.collaboration.domain.usecases.FanOutCollaborationReadiness,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationReadinessTasks")
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier("collaborationReadinessTimers")
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings,
+    ) =
+        dev.fajar.hris.worker.collaboration.CollaborationReadinessWorker(
+            handle::claim,
+            handle::fanOut,
+            tasks,
+            timers,
+            settings,
+        )
+
+    @Bean
     fun inboxPushSettings(policy: dev.fajar.hris.communications.domain.entities.InboxPushPolicy) =
         dev.fajar.hris.worker.push.InboxPushWorkerSettings(
             pollInterval =

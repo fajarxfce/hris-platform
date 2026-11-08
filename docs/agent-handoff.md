@@ -1,5 +1,42 @@
 # Agent continuation — HRIS workspace
 
+## Readiness full source gate accepted; native wake and rollout remain — 8 November 2026, 20:43 UTC
+
+The V116.2/domain/data/worker implementation is ready for commit/push and NOT deployed. Dedicated
+capture-role RLS fixes the confirmed PostgreSQL ON CONFLICT SELECT-policy failure
+without exposing worker lease/checkpoint columns to API publishers. Thirteen PG,
+twelve domain and four worker-lifecycle cases have passed across the focused gates;
+earlier failed results remain under `.work/readiness-wake-2026-11-08`.
+
+Session76420 is REAPED PASS for `check.py full-1`: all collaboration domain, readiness/
+push/native-registration data, delivery, selected real API contexts, FULL worker
+suite, both boot JARs, format and architecture. It passed356 fresh cases in498.672s,
+zero failures/errors and one existing opt-in elapsed-retention skip. All8,272 source
+inputs stayed fixed. The actual readiness context passed on isolated116.2 with all
+required flag combinations. [Evidence](measurements/collaboration-readiness-wake-2026-11-08.json).
+The environment example separately documents the default-off flag; no live config
+changed. `format` is the Platform formatter task (the first attempt incorrectly
+used Mobile's `formatKotlin`). No compiler/emulator remains. Private preflights now
+use root metadata inspection: unprivileged /proc/cwd cannot resolve runuser's
+group-changed compiler/test processes and must not be treated as proof of absence.
+
+Mobile source05201355/full5836 and APK76 sourcef1da12b1 are accepted for source/
+packaging. The original first-account75 store passed two cold restores under76.
+The separate Bima74 fixture cannot mount its encrypted userdata before any76
+installation. Mobilec4f5154e records rejected empty-clone boot proofs, the actual
+candidate metadata mismatch, retained original COW/base snapshot, and stopped owned
+emulators. Do not rerun its disproven metadata-restore script, reset chat keys, send
+Draft66 or replay original synthetic messages. Bima76 and dependent Starter gate
+remain unaccepted. Phone still70/no new availability; no phone UI or install.
+
+Next commit/push this implementation with evidence; then prepare isolated116.2
+rollout and actual post-commit waiting-sender proof, alongside client missed-hint/
+interrupted activation. Reuse the accepted original first-account76 store if needed;
+any new fictional recipient must own a complete isolated AVD/data/key/version set.
+Do not call an empty boot or new enrollment recovery of Bima's original image.
+Live API1aea/schema116.1 and worker10485916 remain unchanged. Migrations117–138,
+native Apple, cloud recovery and all54 PRD groups remain outside this acceptance.
+
 ## Readiness source candidate prepared; Mobile full gate running — 8 November 2026, 19:46 UTC
 
 UNVALIDATED source now includes V116.2, the domain contracts/orchestration,

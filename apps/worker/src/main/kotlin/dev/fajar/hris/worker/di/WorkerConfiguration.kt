@@ -536,6 +536,65 @@ class WorkerConfiguration {
         )
 
     @Bean
+    fun collaborationReadinessControlTasks(
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings
+    ) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-chat-matrix-readiness-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(20)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun collaborationReadinessControlTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-chat-matrix-readiness-timer-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_READINESS_CONTROL_ENABLED",
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun collaborationReadinessControlWorker(
+        handle: dev.fajar.hris.collaboration.domain.usecases.FanOutCollaborationReadinessControl,
+        @org.springframework.beans.factory.annotation.Qualifier(
+            "collaborationReadinessControlTasks"
+        )
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier(
+            "collaborationReadinessControlTimers"
+        )
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings,
+    ) =
+        dev.fajar.hris.worker.collaboration.CollaborationReadinessWorker(
+            handle::claim,
+            handle::fanOut,
+            tasks,
+            timers,
+            settings,
+        )
+
+    @Bean
     fun collaborationReadinessSettings() =
         dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings()
 

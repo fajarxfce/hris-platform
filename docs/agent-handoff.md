@@ -1,5 +1,43 @@
 # Agent continuation — HRIS workspace
 
+## Independent Matrix readiness journal checked — 8 November 2026, 22:12 UTC
+
+V116.3/domain/data/worker source passes focused119 cases in147.211s and full294 fresh
+cases in554.283s: zero failures/errors, one existing opt-in retention skip. Both
+actual API and worker contexts, all worker tests, both JARs, formatting and
+architecture passed with8291 stable source inputs. Sessions66083/54893/31521 are
+REAPED. No compiler/emulator remains. [Evidence](measurements/collaboration-readiness-control-queue-2026-11-08.json).
+
+The independent journal captures only new first-publication events, selects up to
+eight already published peer devices without push registration, and retains its own
+lease/checkpoint. Current guarded parent/device/policy/key checks precede provider
+credential acquisition; external self-to-device I/O stays outside transactions.
+Lost responses keep the original event/transaction, changed credentials defer,
+revoked targets suppress, and retries/resources are finite. FCM progress is separate.
+Actual PostgreSQL migration, RLS, rollback, competing leases, capacity and worker
+default-off/no-FCM cases pass. This is source acceptance, NOT native delivery.
+
+BEFORE consumer/rollout, add a company-scoped commit-ordered publication revision
+captured by the same transaction. The current V1 eight-field hint has no revision;
+do not deduplicate by publication timestamp (concurrent commits can invert it) or
+retain an unbounded event set. Prefer a serial counter row locked through commit,
+immutable revision on each control journal, and a strict nine-field V2 wire shape.
+A higher received revision then subsumes lower committed publications in one owned
+recovery sweep. Repeated capture may leave harmless gaps but must retain the old
+journal's exact revision. Test reversed timestamps/concurrent commit/rollback and
+immutable revisions, then repeat affected full/context checks. Private design
+review is `.work/readiness-control-2026-11-08/consumer-design.md`.
+
+`AccessNativeCollaborationMatrixDevice.publishKeys` acquires parent/device/key guards,
+writes publication and journal, then only rechecks captured admission/deadline;
+verify journal write order before introducing the final counter lock. The native
+consumer still needs a client-owned SDK listener, durable coalesced wake state,
+late-callback fencing and startup/connectivity/interrupted-activation recovery.
+Keep `HRIS_COLLABORATION_READINESS_CONTROL_ENABLED=false` until migration/runtime/native
+gates. Live schema116.2/API1aea/worker52aaccaa unchanged;117–138 remain undeployed.
+Phone70 untouched, no new availability. Bima74 metadata retained/unrecovered.
+Mobile705387b0 and Starter665b9cd clean. Continue full long run and push each commit.
+
 ## Matrix readiness control transport checked — 8 November 2026, 21:50 UTC
 
 The fixed internal self-to-device protocol and sync projection pass89 fresh cases,

@@ -29,26 +29,33 @@ is not an exactly-once guarantee. The client must deduplicate retained controls 
 reconcile existing local originals. A missed callback must be recoverable through
 startup/connectivity work over those same originals.
 
-## Delivery ownership still required
+## Independent delivery ownership
 
-The transport boundary alone does not emit product controls. Add a separate durable
-Matrix readiness checkpoint captured in the first-publication transaction, alongside
-the existing FCM checkpoint. Keeping progress independent prevents an unavailable
-provider from delaying FCM, or notification permission from excluding an active
-device. Select published devices of pre-existing direct peers using bounded,
-stable pages; do not depend on push registrations.
+V116.3 captures a separate Matrix checkpoint in the first-publication transaction,
+alongside the existing FCM checkpoint. There is no backfill. Keeping progress
+independent prevents an unavailable provider from delaying FCM, or notification
+permission from excluding an active device. Its restricted view selects published
+devices of pre-existing direct peers, with at most eight targets per stable page.
+The reader receives public coordinates only, not key fingerprints or credentials.
 
-The delivery use case must acquire current company/member/account/native/device,
-gateway and provider-credential inputs under their ordered guards. It must check
-current client policy and key publication. Provider I/O happens after that
-transaction, under a finite deadline, followed by a current-owner check and exact
-lease/checkpoint advancement. Retain the original event and transaction through
-timeouts/lost replies. Do not create or refresh provider credentials in this worker;
-the active SDK's existing credential owner handles that lifecycle. Bound retries,
-page size, global leases, expiry and worker resources. Keep the new worker disabled
-until isolated migration, API/worker context and actual native acceptance pass.
+`FanOutCollaborationReadinessControl` acquires current company/member/account/native
+and device/gateway inputs under ordered guards, checking current client policy and
+key publication before acquiring an existing provider credential. Provider I/O
+happens outside transactions, under a finite deadline, followed by current-owner
+and credential-generation checks and exact lease/checkpoint advancement. Timeouts
+and lost replies retain the original event and transaction. This worker does not
+create or refresh credentials; the active SDK owns that lifecycle.
 
-The native runtime must attach its SDK listener before sync starts and release it
+The Matrix queue has a separate global capacity of 16 leases, eight failed claims
+without progress, 60-second leases, one-day expiry, two-second deferral and a
+20-second page budget. A committed target checkpoint resets its consecutive
+failure budget. FCM keeps its existing independent capacity of 16. The application
+owns two execution threads with no waiting task queue and two timer threads per
+enabled readiness worker. Explicit `HRIS_COLLABORATION_READINESS_CONTROL_ENABLED`
+defaults off and also requires worker, collaboration and Matrix. Push/FCM is not
+required. Keep it disabled until source/context/migration/native gates pass.
+
+The native consumer is still pending. Its runtime must attach the SDK listener before sync starts and release it
 with the exact client. Callbacks must not invoke UI, networking policy, a ViewModel,
 or the network inspector. An application-owned collector invokes the domain wake
 use case; that use case validates the current parent and durably records/coalesces

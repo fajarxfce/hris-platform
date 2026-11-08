@@ -97,6 +97,61 @@ class CollaborationConfiguration {
     ): CollaborationPushQueueRepository = StoredCollaborationPushQueueRepository(source)
 
     @Bean
+    fun collaborationReadinessControlSource(
+        sql: DSLContext
+    ): CollaborationReadinessControlQueueDataSource =
+        PostgresCollaborationReadinessControlQueueDataSource(sql)
+
+    @Bean
+    fun collaborationReadinessControls(
+        source: CollaborationReadinessControlQueueDataSource
+    ): CollaborationReadinessControlQueueRepository =
+        StoredCollaborationReadinessControlQueueRepository(source)
+
+    @Bean
+    fun collaborationMatrixReadiness(
+        source: ObjectProvider<MatrixReadinessControlDataSource>
+    ): CollaborationMatrixReadinessRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixReadinessRepository)
+            ?: DisabledCollaborationMatrixReadinessRepository()
+
+    @Bean
+    fun fanOutCollaborationReadinessControl(
+        queue: CollaborationReadinessControlQueueRepository,
+        providerSessions: CollaborationProviderSessionRepository,
+        transport: CollaborationMatrixReadinessRepository,
+        registry: CollaborationRegistryRepository,
+        gateway: CollaborationGatewaySessionRepository,
+        keys: CollaborationDeviceKeyRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        FanOutCollaborationReadinessControl(
+            queue,
+            providerSessions,
+            transport,
+            registry,
+            gateway,
+            keys,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun collaborationReadinessWakeSource(sql: DSLContext): CollaborationReadinessWakeDataSource =
         PostgresCollaborationReadinessWakeDataSource(sql)
 

@@ -1,5 +1,31 @@
 # Agent continuation — HRIS workspace
 
+## Mobile account-preservation proof and committed-wake design — 8 November 2026, 18:21 UTC
+
+Live API1aea32288656d3c4e372d6950311b4c43ce5bcdc/schema116.1 and the worker remain
+unchanged. Mobile source767bd226 plus e484a988 packaged as74 passed original-store
+native restoration, cold offline pending/draft retention and180s quiet observation:
+zero settled transport/default-key requests and zero403. No new send, key reset or
+data clear. Earlier71 Storage root remains unresolved. Mobile evidence is pushed in
+6bb1e9c5; its phone74 preflight99010 REAPED timeout, phone still70. The owned emulator
+is stopped. Do not drive phone UI or resend the retained synthetic originals.
+
+The actual journal implementation already writes an outbox row atomically with
+collaboration.device_keys_published. [Committed-wake design](collaboration/recipient-readiness-wake.md)
+records how to consume it with bounded fanout, scoped target admission, exact durable
+checkpoints and existing opaque push hints. V116 coalescing alone is insufficient
+after a hint is claimed/delivered. No readiness worker/migration has been implemented
+or deployed. Keep117–138 out of any eventual116.1-compatible rollout.
+
+Mobile activation side worktree HEAD9eab0dde has the domain/app activation candidate
+and uncommitted request-driven foreground runner. Sole compiler5338 is its recovery-1
+gate; browser/JVM runner tests have passed so far, but the complete gate and recovery
+integration are not yet accepted. No other compiler/emulator may start until reaped.
+Next finish Mobile recovery/full/native acceptance, port generic worker to Starter,
+and implement durable recipient-ready wake plus missed-hint/interrupted-setup recovery.
+All54 PRD groups, calls/meetings, native iOS runtime and cloud key recovery remain open.
+
+
 ## Recipient readiness API deployed — 8 November 2026, 13:13 UTC
 
 Live API1aea32288656d3c4e372d6950311b4c43ce5bcdc is healthy. Stage48740 REAPED

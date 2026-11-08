@@ -36,3 +36,9 @@ application backoff. [Actual observed counts](../measurements/matrix-secret-stor
 
 The validated build is installed on the phone without resetting its data. This is
 not yet a measurement of phone pending latency; composer/keyboard work continues.
+
+A later release66 original-account sample retained the same live API and keys. It observed
+two default-key404 reads and zero403 over180.843 seconds, plus three encrypted sends200.
+The phone still has65 while66 installation waits for connectivity. Emulator pre-send
+latency remains6.5–8.8 seconds; this route compatibility fix does not resolve that separate
+cost. [Mobile66 evidence](https://github.com/fajarxfce/hris-mobile/blob/19748355/docs/measurements/collaboration-composer-release66-2026-11-08.json).

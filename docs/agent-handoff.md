@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Mobile66 probe; server remains unchanged — 8 November 2026, 09:46 UTC
+
+Live API3a7909a6 and the existing secret-storage GET admission are unchanged. Mobile
+accepted66 from a923d844 preserves the original account/keys and sends three unique
+consecutive originals. The180.843s passive window has two default-key GETs, both404,
+zero403 and three encrypted send200 responses (175–205ms to headers). Offline cold
+history/draft/preview and continued software-IME input pass. Pending latency is NOT
+resolved: emulator tap-to-request6.492/8.816/7.636s. The late sync429 occurs after all3acks.
+[Exact device evidence](https://github.com/fajarxfce/hris-mobile/blob/19748355/docs/measurements/collaboration-composer-release66-2026-11-08.json).
+
+Phone remains65 because ADB/WireGuard connection timed out twice;66 is ready but not
+installed. No phone UI was driven. Original Bima emulator is stopped with retained data,
+three original66 messages and an UNSENT next draft. Never resend those originals or
+reset keys/data. Starter generic9-file command observer is accepted/pushed e170ada.
+
+The sole compiler is Mobile composer-stage-timing focused-1/session60641; no emulator.
+Source is frozen until reaped. Its seven-file instrumentation candidate is UNCOMMITTED,
+not a latency fix or accepted67. Read Mobile's private NEXT and current handoff before
+further builds; finer split measurement needs accurate per-source outcomes before the
+full gate. Mobile doc HEAD19748355 is pushed. Continue latency/original54PRD work.
+Worker10485916/schema116.1/GroupOFF/V117–138undeployed remain unchanged. Library/SDK5
+remain unpublished. No platform runtime, database or policy change is needed for this
+checkpoint. This supersedes stale process/build references in historical entries below.
+
 ## Actual SDK probe accepted; Mobile 60 installed — 8 November 2026
 
 Live API 3a7909a6 is unchanged. Original Android emulator build 60 exercised the

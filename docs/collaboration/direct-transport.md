@@ -32,7 +32,9 @@ checks,18 delivery cases and122 worker cases. One unrelated existing opt-in elap
 retention case is skipped. Source fingerprints remain unchanged through the gate,
 both application dependency graphs run, and formatting/architecture/JAR checks pass.
 
-No migration is required. At this checkpoint the endpoint is not deployed, Mobile
-adoption is still under test, and no latency improvement is claimed. Mobile67 measured
+The compatible API-only rollout of e8d1d24f is healthy and verified: exact JAR/image,
+original runtime settings, other service identities and schema116.1 are preserved.
+No migration ran. The rollback image and overlay are retained. Mobile adoption is
+still under test, and no latency improvement is claimed. Mobile67 measured
 2,663 ms before its encrypted request and197 ms to headers in one emulator sample.
 Reducing metadata requests must be verified against the accepted combined release.

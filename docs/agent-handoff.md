@@ -1,5 +1,24 @@
 # Agent continuation — HRIS workspace
 
+## Direct transport API deployed — 8 November 2026, 10:52 UTC
+
+API e8d1d24f is healthy after the accepted compatible API-only rollout. Stage76434
+REAPED PASS21.324s; deploy55681 REAPED PASS22.232s. Exact accepted JAR/image/native-user,
+environment/ports, all other services and schema116.1 match their expected identities.
+No migration/provider key reset/message send/phone UI. Rollback image and overlay
+are retained. [Evidence](measurements/collaboration-direct-transport-2026-11-08.json).
+
+Mobile focused-1/session65789 is the sole compiler; all17 Kotlin changes and library
+inputs are FROZEN. Stage/Deliver use one transport read per independent admission;
+timeline entry/history remain unchanged. Source is UNCOMMITTED/UNACCEPTED, no68APK.
+Next reap its focused/full gates, commit/push, verify68 against this deployed API,
+then original-emulator one-new-send/counter/offline acceptance before phone install.
+Phone67 remains accepted; original emulator is stopped with intact data/keys/unsent
+Draft66. Never resend previous original messages. Starterad3aa93 is accepted/pushed.
+Worker10485916/GroupOFF/V117–138undeployed remain unchanged. All54 PRD groups and
+SDK/library/nativeApple/overhead work remain open. No further API rollout is pending.
+
+
 ## Direct transport source accepted — 8 November 2026, 10:49 UTC
 
 Six Kotlin files add one native device/direct-room metadata read in a guarded transaction.

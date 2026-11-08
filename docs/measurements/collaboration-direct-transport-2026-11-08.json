@@ -260,7 +260,50 @@
   "nativeDeviceRoomEndpoint": true,
   "providerIo": false,
   "migrationRequired": false,
-  "liveDeployed": false,
+  "liveDeployed": true,
   "mobileAdoptionAccepted": false,
-  "latencyImprovementMeasured": false
+  "latencyImprovementMeasured": false,
+  "deployment": {
+    "startedAt": "2026-11-08T10:51:36.450868+00:00",
+    "source": "e8d1d24fdf9228540955f8ace1869975e78d35ec",
+    "success": true,
+    "schema": "116.1",
+    "migrationStarted": false,
+    "phoneUiDriven": false,
+    "newMessagesSent": 0,
+    "apiContainer": "eeab22116576daee5cf8abeee208293654d7b4e28a02b0a9efee565a19cb2605",
+    "apiImage": "sha256:73f2d64d97630a62eb259f36b2d2e1c0ba3995695c21d86f7cb6e5d435f4dc93",
+    "apiHealthy": true,
+    "otherServicesUnchanged": true,
+    "environmentUnchanged": true,
+    "schemaUnchanged": true,
+    "rollbackTag": "hris-dev-api:before-direct-transport-20261108T105033",
+    "rollbackOverlaySha256": "3f3d7a28a394a0b6aed86e9aa1329824c6afc68bcf250d2fe0deec4977a996c7",
+    "elapsedSeconds": 22.232
+  },
+  "artifact": {
+    "path": "apps/server/build/libs/apps-server.jar",
+    "sha256": "9350349b45661bb98ff97a4a446b366bf9c0d65cf0c92f7a941d0e321a36c136",
+    "bytes": 98723963,
+    "source": "e8d1d24fdf9228540955f8ace1869975e78d35ec",
+    "controllerVerified": true
+  },
+  "stage": {
+    "source": "e8d1d24fdf9228540955f8ace1869975e78d35ec",
+    "tag": "hris-dev-api:direct-transport-e8d1d24f",
+    "image": "sha256:73f2d64d97630a62eb259f36b2d2e1c0ba3995695c21d86f7cb6e5d435f4dc93",
+    "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+    "rollbackTag": "hris-dev-api:before-direct-transport-20261108T105033",
+    "seconds": 21.324,
+    "imageBuilt": true
+  },
+  "deploymentJobs": {
+    "76434": "reaped stage pass",
+    "55681": "reaped deploy pass"
+  },
+  "deploymentEvidenceSha256": {
+    "artifact.json": "4f5576d12f28e22ffc0d984f783763242c5edf041d8b660327bd5e9080c8c500",
+    "staged.json": "168524594b732ce5c19bb691087ebbcb56bec4ceccdc672a86c7a4c100ae2447",
+    "deployment.json": "aac2eb91b3fbdc6f89961154d759361c08fcb8459ab7a79903153ac21621029a"
+  }
 }

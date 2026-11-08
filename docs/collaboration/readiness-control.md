@@ -68,8 +68,8 @@ enabled readiness worker. Explicit `HRIS_COLLABORATION_READINESS_CONTROL_ENABLED
 defaults off, requires schema116.4, and also requires worker, collaboration and Matrix. Push/FCM is not
 required. Keep it disabled until source/context/migration/native gates pass.
 
-The native consumer is still pending. Its runtime must attach the SDK listener before sync starts and release it
-with the exact client. Callbacks must not invoke UI, networking policy, a ViewModel,
+Mobile0fb27978 connects the existing SDK5 listener before sync starts and releases it
+with the exact client; source gates pass5,911 cases. Native delivery remains unproven. Callbacks must not invoke UI, networking policy, a ViewModel,
 or the network inspector. An application-owned collector invokes the domain wake
 use case; that use case validates the current parent and durably records/coalesces
 work before scheduling. Duplicate controls and obsolete callbacks cannot create
@@ -84,3 +84,23 @@ These do not establish current-identity delivery admission, durable job behavior
 SDK callback lifetime, product delivery latency, or physical phone acceptance.
 Those remain separate gates. The existing device stores and all original messages
 must be preserved throughout further acceptance.
+
+
+## Prepared development rollout
+
+[Staging evidence](../measurements/collaboration-readiness-control-staging-2026-11-08.json)
+binds both image JARs to the accepted e558a686 source. The isolated116.2→116.4
+upgrade preserves all204 existing tables and migration history, creates no old
+publication backfill and keeps restricted runtime roles. Both retained old images
+and both new images pass isolated startup, health and scheduled database access.
+The fixtures expose no host ports and cannot deliver FCM/mail/chat externally.
+All temporary fixtures are removed and live services remain unchanged.
+
+The reviewed next step applies only116.3/116.4 and replaces both API and worker
+images, with the Matrix readiness-control flag still OFF. The old API cannot
+project V2 controls. Preserve an online pre-migration backup and both rollback
+image tags; restoring those images keeps the already-compatible additive schema.
+Do not apply117–138 or replace device keys. After native77 retains its account and
+public identity, explicitly enable the worker for controlled development proof
+with that fictional sender's push registration disabled. This preparation is not
+native signal-delivery acceptance or a communications PRD completion.

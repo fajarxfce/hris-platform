@@ -1,5 +1,39 @@
 # Agent continuation — HRIS workspace
 
+## V2 images and isolated116.4 rollout checks accepted — 8 November 2026, 23:35 UTC
+
+Both final e558a686 JARs are packaged and byte-verified in staged images:
+API5ce02e63, worker3a86bd67. Package62518 passed13.959s; stage45140 passed25.243s.
+Online backup verified. Isolated upgrade70020 passed19.177s, preserving all204 old
+tables and migration history, adding only116.3/116.4 with no historical backfill.
+Old-runtime34862 passed47.602s; new-runtime31052 passed46.778s, each with healthy API,
+started worker, no DB errors, internal network/no host ports and complete cleanup.
+All sessions REAPED; no compiler/emulator remains. [Evidence](measurements/collaboration-readiness-control-staging-2026-11-08.json).
+
+Mobile product0fb27978 is pushed and passes5,911 full cases/47 actual readiness
+browser cases. Package77 also passes6 supplemental browser storage cases, exact
+signer/source/SDK5/16KiB/backup rules/lint. Mobile2dbe604b records it. No77 native
+install or Matrix-control wake acceptance has happened yet; phone70 unchanged.
+
+Concrete disabled rollout plan is `.work/readiness-control-2026-11-08/live-plan.json`.
+NEXT push this record, then run reviewed deploy-live.py under the docker group.
+It takes another online backup, applies only116.3/116.4, updates BOTH API and worker,
+preserves all other config/services, and leaves controls OFF. On image/startup failure
+it restores both old images while retaining the compatibility-checked additive schema.
+The live server is STILL116.2/API1aea/worker52aaccaa at this checkpoint. No117–138.
+
+Then prepare the independent complete sender76 copy and new fictional recipient via
+Mobile's private readiness-control-native scripts, boot the owned2,560MiB/2-core
+emulator, install77 in place and qualify retained account/public identity. The
+separate enable-control script only follows that qualification for controlled dev
+acceptance. Disable that fictional sender's push registration, retain one newly
+named Control77 original, require quiet waiting, first publication/revision, native
+scheduling diagnostic, same sender process and exactly one encrypted Synapse event.
+Never resend Readiness76 211625 or Draft66, reset keys, or modify Bima74 metadata.
+Native script preparation is not acceptance. Continue reconnect/interrupted activation,
+startup default-key traffic, history affordance and all54 PRD groups; push each commit.
+
+
 ## Commit-ordered readiness revisions checked — 8 November 2026, 22:32 UTC
 
 V116.4 and the strict nine-field V2 control pass122 focused cases in151.554s and

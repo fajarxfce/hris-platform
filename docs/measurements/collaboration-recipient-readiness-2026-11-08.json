@@ -272,10 +272,89 @@
     "bytes": 98728934,
     "sha256": "a847f1f508b6bb0441e54e0087e252948245686b3a95a3aa9add4854578e9a61"
   },
-  "deployed": false,
+  "deployed": true,
   "limits": [
     "Readiness metadata is not a reusable send grant.",
     "No migration, provider key generation, account/device reset, notification event feed or phone UI.",
     "Actual phone no-loop acceptance still requires the Mobile update."
-  ]
+  ],
+  "deployment": {
+    "stageSession": 48740,
+    "deploymentSession": 74682,
+    "reaped": true,
+    "stage": {
+      "at": "2026-11-08T13:11:54.629844+00:00",
+      "source": "1aea32288656d3c4e372d6950311b4c43ce5bcdc",
+      "tag": "hris-dev-api:recipient-readiness-1aea3228",
+      "image": "sha256:02b25fbbae29ded774ca774eb147a9048b25ead77051813bad9b3420c45d8e1f",
+      "jar": {
+        "path": "apps/server/build/libs/apps-server.jar",
+        "bytes": 98728934,
+        "sha256": "a847f1f508b6bb0441e54e0087e252948245686b3a95a3aa9add4854578e9a61"
+      },
+      "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+      "originalOverlaySha256": "906e1efc403ce363887a825199f9201f5c498b672e98a63911bcea6bdaae3208",
+      "candidateOverlaySha256": "33a0a0a70074a1b51ad8dba6bcad183205f62ebe0d8ae1ed88ca2a515021f19f",
+      "inventory": {
+        "api": {
+          "container": "eeab22116576daee5cf8abeee208293654d7b4e28a02b0a9efee565a19cb2605",
+          "image": "sha256:73f2d64d97630a62eb259f36b2d2e1c0ba3995695c21d86f7cb6e5d435f4dc93",
+          "startedAt": "2026-11-08T10:51:40.067603873Z"
+        },
+        "worker": {
+          "container": "01590afd592596329e92fb8fffb89291515f8dbb1f0853e8470828db3e22b846",
+          "image": "sha256:0ca5c11dcf43c0d458265a17efcf210f4f923f793df88408ce471cd711f7e947",
+          "startedAt": "2026-11-06T01:28:36.281452793Z"
+        },
+        "matrix": {
+          "container": "00188dc9022bc1df24525c7ec7f92a5c8299a9cf69ea0297052047b5b885f42f",
+          "image": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+          "startedAt": "2026-11-03T19:35:55.827031944Z"
+        },
+        "matrix-push-gateway": {
+          "container": "19245d3d651eec1833c12b1f843b42d83b1e1d3a3fc0061095671086ae7ac67c",
+          "image": "sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949",
+          "startedAt": "2026-11-03T19:36:04.175238057Z"
+        },
+        "database": {
+          "container": "1e023349da86cba6106f5131a4a06d7e5de4884710e316919b8c2072e8d03f22",
+          "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+          "startedAt": "2026-10-29T09:06:30.54517053Z"
+        },
+        "matrix-database": {
+          "container": "1c63ff44261f7955de2da93faf45eca9e34f8973bcb32f1f059bcd5c0d6469bd",
+          "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+          "startedAt": "2026-11-02T12:24:51.176833334Z"
+        },
+        "garage": {
+          "container": "6f869fe8ff789e2819abcd7ea72ccb006a176554e31c2e47188cd882cc1a3f62",
+          "image": "sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020",
+          "startedAt": "2026-11-03T19:28:43.103963226Z"
+        }
+      },
+      "rollbackTag": "hris-dev-api:before-recipient-readiness-20261108T131134",
+      "seconds": 19.82,
+      "deploymentStarted": false,
+      "resumedAfterCopyOwnershipCorrection": false,
+      "imageBuilt": true
+    },
+    "result": {
+      "startedAt": "2026-11-08T13:12:12.342498+00:00",
+      "source": "1aea32288656d3c4e372d6950311b4c43ce5bcdc",
+      "success": true,
+      "schema": "116.1",
+      "migrationStarted": false,
+      "phoneUiDriven": false,
+      "newMessagesSent": 0,
+      "apiContainer": "9da5005417a4f19264b75f74149893c4f3957c2773a45ac4fcfd7e3642c85670",
+      "apiImage": "sha256:02b25fbbae29ded774ca774eb147a9048b25ead77051813bad9b3420c45d8e1f",
+      "apiHealthy": true,
+      "otherServicesUnchanged": true,
+      "environmentUnchanged": true,
+      "schemaUnchanged": true,
+      "rollbackTag": "hris-dev-api:before-recipient-readiness-20261108T131134",
+      "rollbackOverlaySha256": "906e1efc403ce363887a825199f9201f5c498b672e98a63911bcea6bdaae3208",
+      "elapsedSeconds": 17.919
+    }
+  }
 }

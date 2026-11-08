@@ -1,5 +1,20 @@
 # Agent continuation — HRIS workspace
 
+## Recipient readiness API deployed — 8 November 2026, 13:13 UTC
+
+Live API1aea32288656d3c4e372d6950311b4c43ce5bcdc is healthy. Stage48740 REAPED
+PASS19.820s; deployment74682 REAPED PASS17.919s. Exact accepted JAR/image, nonroot
+runtime, environment/ports, schema116.1 and all other services match the retained
+identities. No migration, phone UI, test send or key mutation. Rollback tag/overlay
+are retained. [Evidence](measurements/collaboration-recipient-readiness-2026-11-08.json).
+
+Mobile3225 remains the sole compiler: recipient-readiness/focused-1. All eleven
+Kotlin sources are frozen until reaped. Then full gate, accepted source push and70
+emulator/phone acceptance; do not install timeline-only work. Phone/original stopped
+emulator remain69. Future persisted waiting explanation and key-change/FCM/APNs wake
+are documented in Mobile docs/collaboration-recipient-readiness.md and unfinished.
+Worker10485916/GroupOFF/V117–138 remain unchanged. Original54PRD work continues.
+
 ## Recipient readiness server source accepted — 8 November 2026, 13:11 UTC
 
 Gate8527 REAPED PASS483.453s:227 reported/226 active, zero failures/errors,

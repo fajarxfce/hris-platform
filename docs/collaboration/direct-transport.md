@@ -57,4 +57,5 @@ does not implement a readiness event feed or create receiver keys.
 passes226 active cases (one existing opt-in retention skip), including receiver
 publication/offline/revocation, late acquisition and interruption, HTTP/OpenAPI,
 both application dependency graphs, boot JAR, format and architecture. All8,259
-source inputs remained unchanged. Deployment and Mobile device acceptance are next.
+source inputs remained unchanged. The API-only deployment of1aea3228 is healthy on schema116.1; other services,
+settings and provider keys remain unchanged. Mobile device acceptance is next.

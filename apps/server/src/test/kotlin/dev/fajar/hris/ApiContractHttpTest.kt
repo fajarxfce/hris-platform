@@ -227,8 +227,12 @@ class ApiContractHttpTest : PeopleApiFixture() {
             schemas["CollaborationSpaceRoomView"]["properties"].propertyNames().toSet(),
         )
         assertEquals(
-            setOf("roomId", "serverName", "origin", "publishedAt"),
+            setOf("roomId", "serverName", "origin", "publishedAt", "original"),
             schemas["CollaborationSpacePublishedRoom"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("companyId", "conversationId", "roomId", "boundAt"),
+            schemas["CollaborationSpaceOriginalRoom"]["properties"].propertyNames().toSet(),
         )
         val roomStatus =
             schemas["CollaborationSpaceRoomStatus"]["properties"].propertyNames().toSet()

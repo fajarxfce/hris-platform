@@ -161,11 +161,35 @@ class ReadNativeCollaborationSpaceRoom(
                 val room =
                     binding?.let {
                         val owner = requireNotNull(intent)
+                        val original = owner.original
+                        if (!validCollaborationSpaceRoomId(it.roomId)) return changed()
+                        when (owner.origin) {
+                            CollaborationSpaceRoomOrigin.SPACE ->
+                                if (original != null) return changed()
+                            CollaborationSpaceRoomOrigin.LEGACY -> {
+                                if (
+                                    original == null ||
+                                        original.companyId == UUID(0, 0) ||
+                                        original.conversationId == UUID(0, 0) ||
+                                        original.roomId != it.roomId ||
+                                        original.boundAt > owner.createdAt ||
+                                        original.boundAt.nano % 1000 != 0 ||
+                                        original.boundAt.epochSecond !in
+                                            -62135596800L..253402300799L ||
+                                        owner.firstMatrixUserId !=
+                                            "@${collaborationMatrixLocalpart(original.companyId, owner.firstAccountId)}:${owner.serverName}" ||
+                                        owner.secondMatrixUserId !=
+                                            "@${collaborationMatrixLocalpart(original.companyId, owner.secondAccountId)}:${owner.serverName}"
+                                )
+                                    return changed()
+                            }
+                        }
                         CollaborationSpacePublishedRoom(
                             it.roomId,
                             owner.serverName,
                             owner.origin,
                             it.createdAt,
+                            original,
                         )
                     }
                 return Result.Success(

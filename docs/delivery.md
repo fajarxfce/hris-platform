@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Published original-room coordinates — 9 November 2026
+
+The native published-room response retains the exact original company/conversation,
+room and binding time for LEGACY, with current admission before and after acquisition.
+Malformed or contradictory provenance is rejected. No schema/provider/routing change.
+[Contract](collaboration/published-room-reference.md) and
+[proof](measurements/collaboration-published-room-reference-2026-11-09.json):266 fresh
+cases pass513.312s, zero failures/errors/skips,8,637 stable inputs; native admission,
+actual LEGACY worker publication, API/OpenAPI, format and architecture pass. Full worker
+application tests were not rerun because DI is unchanged. Mobile encrypted binding
+adoption remains pending; V117–138 remain unshipped. Phone87 is independently accepted.
+
 ## Original publication preflight — 7 November 2026
 
 186 domain/data and236 API/full-worker cases pass, with zero failures/errors and one

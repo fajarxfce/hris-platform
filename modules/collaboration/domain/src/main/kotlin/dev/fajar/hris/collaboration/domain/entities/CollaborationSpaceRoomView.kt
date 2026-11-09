@@ -16,4 +16,6 @@ data class CollaborationSpacePublishedRoom(
     val serverName: String,
     val origin: CollaborationSpaceRoomOrigin,
     val publishedAt: Instant,
+    /** Exact retained company/conversation coordinates for LEGACY; absent for SPACE. */
+    val original: CollaborationSpaceOriginalRoom?,
 )

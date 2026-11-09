@@ -3348,6 +3348,7 @@ class CollaborationSpaceWorkerPublicationTest {
                 server,
                 CollaborationSpaceRoomOrigin.LEGACY,
                 bound.createdAt,
+                requireNotNull(intent.original),
             ),
             view.room,
         )

@@ -660,6 +660,76 @@ class NativeCollaborationSpaceRoomTest {
     }
 
     @Test
+    fun publishedRoomNamesItsExactOriginalCoordinatesOnlyForLegacy() {
+        val f = PublishedRoomFixture()
+        val before = f.owner.counts()
+        val spaceRoom = requireNotNull(success(f.read()).room)
+        assertEquals(CollaborationSpaceRoomOrigin.SPACE, spaceRoom.origin)
+        assertNull(spaceRoom.original)
+        f.adoptOriginal()
+        val legacy = requireNotNull(success(f.read()).room)
+        assertEquals(f.intent.original, legacy.original)
+        assertEquals(f.binding.roomId, legacy.roomId)
+        assertEquals(f.intent.original, requireNotNull(success(f.readPeer()).room).original)
+        assertNotEquals(f.owner.s.space, legacy.original!!.companyId)
+        assertNotEquals(f.owner.conversation, legacy.original!!.conversationId)
+        assertEquals(before, f.owner.counts())
+    }
+
+    @Test
+    fun mismatchedOriginalMetadataCannotBePublishedAsOwnedRoomCoordinates() {
+        val f = PublishedRoomFixture()
+        f.adoptOriginal()
+        val expected = f.intent
+        val original = requireNotNull(expected.original)
+        val invalid =
+            listOf(
+                expected.copy(original = null),
+                expected.copy(origin = CollaborationSpaceRoomOrigin.SPACE),
+                expected.copy(original = original.copy(companyId = UUID(0, 0))),
+                expected.copy(original = original.copy(conversationId = UUID(0, 0))),
+                expected.copy(original = original.copy(roomId = "!another:matrix.example.test")),
+                expected.copy(
+                    original = original.copy(boundAt = expected.createdAt.plusSeconds(1))
+                ),
+                expected.copy(original = original.copy(boundAt = expected.createdAt.minusNanos(1))),
+                expected.copy(original = original.copy(boundAt = Instant.MIN)),
+                expected.copy(firstMatrixUserId = "@wrong:matrix.example.test"),
+                expected.copy(secondMatrixUserId = "@wrong:matrix.example.test"),
+                expected.copy(spaceId = UUID.randomUUID()),
+                expected.copy(conversationId = UUID.randomUUID()),
+            )
+        for (candidate in invalid) {
+            f.intent = candidate
+            assertEquals(
+                "collaboration_room_provisioning_changed",
+                (f.read() as Result.Failed).failure.code,
+            )
+        }
+        f.intent = expected
+        val binding = f.binding
+        f.binding = binding.copy(roomId = "invalid room")
+        assertEquals(
+            "collaboration_room_provisioning_changed",
+            (f.read() as Result.Failed).failure.code,
+        )
+        f.binding = binding
+        assertEquals(original, requireNotNull(success(f.read()).room).original)
+    }
+
+    @Test
+    fun publishedOriginalAcquisitionPreservesCancellationAndFinalPeerDenial() {
+        val f = PublishedRoomFixture()
+        f.adoptOriginal()
+        val before = f.owner.counts()
+        f.onBinding = { throw CancellationException("fictional published-room cancellation") }
+        assertThrows(CancellationException::class.java) { f.read() }
+        assertEquals(before, f.owner.counts())
+        f.onBinding = { f.owner.revokePeer() }
+        assertEquals("collaboration_peer_unavailable", (f.read() as Result.Failed).failure.code)
+    }
+
+    @Test
     fun groupOriginalGuardSerializesWithTheExistingCompanyProducer() {
         val f = Fixture()
         val old = PostgresCollaborationDirectDataSource(f.f.sql)
@@ -1023,6 +1093,83 @@ class NativeCollaborationSpaceRoomTest {
             pool.shutdownNow()
             assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
         }
+    }
+
+    /** Current native/RLS admission is real; only published provider metadata is varied. */
+    private inner class PublishedRoomFixture {
+        val owner = Fixture()
+
+        init {
+            success(owner.open())
+        }
+
+        var intent =
+            requireNotNull(
+                success(
+                    owner.s.tx {
+                        owner.rooms.intent(owner.s.space, owner.s.account, owner.conversation)
+                    }
+                )
+            )
+        private val status =
+            requireNotNull(success(owner.read()).provisioning)
+                .copy(
+                    state = CollaborationSpaceProvisioningState.SUCCEEDED,
+                    completedAt = intent.createdAt,
+                )
+        var binding =
+            CollaborationSpaceRoomBinding(
+                owner.s.space,
+                owner.conversation,
+                owner.s.account,
+                status.revision,
+                UUID.randomUUID(),
+                "!published:matrix.example.test",
+                intent.createdAt,
+                intent.matrixCreatorAccountId,
+            )
+        var onBinding: () -> Unit = {}
+        private val rooms =
+            object : CollaborationSpaceRoomRepository by owner.rooms {
+                override fun intent(spaceId: UUID, accountId: UUID, conversationId: UUID) =
+                    Result.Success(intent)
+
+                override fun status(spaceId: UUID, accountId: UUID, conversationId: UUID) =
+                    Result.Success(status)
+
+                override fun binding(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    conversationId: UUID,
+                ): Result<CollaborationSpaceRoomBinding?> {
+                    onBinding()
+                    return Result.Success(binding)
+                }
+            }
+
+        fun adoptOriginal() {
+            val original =
+                CollaborationSpaceOriginalRoom(
+                    owner.other,
+                    UUID.randomUUID(),
+                    binding.roomId,
+                    intent.createdAt.minusSeconds(1),
+                )
+            fun user(account: UUID) =
+                "@hris_${original.companyId.toString().replace("-", "")}_${account.toString().replace("-", "")}:matrix.example.test"
+            intent =
+                intent.copy(
+                    origin = CollaborationSpaceRoomOrigin.LEGACY,
+                    original = original,
+                    firstMatrixUserId = user(intent.firstAccountId),
+                    secondMatrixUserId = user(intent.secondAccountId),
+                )
+        }
+
+        fun read() = owner.read(rooms = rooms)
+
+        fun readPeer() =
+            owner.read(actor = owner.peerActor, parent = owner.peerParent, rooms = rooms)
     }
 
     private inner class Fixture {

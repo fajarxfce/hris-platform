@@ -1,5 +1,9 @@
 # Architecture
 
+[Published original-room coordinates](collaboration/published-room-reference.md)
+retain the exact LEGACY company/conversation reference under current native admission;
+Mobile encrypted binding adoption and product routing remain separate.
+
 [Native original room-request recovery](collaboration/native-room-request-fence.md)
 resolves retained receipts or immutable non-execution evidence under current admission.
 The owning transaction stays separate from HTTP, Mobile successors and SDK delivery.

@@ -1,5 +1,10 @@
 # Architecture
 
+[Target acknowledgement](collaboration/space-readiness-target-progress.md) keeps
+current target validation and worker cursor progress in one transaction. V140 allows
+the exact target account to advance; publisher-only settlement and all lease guards
+remain. No nested transaction or datasource actor switch is introduced.
+
 [Typed readiness queue](collaboration/space-readiness-queue.md) preserves explicit
 organization/channel identity and verifies full SQL progress readback. Use cases own
 transactions,per-target admission and retry; raw I/O remains in the datasource.

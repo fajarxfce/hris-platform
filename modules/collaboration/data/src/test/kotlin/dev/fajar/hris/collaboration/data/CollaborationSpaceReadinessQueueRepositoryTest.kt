@@ -348,7 +348,129 @@ class CollaborationSpaceReadinessQueueRepositoryTest {
         assertEquals(0, calls)
     }
 
-    private inner class Fixture {
+    @Test
+    fun guardedRecipientAcknowledgesOnlyItsOwnCursorAndRollsBackLateFailureOrCancellation() {
+        val f = Fixture()
+        val lease =
+            success(f.tx { f.repo.claim(CollaborationSpaceReadinessChannel.MATRIX, f.owner, 1) })
+                .single()
+        val original = requireNotNull(success(f.tx { f.repo.find(lease, false) }))
+        val next = CollaborationReadinessPosition(f.e.peer, f.e.peerDevice)
+        val jdbc = f.e.worker
+        for (cancel in listOf(false, true)) {
+            var wrote = false
+            val action = {
+                f.e.workerTransactions.run(f.e.peerActor) {
+                    jdbc.queryForObject(
+                        "select id from accounts where id=? for share",
+                        UUID::class.java,
+                        f.e.peer,
+                    )
+                    jdbc.queryForObject(
+                        "select id from native_sessions where id=? and account_id=? for update",
+                        UUID::class.java,
+                        f.e.peerParent,
+                        f.e.peer,
+                    )
+                    f.repo.advance(original, next).flatMap { changed ->
+                        assertTrue(
+                            changed,
+                            "Current guarded recipient must acknowledge its own target",
+                        )
+                        wrote = true
+                        if (cancel) throw CancellationException("fixture late target check")
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_late_target_check"))
+                    }
+                }
+            }
+            if (cancel) assertThrows(CancellationException::class.java) { action() }
+            else assertInstanceOf(Result.Failed::class.java, action())
+            assertTrue(wrote, "Recipient progression must run before the injected late failure")
+            assertEquals(original, success(f.tx { f.repo.find(lease, false) }))
+        }
+        for (actor in
+            listOf(
+                f.e.peerActor.copy(accountId = UUID.randomUUID()),
+                f.e.peerActor.copy(companyId = f.e.peerCompany),
+            )) {
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.e.workerTransactions.run(actor) { f.repo.advance(original, next) },
+            )
+        }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.e.workerTransactions.run(f.e.peerActor) {
+                f.repo.advance(original, next.copy(accountId = UUID.randomUUID()))
+            },
+        )
+        f.e.s.owner.execute(
+            "grant select,update on collaboration_space_readiness_deliveries to space_gateway_fixture"
+        )
+        val api =
+            StoredCollaborationSpaceReadinessQueueRepository(
+                PostgresCollaborationSpaceReadinessQueueDataSource(f.e.base.sql)
+            )
+        assertFalse(success(f.e.s.tx(f.e.peerActor) { api.advance(original, next) }))
+        assertTrue(
+            success(f.e.workerTransactions.run(f.e.peerActor) { f.repo.advance(original, next) })
+        )
+        val progressed = requireNotNull(success(f.tx { f.repo.find(lease, false) }))
+        assertEquals(original.copy(after = next, attempts = 0), progressed)
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.e.workerTransactions.run(f.e.peerActor) { f.repo.release(progressed, true, now()) },
+        )
+        assertEquals(progressed, success(f.tx { f.repo.find(lease, false) }))
+        assertTrue(success(f.tx { f.repo.release(progressed, true, now()) }))
+    }
+
+    @Test
+    fun targetAcknowledgementMigrationPreservesTheOriginalPublicationAndActiveLease() {
+        val f = Fixture(schema = "139")
+        val lease =
+            success(f.tx { f.repo.claim(CollaborationSpaceReadinessChannel.MATRIX, f.owner, 1) })
+                .single()
+        val checkpoint = requireNotNull(success(f.tx { f.repo.find(lease, false) }))
+        val before =
+            f.e.s.owner.queryForList(
+                "select * from collaboration_space_readiness_deliveries order by event_id,channel"
+            )
+        val revisions =
+            f.e.s.owner.queryForList("select * from collaboration_space_readiness_revisions")
+        val keys =
+            f.e.s.owner.queryForList(
+                "select * from collaboration_space_key_publications order by space_id,device_id"
+            )
+        Flyway.configure().dataSource(f.e.s.source).target("140").load().migrate()
+        assertEquals(
+            before,
+            f.e.s.owner.queryForList(
+                "select * from collaboration_space_readiness_deliveries order by event_id,channel"
+            ),
+        )
+        assertEquals(
+            revisions,
+            f.e.s.owner.queryForList("select * from collaboration_space_readiness_revisions"),
+        )
+        assertEquals(
+            keys,
+            f.e.s.owner.queryForList(
+                "select * from collaboration_space_key_publications order by space_id,device_id"
+            ),
+        )
+        assertEquals(checkpoint, success(f.tx { f.repo.find(lease, false) }))
+        val target = success(f.tx { f.repo.targets(checkpoint, 8) }).single()
+        assertTrue(
+            success(
+                f.e.workerTransactions.run(f.e.peerActor) {
+                    f.repo.advance(checkpoint, target.position)
+                }
+            )
+        )
+    }
+
+    private inner class Fixture(schema: String = "140") {
         val e = SpaceKeyExchangeFixture(postgres)
         val owner = UUID.randomUUID()
         val source =
@@ -362,7 +484,7 @@ class CollaborationSpaceReadinessQueueRepositoryTest {
             e.reserve()
             e.reserve(account = e.peer)
             e.bind()
-            Flyway.configure().dataSource(e.s.source).target("139").load().migrate()
+            Flyway.configure().dataSource(e.s.source).target(schema).load().migrate()
             success(
                 e.s.tx {
                     e.base.journal.record(

@@ -26,11 +26,13 @@ interface CollaborationSpaceReadinessQueueRepository {
         limit: Int,
     ): Result<List<CollaborationReadinessTarget>>
 
+    /** Worker acknowledgement runs under the publisher or the exact target account's guards. */
     fun advance(
         checkpoint: CollaborationSpaceReadinessCheckpoint,
         next: CollaborationReadinessPosition,
     ): Result<Boolean>
 
+    /** Settlement remains in the original publisher scope, after leaving any target transaction. */
     fun release(
         checkpoint: CollaborationSpaceReadinessCheckpoint,
         complete: Boolean,

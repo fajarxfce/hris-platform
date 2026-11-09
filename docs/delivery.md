@@ -1,5 +1,16 @@
 # Delivery and validation
 
+## Guarded readiness target acknowledgement — 9 November 2026
+
+V140 permits the worker's exact next target account to advance its cursor under
+current account/native/device guards; settlement remains publisher-only. The original
+V139 bytes and all existing leases/data are preserved. Six repository tests and41
+Python migration/recovery cases pass,zero failures/errors/skips,8,717 stable inputs.
+The original failing regression and exact migration preservation are retained in the
+[contract](collaboration/space-readiness-target-progress.md) and
+[evidence](measurements/collaboration-space-readiness-target-progress-2026-11-09.json).
+Current-target admission/fanout remains next;no shared DI or live change.
+
 ## Organization readiness queue repository — 9 November 2026
 
 The typed repository now validates complete channel/scope/checkpoint identity and

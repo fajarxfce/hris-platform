@@ -21,6 +21,8 @@ Eight attempts without progress are terminal; a strictly forward target cursor
 resets that counter. Release can defer at most300 seconds. Old tokens, completed
 rows, backwards cursors and another publisher's scope cannot change progress.
 The worker claim transaction must end before acquiring target account guards.
+[V140](space-readiness-target-progress.md) subsequently permits advancement under the
+exact target account,while release remains publisher-only;V139 bytes are preserved.
 
 The security-barrier target view requires worker capability, a current exact lease
 and the publisher's organization scope. It returns public target account/device/

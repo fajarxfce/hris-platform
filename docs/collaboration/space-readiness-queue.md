@@ -5,6 +5,8 @@ lease and complete publication checkpoint. It never substitutes an HR company ID
 Pure domain policy validates nonzero coordinates,PostgreSQL microsecond precision,
 finite timestamps,publication expiry,attempt bounds and forward progress. The caller
 owns transactions,current-target admission,deadlines and retry policy.
+[V140 target acknowledgement](space-readiness-target-progress.md) now allows an exact
+worker target to advance under its own guards; release remains publisher-only.
 
 The datasource performs only bounded SQL and returns generated records. Every read
 or mutation fences the complete captured identity,revision,timestamps,cursor,attempt

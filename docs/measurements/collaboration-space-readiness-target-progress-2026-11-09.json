@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-11-09T19:36:45.082260+00:00",
+  "baseCommit": "a182ebf526de054c2f32f8a587c9aba541d6e985",
+  "scope": "V140 target-scoped cursor acknowledgement under worker capability; publisher-only settlement retained; no fanout activation",
+  "final": {
+    "startedAt": "2026-11-09T19:33:40.270166+00:00",
+    "elapsedSeconds": 125.271,
+    "counts": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "sourceFiles": 8717,
+    "sourcesUnchanged": true
+  },
+  "pythonCases": {
+    "migrationVersions": 5,
+    "recovery": 36
+  },
+  "testcases": [
+    "falseOrInterruptedPostWriteReadbackRollsBackActualCursorAndRelease()",
+    "guardedRecipientAcknowledgesOnlyItsOwnCursorAndRollsBackLateFailureOrCancellation()",
+    "targetAcknowledgementMigrationPreservesTheOriginalPublicationAndActiveLease()",
+    "malformedClaimAndTargetRowsFailInsideTheAcquisitionBoundaryWithoutLeakingAClaim()",
+    "typedChannelsReadExactTargetsAndCompareTheWholeCheckpointBeforeProgress()",
+    "invalidCallerBoundsAndCoordinatesNeverAcquireTheDatasource()"
+  ],
+  "reports": {
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessQueueRepositoryTest.xml": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "967d21ea8e1f0105099a1b69b889bd1428ebaff0351b7fd0e82519ed4500426f"
+    }
+  },
+  "sourceManifestSha256": "8e15123cfed7ac2ee2fdd0feda280aae51f043ed42c979654b9f9b8e4bd53dde",
+  "changedSources": {
+    "core/database/src/main/resources/db/migration/V140__collaboration_space_readiness_target_progress.sql": "2230c4d5e798fc30deebf79a5d93d2c6a0a3114aa375b121ad70c892afa8b467",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceReadinessQueueRepositoryTest.kt": "4d477d0c9cadf5d27c7bd521b250ed110a66f66db1690bb6bdfbb7f20dd78072",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceReadinessQueueRepository.kt": "30667b4e1c53dd26d595546e5f81187c2e83928772cd7728915abb92650b3bc9",
+    "tool/recovery_set.py": "ec09836a0a9b43f26628665dc8dfa91b44ecd52701e5f7f0ce23c334a6a7e154",
+    "tool/test_recovery_set.py": "93917330c5e470876ecbd8c806c9c4a362b18e7c5c4a252b25c68a4cd8d91e92"
+  },
+  "red": {
+    "startedAt": "2026-11-09T19:31:26.182450+00:00",
+    "elapsedSeconds": 46.318,
+    "counts": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "sourcesUnchanged": true
+  },
+  "preservedV139Sha256": "1412bb0b220f238ae275a855bfaa6f36dc4d5ba87a930ddce9bf8460f5046e43",
+  "runtime": {
+    "liveSchema": "116.4",
+    "groupRouting": false,
+    "phoneBuild": 87,
+    "newApk": false,
+    "sharedDiChanged": false
+  },
+  "remaining": [
+    "Current exact target admission and bounded Matrix/PUSH fanout",
+    "Mobile durable foreground/background readiness ownership",
+    "All54 communications PRD acceptance groups"
+  ]
+}

@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 19:24 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 19:36 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -14,6 +14,35 @@ uses2560MiB/two cores; retained sender87 is stopped, the accepted isolated nativ
 installation and never launch, automate, uninstall or clear it. Crashlytics access
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
+
+## Resume current fanout integration
+
+Accepted source:storage7d4d7f1f and typed queuea182ebf5 are committed/pushed;all pushes
+are reaped. V140 target acknowledgement is now validated and recorded below. No active
+heavy job at this checkpoint. Next pure/current target admission and bounded Matrix/
+PUSH fanout,then Mobile durable ownership. Do not restart the retired confirmation
+endpoint,SDK7,old source gates or hosted42656803963. No new APK or live rollout.
+
+Private `.work/space-readiness-fanout-2026-11-09/design.md` records the integration
+boundary. Its initial base isa182ebf5;re-pin successor implementation to the V140
+commit before applying any candidate. No fanout or admission source has been written.
+No nested transaction owners or hidden actor switch. Claim ends before target account
+guards. Exact successful/suppressed cursor advance runs inside the target transaction;
+transport deferral leaves it before publisher-only release. Revalidate actual target
+identity/keys/native/provider or push registration before and after external I/O.
+
+V140 `.work/space-readiness-target-progress-2026-11-09`:
+- red-1 /87113 REAPED EXPECTED FAILURE46.318s:one test. V139 rejects recipient-scope
+  progress before the injected late failure;the exact assertion is retained.
+- focused-1 /56726 REAPED PASS125.271s:6 actual repository cases,zero failures/errors/
+  skips,41 Python migration/recovery cases,format/architecture,8,717 stable inputs.
+  Existing repository cases run on V140. Target/current-cursor scope,ordinary API
+  denial,late rollback/cancellation and preserved V139 active leases/keys pass.
+- verify.py verifies exact source/XML and red regression;V139 bytes stay unchanged.
+  Recovery max140 applies ONLY to Group;Root source/live stays116.4.
+- [Contract](collaboration/space-readiness-target-progress.md) and
+  [measurement](measurements/collaboration-space-readiness-target-progress-2026-11-09.json).
+  No shared DI,worker loop,provider or Mobile activation is part of this increment.
 
 ## Accepted worker original-key publication
 
@@ -117,7 +146,7 @@ schedule existing originals;they never create a message ACK. Reacquire current e
 native/device/identity/publication/provider or push registration before and after
 external delivery;do not refresh credentials or create keys inside fanout.
 
-No active heavy job remains at this accepted checkpoint. Source schema139 is unshipped;
+No active heavy job remains at this accepted checkpoint. Source schema140 is unshipped;
 group routing OFF,phone87/live e558a686/schema116.4 are unchanged. All54 groups stay open.
 
 RETIRED explicit-confirmation approach:9 Group and22 Mobile unaccepted Kotlin files
@@ -238,7 +267,7 @@ for accepted source/hosted Apple transitions. No new APK or product activation.
 ## Accepted state
 
 - Group8d5724e2 exact published original reference is accepted:266 fresh cases,
-  native admission/actual LEGACY worker/API/OpenAPI/quality pass. Group V117–139 is
+  native admission/actual LEGACY worker/API/OpenAPI/quality pass. Group V117–140 is
   present only in this worktree and remains unshipped.
 - Root Platform feat/communications691f3fc5 (recovery verifier only after merge parent4d4df31f). Live API/worker remains
   e558a6868399058a2dcdee97acfd0e7fa7f1ef07, schema116.4, readiness control ON.

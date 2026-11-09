@@ -155,6 +155,36 @@ class NativeSdkMatrixServer(messageBurst: Int = 10, loginBurst: Int? = null) : A
         return values
     }
 
+    /** Bounded fictional room event IDs only; no message content, keys or credentials leave SQL. */
+    fun encryptedRoomEvents(roomId: String, sender: String): List<String> {
+        require(roomId.startsWith('!') && roomId.length <= 255)
+        require(sender.startsWith("@hris_") && sender.length <= 255)
+        val probe =
+            server.execInContainer(
+                "python",
+                "-c",
+                """
+                import json,sqlite3,sys
+                with sqlite3.connect('file:/data/fixture.db?mode=ro',uri=True,timeout=5) as db:
+                 rows=db.execute("select event_id from events where room_id=? and sender=? and type='m.room.encrypted' order by event_id limit 129",(sys.argv[1],sys.argv[2])).fetchall()
+                 assert len(rows)<=128
+                 print(json.dumps([row[0] for row in rows]))
+                """
+                    .trimIndent(),
+                roomId,
+                sender,
+            )
+        check(probe.exitCode == 0 && probe.stdout.length <= 32768)
+        val events =
+            json.readTree(probe.stdout).iterator().asSequence().map { it.asString() }.toList()
+        check(
+            events.size <= 128 &&
+                events.distinct().size == events.size &&
+                events.all { it.startsWith('$') && it.length in 2..255 }
+        )
+        return events
+    }
+
     override fun close() {
         server.stop()
     }

@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 17:18 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 17:23 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -10,7 +10,7 @@ Mobile to prove generic foundations before Starter. Preserve original keys, stor
 accounts, native/SDK IDs and message transactions. Follow AGENTS.md layer ownership.
 
 One heavy local compiler OR emulator. Do not kill live API/worker JVMs. The emulator
-uses2560MiB/two cores; retained sender87 is stopped, isolated native-5 is active. Phone10.77.77.3:5555 is install-only; announce
+uses2560MiB/two cores; retained sender87 is stopped, the accepted isolated native-5 is also stopped. Phone10.77.77.3:5555 is install-only; announce
 installation and never launch, automate, uninstall or clear it. Crashlytics access
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
@@ -19,11 +19,11 @@ Apple runtime/build and push/call acceptance remains separate.
 
 Mobile69e639f8 source is accepted and pushed. Hosted42656803963 portable job is
 accepted with6,638 fresh cases,zero failures/errors/skips; Apple still runs. Mobile
-82986dbf records the audited artifact and current handoff. Native proof remains open.
+82986dbf records the audited portable artifact; subsequent Mobile handoff records native acceptance.
 
-Uncommitted Group test-only work: NativeSpaceOriginalFixture/DeliveryTest,
+Accepted Group test-only work: NativeSpaceOriginalFixture/DeliveryTest,
 NativeOriginalDeliveryTrace, bounded NativeSdkMatrixServer.encryptedRoomEvents and
-`tool/collaboration_space_original.py` plus six ownership tests. Real native commands
+`tool/collaboration_space_original.py` plus seven ownership tests. Real native commands
 and room/provisioning workers adopt two fictional legacy devices and their original
 room. The driver stages original app commands, kills only its owned process after a
 durable ACK but before Sent projection, then reopens unchanged encrypted stores and
@@ -48,15 +48,23 @@ Private `.work/space-original-delivery-native-2026-11-09`:
   No generated/replaced keys or SQL publication injection. This explicitly DOES NOT
   prove automatic Mobile first-key-publication activation; that product gap remains.
 - Source1075/source-4 is REAPED PASS32.002s,8,698 stable inputs,compile/format/architecture.
-- **Native31328/native-5 RUNNING**, Mobile/Group sources frozen. Both earlier actual
-  experiments ran only precompiled classes and preserved failed SDK/app stores; their
-  emulators are stopped. Current run again owns a fresh2560MiB/two-core emulator.
+- **Native31328/native-5 REAPED PASS135.232s**, one fresh case,zero failures/errors/skips.
+  Two original messages/transactions survive a killed process after durable ACK and
+  before projection; provider has exactly two encrypted events. A later process reads
+  both Sent records offline before transport. Ten native requests contain exactly two
+  bootstrap replays/two direct reads,zero registration/room requests/native failures.
+  Both manifests/APK match; all other128 tasks remain up to date (no concurrent compiler).
+  The emulator is stopped,successful proof package removed; failed fixture data retained.
+  Strict publisher passes. [Contract](collaboration/space-original-delivery-native.md) and
+  [measurement](measurements/collaboration-space-original-delivery-native-2026-11-09.json).
 - SDK6 x86_64 library exactly matches deterministic NDK28.2 stripping,111204848bytes,
   SHA256ecffbab72fd5dd29d656bc4757ea423bb4bccf0444140af0480684bc32761278.
   Proof APK SHA2561b64c9eed71feebf9cfdebb6e7ec42991512d25e8f5d7a0e0601a7f726d96b7f.
 
 Live e558a686/schema116.4/group routing OFF, phone87 and retained stopped sender87
-are unchanged. No native acceptance or new product APK is claimed yet.
+are unchanged. Native fixture acceptance is bounded above; no new product APK. Next:
+automatic Mobile original-key activation,group readiness-event consumption/background
+ownership/product routing. No acceptance group is complete.
 
 ## Current source reconciliation
 

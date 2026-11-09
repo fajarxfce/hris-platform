@@ -1,0 +1,82 @@
+"""Preserve original data on failure; reject changed processes and unverified SDK artifacts."""
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import Mock, patch
+import zipfile
+
+from collaboration_native_device import PACKAGE
+from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint
+
+
+class OriginalDeliveryOwnershipTest(unittest.TestCase):
+    def experiment(self, installed=True):
+        experiment = object.__new__(OriginalDeliveryExperiment)
+        experiment.process = None
+        experiment.result = {"passed": False}
+        experiment.native = Mock(installed=installed, port=None, lock=Mock())
+        return experiment
+
+    def test_failed_experiment_preserves_package_and_releases_ownership(self):
+        experiment = self.experiment()
+        self.assertTrue(experiment.cleanup())
+        experiment.native.command.assert_called_once_with("shell", "am", "force-stop", PACKAGE)
+        experiment.native.cleanup.assert_not_called()
+        experiment.native.lock.close.assert_called_once()
+        self.assertTrue(experiment.result["retainedProofPackage"])
+
+    def test_failed_stop_still_disconnects_and_releases_without_uninstalling(self):
+        experiment = self.experiment()
+        experiment.native.port = 45678
+        experiment.native.command.side_effect = subprocess.TimeoutExpired("owned", 15)
+        with patch("collaboration_space_original.disconnect_owned_gateway") as disconnect:
+            self.assertFalse(experiment.cleanup())
+            disconnect.assert_called_once_with(experiment.native)
+        experiment.native.lock.close.assert_called_once()
+        experiment.native.cleanup.assert_not_called()
+
+    def test_unowned_package_is_never_stopped_or_removed(self):
+        experiment = self.experiment(installed=False)
+        self.assertTrue(experiment.cleanup())
+        experiment.native.command.assert_not_called()
+        experiment.native.cleanup.assert_not_called()
+        self.assertFalse(experiment.result["retainedProofPackage"])
+
+    def test_process_replacement_is_not_killed(self):
+        experiment = self.experiment()
+        experiment.native.process_id.return_value = 122
+        with self.assertRaises(RuntimeError):
+            experiment.kill_owned({"processId": 121})
+        experiment.native.command.assert_not_called()
+
+    def test_checkpoint_published_between_poll_and_completion_is_read_before_failure(self):
+        experiment = self.experiment()
+        checkpoint = {"processId": 121}
+        experiment.app_json = Mock(side_effect=[None, {"complete": True}, checkpoint])
+        self.assertEqual(checkpoint, experiment.wait_app("staged"))
+        self.assertEqual([("original-staged",), ("instrumentation",), ("original-staged",)],
+                         [call.args for call in experiment.app_json.call_args_list])
+
+    def test_boolean_and_out_of_range_pids_are_rejected(self):
+        for pid in (True, False, 0, -1, 2147483648, "121"):
+            with self.subTest(pid=pid), self.assertRaises(ValueError):
+                checkpoint({"processId": pid})
+
+    def test_wrong_missing_duplicate_or_truncated_native_library_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "proof.apk"
+            for names in ([], ["lib/arm64-v8a/libmatrix_sdk_ffi.so"],
+                          ["lib/x86_64/libmatrix_sdk_ffi.so"],
+                          ["lib/x86_64/libmatrix_sdk_ffi.so", "lib/x86/libmatrix_sdk_ffi.so"]):
+                with self.subTest(names=names):
+                    with zipfile.ZipFile(path, "w") as archive:
+                        archive.writestr("AndroidManifest.xml", b"fictional")
+                        for name in names:
+                            archive.writestr(name, b"unverified")
+                    with self.assertRaises(ValueError):
+                        verified_artifact(path)
+
+
+if __name__ == "__main__":
+    unittest.main()

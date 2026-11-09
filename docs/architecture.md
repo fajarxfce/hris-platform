@@ -1,5 +1,9 @@
 # Architecture
 
+[Current source reconciliation](collaboration/root-source-reconciliation.md) preserves
+company readiness and native organization ownership across shared sync/DI boundaries.
+Validation and deployment remain separate.
+
 [Published original-room coordinates](collaboration/published-room-reference.md)
 retain the exact LEGACY company/conversation reference under current native admission;
 Mobile encrypted binding adoption and product routing remain separate.
@@ -70,6 +74,9 @@ The [organization DIRECT sync scope](collaboration/space-room-sync-scope.md) now
 uses the existing monotonic gateway head to fence late original operations and returns
 a complete effect descriptor with the replacement's own credentials. Original command
 fingerprints remain unchanged. Durable Mobile handoff and SDK adoption remain separate.
+[Recipient readiness controls](collaboration/readiness-control.md) use a fixed
+internal Matrix to-device shape. They carry no chat content or send authority;
+publication delivery and native wake admission have separate owners.
 
 ## Deployment and modules
 

@@ -1,0 +1,235 @@
+{
+  "recordedAt": "2026-11-08T20:43:04.264047+00:00",
+  "scope": "Committed public-key readiness capture, bounded durable fanout and worker ownership; not native sender resumption or live rollout.",
+  "full": {
+    "startedAt": "2026-11-08T20:33:39.679700+00:00",
+    "elapsedSeconds": 498.672,
+    "exitCode": 0,
+    "sourceFiles": 8272,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 356,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "skipped": [
+      {
+        "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+        "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+      }
+    ]
+  },
+  "fullResultSha256": "8b43ce123a6cfe8196c3802ddbfae52c5b49b5021340946473ab46dc779ca236",
+  "sourceManifestSha256": "938e3b6c6e6ed903b6e9391b8680e3eb010a846db07eb129156e3abac17e9032",
+  "focusedRuns": [
+    {
+      "run": "format-1",
+      "startedAt": "2026-11-08T20:24:08.592283+00:00",
+      "elapsedSeconds": 12.056,
+      "exitCode": 1,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "8e689a0f919e2080cd53db1c7173c6b67828801a0cea6ff59d85382af62f2076"
+    },
+    {
+      "run": "format-2",
+      "startedAt": "2026-11-08T20:24:49.548108+00:00",
+      "elapsedSeconds": 20.065,
+      "exitCode": 0,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": false,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "351ae55a7d3e2d862cd4db5d29059e7364e31db04203f7e2a00b0b840f335809"
+    },
+    {
+      "run": "focused-1",
+      "startedAt": "2026-11-08T20:25:17.170923+00:00",
+      "elapsedSeconds": 104.869,
+      "exitCode": 1,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 28,
+        "failures": 12,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "8f8ccb1c85b9f118df2554e9c36c650378bec3b1995ecc4818a213bfcbd1b8ee"
+    },
+    {
+      "run": "format-3",
+      "startedAt": "2026-11-08T20:29:14.954712+00:00",
+      "elapsedSeconds": 20.032,
+      "exitCode": 0,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": false,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "1edfb0c6fb6854d221a5d28c550e3a2ca330538d30f9c0374edb2df8a3728240"
+    },
+    {
+      "run": "focused-2",
+      "startedAt": "2026-11-08T20:29:46.655893+00:00",
+      "elapsedSeconds": 80.997,
+      "exitCode": 1,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "21af78c02595a75591c5d557aac3581a6ced853b619cd06feaa77d6a1412cae3"
+    },
+    {
+      "run": "format-4",
+      "startedAt": "2026-11-08T20:31:32.836742+00:00",
+      "elapsedSeconds": 19.782,
+      "exitCode": 0,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "24e3ed0511c562ee7b316308dff5dfaa4dac35d24b386a57a1ea37a4daaa6219"
+    },
+    {
+      "run": "focused-3",
+      "startedAt": "2026-11-08T20:32:18.071917+00:00",
+      "elapsedSeconds": 52.287,
+      "exitCode": 0,
+      "sourceFiles": 8272,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skipped": [],
+      "resultSha256": "dddf854303e43e14898b42744fec94e3380c3e73e28548f0ce455cf46cbe9b80"
+    }
+  ],
+  "selectedActualReports": {
+    "CollaborationReadinessContextTest": {
+      "sha256": "68861a6e85ffa96b6b662b3e3d3301fdf108ccf84f716dfeced6f8ec143ceb5c",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "CollaborationReadinessLoopTest": {
+      "sha256": "1e09cb2b50e3eb0c0c3f66f870cc06c548fea403fd540bf68450f7e26db0ef74",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "ApiContractHttpTest": {
+      "sha256": "b5faf64ce5ffc0e1170b177c2782583cf66b6a720d763d1f79407e4e0fb32eb1",
+      "tests": 69,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "NativeCollaborationRoomLookupHttpTest": {
+      "sha256": "25a17afe60068e510aa446b2ec41d2b6d2e9cf636fd225c7c4846d3443355e97",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "CollaborationReadinessWakeTest": {
+      "sha256": "6d8334b1eaaeaaa847cd91dc3bd6ca58a8850fe1d917464297d54cf37f5fc266",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "NativeCollaborationRegistrationTest": {
+      "sha256": "3a849cc07ba9969ecc8bf3e695337d2a6186bc7cf3b260f914393ebaa5bdda74",
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "CollaborationPushQueueTest": {
+      "sha256": "e3b7333eadd9d6b1db5faf1907f0a82dd0e67f930ab8a68018fa2cbf46317049",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "FanOutCollaborationReadinessTest": {
+      "sha256": "36d6b50800b2e686773a9089cbdeee4a853d922524df8d18282c5158f0611c8c",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "jars": {
+    "apps/server/build/libs/apps-server.jar": {
+      "bytes": 98784805,
+      "sha256": "bf2178fcba6c0ffaefc2c7480722966220083538c430d36ead7163066905078f"
+    },
+    "apps/worker/build/libs/apps-worker.jar": {
+      "bytes": 78859412,
+      "sha256": "2731fdcb84d2801e4679873aa3d27c465bb8adb1b670805bcd23049488f89276"
+    }
+  },
+  "environmentExample": {
+    "defaultDisabled": true,
+    "duplicateKey": false,
+    "sha256": "cf0ac62e6057d6039326151f313a9ab976170f6c1ec0f6ed8d271f13a165d0a1"
+  },
+  "initialFailures": {
+    "formatTask": "Platform uses :format; initial :formatKotlin task was rejected before source edits.",
+    "rls": "Initial 12 PG cases failed publication capture. An isolated PG18 reproduction confirmed ON CONFLICT requires SELECT RLS; capture role now owns scoped column-limited conflict visibility.",
+    "diagnosticFixtureStartup": "First standalone diagnostic hit the temporary PostgreSQL initialization shutdown. Second waited for final TCP readiness and passed; both owned containers removed.",
+    "fixtureTimestamp": "Second focused run had one failure from a nanosecond timestamp violating the existing microsecond push-binding contract. Test fixture now uses actual ordered microsecond timestamps and independent binding/conversation cutoffs."
+  },
+  "limits": {
+    "deployed": false,
+    "readinessFlagDefault": false,
+    "liveSchema": "116.1",
+    "pendingGroupMigrationsApplied": false,
+    "actualFcmWake": false,
+    "originalSenderResumption": false,
+    "missedHintRecovery": false,
+    "mobileBima76Accepted": false,
+    "phoneUpdated": false,
+    "nativeAppleExecuted": false
+  },
+  "resourceOwnership": {
+    "fullCompilerReaped": true,
+    "emulatorRunning": false,
+    "procInspection": "Unprivileged cwd inspection cannot resolve runuser-group processes. The private runner now inspects owned process metadata through sudo; earlier exact test-JVM capture verified ownership without stopping it."
+  }
+}

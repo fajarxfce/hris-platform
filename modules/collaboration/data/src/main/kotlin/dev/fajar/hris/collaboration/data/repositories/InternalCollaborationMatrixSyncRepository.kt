@@ -39,6 +39,7 @@ class InternalCollaborationMatrixSyncRepository(
                         )
                 },
                 collaborationDirectMetadata(owner, scope),
+                readinessOwner = owner,
             ) { roomId, privatePosition ->
                 sealMatrixRoomCursor(crypto, owner, roomId, privatePosition)
             }

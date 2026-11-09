@@ -1,0 +1,54 @@
+{
+  "recordedAt": "2026-11-07T01:21:57.261961+00:00",
+  "deployment": {
+    "startedAt": "2026-11-07T01:20:29.832927+00:00",
+    "source": "2e75fe1ee88b5766259fc3efd3ab7f21e70d621a",
+    "success": true,
+    "schema": "116.1",
+    "migrationStarted": false,
+    "phoneUiDriven": false,
+    "newMessagesSent": 0,
+    "apiContainer": "23e7d231a3b782429d42329c3d64e17470855479a417c388ec06a2196873bda7",
+    "apiImage": "sha256:3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524",
+    "apiHealthy": true,
+    "otherServicesUnchanged": true,
+    "environmentUnchanged": true,
+    "schemaUnchanged": true,
+    "rollbackTag": "hris-dev-api:before-gateway-operation-20261107T012002",
+    "rollbackOverlaySha256": "3c850c5cc8ecba101232af0853224b53b82b4d13be7052714c76b3a20aaad112",
+    "elapsedSeconds": 11.048
+  },
+  "staged": {
+    "at": "2026-11-07T01:20:15.930702+00:00",
+    "source": "2e75fe1ee88b5766259fc3efd3ab7f21e70d621a",
+    "tag": "hris-dev-api:gateway-operation-2e75fe1e",
+    "image": "sha256:3a2ea23b1dd3908419f4c548141dad0a799f5935585f2175d5163d449c0f2524",
+    "jar": {
+      "path": ".work/gateway-operation-2026-11-07/accepted-api.jar",
+      "sha256": "b77fc179817e12166b7ecf2528dec23099e9ebd6747630cbf394bcc4f02c82c8",
+      "bytes": 98703693,
+      "diagnosticClassSha256": "3e4dc4be901d45a67db3748fb8dad99f3101c52b0953a858922d5d0537e7c962",
+      "nestedModuleSha256": "73333b58f8b1e02430a1273942d9829c45c0ab38f2490cdf2ba9df8bb4731e6c",
+      "diagnosticPresent": true
+    },
+    "baseImage": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+    "originalOverlaySha256": "3c850c5cc8ecba101232af0853224b53b82b4d13be7052714c76b3a20aaad112",
+    "candidateOverlaySha256": "279811d1d44b4f460e2bcce7dd73ec18b893c5afb929617ae542471e0c3c91b1",
+    "rollbackTag": "hris-dev-api:before-gateway-operation-20261107T012002",
+    "seconds": 13.918,
+    "deploymentStarted": false,
+    "resumedAfterCopyOwnershipCorrection": false,
+    "imageBuilt": true
+  },
+  "firstSourceCI": [
+    {
+      "conclusion": "",
+      "databaseId": 42323441241,
+      "headSha": "2e75fe1ee88b5766259fc3efd3ab7f21e70d621a",
+      "status": "in_progress",
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/42323441241",
+      "workflowName": "Collaboration control"
+    }
+  ],
+  "phonePendingResolved": false
+}

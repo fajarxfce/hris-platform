@@ -1,92 +1,139 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 12:37 UTC. Earlier branch checkpoints are preserved in
-[Git at fdcd783e](https://github.com/fajarxfce/hris-platform/blob/fdcd783e/docs/agent-handoff.md).
-Treat their device versions, running jobs and rollout statements as historical.
+Updated 9 November 2026, 15:31 UTC. Historical checkpoints are retained in
+[bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
+Use this file for current work; do not restart old gates from historical records.
 
-## Authorization and boundaries
+The user authorized the whole communications PRD, long-running work, atomic commits
+with pushes and validated phone updates. All54 acceptance groups remain open. Use
+Mobile to prove generic foundations before Starter. Preserve original keys, stores,
+accounts, native/SDK IDs and message transactions. Follow AGENTS.md layer ownership.
 
-The user authorized the complete communications plan, continued implementation,
-push after every commit and validated phone updates. All 54 acceptance groups remain
-open. Mobile proves reusable changes before Starter. Follow AGENTS.md: use cases own
-business policy and transactions, repositories coordinate datasources, datasources
-perform raw I/O. Preserve existing native IDs, SDK stores, keys and original messages.
+One heavy local compiler OR emulator. Do not kill live API/worker JVMs. The emulator
+uses2560MiB/two cores and is stopped. Phone10.77.77.3:5555 is install-only; announce
+installation and never launch, automate, uninstall or clear it. Crashlytics access
+is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
+Apple runtime/build and push/call acceptance remains separate.
 
-Use one heavy local compiler OR emulator. Do not kill the live API/worker JVMs.
-The owned emulator uses 2,560 MiB and two cores. Phone `10.77.77.3:5555` is install-only;
-announce every installation and never launch/drive its UI. Preserve the Inspector
-worktree's unrelated gradlew.bat change. No repeated IAM request: Crashlytics access
-is already verified.
+## Current source reconciliation
 
-## Current repositories and runtime
+This checkout `/home/fajar/hris/.worktrees/communication-space`, branch
+feat/communication-space, accepts the source merge of Root4d4df31f into group bf6e176a.
+It is NOT DEPLOYED. Common ancestor8bad394e;171/85 divergent commits.
+Eight conflict paths were manually resolved. Their originals and both parent hashes
+are retained in `.work/space-root-reconciliation-2026-11-09`.
 
-- This checkout: `/home/fajar/hris/.worktrees/communication-space`, branch
-  `feat/communication-space`, accepted original-reference source8d5724e2. V117–138 are present here but remain unshipped.
-- Original Platform: `feat/communications` at4d4df31f. Live API/worker remains
+[Reconciliation contract](collaboration/root-source-reconciliation.md) describes:
+
+- Both company runtime-transfer and default-key dependencies retained in DI.
+- Group push and company readiness worker definitions/guards retained separately.
+- Company readiness projection ported into the shared MatrixSyncReader with explicit
+  company framing. A new regression excludes old company controls from adopted group sync.
+- The fixed default-key read added to the group native gateway and exact-token HTTP
+  dispatch. Three new native/SQL cases and one HTTP case cover scope, missing/empty/
+  existing metadata, late denial, cancellation, cleanup and provider unavailability.
+- Recovery verification now accepts reviewed116.2–4 without changing encrypted envelope
+  projection. One expected RED error precedes27 passing Python cases; no live restore.
+
+The full merge is ACCEPTED. Pinned ktfmt0.59 passed65 changed inputs in
+3.651s with256MiB heap; three files changed. Focused results are retained separately:
+
+- 49700 REAPED FAILED226.851s:207 domain/data cases passed, then API compilation
+ failed on five old directMetadata fixture calls. They now use the merged accountData
+ method, whose default remains m.direct. Targeted formatter passed unchanged1.519s;
+ its first unsupported --max-width option was rejected before changes.
+- 67950 REAPED FAILED83.59s:two HTTP cases ran; the new default-key case returned409
+ request_lost because groupNative freezes the application clock before PostgreSQL
+ creates its request lease. The new provider-operation test now follows wall time.
+ Its503 assertion and all real request lifetime guards remain unchanged.
+- 24065 REAPED PASS75.409s:both the new default-key and existing group metadata HTTP
+ cases pass; zero failures/errors/skips. Domain/data were cached, not recounted.
+- Full33511 is REAPED PASS5,607.828s on8,686 unchanged inputs. It contains1,444 cases:
+ 138 database,189 domain,762 data,25 delivery,180 API and150 worker. Zero failures/errors;
+ the one existing ReportExportElapsedRetentionTest opt-in skip remains explicit. Both
+ readiness worker contexts and every new default-key/isolation regression are present.
+ Migration/recovery/image/format/architecture checks pass.
+ [Accepted evidence](measurements/collaboration-root-source-reconciliation-2026-11-09.json)
+ verifies archived fresh XML, exact source hashes and the complete worker command.
+
+Do not substitute bootJar or one worker smoke test for the full shared DI checks.
+Full results and earlier failures are audited. No local heavy job remains from this gate;
+do not rerun it or infer a live rollout from source acceptance.
+
+Mobile binding preparation final full81742 is REAPED PASS511.375s:4,224 fresh
+cases=3,587 desktop+613 Android host+24 exact browser cases, no failures/errors/skips.
+Final focused50366 passes26 cases;4,551 source inputs match both gates. Its earlier
+coincident-denial/expiry failure and insufficient correction are preserved. See the
+[latest Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
+for accepted source/hosted Apple transitions. No new APK or product activation.
+
+## Accepted state
+
+- Group8d5724e2 exact published original reference is accepted:266 fresh cases,
+  native admission/actual LEGACY worker/API/OpenAPI/quality pass. Group V117–138 is
+  present only in this worktree and remains unshipped.
+- Root Platform feat/communications691f3fc5 (recovery verifier only after merge parent4d4df31f). Live API/worker remains
   e558a6868399058a2dcdee97acfd0e7fa7f1ef07, schema116.4, readiness control ON.
-  Group routing is OFF; there is no live migration in this increment.
-- Original Mobile: `feat/chat-send-timing-20261107` ata06b3370 (APK source d8383438). Original Room request
-  dispatch4e7be081 and Joined-room reuse are accepted/pushed. APK87 passes packaging,
-  lint/signature/immutableSDK6 checks. Actual retained-native87 and phone87 are accepted. One new send took2,066.684ms,
-  room acquisition1ms; no join requests across four lifecycle phases. Eight originals
-  remain in the latest stopped87 store; this is not phone/p95 latency acceptance.
-- Mobile isolated CI: `feat/pinned-inspector-ci-20261109` at951cdbcf. Hosted verify
-  42611795210 passed7,950 cases, zero failures/errors/skips/lint. Artifact13672363171
-  was hashed/audited, including three APKs and393-component SBOM. Root integration
-  57ebc77a passed66 focused cases and is pushed; previous failures remain preserved.
-- Inspector rootf8ca3d6 and isolateda6b8236 use verified immutable publicSDK6;
-  library CI passes226 portable/Android-host +69 actual Apple simulator cases.
-  Native Apple Matrix binding is still open. Starterffd0ac5 is pushed: pinned workflow
-  port passes root/Android/web/iOS-source/quality/SBOM,62 fresh actual browser cases
-  and fixed1,052 app/49 library inputs. Lint0errors/45 existing advisories. No hosted
-  Starter workflow or distribution dispatch occurred.
+  Organization routing is OFF. This merge does not change live runtime.
+- Mobile feat/chat-send-timing-20261107: room dispatch4e7be081, joined-roomd8383438,
+  original-reference5b63b498 and encrypted binding storage0f6c843f accepted/pushed.
+  Owning binding preparation78076d4e is accepted/pushed; no SDK/worker/UI activation.
+- Mobile public CI42611795210 at21101489 passed7,950 cases; artifact13672363171
+  digest/XML/APKs/SBOM audited. Root integration57ebc77a passed66 focused cases.
+- Inspector rootf8ca3d6/isolateda6b8236 use immutable publicSDK6. CI at742a2d1 passes
+  226 portable/Android-host+69 Apple simulator cases; native Apple Matrix binding open.
+- Starterffd0ac5 pinned workflow/checksum port accepted: root/Android/Web/iOS source,
+  quality/SBOM and62 fresh browser cases. No Starter hosted distribution.
 
-## Accepted published-room reference
+## Phone and retained originals
 
-The native published room response now includes the existing immutable original
-company/conversation/room/binding time for LEGACY; SPACE returns null. Current native,
-group and peer admission stays before/after the read. Invalid provenance is rejected;
-no schema, credential, provider mutation or content authority is added.
-[Contract](collaboration/published-room-reference.md).
+APK87 is ALREADY INSTALLED fromd8383438. Phone install33957 passed210.86s with exact
+installed digest and unchanged first-install identity, no UI driving. Native retained
+86→87 proof passed670.401s, four quiet sync phases, no join/setup loop, paired refresh
+200×3 and one new send at2,066.684ms. This is one emulator sample, not phone/p95 proof.
+All emulator/native jobs are stopped and reaped. No APK88 exists; do not reinstall87.
 
-The accepted8d5724e2 increment changed five Kotlin files: public room entity, read use case, native admission
-regressions, the existing real LEGACY worker publication expectation, and OpenAPI
-field assertions. Pinned ktfmt passes. The new three cases cover exact coordinates
-for both participants, contradictory references, cancellation and final denial.
-Focused gate71857 is reaped PASS513.312s:266 fresh cases, no failures/errors/skips;
-8,637 fixed inputs, format/architecture checks pass. All three new cases are verified
-in XML; API/OpenAPI and actual LEGACY worker publication pass. No full worker rerun. `.work/published-room-reference-2026-11-09/check.py focused-1`
-is prepared and refuses to start beside the emulator. It runs domain/native data,
-actual LEGACY publication, API/OpenAPI and quality checks. Shared DI is unchanged.
+Latest COMPLETE STOPPED sender store is Mobile
+`.work/joined-room-entry-native-2026-11-09/sender`; keep the complete AVD and encryption/
+userdata files, plus Bima74's stopped store. Eight originals must never be resent:
+Control77 235408, Warm77 235728, Recovery78 005634, Registry82 055959, Parent83 071123,
+History84 083059, Selected86 102110, Joined87 115837. Draft66 092041 must never be sent.
+Preserve Inspector's unrelated gradlew.bat worktree delta. SDK26.10.23-hris.6 release
+438835525 is immutable; do not rebuild or overwrite its assets.
 
-Backend71857 is complete and reaped. Mobile native87 emulator8719/phases46256/
-counters28538/78071 are all stopped and reaped. Latest complete store is Mobile
-`.work/joined-room-entry-native-2026-11-09/sender`, with eight originals. Never resend
-Joined87 115837, the seven earlier originals, or Draft66 092041. Phone install33957
-is reaped PASS210.86s with exact digest and identity; no UI driving or clearing.
+## Next work
 
-Mobile original-reference5b63b498 is accepted/pushed:49 focused and4,162 fresh full
-cases pass, zero failures/errors/skips/lint,4,535 fixed inputs. Full89590 is reaped.
-The next encrypted-binding candidate passes focused82526:85 fresh cases including
-all14 actual SQLite binding cases, no failures/errors/skips,4,544 fixed app inputs.
-The only post-focused source change resolves the new repository in the actual app
-DI test. Full45444 is now RUNNING with root/Android/Wasm/iOS source and both new/old
-actual IndexedDB storage contracts. Mobile/Inspector source inputs are FROZEN;
-do not start another compiler/emulator. No owning acquisition or routing is added.
+1. Commit/push this accepted reconciliation, then apply the11-file direct-transport
+   candidate only through its exact base/source/merge checks. Never redo the merge.
+2. Validate the current device/room/recipient API, actual PostgreSQL/HTTP/OpenAPI and
+   FULL worker graph; then validate the13-file Mobile transport candidate. Original
+   Root691f3fc5's verifier maximum stays116.4; Group stays138.
+3. Continue owning original SDK delivery/history, recipient readiness, background
+   lifetime and group product routing. Existing Prepare/Resolve/Replay Room commands
+   are accepted; do not recreate them or replace uncertain originals.
+4. Continue rich actions/media/stickers/voice, encrypted Drive/iCloud recovery,
+   MatrixRTC native calls, LiveKit meetings and all remaining PRD scope in
+   docs/collaboration/prd.md and delivery.json. No acceptance group is complete.
 
-## Next steps
+Mobile hosted collaboration-control42628449460 is complete SUCCESS on exact78076d4e.
+Verified artifacts contain9,003 cases, including2,457 Apple simulator, zero failures/
+errors/skips; exact21 domain+3 actual storage preparation cases run on each shared target.
+Xcode builds the unsigned simulator host. Evidence/handoff7e636567 is pushed. Do not
+redispatch or reaudit. Native Apple Matrix delivery/APNs/calling remain separate.
 
-1. Backend response8d5724e2 and Mobile typed reference5b63b498 are accepted/pushed;
-   do not repeat their completed gates. Await/reap Mobile binding full45444.
-2. Finish immutable encrypted binding storage, then its owning acquisition under
-   current admission. LEGACY must use the exact original company/conversation read
-   and match canonical metadata, pair, room, server and binding time. Retained facts
-   grant no content/SDK/send authority; no guessed company or replacement original.
-3. Continue SDK delivery/history, background ownership, group product routing, rich
-   messages/media/stickers/voice, encrypted Drive/iCloud recovery, MatrixRTC native
-   calls and LiveKit meetings. `docs/collaboration/prd.md` and delivery.json own scope.
+## Prepared next increment (not applied)
 
-Existing Prepare/Resolve/Replay Room command use cases are already accepted on Mobile;
-do not recreate them. Current native group gateway, push, original-history and stable
-receipt/fencing contracts are documented in docs/architecture.md and linked evidence.
-Their source acceptance does not mean group routing or the full PRD is complete.
+`.work/space-direct-transport-2026-11-09/candidate` holds11 PRIVATE UNCOMPILED
+Kotlin draft files for one current device/room/recipient GET, including API/DI and
+seven SQL/three pure policy methods plus HTTP/OpenAPI tests. base.json pins all four
+modified source paths. Format3 passes2.017s; this is parser/format proof only. Prepared
+apply.py requires a successful committed merge and exact source/base hashes; check.py
+requires actual SQL/API and FULL worker tests. Neither script has been executed. Do not
+apply these while full33511 owns the current source or count them as implementation
+acceptance. Existing room mapping becomes a pure domain policy; both owning reads
+coordinate repositories directly. V135 already keeps confirmed receiving keys
+through short token expiry, with hard expiry/revocation still enforced.
+
+Original message repository.get already returns archived command facts; its actual
+completion storage contract proves reopen/login behavior. No null-to-archive fallback
+belongs in ReadCollaborationSpaceOriginalQueue. Keep its missing-record rejection.

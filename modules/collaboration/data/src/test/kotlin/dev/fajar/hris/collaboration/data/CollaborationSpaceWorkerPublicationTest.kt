@@ -4723,6 +4723,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     PostgresNativePushRegistrationDataSource(sql),
                     pushCrypto(),
                 ),
+                secretStorage = DisabledCollaborationSecretStorageRepository(),
             )
         }
 

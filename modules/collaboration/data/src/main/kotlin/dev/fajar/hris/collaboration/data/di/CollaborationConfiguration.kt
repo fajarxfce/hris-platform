@@ -690,6 +690,90 @@ class CollaborationConfiguration {
     ): CollaborationPushQueueRepository = StoredCollaborationPushQueueRepository(source)
 
     @Bean
+    fun collaborationReadinessControlSource(
+        sql: DSLContext
+    ): CollaborationReadinessControlQueueDataSource =
+        PostgresCollaborationReadinessControlQueueDataSource(sql)
+
+    @Bean
+    fun collaborationReadinessControls(
+        source: CollaborationReadinessControlQueueDataSource
+    ): CollaborationReadinessControlQueueRepository =
+        StoredCollaborationReadinessControlQueueRepository(source)
+
+    @Bean
+    fun collaborationMatrixReadiness(
+        source: ObjectProvider<MatrixReadinessControlDataSource>
+    ): CollaborationMatrixReadinessRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixReadinessRepository)
+            ?: DisabledCollaborationMatrixReadinessRepository()
+
+    @Bean
+    fun fanOutCollaborationReadinessControl(
+        queue: CollaborationReadinessControlQueueRepository,
+        providerSessions: CollaborationProviderSessionRepository,
+        transport: CollaborationMatrixReadinessRepository,
+        registry: CollaborationRegistryRepository,
+        gateway: CollaborationGatewaySessionRepository,
+        keys: CollaborationDeviceKeyRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        FanOutCollaborationReadinessControl(
+            queue,
+            providerSessions,
+            transport,
+            registry,
+            gateway,
+            keys,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun collaborationReadinessWakeSource(sql: DSLContext): CollaborationReadinessWakeDataSource =
+        PostgresCollaborationReadinessWakeDataSource(sql)
+
+    @Bean
+    fun collaborationReadinessWakes(
+        source: CollaborationReadinessWakeDataSource
+    ): CollaborationReadinessWakeRepository = StoredCollaborationReadinessWakeRepository(source)
+
+    @Bean
+    fun fanOutCollaborationReadiness(
+        wakes: CollaborationReadinessWakeRepository,
+        bindings: CollaborationPushBindingRepository,
+        pushes: CollaborationPushQueueRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        FanOutCollaborationReadiness(
+            wakes,
+            bindings,
+            pushes,
+            transactions,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun handleCollaborationPush(
         bindings: CollaborationPushBindingRepository,
         queue: CollaborationPushQueueRepository,
@@ -973,6 +1057,40 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun readNativeCollaborationDirectTransport(
+        conversations: CollaborationDirectRepository,
+        rooms: CollaborationDirectRoomRepository,
+        registry: CollaborationRegistryRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+        recipients: CollaborationRecipientRepository,
+    ) =
+        ReadNativeCollaborationDirectTransport(
+            conversations,
+            rooms,
+            registry,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+            recipients,
+        )
+
+    @Bean
     fun advanceNativeCollaborationDirectRoom(
         conversations: CollaborationDirectRepository,
         rooms: CollaborationDirectRoomRepository,
@@ -1083,6 +1201,13 @@ class CollaborationConfiguration {
         } ?: DisabledCollaborationMatrixRepository()
 
     @Bean
+    fun collaborationSecretStorage(
+        clients: ObjectProvider<MatrixSecretStorageDataSource>
+    ): CollaborationSecretStorageRepository =
+        clients.ifAvailable?.let { InternalCollaborationSecretStorageRepository(it) }
+            ?: DisabledCollaborationSecretStorageRepository()
+
+    @Bean
     fun collaborationMatrixRooms(
         clients: ObjectProvider<MatrixRoomDataSource>,
         provider: CollaborationMatrixPolicy,
@@ -1183,6 +1308,7 @@ class CollaborationConfiguration {
         pushBindings: CollaborationSpacePushBindingRepository,
         providerPush: CollaborationMatrixPusherRepository,
         nativePush: NativePushRegistrationRepository,
+        secretStorage: CollaborationSecretStorageRepository,
     ) =
         AccessNativeCollaborationSpaceMatrixDevice(
             gateway,
@@ -1218,6 +1344,7 @@ class CollaborationConfiguration {
             pushBindings,
             providerPush,
             nativePush,
+            secretStorage,
         )
 
     @Bean
@@ -1533,6 +1660,7 @@ class CollaborationConfiguration {
         providerPush: CollaborationMatrixPusherRepository,
         nativePush: NativePushRegistrationRepository,
         runtimes: CollaborationLegacyRuntimeRepository,
+        secretStorage: CollaborationSecretStorageRepository,
     ) =
         AccessNativeCollaborationMatrixDevice(
             gateway,
@@ -1565,6 +1693,7 @@ class CollaborationConfiguration {
             providerPush,
             nativePush,
             runtimes,
+            secretStorage,
         )
 
     @Bean

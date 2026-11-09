@@ -1,5 +1,6 @@
 package dev.fajar.hris.collaboration.delivery.controllers
 
+import dev.fajar.hris.collaboration.delivery.matrix.MatrixGatewayOperation
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.delivery.requests.matrixDirectMetadataRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyClaimRequest
@@ -60,6 +61,7 @@ class MatrixGatewayDeviceController(
             request,
             { matrixRoomMessageRequest(transactionId, it) },
             reader = envelopeParser,
+            diagnosticOperation = MatrixGatewayOperation.RoomSend,
         ) { token, correlation, message ->
             (if (validCollaborationSpaceGatewayAccess(token))
                     group.sendRoomMessage(token, correlation, roomId, message)
@@ -188,6 +190,7 @@ class MatrixGatewayDeviceController(
             { matrixToDeviceRequest(transactionId, it) },
             1_048_576,
             envelopeParser,
+            diagnosticOperation = MatrixGatewayOperation.ToDevice,
         ) { token, correlation, envelope ->
             (if (validCollaborationSpaceGatewayAccess(token))
                     group.sendToDevice(token, correlation, envelope)
@@ -200,6 +203,7 @@ class MatrixGatewayDeviceController(
         decode: (JsonNode) -> T,
         maximumBytes: Int = 65536,
         reader: JsonMapper = parser,
+        diagnosticOperation: MatrixGatewayOperation = MatrixGatewayOperation.General,
         operation: (String, UUID, T) -> Result<Map<String, Any>>,
     ): ResponseEntity<Any> {
         if (request.queryString != null) return problem(400, "M_INVALID_PARAM")
@@ -246,7 +250,7 @@ class MatrixGatewayDeviceController(
             }
         val correlation = request.getAttribute("hris.correlationId") as? UUID ?: UUID.randomUUID()
         return when (val result = operation(header.substring(7), correlation, input)) {
-            is Result.Failed -> matrixGatewayProblem(result.failure)
+            is Result.Failed -> matrixGatewayProblem(result.failure, diagnosticOperation)
             is Result.Success ->
                 ResponseEntity.ok().header("Cache-Control", "no-store").body(result.value)
         }

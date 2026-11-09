@@ -1,0 +1,43 @@
+{
+  "readAt": "2026-11-07T14:00:00.714160+00:00",
+  "readOnly": true,
+  "fictionalRecipient": "Bima demo",
+  "activeDevices": 1,
+  "providerBindings": 1,
+  "deviceKeys": 1,
+  "signedOneTimeKeys": 50,
+  "signedFallbackKeys": 1,
+  "privateKeysRead": false,
+  "providerLoginPerformed": false,
+  "messageSent": false,
+  "phoneAccessed": false,
+  "phoneLatencyResolved": false,
+  "sourceResultSha256": "a43f053110a774f380ea32873d07283adfa480ea3f93eba83a64108d36564b83",
+  "method": "Read-only PostgreSQL transactions with10s statement/20s subprocess bounds; exact fictional Bima account selected from retained private manifest. Count active device/provider binding and published Synapse public-key rows without fetching key values.",
+  "limits": "Published-key counts are metadata, not a new cryptographic signature check, physical-phone message send or latency measurement. Receiver need not remain online for server acceptance once keys are published.",
+  "recipientEligibility": {
+    "readAt": "2026-11-07T14:04:40.528309+00:00",
+    "readOnly": true,
+    "fictionalRecipient": "Bima demo",
+    "existingPeerViews": [
+      {
+        "peerIndex": 1,
+        "eligibleRecipientDevices": 1,
+        "confirmedRecipientDevices": 1,
+        "hardLifetimeRemaining": true
+      }
+    ],
+    "deviceState": {
+      "activeDevices": 1,
+      "boundHardLiveParents": 1,
+      "boundExpiredAccessParents": 1
+    },
+    "privateKeysRead": false,
+    "providerLoginPerformed": false,
+    "messageSent": false,
+    "phoneAccessed": false,
+    "phoneLatencyResolved": false,
+    "sourceResultSha256": "a31367589460c884dd3c0f15c4364c2c1ce09cefbd38a601b976cc29725b2403",
+    "method": "Exact retained Bima conversation peer actor/company context; read-only recipient projection and native hard-lifetime metadata. No access tokens or key values are selected."
+  }
+}

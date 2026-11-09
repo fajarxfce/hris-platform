@@ -332,6 +332,7 @@ internal class SpaceKeyExchangeFixture(
             pushBindings,
             providerPush,
             nativePush,
+            secretStorage = DisabledCollaborationSecretStorageRepository(),
         )
 
     fun queryRequest() =

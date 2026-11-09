@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Source reconciliation accepted — 9 November 2026
+
+Group bf6e176a and Root4d4df31f retain both organization ownership and current company
+readiness/default-key behavior. Full33511 passes5,607.828s:1,444 fresh cases, zero
+failures/errors and one existing opt-in elapsed-retention skip,8,686 unchanged inputs.
+Actual database/domain/data/delivery/API and complete worker contexts pass, together
+with format/architecture/image/migration/recovery checks. Both earlier focused failures
+and corrections remain in the [accepted evidence](measurements/collaboration-root-source-reconciliation-2026-11-09.json).
+[Contract](collaboration/root-source-reconciliation.md) and [handoff](agent-handoff.md)
+record follow-up transport work. Live e558a686/schema116.4 and disabled group routing
+remain unchanged; this is source acceptance only.
+
 ## Published original-room coordinates — 9 November 2026
 
 The native published-room response retains the exact original company/conversation,

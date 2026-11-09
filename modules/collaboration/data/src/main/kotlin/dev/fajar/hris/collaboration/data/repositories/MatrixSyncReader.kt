@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.data.repositories
 
 import dev.fajar.hris.collaboration.data.matrix.*
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.*
 import java.time.Instant
 import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.JsonNode
@@ -139,7 +140,35 @@ internal class MatrixSyncReader(private val source: MatrixSyncDataSource) {
                     objectNode(envelope)
                     val sender = text(envelope, "sender", 255)
                     if (sender !in allowedUsers) return@mapNotNull null
-                    if (text(envelope, "type", 128) != "m.room.encrypted") return@mapNotNull null
+                    val type = text(envelope, "type", 128)
+                    if (type == COLLABORATION_READINESS_CONTROL_TYPE) {
+                        val owner = frame.readinessOwner ?: return@mapNotNull null
+                        // The public gateway cannot send this clear event type. Only the
+                        // target's own provider identity may carry a bounded opaque hint.
+                        if (sender != ownUser) return@mapNotNull null
+                        val content = envelope.path("content")
+                        if (!content.isObject || content.size() != 9) return@mapNotNull null
+                        val fields = linkedMapOf<String, String>()
+                        for ((name, value) in content.properties()) {
+                            if (!value.isString || value.asString().length > 36)
+                                return@mapNotNull null
+                            fields[name] = value.asString()
+                        }
+                        val control =
+                            readCollaborationReadinessControl(fields) ?: return@mapNotNull null
+                        if (
+                            control.companyId != owner.companyId ||
+                                control.accountId != owner.accountId ||
+                                control.deviceId != owner.deviceId
+                        )
+                            return@mapNotNull null
+                        return@mapNotNull mapOf(
+                            "sender" to sender,
+                            "type" to type,
+                            "content" to fields,
+                        )
+                    }
+                    if (type != "m.room.encrypted") return@mapNotNull null
                     val content = envelope.path("content")
                     objectNode(content)
                     if (content.path("algorithm").asString() != "m.olm.v1.curve25519-aes-sha2")
@@ -252,5 +281,7 @@ internal data class MatrixSyncFrame(
     val ownDevice: String,
     val rooms: Map<String, MatrixSyncRoomFrame>,
     val direct: Map<String, List<String>>,
+    // Company controls stay in their original scope; group framing never inherits them.
+    val readinessOwner: CollaborationSyncOwner? = null,
     val sealHistory: (String, String) -> String,
 )

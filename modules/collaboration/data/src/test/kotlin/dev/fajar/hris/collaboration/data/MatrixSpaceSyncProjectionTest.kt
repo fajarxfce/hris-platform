@@ -197,6 +197,40 @@ class MatrixSpaceSyncProjectionTest {
     private fun tree(batch: CollaborationMatrixSyncBatch): JsonNode = node(batch.payload)
 
     @Test
+    fun originalCompanyReadinessDoesNotCrossIntoTheAdoptedSpaceSync() {
+        val control =
+            CollaborationReadinessControl(
+                UUID.randomUUID(),
+                f.company,
+                owner.accountId,
+                UUID.randomUUID(),
+                f.originalDevice,
+                f.at.toEpochMilli(),
+                1L,
+            )
+        val hint =
+            mapOf(
+                "sender" to owner.matrixUserId,
+                "type" to COLLABORATION_READINESS_CONTROL_TYPE,
+                "content" to collaborationReadinessControlContent(control),
+            )
+        val retained = encrypted(oldPeer)
+        val connection =
+            Connection(
+                node(
+                    mapOf(
+                        "next_batch" to "s-company-control",
+                        "to_device" to mapOf("events" to listOf(hint, retained)),
+                    )
+                )
+            )
+        val batch = success(call(connection))
+        assertEquals(node(listOf(retained)), tree(batch).path("to_device").path("events"))
+        assertEquals("s-company-control", batch.providerSince)
+        assertEquals(1, connection.closes)
+    }
+
+    @Test
     fun originalAndCurrentPeerAliasesKeepQueuedKeysDirectMetadataAndTheirOwnHistoryFraming() {
         val connection = Connection(response())
         val batch = success(call(connection))

@@ -1,0 +1,140 @@
+{
+  "observedAt": "2026-11-09T15:30:12.781497+00:00",
+  "status": "Accepted source reconciliation; not deployed",
+  "parents": {
+    "startedAt": "2026-11-09T13:15:39.046188+00:00",
+    "head": "bf6e176a0c50753c814af8895f38ac8c0e765bf5",
+    "target": "4d4df31f8b5b96f4289f545808cb8a06eeb75877",
+    "base": "8bad394e0b317c3a2d939d10c4f0ece95693a46d"
+  },
+  "full": {
+    "startedAt": "2026-11-09T13:56:20.665162+00:00",
+    "elapsedSeconds": 5607.828,
+    "exitCode": 0,
+    "sourceFiles": 8686,
+    "sourcesUnchanged": true,
+    "changedSources": [],
+    "counts": {
+      "tests": 1444,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "skips": [
+      {
+        "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+        "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()",
+        "reason": null
+      }
+    ],
+    "scopes": {
+      "apps/worker": {
+        "suites": 34,
+        "tests": 150,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "apps/server": {
+        "suites": 7,
+        "tests": 180,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "suites": 43,
+        "tests": 189,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/delivery": {
+        "suites": 6,
+        "tests": 25,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "suites": 104,
+        "tests": 762,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "core/database": {
+        "suites": 36,
+        "tests": 138,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "sourceManifestSha256": "d825ba09d8806232c031e395b7fb30e045fcde1c6621da2ca2761305bb82334a",
+    "reportManifestSha256": "77ecdf7c468234386bb33ab4f481d464413f078617760d062e5b9d8c707c71b5"
+  },
+  "earlierPhases": {
+    "focused-1": {
+      "startedAt": "2026-11-09T13:45:35.297085+00:00",
+      "elapsedSeconds": 226.851,
+      "exitCode": 1,
+      "sourceFiles": 8686,
+      "sourcesUnchanged": true,
+      "changedSources": [],
+      "counts": {
+        "tests": 207,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skips": []
+    },
+    "focused-2": {
+      "startedAt": "2026-11-09T13:51:05.199414+00:00",
+      "elapsedSeconds": 83.59,
+      "exitCode": 1,
+      "sourceFiles": 8686,
+      "sourcesUnchanged": true,
+      "changedSources": [],
+      "counts": {
+        "tests": 2,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skips": []
+    },
+    "focused-3": {
+      "startedAt": "2026-11-09T13:54:09.150063+00:00",
+      "elapsedSeconds": 75.409,
+      "exitCode": 0,
+      "sourceFiles": 8686,
+      "sourcesUnchanged": true,
+      "changedSources": [],
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skips": []
+    }
+  },
+  "reviewedCorrections": [
+    "Five surviving Group HTTP fixture calls were renamed to the merged accountData fixture; unchanged m.direct behavior.",
+    "Only the actual default-key provider HTTP fixture follows system time so PostgreSQL request-lease start does not exceed a frozen app clock. Admission and assertion stay unchanged.",
+    "Recovery allowlist explicitly includes reviewed116.2/3/4 without widening to unknown fractional versions; Group maximum remains138. Root691f3fc5 independently validates its116.4 maximum."
+  ],
+  "checks": [
+    "Full database and collaboration domain/data/delivery tests",
+    "Selected actual API/native contexts and complete worker test task",
+    "Format, architecture, container image pins, migration and recovery verifier checks"
+  ],
+  "limits": [
+    "Existing elapsed-hour opt-in ReportExportElapsedRetentionTest may remain skipped; no additional skip is allowed.",
+    "Live API/worker e558a686 and schema116.4 remain unchanged; organization V117-138 and routing remain off.",
+    "Current Mobile direct-transport and private backend eleven-file draft are separate, uncompiled candidates.",
+    "No phone installation, group runtime adoption, original delivery completion, calling or meeting acceptance is implied; all54 groups remain open."
+  ]
+}

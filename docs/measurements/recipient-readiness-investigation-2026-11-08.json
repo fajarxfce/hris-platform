@@ -1,0 +1,666 @@
+{
+  "recordedAt": "2026-11-08T12:57:52.430435+00:00",
+  "source": "Live API e8d1d24f and phone release69",
+  "rootCauseVerified": true,
+  "phoneUiDriven": false,
+  "messageSentByAgent": false,
+  "readOnly": true,
+  "evidence": {
+    "matrix-http-counts.json": {
+      "startedAt": "2026-11-08T12:46:03.189490+00:00",
+      "monotonicStartedSeconds": 1818655.838030688,
+      "elapsedSeconds": 180.476,
+      "requests": {
+        "sync": 21,
+        "other_hris": 12,
+        "hris_device_setup": 11,
+        "secret_storage_default_key": 6,
+        "hris_room": 11,
+        "hris_conversation": 8,
+        "other_matrix": 8,
+        "hris_direct_transport": 4,
+        "encrypted_room_send": 2,
+        "refresh": 1
+      },
+      "records": [
+        {
+          "offsetSeconds": 4.849,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10302
+        },
+        {
+          "offsetSeconds": 24.317,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 11
+        },
+        {
+          "offsetSeconds": 24.355,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 7
+        },
+        {
+          "offsetSeconds": 24.396,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 14
+        },
+        {
+          "offsetSeconds": 15.193,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10060
+        },
+        {
+          "offsetSeconds": 25.762,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 28
+        },
+        {
+          "offsetSeconds": 26.061,
+          "operation": "secret_storage_default_key",
+          "method": "GET",
+          "status": 404,
+          "headerLatencyMs": 35
+        },
+        {
+          "offsetSeconds": 26.062,
+          "operation": "secret_storage_default_key",
+          "method": "GET",
+          "status": 404,
+          "headerLatencyMs": 39
+        },
+        {
+          "offsetSeconds": 26.319,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 26.421,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 18
+        },
+        {
+          "offsetSeconds": 26.482,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 16
+        },
+        {
+          "offsetSeconds": 26.538,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 16
+        },
+        {
+          "offsetSeconds": 26.593,
+          "operation": "other_matrix",
+          "method": "POST",
+          "status": 200,
+          "headerLatencyMs": 46
+        },
+        {
+          "offsetSeconds": 26.811,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 17
+        },
+        {
+          "offsetSeconds": 26.87,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 17
+        },
+        {
+          "offsetSeconds": 26.925,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 16
+        },
+        {
+          "offsetSeconds": 26.983,
+          "operation": "other_matrix",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 36
+        },
+        {
+          "offsetSeconds": 27.064,
+          "operation": "other_matrix",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 33
+        },
+        {
+          "offsetSeconds": 27.167,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 16
+        },
+        {
+          "offsetSeconds": 27.238,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 16
+        },
+        {
+          "offsetSeconds": 27.293,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 17
+        },
+        {
+          "offsetSeconds": 27.915,
+          "operation": "hris_direct_transport",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 17
+        },
+        {
+          "offsetSeconds": 27.99,
+          "operation": "encrypted_room_send",
+          "method": "PUT",
+          "status": 403,
+          "headerLatencyMs": 23
+        },
+        {
+          "offsetSeconds": 28.068,
+          "operation": "hris_direct_transport",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 18
+        },
+        {
+          "offsetSeconds": 26.599,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10044
+        },
+        {
+          "offsetSeconds": 38.273,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10053
+        },
+        {
+          "offsetSeconds": 48.44,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10060
+        },
+        {
+          "offsetSeconds": 58.579,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10072
+        },
+        {
+          "offsetSeconds": 68.718,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10043
+        },
+        {
+          "offsetSeconds": 84.47,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 11
+        },
+        {
+          "offsetSeconds": 84.507,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 4
+        },
+        {
+          "offsetSeconds": 84.546,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 12
+        },
+        {
+          "offsetSeconds": 78.856,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10043
+        },
+        {
+          "offsetSeconds": 89.367,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 28
+        },
+        {
+          "offsetSeconds": 89.659,
+          "operation": "secret_storage_default_key",
+          "method": "GET",
+          "status": 404,
+          "headerLatencyMs": 39
+        },
+        {
+          "offsetSeconds": 89.66,
+          "operation": "secret_storage_default_key",
+          "method": "GET",
+          "status": 404,
+          "headerLatencyMs": 43
+        },
+        {
+          "offsetSeconds": 89.894,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 20
+        },
+        {
+          "offsetSeconds": 90.002,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 90.061,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 90.117,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 18
+        },
+        {
+          "offsetSeconds": 90.172,
+          "operation": "other_matrix",
+          "method": "POST",
+          "status": 200,
+          "headerLatencyMs": 60
+        },
+        {
+          "offsetSeconds": 90.369,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 20
+        },
+        {
+          "offsetSeconds": 90.427,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 90.487,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 90.551,
+          "operation": "other_matrix",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 37
+        },
+        {
+          "offsetSeconds": 90.632,
+          "operation": "other_matrix",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 43
+        },
+        {
+          "offsetSeconds": 90.754,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 90.815,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 18
+        },
+        {
+          "offsetSeconds": 90.892,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 91.526,
+          "operation": "hris_direct_transport",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 28
+        },
+        {
+          "offsetSeconds": 91.64,
+          "operation": "encrypted_room_send",
+          "method": "PUT",
+          "status": 403,
+          "headerLatencyMs": 25
+        },
+        {
+          "offsetSeconds": 91.718,
+          "operation": "hris_direct_transport",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 20
+        },
+        {
+          "offsetSeconds": 90.179,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10051
+        },
+        {
+          "offsetSeconds": 100.358,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10043
+        },
+        {
+          "offsetSeconds": 110.496,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10046
+        },
+        {
+          "offsetSeconds": 120.636,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10047
+        },
+        {
+          "offsetSeconds": 130.769,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10042
+        },
+        {
+          "offsetSeconds": 140.858,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 3323
+        },
+        {
+          "offsetSeconds": 144.222,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 43
+        },
+        {
+          "offsetSeconds": 144.605,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10
+        },
+        {
+          "offsetSeconds": 144.64,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 3
+        },
+        {
+          "offsetSeconds": 144.668,
+          "operation": "other_hris",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 9
+        },
+        {
+          "offsetSeconds": 145.163,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 20
+        },
+        {
+          "offsetSeconds": 145.461,
+          "operation": "secret_storage_default_key",
+          "method": "GET",
+          "status": 404,
+          "headerLatencyMs": 35
+        },
+        {
+          "offsetSeconds": 145.461,
+          "operation": "secret_storage_default_key",
+          "method": "GET",
+          "status": 404,
+          "headerLatencyMs": 42
+        },
+        {
+          "offsetSeconds": 145.679,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 24
+        },
+        {
+          "offsetSeconds": 145.79,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 145.851,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 145.913,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 18
+        },
+        {
+          "offsetSeconds": 145.972,
+          "operation": "other_matrix",
+          "method": "POST",
+          "status": 200,
+          "headerLatencyMs": 53
+        },
+        {
+          "offsetSeconds": 145.983,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 48
+        },
+        {
+          "offsetSeconds": 146.171,
+          "operation": "hris_device_setup",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 27
+        },
+        {
+          "offsetSeconds": 146.244,
+          "operation": "hris_conversation",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 19
+        },
+        {
+          "offsetSeconds": 146.309,
+          "operation": "hris_room",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 25
+        },
+        {
+          "offsetSeconds": 146.383,
+          "operation": "other_matrix",
+          "method": "GET",
+          "status": 401,
+          "headerLatencyMs": 6
+        },
+        {
+          "offsetSeconds": 146.988,
+          "operation": "sync",
+          "method": "GET",
+          "status": 401,
+          "headerLatencyMs": 6
+        },
+        {
+          "offsetSeconds": 147.008,
+          "operation": "refresh",
+          "method": "POST",
+          "status": 200,
+          "headerLatencyMs": 16
+        },
+        {
+          "offsetSeconds": 147.06,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10046
+        },
+        {
+          "offsetSeconds": 157.187,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10040
+        },
+        {
+          "offsetSeconds": 167.33,
+          "operation": "sync",
+          "method": "GET",
+          "status": 200,
+          "headerLatencyMs": 10047
+        }
+      ],
+      "passiveReadOnly": true,
+      "bodyOrHeadersRetained": false,
+      "phoneUiDriven": false,
+      "interface": "br-3b9b9ff77286",
+      "scope": "Passive physical-phone gateway traffic; fixed Matrix and HRIS route buckets only. Packet-level counts can omit fragmented starts; not a complete HTTP reconstruction or capture-overhead benchmark"
+    },
+    "closed-failure-summary.json": {
+      "readOnly": true,
+      "phoneUiDriven": false,
+      "logs": [
+        {
+          "file": "diagnostics-before.private.log",
+          "failures": {
+            "ChatQueueRetained_ApiForbidden": 12,
+            "ChatQueueSend_ApiForbidden": 6,
+            "ChatDelivery_DeliverMessages_DeliveryPending": 6,
+            "ChatDelivery_ProcessRooms_DeliveryPending": 5
+          }
+        },
+        {
+          "file": "diagnostics-live.private.log",
+          "failures": {
+            "ChatQueueRetained_ApiForbidden": 5,
+            "ChatQueueSend_ApiForbidden": 2,
+            "ChatDelivery_DeliverMessages_DeliveryPending": 2,
+            "ChatDelivery_ProcessRooms_DeliveryPending": 2,
+            "RequestFailureException": 1,
+            "ChatDelivery_RecoverOriginal_SdkAuthentication": 1,
+            "ChatDelivery_ProcessRooms_SdkAuthentication": 1
+          }
+        }
+      ]
+    },
+    "target-recipient-result.json": {
+      "at": "2026-11-08T12:50:59.761811+00:00",
+      "readOnly": true,
+      "actualFailedRoomMatched": true,
+      "recipient": {
+        "peerOrdinal": 3,
+        "confirmedRecipientDevices": 0,
+        "allDevices": 0,
+        "activeAccount": true,
+        "activeMembership": true,
+        "chatPermission": true
+      },
+      "schemaUnchanged": true,
+      "deviceOrKeyMutated": false,
+      "phoneUiDriven": false
+    }
+  },
+  "evidenceSha256": {
+    "matrix-http-counts.json": "01d62804f12467d620a3e5a107da17d4e6584224fd4a136ef8df35659cb0693a",
+    "closed-failure-summary.json": "099903bd825724ee29dce466af2c25e1733d8f49475802d484db3e9b5e8c325d",
+    "target-recipient-result.json": "ff02cd1f79901c28547cb7e140c29029712b86954641d8edd6359093128cb8df"
+  },
+  "jobs": {
+    "phoneCounters": {
+      "session": 15747,
+      "reaped": true
+    },
+    "phoneLogCapture": {
+      "session": 20480,
+      "reaped": true
+    },
+    "roomTargetCapture": {
+      "session": 43287,
+      "reaped": true
+    }
+  },
+  "finding": "Actual repeatedly rejected room targets an active HRIS account with zero enrolled collaboration devices. Transport metadata succeeds without recipient readiness, while encrypted room-send admission denies it. Native generic API failure is retried and collapsed to delivery_pending, causing renewed metadata and send attempts.",
+  "boundary": "Three-minute capture:4 transport responses200 and2 encrypted-send403; inspector cumulative count167 is user-reported and not independently equated to this time window. Bima separately has one eligible confirmed device with a live hard parent despite expired short access; do not reset/re-enroll it.",
+  "privateEvidenceNotPublished": [
+    "Raw phone logcat",
+    "Room and account identifiers",
+    "Recipient display name",
+    "SQL metadata query inputs"
+  ],
+  "fixPending": true,
+  "release70Held": true
+}

@@ -32,6 +32,26 @@ class NativeDeviceTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 native_diagnostic({"progress": progress})
 
+    def test_recent_storage_diagnostics_are_bounded_code_only_and_detached(self):
+        record = {"categories": ["IllegalStateException", "SQLException"],
+                  "frames": ["dev.fajar.proof.Store.read:12"], "message": "private-fixture"}
+        native = {"recentStorageFailures": [record]}
+        result = native_diagnostic({"instrumentation": native})["recentStorageFailures"]
+        self.assertEqual([{"categories": record["categories"], "frames": record["frames"]}], result)
+        self.assertNotIn("private", str(result))
+        record["categories"].clear()
+        record["frames"].clear()
+        self.assertEqual(2, len(result[0]["categories"]))
+        self.assertEqual(1, len(result[0]["frames"]))
+        bad_records = [None, {}, {"categories": [], "frames": []},
+                       {"categories": ["Exception"] * 5, "frames": []},
+                       {"categories": ["private token"], "frames": []},
+                       {"categories": ["Exception"], "frames": ["raw message"]},
+                       {"categories": ["Exception"], "frames": ["dev.fajar.proof.Store.read:12"] * 7}]
+        for records in ["private", [record] * 9] + [[value] for value in bad_records]:
+            with self.subTest(records=records), self.assertRaises(ValueError):
+                native_diagnostic({"instrumentation": {"recentStorageFailures": records}})
+
     def fixture(self, root):
         apk = root / "proof.apk"
         apk.write_bytes(b"fixture")

@@ -62,6 +62,64 @@ class MatrixSyncProjectionTest {
         )
 
     @Test
+    fun onlyExactOwnReadinessControlSurvivesWithoutPoisoningEncryptedSync() {
+        val control =
+            CollaborationReadinessControl(
+                UUID.randomUUID(),
+                owner.companyId,
+                owner.accountId,
+                UUID.randomUUID(),
+                owner.deviceId,
+                1_794_171_600_123L,
+                1L,
+            )
+        val content = collaborationReadinessControlContent(control)
+        fun hint(value: Map<String, Any> = content, sender: String = user(owner.accountId)) =
+            mapOf(
+                "sender" to sender,
+                "type" to COLLABORATION_READINESS_CONTROL_TYPE,
+                "content" to value,
+            )
+        val valid = hint()
+        val encrypted =
+            mapOf(
+                "sender" to user(peer),
+                "type" to "m.room.encrypted",
+                "content" to
+                    mapOf("algorithm" to "m.olm.v1.curve25519-aes-sha2", "ciphertext" to "opaque"),
+            )
+        val bad =
+            listOf(
+                hint(sender = user(peer)),
+                hint(content + ("company_id" to UUID.randomUUID().toString())),
+                hint(content + ("account_id" to UUID.randomUUID().toString())),
+                hint(content + ("device_id" to UUID.randomUUID().toString())),
+                hint(content + ("native_session_id" to "")),
+                hint(content + ("published_at" to 1_794_171_600_123L)),
+                hint(content + ("schema_version" to "1")),
+                hint(content + ("body" to "must not escape")),
+                hint(content - "expires_at"),
+                hint(content + ("event_id" to "x".repeat(4096))),
+            )
+        val connection =
+            Connection(
+                node(
+                    mapOf(
+                        "next_batch" to "s-control",
+                        "to_device" to mapOf("events" to bad + valid + encrypted),
+                    )
+                )
+            )
+        val batch = (call(connection) as Result.Success).value
+        assertEquals(
+            node(listOf(valid, encrypted)),
+            node(batch.payload).path("to_device").path("events"),
+        )
+        assertEquals("s-control", batch.providerSince)
+        assertEquals(1, connection.closed)
+    }
+
+    @Test
     fun everyForeignBucketAndMetadataSurfaceIsExcludedAndDirectMappingComesFromHris() {
         val foreign = "@private:other.invalid"
         val invite =

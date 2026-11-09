@@ -1,0 +1,44 @@
+# Matrix secret-storage discovery
+
+The native SDK checks its own `m.secret_storage.default_key` account-data event
+while initializing encryption recovery. The HRIS gateway previously rejected the
+route with `403 M_FORBIDDEN`, even when the provider simply had no recovery setup.
+
+The gateway now supports this exact GET for the current native device's Matrix
+user. Admission checks the current account, company, membership, native session,
+device, client policy and gateway credential. A peer or another company's user
+cannot be queried. Provider I/O occurs outside the admission transaction; live
+authority is checked again before publishing either content or an absent result.
+
+The datasource uses the existing fixed-origin, bounded, cancellable HTTP owner.
+It reads at most 4 KiB, does not redirect or retry, and recognizes absence only
+from an exact `404 M_NOT_FOUND`. An empty event remains `{}`; a configured event
+returns only its bounded public key identifier. Malformed content, authorization
+failures, limits and transport errors do not become fabricated absence. No
+encryption private key, secret content or caller-supplied account-data type is
+read or written. Other secret-storage routes remain unavailable.
+
+This read is compatibility work, not implementation of backup/recovery. It does
+not change recipient eligibility or acknowledge messages. The reported pending
+messages and repeated requests require separate device observation: recent logs
+also contain `room_send` rejections for unavailable recipients. Bima's original
+enrolled device and published key remain eligible while its emulator is stopped.
+See [investigation](../measurements/matrix-secret-storage-investigation-2026-11-08.json).
+
+
+Build 60 has now exercised the deployed route through the actual Android SDK and
+inspector. In a controlled 180-second original-account emulator sample, the four
+reads were two 401 responses, one successful refresh, and two 404 responses. There
+were zero 403 responses, eleven successful syncs, and one encrypted message send
+with HTTP 200. Inspector response/transfer time for that send was 243 ms. The mobile
+retry correction separately prevents passive SDK echo changes from bypassing its
+application backoff. [Actual observed counts](../measurements/matrix-secret-storage-device-2026-11-08.json).
+
+The validated build is installed on the phone without resetting its data. This is
+not yet a measurement of phone pending latency; composer/keyboard work continues.
+
+A later release66 original-account sample retained the same live API and keys. It observed
+two default-key404 reads and zero403 over180.843 seconds, plus three encrypted sends200.
+The phone still has65 while66 installation waits for connectivity. Emulator pre-send
+latency remains6.5–8.8 seconds; this route compatibility fix does not resolve that separate
+cost. [Mobile66 evidence](https://github.com/fajarxfce/hris-mobile/blob/19748355/docs/measurements/collaboration-composer-release66-2026-11-08.json).

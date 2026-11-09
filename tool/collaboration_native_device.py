@@ -125,6 +125,26 @@ def native_diagnostic(value):
     ):
         raise ValueError("Invalid native failure frames")
     output["failureFrames"] = frames
+    storage = native.get("recentStorageFailures")
+    if storage is not None:
+        if not isinstance(storage, list) or len(storage) > 8:
+            raise ValueError("Invalid native storage diagnostics")
+        output["recentStorageFailures"] = []
+        for record in storage:
+            if not isinstance(record, dict):
+                raise ValueError("Invalid native storage diagnostic")
+            categories, storage_frames = record.get("categories"), record.get("frames")
+            if not isinstance(categories, list) or not 1 <= len(categories) <= 4 or any(
+                not isinstance(category, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$]{0,79}", category)
+                for category in categories
+            ):
+                raise ValueError("Invalid native storage categories")
+            if not isinstance(storage_frames, list) or len(storage_frames) > 6 or any(
+                not isinstance(frame, str) or len(frame) > 255 or not re.fullmatch(r"(?:dev\.fajar\.|org\.matrix\.)[A-Za-z0-9_.$]+:-?[0-9]{1,6}", frame)
+                for frame in storage_frames
+            ):
+                raise ValueError("Invalid native storage frames")
+            output["recentStorageFailures"].append({"categories": categories[:], "frames": storage_frames[:]})
     progress = value.get("progress")
     if progress is not None:
         stages = {"waiting_for_offline_peer", "creating_offline_room", "acquiring_offline_room",

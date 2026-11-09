@@ -55,6 +55,9 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
     @Autowired private lateinit var queue: CollaborationSpaceProvisioningRepository
     @Autowired private lateinit var transactions: TransactionRunner
     @Autowired private lateinit var policy: CollaborationSpacePolicy
+    @Autowired
+    private lateinit var groupProviders:
+        dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceProviderSessionRepository
 
     @Test
     fun identityReadIsPrivateMetadataAndNeverSelectsOrDisclosesPreferredDeviceOrCredentials() {
@@ -1633,6 +1636,98 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
                     Int::class.java,
                     n.fixture.account,
                 ),
+        )
+    }
+
+    @Test
+    fun defaultKeyHttpUsesTheGroupGatewayAndRejectsForeignOrOffboardedOwners() {
+        val n = groupNative()
+        // Request leases use PostgreSQL wall time; this operation must share that live clock.
+        clock.followSystemTime()
+        val base = groupBase(n)
+        val device = activeGroupFixture(n, base)
+        val space = UUID.fromString(base.substringAfterLast('/'))
+        val actor = Actor(n.fixture.account, null, emptySet(), clock.instant(), UUID.randomUUID())
+        val rotated =
+            transactions.run(actor) {
+                groupProviders.metadata(space, n.fixture.account, device).flatMap {
+                    val previous = requireNotNull(it)
+                    groupProviders.rotate(
+                        CollaborationSpaceProviderSession(
+                            previous.copy(
+                                generation = previous.generation + 1,
+                                updatedAt = clock.instant().truncatedTo(ChronoUnit.MICROS),
+                            ),
+                            "fictional-group-read-token",
+                        ),
+                        previous.generation,
+                    )
+                }
+            }
+        assertEquals(Result.Success(Unit), rotated)
+        val issued =
+            groupCall(
+                n,
+                "$base/native-device/bootstrap",
+                mapOf("deviceId" to device, "expectedDeviceVersion" to 1),
+            )
+        assertEquals(200, issued.statusCode(), issued.body())
+        val token = json.readTree(issued.body())["accessToken"].asString()
+        val ownUser =
+            database()
+                .queryForObject(
+                    "select matrix_user_id from collaboration_space_devices where id=?",
+                    String::class.java,
+                    device,
+                )!!
+        fun read(user: String) =
+            n.fixture.browser.send(
+                java.net.http.HttpRequest.newBuilder(
+                        java.net.URI(
+                            "http://127.0.0.1:$port/_matrix/client/v3/user/${java.net.URLEncoder.encode(user, java.nio.charset.StandardCharsets.UTF_8)}/account_data/m.secret_storage.default_key"
+                        )
+                    )
+                    .timeout(java.time.Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer $token")
+                    .GET()
+                    .build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString(),
+            )
+        // This configuration deliberately has an unreachable provider. A current group token
+        // must reach that read boundary; the company gateway would reject it as unknown.
+        val unavailable = read(ownUser)
+        assertEquals(503, unavailable.statusCode(), unavailable.body())
+        assertEquals("M_UNKNOWN", json.readTree(unavailable.body())["errcode"].asString())
+        val foreign = read("@foreign:matrix.example.test")
+        assertEquals(403, foreign.statusCode(), foreign.body())
+        assertEquals(
+            "collaboration_account_data_unavailable",
+            json.readTree(foreign.body())["org.hris.error_code"].asString(),
+        )
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                n.fixture.account,
+            )
+        val denied = read(ownUser)
+        assertEquals(403, denied.statusCode(), denied.body())
+        assertEquals(
+            "collaboration_access_denied",
+            json.readTree(denied.body())["org.hris.error_code"].asString(),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where account_id=?",
+                    Int::class.java,
+                    n.fixture.account,
+                ),
+        )
+        assertFalse(
+            listOf(unavailable, foreign, denied).any {
+                it.body().contains(token) || it.body().contains("fictional-group-read-token")
+            }
         )
     }
 

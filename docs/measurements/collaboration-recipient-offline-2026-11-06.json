@@ -1,0 +1,27 @@
+{
+  "at": "2026-11-06T18:20:30.545152+00:00",
+  "readOnly": true,
+  "fictionalSample": 2,
+  "bimaEmulatorStoppedAt": "2026-11-06T17:04:22.664804+00:00",
+  "existingPeerViews": [
+    {
+      "peer": 1,
+      "eligibleRecipientDevices": 1,
+      "confirmedRecipientDevices": 1,
+      "hardLifetimeRemaining": true
+    }
+  ],
+  "deviceState": {
+    "activeDevices": 1,
+    "boundHardLiveParents": 1,
+    "boundExpiredAccessParents": 1
+  },
+  "providerKeysFetched": false,
+  "messageSent": false,
+  "phoneUiDriven": false,
+  "phonePendingResolved": false,
+  "liveBackend": "10485916ee02850cf913793398f7ef3dd1e09afb",
+  "liveSchema": "116.1",
+  "sourceContract": "V114__collaboration_reserved_recipient_keys.sql",
+  "scope": "Actual existing-peer recipient view and retained device metadata; not an SDK send or provider public-key verification."
+}

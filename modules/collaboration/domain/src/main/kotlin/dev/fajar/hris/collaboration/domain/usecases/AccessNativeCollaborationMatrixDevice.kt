@@ -46,7 +46,34 @@ class AccessNativeCollaborationMatrixDevice(
     private val providerPush: CollaborationMatrixPusherRepository,
     private val nativePush: NativePushRegistrationRepository,
     private val runtimes: CollaborationLegacyRuntimeRepository,
+    private val secretStorage: CollaborationSecretStorageRepository,
 ) {
+    fun secretStorageDefaultKey(
+        token: String,
+        correlationId: UUID,
+        userId: String,
+    ): Result<CollaborationSecretStorageDefaultKey> =
+        admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ ->
+                if (userId == expectedUser(initial)) Result.Success(Unit)
+                else
+                    Result.Failed(
+                        Failure(FailureKind.FORBIDDEN, "collaboration_account_data_unavailable")
+                    )
+            },
+        ) { exchange, _ ->
+            exchange
+                .exchange { bearer, deadline -> secretStorage.defaultKey(userId, bearer, deadline) }
+                .flatMap {
+                    it?.let { key -> Result.Success(key) }
+                        ?: Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "collaboration_account_data_not_found")
+                        )
+                }
+        }
+
     fun ensurePusher(token: String, correlationId: UUID): Result<Unit> {
         if (!service.pushEnabled) return pushUnavailable()
         return admitted(
@@ -634,7 +661,15 @@ class AccessNativeCollaborationMatrixDevice(
             prepareQuery(initial, CollaborationMatrixKeyQuery(mapOf(peerUser to emptyList())))
         if (resolved is Result.Failed) return resolved
         val targets = (resolved as Result.Success).value
-        if (targets.devices.values.none { it.publicationConfirmed })
+        val ready =
+            collaborationRecipientReady(
+                initial.companyId,
+                peer,
+                clock.instant(),
+                targets.devices.values,
+            )
+        if (ready is Result.Failed) return ready
+        if (!(ready as Result.Success).value)
             return Result.Failed(
                 Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
             )

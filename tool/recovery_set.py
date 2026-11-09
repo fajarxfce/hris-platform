@@ -43,6 +43,7 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V115 retains encrypted opaque Matrix push keys bound to immutable native devices.
 # V116 retains bounded wake/lease metadata; no new encrypted envelope format.
 # V116.1 adds public summary projections and raw queues, not encrypted envelopes.
+# V116.2–4 add public readiness wake/control/revision metadata; original envelopes stay unchanged.
 # CollaborationSummaryMigrationTest verifies their real dump/restore and guards.
 # V117 adds the immutable organization communication identity and minimal directory;
 # no new encryption envelope. Its migration test restores identity, view ownership
@@ -286,7 +287,7 @@ def validate_schema(manifest):
         if type(value) not in (str, int):
             raise ValueError()
         schema = migration_version(str(value))
-        if not (59,) <= schema <= MAX_SCHEMA or (len(schema) > 1 and schema != (116, 1)):
+        if not (59,) <= schema <= MAX_SCHEMA or (len(schema) > 1 and schema not in {(116, 1), (116, 2), (116, 3), (116, 4)}):
             raise ValueError()
         return schema
     except (KeyError, TypeError, ValueError):

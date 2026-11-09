@@ -1,0 +1,185 @@
+{
+  "recordedAt": "2026-11-08T23:35:56.056763+00:00",
+  "source": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+  "package": {
+    "source": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+    "startedAt": "2026-11-08T23:30:43.607074+00:00",
+    "elapsedSeconds": 13.959,
+    "exitCode": 0,
+    "sourcesUnchanged": true,
+    "success": true,
+    "jars": {
+      "api": {
+        "path": "apps/server/build/libs/apps-server.jar",
+        "sha256": "6e6c7df1c5288ce46dd59d0e4361d1b69d7d8f846ed6c4ceebe167c4501f913b",
+        "bytes": 98862616
+      },
+      "worker": {
+        "path": "apps/worker/build/libs/apps-worker.jar",
+        "sha256": "22ea03fc9b60902a3efbcdd036657d7d2c8be7516e812dc29d96fe6c6b4e82bc",
+        "bytes": 78940069
+      }
+    }
+  },
+  "images": {
+    "api": {
+      "tag": "hris-dev-api:readiness-control-e558a686",
+      "image": "sha256:5ce02e6302e416cfce50fd4ebb4e2100642e921230420b86f9bfbaa4c271da4e",
+      "rollbackTag": "hris-dev-api:before-readiness-control-20261108T233133",
+      "artifact": {
+        "path": "apps/server/build/libs/apps-server.jar",
+        "sha256": "6e6c7df1c5288ce46dd59d0e4361d1b69d7d8f846ed6c4ceebe167c4501f913b",
+        "bytes": 98862616
+      },
+      "jarVerified": true
+    },
+    "worker": {
+      "tag": "hris-dev-worker:readiness-control-e558a686",
+      "image": "sha256:3a86bd672b6f78c497328d65cd2475cf216dd8c4caec2935dead9b683f4a16ba",
+      "rollbackTag": "hris-dev-worker:before-readiness-control-20261108T233146",
+      "artifact": {
+        "path": "apps/worker/build/libs/apps-worker.jar",
+        "sha256": "22ea03fc9b60902a3efbcdd036657d7d2c8be7516e812dc29d96fe6c6b4e82bc",
+        "bytes": 78940069
+      },
+      "jarVerified": true
+    }
+  },
+  "isolatedUpgrade": {
+    "success": true,
+    "source": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+    "liveMigrationStarted": false,
+    "beforeSchema": "116.2",
+    "afterSchema": "116.4",
+    "originalTablesPreserved": 204,
+    "originalMigrationHistoryPreserved": true,
+    "oldPublicationsBackfilled": false,
+    "restrictedRuntimeRoles": true,
+    "failedMigrations": 0,
+    "invalidConstraints": 0,
+    "hostPortsPublished": false,
+    "temporaryResourcesRemoved": true,
+    "liveServicesUnchanged": true,
+    "at": "2026-11-08T23:32:39.305009+00:00",
+    "elapsedSeconds": 19.177
+  },
+  "oldRuntime": {
+    "success": true,
+    "startedAt": "2026-11-08T23:32:51.579528+00:00",
+    "migrationSource": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+    "runtimeSources": {
+      "api": "1aea32288656d3c4e372d6950311b4c43ce5bcdc",
+      "worker": "52aaccaa45adc3647f3a7e6fb983d9d9c2a13d13"
+    },
+    "apps": {
+      "api": {
+        "image": "sha256:02b25fbbae29ded774ca774eb147a9048b25ead77051813bad9b3420c45d8e1f",
+        "started": true,
+        "restartCount": 0,
+        "databaseErrors": false
+      },
+      "worker": {
+        "image": "sha256:59885ca23e6775a84ce556347091375726f2c5562eda3e2222507a1e70fe6764",
+        "started": true,
+        "restartCount": 0,
+        "databaseErrors": false
+      }
+    },
+    "healthStatuses": [
+      200
+    ],
+    "schema": "116.4",
+    "apiHealthy": true,
+    "networkInternal": true,
+    "hostPortsPublished": false,
+    "liveServicesUnchanged": true,
+    "temporaryResourcesRemoved": true,
+    "scope": "old API/worker startup and scheduled database access on the migrated retained copy. No new publication or readiness wake is asserted. Fresh clone-only runtime passwords; outbound FCM/mail/chat delivery and external document scanner disabled and network internal. No authenticated business acceptance, no live data mutation.",
+    "elapsedSeconds": 47.602
+  },
+  "newRuntime": {
+    "success": true,
+    "startedAt": "2026-11-08T23:34:13.098696+00:00",
+    "migrationSource": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+    "runtimeSources": {
+      "api": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+      "worker": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07"
+    },
+    "apps": {
+      "api": {
+        "image": "sha256:5ce02e6302e416cfce50fd4ebb4e2100642e921230420b86f9bfbaa4c271da4e",
+        "started": true,
+        "restartCount": 0,
+        "databaseErrors": false
+      },
+      "worker": {
+        "image": "sha256:3a86bd672b6f78c497328d65cd2475cf216dd8c4caec2935dead9b683f4a16ba",
+        "started": true,
+        "restartCount": 0,
+        "databaseErrors": false
+      }
+    },
+    "healthStatuses": [
+      200
+    ],
+    "schema": "116.4",
+    "apiHealthy": true,
+    "networkInternal": true,
+    "hostPortsPublished": false,
+    "liveServicesUnchanged": true,
+    "temporaryResourcesRemoved": true,
+    "scope": "new API/worker startup and scheduled database access on the migrated retained copy. No new publication or readiness wake is asserted. Fresh clone-only runtime passwords; outbound FCM/mail/chat delivery and external document scanner disabled and network internal. No authenticated business acceptance, no live data mutation.",
+    "elapsedSeconds": 46.778
+  },
+  "plan": {
+    "at": "2026-11-08T23:35:29.231315+00:00",
+    "source": "e558a6868399058a2dcdee97acfd0e7fa7f1ef07",
+    "expectedSchemaBefore": "116.2",
+    "targetSchema": "116.4",
+    "migrationInputs": {
+      "core/database/src/main/resources/db/migration/V116_3__collaboration_readiness_controls.sql": "79082214ea527371742d623e3da52fe10ddc3e5300e88d6a49aaacbd1a5fae86",
+      "core/database/src/main/resources/db/migration/V116_4__collaboration_readiness_revisions.sql": "f598df11faf609c2b59b8a3e6911b48ce0fabb96a1f10b870815c8678e760d6c"
+    },
+    "images": {
+      "api": {
+        "tag": "hris-dev-api:readiness-control-e558a686",
+        "image": "sha256:5ce02e6302e416cfce50fd4ebb4e2100642e921230420b86f9bfbaa4c271da4e",
+        "rollbackTag": "hris-dev-api:before-readiness-control-20261108T233133",
+        "artifact": {
+          "path": "apps/server/build/libs/apps-server.jar",
+          "sha256": "6e6c7df1c5288ce46dd59d0e4361d1b69d7d8f846ed6c4ceebe167c4501f913b",
+          "bytes": 98862616
+        },
+        "jarVerified": true
+      },
+      "worker": {
+        "tag": "hris-dev-worker:readiness-control-e558a686",
+        "image": "sha256:3a86bd672b6f78c497328d65cd2475cf216dd8c4caec2935dead9b683f4a16ba",
+        "rollbackTag": "hris-dev-worker:before-readiness-control-20261108T233146",
+        "artifact": {
+          "path": "apps/worker/build/libs/apps-worker.jar",
+          "sha256": "22ea03fc9b60902a3efbcdd036657d7d2c8be7516e812dc29d96fe6c6b4e82bc",
+          "bytes": 78940069
+        },
+        "jarVerified": true
+      }
+    },
+    "overlayBeforeSha256": "666eb9d4a662920702bc6507b4491d8c24cdbf3ec49af73c723a980f004a3fdd",
+    "overlayCandidateSha256": "eb8d57796f8071ad5ea9cd90511c4fe1cda29996e0324e0059666809947cb2d7",
+    "readinessControlEnabled": false,
+    "existingFcmReadinessUnchanged": true,
+    "nativeWakeAccepted": false,
+    "rollback": "Restore both previous images/overlay; preserve the additive116.4 schema and all original jobs/keys. Isolated old-runtime compatibility has passed."
+  },
+  "onlineBackupVerified": true,
+  "liveDeploymentStarted": false,
+  "nativeWakeAccepted": false,
+  "sessionsReaped": [
+    62518,
+    45140,
+    70020,
+    34862,
+    31052
+  ],
+  "mobile": "0fb27978 product source, verified ARM64 release77;5911 root cases plus6 supplementary browser cases. Mobile2dbe604b records package evidence. No77 native installation or control delivery proof yet."
+}

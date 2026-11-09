@@ -25,6 +25,7 @@ import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatri
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomMessageRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationSecretStorageRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationPushBindingRepository
@@ -61,6 +62,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixSyncR
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationPushBindingRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationPushQueueRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationRecipientRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRoomScopeRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -5973,6 +5975,310 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun directTransportRetainsOwnedCoordinatesWithoutCreatingJobsOrProviderIo() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val event = f.pushRoom(room.parent, room.device)
+        val conversation =
+            success(
+                    f.transactions.run(f.actor) {
+                        f.roomScopes()
+                            .find(
+                                requireNotNull(f.actor.companyId),
+                                f.account,
+                                "proof.invalid",
+                                event.roomId,
+                            )
+                    }
+                )!!
+                .conversationId
+        val tables =
+            listOf("background_jobs", "operation_receipts", "audit_entries", "outbox_events")
+        val before = tables.associateWith(f::rows)
+        repeat(2) {
+            val value =
+                success(
+                    f.directTransport().execute(f.actor, room.parent, 0, room.client, conversation)
+                )
+            assertEquals(f.actor.companyId, value.companyId)
+            assertEquals(f.account, value.accountId)
+            assertEquals(room.parent, value.nativeSessionId)
+            assertEquals(room.device, value.deviceId)
+            assertEquals(1L, value.deviceVersion)
+            assertEquals(event.roomId, value.matrixRoomId)
+            assertFalse(value.recipientReady)
+            assertEquals(conversation, value.conversationId)
+            assertTrue(f.account in setOf(value.firstAccountId, value.secondAccountId))
+        }
+        assertEquals(before, tables.associateWith(f::rows))
+        assertEquals(
+            "collaboration_room_not_ready",
+            failed(
+                f.directTransport().execute(f.actor, room.parent, 0, room.client, room.conversation)
+            ),
+        )
+    }
+
+    @Test
+    fun directTransportDistinguishesUnpublishedOfflineAndRevokedRecipient() {
+        val q = KeyQueryFixture(published = false, paired = false)
+        val f = q.upload.g.f
+        val parent = q.upload.g.parent
+        val device = q.upload.g.device
+        val event = f.pushRoom(parent, device, q.peer)
+        val conversation =
+            success(
+                    f.transactions.run(f.actor) {
+                        f.roomScopes().find(q.company, f.account, "proof.invalid", event.roomId)
+                    }
+                )!!
+                .conversationId
+        fun read() =
+            success(
+                f.directTransport()
+                    .execute(
+                        f.actor,
+                        parent,
+                        0,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                        conversation,
+                    )
+            )
+        assertFalse(read().recipientReady)
+        sql.update(
+            "update collaboration_device_key_publications set version=1,published_at=now() where company_id=? and device_id=?",
+            q.company,
+            q.peerDevice,
+        )
+        sql.update(
+            "update native_sessions set access_expires_at=now()-interval '1 hour',mfa_verified_at=null where id=?",
+            q.peerParent,
+        )
+        assertTrue(read().recipientReady)
+        sql.update(
+            "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+            q.peerParent,
+        )
+        assertFalse(read().recipientReady)
+        assertEquals(0, q.roomSendCalls.get())
+    }
+
+    @Test
+    fun directTransportPreservesRecipientReadFailureAndRechecksCallerAtCompletion() {
+        for (mode in listOf("failure", "lateSuccess", "lateFailure", "interrupt")) {
+            val room = DirectRoomFixture()
+            val f = room.f
+            val event = f.pushRoom(room.parent, room.device)
+            val conversation =
+                success(
+                        f.transactions.run(f.actor) {
+                            f.roomScopes()
+                                .find(
+                                    requireNotNull(f.actor.companyId),
+                                    f.account,
+                                    "proof.invalid",
+                                    event.roomId,
+                                )
+                        }
+                    )!!
+                    .conversationId
+            val unavailable =
+                Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_recipient_storage"))
+            val recipients =
+                object : CollaborationRecipientRepository {
+                    override fun devices(
+                        companyId: UUID,
+                        accountIds: Set<UUID>,
+                        at: Instant,
+                    ): Result<List<CollaborationRecipientDevice>> {
+                        if (mode == "interrupt")
+                            throw InterruptedException("fixture recipient cancellation")
+                        if (mode.startsWith("late")) f.clock.at = f.clock.at.plusSeconds(901)
+                        return if (mode == "lateSuccess") Result.Success(emptyList())
+                        else unavailable
+                    }
+                }
+            val command = f.directTransport(recipients = recipients)
+            if (mode == "interrupt") {
+                try {
+                    assertThrows(InterruptedException::class.java) {
+                        command.execute(f.actor, room.parent, 0, room.client, conversation)
+                    }
+                } finally {
+                    Thread.interrupted()
+                }
+            } else
+                assertEquals(
+                    if (mode == "failure") "fixture_recipient_storage"
+                    else "native_session_invalid",
+                    failed(command.execute(f.actor, room.parent, 0, room.client, conversation)),
+                )
+        }
+    }
+
+    @Test
+    fun directTransportRejectsSubstitutedDeviceOwnershipAndPlatform() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val original =
+            success(
+                f.transactions.run(f.actor) {
+                    f.registry.findBound(requireNotNull(f.actor.companyId), f.account, room.parent)
+                }
+            )!!
+        val changed =
+            listOf(
+                original.copy(companyId = UUID.randomUUID()),
+                original.copy(accountId = UUID.randomUUID()),
+                original.copy(nativeSessionId = UUID.randomUUID()),
+                original.copy(platform = CollaborationPlatform.IOS),
+                original.copy(state = CollaborationDeviceState.PROVISIONING),
+                original.copy(state = CollaborationDeviceState.REVOKED),
+                original.copy(revokedAt = f.clock.at),
+            )
+        for (device in changed) {
+            val registry =
+                object : CollaborationRegistryRepository by f.registry {
+                    override fun findBound(
+                        companyId: UUID,
+                        accountId: UUID,
+                        nativeSessionId: UUID,
+                    ): Result<CollaborationDevice?> = Result.Success(device)
+                }
+            assertEquals(
+                "collaboration_device_unavailable",
+                failed(
+                    f.directTransport(registry = registry)
+                        .execute(f.actor, room.parent, 0, room.client, room.conversation)
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun directTransportRechecksExpiryAfterMissingAndFailedAcquisition() {
+        for (failRead in listOf(false, true)) {
+            val room = DirectRoomFixture()
+            val f = room.f
+            val rooms =
+                object : CollaborationDirectRoomRepository by f.directRooms {
+                    override fun binding(
+                        companyId: UUID,
+                        conversationId: UUID,
+                    ): Result<CollaborationDirectRoomBinding?> {
+                        f.clock.at = f.clock.at.plusSeconds(901)
+                        return if (failRead)
+                            Result.Failed(
+                                Failure(FailureKind.UNAVAILABLE, "fixture_storage_unavailable")
+                            )
+                        else Result.Success(null)
+                    }
+                }
+            assertEquals(
+                "native_session_invalid",
+                failed(
+                    f.directTransport(rooms = rooms)
+                        .execute(f.actor, room.parent, 0, room.client, room.conversation)
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun directTransportRejectsForeignOrMismatchedPublishedRoomAndLateSuccess() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val event = f.pushRoom(room.parent, room.device)
+        val conversation =
+            success(
+                    f.transactions.run(f.actor) {
+                        f.roomScopes()
+                            .find(
+                                requireNotNull(f.actor.companyId),
+                                f.account,
+                                "proof.invalid",
+                                event.roomId,
+                            )
+                    }
+                )!!
+                .conversationId
+        val original =
+            success(
+                f.transactions.run(f.actor) {
+                    f.directRooms.binding(requireNotNull(f.actor.companyId), conversation)
+                }
+            )!!
+        val changed =
+            listOf(
+                original.copy(companyId = UUID.randomUUID()),
+                original.copy(conversationId = UUID.randomUUID()),
+                original.copy(accountId = UUID.randomUUID()),
+                original.copy(jobId = UUID.randomUUID()),
+                original.copy(provisioningVersion = original.provisioningVersion + 1),
+                original.copy(matrixServerName = "foreign.invalid"),
+                original.copy(matrixRoomId = "invalid"),
+                original.copy(matrixRoomId = "!line\n"),
+                original.copy(matrixRoomId = "!" + "x".repeat(255)),
+            )
+        for (binding in changed) {
+            val rooms =
+                object : CollaborationDirectRoomRepository by f.directRooms {
+                    override fun binding(
+                        companyId: UUID,
+                        conversationId: UUID,
+                    ): Result<CollaborationDirectRoomBinding?> = Result.Success(binding)
+                }
+            assertEquals(
+                "collaboration_room_provisioning_changed",
+                failed(
+                    f.directTransport(rooms = rooms)
+                        .execute(f.actor, room.parent, 0, room.client, conversation)
+                ),
+            )
+        }
+        val late =
+            object : CollaborationDirectRoomRepository by f.directRooms {
+                override fun binding(
+                    companyId: UUID,
+                    conversationId: UUID,
+                ): Result<CollaborationDirectRoomBinding?> {
+                    f.clock.at = f.clock.at.plusSeconds(901)
+                    return Result.Success(original)
+                }
+            }
+        assertEquals(
+            "native_session_invalid",
+            failed(
+                f.directTransport(rooms = late)
+                    .execute(f.actor, room.parent, 0, room.client, conversation)
+            ),
+        )
+    }
+
+    @Test
+    fun directTransportPropagatesInterruptedAcquisition() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val rooms =
+            object : CollaborationDirectRoomRepository by f.directRooms {
+                override fun binding(
+                    companyId: UUID,
+                    conversationId: UUID,
+                ): Result<CollaborationDirectRoomBinding?> =
+                    throw InterruptedException("fixture transport cancellation")
+            }
+        try {
+            assertThrows(InterruptedException::class.java) {
+                f.directTransport(rooms = rooms)
+                    .execute(f.actor, room.parent, 0, room.client, room.conversation)
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(0, f.rows("collaboration_direct_room_bindings"))
+    }
+
+    @Test
     fun directRoomWorkerRecoversLostCreateResponseWithoutDuplicateRoomOrLogout() {
         val room = DirectRoomFixture()
         success(room.request())
@@ -7701,6 +8007,28 @@ class NativeCollaborationRegistrationTest {
                 clock,
             )
 
+        fun directTransport(
+            rooms: CollaborationDirectRoomRepository = directRooms,
+            registry: CollaborationRegistryRepository = this.registry,
+            recipients: CollaborationRecipientRepository = this.recipients,
+        ) =
+            ReadNativeCollaborationDirectTransport(
+                direct,
+                rooms,
+                registry,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
+                clock,
+                recipients,
+            )
+
         fun roomStatus(rooms: CollaborationDirectRoomRepository = directRooms) =
             GetNativeCollaborationDirectRoomStatus(
                 direct,
@@ -7954,6 +8282,7 @@ class NativeCollaborationRegistrationTest {
                 providerPush,
                 nativePush,
                 runtimes,
+                DisabledCollaborationSecretStorageRepository(),
             )
 
         fun freezeRuntime(owner: CollaborationLegacyRuntimeOwner, fingerprint: String) {
@@ -8046,9 +8375,12 @@ class NativeCollaborationRegistrationTest {
                 push,
             )
 
-        fun pushRoom(parent: UUID, device: UUID): CollaborationPushEvent {
+        fun pushRoom(
+            parent: UUID,
+            device: UUID,
+            peer: UUID = peer("Fictional push peer"),
+        ): CollaborationPushEvent {
             val client = ClientVersion(ClientPlatform.ANDROID, 1)
-            val peer = peer("Fictional push peer")
             val conversation =
                 success(openDirect().execute(actor, parent, 0, client, UUID.randomUUID(), peer)).id
             success(

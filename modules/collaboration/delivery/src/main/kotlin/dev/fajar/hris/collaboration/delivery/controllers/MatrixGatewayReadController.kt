@@ -24,6 +24,20 @@ class MatrixGatewayReadController(
     private val service: CollaborationServicePolicy,
     private val provider: CollaborationMatrixPolicy,
 ) {
+    @GetMapping("/_matrix/client/v3/user/{userId}/account_data/m.secret_storage.default_key")
+    fun secretStorageDefaultKey(
+        @PathVariable userId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        read(request) { token, correlation ->
+            (if (validCollaborationSpaceGatewayAccess(token))
+                    group.secretStorageDefaultKey(token, correlation, userId)
+                else device.secretStorageDefaultKey(token, correlation, userId))
+                .map { value ->
+                    value.keyId?.let { mapOf("key" to it) } ?: emptyMap<String, String>()
+                }
+        }
+
     @GetMapping("/_matrix/client/v3/user/{userId}/account_data/m.direct")
     fun directMetadata(
         @PathVariable userId: String,

@@ -29,6 +29,139 @@ class NativeCollaborationSpaceGatewayAccessTest {
     val postgres = PostgreSQLContainer(requireNotNull(System.getProperty("hris.postgres.image")))
 
     @Test
+    fun ownDefaultKeyReadPreservesAbsentEmptyAndPresentWithoutChangingPrivateProvenance() {
+        val f = Fixture()
+        val before = f.provenance()
+        var calls = 0
+        var outcome: CollaborationSecretStorageDefaultKey? = null
+        val provider =
+            object : CollaborationSecretStorageRepository {
+                override fun defaultKey(
+                    userId: String,
+                    bearer: String,
+                    deadline: Instant,
+                ): Result<CollaborationSecretStorageDefaultKey?> {
+                    calls++
+                    assertEquals(f.identity.userId, userId)
+                    assertEquals("fictional-provider-token", bearer)
+                    assertFalse(TransactionSynchronizationManager.isActualTransactionActive())
+                    assertEquals(1, f.leases())
+                    assertTrue(deadline <= Instant.now().plusSeconds(30))
+                    return Result.Success(outcome)
+                }
+            }
+        val command = f.command(secretStorage = provider)
+        val correlation = UUID.randomUUID()
+        failure(
+            command.secretStorageDefaultKey(
+                f.tokens.accessToken,
+                correlation,
+                "@foreign:matrix.example.test",
+            ),
+            "collaboration_account_data_unavailable",
+        )
+        assertEquals(0, calls)
+        failure(
+            command.secretStorageDefaultKey(f.tokens.accessToken, correlation, f.identity.userId),
+            "collaboration_account_data_not_found",
+        )
+        for (value in
+            listOf(
+                CollaborationSecretStorageDefaultKey(null),
+                CollaborationSecretStorageDefaultKey("existing-key"),
+            )) {
+            outcome = value
+            assertEquals(
+                value,
+                success(
+                    command.secretStorageDefaultKey(
+                        f.tokens.accessToken,
+                        correlation,
+                        f.identity.userId,
+                    )
+                ),
+            )
+        }
+        assertEquals(3, calls)
+        assertEquals(0, f.calls.get())
+        assertEquals(0, f.leases())
+        assertEquals(before, f.provenance())
+    }
+
+    @Test
+    fun defaultKeyReadRechecksCurrentDenialOnBothProviderOutcomes() {
+        val f = Fixture()
+        var calls = 0
+        for (succeeds in listOf(false, true)) {
+            var denied = false
+            val spaces =
+                object : CollaborationSpaceRepository by f.base.spaces {
+                    override fun current(): Result<UUID?> =
+                        if (denied) Result.Success(null) else f.base.spaces.current()
+                }
+            val provider =
+                object : CollaborationSecretStorageRepository {
+                    override fun defaultKey(
+                        userId: String,
+                        bearer: String,
+                        deadline: Instant,
+                    ): Result<CollaborationSecretStorageDefaultKey?> {
+                        calls++
+                        denied = true
+                        return if (succeeds)
+                            Result.Success(CollaborationSecretStorageDefaultKey("withheld"))
+                        else
+                            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_down"))
+                    }
+                }
+            failure(
+                f.command(spaces = spaces, secretStorage = provider)
+                    .secretStorageDefaultKey(
+                        f.tokens.accessToken,
+                        UUID.randomUUID(),
+                        f.identity.userId,
+                    ),
+                "collaboration_access_denied",
+            )
+            assertEquals(0, f.leases())
+        }
+        assertEquals(2, calls)
+    }
+
+    @Test
+    fun cancelledOrLateDefaultKeyReadsReleaseTheExactRequestAndNeverReplaceKeys() {
+        val f = Fixture()
+        val before = f.provenance()
+        for (cancel in listOf(true, false)) {
+            val clock = OffsetClock()
+            val provider =
+                object : CollaborationSecretStorageRepository {
+                    override fun defaultKey(
+                        userId: String,
+                        bearer: String,
+                        deadline: Instant,
+                    ): Result<CollaborationSecretStorageDefaultKey?> {
+                        if (cancel) throw CancellationException("fixture cancellation")
+                        clock.seconds = 30
+                        return Result.Success(CollaborationSecretStorageDefaultKey("late-key"))
+                    }
+                }
+            val command = f.command(clock = clock, secretStorage = provider)
+            val read = {
+                command.secretStorageDefaultKey(
+                    f.tokens.accessToken,
+                    UUID.randomUUID(),
+                    f.identity.userId,
+                )
+            }
+            if (cancel) assertThrows(CancellationException::class.java) { read() }
+            else failure(read(), "collaboration_admission_changed")
+            assertEquals(0, f.leases())
+            assertEquals(before, f.provenance())
+        }
+    }
+
+    @Test
     fun exactGroupIdentityUsesOneOwnedRequestOutsideSqlAndCapabilitiesNeverDecrypt() {
         val f = Fixture()
         val snapshot = f.provenance()
@@ -405,6 +538,8 @@ class NativeCollaborationSpaceGatewayAccessTest {
             spaces: CollaborationSpaceRepository = base.spaces,
             policy: CollaborationSpacePolicy = CollaborationSpacePolicy(true, 5, 5),
             clock: Clock = Clock.systemUTC(),
+            secretStorage: CollaborationSecretStorageRepository =
+                DisabledCollaborationSecretStorageRepository(),
         ) =
             AccessNativeCollaborationSpaceMatrixDevice(
                 s.repo,
@@ -455,6 +590,7 @@ class NativeCollaborationSpaceGatewayAccessTest {
                         .PostgresNativePushRegistrationDataSource(base.sql),
                     JceIdentityTokenDataSource(s.currentKeys),
                 ),
+                secretStorage = secretStorage,
             )
 
         fun access(

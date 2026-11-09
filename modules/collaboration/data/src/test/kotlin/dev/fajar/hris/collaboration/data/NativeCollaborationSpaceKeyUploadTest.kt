@@ -624,6 +624,7 @@ class NativeCollaborationSpaceKeyUploadTest {
                         .PostgresNativePushRegistrationDataSource(base.sql),
                     JceIdentityTokenDataSource(s.currentKeys),
                 ),
+                secretStorage = DisabledCollaborationSecretStorageRepository(),
             )
 
         fun upload(

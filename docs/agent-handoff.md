@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 18:10 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 18:19 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -24,20 +24,33 @@ the same existing transaction, with timestamps from database completion. Fresh S
 devices still publish through their SDK; empty keys/upload stays counts-only. No
 extra Mobile endpoint, token refresh, SDK7, migration or readiness relaxation.
 
-Three Kotlin files currently change: worker use case, shared constructor DI, and
-CollaborationSpaceWorkerPublicationTest. [Contract](collaboration/space-original-key-publication.md)
-is unaccepted work in progress. Private `.work/space-original-key-publication-2026-11-09`:
+Six Kotlin files currently change: worker use case, repository contract, shared
+constructor DI, worker publication tests and two native fixture files.
+[Contract](collaboration/space-original-key-publication.md) is not fully accepted yet.
+Private `.work/space-original-key-publication-2026-11-09`:
 - red-1 /30751 REAPED FAILED22.365s before tests: fixture passed DSLContext instead
   of PostgresCollaborationSpaceKeyDataSource. Production remained unchanged.
 - red-2 /96766 REAPED EXPECTED FAILURE37.844s:one test,missing group publication.
-- focused-1 /97011 RUNNING: original/fresh activation,rollback at key write/readback/
-  journal boundaries,competing workers,late admission,and actual Synapse continuity;
-  API/worker compilation and quality. Freeze source until reaped.
-- `native-prepared` has TWO private fixture candidates, not applied. They remove the
-  old explicit keys/upload and assert worker-confirmed publication before bootstrap.
-  Apply only after checking its manifest against unchanged current fixture files.
-- Shared DI requires FULL API and worker contexts,not just the compilation above.
-  Native proof follows on unchanged Mobilea14eea78 source/accepted SDK6 proof APK.
+- focused-1 /97011 REAPED PASS164.148s:11 cases,zero failures/errors/skips,
+  original/fresh activation,36 write-boundary rollback variants,competing workers,
+  late admission,and actual Synapse continuity; API/worker compilation/quality pass.
+- TWO native fixtures are now applied after their original hashes were verified.
+  They remove explicit keys/upload and assert the worker publication before bootstrap.
+- source-1 /29647 REAPED PASS31.698s:compile/format/architecture,8,698 stable inputs.
+- native-1 /71915 REAPED PASS139.231s:one actual Android SDK6 case,zero failures/errors/
+  skips. Worker activation suffices; original messages survive process loss,exactly
+  two encrypted provider events,and final offline read. Ten native requests retain
+  two bootstrap/two direct reads. Unchanged proof APK/Mobile source. Emulator stopped.
+- full-1 /62503 RUNNING:complete domain; seven relevant SQL/provider classes,delivery,
+  six native API/OpenAPI classes and FULL unfiltered apps:worker:test,plus quality.
+  Freeze Group source until reaped. This validates shared DI runtime contexts.
+- accept.py is prepared but has NOT run. Audit exact source/XML/native behavior after
+  full completion,then commit implementation/tests/docs. No source acceptance yet.
+
+Next independent work is organization readiness controls,then background ownership
+and product routing. The company control cannot be reused with a space UUID. Any
+private successor preparation must stay outside the frozen source tree until62503
+finishes. No Mobile build,SDK7,live change or phone install follows from this gate.
 
 RETIRED explicit-confirmation approach:9 Group and22 Mobile unaccepted Kotlin files
 are archived in each checkout's `.work/space-original-key-confirmation-2026-11-09/retired-*`.

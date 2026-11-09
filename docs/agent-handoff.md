@@ -1,12 +1,12 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 12:11 UTC. Previous checkpoints remain in
+Updated 9 November 2026, 12:36 UTC. Previous checkpoints remain in
 [Git at 1c0cb482](https://github.com/fajarxfce/hris-platform/blob/1c0cb482/docs/agent-handoff.md).
 Use this file for current state; older active-job instructions are historical.
 
 ## Current continuation
 
-The current detailed checkpoint is [Mobile at ff1adeca](https://github.com/fajarxfce/hris-mobile/blob/ff1adeca/docs/agent-handoff.md).
+The current detailed checkpoint is [Mobile at a06b3370](https://github.com/fajarxfce/hris-mobile/blob/a06b3370/docs/agent-handoff.md).
 Do not resume the superseded active-job instructions from this file's earlier Git versions.
 The user authorized the whole communications plan, atomic commits/pushes, and validated
 phone installations. All54 communications acceptance groups remain open.
@@ -29,12 +29,14 @@ any original or send Draft66. All native jobs are stopped/reaped. Phone install3
 passes210.86s with exact installed digest and existing app identity; no UI launch,
 uninstall or data clear. Native84 and interrupted/resumed86 failures remain preserved.
 
-The sole local compiler is now Mobile original-reference focused16289, with its app
-and Inspector inputs frozen until reaped. It contains seven uncommitted typed DTO/
-policy/test changes matching the newly accepted backend reference. Full gate and
-immutable encrypted binding persistence remain pending. Root Mobile and isolated
-public-CI worktrees remain distinct; check ownership before another heavy build/emulator.
-Do not kill the live API/worker JVMs.
+Mobile's typed original-reference5b63b498 is accepted/pushed:49 focused and4,162
+fresh full cases pass, no failures/errors/skips/lint; full89590 is reaped536.843s.
+CI integration57ebc77a is accepted/pushed after66 fresh focused cases in100.523s.
+The only current compiler is Mobile encrypted-binding focused82526. Its11 new/
+modified source files remain unaccepted and frozen through the gate. Storage keeps
+exact immutable conversation/room/original metadata, with atomic encrypted indexes.
+No owning acquisition, SDK delivery, queue, route or live change is made yet. Do not
+start another compiler/emulator; do not kill the live API/worker JVMs.
 
 Inspector publicSDK6 source742a2d1 passes226 portable/Android host and69 Apple simulator
 cases with verified artifacts. Mobile's first public consumer Apple job passes1777 cases
@@ -44,10 +46,16 @@ notification navigation test races are corrected with explicit observable comple
 focused checks pass. A previous desktop abort remains unclassified; bounded native
 diagnostics are retained. Fifth verify42604884828 failed two fixture assertions; first correction failed
 locally and sixth42609635524 was cancelled. Corrected21101489 passes66 focused cases;
-seventh42611795210/job129141795434 remains active. Web42599865437
-passes the optimized distribution; both artifact digests and26 web file hashes are
-verified. Earlier runner shutdowns remain unexplained. CI worktree21101489 records
-precise evidence. No distribution workflow was dispatched. Starter follows Mobile proof.
+seventh42611795210 is SUCCESS at21101489. Artifact13672363171 was audited:
+7,950 cases (5,429 desktop,1,912 browser,599 Android host,10 build-logic), zero
+failures/errors/skips/lint; three APKs and393-component SBOM hashed. Audit30078 is
+reaped. Root Mobile integration57ebc77a carries the exact verified source/evidence.
+Web42599865437 separately passes optimized distribution with26 verified web files.
+Earlier runner shutdowns remain unexplained. No distribution workflow was dispatched.
+Starter's generic portffd0ac5 is accepted/pushed: full88319 REAPED PASS188.590s,
+62 fresh actual browser cases, fixed1,052 app/49 library inputs, root/Android/web/
+iOS source/strict SBOM/quality pass. Lint0errors/45 existing advisories;366 SBOM
+components and three APKs/26 web files verified. No hosted Starter dispatch.
 
 Live platform remains e558a6868399058a2dcdee97acfd0e7fa7f1ef07/schema116.4/controlON.
 Crashlytics IAM works. Group source8d5724e2 is pushed in the separate communication-space
@@ -55,16 +63,15 @@ worktree. Its exact published original-room reference passes266 fresh cases in51
 with8,637 fixed inputs, no failures/errors/skips, and format/architecture checks. Native
 admission, actual LEGACY worker publication and HTTP/OpenAPI pass; shared DI is
 unchanged and the full worker application suite was not rerun. No live/schema change; V117–138 and group routing are NOT deployed or present in original Platform.
-Starter6157db1 generic worker/identity ports are pushed. Inspector original f8ca3d6 integrates verified public SDK6; isolated a6b8236 retains
+Starterffd0ac5 includes the prior accepted generic worker/identity ports. Inspector original f8ca3d6 integrates verified public SDK6; isolated a6b8236 retains
 its unrelated gradlew.bat delta.
 
 ## Next implementation
 
 1. Native87/phone87 are accepted. Continue measured latency/startup work, preserving
    all eight originals and the exact accepted source/artifact records.
-2. Finish public application CI, retaining original failures and verifying actual
-   reports. Integrate the verified inspector/consumer setup after Mobile inputs unfreeze,
-   then port generic changes to Starter.
+2. Public consumer integration and the generic Starter port are accepted. Preserve
+   exact evidence and historical failures; do not repeat the same successful graph.
 3. Resume organization chat. Backend work is in .worktrees/communication-space,
    including V117–138; the original Platform checkout does not contain those migrations.
    Mobile4e7be081 accepts bounded original Room dispatch:76 focused,5,963 full and74

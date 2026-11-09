@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 14:54 UTC. Historical detail remains in
+Updated 9 November 2026, 15:34 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -29,20 +29,21 @@ The Group checkout already has the equivalent allowlist with its separate138 bou
 do not replace that bound with this branch's116.4 limit.
 
 Group `/home/fajar/hris/.worktrees/communication-space`, feat/communication-space,
-is merging Root4d4df31f into bf6e176a (base8bad394e). Eight textual conflicts were
-resolved, preserving company runtime/readiness/default-key fixes and group behavior.
-It is NOT COMMITTED or DEPLOYED. Focused49700 passed207 domain/data cases but failed
+accepts merge fa90ddcc of Root4d4df31f into bf6e176a (base8bad394e). It is committed
+and pushed;34015 is reaped. Eight textual conflicts preserve company runtime/readiness/
+default-key fixes and group behavior. It is NOT DEPLOYED. Focused49700 passed207 domain/data cases but failed
 API test compilation: five group-only fixture calls retained a renamed method. Those
 calls now use the merged accountData fixture with the same m.direct default.
 Focused67950 then failed one HTTP case because its frozen fixture clock preceded the
 actual PostgreSQL request-lease start. Only that real-provider fixture now follows
 system time; admission and the expected503 response remain unchanged. Corrected24065
-passes both HTTP cases in75.409s. Full33511 is RUNNING on8,686 frozen inputs and is the
-only heavy local job. Its completed database138 and domain189 cases have no failures,
-errors or skips; data/API/FULL worker and remaining quality checks must finish before
-accepting or committing the merge. Private evidence is in the Group checkout's
-`.work/space-root-reconciliation-2026-11-09`; the prepared publisher requires final
-success and exact source/XML hashes. Do not reset or restart the merge.
+passes both HTTP cases in75.409s. Full33511 is REAPED PASS5,607.828s on8,686 unchanged
+inputs:1,444 fresh cases, zero failures/errors and one existing elapsed-retention opt-in
+skip. Database138/domain189/data762/delivery25/API180/FULL worker150 and quality/
+migration/recovery checks pass. Archived fresh XML, both readiness worker contexts,
+all new default-key/isolation regressions and exact hashes are audited in Group
+`docs/measurements/collaboration-root-source-reconciliation-2026-11-09.json`. Do not
+reset, repeat or redeploy this accepted source merge.
 
 Mobile feat/chat-send-timing-20261107 now has accepted/pushed78076d4e: owning published
 room binding preparation. It first reads owned immutable local metadata; only absence
@@ -60,13 +61,20 @@ This is separate from APNs/calling, native SDK6 Matrix delivery and signed distr
 The [latest Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
 is authoritative for subsequent transitions; do not redispatch this accepted CI run.
 
-A finite group direct-transport read is drafted next: Mobile has13 uncommitted Kotlin
-files/eight transport methods; Group has11 private unapplied files, seven SQL methods,
-three pure policy methods and HTTP/OpenAPI/DI changes. Format only has passed so far;
-neither implementation is compiled or accepted. The Group private apply/check scripts
-must verify the accepted merge and base hashes first. Device origin stays separate from
-user origin; a new crypto device may retain an original identity/room. Owning SDK
-delivery, durable receipt reconciliation and group readiness wake are still required.
+The finite Group direct-transport candidate is now applied after exact accepted/base
+checks. Eleven Kotlin files include seven SQL and three pure policy cases, HTTP/OpenAPI
+and shared DI. Full38552 is the only heavy local job and remains RUNNING. Its first
+compile attempt found two fixture errors: the repository override parameter must be
+named id, and the Native fixture is not a data class with copy(). Two test-only
+corrections are prepared privately and formatted1.774s; do not change its frozen source
+until reaped. Full worker is still running under --continue. Preserve this failure;
+actual new SQL/API execution remains required after the correction.
+
+Mobile has13 uncompiled transport files/eight methods. Its private original follow-up
+now has seven files/ten pure methods for matching and exact journal/archive ACK facts,
+formatted0.917s only; no owning delivery implementation or runtime activation. Device
+origin stays separate from user origin. Current direct contracts must pass before
+applying that follow-up. Latest Mobile checkpoint deb8ba1f is pushed.
 
 ## Accepted runtime and device state
 
@@ -97,9 +105,11 @@ Web/iOS-source/quality/SBOM and62 fresh browser tests; no Starter hosted distrib
 
 ## Next work
 
-1. Reap/audit Group full33511, then commit/push the accepted source reconciliation.
-   Hosted Mobile42628449460 is already accepted; continue the pending direct-transport
-   increment and required API/FULL worker/Mobile checks after that merge.
+1. Reap Group direct-transport full38552, preserve its fixture compile failures, apply
+   only the prepared exact test corrections and complete the missing SQL/API checks.
+   Validate shared production inputs against the full worker result before acceptance.
+   Then validate Mobile transport. Reconciliation fa90ddcc and hosted Mobile42628449460
+   are already accepted; do not rerun them.
 2. Continue owning original SDK delivery/history, recipient readiness, background
    ownership and group product routing. Room Prepare/Resolve/Replay, exact original
    references and encrypted binding preparation are accepted; do not recreate them.

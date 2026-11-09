@@ -11,11 +11,16 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-/** Current target guards own acknowledgement; Matrix I/O never runs inside a transaction. */
-class FanOutCollaborationSpaceReadinessControl(
+/**
+ * One current-target guard owner for independent readiness channels. Matrix sends outside SQL; PUSH
+ * atomically hands off to the existing FCM queue, whose worker owns actual delivery.
+ */
+class FanOutCollaborationSpaceReadiness(
     private val queue: CollaborationSpaceReadinessQueueRepository,
     private val providers: CollaborationSpaceProviderSessionRepository,
     private val transport: CollaborationSpaceMatrixReadinessRepository,
+    private val pushBindings: CollaborationSpacePushBindingRepository,
+    private val pushQueue: CollaborationSpacePushQueueRepository,
     private val registry: CollaborationSpaceDeviceRepository,
     private val gateway: CollaborationSpaceGatewaySessionRepository,
     private val keys: CollaborationSpaceKeyRepository,
@@ -32,11 +37,15 @@ class FanOutCollaborationSpaceReadinessControl(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
-    fun claim(owner: UUID, limit: Int): Result<List<CollaborationSpaceReadinessLease>> {
-        if (!enabled()) return Result.Success(emptyList())
+    fun claim(
+        channel: CollaborationSpaceReadinessChannel,
+        owner: UUID,
+        limit: Int,
+    ): Result<List<CollaborationSpaceReadinessLease>> {
+        if (!enabled(channel)) return Result.Success(emptyList())
         if (owner == UUID(0, 0) || limit !in 1..4) return lost()
         return transactions.run(actor(UUID(0, 0))) {
-            queue.claim(CollaborationSpaceReadinessChannel.MATRIX, owner, limit).flatMap { leases ->
+            queue.claim(channel, owner, limit).flatMap { leases ->
                 if (
                     leases.size > limit ||
                         leases.map { it.eventId }.distinct().size != leases.size ||
@@ -44,7 +53,7 @@ class FanOutCollaborationSpaceReadinessControl(
                         leases.any {
                             !validCollaborationSpaceReadinessLease(it) ||
                                 it.ownerId != owner ||
-                                it.channel != CollaborationSpaceReadinessChannel.MATRIX ||
+                                it.channel != channel ||
                                 it.until <= clock.instant() ||
                                 it.until > clock.instant().plusSeconds(60)
                         }
@@ -56,14 +65,10 @@ class FanOutCollaborationSpaceReadinessControl(
     }
 
     fun fanOut(lease: CollaborationSpaceReadinessLease): Result<Unit> {
-        if (!enabled()) return unavailable()
-        if (
-            !validCollaborationSpaceReadinessLease(lease) ||
-                lease.channel != CollaborationSpaceReadinessChannel.MATRIX
-        )
-            return lost()
+        if (!enabled(lease.channel)) return unavailable()
+        if (!validCollaborationSpaceReadinessLease(lease)) return lost()
         val started = clock.instant()
-        val budget = Budget(started, minOf(started.plusSeconds(20), lease.until))
+        val budget = Budget(started, minOf(started.plusSeconds(20), lease.until), lease.channel)
         val page =
             step(budget) {
                 transactions.run(actor(lease.publisherAccountId)) {
@@ -103,6 +108,41 @@ class FanOutCollaborationSpaceReadinessControl(
         var checkpoint = initial
         for (target in targets) {
             val expected = checkpoint
+            if (lease.channel == CollaborationSpaceReadinessChannel.PUSH) {
+                val handedOff =
+                    withTarget(expected, target, budget) { admission ->
+                        if (admission == null) return@withTarget advance(expected, target)
+                        step(budget) {
+                                pushBindings.find(
+                                    lease.spaceId,
+                                    target.position.accountId,
+                                    target.position.deviceId,
+                                )
+                            }
+                            .flatMap { binding ->
+                                val lifetime =
+                                    collaborationSpaceReadinessPushLifetime(
+                                        expected,
+                                        admission,
+                                        binding,
+                                        clock.instant(),
+                                    )
+                                if (lifetime == null) advance(expected, target)
+                                else
+                                    step(budget) {
+                                            pushQueue.append(
+                                                requireNotNull(binding),
+                                                null,
+                                                lifetime,
+                                            )
+                                        }
+                                        .flatMap { advance(expected, target) }
+                            }
+                    }
+                if (handedOff is Result.Failed) return handedOff
+                checkpoint = expected.copy(after = target.position, attempts = 0)
+                continue
+            }
             val prepared =
                 withTarget(expected, target, budget) { admission ->
                     if (admission == null)
@@ -145,7 +185,7 @@ class FanOutCollaborationSpaceReadinessControl(
                             expected.publicationRevision,
                         )
                     val sent =
-                        step(Budget(budget.started, deadline)) {
+                        step(Budget(budget.started, deadline, budget.channel)) {
                             transport.send(
                                 control,
                                 ready.admission.owner,
@@ -346,20 +386,34 @@ class FanOutCollaborationSpaceReadinessControl(
     private fun actor(account: UUID) =
         Actor(account, null, emptySet(), clock.instant(), UUID.randomUUID())
 
-    private fun enabled() = service.enabled && policy.enabled && provider.enabled
+    private fun enabled(channel: CollaborationSpaceReadinessChannel) =
+        service.enabled &&
+            policy.enabled &&
+            provider.enabled &&
+            (channel != CollaborationSpaceReadinessChannel.PUSH || service.pushEnabled)
 
-    private class Budget(val started: Instant, val deadline: Instant)
+    private class Budget(
+        val started: Instant,
+        val deadline: Instant,
+        val channel: CollaborationSpaceReadinessChannel,
+    )
 
     private fun <T> step(budget: Budget, operation: () -> Result<T>): Result<T> {
         if (Thread.currentThread().isInterrupted)
             throw InterruptedException("Readiness delivery interrupted")
-        if (!enabled() || clock.instant() < budget.started || clock.instant() >= budget.deadline)
+        if (
+            !enabled(budget.channel) ||
+                clock.instant() < budget.started ||
+                clock.instant() >= budget.deadline
+        )
             return lost()
         val result = operation()
         if (Thread.currentThread().isInterrupted)
             throw InterruptedException("Readiness delivery interrupted")
         return if (
-            !enabled() || clock.instant() < budget.started || clock.instant() >= budget.deadline
+            !enabled(budget.channel) ||
+                clock.instant() < budget.started ||
+                clock.instant() >= budget.deadline
         )
             lost()
         else result

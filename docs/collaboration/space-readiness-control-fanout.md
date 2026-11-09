@@ -1,5 +1,9 @@
 # Organization readiness control fanout
 
+The [PUSH successor](space-readiness-push-handoff.md) renames the coordinator to
+FanOutCollaborationSpaceReadiness and shares these guards across both channels.
+This document retains the accepted Matrix behavior and its original evidence.
+
 A verified first-key publication now has a bounded Matrix delivery use case. The
 worker reads the existing MATRIX checkpoint, admits each current recipient and sends
 the fixed opaque control to its actual original or fresh Matrix device. It never

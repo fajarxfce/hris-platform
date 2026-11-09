@@ -1,5 +1,10 @@
 # Architecture
 
+[Independent readiness PUSH handoff](collaboration/space-readiness-push-handoff.md)
+shares the current-target fanout coordinator with Matrix. PUSH appends a quiet wake
+and advances its publication cursor atomically; the existing FCM worker owns current
+registration, actual cloud delivery, retries and token cleanup. No second FCM owner.
+
 [Organization Matrix readiness fanout](collaboration/space-readiness-control-fanout.md)
 owns current recipient admission, external delivery and guarded cursor acknowledgement.
 Provider I/O stays outside transactions; deferral leaves recipient scope before

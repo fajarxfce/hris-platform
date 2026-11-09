@@ -42,7 +42,13 @@ class FanOutCollaborationSpaceReadinessControlTest {
             f.deliveries.single().publishedAtEpochMillis,
         )
         assertEquals(push, f.rows().single { it["channel"] == "PUSH" })
-        assertTrue(f.success(f.command().claim(UUID.randomUUID(), 4)).isEmpty())
+        assertTrue(
+            f.success(
+                    f.command()
+                        .claim(CollaborationSpaceReadinessChannel.MATRIX, UUID.randomUUID(), 4)
+                )
+                .isEmpty()
+        )
         assertInstanceOf(Result.Failed::class.java, f.command().fanOut(lease))
         assertEquals(1, f.deliveries.size)
     }
@@ -70,7 +76,13 @@ class FanOutCollaborationSpaceReadinessControlTest {
         val next = (row["available_at"] as java.sql.Timestamp).toInstant()
         assertTrue(next >= before.plusSeconds(300))
         assertTrue(next <= f.now().plusSeconds(300))
-        assertTrue(f.success(f.command().claim(UUID.randomUUID(), 1)).isEmpty())
+        assertTrue(
+            f.success(
+                    f.command()
+                        .claim(CollaborationSpaceReadinessChannel.MATRIX, UUID.randomUUID(), 1)
+                )
+                .isEmpty()
+        )
         assertEquals(1, f.deliveries.size)
     }
 
@@ -218,7 +230,13 @@ class FanOutCollaborationSpaceReadinessControlTest {
         val original = requireNotNull(f.checkpoint(lease))
         assertInstanceOf(
             Result.Failed::class.java,
-            f.command().fanOut(lease.copy(channel = CollaborationSpaceReadinessChannel.PUSH)),
+            f.command(service = CollaborationServicePolicy(true, true))
+                .fanOut(
+                    lease.copy(
+                        channel = CollaborationSpaceReadinessChannel.PUSH,
+                        token = UUID.randomUUID(),
+                    )
+                ),
         )
         assertInstanceOf(
             Result.Failed::class.java,

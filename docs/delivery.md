@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Independent readiness PUSH handoff — 9 November 2026
+
+The shared readiness coordinator now hands PUSH to the existing quiet wake queue in
+the same guarded transaction as cursor progress. Current FCM delivery remains owned
+by HandleCollaborationSpacePush. Coalescing, in-flight revision preservation, rollback,
+cancellation, deadline and revocation tests pass alongside existing Matrix/FCM cases.
+Final gate:256 cases in463.060s,205 domain +51 PostgreSQL,zero failures/errors/skips,
+8,727 stable inputs,format/architecture. [Contract](collaboration/space-readiness-push-handoff.md)
+and [evidence](measurements/collaboration-space-readiness-push-handoff-2026-11-09.json).
+No shared DI, scheduled worker, cloud, Mobile or live activation is included. Owning
+worker and Mobile integration remain next; all54 acceptance groups remain open.
+
 ## Organization Matrix readiness fanout — 9 November 2026
 
 Current recipient guards now surround capture and acknowledgement, with external

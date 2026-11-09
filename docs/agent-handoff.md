@@ -1,5 +1,32 @@
 # Agent continuation — HRIS workspace
 
+
+## Mobile83 verified; retained runtime acceptance running — 9 November 2026, 07:02 UTC
+
+Mobile f6670592 records verified APK83 and the active retained82→83 observation.
+Parent maintenance c0b645d0 shares existing durable identity acquisition; its deadline
+guard prevents immediate automatic refresh of already-due returned tokens. No server
+admission or TTL changes. Full Mobile check passes5837 fresh cases (5082desktop,
+595Android host,160actual browser), plus current74identity desktop cases; all10
+maintenance cases pass browser. Format/architecture/detekt/lint and shared web/iOS
+source compilation pass; no Apple runtime claim.
+
+APK83 SHA1acea7f495a0250970793fdd24aa9e7fa89a33eec1b4a4089d0b17684d01aad5,
+source ddb3d058, exact SDK6 native, same signer. Mobile native-parent-renewal-native-
+2026-11-09 runs emulator46665 plus phases15283/counter3624/paired80385. Upgrade
+preserves account/app/public identity; first Matrix renewal200 with fresh parent.
+Complete all lifecycle/renewal intervals before acceptance/install. Home startup
+still has many metadata reads (52setup/38room/30conversation at131s); retained as
+an open investigation, not hidden by settled-traffic acceptance.
+
+Latest COMPLETE source store remains Mobile sdk-shared-borrow-native-2026-11-09/
+sender at82; the running83 target must be preserved after boot. FOUR original events
+must never be resent. No phone install/UI, SDK6 publication or Starter port yet.
+Both generic Starter ports and SDK publisher require accepted83. Continue from
+[Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md).
+Platform source/runtime remain e558a686/schema116.4/controlON;117–138 undeployed.
+All54 communications PRD groups remain open.
+
 ## Native82 preserves four originals; parent renewal in Mobile — 9 November 2026, 06:14 UTC
 
 Latest Mobile pushed checkpoint0cb1a575 records failed native82. Full SDK6 source

@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 22:08 UTC. Historical detail remains in
+Updated 9 November 2026, 22:20 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -138,13 +138,23 @@ is running on immutableeba05a9c253aa7fe7f0cf816b49c128b4f3003a6;dispatch9340 rea
 Expected6,743 portable+2,549 Apple=9,292 cases. Mobile inventory hosted.json/auditor
 pins it against accepted42697887863. No successor hosted acceptance yet.
 
-Current only heavy local job is Mobile sync focused-1 /9832, under private
-`.work/space-device-sync-2026-11-09`. Ten unaccepted Kotlin inputs add an exact installed
-group sync port on the existing runtime,owned native/directory/bootstrap admission,
-one remote device read and original-client initial sync. Sixteen domain cases and
-three new Android cases accompany existing native sync/adoption/readiness tests and
-app DI. Pinned formatter85341 is reaped;expected37 focused cases. Keep sources frozen
-until reaped. No collector,actual group worker,product activation,phone or live change.
+Current only heavy local job is Mobile sync full-1 /51820, under private
+`.work/space-device-sync-2026-11-09`. Ten unaccepted Kotlin inputs add exact installed
+group sync on the existing runtime,owned native/directory/bootstrap admission and
+one remote device read. Focused9832 first failed242.225s:missing Android mapper import
+and one app DI fixture assertion among18 desktop cases (domain16 pass). Both corrected;
+two new group cleanup assertions were also corrected during review before Android
+execution. Existing company helpers/tests unchanged. Focused85631 now REAPED PASS:
+37 cases in152.816s,zero failures/errors/skips,4,599 stable source inputs and strict
+source/library/XML audit. Full51820 expects4,340 cases;keep ten source inputs frozen.
+No collector,actual group worker,product activation,phone or live change.
+
+Next worker design must distinguish exact original SDK transactions from Queued/new
+SPACE messages;the existing original-only writer cannot enqueue. Empty active app
+commands,or even retired receipts,do not prove the SDK has no settlement work. Avoid
+false-negative skips;local SDK inventory or a properly retired durable work index is
+needed before claiming a room has nothing to recover. Mobile inventory worker-next.md
+records these verified boundaries;no new worker source has been applied yet.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must

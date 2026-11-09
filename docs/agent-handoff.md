@@ -1,5 +1,40 @@
 # Agent continuation — HRIS workspace
 
+## Mobile native84 rejected; diagnostic85 packaging — 9 November 2026, 08:58 UTC
+
+Mobilef9cdc708 is committed/pushed. Native84 preserves its account/public keys,
+five original Sent messages, history end and resume/cold behavior. One distinct
+new original reached the server in3017.438ms with recipient stopped; now SIX
+originals are retained. Strict traffic and independent review BOTH reject Home:
+26 setup/metadata requests in its settled interval and a121.661sec SDK-sync gap
+before opening chat. No phone84 installation or native-release acceptance.
+[Evidence](https://github.com/fajarxfce/hris-mobile/blob/f9cdc708/docs/measurements/collaboration-release84-native-2026-11-09.json).
+
+Closed app activation diagnostics now expose only known step/failure categories,
+without changing SDK ownership/retry. Actual failure reason remains to be captured;
+RuntimeOpening/Busy is a source-path hypothesis, not a native root-cause claim.
+Full60632 REAPED PASS1255.393s,5937 fresh tests, zero failures/errors/skips, all4529
+app and82 original library inputs unchanged;21 lifecycle cases include2 new privacy/
+cancellation/no-retry cases. Android release compile/lint0, Wasm/iOS source and
+quality pass. [Source checks](https://github.com/fajarxfce/hris-mobile/blob/f9cdc708/docs/measurements/collaboration-activation-diagnostics-2026-11-09.json).
+
+ACTIVE local heavy job: Mobile diagnostic85 build31550 in .work/release-phone-2026-11-09-build85.
+Reap/verify, then use prepared .work/activation-startup-native-2026-11-09 scripts.
+Clone ONLY latest complete stopped Mobile history-transport-native-2026-11-09/sender
+at84, all4userdata/encryption files+AVD. Preserve all SIX originals. Diagnostic85
+observes150sec Home with NO new send/reset and no phone UI/install. Keep its upgraded
+store even if the diagnosis fails. Phone stays83; do not treat85 as a feature release.
+
+Inspector isolated worktree /home/fajar/hris/.worktrees/inspector-sdk6-2026-11-09:
+b8b46b3d6b44a3201499667d0dbb085af95dd20c committed/pushed, publicCI42589272966 RUNNING
+(portable/Apple). SDK6 catalog/checksums replace unpublishedSDK5; CI adds13 adapter
+host cases/fixture compilation. Root inspector2b849217 remains frozen for85. Preserve
+unrelated gradlew.bat delta in the isolated worktree. No local library compiler yet.
+SDK6 public descriptor now200/exact checksum; root inspector's SDK5 still404, so85
+uses the verified local mirror until the reviewed library port. Starter6157db1 stays
+pushed. Backend e558a686/schema116.4/controlON unchanged;117–138 not deployed.
+All54 feature groups, native Apple binding, latency p95 and capture overhead remain.
+
 ## Mobile history admission accepted; build84 packaging — 9 November 2026, 08:12 UTC
 
 Mobile b0e4079e is committed/pushed. Original-window/provider-page history now uses

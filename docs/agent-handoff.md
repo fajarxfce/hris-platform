@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:32 UTC. Historical detail remains in
+Updated 9 November 2026, 23:38 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -175,20 +175,26 @@ on immutable efa700bbb5a2b7a75af392afb5add8b642eb2ba0;dispatch99990 reaped. Expe
 6,940 portable+2,628 Apple=9,568,unaccepted. It covers sync/progress/worker and expanded
 app filters,not the following native proof. Earlier42707758241 is fully accepted.
 
-Current only heavy job is Mobile native proof focused-1 /6044 under private
-`.work/space-recovery-native-2026-11-09`. Five Mobile Kotlin proof inputs are applied,
-formatted and frozen. Group two new Kotlin fixtures +driver/four unit tests are applied
-and formatted,not compiled. Worker source is unchanged. Old native original probe is
-byte-identical. Do not reapply prepared copies over current src after corrections.
+Current active native proof is Group34069 under private
+`.work/space-recovery-native-2026-11-09` (also in Mobile). Mobile6044 is REAPED
+PASS131.926s:20 unit cases,format/architecture/detekt,4,630 stable inputs,unchanged
+Inspector and strict source/library/XML/APK audit. APK150,441,529 bytes,SHA256
+227cdc9211dd5415cb76c8167a10016acc3d50fc4753518b374250f2850a77a1.
+Five Mobile proof Kotlin inputs are applied;old original probe remains byte-identical.
 
-New proof requires real group Matrix fanout -> owned callback -> encrypted receipt/
-durable wake -> actual Koin task -> original provider ACK. Kill only the fictional proof
-process after durable receipt/before projection. Recover exact claim and two original
-transactions without another control/FCM;assert2 provider events and offline reads.
-Bound Matrix/native requests and reject401/403 loops. Four draft driver cases pass
-0.003s;formal source/native acceptance pending. Reap6044 first,fix if necessary,compile
-Group,run driver/native tests on one fresh2560MiB/two-core emulator,then required final
-Mobile root check and source/APK/XML audits. No emulator is currently running.
+Group97130 failed28.602s because two shared fixture functions were private. Only
+withWorker/success visibility changed to protected. Group75117 is REAPED PASS33.716s,
+8,733 unchanged inputs,format/architecture;11 driver cases pass0.005s. Three Group
+Kotlin/two Python inputs are applied. No production Group or shared DI change.
+
+Native34069 booted one fresh2560MiB/two-core emulator in35.562s and runs precompiled
+old+new native tests. All source/APK inputs are frozen;no compiler or formatter.
+It requires actual Matrix control -> durable wake -> actual task -> original ACK,
+process death before Sent,exact claim recovery without another hint,2 provider events
+per scenario,offline reads and bounded traffic without401/403. Reap34069,retain any
+failed data and inspect safe diagnostics before correction. Native acceptance and
+final Mobile root check/strict cross-source/APK/XML audit remain. Prepared files are
+archival after application. No product APK88 or phone/live rollout.
 
 Idle checks still need complete SDK inventory plus app commands/receipts. Producer
 wakes,group FCM/product routing,new SPACE enqueue and native acceptance remain.

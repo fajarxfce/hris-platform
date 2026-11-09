@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 16:49 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 17:07 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -14,6 +14,37 @@ uses2560MiB/two cores and is stopped. Phone10.77.77.3:5555 is install-only; anno
 installation and never launch, automate, uninstall or clear it. Crashlytics access
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
+
+## Current original-delivery experiment
+
+Mobile69e639f8 source is accepted and pushed. Hosted42656803963 portable job is
+accepted with6,638 fresh cases,zero failures/errors/skips; Apple still runs. Mobile
+82986dbf records the audited artifact and current handoff. Native proof remains open.
+
+Uncommitted Group test-only work: NativeSpaceOriginalFixture/DeliveryTest,
+NativeOriginalDeliveryTrace, bounded NativeSdkMatrixServer.encryptedRoomEvents and
+`tool/collaboration_space_original.py` plus six ownership tests. Real native commands
+and room/provisioning workers adopt two fictional legacy devices and their original
+room. The driver stages original app commands, kills only its owned process after a
+durable ACK but before Sent projection, then reopens unchanged encrypted stores and
+checks offline readback. Failed app data is retained; no employee originals are used.
+
+Private `.work/space-original-delivery-native-2026-11-09`:
+- Mobile source89458 passes131.229s/20 cases,4,572 stable inputs,proof APK/lint/quality.
+- Group source49471 fails31.843s on a Jackson test JSON map overload; source66177
+  passes32.624s after correction. Review fixes nested room fields and adds request counts.
+- Final Group source21551 passes32.425s,8,698 stable inputs; compilation/format/architecture.
+- Existing driver82 tests and new ownership6 tests pass. No production source changes.
+- native-1/2 fail only fresh-emulator setup, before any server/message test; reaped/stopped.
+- **Native61494/native-3 RUNNING**: fresh owned x86_64 emulator boots40.882s,2560MiB/two
+  cores. Server tests use compiled inputs. Both Mobile and Group sources are frozen.
+  Reap its result and preserve any failed original stores; do not enqueue replacements.
+- SDK6 x86_64 library exactly matches deterministic NDK28.2 stripping,111204848bytes,
+  SHA256ecffbab72fd5dd29d656bc4757ea423bb4bccf0444140af0480684bc32761278.
+  Proof APK SHA2561b64c9eed71feebf9cfdebb6e7ec42991512d25e8f5d7a0e0601a7f726d96b7f.
+
+Live e558a686/schema116.4/group routing OFF, phone87 and retained stopped sender87
+are unchanged. No native acceptance or new product APK is claimed yet.
 
 ## Current source reconciliation
 

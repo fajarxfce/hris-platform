@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 16:05 UTC. Historical detail remains in
+Updated 9 November 2026, 16:49 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -72,20 +72,22 @@ Actual retained LEGACY publication proves exact original room/user/physical devi
 No production policy/schema/DI was changed to resolve test fixture errors. See Group
 `docs/measurements/collaboration-space-direct-transport-2026-11-09.json`; do not rerun.
 
-Mobile has13 uncommitted transport files. Focused25221 PASSES203.352s/23 fresh cases:
-eight new transport,13 existing room transport and two actual app DI cases, zero
-failures/errors/skips,4,562 unchanged inputs and unchanged Inspector sources. Full90875
-FAILED22.617s before any tests because the private browser init used an unsupported
-KotlinJsTest.filter closure. The corrected runner uses getFilter/includeTestsMatching
-and an archived exact init script. Full94359 (`full-2`) is RUNNING and owns the only
-heavy local slot; Mobile source stays frozen. No new APK or product activation.
+Mobile direct transport ab17eadd is accepted/pushed:23 focused/4,237 full cases,
+zero failures/errors/skips. Owning original delivery69e639f8 is accepted/pushed:
+56 focused/4,304 full cases (3,629 desktop/621 Android host/54 browser), zero failures/
+errors/skips;4,571 unchanged inputs/library and exact source/XML audit. Two new review
+regressions first reproduced inventory-order rejection and unbounded post-ACK storage;
+corrected source preserves original IDs, late ACK journals and absent-original uncertainty.
+Source does not activate group UI/worker/SDK delivery or deploy the backend.
 
-Mobile's private original follow-up has seven files/ten pure methods for matching and
-exact journal/archive ACK facts, formatter-only proof; no owning delivery implementation.
-Its next window must retain orphaned local Staged records when the SDK queue is empty,
-journal late ACKs without publishing through cancelled owners, and pause/drain before
-writer release. Source policy/original identities and all eight retained originals stay
-unchanged. Both direct contracts must be accepted before applying that follow-up.
+Hosted42656803963 is RUNNING on exact69e639f8, portable and Apple jobs. Do not redispatch.
+Mobile has four uncommitted proof-only Kotlin files for actual original staging, local
+DB/journal interruption and existing-only group SDK restoration. Source4649 is RUNNING
+with frozen Mobile inputs (root/proof unit/APK/lint/quality); one reported Detekt
+LongMethod still needs correction after the job is reaped. The actual Group server
+fixture/driver remain to be implemented. No actual native proof or APK88 exists.
+SDK6 AAR has four verified ABIs; use its x86_64 library for the dedicated emulator and
+validate packaged stripping. All old accepted native originals remain untouched.
 
 ## Accepted runtime and device state
 
@@ -116,9 +118,9 @@ Web/iOS-source/quality/SBOM and62 fresh browser tests; no Starter hosted distrib
 
 ## Next work
 
-1. Reap/audit Mobile full94359, preserve its init-script failure, then commit/push the
-   accepted Mobile transport. Backend96d2d238, reconciliationfa90ddcc and hosted
-   Mobile42628449460 are already accepted; do not repeat them.
+1. Continue Mobile's current native experiment and source4649, then the actual isolated
+   Group server/SDK/restart proof. Track hosted42656803963 at exact69e639f8 and audit
+   artifacts when complete. Accepted prior source gates must not be repeated.
 2. Continue owning original SDK delivery/history, recipient readiness, background
    ownership and group product routing. Room Prepare/Resolve/Replay, exact original
    references and encrypted binding preparation are accepted; do not recreate them.

@@ -692,6 +692,71 @@ class CollaborationConfiguration {
     ): CollaborationPushQueueRepository = StoredCollaborationPushQueueRepository(source)
 
     @Bean
+    fun collaborationSpaceReadinessQueueSource(
+        sql: DSLContext
+    ): CollaborationSpaceReadinessQueueDataSource =
+        PostgresCollaborationSpaceReadinessQueueDataSource(sql)
+
+    @Bean
+    fun collaborationSpaceReadinessQueue(
+        source: CollaborationSpaceReadinessQueueDataSource
+    ): CollaborationSpaceReadinessQueueRepository =
+        StoredCollaborationSpaceReadinessQueueRepository(source)
+
+    @Bean
+    fun collaborationSpaceMatrixReadiness(
+        source: ObjectProvider<MatrixSpaceReadinessControlDataSource>
+    ): CollaborationSpaceMatrixReadinessRepository =
+        source.ifAvailable?.let(::InternalCollaborationSpaceMatrixReadinessRepository)
+            ?: DisabledCollaborationSpaceMatrixReadinessRepository()
+
+    @Bean
+    fun fanOutCollaborationSpaceReadiness(
+        queue: CollaborationSpaceReadinessQueueRepository,
+        providers: CollaborationSpaceProviderSessionRepository,
+        transport: CollaborationSpaceMatrixReadinessRepository,
+        pushBindings: CollaborationSpacePushBindingRepository,
+        pushQueue: CollaborationSpacePushQueueRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        keys: CollaborationSpaceKeyRepository,
+        selections: CollaborationSpaceIdentityRepository,
+        legacyParents: CollaborationLegacyParentRepository,
+        completions: CollaborationLegacyRuntimeCompletionRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        service: CollaborationServicePolicy,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        FanOutCollaborationSpaceReadiness(
+            queue,
+            providers,
+            transport,
+            pushBindings,
+            pushQueue,
+            registry,
+            gateway,
+            keys,
+            selections,
+            legacyParents,
+            completions,
+            provisioning,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            service,
+            policy,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun collaborationReadinessControlSource(
         sql: DSLContext
     ): CollaborationReadinessControlQueueDataSource =

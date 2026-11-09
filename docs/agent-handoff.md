@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 20:22 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 20:43 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,49 +15,58 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Current: both readiness channels accepted; scheduled owners next
+## Current: organization readiness worker integration accepted
 
-The combined FanOutCollaborationSpaceReadiness replaces the Matrix-only class name
-and shares the existing full target admission/guard implementation across channels.
-Explicit MATRIX/PUSH claims remain independent; PUSH also requires service.pushEnabled.
-Matrix transport behavior is retained. PUSH checks exact published immutable binding
-coordinates/capture time, then atomically appends a quiet SpacePushQueue hint and
-advances its publication cursor. Final target/time checks roll back both mutations.
-Handoff completion does not mean FCM acknowledgement. No token is decrypted or new
-cloud retry loop introduced in this branch; HandleCollaborationSpacePush retains
-current registration, external FCM and exact-token cleanup ownership.
+Base806601d5 and predecessor99a0d8c5 are committed/pushed; their jobs are reaped.
+Five Kotlin inputs now wire the shared queue/fanout/Matrix transport, explicit
+unavailable fallback, generic opaque-lease lifecycle and separate group channel
+workers/pools. No MatrixProviderConfiguration or schema change. Existing Matrix
+fanout and atomic quiet PUSH handoff remain the owning use-case behavior.
 
-Private `.work/space-readiness-push-handoff-2026-11-09` pins99a0d8c5/schema140:
-- focused-1 /95714 REAPED PASS463.060s:256 cases =205 domain +51 PostgreSQL,
-  zero failures/errors/skips,8,727 stable source inputs,format and architecture.
-- Ten new handoff cases run real ordinary-worker repositories and the existing FCM
-  delivery use case; only external transport is fake. They cover atomic rollback,
-  cancellation,deadline,late directory loss,missing/unpublished/late/foreign bindings,
-  expired Matrix bearer,quiet coalescing,newer wake during FCM lease,native revocation
-  before actual delivery and disabled PUSH. Existing Matrix10/queue6 and FCM25 pass.
-- accept.py focused-1 PASS checks every current source/report hash and exact cases;
-  accepted.json is the tracked measurement. Five current Kotlin files plus the old
-  renamed path; no DI/schema/Mobile changes. No failed gate in this increment.
-- [Contract](collaboration/space-readiness-push-handoff.md) and
-  [evidence](measurements/collaboration-space-readiness-push-handoff-2026-11-09.json).
+Private `.work/space-readiness-worker-integration-2026-11-09`:
+- focused-1 /98743 REAPED PASS101.486s: 8 context/lifecycle cases, no failures,
+  errors or skips, format/architecture and 8,729 stable source inputs.
+- full-1 /56826 REAPED PASS775.848s: 325 cases = 174 across six actual API
+  context/contract classes in :apps:server:test + 151 FULL UNFILTERED worker cases.
+  Zero failures/errors; one existing opt-in ReportExportElapsedRetentionTest skip.
+- accept.py PASS verifies both manifests, every current source/report hash, exact
+  counts and the full worker report set (previous suite plus the new context).
+- The new context case opens ten flag configurations using the normal worker role,
+  delegates actual queue claims, checks channel independence and disabled states,
+  then verifies all owned pools terminate. No actual Matrix/FCM traffic occurs.
+- [Contract](collaboration/space-readiness-workers.md) and
+  [measurement](measurements/collaboration-space-readiness-workers-2026-11-09.json).
 
-Next shared CollaborationConfiguration binds the typed queue, combined use case and
-existing MatrixSpaceReadinessControlDataSource transport with an explicit disabled
-fallback. HttpMatrixClientDataSource already implements that interface; its existing
-concrete bean supplies it. Do not change MatrixProviderConfiguration unnecessarily.
-Make the opaque lease-only CollaborationReadinessWorker generic rather than duplicate
-its lifecycle if inference remains sound; add separately qualified group channel
-pools/workers with existing flags plus group rollout enabled. No business retry in
-worker adapters. Validate enabled/disabled ordinary-role claims and owned shutdown.
+Mobile baseb061614a has eleven pending Kotlin inputs for strict group V1 control
+parsing, a separate typed encrypted readiness receipt namespace, shared storage
+contracts across desktop SQLite/IndexedDB/Apple Room and an application DI assertion.
+Private Mobile `.work/space-readiness-protocol-2026-11-09` focused-1 /81916 RUNNING.
+It owns the only heavy compiler. Mobile source is frozen until reaped; no other
+Gradle/Java formatter/emulator. Group acceptance is complete and its source frozen
+hashes are recorded. Next finish Mobile required root/platform and hosted Apple
+checks, then current-runtime provenance and durable wake ownership before activation.
 
-The actual API project is :apps:server:test (apps/server), not apps/api. Validate
-native API application contexts plus FULL UNFILTERED :apps:worker:test after shared DI.
-The private worker-integration-review.md records exact existing six API classes and
-scope. No source for this worker integration exists yet. No active heavy job, SDK7,
-APK88,emulator or live rollout. Phone87 remains unchanged;all54 groups remain open.
+This is still one part of the larger PRD. All54 groups remain open. No SDK7, APK88,
+emulator or live/phone change; phone87 stays installed. The live deployment stays
+schema116.4 with group OFF. Group recovery verifier max140 must never be copied to
+the original platform branch (max116.4). Do not restart retired confirmation routes,
+old native proofs or accepted hosted run42656803963.
 
-Root652f67e3 and Mobileb061614a update cross-repo continuation through99a0d8c5 and
-identify the then-running95714;those pushes are reaped. This Group checkpoint is newer.
+## Accepted independent PUSH handoff — previous checkpoint
+
+806601d5 makes FanOutCollaborationSpaceReadiness the shared target-admission owner.
+Explicit channels keep independent checkpoints. PUSH requires its feature flag,
+checks exact published binding coordinates and capture time, then atomically appends
+a quiet hint to the existing SpacePushQueue and advances publication progress.
+Final target/time checks roll back both changes. Handoff is not a cloud ACK;
+HandleCollaborationSpacePush retains registration, delivery and token cleanup ownership.
+
+Private `.work/space-readiness-push-handoff-2026-11-09` focused-1 /95714 REAPED
+PASS463.060s: 256 cases (205 domain + 51 PostgreSQL), no failures/errors/skips,
+8,727 stable inputs, format/architecture and exact source/XML acceptance.
+[Contract](collaboration/space-readiness-push-handoff.md) and
+[measurement](measurements/collaboration-space-readiness-push-handoff-2026-11-09.json).
+Worker integration described above supersedes the earlier next-step instructions.
 
 ## Accepted Matrix fanout — previous checkpoint
 

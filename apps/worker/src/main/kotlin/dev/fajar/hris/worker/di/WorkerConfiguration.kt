@@ -728,6 +728,143 @@ class WorkerConfiguration {
         )
 
     @Bean
+    fun collaborationSpaceReadinessControlTasks(
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings
+    ) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-space-readiness-matrix-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(20)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun collaborationSpaceReadinessControlTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-space-readiness-matrix-timer-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_READINESS_CONTROL_ENABLED",
+                "HRIS_COLLABORATION_SPACE_ENABLED",
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun collaborationSpaceReadinessControlWorker(
+        handle: FanOutCollaborationSpaceReadiness,
+        @org.springframework.beans.factory.annotation.Qualifier(
+            "collaborationSpaceReadinessControlTasks"
+        )
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier(
+            "collaborationSpaceReadinessControlTimers"
+        )
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings,
+    ) =
+        dev.fajar.hris.worker.collaboration.CollaborationReadinessWorker(
+            { owner, limit ->
+                handle.claim(
+                    dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceReadinessChannel
+                        .MATRIX,
+                    owner,
+                    limit,
+                )
+            },
+            handle::fanOut,
+            tasks,
+            timers,
+            settings,
+        )
+
+    @Bean
+    fun collaborationSpaceReadinessPushTasks(
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings
+    ) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-space-readiness-push-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(20)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun collaborationSpaceReadinessPushTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-space-readiness-push-timer-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name =
+            [
+                "HRIS_COLLABORATION_READINESS_ENABLED",
+                "HRIS_COLLABORATION_SPACE_ENABLED",
+                "HRIS_COLLABORATION_PUSH_DELIVERY_ENABLED",
+                "HRIS_FCM_ENABLED",
+                "HRIS_COLLABORATION_ENABLED",
+                "HRIS_MATRIX_ENABLED",
+                "HRIS_COLLABORATION_PUSH_ENABLED",
+            ],
+        havingValue = "true",
+    )
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun collaborationSpaceReadinessPushWorker(
+        handle: FanOutCollaborationSpaceReadiness,
+        @org.springframework.beans.factory.annotation.Qualifier(
+            "collaborationSpaceReadinessPushTasks"
+        )
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier(
+            "collaborationSpaceReadinessPushTimers"
+        )
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings,
+    ) =
+        dev.fajar.hris.worker.collaboration.CollaborationReadinessWorker(
+            { owner, limit ->
+                handle.claim(
+                    dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceReadinessChannel
+                        .PUSH,
+                    owner,
+                    limit,
+                )
+            },
+            handle::fanOut,
+            tasks,
+            timers,
+            settings,
+        )
+
+    @Bean
     fun collaborationReadinessControlTasks(
         settings: dev.fajar.hris.worker.collaboration.CollaborationReadinessWorkerSettings
     ) =

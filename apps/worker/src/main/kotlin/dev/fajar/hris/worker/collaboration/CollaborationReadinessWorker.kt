@@ -1,6 +1,5 @@
 package dev.fajar.hris.worker.collaboration
 
-import dev.fajar.hris.collaboration.domain.entities.CollaborationReadinessLease
 import dev.fajar.hris.core.domain.Result
 import dev.fajar.hris.worker.runtime.DeadlineTask
 import java.time.Instant
@@ -13,9 +12,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 
 /** Owns bounded task/timer pools; retained progress lives in PostgreSQL, not a process registry. */
-class CollaborationReadinessWorker(
-    private val claim: (UUID, Int) -> Result<List<CollaborationReadinessLease>>,
-    private val fanOut: (CollaborationReadinessLease) -> Result<Unit>,
+class CollaborationReadinessWorker<Lease>(
+    private val claim: (UUID, Int) -> Result<List<Lease>>,
+    private val fanOut: (Lease) -> Result<Unit>,
     private val tasks: ThreadPoolTaskExecutor,
     private val timers: ThreadPoolTaskScheduler,
     private val settings: CollaborationReadinessWorkerSettings =

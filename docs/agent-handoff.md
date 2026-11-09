@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:38 UTC. Historical detail remains in
+Updated 9 November 2026, 23:47 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -187,14 +187,22 @@ withWorker/success visibility changed to protected. Group75117 is REAPED PASS33.
 8,733 unchanged inputs,format/architecture;11 driver cases pass0.005s. Three Group
 Kotlin/two Python inputs are applied. No production Group or shared DI change.
 
-Native34069 booted one fresh2560MiB/two-core emulator in35.562s and runs precompiled
-old+new native tests. All source/APK inputs are frozen;no compiler or formatter.
-It requires actual Matrix control -> durable wake -> actual task -> original ACK,
-process death before Sent,exact claim recovery without another hint,2 provider events
-per scenario,offline reads and bounded traffic without401/403. Reap34069,retain any
-failed data and inspect safe diagnostics before correction. Native acceptance and
-final Mobile root check/strict cross-source/APK/XML audit remain. Prepared files are
-archival after application. No product APK88 or phone/live rollout.
+Native34069 is REAPED FAIL249.572s:two cases,one failure. Old scenario passes with
+2 encrypted provider events,10 native requests and offline recovery. The new case
+reaches listening but times out before control. Source/APK unchanged,no compilation
+during emulator,and emulator stopped. Its failed proof data remains intact.
+
+Root cause is test ordering:V139 control targets require room intent/binding created
+before publication captured_at. Both publications preceded room creation,correctly
+selecting zero targets. Only Group fixture changed:prepare recipient,create the room,
+wait for listening,then complete the original recipient worker to publish its keys.
+Assertions verify room-before-publication and target ACK;safe traffic persists on failure.
+Group89294 is REAPED PASS34.055s,8,733 unchanged inputs,format/architecture. Mobile
+source/APK and all production code are unchanged. Native-2 /98504 is RUNNING on a
+fresh2560MiB/two-core emulator with old+new scenarios. All source/APK inputs frozen;
+no compiler/formatter. Reap98504 and retain any failed data before corrections.
+Final Mobile root check and strict cross-source/APK/XML audit remain. No native
+acceptance,product APK88,phone or live rollout. Prepared files are archival now.
 
 Idle checks still need complete SDK inventory plus app commands/receipts. Producer
 wakes,group FCM/product routing,new SPACE enqueue and native acceptance remain.

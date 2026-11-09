@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 21:45 UTC. Historical detail remains in
+Updated 9 November 2026, 21:56 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -96,8 +96,15 @@ full previous report set plus24 new protocol/storage cases verified. Audit7525 i
 reaped. Job129434510765,artifact13710243749,3,296,341 bytes,GitHub digest and ZIP CRC
 verified. SHA25619ce5254277f1c2c03502ea6b22fb4043b5fe7443d78fe5b8c783b69cd3aa471;
 XML manifest3539a401dad1b6aa535c06a4a81799ac6ebe600fa55ffbf5e2f6f6c4e3955288.
-Apple remains IN PROGRESS;no native Apple/Room/Xcode acceptance yet. Private Mobile
-protocol directory contains hosted.json and archived portable audit. Do not rerun.
+Apple is now accepted:2,511 simulator cases,zero failures/errors/skips,and unsigned
+Xcode host success. Audit30032 is reaped. Job129434510161,artifact13714460959,
+492,864 bytes,SHA2561fd597c818a46793c0fa337902b0c67c764ff958f4a943da5f45b3a73f7f6595;
+XML manifest60f3f42d9121c45e5839da2cecc6a4b58dbeabad60a6be00f122a3ee17834590.
+GitHub digests,ZIP CRCs,every XML/report count and exact prior full sets plus36 total
+protocol/storage cases are verified. Combined9,173 cases. Mobiledd15a4fd retains
+[hosted evidence](https://github.com/fajarxfce/hris-mobile/blob/dd15a4fd/docs/measurements/collaboration-space-readiness-protocol-hosted-2026-11-09.json).
+No remote CI remains active. Do not rerun these unchanged gates or attribute this
+protocol evidence to newer native/wake/inventory sources. Native Apple Matrix stays open.
 
 Mobile [a877c088](https://github.com/fajarxfce/hris-mobile/blob/a877c088/docs/collaboration-space-readiness-listener.md)
 is also committed/pushed;68495 is reaped. This successor routes original native
@@ -118,11 +125,12 @@ zero failures/errors/skips. Required root/platform/quality checks pass;focused/f
 retain identical4,593 source inputs and unchanged Inspector bytes. All XML audited.
 No collector or actual group worker is bound;this is not product activation.
 
-Current sole heavy job is Mobile inventory focused-1 /51195, under private
-`.work/space-room-binding-inventory-2026-11-09`. Five unaccepted Kotlin inputs add a
-bounded local encrypted room-binding reader, account/generation/revision cursors,
-nine shared database regressions and same-instance DI. Its source remains frozen
-until the job is reaped. Expected25 focused cases, then required full checks.
+Current sole heavy job is Mobile inventory full-1 /11069, under private
+`.work/space-room-binding-inventory-2026-11-09`. Focused51195 is REAPED PASS208.1s:
+25 cases,zero failures/errors/skips,4,595 stable source inputs and strict audit.
+Five unaccepted Kotlin inputs add a bounded local encrypted room-binding reader,
+account/generation/revision cursors,nine shared database regressions and same-instance
+DI. Keep source frozen until full11069 is reaped;expected4,328 fresh cases.
 No emulator,SDK,APK,phone or live change. Current Mobile handoff owns the next steps.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.

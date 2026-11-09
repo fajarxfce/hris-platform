@@ -1,5 +1,15 @@
 # Delivery and validation
 
+## Readiness recovery verifier — 9 November 2026
+
+The company branch now accepts reviewed schema116.2–4 while preserving the exact
+116.1 encrypted-envelope query and rejecting unshipped117+ schemas. One regression
+reproduced the original rejection;40 database-recovery, numeric migration-order and
+recovery-set unit cases pass. No migration, application/worker DI or live restore.
+[Contract](recovery-set.md) and
+[evidence](measurements/collaboration-readiness-recovery-verifier-2026-11-09.json).
+
+
 ## Quoted backend live and current product FCM accepted — 5 November 2026
 
 Live API/worker source11a98115 (bounded reply enveloped4f34140) replaces8b40 using

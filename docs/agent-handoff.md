@@ -1,89 +1,92 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 12:36 UTC. Previous checkpoints remain in
-[Git at 1c0cb482](https://github.com/fajarxfce/hris-platform/blob/1c0cb482/docs/agent-handoff.md).
-Use this file for current state; older active-job instructions are historical.
+Updated 9 November 2026, 13:51 UTC. Historical detail remains in
+[4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
+Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
-## Current continuation
+## Scope and boundaries
 
-The current detailed checkpoint is [Mobile at a06b3370](https://github.com/fajarxfce/hris-mobile/blob/a06b3370/docs/agent-handoff.md).
-Do not resume the superseded active-job instructions from this file's earlier Git versions.
-The user authorized the whole communications plan, atomic commits/pushes, and validated
-phone installations. All54 communications acceptance groups remain open.
+The user authorized the entire communications PRD, long-running implementation,
+atomic commits with pushes and validated phone updates. All54 acceptance groups remain
+open. Mobile proves reusable foundations before Starter. Follow AGENTS.md layer
+ownership and preserve original accounts, native/SDK identities, keys and transactions.
 
-Mobile d8383438 reuses an already Joined native room instead of requesting join on
-every timeline acquisition. Full gate passes5,975 fresh cases; source and prior
-selected-client retention2293ff05 are accepted. ff1adeca records accepted APK87 and
-phone delivery. APK SHA43373c6c4e6335149138630e7c2c9d6daa05edc1f76729ff01dae1023916ce8b.
-Four settled Home/room/resumed/cold phases retain sync with no setup/rejected traffic;
-paired refresh200×3 retains credentials, parent26→27 renews before expiry, no room_join
-across the run. Seven originals remain; one Joined87 115837 was sent once,2,066.684ms
-versus prior86 sample2,983.114ms. Room acquisition1ms versus509ms, timeline154ms versus
-704ms. Other stage timings vary; these are individual emulator samples, not p95/phone
-latency. Startup cost and the remaining520ms setup stage need further work.
+One heavy local compiler OR emulator. Do not kill live API/worker JVMs. The emulator
+uses2560MiB/two cores and is stopped. Phone10.77.77.3:5555 is install-only; announce each
+installation and never launch, automate, uninstall or clear its app. Crashlytics IAM
+is verified; do not request it again. Physical iPhone testing is waived, relevant
+Apple runtime, push and calling acceptance remains separate.
 
-Latest COMPLETE STOPPED fixture: Mobile
-.work/joined-room-entry-native-2026-11-09/sender at87, EIGHT original messages. Preserve
-all four userdata/encryption files and full AVD. Never clone an older baseline, resend
-any original or send Draft66. All native jobs are stopped/reaped. Phone install33957
-passes210.86s with exact installed digest and existing app identity; no UI launch,
-uninstall or data clear. Native84 and interrupted/resumed86 failures remain preserved.
+## Current work
 
-Mobile's typed original-reference5b63b498 is accepted/pushed:49 focused and4,162
-fresh full cases pass, no failures/errors/skips/lint; full89590 is reaped536.843s.
-CI integration57ebc77a is accepted/pushed after66 fresh focused cases in100.523s.
-The only current compiler is Mobile encrypted-binding focused82526. Its11 new/
-modified source files remain unaccepted and frozen through the gate. Storage keeps
-exact immutable conversation/room/original metadata, with atomic encrypted indexes.
-No owning acquisition, SDK delivery, queue, route or live change is made yet. Do not
-start another compiler/emulator; do not kill the live API/worker JVMs.
+Original Platform feat/communications contains the minimal reviewed readiness recovery
+verifier correction in this commit. The source bound advances116.1→116.4, with exact
+fractional-version allowlisting;117+ remains rejected here. The new regression first
+reproduced the error, then40 database-recovery/migration-order/recovery-set unit tests
+passed. The original encrypted-envelope query is unchanged. No live restore or schema
+mutation occurred. [Evidence](measurements/collaboration-readiness-recovery-verifier-2026-11-09.json).
+The Group checkout already has the equivalent allowlist with its separate138 bound;
+do not replace that bound with this branch's116.4 limit.
 
-Inspector publicSDK6 source742a2d1 passes226 portable/Android host and69 Apple simulator
-cases with verified artifacts. Mobile's first public consumer Apple job passes1777 cases
-plus Xcode build; Windows also passes. Native Apple Matrix binding remains separate.
-Verified complete SBOM checksum inventory passes strict resolution. Cancellation and
-notification navigation test races are corrected with explicit observable completion;
-focused checks pass. A previous desktop abort remains unclassified; bounded native
-diagnostics are retained. Fifth verify42604884828 failed two fixture assertions; first correction failed
-locally and sixth42609635524 was cancelled. Corrected21101489 passes66 focused cases;
-seventh42611795210 is SUCCESS at21101489. Artifact13672363171 was audited:
-7,950 cases (5,429 desktop,1,912 browser,599 Android host,10 build-logic), zero
-failures/errors/skips/lint; three APKs and393-component SBOM hashed. Audit30078 is
-reaped. Root Mobile integration57ebc77a carries the exact verified source/evidence.
-Web42599865437 separately passes optimized distribution with26 verified web files.
-Earlier runner shutdowns remain unexplained. No distribution workflow was dispatched.
-Starter's generic portffd0ac5 is accepted/pushed: full88319 REAPED PASS188.590s,
-62 fresh actual browser cases, fixed1,052 app/49 library inputs, root/Android/web/
-iOS source/strict SBOM/quality pass. Lint0errors/45 existing advisories;366 SBOM
-components and three APKs/26 web files verified. No hosted Starter dispatch.
+Group `/home/fajar/hris/.worktrees/communication-space`, feat/communication-space,
+is merging Root4d4df31f into bf6e176a (base8bad394e). Eight textual conflicts were
+resolved, preserving company runtime/readiness/default-key fixes and group behavior.
+It is NOT COMMITTED or DEPLOYED. Focused49700 passed207 domain/data cases but failed
+API test compilation: five group-only fixture calls retained a renamed method. Those
+calls now use the merged accountData fixture with the same m.direct default.
+Corrected focused67950 is RUNNING; Group source is frozen. This is the only heavy
+local job. After focused proof, run required migration/collaboration/API and FULL
+worker checks because shared DI changed. See its
+[current handoff](https://github.com/fajarxfce/hris-platform/blob/feat/communication-space/docs/agent-handoff.md)
+and private `.work/space-root-reconciliation-2026-11-09` for candidate work.
 
-Live platform remains e558a6868399058a2dcdee97acfd0e7fa7f1ef07/schema116.4/controlON.
-Crashlytics IAM works. Group source8d5724e2 is pushed in the separate communication-space
-worktree. Its exact published original-room reference passes266 fresh cases in513.312s
-with8,637 fixed inputs, no failures/errors/skips, and format/architecture checks. Native
-admission, actual LEGACY worker publication and HTTP/OpenAPI pass; shared DI is
-unchanged and the full worker application suite was not rerun. No live/schema change; V117–138 and group routing are NOT deployed or present in original Platform.
-Starterffd0ac5 includes the prior accepted generic worker/identity ports. Inspector original f8ca3d6 integrates verified public SDK6; isolated a6b8236 retains
-its unrelated gradlew.bat delta.
+Mobile feat/chat-send-timing-20261107 now has accepted/pushed78076d4e: owning published
+room binding preparation. It first reads owned immutable local metadata; only absence
+performs bounded live acquisition and exact readback. Final focused50366 passes26;
+full81742 passes4,224 fresh cases (3,587 desktop/613 Android host/24 actual browser),
+zero failures/errors/skips,4,551 stable application/library inputs. Root/release/Wasm/
+iOS-source/quality pass. Original denial/expiry regressions remain recorded. No SDK/
+worker/UI activation or new APK follows from this change. Hosted collaboration-control
+[42628449460](https://github.com/fajarxfce/hris-mobile/actions/runs/42628449460) runs
+on exact78076d4e, including actual Apple database coverage; do not dispatch a duplicate.
+The [latest Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
+is authoritative for subsequent job transitions.
 
-## Next implementation
+## Accepted runtime and device state
 
-1. Native87/phone87 are accepted. Continue measured latency/startup work, preserving
-   all eight originals and the exact accepted source/artifact records.
-2. Public consumer integration and the generic Starter port are accepted. Preserve
-   exact evidence and historical failures; do not repeat the same successful graph.
-3. Resume organization chat. Backend work is in .worktrees/communication-space,
-   including V117–138; the original Platform checkout does not contain those migrations.
-   Mobile4e7be081 accepts bounded original Room dispatch:76 focused,5,963 full and74
-   actual Chromium cases pass, with fixed inputs and no failures/errors/skips/lint.
-   Shared iOS source compiles; new exact-source Apple execution remains separate.
-   Backend8d5724e2 now supplies exact LEGACY original coordinates. Finish Mobile
-   focused16289/full validation and durable published binding, then original SDK
-   delivery/history, group workers and product routing. Preserve original transaction
-   IDs and keys; a missing receipt never authorizes replacement.
-4. Continue rich messages, actions/media/stickers/voice notes, encrypted backup,
-   native MatrixRTC calls and LiveKit meetings under delivery.json. No whole PRD group
-   becomes accepted from a domain test or provider experiment alone.
+Live API/worker remains e558a6868399058a2dcdee97acfd0e7fa7f1ef07, schema116.4,
+readiness control ON. Group V117–138 is absent here and remains unshipped; organization
+routing is OFF. None of this source reconciliation changes live runtime.
 
-Keep this checkpoint current and concise. Implementation measurements and immutable
-Git history retain detail; do not append obsolete active-job instructions here.
+APK87 from Mobile d8383438 is ALREADY INSTALLED. Install33957 passed210.86s with exact
+digest and unchanged first-install identity; no phone UI driving. SHA256
+43373c6c4e6335149138630e7c2c9d6daa05edc1f76729ff01dae1023916ce8b.
+No APK88 exists; do not reinstall87. Retained native86→87 proof passes670.401s with
+four quiet sync phases, zero setup/rejected traffic, no room_join and paired refresh
+200×3. One new Joined87 send took2,066.684ms; this is one emulator sample, not phone/p95.
+
+Latest COMPLETE STOPPED sender store is Mobile
+`.work/joined-room-entry-native-2026-11-09/sender`. Preserve the whole AVD and all four
+userdata/encryption files, plus stopped Bima74. Eight originals must NEVER be resent:
+Control77 235408, Warm77 235728, Recovery78 005634, Registry82 055959, Parent83 071123,
+History84 083059, Selected86 102110, Joined87 115837. Draft66 092041 must NEVER be sent.
+
+Mobile public inspector CI42611795210 passed7,950 cases with audited artifacts;
+Root integration57ebc77a is accepted. Inspector rootf8ca3d6/isolateda6b8236 use public
+immutable SDK26.10.23-hris.6 (release438835525); never rebuild/overwrite those assets.
+Inspector742a2d1 CI passed226 portable/host+69 Apple simulator cases. Native Apple
+Matrix bindings remain separate. Preserve isolated Inspector's unrelated gradlew.bat
+change. Starterffd0ac5's generic pinned workflow/checksum port passes root/Android/
+Web/iOS-source/quality/SBOM and62 fresh browser tests; no Starter hosted distribution.
+
+## Next work
+
+1. Finish Group focused67950 and required full checks, audit every failure, then
+   commit/push the source reconciliation. Audit Mobile hosted Apple run42628449460.
+2. Continue owning original SDK delivery/history, recipient readiness, background
+   ownership and group product routing. Room Prepare/Resolve/Replay, exact original
+   references and encrypted binding preparation are accepted; do not recreate them.
+3. Continue rich message actions/media/stickers/voice, encrypted Drive/iCloud recovery,
+   native MatrixRTC call lifecycle, LiveKit meetings and all remaining PRD groups.
+   Whole acceptance groups need their product/provider/lifecycle proof, not domain
+   tests alone. Current scope is docs/collaboration/prd.md and delivery.json.

@@ -13,7 +13,7 @@ class MigrationVersionsTest(unittest.TestCase):
             return [path.name for path in ordered_migrations(root)]
 
     def test_inserted_version_precedes_unshipped_group_range(self):
-        expected = ["V9__a.sql", "V10__b.sql", "V116__c.sql", "V116_1__d.sql", "V117__e.sql", "V137__f.sql"]
+        expected = ["V9__a.sql", "V10__b.sql", "V116__c.sql", "V116_1__d.sql", "V116_2__g.sql", "V116_3__h.sql", "V116_4__i.sql", "V117__e.sql", "V137__f.sql"]
         self.assertEqual(expected, self.ordered(reversed(expected)))
 
     def test_numeric_components_and_both_flyway_separators(self):

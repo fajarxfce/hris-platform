@@ -68,11 +68,16 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("key_encrypted", sql)
 
     def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, '116.1'):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, '116.1', '116.2', '116.3', '116.4'):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 117, None, 'invalid', '116.2', '115.1', 116.1, '116.1.1', '1' * 65):
+        for schema in (58, 117, None, 'invalid', '116.5', '115.1', 116.1, '116.1.1', '1' * 65):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
+
+    def test_reviewed_readiness_migrations_keep_existing_envelope_verification(self):
+        for schema in ('116.2', '116.3', '116.4'):
+            self.assertEqual((116, int(schema[-1])), recovery.validate_schema({'observedSchema': schema}))
+            self.assertEqual(recovery.envelope_query('116.1'), recovery.envelope_query(schema))
 
     def test_keypack_requires_exact_fields_current_key_and_unique_bounded_old_keys(self):
         self.assertEqual(keys(), recovery.validate_keys(keys()))

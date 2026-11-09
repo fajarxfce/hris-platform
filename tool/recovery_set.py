@@ -44,7 +44,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V116 retains bounded wake/lease metadata; no new encrypted envelope format.
 # V116.1 adds public summary projections and raw queues, not encrypted envelopes.
 # CollaborationSummaryMigrationTest verifies their real dump/restore and guards.
-MAX_SCHEMA = (116, 1)
+# V116.2–4 add readiness wake/control/revision metadata; encrypted envelopes stay unchanged.
+MAX_SCHEMA = (116, 4)
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -232,7 +233,7 @@ def validate_schema(manifest):
         if type(value) not in (str, int):
             raise ValueError()
         schema = migration_version(str(value))
-        if not (59,) <= schema <= MAX_SCHEMA or (len(schema) > 1 and schema != (116, 1)):
+        if not (59,) <= schema <= MAX_SCHEMA or (len(schema) > 1 and schema not in {(116, 1), (116, 2), (116, 3), (116, 4)}):
             raise ValueError()
         return schema
     except (KeyError, TypeError, ValueError):

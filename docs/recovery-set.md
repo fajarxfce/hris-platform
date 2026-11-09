@@ -8,9 +8,16 @@ It has no live restore destination and never stops or restarts the source servic
 Use Linux, Python 3.11+, Java 21, Docker and curl with SigV4 support. Build the
 current API JAR first; its offline key-verification entry point reuses the actual
 application cipher without starting Spring, an HTTP server, workers or providers.
-The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–103
-are supported. V103 adds typed document metadata and immutable history, without
-a new encrypted record family. New encryption contracts require reviewing the schema bound.
+The checked-in Garage 2.4.1 single-node SQLite layout and reviewed database schemas
+59–116, plus 116.1–116.4, are supported in this branch. V116.2–116.4 add readiness
+wake/control/revision metadata without another encrypted record family. Unknown
+fractional versions and the separate organization branch's 117+ schemas are rejected.
+New encryption contracts require reviewing the schema bound.
+
+The readiness schema correction preserves the exact envelope query from 116.1. Its
+regression first reproduced the rejection; all 40 database-recovery, migration-order
+and recovery-set unit cases then passed. This is verifier coverage, not a new live
+restore exercise. [Validation](measurements/collaboration-readiness-recovery-verifier-2026-11-09.json).
 
 ## Capture a checkpoint
 

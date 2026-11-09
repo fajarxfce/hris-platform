@@ -1,0 +1,67 @@
+{
+  "at": "2026-11-09T13:49:41.056016+00:00",
+  "accepted": true,
+  "baseCommit": "4d4df31f8b5b96f4289f545808cb8a06eeb75877",
+  "scope": "Root verifier recognizes reviewed schemas116.2\u20134; no database mutation or live restore. Group117+ remains rejected.",
+  "initialSources": {
+    "tool/recovery_set.py": "d17ba6ccb8ce34d442eff56fa630f120dcc27ddc2c42e9c12425fadb58a7d2ba",
+    "tool/test_recovery_set.py": "40877497de476104deb8f5e8b65b095f5998756ac5ea2cc9e1cd783e89281698",
+    "tool/test_migration_versions.py": "3c26da7a90a610238fcd71cb6b8420f3634d1a0d6523f65666a73a50e04753ad"
+  },
+  "red": {
+    "at": "2026-11-09T13:49:40.839664+00:00",
+    "elapsedSeconds": 0.088,
+    "exitCode": 1,
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_recovery_set.RecoverySetTest.test_reviewed_readiness_migrations_keep_existing_envelope_verification"
+    ],
+    "sources": {
+      "tool/recovery_set.py": "d17ba6ccb8ce34d442eff56fa630f120dcc27ddc2c42e9c12425fadb58a7d2ba",
+      "tool/test_recovery_set.py": "ec1868a54e814a811e0959e1205d79df8a280662314635f1c4f9fa1ba5a8a0f8",
+      "tool/test_migration_versions.py": "3c26da7a90a610238fcd71cb6b8420f3634d1a0d6523f65666a73a50e04753ad"
+    },
+    "sourcesUnchanged": true,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "b161b6c1816e32fd218e98ea5048301d1b470ea5b2a1690f0900957912e9d4de",
+    "tests": 1,
+    "errors": 1,
+    "expectedFailure": true
+  },
+  "green": {
+    "at": "2026-11-09T13:49:40.929167+00:00",
+    "elapsedSeconds": 0.127,
+    "exitCode": 0,
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_database_recovery",
+      "test_migration_versions",
+      "test_recovery_set"
+    ],
+    "sources": {
+      "tool/recovery_set.py": "9f0b7f41c6f2fada8bbf744910e874c0957fbfde1992c931f77368b4e0aba6d6",
+      "tool/test_recovery_set.py": "8593c06e65529b48a0d723b8a55075d881bde50fd7a073cb9e9794d1a494c4d3",
+      "tool/test_migration_versions.py": "91d145d3d9b5735c743f7a7d46374aa14fa32d38a4f109463c1b315dddf4ba79"
+    },
+    "sourcesUnchanged": true,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "406dc54692a02ea75c6b4b30e106bc689c99c62aa0431099897c67cc1063b96e",
+    "tests": 40,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "migrationSha256": {
+    "core/database/src/main/resources/db/migration/V116_2__collaboration_readiness_wakes.sql": "9a2003d155c7bd4fa158ba3eb9788bfe019084511937d74e42d1b7b2ba6b56af",
+    "core/database/src/main/resources/db/migration/V116_3__collaboration_readiness_controls.sql": "79082214ea527371742d623e3da52fe10ddc3e5300e88d6a49aaacbd1a5fae86",
+    "core/database/src/main/resources/db/migration/V116_4__collaboration_readiness_revisions.sql": "f598df11faf609c2b59b8a3e6911b48ce0fabb96a1f10b870815c8678e760d6c"
+  },
+  "limits": [
+    "Unit verification and numeric migration ordering only; no new full database restore.",
+    "No application/worker DI or schema changes."
+  ]
+}

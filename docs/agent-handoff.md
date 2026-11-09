@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 17:23 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 18:10 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,11 +15,47 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
+## Current worker publication correction (unaccepted)
+
+Root cause: AdvanceCollaborationSpaceProvisioning already reads/validates the actual
+signed original identity before immutable LEGACY completion, but omitted the V135
+group key-publication record. The correction adds that publication and its audit to
+the same existing transaction, with timestamps from database completion. Fresh SPACE
+devices still publish through their SDK; empty keys/upload stays counts-only. No
+extra Mobile endpoint, token refresh, SDK7, migration or readiness relaxation.
+
+Three Kotlin files currently change: worker use case, shared constructor DI, and
+CollaborationSpaceWorkerPublicationTest. [Contract](collaboration/space-original-key-publication.md)
+is unaccepted work in progress. Private `.work/space-original-key-publication-2026-11-09`:
+- red-1 /30751 REAPED FAILED22.365s before tests: fixture passed DSLContext instead
+  of PostgresCollaborationSpaceKeyDataSource. Production remained unchanged.
+- red-2 /96766 REAPED EXPECTED FAILURE37.844s:one test,missing group publication.
+- focused-1 /97011 RUNNING: original/fresh activation,rollback at key write/readback/
+  journal boundaries,competing workers,late admission,and actual Synapse continuity;
+  API/worker compilation and quality. Freeze source until reaped.
+- `native-prepared` has TWO private fixture candidates, not applied. They remove the
+  old explicit keys/upload and assert worker-confirmed publication before bootstrap.
+  Apply only after checking its manifest against unchanged current fixture files.
+- Shared DI requires FULL API and worker contexts,not just the compilation above.
+  Native proof follows on unchanged Mobilea14eea78 source/accepted SDK6 proof APK.
+
+RETIRED explicit-confirmation approach:9 Group and22 Mobile unaccepted Kotlin files
+are archived in each checkout's `.work/space-original-key-confirmation-2026-11-09/retired-*`.
+Do not reapply that directory's `native-prepared` or run its old Mobile focused script.
+213 focused/2 HTTP cases passed for that candidate only. Full61608 was deliberately
+terminated/reaped after1,231.719s,192 domain cases; it was NOT full acceptance. Its
+verified process group is stopped. Those source files were restored before this work.
+
+Mobile hosted42656803963 is complete and accepted at69e639f8:9,137 cases,including
+2,499 Apple simulator,zero failures/errors/skips,and successful unsigned Xcode host.
+Artifact audits are complete; Mobilea945220c records Apple evidence,8d1a6917 records
+this direction. No rerun/reaudit. Actual native Apple Matrix/APNs/calls remain separate.
+
 ## Current original-delivery experiment
 
 Mobile69e639f8 source is accepted and pushed. Hosted42656803963 portable job is
-accepted with6,638 fresh cases,zero failures/errors/skips; Apple still runs. Mobile
-82986dbf records the audited portable artifact; subsequent Mobile handoff records native acceptance.
+accepted with6,638 fresh cases,zero failures/errors/skips; Apple also passes2,499
+cases/Xcode. Mobilea945220c records complete hosted acceptance; a14eea78 records native acceptance.
 
 Accepted Group test-only work: NativeSpaceOriginalFixture/DeliveryTest,
 NativeOriginalDeliveryTrace, bounded NativeSdkMatrixServer.encryptedRoomEvents and
@@ -63,7 +99,7 @@ Private `.work/space-original-delivery-native-2026-11-09`:
 
 Live e558a686/schema116.4/group routing OFF, phone87 and retained stopped sender87
 are unchanged. Native fixture acceptance is bounded above; no new product APK. Next:
-automatic Mobile original-key activation,group readiness-event consumption/background
+atomic worker original-key publication,group readiness-event consumption/background
 ownership/product routing. No acceptance group is complete.
 
 ## Current source reconciliation
@@ -158,9 +194,9 @@ Preserve Inspector's unrelated gradlew.bat worktree delta. SDK26.10.23-hris.6 re
    their apply/merge or accepted source gates. Live runtime/schema remain unchanged.
 2. Mobile ab17eadd/69e639f8 are accepted/pushed for direct transport/original delivery;
    full owning source passes4,304 cases with exact source/XML audit. Hosted42656803963
-   runs exact69e639f8. Four proof-only Mobile files are now uncommitted; source4649 is
-   running and has one Detekt finding to correct after reaping. Finish the isolated
-   Group real Synapse/SQL/HTTP fixture and driver; no actual SDK delivery proof yet.
+   completed exact69e639f8 with audited portable/Apple success. Group e2c61dad and
+   Mobilea14eea78 accept actual native31328. Finish the worker publication correction
+   above,then prove the fixture without explicit key uploads.
 3. Continue owning original SDK delivery/history, recipient readiness, background
    lifetime and group product routing. Existing Prepare/Resolve/Replay Room commands
    are accepted; do not recreate them or replace uncertain originals.

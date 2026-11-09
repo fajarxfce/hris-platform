@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 17:07 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 17:18 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -10,7 +10,7 @@ Mobile to prove generic foundations before Starter. Preserve original keys, stor
 accounts, native/SDK IDs and message transactions. Follow AGENTS.md layer ownership.
 
 One heavy local compiler OR emulator. Do not kill live API/worker JVMs. The emulator
-uses2560MiB/two cores and is stopped. Phone10.77.77.3:5555 is install-only; announce
+uses2560MiB/two cores; retained sender87 is stopped, isolated native-5 is active. Phone10.77.77.3:5555 is install-only; announce
 installation and never launch, automate, uninstall or clear it. Crashlytics access
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
@@ -36,9 +36,21 @@ Private `.work/space-original-delivery-native-2026-11-09`:
 - Final Group source21551 passes32.425s,8,698 stable inputs; compilation/format/architecture.
 - Existing driver82 tests and new ownership6 tests pass. No production source changes.
 - native-1/2 fail only fresh-emulator setup, before any server/message test; reaped/stopped.
-- **Native61494/native-3 RUNNING**: fresh owned x86_64 emulator boots40.882s,2560MiB/two
-  cores. Server tests use compiled inputs. Both Mobile and Group sources are frozen.
-  Reap its result and preserve any failed original stores; do not enqueue replacements.
+- Native61494/native-3 is REAPED FAILED136.271s:one case fails before delivery on a
+  driver checkpoint/terminal-state read race. Inspection of retained app files proves
+  two staged originals and unchanged identities; terminal-file inspection itself failed.
+  A focused Python regression reproduces the race (7 cases/1 error), then all7 pass
+  after re-reading the checkpoint on terminal observation. Original app source unchanged.
+- Native5680/native-4 is REAPED FAILED121.262s:one case reaches adopted room, correctly
+  reports recipientReady=false because original company publication is not group
+  publication. No production readiness guard is weakened. Fixture now uses the actual
+  SDK's signed public identity and real group gateway keys/upload after completion.
+  No generated/replaced keys or SQL publication injection. This explicitly DOES NOT
+  prove automatic Mobile first-key-publication activation; that product gap remains.
+- Source1075/source-4 is REAPED PASS32.002s,8,698 stable inputs,compile/format/architecture.
+- **Native31328/native-5 RUNNING**, Mobile/Group sources frozen. Both earlier actual
+  experiments ran only precompiled classes and preserved failed SDK/app stores; their
+  emulators are stopped. Current run again owns a fresh2560MiB/two-core emulator.
 - SDK6 x86_64 library exactly matches deterministic NDK28.2 stripping,111204848bytes,
   SHA256ecffbab72fd5dd29d656bc4757ea423bb4bccf0444140af0480684bc32761278.
   Proof APK SHA2561b64c9eed71feebf9cfdebb6e7ec42991512d25e8f5d7a0e0601a7f726d96b7f.

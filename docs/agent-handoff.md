@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 20:43 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 23:57 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,7 +15,39 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Current: organization readiness worker integration accepted
+## Accepted: actual organization recovery proof
+
+Mobile worker efa700bb is accepted/pushed. The native proof is now accepted locally:
+Mobile6044 passes20 fresh proof unit cases/131.926s; final73682 is REAPED PASS68.001s
+with required root/Android-host/quality checks. Tests are up-to-date in the final gate:
+4,439 predecessor cases plus20 proof cases have exact archived/current passing XML.
+No production Mobile source changed; all4,630 source inputs and Inspector hashes match.
+
+Group source89294 passes34.055s with8,733 stable inputs and format/architecture.
+Eleven Python driver cases pass0.005s. Native98504 is REAPED PASS196.262s:2 actual
+native cases,zero failures/errors/skips. Original scenario has2 provider events and10
+native requests. Group recovery has2 provider events,22 native and16 Matrix requests,
+zero401/403/server errors. Actual control -> durable wake -> actual registered task ->
+persisted claim/ACK -> process death -> original recovery without new hint/FCM passes.
+Consumer dedup uses an explicit replay of the captured real signal. Offline Sent reads
+occur after online recovery. Manual scheduling is explicit; no OS timing claim.
+
+APK150,441,529 bytes,SHA227cdc9211dd5415cb76c8167a10016acc3d50fc4753518b374250f2850a77a1.
+SDK6 is unchanged. Strict cross-source/APK/XML/driver audit passes; no compilation
+during emulator and emulator stopped. Failed native34069 correctly had no eligible
+target because its room was created after publication; only fixture ordering changed.
+Private `.work/space-recovery-native-2026-11-09` retains failed data and accepted.json.
+Prepared files are archival. Do not repeat unchanged accepted gates.
+
+Next: complete SDK+app-ledger idle checks, producer durable wakes after final reads,
+group FCM/product routing, new SPACE enqueue and remaining rich messaging/calls/meetings.
+No product88,phone or live change; all54 PRD groups remain open. Hosted42721024887
+is pinned to worker efa700bb and audited separately; it excludes native proof edits.
+
+[Native contract](collaboration/space-recovery-native.md) and
+[measurement](measurements/collaboration-space-recovery-native-2026-11-09.json).
+
+## Accepted: organization readiness worker integration
 
 Base806601d5 and predecessor99a0d8c5 are committed/pushed; their jobs are reaped.
 Five Kotlin inputs now wire the shared queue/fanout/Matrix transport, explicit
@@ -37,20 +69,9 @@ Private `.work/space-readiness-worker-integration-2026-11-09`:
 - [Contract](collaboration/space-readiness-workers.md) and
   [measurement](measurements/collaboration-space-readiness-workers-2026-11-09.json).
 
-Mobile baseb061614a has eleven pending Kotlin inputs for strict group V1 control
-parsing, a separate typed encrypted readiness receipt namespace, shared storage
-contracts across desktop SQLite/IndexedDB/Apple Room and an application DI assertion.
-Private Mobile `.work/space-readiness-protocol-2026-11-09` focused-1 /81916 RUNNING.
-It owns the only heavy compiler. Mobile source is frozen until reaped; no other
-Gradle/Java formatter/emulator. Group acceptance is complete and its source frozen
-hashes are recorded. Next finish Mobile required root/platform and hosted Apple
-checks, then current-runtime provenance and durable wake ownership before activation.
-
-This is still one part of the larger PRD. All54 groups remain open. No SDK7, APK88,
-emulator or live/phone change; phone87 stays installed. The live deployment stays
-schema116.4 with group OFF. Group recovery verifier max140 must never be copied to
-the original platform branch (max116.4). Do not restart retired confirmation routes,
-old native proofs or accepted hosted run42656803963.
+The older Mobile protocol gate81916 and its successors are completed. Current Mobile
+source/evidence is efa700bb;the actual next native gate is34069 above. Do not restart
+old pending-job notes. Live remains group-OFF/schema116.4 and phone87 unchanged.
 
 ## Accepted independent PUSH handoff — previous checkpoint
 

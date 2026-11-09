@@ -70,6 +70,13 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
     }
 
     protected fun completeOriginal(owner: SdkOwner, fingerprint: String): GroupOriginal {
+        val prepared = prepareOriginal(owner, fingerprint)
+        completeOriginal(owner, fingerprint, prepared)
+        return prepared
+    }
+
+    /** Freeze the actual original, leaving key publication to the separately controlled worker. */
+    protected fun prepareOriginal(owner: SdkOwner, fingerprint: String): GroupOriginal {
         val native = owner.native
         val originalKeys = originalPublicKeys(owner)
         assertEquals(
@@ -118,6 +125,14 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
                 "$base/native-device/legacy-runtime/drain?deviceId=$device&expectedDeviceVersion=0&fingerprint=$fingerprint",
             )
         assertEquals(0, drained["activeRequests"].asInt())
+        return GroupOriginal(space, device, UUID.randomUUID(), registration, handover, createdAt)
+    }
+
+    /** The actual worker publishes keys only after an existing conversation can need its wake. */
+    protected fun completeOriginal(owner: SdkOwner, fingerprint: String, group: GroupOriginal) {
+        val native = owner.native
+        val device = group.deviceId
+        val base = "/api/v1/collaboration/spaces/${group.spaceId}"
         withWorker {
             val leases = success(claim.execute(UUID.randomUUID(), 8))
             assertEquals(listOf(device), leases.map { it.request.deviceId })
@@ -133,7 +148,6 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
                     owner.device,
                 ),
         )
-        val bootstrap = UUID.randomUUID()
         // Worker completion alone must establish receiving readiness before any group SDK or
         // gateway bootstrap exists. This is an assertion, never fixture publication SQL.
         assertEquals(
@@ -150,9 +164,8 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
             native,
             "$base/native-device/bootstrap",
             mapOf("deviceId" to device, "expectedDeviceVersion" to 1),
-            bootstrap,
+            group.bootstrapOperationId,
         )
-        return GroupOriginal(space, device, bootstrap, registration, handover, createdAt)
     }
 
     /** Public identity produced by the actual stopped SDK; this fixture never generates keys. */
@@ -187,6 +200,7 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
         recipient: SdkOwner,
         group: GroupOriginal,
         originalRoom: String,
+        recipientReady: Boolean = true,
     ): UUID {
         val base = "/api/v1/collaboration/spaces/${group.spaceId}/direct-conversations"
         val conversation =
@@ -212,7 +226,7 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
         assertEquals(originalRoom, transport["room"]["roomId"].asString())
         assertEquals(sender.session.getValue("userId"), transport["matrixUserId"].asString())
         assertEquals(sender.session.getValue("deviceId"), transport["matrixDeviceId"].asString())
-        assertTrue(transport["recipientReady"].asBoolean())
+        assertEquals(recipientReady, transport["recipientReady"].asBoolean())
         assertEquals("LEGACY", transport["room"]["origin"].asString())
         assertEquals(
             originalRoom,
@@ -257,7 +271,7 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
         )
     }
 
-    private fun withWorker(action: () -> Unit) {
+    protected fun withWorker(action: () -> Unit) {
         database().execute("grant hris_worker_capability to hris_test_runtime")
         try {
             action()
@@ -293,7 +307,7 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
         return value
     }
 
-    private fun <T> success(result: Result<T>): T {
+    protected fun <T> success(result: Result<T>): T {
         if (result is Result.Failed)
             fail<Nothing>("Original fixture failed: ${result.failure.kind}/${result.failure.code}")
         return (result as Result.Success).value

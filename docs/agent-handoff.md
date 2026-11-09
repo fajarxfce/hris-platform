@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:21 UTC. Historical detail remains in
+Updated 9 November 2026, 23:32 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -158,34 +158,41 @@ source/browser/quality pass. Both4,611-input manifests and all source/library/XM
 checks agree. Claimed raw pages survive interruption;only a clean exhausted sweep
 can return its exact wake. No schema,SDK,phone or live change.
 
-Current only heavy job is Mobile worker focused-4 /85180 under private
-`.work/space-recovery-worker-2026-11-09`;23 Kotlin inputs and one workflow are frozen.
-Initial91375 had a new fixture collision/two LongMethod failures;37708 passed75
-cases but retained one LongMethod. Explicit lazy undispatched observer ownership and
-separate task DI corrected these without suppression. Focused56790 is REAPED PASS:
-75 cases/99.492s,zero failures/errors/skips,strict source/library/XML checks.
+Mobile [efa700bb](https://github.com/fajarxfce/hris-mobile/blob/efa700bb/docs/collaboration-space-recovery-worker.md)
+is accepted/pushed;12097 reaped. Its group task uses independent durable wake/claims,
+current native-parent cancellation,original adoption/sync/delivery and exact completion.
+One processor/one waiter,four raw pages per90-second turn. Faults retain backoff.
+Focused85180 passes97 cases/85.225s. Final89627 passes253.361s with4,439 validated
+cases:2,489 rerun and1,950 passing reports reused from first-full83939. All240 reused
+XML hashes and production inputs match;only CI and the old startup test changed.
+That formerly failing suite reran successfully. Zero failures/errors/skips. Required
+root,Android release/lint,shared Wasm/iOS source and quality pass;4,627 stable inputs
+match focused/full. Initial fixture/quality and startup-expectation failures are retained
+in the Mobile measurement;no checks suppressed. No new product APK/phone/live rollout.
 
-Full83939 is REAPED FAIL582.138s:4,439 cases,one old startup-key expectation failure,
-zero errors/skips;4,627 source inputs and Inspector unchanged. The old22-case delivery
-worker suite expected only company recovery+delivery. Its startup test now retains
-those checks and adds group key+durable wake. Expanded focused85180 expects97 cases;
-full-2 expected4,439 remains required. CI app filters now include group worker and
-application lifecycle. The actual task reuses original native ownership/adoption/sync/
-delivery,one processor/one waiter,four raw pages per90-second turn,exact checkpoints
-and wake ACK;faults back off. No source acceptance or APK/phone/live rollout yet.
+[CI42721024887](https://github.com/fajarxfce/hris-mobile/actions/runs/42721024887) runs
+on immutable efa700bbb5a2b7a75af392afb5add8b642eb2ba0;dispatch99990 reaped. Expected
+6,940 portable+2,628 Apple=9,568,unaccepted. It covers sync/progress/worker and expanded
+app filters,not the following native proof. Earlier42707758241 is fully accepted.
 
-Next native proof is drafted,not applied,in Mobile and Group private
-`.work/space-recovery-native-2026-11-09`:three Mobile Kotlin files,two Group Kotlin
-files,and one driver. It reuses two fresh fictional originals and actual group Matrix
-fanout. It will distinguish startup wake from native control,invoke the actual task,
-kill only its proof process after durable ACK before Sent,retain exact page/wake and
-recover without another hint. Matrix/native counters must stay bounded with no401/403.
-Older accepted native proof remains intact. Apply/compile only after worker acceptance;
-no second compiler/emulator while85180 or its successor runs.
+Current only heavy job is Mobile native proof focused-1 /6044 under private
+`.work/space-recovery-native-2026-11-09`. Five Mobile Kotlin proof inputs are applied,
+formatted and frozen. Group two new Kotlin fixtures +driver/four unit tests are applied
+and formatted,not compiled. Worker source is unchanged. Old native original probe is
+byte-identical. Do not reapply prepared copies over current src after corrections.
 
-Idle optimization still needs complete paused SDK inventory plus app commands/receipts;
-empty app tables alone are insufficient. Producer wakes,group FCM/product routing,
-new SPACE enqueue and actual native proof remain. All54 groups are still open.
+New proof requires real group Matrix fanout -> owned callback -> encrypted receipt/
+durable wake -> actual Koin task -> original provider ACK. Kill only the fictional proof
+process after durable receipt/before projection. Recover exact claim and two original
+transactions without another control/FCM;assert2 provider events and offline reads.
+Bound Matrix/native requests and reject401/403 loops. Four draft driver cases pass
+0.003s;formal source/native acceptance pending. Reap6044 first,fix if necessary,compile
+Group,run driver/native tests on one fresh2560MiB/two-core emulator,then required final
+Mobile root check and source/APK/XML audits. No emulator is currently running.
+
+Idle checks still need complete SDK inventory plus app commands/receipts. Producer
+wakes,group FCM/product routing,new SPACE enqueue and native acceptance remain.
+All54 PRD groups remain open;live group-OFF/schema116.4 and phone87 unchanged.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must

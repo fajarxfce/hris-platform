@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 18:41 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 18:44 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -46,13 +46,33 @@ are accepted. Private `.work/space-original-key-publication-2026-11-09`:
   original transaction/event identity,durable ACK before projection,and offline read.
   Focused cases are not double-counted with the final suite. No new live/phone release.
 
-Next independent increment is organization readiness-control protocol and projection.
-Private `.work/space-readiness-control-2026-11-09/prepared` has14 Kotlin candidates;
-base.json pins six existing files,apply.py requires this accepted clean commit and no
-heavy job. No candidate has been applied,formatted,compiled or tested yet. Review its
-private design.md/check.py and preserve company/group scope separation. Add the bounded
-publication queue/current-target fanout and Mobile consumer/background owner afterward.
-Do not call the private protocol candidate product activation. Group routing remains OFF.
+## Current organization readiness-control protocol (unaccepted)
+
+The atomic worker correction is committed/pushed as61e8c2f5; its62503 gate is reaped,
+strict audit passes,and no old worker/emulator remains. Mobilefbb89f80 and Root
+ee755305 point to that accepted616-case plus actual native proof. No Mobile source,
+SDK,phone or live deployment changed. Do not repeat those accepted gates.
+
+Fourteen successor Kotlin files are now applied after all six base hashes matched,
+then formatted with pinned ktfmt0.59. `.work/space-readiness-control-2026-11-09`:
+- prepared/ and base.json preserve originals/candidates; apply.py has ALREADY RUN.
+  Do not reapply it over the formatted source.
+- focused-1 /21454 RUNNING:complete domain,five protocol/provider/projection classes,
+  six selected actual native API methods,format and architecture. Freeze Group source
+  until reaped. No source/provider/native acceptance exists yet for this increment.
+- New separate dev.fajar.hris.space_recipient_ready V1,nine bounded canonical string
+  fields,exact original or fresh Matrix user/device routing,finite existing raw HTTP.
+  Company/group sync owners remain explicit and exclusive;malformed/foreign hints
+  are discarded without losing encrypted to-device data. No public clear send route.
+- Tests cover canonical identities/revisions/bounds,company/group isolation,original/
+  fresh device mapping,provider errors/cancellation,current HTTP route denial,and
+  actual Synapse wake/replay/token rotation/restart. Do not count them before21454 exits.
+- No worker fanout,publication capture schema,Mobile consumer or product activation
+  is added yet. Next add bounded committed publication fanout and foreground/background
+  consumers over the same original work;do not substitute group IDs into company queues.
+
+Record/audit the new exact reports before its atomic implementation/test/doc commit.
+Group routing remains OFF;phone87 and live e558a686/schema116.4 are unchanged.
 
 RETIRED explicit-confirmation approach:9 Group and22 Mobile unaccepted Kotlin files
 are archived in each checkout's `.work/space-original-key-confirmation-2026-11-09/retired-*`.

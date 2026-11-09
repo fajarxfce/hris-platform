@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 13:51 UTC. Historical detail remains in
+Updated 9 November 2026, 14:54 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -20,7 +20,7 @@ Apple runtime, push and calling acceptance remains separate.
 ## Current work
 
 Original Platform feat/communications contains the minimal reviewed readiness recovery
-verifier correction in this commit. The source bound advances116.1→116.4, with exact
+verifier correction in691f3fc5. The source bound advances116.1→116.4, with exact
 fractional-version allowlisting;117+ remains rejected here. The new regression first
 reproduced the error, then40 database-recovery/migration-order/recovery-set unit tests
 passed. The original encrypted-envelope query is unchanged. No live restore or schema
@@ -34,11 +34,15 @@ resolved, preserving company runtime/readiness/default-key fixes and group behav
 It is NOT COMMITTED or DEPLOYED. Focused49700 passed207 domain/data cases but failed
 API test compilation: five group-only fixture calls retained a renamed method. Those
 calls now use the merged accountData fixture with the same m.direct default.
-Corrected focused67950 is RUNNING; Group source is frozen. This is the only heavy
-local job. After focused proof, run required migration/collaboration/API and FULL
-worker checks because shared DI changed. See its
-[current handoff](https://github.com/fajarxfce/hris-platform/blob/feat/communication-space/docs/agent-handoff.md)
-and private `.work/space-root-reconciliation-2026-11-09` for candidate work.
+Focused67950 then failed one HTTP case because its frozen fixture clock preceded the
+actual PostgreSQL request-lease start. Only that real-provider fixture now follows
+system time; admission and the expected503 response remain unchanged. Corrected24065
+passes both HTTP cases in75.409s. Full33511 is RUNNING on8,686 frozen inputs and is the
+only heavy local job. Its completed database138 and domain189 cases have no failures,
+errors or skips; data/API/FULL worker and remaining quality checks must finish before
+accepting or committing the merge. Private evidence is in the Group checkout's
+`.work/space-root-reconciliation-2026-11-09`; the prepared publisher requires final
+success and exact source/XML hashes. Do not reset or restart the merge.
 
 Mobile feat/chat-send-timing-20261107 now has accepted/pushed78076d4e: owning published
 room binding preparation. It first reads owned immutable local metadata; only absence
@@ -47,10 +51,22 @@ full81742 passes4,224 fresh cases (3,587 desktop/613 Android host/24 actual brow
 zero failures/errors/skips,4,551 stable application/library inputs. Root/release/Wasm/
 iOS-source/quality pass. Original denial/expiry regressions remain recorded. No SDK/
 worker/UI activation or new APK follows from this change. Hosted collaboration-control
-[42628449460](https://github.com/fajarxfce/hris-mobile/actions/runs/42628449460) runs
-on exact78076d4e, including actual Apple database coverage; do not dispatch a duplicate.
+[42628449460](https://github.com/fajarxfce/hris-mobile/actions/runs/42628449460) is now
+SUCCESS on exact78076d4e. Both artifact digests/ZIP CRC/XML are verified:9,003 cases,
+including2,457 Apple simulator and the exact21 domain+3 actual database preparation
+cases on each shared target; zero failures/errors/skips. Xcode builds the unsigned
+simulator host. Evidence and continuation are committed/pushed in Mobile7e636567.
+This is separate from APNs/calling, native SDK6 Matrix delivery and signed distribution.
 The [latest Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
-is authoritative for subsequent job transitions.
+is authoritative for subsequent transitions; do not redispatch this accepted CI run.
+
+A finite group direct-transport read is drafted next: Mobile has13 uncommitted Kotlin
+files/eight transport methods; Group has11 private unapplied files, seven SQL methods,
+three pure policy methods and HTTP/OpenAPI/DI changes. Format only has passed so far;
+neither implementation is compiled or accepted. The Group private apply/check scripts
+must verify the accepted merge and base hashes first. Device origin stays separate from
+user origin; a new crypto device may retain an original identity/room. Owning SDK
+delivery, durable receipt reconciliation and group readiness wake are still required.
 
 ## Accepted runtime and device state
 
@@ -81,8 +97,9 @@ Web/iOS-source/quality/SBOM and62 fresh browser tests; no Starter hosted distrib
 
 ## Next work
 
-1. Finish Group focused67950 and required full checks, audit every failure, then
-   commit/push the source reconciliation. Audit Mobile hosted Apple run42628449460.
+1. Reap/audit Group full33511, then commit/push the accepted source reconciliation.
+   Hosted Mobile42628449460 is already accepted; continue the pending direct-transport
+   increment and required API/FULL worker/Mobile checks after that merge.
 2. Continue owning original SDK delivery/history, recipient readiness, background
    ownership and group product routing. Room Prepare/Resolve/Replay, exact original
    references and encrypted binding preparation are accepted; do not recreate them.

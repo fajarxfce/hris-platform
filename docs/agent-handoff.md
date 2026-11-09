@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 15:34 UTC. Historical detail remains in
+Updated 9 November 2026, 16:05 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -61,20 +61,31 @@ This is separate from APNs/calling, native SDK6 Matrix delivery and signed distr
 The [latest Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
 is authoritative for subsequent transitions; do not redispatch this accepted CI run.
 
-The finite Group direct-transport candidate is now applied after exact accepted/base
-checks. Eleven Kotlin files include seven SQL and three pure policy cases, HTTP/OpenAPI
-and shared DI. Full38552 is the only heavy local job and remains RUNNING. Its first
-compile attempt found two fixture errors: the repository override parameter must be
-named id, and the Native fixture is not a data class with copy(). Two test-only
-corrections are prepared privately and formatted1.774s; do not change its frozen source
-until reaped. Full worker is still running under --continue. Preserve this failure;
-actual new SQL/API execution remains required after the correction.
+Group direct transport is ACCEPTED/COMMITTED/PUSHED as96d2d238 (85313 reaped).
+The12 Kotlin files expose one current native device/room/recipient GET. Verified
+combined evidence covers452 cases:192 domain,38 SQL,72 API/OpenAPI,150 complete worker;
+zero failures/errors and one existing elapsed-retention opt-in skip. Full38552 and
+focused34852 preserved compile/fixture failures. Final43271 passes nine fresh cases
+in148.630s on8,693 unchanged inputs. Only three SQL/API fixtures changed since the
+complete worker run; exact source/XML comparison retains unchanged broader proof.
+Actual retained LEGACY publication proves exact original room/user/physical device.
+No production policy/schema/DI was changed to resolve test fixture errors. See Group
+`docs/measurements/collaboration-space-direct-transport-2026-11-09.json`; do not rerun.
 
-Mobile has13 uncompiled transport files/eight methods. Its private original follow-up
-now has seven files/ten pure methods for matching and exact journal/archive ACK facts,
-formatted0.917s only; no owning delivery implementation or runtime activation. Device
-origin stays separate from user origin. Current direct contracts must pass before
-applying that follow-up. Latest Mobile checkpoint deb8ba1f is pushed.
+Mobile has13 uncommitted transport files. Focused25221 PASSES203.352s/23 fresh cases:
+eight new transport,13 existing room transport and two actual app DI cases, zero
+failures/errors/skips,4,562 unchanged inputs and unchanged Inspector sources. Full90875
+FAILED22.617s before any tests because the private browser init used an unsupported
+KotlinJsTest.filter closure. The corrected runner uses getFilter/includeTestsMatching
+and an archived exact init script. Full94359 (`full-2`) is RUNNING and owns the only
+heavy local slot; Mobile source stays frozen. No new APK or product activation.
+
+Mobile's private original follow-up has seven files/ten pure methods for matching and
+exact journal/archive ACK facts, formatter-only proof; no owning delivery implementation.
+Its next window must retain orphaned local Staged records when the SDK queue is empty,
+journal late ACKs without publishing through cancelled owners, and pause/drain before
+writer release. Source policy/original identities and all eight retained originals stay
+unchanged. Both direct contracts must be accepted before applying that follow-up.
 
 ## Accepted runtime and device state
 
@@ -105,11 +116,9 @@ Web/iOS-source/quality/SBOM and62 fresh browser tests; no Starter hosted distrib
 
 ## Next work
 
-1. Reap Group direct-transport full38552, preserve its fixture compile failures, apply
-   only the prepared exact test corrections and complete the missing SQL/API checks.
-   Validate shared production inputs against the full worker result before acceptance.
-   Then validate Mobile transport. Reconciliation fa90ddcc and hosted Mobile42628449460
-   are already accepted; do not rerun them.
+1. Reap/audit Mobile full94359, preserve its init-script failure, then commit/push the
+   accepted Mobile transport. Backend96d2d238, reconciliationfa90ddcc and hosted
+   Mobile42628449460 are already accepted; do not repeat them.
 2. Continue owning original SDK delivery/history, recipient readiness, background
    ownership and group product routing. Room Prepare/Resolve/Replay, exact original
    references and encrypted binding preparation are accepted; do not recreate them.

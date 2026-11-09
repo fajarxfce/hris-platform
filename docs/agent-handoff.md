@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:53 UTC. Historical detail remains in
+Updated 9 November 2026, 23:59 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -172,60 +172,46 @@ in the Mobile measurement;no checks suppressed. No new product APK/phone/live ro
 
 [CI42721024887](https://github.com/fajarxfce/hris-mobile/actions/runs/42721024887) runs
 on immutable efa700bbb5a2b7a75af392afb5add8b642eb2ba0;dispatch99990 reaped. Expected
-6,940 portable+2,628 Apple=9,568,unaccepted. It covers sync/progress/worker and expanded
+6,940 portable cases accepted;2,628 Apple cases expected and unaccepted. It covers sync/progress/worker and expanded
 app filters,not the following native proof. Earlier42707758241 is fully accepted.
 
-Current active native proof is Group34069 under private
-`.work/space-recovery-native-2026-11-09` (also in Mobile). Mobile6044 is REAPED
-PASS131.926s:20 unit cases,format/architecture/detekt,4,630 stable inputs,unchanged
-Inspector and strict source/library/XML/APK audit. APK150,441,529 bytes,SHA256
-227cdc9211dd5415cb76c8167a10016acc3d50fc4753518b374250f2850a77a1.
-Five Mobile proof Kotlin inputs are applied;old original probe remains byte-identical.
+Native proof is accepted and pushed: Mobile78145d78 and Group450fd51d.
+[Mobile contract](https://github.com/fajarxfce/hris-mobile/blob/78145d78/docs/collaboration-space-recovery-native.md)
+and [backend contract](https://github.com/fajarxfce/hris-platform/blob/450fd51d/docs/collaboration/space-recovery-native.md)
+retain exact source, APK, SDK and XML evidence. Native98504 passes196.262s:2 actual
+cases,zero failures/errors/skips. Each preserves exactly2 provider events. Group control
+flows through durable receipt/wake and actual registered task; process death after
+ACK/before Sent retains the claim and original transactions. Recovery needs no new
+hint/FCM; later offline Sent reads pass. The captured real signal is explicitly replayed
+into its consumer to test dedup. The fixture manually invokes the registered task.
 
-Group97130 failed28.602s because two shared fixture functions were private. Only
-withWorker/success visibility changed to protected. Group75117 is REAPED PASS33.716s,
-8,733 unchanged inputs,format/architecture;11 driver cases pass0.005s. Three Group
-Kotlin/two Python inputs are applied. No production Group or shared DI change.
+Group scenario has22 native and16 Matrix requests,zero401/403/server errors;3 encrypted
+HTTP sends include original transaction replay and create only2 events. Whole-scenario
+counts are not per-message latency. Original scenario retains2 events/10 native requests.
+Source/APK hashes match;no compiler during emulator;emulator stopped. Failed native34069
+had no eligible control target because its fixture created the room after publication.
+Only fixture ordering changed;failed userdata remains retained.
 
-Native34069 is REAPED FAIL249.572s:two cases,one failure. Old scenario passes with
-2 encrypted provider events,10 native requests and offline recovery. The new case
-reaches listening but times out before control. Source/APK unchanged,no compilation
-during emulator,and emulator stopped. Its failed proof data remains intact.
+Mobile final73682 passes68.001s,required root/Android-host/quality checks. No tests rerun
+in this final gate;exact current/archived XML validates4,439 predecessor and20 proof
+cases with unchanged production bytes. Focused6044 ran20 proof cases/131.926s.
+Group89294 source/format/architecture passes34.055s;11 driver cases pass0.005s.
+Strict cross-source/APK/SDK/XML audit passes4,630 Mobile and8,733 Group inputs.
+Pushes15951/83711 are REAPED. Prior Platformfb1beb63 push62231 is also confirmed
+complete by clean origin-tracking status;do not restart it.
 
-Root cause is test ordering:V139 control targets require room intent/binding created
-before publication captured_at. Both publications preceded room creation,correctly
-selecting zero targets. Only Group fixture changed:prepare recipient,create the room,
-wait for listening,then complete the original recipient worker to publish its keys.
-Assertions verify room-before-publication and target ACK;safe traffic persists on failure.
-Group89294 is REAPED PASS34.055s,8,733 unchanged inputs,format/architecture. Mobile
-source/APK and all production code are unchanged by fixture-order correction.
-Native98504 is REAPED PASS196.262s:2 cases,zero failures/errors/skips. Original scenario
-retains2 provider events/10 native requests. Group scenario proves actual control ->
-wake -> registered task -> original ACK,process death before Sent,exact claim recovery
-without FCM,and offline reads. Captured-signal replay deduplicates. Exactly2 provider
-events from3 encrypted HTTP sends;the replay keeps its original transaction. Group
-traffic:22 native requests (1 registration,1 bootstrap,3 transport),16 Matrix requests
-(4 secret-storage,6 sync,3 encrypted sends),zero401/403/server errors. This is whole
-scenario traffic,not per-message latency or phone/p95 evidence.
+Portable hosted42721024887 is accepted6,940 cases=3,242 desktop+629 Android host+
+3,069 browser,zero failures/errors/skips. Audit71793 is reaped;GitHub digest,ZIP CRC,
+full previous testcase set and new cases verified. Artifact13720089441,3,385,094 bytes,
+SHA2ea99a2369cd5ff6a6af84dc10a68d103900f464750d83b3b75385614f34ee7b.
+Apple job remains running/unaccepted. This run pins efa700bb,not the later proof edits.
 
-All source/APK hashes match;no compilation during emulator;emulator stopped. Final
-Mobile full-1 /73682 is RUNNING with source/APK frozen. Required root check and exact
-cross-source/library/APK/XML audits remain before native-proof commits. Do not repeat
-native98504 absent new changes/failure. No product APK88,phone or live rollout. Previous
-failed native data stays retained;prepared source copies are archival now.
-
-Idle checks still need complete SDK inventory plus app commands/receipts. Producer
-wakes,group FCM/product routing,new SPACE enqueue and native acceptance remain.
-All54 PRD groups remain open;live group-OFF/schema116.4 and phone87 unchanged.
-
-The actual old recovery worker is company-only and cannot acknowledge group work.
-Group adoption also restores a paused SDK,so the eventual foreground owner must
-start that same client's sync under current admission. Exact logical source and
-physical Matrix sender stay distinct. Never call registry lookup from inside the
-native listener monitor;registry retirement already takes the reverse lock order.
-Next validate the actual group worker,then prove native recovery and finish product routing.
-No SDK7,APK88,phone or live rollout. All54 acceptance groups remain open. Group
-recovery max140 must not be copied to original/live max116.4.
+Next: complete SDK+app-ledger idle checks before redundant room transport, durable
+producer wakes after final reads, group FCM/product routing, new SPACE enqueue, rich
+messaging/calls/meetings. No local heavy job or emulator remains. No product88/phone
+or live rollout;phone87,SDK6,live e558a686/schema116.4 and groupOFF are unchanged.
+All54 PRD acceptance groups remain open. Group recovery max140 must not be copied
+into the original/live max116.4 verifier without its own integration.
 
 
 Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple

@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 09:52 UTC. Previous checkpoints remain in
+Updated 9 November 2026, 10:12 UTC. Previous checkpoints remain in
 [Git at 1c0cb482](https://github.com/fajarxfce/hris-platform/blob/1c0cb482/docs/agent-handoff.md).
 Use this file for current state; older active-job instructions are historical.
 
@@ -23,7 +23,7 @@ Do not put orchestration/retry policy in controllers, ViewModels or datasources.
 | Platform original | feat/communications / 1c0cb482 | Documentation checkpoint; runtime unchanged |
 | Platform group worktree | feat/communication-space / fdcd783e | Separate unshipped organization chat |
 | Mobile original | feat/chat-send-timing-20261107 / 2293ff05 | Accepted selected-runtime source; native86 proof running |
-| Mobile CI worktree | feat/pinned-inspector-ci-20261109 / acc0e79d | Pushed; public consumer CI underway |
+| Mobile CI worktree | feat/pinned-inspector-ci-20261109 / e95aead7 | Pushed; public consumer CI underway |
 | Inspector original | feat/matrix-rust-bindings-20261107 / 2b849217 | Frozen with Mobile native proof |
 | Inspector CI worktree | feat/sdk6-distribution-20261109 / a6b8236 | Published SDK consumer validation accepted |
 | Starter | feat/network-inspector-20261107 / 6157db1 | Generic worker/identity ports accepted and pushed |
@@ -37,7 +37,7 @@ Never print the Firebase service-account file or native credentials.
 
 ## Mobile work in progress
 
-Read the [concise Mobile checkpoint at acc0e79d](https://github.com/fajarxfce/hris-mobile/blob/acc0e79d/docs/agent-handoff.md)
+Read the [concise Mobile checkpoint at e95aead7](https://github.com/fajarxfce/hris-mobile/blob/e95aead7/docs/agent-handoff.md)
 and its current local checkout before starting another heavy job. It records exact
 source checks, artifacts, active sessions, retained stores and failure evidence.
 
@@ -52,25 +52,28 @@ Initial packaging ran out of2GiB heap; preserved retry with3GiB/one worker passe
 No86 phone install yet; phone remains83. ADB is available, but phone interaction is
 install-only after notification and actual native acceptance.
 
-The first85→86 emulator run retained account, public keys and SIX original messages.
-Home/room and old-message observations passed; interruption stopped its resumed-idle
-phase. No new send, reset or full acceptance. The current proof clones that latest
-complete86 store and checks the already installed APK without repeating installation.
-Root: Mobile .work/selected-runtime-publication-resumed-native-2026-11-09.
-It tests four complete idle/lifecycle intervals and exactly one new Selected86 sample
-at the end. Preserve every original and inspect new-send.json before continuation.
-Do not roll back to an older store, recreate keys or resubmit messages.
+The first85→86 upgrade retained account/public keys and six originals before turn
+interruption. Follow-up .work/selected-runtime-publication-resumed-native-2026-11-09
+completed four120s lifecycle intervals: active sync, zero setup in complete bins,
+zero bootstrap/403 and all six old Sent messages/history end retained. Overall gate
+still FAILS: one unclassified otherAccess in paired-refresh observation. Its old
+observer kept only a count. A separate stale send-script check expected5 events
+instead of6 and stopped BEFORE typing/sending. No new Selected86 message exists.
+Both failed records are preserved; this is not native/phone acceptance.
 
-Only one local heavy job runs: owned emulator92677/PID645928,2560MiB/two cores,
-serial emulator-5562. Phases47713 and passive counter36194/paired-refresh71793 own
-bounded observation. Reap jobs and inspect stored evidence before edits or a compiler.
-Turn interruption may remove session handles; actual process/ownership files then
-remain authoritative. Never kill live API/worker JVMs as build cleanup.
+Latest COMPLETE STOPPED store is that follow-up's sender at86. The current proof
+clones only it, retaining all userdata/encryption files and full AVD; no reset/resend.
+Mobile root .work/selected-runtime-auth-trace-native-2026-11-09 is ACTIVE with corrected
+six-event preflight and additional passive closed route/time/status/known-access
+classification. Tokens/hashes remain volatile; strict gates are unchanged.
 
-Native84's failed Home gate (26 metadata reads and121.661s sync gap) remains a failure.
-Diagnostic85 did not reproduce it. Current86 captures the opening-contention path with
-continued Home synchronization; final idle/credential/send acceptance remains pending.
-Startup cost, phone latency and p95 are not declared solved by one emulator sample.
+Only local heavy job: owned emulator18238/PID795640,2560MiB/two cores, emulator-5562.
+Phases38867, passive counter25926 and paired observer91581 run bounded observation.
+No compiler overlap. Reap and inspect actual records before another heavy job; turn
+interruption may remove session handles. Never kill API/worker JVMs as build cleanup.
+No accept-release/phone installation until genuine native success. Earlier native84
+failed Home; current source tests and idle observations do not erase that history.
+One send sample will not establish p95 or whole communications acceptance.
 
 ## Public dependency CI
 
@@ -82,11 +85,19 @@ with exact artifact digests/XML audited. Native Android fixture compilation ther
 not execution; native Apple Matrix binding and capture overhead remain open.
 
 Mobile CI pins verified inspector742a2d1 in all nine consumer jobs across five workflows.
-First run42594287486: Windows succeeds; Apple/web continue; verify failed before tests
-because Android SBOM resolution lacked one Material3 POM checksum. b1630963 adds only
-the official Maven Central/publisher-SHA1-verified POM hash. Corrected verify run
-42596014241 is active. Do not relax verification or dispatch distribution workflows
-merely to make checks green. Port generic CI setup to Starter after Mobile validation.
+First run42594287486: Windows and Apple succeed. Apple artifact13664276449 is audited:
+1777 simulator tests/195 suites, zero failures/errors/skips, plus Xcode app build.
+Web's runner shut down during Wasm optimization; cause not established. Web-only
+run42597096435 repeats unchanged compile settings with resource evidence.
+
+Verify first lacked a Material3 POM checksum, then42596014241 lacked Lifecycle POM.
+Complete local inventory restores original metadata before review: eight new artifacts,
+all independently matched to official bytes and publisher SHA-1; old checksums unchanged.
+Strict63401 PASS46.014s, all inputs retained,393-component same-input BOM cache reuse.
+The initial insertion failure/strict failure and metadata-alias URL404 are preserved.
+Mobilea5d74fa3 records the validated inventory; third verify42598801511 is running.
+No distribution workflow dispatched. Port generic CI setup to Starter after Mobile
+validation; original app/inspector remain frozen for native86.
 
 ## Next implementation
 

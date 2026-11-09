@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 17:08 UTC. Historical detail remains in
+Updated 9 November 2026, 17:20 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -19,14 +19,19 @@ Apple runtime, push and calling acceptance remains separate.
 
 ## Active original-delivery proof
 
-Mobile82986dbf and Group1b2c3f9f handoffs record the current experiment. Mobile owning
+Mobiledfcc97e6 and Group716eab57 handoffs record the current experiment. Mobile owning
 source69e639f8 and native transport ab17eadd/96d2d238 are accepted; no live activation.
 Hosted42656803963 portable artifact is audited:6,638 fresh desktop/Android/browser
 cases pass,including all24 owning-delivery cases on desktop/browser. Apple still runs.
 Do not redispatch. Mobile proof-only source passes20 tests and APK/lint/quality; Group
-fixture compilation/format/architecture and88 Python driver tests pass.
+fixture compilation/format/architecture pass;82 existing driver tests and7 new ownership
+regressions pass. Native-3 exposed a checkpoint-read race (fixed with a reproduced
+regression); native-4 correctly rejected unconfirmed group recipient keys. Group now
+establishes receiving publication through its actual gateway using the original SDK
+signed public identity. No key replacement or SQL publication injection. Automatic
+Mobile first-key-publication activation remains separate required product work.
 
-**Native61494 is running** in Group `.work/space-original-delivery-native-2026-11-09/native-3`.
+**Native31328 is running** in Group `.work/space-original-delivery-native-2026-11-09/native-5`.
 Both source manifests are frozen. It uses a new private emulator image (2560MiB/two
 cores), actual SDK6 and isolated native HTTP/PostgreSQL/Synapse. Two fictional paused
 original commands are delivered to an offline recipient; the owned process is killed

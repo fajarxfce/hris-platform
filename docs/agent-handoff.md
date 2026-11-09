@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:10 UTC. Historical detail remains in
+Updated 9 November 2026, 23:21 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -158,29 +158,34 @@ source/browser/quality pass. Both4,611-input manifests and all source/library/XM
 checks agree. Claimed raw pages survive interruption;only a clean exhausted sweep
 can return its exact wake. No schema,SDK,phone or live change.
 
-Current only heavy job is Mobile worker focused-3 /56790 under private
-`.work/space-recovery-worker-2026-11-09`;22 Kotlin inputs are frozen.
-First91375 reaped exit1/213.555s:38 app cases pass;37 domain cases did not execute
-because of a new test fixture name collision;two LongMethod quality failures.
-Second37708 reaped exit1/141.468s:all75 cases pass,zero failures/errors/skips;one
-remaining LongMethod (start102 >100). Both4,627 source and Inspector manifests
-remained unchanged in the second gate. The new fixture was renamed;group task DI
-is separate;company/group readiness now have explicit lazy undispatched application
-subscriptions before activation. No suppression or relaxed quality thresholds.
+Current only heavy job is Mobile worker focused-4 /85180 under private
+`.work/space-recovery-worker-2026-11-09`;23 Kotlin inputs and one workflow are frozen.
+Initial91375 had a new fixture collision/two LongMethod failures;37708 passed75
+cases but retained one LongMethod. Explicit lazy undispatched observer ownership and
+separate task DI corrected these without suppression. Focused56790 is REAPED PASS:
+75 cases/99.492s,zero failures/errors/skips,strict source/library/XML checks.
 
-The task reuses current application native-parent cancellation,original adoption/sync/
-delivery and encrypted exact checkpoints. One processor,one waiter,four raw pages
-per90-second turn,180-second admission bound. Failed work retains backoff,clean
-completion alone discharges an exact wake. Lazy Resume avoids the task/scheduler
-construction cycle. Expected focused75 =37 domain+12 worker+24 lifetime+2 graph.
-Full gate has not started. Prepared private files are archival;never restore over src.
-No actual provider,APK,phone or live rollout.
+Full83939 is REAPED FAIL582.138s:4,439 cases,one old startup-key expectation failure,
+zero errors/skips;4,627 source inputs and Inspector unchanged. The old22-case delivery
+worker suite expected only company recovery+delivery. Its startup test now retains
+those checks and adds group key+durable wake. Expanded focused85180 expects97 cases;
+full-2 expected4,439 remains required. CI app filters now include group worker and
+application lifecycle. The actual task reuses original native ownership/adoption/sync/
+delivery,one processor/one waiter,four raw pages per90-second turn,exact checkpoints
+and wake ACK;faults back off. No source acceptance or APK/phone/live rollout yet.
 
-Worker currently attempts original rooms conservatively. Idle optimization must
-combine complete paused SDK inventory with app commands and receipts. Empty app
-records alone cannot prove native settlement is done. Producer wakes after final
-inventory reads,group FCM/legacy/product routing,new SPACE enqueue and actual native
-control-to-original-delivery proof remain. The original-only writer cannot enqueue.
+Next native proof is drafted,not applied,in Mobile and Group private
+`.work/space-recovery-native-2026-11-09`:three Mobile Kotlin files,two Group Kotlin
+files,and one driver. It reuses two fresh fictional originals and actual group Matrix
+fanout. It will distinguish startup wake from native control,invoke the actual task,
+kill only its proof process after durable ACK before Sent,retain exact page/wake and
+recover without another hint. Matrix/native counters must stay bounded with no401/403.
+Older accepted native proof remains intact. Apply/compile only after worker acceptance;
+no second compiler/emulator while85180 or its successor runs.
+
+Idle optimization still needs complete paused SDK inventory plus app commands/receipts;
+empty app tables alone are insufficient. Producer wakes,group FCM/product routing,
+new SPACE enqueue and actual native proof remain. All54 groups are still open.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must

@@ -136,18 +136,30 @@ pass with4,595 unchanged source inputs. No original binding rewrite or schema ch
 Fresh [CI42707758241](https://github.com/fajarxfce/hris-mobile/actions/runs/42707758241)
 is running on immutableeba05a9c253aa7fe7f0cf816b49c128b4f3003a6;dispatch9340 reaped.
 Expected6,743 portable+2,549 Apple=9,292 cases. Mobile inventory hosted.json/auditor
-pins it against accepted42697887863. No successor hosted acceptance yet.
+pins it against accepted42697887863. Portable audit75963 is REAPED PASS6,743 cases,
+zero failures/errors/skips. Full baseline+81 new cases,GitHub digest,ZIP CRC and every
+XML pass. Artifact13715877458 is3,309,928 bytes,SHA256
+ db83868e00d3b30df74867156965b7443c91bda4249e344524df1f51524cd52c;
+report manifest a8169240844b1fcf2b133a0cd09a2ff550fd2a818c5314b21816f340b7658c1c.
+Apple remains in progress. This immutable source does not cover sync/progress successors.
 
-Current only heavy local job is Mobile sync full-1 /51820, under private
-`.work/space-device-sync-2026-11-09`. Ten unaccepted Kotlin inputs add exact installed
-group sync on the existing runtime,owned native/directory/bootstrap admission and
-one remote device read. Focused9832 first failed242.225s:missing Android mapper import
-and one app DI fixture assertion among18 desktop cases (domain16 pass). Both corrected;
-two new group cleanup assertions were also corrected during review before Android
-execution. Existing company helpers/tests unchanged. Focused85631 now REAPED PASS:
-37 cases in152.816s,zero failures/errors/skips,4,599 stable source inputs and strict
-source/library/XML audit. Full51820 expects4,340 cases;keep ten source inputs frozen.
-No collector,actual group worker,product activation,phone or live change.
+Mobile [b51e70d8](https://github.com/fajarxfce/hris-mobile/blob/b51e70d8/docs/collaboration-space-device-sync.md)
+is committed/pushed;9895 reaped. Exact original group sync passes focused85631:
+37 cases/152.816s and full51820:4,340 fresh cases/526.554s,zero failures/errors/skips.
+Full root,Android release/lint,shared Wasm/iOS source,browser and quality pass.
+Both manifests contain4,599 identical source inputs;current source/library/XML audits
+pass. The initial missing mapper import and app DI fixture failure are recorded.
+Original parent-owned sync reuses its cursor;no store/key/queue is recreated.
+
+Current only heavy job is Mobile progress focused-1 /31161, under private
+`.work/space-recovery-progress-2026-11-09`. Fourteen unaccepted Kotlin inputs add
+independent encrypted native-family/account/space checkpoints, one claimed raw room
+page, exact-generation CAS, separate retry/continuation/append flags, and local owning
+read/update use cases. A pending room is retained before delivery;only a clean
+exhausted sweep can return its original wake for separate ACK. Fourteen domain and
+twelve SQLite/IndexedDB/Apple Room contract cases plus app DI are prepared. Freeze
+all fourteen Kotlin inputs until this gate is reaped. No actual worker/app activation,
+APK,phone or live change yet. Mobile handoff is the detailed current implementation.
 
 Next worker design must distinguish exact original SDK transactions from Queued/new
 SPACE messages;the existing original-only writer cannot enqueue. Empty active app
@@ -161,7 +173,7 @@ Group adoption also restores a paused SDK,so the eventual foreground owner must
 start that same client's sync under current admission. Exact logical source and
 physical Matrix sender stay distinct. Never call registry lookup from inside the
 native listener monitor;registry retirement already takes the reverse lock order.
-Next finish local inventory,then actual group recovery/sync ownership and product routing.
+Next finish independent progress,then actual group recovery/application ownership and product routing.
 No SDK7,APK88,phone or live rollout. All54 acceptance groups remain open. Group
 recovery max140 must not be copied to original/live max116.4.
 

@@ -113,87 +113,15 @@ class ReadNativeCollaborationSpaceRoom(
                 if (readStatus is Result.Failed) return readStatus
                 val readBinding = rooms.binding(spaceId, actor.accountId, conversationId)
                 if (readBinding is Result.Failed) return readBinding
-                val intent = (readIntent as Result.Success).value
-                val status = (readStatus as Result.Success).value
-                val binding = (readBinding as Result.Success).value
-                if ((intent == null) != (status == null)) return changed()
-                if (
-                    intent != null &&
-                        (intent.spaceId != spaceId ||
-                            intent.conversationId != conversationId ||
-                            intent.firstAccountId != conversation.firstAccountId ||
-                            intent.secondAccountId != conversation.secondAccountId ||
-                            intent.serverName != provider.serverName ||
-                            intent.createdAt > clock.instant())
-                )
-                    return changed()
-                if (
-                    status != null &&
-                        (status.spaceId != spaceId ||
-                            status.conversationId != conversationId ||
-                            status.accountId !in
-                                setOf(conversation.firstAccountId, conversation.secondAccountId) ||
-                            status.requestedAt > clock.instant() ||
-                            status.completedAt?.let { it > clock.instant() } == true)
-                )
-                    return changed()
-                if (
-                    (binding != null) !=
-                        (status?.state == CollaborationSpaceProvisioningState.SUCCEEDED)
-                )
-                    return changed()
-                if (
-                    binding != null &&
-                        (intent == null ||
-                            status == null ||
-                            binding.spaceId != spaceId ||
-                            binding.conversationId != conversationId ||
-                            binding.publishedBy != status.accountId ||
-                            binding.matrixCreatorAccountId !in
-                                setOf(intent.firstAccountId, intent.secondAccountId) ||
-                            (intent.origin == CollaborationSpaceRoomOrigin.LEGACY &&
-                                binding.matrixCreatorAccountId != intent.matrixCreatorAccountId) ||
-                            binding.requestRevision != status.revision ||
-                            binding.createdAt > clock.instant() ||
-                            binding.createdAt < intent.createdAt)
-                )
-                    return changed()
-                val room =
-                    binding?.let {
-                        val owner = requireNotNull(intent)
-                        val original = owner.original
-                        if (!validCollaborationSpaceRoomId(it.roomId)) return changed()
-                        when (owner.origin) {
-                            CollaborationSpaceRoomOrigin.SPACE ->
-                                if (original != null) return changed()
-                            CollaborationSpaceRoomOrigin.LEGACY -> {
-                                if (
-                                    original == null ||
-                                        original.companyId == UUID(0, 0) ||
-                                        original.conversationId == UUID(0, 0) ||
-                                        original.roomId != it.roomId ||
-                                        original.boundAt > owner.createdAt ||
-                                        original.boundAt.nano % 1000 != 0 ||
-                                        original.boundAt.epochSecond !in
-                                            -62135596800L..253402300799L ||
-                                        owner.firstMatrixUserId !=
-                                            "@${collaborationMatrixLocalpart(original.companyId, owner.firstAccountId)}:${owner.serverName}" ||
-                                        owner.secondMatrixUserId !=
-                                            "@${collaborationMatrixLocalpart(original.companyId, owner.secondAccountId)}:${owner.serverName}"
-                                )
-                                    return changed()
-                            }
-                        }
-                        CollaborationSpacePublishedRoom(
-                            it.roomId,
-                            owner.serverName,
-                            owner.origin,
-                            it.createdAt,
-                            original,
-                        )
-                    }
-                return Result.Success(
-                    CollaborationSpaceRoomView(spaceId, conversationId, status, room)
+                return collaborationSpaceRoomView(
+                    spaceId,
+                    conversationId,
+                    conversation,
+                    (readIntent as Result.Success).value,
+                    (readStatus as Result.Success).value,
+                    (readBinding as Result.Success).value,
+                    provider.serverName,
+                    clock.instant(),
                 )
             }
             val result = acquire()

@@ -1,5 +1,10 @@
 # Architecture
 
+[Current organization direct transport](collaboration/space-direct-transport.md) joins
+current native device, immutable room and explicit receiving readiness in one bounded
+read. SQL/native HTTP and shared API/full-worker graphs are validated; Mobile owning
+delivery and product adoption remain separate.
+
 [Current source reconciliation](collaboration/root-source-reconciliation.md) preserves
 company readiness and native organization ownership across shared sync/DI boundaries.
 Validation and deployment remain separate.

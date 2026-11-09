@@ -2065,6 +2065,40 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun readNativeCollaborationSpaceDirectTransport(
+        rooms: CollaborationSpaceRoomRepository,
+        conversations: CollaborationSpaceConversationRepository,
+        registry: CollaborationSpaceDeviceRepository,
+        provisioning: CollaborationSpaceProvisioningRepository,
+        gateway: CollaborationSpaceGatewaySessionRepository,
+        recipients: CollaborationSpaceRecipientRepository,
+        spaces: CollaborationSpaceRepository,
+        sessions: NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        policy: CollaborationSpacePolicy,
+        provider: CollaborationMatrixPolicy,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReadNativeCollaborationSpaceDirectTransport(
+            rooms,
+            conversations,
+            registry,
+            provisioning,
+            gateway,
+            recipients,
+            spaces,
+            sessions,
+            identities,
+            transactions,
+            policy,
+            provider,
+            security,
+            clock,
+        )
+
+    @Bean
     fun claimCollaborationSpaceRooms(
         rooms: CollaborationSpaceRoomRepository,
         policy: CollaborationSpacePolicy,

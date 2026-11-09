@@ -1696,11 +1696,12 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         n: Native,
         path: String,
         body: Map<String, Any>? = null,
+        token: String = n.access,
     ): HttpResponse<String> {
         val builder =
             HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path"))
                 .timeout(Duration.ofSeconds(15))
-                .header("Authorization", "Bearer ${n.access}")
+                .header("Authorization", "Bearer $token")
                 .header("X-HRIS-Client-Platform", "ANDROID")
                 .header("X-HRIS-Client-Build", "1")
         if (body == null) builder.GET()
@@ -2522,6 +2523,75 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             state("m.room.create", mapOf("room_version" to "12", "m.federate" to false)),
             state("m.room.encryption", mapOf("algorithm" to "m.megolm.v1.aes-sha2")),
         ) + history
+    }
+
+    @Test
+    fun groupDirectTransportReturnsOnlyCurrentNativePairDeviceAndPublishedRoom() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val (device, gatewayToken) = enrollGroup(a)
+        enrollGroup(b)
+        val room = publishedGroupRoom(a, device, b)
+        val row =
+            database()
+                .queryForMap(
+                    "select space_id,conversation_id from collaboration_space_room_bindings where matrix_room_id=?",
+                    room,
+                )
+        val path =
+            "/api/v1/collaboration/spaces/${row["space_id"]}/direct-conversations/${row["conversation_id"]}/transport"
+        val response = groupNativeCall(a, path)
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        val data = json.readTree(response.body())
+        assertEquals(
+            setOf(
+                "spaceId",
+                "accountId",
+                "nativeSessionId",
+                "nativeSessionVersion",
+                "conversation",
+                "device",
+                "matrixUserId",
+                "matrixDeviceId",
+                "room",
+                "recipientReady",
+            ),
+            data.propertyNames().toSet(),
+        )
+        assertEquals(a.fixture.account.toString(), data["accountId"].asString())
+        assertEquals(a.session.toString(), data["nativeSessionId"].asString())
+        assertEquals(device.toString(), data["device"]["id"].asString())
+        assertEquals(room, data["room"]["roomId"].asString())
+        assertTrue(data["room"]["original"].isNull)
+        assertFalse(data["recipientReady"].asBoolean())
+        assertEquals(
+            setOf(a.fixture.account.toString(), b.fixture.account.toString()),
+            setOf(
+                data["conversation"]["firstAccountId"].asString(),
+                data["conversation"]["secondAccountId"].asString(),
+            ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_request_leases where account_id=?",
+                    Int::class.java,
+                    a.fixture.account,
+                ),
+        )
+        assertFalse(response.body().contains(a.access))
+        assertFalse(response.body().contains(gatewayToken))
+        val wrongTransport = groupNativeCall(a, path, token = gatewayToken)
+        assertTrue(wrongTransport.statusCode() in setOf(401, 403), wrongTransport.body())
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        val denied = groupNativeCall(a, path)
+        assertEquals(403, denied.statusCode(), denied.body())
     }
 
     @Test

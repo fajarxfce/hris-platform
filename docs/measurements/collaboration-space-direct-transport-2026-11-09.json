@@ -1,0 +1,131 @@
+{
+  "observedAt": "2026-11-09T15:53:17.276619+00:00",
+  "status": "Accepted source contract; not deployed",
+  "reconciliationCommit": "fa90ddcc",
+  "firstAttempt": {
+    "startedAt": "2026-11-09T15:31:28.167417+00:00",
+    "elapsedSeconds": 459.946,
+    "exitCode": 1,
+    "sourceFiles": 8693,
+    "sourcesUnchanged": true,
+    "changedSources": [],
+    "counts": {
+      "tests": 342,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "skips": [
+      {
+        "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+        "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()",
+        "reason": null
+      }
+    ]
+  },
+  "intermediateAttempts": {
+    "focused-2": {
+      "startedAt": "2026-11-09T15:39:31.609938+00:00",
+      "elapsedSeconds": 591.639,
+      "exitCode": 1,
+      "sourceFiles": 8693,
+      "sourcesUnchanged": true,
+      "changedSources": [],
+      "counts": {
+        "tests": 302,
+        "failures": 8,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skips": []
+    }
+  },
+  "finalAttempt": {
+    "startedAt": "2026-11-09T15:50:36.776377+00:00",
+    "elapsedSeconds": 148.63,
+    "exitCode": 0,
+    "sourceFiles": 8693,
+    "sourcesUnchanged": true,
+    "changedSources": [],
+    "counts": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "skips": []
+  },
+  "finalPhase": "targeted-3",
+  "changedSinceFirstAttempt": [
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceWorkerPublicationTest.kt",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationSpaceDirectTransportTest.kt"
+  ],
+  "unchangedContractProof": "Domain, existing room/LEGACY SQL and API reports from focused-2 retain byte-identical source except the corrected direct SQL/HTTP fixtures; their nine cases are replaced by fresh final reports.",
+  "workerProof": "Complete worker test task from full-1 with byte-identical production, DI, build and worker-test inputs; only three SQL/API test fixtures changed.",
+  "scopes": {
+    "apps/server": {
+      "suites": 2,
+      "tests": 72,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/data": {
+      "suites": 3,
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/domain": {
+      "suites": 44,
+      "tests": 192,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "apps/worker": {
+      "suites": 34,
+      "tests": 150,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    }
+  },
+  "counts": {
+    "tests": 452,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "skips": [
+    {
+      "class": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+      "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+    }
+  ],
+  "sourceManifestSha256": "9c7a69147d021745ef0243aa0e0d5e71ff3034ed253c1c079cbe82fcc3122278",
+  "selectedReportManifestSha256": "b94b078254febd7409fae612bdee10afb9473774f499370b5479620e06834072",
+  "corrections": [
+    "Repository override uses exact parameter name id under Werror.",
+    "Native HTTP helper accepts an explicit token override for the gateway-auth rejection test; no Native.copy assumption.",
+    "The pre-V122 SQL fixture had no device provisioning head; new tests now create it through actual enqueue/worker claim/finish and retain explicit missing-head rejection.",
+    "Existing actual retained LEGACY publication now also asserts exact direct transport room/user/original physical device and readiness.",
+    "HTTP fixture now queries the actual matrix_room_id column; no schema or production query change."
+  ],
+  "checks": [
+    "Three pure receiving-readiness cases and seven actual PostgreSQL/native cases",
+    "Existing native room mapping regressions",
+    "OpenAPI inventory and actual native direct-transport HTTP with no-store/auth/offboarding assertions",
+    "Actual retained LEGACY publication keeps original room/user and physical device after native bootstrap",
+    "Complete worker runtime contexts",
+    "Format, architecture and container-image pin checks"
+  ],
+  "limits": [
+    "Live e558a686/schema116.4 and group routing remain unchanged.",
+    "This contract creates no keys, room, request leases, provider state or sending authority.",
+    "Mobile direct transport and owning original SDK delivery still need separate validation/integration.",
+    "No phone build/install, APNs, calling, meeting or PRD-group completion is implied."
+  ]
+}

@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 15:31 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 15:53 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -103,11 +103,10 @@ Preserve Inspector's unrelated gradlew.bat worktree delta. SDK26.10.23-hris.6 re
 
 ## Next work
 
-1. Commit/push this accepted reconciliation, then apply the11-file direct-transport
-   candidate only through its exact base/source/merge checks. Never redo the merge.
-2. Validate the current device/room/recipient API, actual PostgreSQL/HTTP/OpenAPI and
-   FULL worker graph; then validate the13-file Mobile transport candidate. Original
-   Root691f3fc5's verifier maximum stays116.4; Group stays138.
+1. Commit/push the accepted twelve-file direct-transport increment; the audit is done.
+   Reconciliation fa90ddcc is already pushed. Never redo either accepted source gate.
+2. Validate/commit/push the13-file Mobile transport candidate, then continue owning
+   original SDK delivery. Root691f3fc5's verifier maximum stays116.4; Group stays138.
 3. Continue owning original SDK delivery/history, recipient readiness, background
    lifetime and group product routing. Existing Prepare/Resolve/Replay Room commands
    are accepted; do not recreate them or replace uncertain originals.
@@ -121,18 +120,30 @@ errors/skips; exact21 domain+3 actual storage preparation cases run on each shar
 Xcode builds the unsigned simulator host. Evidence/handoff7e636567 is pushed. Do not
 redispatch or reaudit. Native Apple Matrix delivery/APNs/calling remain separate.
 
-## Prepared next increment (not applied)
+## Accepted direct-transport increment
 
-`.work/space-direct-transport-2026-11-09/candidate` holds11 PRIVATE UNCOMPILED
-Kotlin draft files for one current device/room/recipient GET, including API/DI and
-seven SQL/three pure policy methods plus HTTP/OpenAPI tests. base.json pins all four
-modified source paths. Format3 passes2.017s; this is parser/format proof only. Prepared
-apply.py requires a successful committed merge and exact source/base hashes; check.py
-requires actual SQL/API and FULL worker tests. Neither script has been executed. Do not
-apply these while full33511 owns the current source or count them as implementation
-acceptance. Existing room mapping becomes a pure domain policy; both owning reads
-coordinate repositories directly. V135 already keeps confirmed receiving keys
-through short token expiry, with hard expiry/revocation still enforced.
+Twelve Kotlin files implement the current native device/room/recipient read, pure shared
+room mapping, native HTTP and DI. [Contract](collaboration/space-direct-transport.md) and
+[evidence](measurements/collaboration-space-direct-transport-2026-11-09.json) are accepted.
+Full38552 FAILED459.946s after342 domain/worker cases: two fixture compile errors.
+Focused34852 FAILED591.639s with302 cases/eight failures: the pre-V122 SQL fixture had no
+provisioning head and the HTTP fixture used the wrong room column. Corrections use actual
+enqueue/claim/finish plus explicit missing-head rejection and the actual matrix_room_id.
+
+Targeted43271 is REAPED PASS148.630s with nine fresh SQL/HTTP cases, zero failures/errors/
+skips,8,693 unchanged inputs. The strict audit accepts452 cases:192 domain,38 SQL,
+72 API/OpenAPI,150 full worker; zero failures/errors and one existing elapsed-retention
+opt-in skip. Only three SQL/API fixtures changed since full-1; all production, DI,
+worker tests and build inputs match. Unchanged domain/room/LEGACY/OpenAPI reports from
+focused-2 and worker reports from full-1 are hash-verified and not misreported as fresh.
+All new cases and both readiness worker contexts are present. Format/architecture/image
+checks pass. All local jobs are reaped; no deployment or group routing enablement.
+
+Private attempts/corrections/audit are under `.work/space-direct-transport-2026-11-09`.
+Do not repeat the initial apply or any accepted reconciliation/hosted gate. Mobile still
+has thirteen uncompiled transport files; its original follow-up has seven private files/
+ten pure tests with formatter-only proof. Owning delivery/receipt projection/late callback
+journaling and pause/drain remain required; no SDK or UI activation has been added.
 
 Original message repository.get already returns archived command facts; its actual
 completion storage contract proves reopen/login behavior. No null-to-archive fallback

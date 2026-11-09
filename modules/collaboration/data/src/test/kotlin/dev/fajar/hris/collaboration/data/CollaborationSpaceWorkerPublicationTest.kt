@@ -3361,6 +3361,16 @@ class CollaborationSpaceWorkerPublicationTest {
         a.assertRetainedGroupKeyStorage(idA)
         b.assertRetainedGroupKeyStorage(idB)
         val token = success(b.groupBootstrap(idB)).tokens.accessToken
+        success(a.groupBootstrap(idA))
+        val transport = success(b.readDirectTransport(group))
+        assertEquals(view.room, transport.room)
+        assertEquals(b.session, transport.nativeSessionId)
+        assertEquals(idB, transport.device.id)
+        assertNotEquals(oldB.deviceId, transport.device.id)
+        assertEquals(CollaborationSpaceDeviceOrigin.LEGACY, transport.device.origin)
+        assertEquals(b.device(idB).matrixUserId, transport.matrixUserId)
+        assertEquals("HRIS_${compact(oldB.deviceId)}", transport.matrixDeviceId)
+        assertTrue(transport.recipientReady)
         assertRetainedRoomMessage(b, idB, originalRoom.roomId, gatewayToken = token)
         assertRetainedGroupRoomHistory(
             b,
@@ -4233,6 +4243,32 @@ class CollaborationSpaceWorkerPublicationTest {
                     roomRepository(),
                     StoredCollaborationSpaceConversationRepository(
                         PostgresCollaborationSpaceConversationDataSource(sql)
+                    ),
+                    spaces,
+                    sessions,
+                    identities,
+                    transactions,
+                    CollaborationSpacePolicy(true, 28, 28),
+                    CollaborationMatrixPolicy(true, server),
+                    IdentitySecurityPolicy(),
+                    Clock.systemUTC(),
+                )
+                .execute(actor, session, 0, space, conversation, client)
+
+        fun readDirectTransport(conversation: UUID) =
+            ReadNativeCollaborationSpaceDirectTransport(
+                    roomRepository(),
+                    StoredCollaborationSpaceConversationRepository(
+                        PostgresCollaborationSpaceConversationDataSource(sql)
+                    ),
+                    registry,
+                    provisioning,
+                    EncryptedCollaborationSpaceGatewaySessionRepository(
+                        PostgresCollaborationSpaceGatewaySessionDataSource(sql),
+                        pushCrypto(),
+                    ),
+                    StoredCollaborationSpaceRecipientRepository(
+                        PostgresCollaborationSpaceRecipientDataSource(sql)
                     ),
                     spaces,
                     sessions,

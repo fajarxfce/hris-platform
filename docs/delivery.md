@@ -1,5 +1,17 @@
 # Delivery and validation
 
+## Current organization direct transport — 9 November 2026
+
+One admitted native GET returns the immutable published room, this parent's device and
+explicit receiving readiness without Matrix I/O or setup writes. Short receiver access
+expiry does not erase confirmed keys; hard expiry, ownership and revocation still gate
+readiness. Actual retained LEGACY publication preserves original room/user/physical device.
+[Contract](collaboration/space-direct-transport.md) and [evidence](measurements/collaboration-space-direct-transport-2026-11-09.json)
+record452 accepted cases, zero failures/errors and one existing opt-in skip. Final nine
+SQL/HTTP cases pass148.630s; exact source/XML comparison retains unchanged broad cases
+and the complete worker result. Earlier compile/fixture failures remain visible. Live
+runtime/schema and group routing are unchanged; Mobile integration remains next.
+
 ## Source reconciliation accepted — 9 November 2026
 
 Group bf6e176a and Root4d4df31f retain both organization ownership and current company

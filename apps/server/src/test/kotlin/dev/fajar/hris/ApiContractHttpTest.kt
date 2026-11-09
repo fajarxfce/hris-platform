@@ -36,6 +36,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations" to "get",
                 "$base/direct-conversations" to "post",
                 "$base/direct-conversations/{conversationId}" to "get",
+                "$base/direct-conversations/{conversationId}/transport" to "get",
                 "$base/direct-conversations/{conversationId}/room" to "get",
                 "$base/direct-conversations/{conversationId}/room" to "post",
                 "$base/direct-conversations/{conversationId}/room/receipts/read" to "post",
@@ -102,6 +103,21 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "expiresAt",
             ),
             schemas["CollaborationLegacyPublication"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "spaceId",
+                "accountId",
+                "nativeSessionId",
+                "nativeSessionVersion",
+                "conversation",
+                "device",
+                "matrixUserId",
+                "matrixDeviceId",
+                "room",
+                "recipientReady",
+            ),
+            schemas["CollaborationSpaceDirectTransport"]["properties"].propertyNames().toSet(),
         )
         val roomRequest = schemas["RequestCollaborationSpaceRoomRequest"]
         val originalReceipt = schemas["ReadCollaborationSpaceRoomReceiptRequest"]

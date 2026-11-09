@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 20:14 UTC. Historical detail remains in
+Updated 9 November 2026, 20:44 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -63,20 +63,33 @@ adds bounded Matrix fanout. Final21572 passes221 cases in215.181s:205 domain and
 real PostgreSQL queue/use-case cases,zero failures/errors/skips,8,725 stable inputs,
 format/architecture. Actual provider rotation waits on target guards until ACK commits.
 Prior9502 had one invalid expired-token fixture among220 cases; it is corrected and
-recorded. All pushes are reaped; no shared DI or worker activation is accepted yet.
+recorded. Its pushes are reaped; the later worker integration below supersedes its scope.
 
-Current Group work is the independent PUSH handoff. The existing fanout is renamed
-FanOutCollaborationSpaceReadiness to share current-target admission across channels;
-PUSH atomically appends a quiet wake to the existing FCM queue with cursor progress.
-HandleCollaborationSpacePush remains the actual delivery/token/retry owner. This
-successor is NOT yet accepted. See the Group handoff and private
-`.work/space-readiness-push-handoff-2026-11-09` for its latest gate;95714/focused-1 was
-running when this note was written. Do not edit frozen Group inputs or start a second
-heavy job until it is reaped. Do not reapply old prepared candidates or replay accepted
-native/hosted gates. Next: full API/unfiltered worker integration, then Mobile durable
-group foreground/background ownership and product routing. No Mobile source,SDK7,
-APK88,phone or live rollout; all54 acceptance groups remain open. Group recovery max140
-must not be copied to Root/live schema116.4.
+Group [806601d5](https://github.com/fajarxfce/hris-platform/blob/806601d5/docs/collaboration/space-readiness-push-handoff.md)
+accepts independent PUSH handoff through the existing durable FCM queue. Final95714
+passes256 cases/463.060s,zero failures/errors/skips,8,727 stable sources. Current
+binding checks,quiet coalescing,newer wakes during FCM leases,atomic rollback and
+post-handoff native revocation are tested with normal-worker PostgreSQL repositories.
+The existing HandleCollaborationSpacePush remains the sole cloud delivery owner.
+
+Group [d4246a08](https://github.com/fajarxfce/hris-platform/blob/d4246a08/docs/collaboration/space-readiness-workers.md)
+is committed/pushed;89491 is reaped. Shared DI and separate scheduled MATRIX/PUSH
+owners are now accepted. Focused98743 passes8 cases/101.486s. Full56826 is REAPED
+PASS775.848s:325 cases=174 across six API context/contract classes +151 FULL
+UNFILTERED worker cases,zero failures/errors,one existing opt-in retention skip.
+Both gates retain8,729 identical source inputs;exact XML and complete worker set
+checks pass. One new context case opens ten feature-flag configurations,uses actual
+normal-role queue claims and verifies pool termination. No actual cloud delivery.
+
+Mobileb061614a has eleven pending Kotlin inputs for exact group V1 readiness
+parsing,a separate encrypted receipt namespace,four pure/eight shared storage tests
+and an app graph assertion. Its `.work/space-readiness-protocol-2026-11-09`
+focused-1 /81916 RUNNING now owns the only heavy compiler. Mobile source is frozen;
+no other Gradle/Java formatter/emulator. Next required root/platform and fresh hosted
+Apple checks,then current-runtime provenance,durable wake ownership and product routing.
+Group worker integration is complete;do not restart56826 or old native/hosted gates.
+No SDK7,APK88,phone or live rollout. All54 acceptance groups remain open. Group
+recovery max140 must not be copied to Root/live schema116.4.
 
 
 Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple

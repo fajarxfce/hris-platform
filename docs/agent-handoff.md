@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 18:42 UTC. Historical detail remains in
+Updated 9 November 2026, 19:20 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -45,11 +45,24 @@ one existing elapsed-retention opt-in skip. Format/architecture and strict archi
 XML/source/native/APK audit pass. [Group61e8c2f5](https://github.com/fajarxfce/hris-platform/blob/61e8c2f5d62b0f7f6406972df7191e4b32638a5c/docs/collaboration/space-original-key-publication.md) is committed/pushed.
 No Mobile,SDK,live schema,runtime or phone source change was required for this fix.
 
-Next:group readiness-control protocol/projection,bounded committed publication fanout,
-Mobile foreground/background ownership and product routing. Private successor
-candidates are not acceptance. Follow the [Group handoff](https://github.com/fajarxfce/hris-platform/blob/feat/communication-space/docs/agent-handoff.md)
-for current jobs and keep one heavy local compiler OR emulator. Do not repeat these
-accepted gates or resurrect the retired explicit-confirmation/SDK7 approach.
+Group [41c52145](https://github.com/fajarxfce/hris-platform/blob/41c52145/docs/collaboration/space-readiness-control.md)
+accepts the separate readiness protocol/projection:216 cases,including actual Synapse
+wake,replay,same-device bearer change and restart. Group [7d4d7f1f](https://github.com/fajarxfce/hris-platform/blob/7d4d7f1f/docs/collaboration/space-readiness-publications.md)
+now accepts V139 atomic publication/revision and independent Matrix/PUSH checkpoints.
+Final42132 passes335.110s:23 JVM cases,zero failures/errors/skips,plus40 Python
+migration/recovery cases. Normal-role concurrency,capacity,stale leases,rollback and
+actual dump/restore pass. Receiver commit-order regression first fails as expected,
+then passes with the revision fence. Both original worker and fresh SDK upload capture
+exactly two channels. Strict source/XML audit passes;8,708 stable inputs,no shared DI change.
+
+Next:typed repository,current-target admission/fanout,Mobile durable foreground/
+background ownership and group product routing. Eight successor repository/policy/
+datasource/test files have ALREADY been applied in the Group checkout after7d4d7f1f;
+their validation is separate and not accepted by the storage commit. Do not reapply
+`space-readiness-publication-2026-11-09/prepared`. Consult the Group current handoff
+and `.work/space-readiness-queue-2026-11-09` for the latest gate. No Mobile source,
+SDK7,APK88,live schema/runtime or phone change;all54 acceptance groups stay open.
+
 
 Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple
 simulator,zero failures/errors/skips,and unsigned Xcode host success. Mobilea945220c
@@ -65,7 +78,7 @@ fractional-version allowlisting;117+ remains rejected here. The new regression f
 reproduced the error, then40 database-recovery/migration-order/recovery-set unit tests
 passed. The original encrypted-envelope query is unchanged. No live restore or schema
 mutation occurred. [Evidence](measurements/collaboration-readiness-recovery-verifier-2026-11-09.json).
-The Group checkout already has the equivalent allowlist with its separate138 bound;
+The Group checkout already has the equivalent allowlist with its separate139 bound;
 do not replace that bound with this branch's116.4 limit.
 
 Group `/home/fajar/hris/.worktrees/communication-space`, feat/communication-space,
@@ -128,7 +141,7 @@ SDK6 remains immutable; all original stores/messages remain preserved.
 ## Accepted runtime and device state
 
 Live API/worker remains e558a6868399058a2dcdee97acfd0e7fa7f1ef07, schema116.4,
-readiness control ON. Group V117–138 is absent here and remains unshipped; organization
+readiness control ON. Group V117–139 is absent here and remains unshipped; organization
 routing is OFF. None of this source reconciliation changes live runtime.
 
 APK87 from Mobile d8383438 is ALREADY INSTALLED. Install33957 passed210.86s with exact

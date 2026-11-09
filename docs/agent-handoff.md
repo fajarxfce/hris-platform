@@ -141,7 +141,7 @@ zero failures/errors/skips. Full baseline+81 new cases,GitHub digest,ZIP CRC and
 XML pass. Artifact13715877458 is3,309,928 bytes,SHA256
  db83868e00d3b30df74867156965b7443c91bda4249e344524df1f51524cd52c;
 report manifest a8169240844b1fcf2b133a0cd09a2ff550fd2a818c5314b21816f340b7658c1c.
-Apple remains in progress. This immutable source does not cover sync/progress successors.
+Apple simulator step passed;unsigned host build remains in progress. This immutable source does not cover sync/progress successors.
 
 Mobile [b51e70d8](https://github.com/fajarxfce/hris-mobile/blob/b51e70d8/docs/collaboration-space-device-sync.md)
 is committed/pushed;9895 reaped. Exact original group sync passes focused85631:
@@ -151,15 +151,28 @@ Both manifests contain4,599 identical source inputs;current source/library/XML a
 pass. The initial missing mapper import and app DI fixture failure are recorded.
 Original parent-owned sync reuses its cursor;no store/key/queue is recreated.
 
-Current only heavy job is Mobile progress focused-1 /31161, under private
-`.work/space-recovery-progress-2026-11-09`. Fourteen unaccepted Kotlin inputs add
-independent encrypted native-family/account/space checkpoints, one claimed raw room
-page, exact-generation CAS, separate retry/continuation/append flags, and local owning
-read/update use cases. A pending room is retained before delivery;only a clean
-exhausted sweep can return its original wake for separate ACK. Fourteen domain and
-twelve SQLite/IndexedDB/Apple Room contract cases plus app DI are prepared. Freeze
-all fourteen Kotlin inputs until this gate is reaped. No actual worker/app activation,
-APK,phone or live change yet. Mobile handoff is the detailed current implementation.
+Mobile [8bc952fe](https://github.com/fajarxfce/hris-mobile/blob/8bc952fe/docs/collaboration-space-recovery-progress.md)
+is accepted/pushed;57676 reaped. Independent encrypted account/native-family/space
+page checkpoints pass focused31161:28 cases/244.986s and full35632:4,376 fresh cases/
+597.698s. Zero failures/errors/skips;required root/Android release/lint/shared Wasm/iOS
+source/browser/quality pass. Both4,611-input manifests and all source/library/XML
+checks agree. Claimed raw pages survive interruption;only a clean exhausted sweep
+can return its exact wake. No schema,SDK,phone or live change.
+
+Current only heavy job is Mobile worker focused-1 /91375, under private
+`.work/space-recovery-worker-2026-11-09`. Twenty-one unaccepted Kotlin inputs now add
+the actual independent group SyncTask/application wiring,group wake commands,local
+original recovery selection and a final inventory recheck. One processor/one waiter,
+4 raw pages per90-second turn/180-second queue bound,exact checkpoint/wake CAS and
+fault backoff. Original SDK/admission use cases are reused. Group collector subscribes
+before startup recovery and failures cannot stop native lifetime. Lazy Resume breaks
+the scheduler/task registry construction cycle,corrected during pre-gate review.
+
+Formatter13099 reaped. Expected75 focused cases=37 domain+12 worker+24 application
+lifetime+2 graph. All21 Kotlin inputs are frozen;full gate not started. Prepared copies
+were applied then extended;never reapply those archival drafts over current src.
+No actual provider,APK,phone or live rollout. Idle-room SDK/app-ledger optimization,
+producer wakes after end reads,group push/legacy routing and native proof remain.
 
 Next worker design must distinguish exact original SDK transactions from Queued/new
 SPACE messages;the existing original-only writer cannot enqueue. Empty active app
@@ -173,7 +186,7 @@ Group adoption also restores a paused SDK,so the eventual foreground owner must
 start that same client's sync under current admission. Exact logical source and
 physical Matrix sender stay distinct. Never call registry lookup from inside the
 native listener monitor;registry retirement already takes the reverse lock order.
-Next finish independent progress,then actual group recovery/application ownership and product routing.
+Next validate the actual group worker,then prove native recovery and finish product routing.
 No SDK7,APK88,phone or live rollout. All54 acceptance groups remain open. Group
 recovery max140 must not be copied to original/live max116.4.
 

@@ -1,5 +1,10 @@
 # Architecture
 
+[Organization readiness protocol](collaboration/space-readiness-control.md) carries
+a bounded opaque hint on the existing Matrix connection. Explicit group/company
+framing preserves encrypted traffic and original physical identities; publication
+fanout and Mobile foreground/background ownership remain separate work.
+
 [Original-key activation](collaboration/space-original-key-publication.md) now commits
 verified original public-key readiness atomically with LEGACY worker completion.
 The actual original SDK needs no extra confirmation request or private-key change;

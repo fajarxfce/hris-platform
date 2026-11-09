@@ -25,6 +25,7 @@ class HttpMatrixClientDataSource(
     MatrixKeyDataSource,
     MatrixToDeviceDataSource,
     MatrixReadinessControlDataSource,
+    MatrixSpaceReadinessControlDataSource,
     MatrixRoomAccessDataSource,
     MatrixRoomHistoryDataSource,
     MatrixRoomMessageDataSource,
@@ -175,6 +176,27 @@ class HttpMatrixClientDataSource(
         val response =
             roomRequest(
                 "/_matrix/client/v3/sendToDevice/dev.fajar.hris.recipient_ready/${segment(transactionId)}",
+                "PUT",
+                body,
+                token,
+                deadline,
+                maximumRequestBytes = 4096,
+                maximumResponseBytes = 4096,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
+    override fun sendSpaceReadinessControl(
+        transactionId: String,
+        body: Map<String, Any>,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(transactionId.matches(Regex("hris_space_ready_[a-f0-9-]{36}_[a-f0-9-]{36}")))
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/sendToDevice/dev.fajar.hris.space_recipient_ready/${segment(transactionId)}",
                 "PUT",
                 body,
                 token,

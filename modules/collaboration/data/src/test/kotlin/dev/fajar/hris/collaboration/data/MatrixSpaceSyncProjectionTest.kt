@@ -197,6 +197,58 @@ class MatrixSpaceSyncProjectionTest {
     private fun tree(batch: CollaborationMatrixSyncBatch): JsonNode = node(batch.payload)
 
     @Test
+    fun onlyExactGroupSelfControlSurvivesAlongsideOriginalEncryptedKeys() {
+        val control =
+            CollaborationSpaceReadinessControl(
+                UUID.randomUUID(),
+                owner.spaceId,
+                owner.accountId,
+                UUID.randomUUID(),
+                owner.deviceId,
+                f.at.toEpochMilli(),
+                Long.MAX_VALUE,
+            )
+        val content = collaborationSpaceReadinessControlContent(control)
+        fun hint(value: Map<String, Any> = content, sender: String = owner.matrixUserId) =
+            mapOf(
+                "sender" to sender,
+                "type" to COLLABORATION_SPACE_READINESS_CONTROL_TYPE,
+                "content" to value,
+            )
+        val valid = hint()
+        val bad =
+            listOf(
+                hint(sender = oldPeer),
+                hint(sender = newPeer),
+                hint(content + ("space_id" to UUID.randomUUID().toString())),
+                hint(content + ("account_id" to UUID.randomUUID().toString())),
+                hint(content + ("device_id" to f.originalDevice.toString())),
+                hint(content + ("native_session_id" to "")),
+                hint(content + ("published_at" to f.at.toEpochMilli())),
+                hint(content + ("publication_revision" to "01")),
+                hint(content + ("schema_version" to "2")),
+                hint(content + ("body" to "must not escape")),
+                hint(content - "expires_at"),
+                hint(content + ("event_id" to "x".repeat(4096))),
+                hint((content - "space_id") + ("company_id" to owner.spaceId.toString())),
+            )
+        val retained = encrypted(oldPeer)
+        val connection =
+            Connection(
+                node(
+                    mapOf(
+                        "next_batch" to "s-group-control",
+                        "to_device" to mapOf("events" to bad + valid + retained),
+                    )
+                )
+            )
+        val batch = success(call(connection))
+        assertEquals(node(listOf(valid, retained)), tree(batch).path("to_device").path("events"))
+        assertEquals("s-group-control", batch.providerSince)
+        assertEquals(1, connection.closes)
+    }
+
+    @Test
     fun originalCompanyReadinessDoesNotCrossIntoTheAdoptedSpaceSync() {
         val control =
             CollaborationReadinessControl(

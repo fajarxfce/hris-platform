@@ -20,6 +20,7 @@ internal class MatrixSyncReader(private val source: MatrixSyncDataSource) {
         bearer: String,
         deadline: Instant,
     ): CollaborationMatrixSyncBatch {
+        require(frame.readinessOwner == null || frame.spaceReadinessOwner == null)
         val ownUser = frame.ownUser
         val rooms = frame.rooms
         val allowedUsers = rooms.values.flatMap { it.users }.toSet() + ownUser
@@ -168,6 +169,33 @@ internal class MatrixSyncReader(private val source: MatrixSyncDataSource) {
                             "content" to fields,
                         )
                     }
+                    if (type == COLLABORATION_SPACE_READINESS_CONTROL_TYPE) {
+                        val owner = frame.spaceReadinessOwner ?: return@mapNotNull null
+                        // The public gateway cannot send this clear event type. Only the
+                        // target's own provider identity may carry a bounded opaque hint.
+                        if (sender != ownUser) return@mapNotNull null
+                        val content = envelope.path("content")
+                        if (!content.isObject || content.size() != 9) return@mapNotNull null
+                        val fields = linkedMapOf<String, String>()
+                        for ((name, value) in content.properties()) {
+                            if (!value.isString || value.asString().length > 36)
+                                return@mapNotNull null
+                            fields[name] = value.asString()
+                        }
+                        val control =
+                            readCollaborationSpaceReadinessControl(fields) ?: return@mapNotNull null
+                        if (
+                            control.spaceId != owner.spaceId ||
+                                control.accountId != owner.accountId ||
+                                control.deviceId != owner.deviceId
+                        )
+                            return@mapNotNull null
+                        return@mapNotNull mapOf(
+                            "sender" to sender,
+                            "type" to type,
+                            "content" to fields,
+                        )
+                    }
                     if (type != "m.room.encrypted") return@mapNotNull null
                     val content = envelope.path("content")
                     objectNode(content)
@@ -283,5 +311,6 @@ internal data class MatrixSyncFrame(
     val direct: Map<String, List<String>>,
     // Company controls stay in their original scope; group framing never inherits them.
     val readinessOwner: CollaborationSyncOwner? = null,
+    val spaceReadinessOwner: CollaborationSpaceHistoryOwner? = null,
     val sealHistory: (String, String) -> String,
 )

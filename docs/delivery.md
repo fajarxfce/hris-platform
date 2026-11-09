@@ -1,5 +1,18 @@
 # Delivery and validation
 
+## Organization readiness protocol — 9 November 2026
+
+The fixed group to-device control now preserves exact original/fresh Matrix identity,
+uses one bounded provider request, and stays separate from company controls in sync.
+Malformed hints do not discard encrypted traffic; both public gateway scopes reject
+clear readiness sends. Domain/provider/projection and native HTTP gates pass216 cases
+with zero failures/errors/skips,including actual Synapse wake/replay/bearer rotation/
+restart. [Contract](collaboration/space-readiness-control.md) and
+[evidence](measurements/collaboration-space-readiness-control-2026-11-09.json) record
+8,706 stable inputs and exact scope. Publication fanout and Mobile consumers remain
+next;no live change or new APK is implied.
+
+
 ## Original key publication belongs to transfer — 9 November 2026
 
 The provisioning worker already verified the original signed Matrix identity but

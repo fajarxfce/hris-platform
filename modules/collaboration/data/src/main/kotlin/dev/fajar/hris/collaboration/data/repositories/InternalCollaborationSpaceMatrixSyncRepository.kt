@@ -65,9 +65,13 @@ class InternalCollaborationSpaceMatrixSyncRepository(
             }
         val direct = collaborationSpaceDirectMetadata(owner, scope)
         val frame =
-            MatrixSyncFrame(owner.matrixUserId, owner.matrixDeviceId, frames, direct) {
-                id,
-                privatePosition ->
+            MatrixSyncFrame(
+                owner.matrixUserId,
+                owner.matrixDeviceId,
+                frames,
+                direct,
+                spaceReadinessOwner = owner,
+            ) { id, privatePosition ->
                 when (val room = requireNotNull(rooms[id])) {
                     is CollaborationSpaceReadRoom.Published ->
                         sealMatrixSpaceRoomCursor(crypto, owner, room.value, privatePosition)

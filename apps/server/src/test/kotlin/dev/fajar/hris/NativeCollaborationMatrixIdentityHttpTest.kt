@@ -3,6 +3,8 @@ package dev.fajar.hris
 import com.sun.net.httpserver.HttpServer
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceKeyPublication
+import dev.fajar.hris.collaboration.domain.policies.COLLABORATION_READINESS_CONTROL_TYPE
+import dev.fajar.hris.collaboration.domain.policies.COLLABORATION_SPACE_READINESS_CONTROL_TYPE
 import dev.fajar.hris.collaboration.domain.policies.validateCollaborationDeviceKeys
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationSpaceKeyRepository
 import dev.fajar.hris.core.domain.Actor
@@ -1128,6 +1130,16 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 body.replace(key.device, "*"),
             )) assertEquals(400, send(invalid).statusCode())
         assertEquals(413, send(" ".repeat(1_048_577)).statusCode())
+        for (type in
+            listOf(
+                COLLABORATION_READINESS_CONTROL_TYPE,
+                COLLABORATION_SPACE_READINESS_CONTROL_TYPE,
+            )) {
+            assertTrue(
+                uploadKeys(n, token, body, route = "sendToDevice/$type/fixture-txn", method = "PUT")
+                    .statusCode() in 400..499
+            )
+        }
         assertEquals(before, provider.encryptedSends.get())
         assertEquals(403, send().statusCode()) // No confirmed recipient publication yet.
         assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
@@ -3238,7 +3250,14 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             )) {
             assertEquals(400, send(invalid).statusCode())
         }
-        assertTrue(send(body, "sendToDevice/m.room_key/fixture-txn").statusCode() in 400..499)
+        for (type in
+            listOf(
+                "m.room_key",
+                COLLABORATION_READINESS_CONTROL_TYPE,
+                COLLABORATION_SPACE_READINESS_CONTROL_TYPE,
+            )) {
+            assertTrue(send(body, "sendToDevice/$type/fixture-txn").statusCode() in 400..499)
+        }
         assertEquals(
             413,
             uploadKeys(

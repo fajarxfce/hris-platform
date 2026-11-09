@@ -100,6 +100,22 @@ class MatrixSyncProjectionTest {
                 hint(content + ("body" to "must not escape")),
                 hint(content - "expires_at"),
                 hint(content + ("event_id" to "x".repeat(4096))),
+                mapOf(
+                    "sender" to user(owner.accountId),
+                    "type" to COLLABORATION_SPACE_READINESS_CONTROL_TYPE,
+                    "content" to
+                        collaborationSpaceReadinessControlContent(
+                            CollaborationSpaceReadinessControl(
+                                control.eventId,
+                                owner.companyId,
+                                owner.accountId,
+                                control.nativeSessionId,
+                                owner.deviceId,
+                                control.publishedAtEpochMillis,
+                                control.publicationRevision,
+                            )
+                        ),
+                ),
             )
         val connection =
             Connection(

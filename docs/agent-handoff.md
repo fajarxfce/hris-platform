@@ -1,5 +1,46 @@
 # Agent continuation — HRIS workspace
 
+## Mobile history admission accepted; build84 packaging — 9 November 2026, 08:12 UTC
+
+Mobile b0e4079e is committed/pushed. Original-window/provider-page history now uses
+one combined transport snapshot at each pre/post boundary (2 requests rather than6).
+Current owner/device/platform/membership/room and denial checks remain domain policy;
+recipient readiness remains send-only. No backend endpoint, schema, session TTL,
+schedule or inspector policy changes. Remaining older/reopen/timeline/receipt readers
+have distinct lifetimes and are recorded for subsequent measured review.
+
+Mobile full-cached-1/session67163 REAPED PASS897.873s:3804 fresh cases, no failures,
+errors or skips,4529 app/all82 library inputs unchanged.44 actual Chrome cases,
+root checks, Android release/proof compilation/lint0, Wasm/iOS source, architecture
+and quality pass. Prior focused-cached-2/session43377 passes2180 fresh (1585desktop,
+595Android) in590.198s; results are separate, not summed. Two RED regressions fail
+before the fix. A public GitHub SDK6 descriptor read returns504 before tests;
+verified local AAR/Ivy bytes match the unchanged published digests. Public download
+availability is not relabelled as passing. Kotlin incremental cache recovery uses
+successful full compilation. [Evidence](https://github.com/fajarxfce/hris-mobile/blob/b0e4079e/docs/measurements/collaboration-history-transport-2026-11-09.json).
+
+Starter6157db1 is committed/pushed:8 exact generic worker files and optional identity
+maintenance adapted to its existing session contract. Full75.282s/62fresh plus corrected
+actual browser9identity cases pass; initial fixture compile error and zero-selection
+filter remain recorded. HRIS policies are not copied into Starter.
+
+ACTIVE heavy job: Mobile build84 packaging65762, .work/release-phone-2026-11-09-build84.
+Keep app/library inputs frozen; no emulator. Reap, verify artifact/SDK, then clone ONLY
+latest COMPLETE Mobile native-parent-renewal-native-2026-11-09/sender at83, all4userdata/
+encryption files+AVD. FIVE originals incl Parent83 071123 must never be reset/resubmitted.
+New prepared history-transport-native-2026-11-09 harness records host/device clock offset
+and bounded independent periodic-work attribution, preserving the strict traffic result.
+It is not executed yet and no native84/phone84 acceptance is claimed.
+
+Phone remains installed83, install-only/no UI. Announce next phone update only after
+native acceptance. SDK6 release438835525 remains published with unchanged assets.
+Live backend e558a686/schema116.4/controlON unchanged;117–138 undeployed. All54 groups
+remain open. After native84, CI needs explicit pinned inspector checkout; its current
+SDK5 catalog also needs verified SDK6 adoption before general public Android CI. Do not
+change library inputs during the current build/proof. Physical iPhone interaction is
+waived; actual Apple SDK/runtime acceptance stays separate.
+
+
 
 ## Phone83 installed and SDK6 public; Starter validation active — 9 November 2026, 07:28 UTC
 

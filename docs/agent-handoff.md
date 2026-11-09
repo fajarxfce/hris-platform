@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 22:20 UTC. Historical detail remains in
+Updated 9 November 2026, 23:10 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -133,15 +133,14 @@ full11069 REAPED PASS575.815s:4,328 fresh cases=3,679 desktop+626 Android host
 +23 browser,zero failures/errors/skips. Required root/platform/quality checks and exact source/library/XML audit
 pass with4,595 unchanged source inputs. No original binding rewrite or schema change.
 
-Fresh [CI42707758241](https://github.com/fajarxfce/hris-mobile/actions/runs/42707758241)
-is running on immutableeba05a9c253aa7fe7f0cf816b49c128b4f3003a6;dispatch9340 reaped.
-Expected6,743 portable+2,549 Apple=9,292 cases. Mobile inventory hosted.json/auditor
-pins it against accepted42697887863. Portable audit75963 is REAPED PASS6,743 cases,
-zero failures/errors/skips. Full baseline+81 new cases,GitHub digest,ZIP CRC and every
-XML pass. Artifact13715877458 is3,309,928 bytes,SHA256
- db83868e00d3b30df74867156965b7443c91bda4249e344524df1f51524cd52c;
-report manifest a8169240844b1fcf2b133a0cd09a2ff550fd2a818c5314b21816f340b7658c1c.
-Apple simulator step passed;unsigned host build remains in progress. This immutable source does not cover sync/progress successors.
+[CI42707758241](https://github.com/fajarxfce/hris-mobile/actions/runs/42707758241)
+is fully accepted on immutable eba05a9c253aa7fe7f0cf816b49c128b4f3003a6.
+Portable6,743 +Apple simulator2,549 =9,292 cases,zero failures/errors/skips;
+unsigned Xcode host succeeds. Audits75963/66359 are reaped. GitHub SHA256,ZIP CRC,
+every XML and the full previous report set plus119 cases pass. Mobile495dd81b
+records [complete evidence](https://github.com/fajarxfce/hris-mobile/blob/495dd81b/docs/measurements/collaboration-space-inventory-hosted-2026-11-09.json)
+and is pushed;31316 reaped. This source covers cumulative listener,wake and inventory,
+not later sync/progress/worker or native Apple Matrix/APNs/calling behavior.
 
 Mobile [b51e70d8](https://github.com/fajarxfce/hris-mobile/blob/b51e70d8/docs/collaboration-space-device-sync.md)
 is committed/pushed;9895 reaped. Exact original group sync passes focused85631:
@@ -159,27 +158,29 @@ source/browser/quality pass. Both4,611-input manifests and all source/library/XM
 checks agree. Claimed raw pages survive interruption;only a clean exhausted sweep
 can return its exact wake. No schema,SDK,phone or live change.
 
-Current only heavy job is Mobile worker focused-1 /91375, under private
-`.work/space-recovery-worker-2026-11-09`. Twenty-one unaccepted Kotlin inputs now add
-the actual independent group SyncTask/application wiring,group wake commands,local
-original recovery selection and a final inventory recheck. One processor/one waiter,
-4 raw pages per90-second turn/180-second queue bound,exact checkpoint/wake CAS and
-fault backoff. Original SDK/admission use cases are reused. Group collector subscribes
-before startup recovery and failures cannot stop native lifetime. Lazy Resume breaks
-the scheduler/task registry construction cycle,corrected during pre-gate review.
+Current only heavy job is Mobile worker focused-3 /56790 under private
+`.work/space-recovery-worker-2026-11-09`;22 Kotlin inputs are frozen.
+First91375 reaped exit1/213.555s:38 app cases pass;37 domain cases did not execute
+because of a new test fixture name collision;two LongMethod quality failures.
+Second37708 reaped exit1/141.468s:all75 cases pass,zero failures/errors/skips;one
+remaining LongMethod (start102 >100). Both4,627 source and Inspector manifests
+remained unchanged in the second gate. The new fixture was renamed;group task DI
+is separate;company/group readiness now have explicit lazy undispatched application
+subscriptions before activation. No suppression or relaxed quality thresholds.
 
-Formatter13099 reaped. Expected75 focused cases=37 domain+12 worker+24 application
-lifetime+2 graph. All21 Kotlin inputs are frozen;full gate not started. Prepared copies
-were applied then extended;never reapply those archival drafts over current src.
-No actual provider,APK,phone or live rollout. Idle-room SDK/app-ledger optimization,
-producer wakes after end reads,group push/legacy routing and native proof remain.
+The task reuses current application native-parent cancellation,original adoption/sync/
+delivery and encrypted exact checkpoints. One processor,one waiter,four raw pages
+per90-second turn,180-second admission bound. Failed work retains backoff,clean
+completion alone discharges an exact wake. Lazy Resume avoids the task/scheduler
+construction cycle. Expected focused75 =37 domain+12 worker+24 lifetime+2 graph.
+Full gate has not started. Prepared private files are archival;never restore over src.
+No actual provider,APK,phone or live rollout.
 
-Next worker design must distinguish exact original SDK transactions from Queued/new
-SPACE messages;the existing original-only writer cannot enqueue. Empty active app
-commands,or even retired receipts,do not prove the SDK has no settlement work. Avoid
-false-negative skips;local SDK inventory or a properly retired durable work index is
-needed before claiming a room has nothing to recover. Mobile inventory worker-next.md
-records these verified boundaries;no new worker source has been applied yet.
+Worker currently attempts original rooms conservatively. Idle optimization must
+combine complete paused SDK inventory with app commands and receipts. Empty app
+records alone cannot prove native settlement is done. Producer wakes after final
+inventory reads,group FCM/legacy/product routing,new SPACE enqueue and actual native
+control-to-original-delivery proof remain. The original-only writer cannot enqueue.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must

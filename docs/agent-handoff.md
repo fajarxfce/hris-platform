@@ -1,5 +1,29 @@
 # Agent continuation — HRIS workspace
 
+## Native78 exposes stale SDK refresh; server unchanged — 9 November 2026, 01:08 UTC
+
+Mobile a1f2cfe9 fixes duplicate recovery consumers manufacturing fresh wakes. Its full
+5,949-case gate and actual WorkManager migration/trigger proof pass. Product78 is NOT
+accepted:417 requests/328.536s include42 refresh401 and72 default-key401. One original
+`Recovery78 005634` remains pending; never resend it. Same account/public-key identity
+survives in-place upgrade; old messages render. [Evidence](measurements/collaboration-recovery-native78-2026-11-09.json).
+
+Passive read-only comparison at01:04:27 proves the client's refresh token matches
+NEITHER current nor previous hash of its sole gateway head(version8, not revoked,
+expires8 December). Last rotation00:03:33.807589 was just before77 emulator shutdown;
+the historical loss instant is unproven. Mobile closes credential persistence before
+draining native work; a regression is running for a refresh callback during shutdown.
+Also trace automatic recovery of rejected sessions across successive SDK instances:
+an expired gateway session needs admitted credential replacement preserving private
+keys/queue, not device re-enrollment, relaxed server authentication or longer token TTL.
+
+No Platform code/runtime change: e558a686, schema116.4, control ON, API f6022812/image
+5ce02e63 and worker14d8eb8b/image3a86bd67.117–138 untouched. Native emulator80866 and
+counter/proof/passive comparison are REAPED; source77 unchanged and full78 pending
+store preserved. One Mobile compiler45539 runs the pre-fix drain regression. Follow
+Mobile's latest handoff for subsequent source/tests. Phone70 unchanged, no new
+availability; no Starter port until consumer proof. Continue all54 open PRD groups.
+
 ## Native77 readiness succeeds; excessive metadata recovery remains — 9 November 2026
 
 Current dev API/worker source e558a686, schema116.4, readiness control **ON**.

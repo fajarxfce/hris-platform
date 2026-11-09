@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 18:26 UTC. Historical detail remains in
+Updated 9 November 2026, 18:42 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,7 +17,7 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Original-key worker publication — full validation running
+## Original-key worker publication accepted
 
 Mobilea14eea78 and Groupe2c61dad accept the prior original-delivery native fixture,
 which used an explicit current-gateway upload of the unchanged signed public key.
@@ -39,12 +39,17 @@ events,and remain readable offline in a later process. Ten native requests retai
 two bootstrap/two direct reads. Mobile source and accepted SDK6 APK are unchanged.
 The isolated2560MiB/two-core emulator is stopped; phone87 remains untouched.
 
-Group62503/full-1 is RUNNING with frozen inputs:complete domain,relevant SQL/provider,
-delivery,native API/OpenAPI and FULL worker tests/quality. Domain192 passes so far.
-Strict source/XML/native audit and implementation/test/doc commit remain required.
-Private group readiness-control successor candidates are not applied or validated.
-Follow [Group handoff](https://github.com/fajarxfce/hris-platform/blob/feat/communication-space/docs/agent-handoff.md)
-for that job; do not start another heavy compiler/emulator or repeat accepted gates.
+Group62503/full-1 is REAPED PASS1410.192s:616 fresh cases=192 domain,75 SQL/
+provider,25 delivery,174 native API/OpenAPI and FULL worker150. Zero failures/errors;
+one existing elapsed-retention opt-in skip. Format/architecture and strict archived
+XML/source/native/APK audit pass. [Group61e8c2f5](https://github.com/fajarxfce/hris-platform/blob/61e8c2f5d62b0f7f6406972df7191e4b32638a5c/docs/collaboration/space-original-key-publication.md) is committed/pushed.
+No Mobile,SDK,live schema,runtime or phone source change was required for this fix.
+
+Next:group readiness-control protocol/projection,bounded committed publication fanout,
+Mobile foreground/background ownership and product routing. Private successor
+candidates are not acceptance. Follow the [Group handoff](https://github.com/fajarxfce/hris-platform/blob/feat/communication-space/docs/agent-handoff.md)
+for current jobs and keep one heavy local compiler OR emulator. Do not repeat these
+accepted gates or resurrect the retired explicit-confirmation/SDK7 approach.
 
 Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple
 simulator,zero failures/errors/skips,and unsigned Xcode host success. Mobilea945220c
@@ -117,7 +122,7 @@ Source does not activate group UI/worker/SDK delivery or deploy the backend.
 
 The former Mobile4649 compilation/native-proof work is complete; its failed first
 attempt and corrected source/native/hosted gates are retained in the current Mobile
-handoff. Do not restart it. Current work is the worker publication gate above.
+handoff. Do not restart it. Current work follows the accepted worker publication above.
 SDK6 remains immutable; all original stores/messages remain preserved.
 
 ## Accepted runtime and device state

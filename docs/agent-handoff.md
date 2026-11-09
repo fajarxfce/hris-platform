@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 19:20 UTC. Historical detail remains in
+Updated 9 November 2026, 20:14 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -55,13 +55,28 @@ actual dump/restore pass. Receiver commit-order regression first fails as expect
 then passes with the revision fence. Both original worker and fresh SDK upload capture
 exactly two channels. Strict source/XML audit passes;8,708 stable inputs,no shared DI change.
 
-Next:typed repository,current-target admission/fanout,Mobile durable foreground/
-background ownership and group product routing. Eight successor repository/policy/
-datasource/test files have ALREADY been applied in the Group checkout after7d4d7f1f;
-their validation is separate and not accepted by the storage commit. Do not reapply
-`space-readiness-publication-2026-11-09/prepared`. Consult the Group current handoff
-and `.work/space-readiness-queue-2026-11-09` for the latest gate. No Mobile source,
-SDK7,APK88,live schema/runtime or phone change;all54 acceptance groups stay open.
+Group queuea182ebf5, target acknowledgement4a5dd90f and pure admissionbebe3138
+are accepted/pushed. V140 preserves the original V139 leases and allows exact target
+progress under its own current guards; publisher-only settlement remains separate.
+The latest accepted [99a0d8c5](https://github.com/fajarxfce/hris-platform/blob/99a0d8c5/docs/collaboration/space-readiness-control-fanout.md)
+adds bounded Matrix fanout. Final21572 passes221 cases in215.181s:205 domain and16
+real PostgreSQL queue/use-case cases,zero failures/errors/skips,8,725 stable inputs,
+format/architecture. Actual provider rotation waits on target guards until ACK commits.
+Prior9502 had one invalid expired-token fixture among220 cases; it is corrected and
+recorded. All pushes are reaped; no shared DI or worker activation is accepted yet.
+
+Current Group work is the independent PUSH handoff. The existing fanout is renamed
+FanOutCollaborationSpaceReadiness to share current-target admission across channels;
+PUSH atomically appends a quiet wake to the existing FCM queue with cursor progress.
+HandleCollaborationSpacePush remains the actual delivery/token/retry owner. This
+successor is NOT yet accepted. See the Group handoff and private
+`.work/space-readiness-push-handoff-2026-11-09` for its latest gate;95714/focused-1 was
+running when this note was written. Do not edit frozen Group inputs or start a second
+heavy job until it is reaped. Do not reapply old prepared candidates or replay accepted
+native/hosted gates. Next: full API/unfiltered worker integration, then Mobile durable
+group foreground/background ownership and product routing. No Mobile source,SDK7,
+APK88,phone or live rollout; all54 acceptance groups remain open. Group recovery max140
+must not be copied to Root/live schema116.4.
 
 
 Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple

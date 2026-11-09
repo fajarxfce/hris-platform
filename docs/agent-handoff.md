@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 19:36 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 19:46 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -18,14 +18,14 @@ Apple runtime/build and push/call acceptance remains separate.
 ## Resume current fanout integration
 
 Accepted source:storage7d4d7f1f and typed queuea182ebf5 are committed/pushed;all pushes
-are reaped. V140 target acknowledgement is now validated and recorded below. No active
-heavy job at this checkpoint. Next pure/current target admission and bounded Matrix/
-PUSH fanout,then Mobile durable ownership. Do not restart the retired confirmation
+are reaped. V140 target acknowledgement4a5dd90f is committed/pushed;all pushes are reaped. No active
+heavy job at this checkpoint. Pure/current target admission now passes below. Next bounded Matrix/PUSH fanout,
+then Mobile durable ownership. Do not restart the retired confirmation
 endpoint,SDK7,old source gates or hosted42656803963. No new APK or live rollout.
 
 Private `.work/space-readiness-fanout-2026-11-09/design.md` records the integration
 boundary. Its initial base isa182ebf5;re-pin successor implementation to the V140
-commit before applying any candidate. No fanout or admission source has been written.
+commit before applying any candidate. Pure admission source is now accepted below;no owning fanout source exists yet.
 No nested transaction owners or hidden actor switch. Claim ends before target account
 guards. Exact successful/suppressed cursor advance runs inside the target transaction;
 transport deferral leaves it before publisher-only release. Revalidate actual target
@@ -43,6 +43,32 @@ V140 `.work/space-readiness-target-progress-2026-11-09`:
 - [Contract](collaboration/space-readiness-target-progress.md) and
   [measurement](measurements/collaboration-space-readiness-target-progress-2026-11-09.json).
   No shared DI,worker loop,provider or Mobile activation is part of this increment.
+
+## Accepted pure readiness admission; owning fanout next
+
+Three new domain files add current metadata snapshot/admission,pure validation and
+seven policy tests. Scope is an opaque wake only. Hard native/group eligibility and
+actual original completion remain required;short native/gateway/MFA freshness is not.
+Fresh HRISG_ on an original Matrix user stays distinct from retained HRIS_ identity.
+Receiver keys use capturedAt,not issuer observation time. Provider credentials must
+match the complete admitted state and remain live;no refresh occurs in this policy.
+
+Private `.work/space-readiness-admission-2026-11-09` pins4a5dd90f:
+- focused-1 /96709 REAPED PASS30.847s:203 domain cases,including7 new,zero failures/
+  errors/skips,8,720 stable inputs,format/architecture. No source change during gate.
+- verify.py validates every archived fresh XML and source hash;accepted.json is the
+  tracked measurement. No provider/native/phone or worker delivery acceptance claimed.
+- [Contract](collaboration/space-readiness-admission.md) and
+  [measurement](measurements/collaboration-space-readiness-admission-2026-11-09.json).
+
+Next implement owning Matrix control fanout with existing typed queue and pure
+admission,then independent PUSH delivery. Read target repositories under account ->
+native -> device -> gateway -> queue guards;I/O outside transactions. Reacquire after
+both outcomes and acknowledge exactly that target in the same guarded transaction.
+On deferral,leave target scope before publisher-only queue settlement. Bound page8,
+claim4,20-second task/60-second lease,eight no-progress attempts,24-hour publication.
+Shared DI/worker integration MUST validate full API and unfiltered worker tests.
+No active heavy job at this checkpoint;no new APK,SDK7 or live deployment.
 
 ## Accepted worker original-key publication
 

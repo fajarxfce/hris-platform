@@ -1,5 +1,10 @@
 # Architecture
 
+[Current readiness admission](collaboration/space-readiness-admission.md) validates
+actual original/fresh target identity and hard native lifetime without requiring short
+interactive freshness. Pure policy supplies bounded wake admission; the use case must
+own guarded reads,provider I/O,revalidation and queue progress.
+
 [Target acknowledgement](collaboration/space-readiness-target-progress.md) keeps
 current target validation and worker cursor progress in one transaction. V140 allows
 the exact target account to advance; publisher-only settlement and all lease guards

@@ -34,6 +34,6 @@ publication/key/revision/channel row and the active original lease before advanc
 it under the receiving scope. Existing repository regressions also run on V140.
 
 The Group recovery bound is140 with the same encrypted-envelope projection. Root
-Platform remains116.4. Next implement pure/current target admission and bounded
-Matrix/PUSH fanout,then Mobile durable consumption/background ownership. Live
+Platform remains116.4. [Pure/current target admission](space-readiness-admission.md) is now accepted separately.
+Next implement bounded Matrix/PUSH fanout,then Mobile durable consumption/background ownership. Live
 schema116.4,group routing OFF,phone87 and SDK6 are unchanged;all54 PRD groups stay open.

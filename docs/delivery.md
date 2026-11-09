@@ -1,5 +1,14 @@
 # Delivery and validation
 
+## Current organization readiness admission — 9 November 2026
+
+Pure target policy now preserves original/fresh Matrix identity,confirmed keys,current
+native/group eligibility and exact post-I/O credential observations. Full domain tests
+pass203 cases,including seven new policy cases,zero failures/errors/skips,8,720 stable
+inputs,format/architecture. [Contract](collaboration/space-readiness-admission.md) and
+[evidence](measurements/collaboration-space-readiness-admission-2026-11-09.json).
+Owning fanout and Mobile consumers remain next;no DI or live change.
+
 ## Guarded readiness target acknowledgement — 9 November 2026
 
 V140 permits the worker's exact next target account to advance its cursor under

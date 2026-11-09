@@ -1,5 +1,37 @@
 # Agent continuation — HRIS workspace
 
+## Native82 preserves four originals; parent renewal in Mobile — 9 November 2026, 06:14 UTC
+
+Latest Mobile pushed checkpoint0cb1a575 records failed native82. Full SDK6 source
+validation passed5476 fresh tests plus current595 Android host results; APK82 is
+verified but NOT release-accepted/installed. Actual retained81→82 proof preserves
+account/private-key identity, three original Sent bubbles and durable history end.
+Exactly one new Registry82 message reaches server in2123.624ms with recipient process
+stopped; there are now FOUR original encrypted events. Never resend any of them.
+All emulator/probe processes stopped/reaped; latest COMPLETE store is Mobile
+.work/sdk-shared-borrow-native-2026-11-09/sender at82 with four userdata/encryption
+files and full AVD. Do not restore81/80 over it.
+
+Home/room complete110s idle bins pass. Resumed/cold bins fail repeated metadata;
+third Matrix refresh401 matches prior returned/current DB refresh hash, same head19,
+not revoked or expired. Native parent rotates at05:58:49.704821, about91ms after
+refresh rejection; gateway auto-recovery19→20 at05:58:53.010254 preserves keys.
+The old probe omitted org.hris.error_code, so exact HRIS reason is not proven.
+Current admission policy requires native parent.accessExpiresAt>now independently
+of Matrix credential lifetime. Mobile is implementing application-owned proactive
+parent token maintenance through its existing identity acquisition; do not relax
+server authorization, lengthen TTLs or re-enroll devices to hide the failure.
+
+Mobile83 source/tests UNCOMMITTED and under focused validation; consult its live
+handoff/.work/native-parent-renewal-2026-11-09. First focused attempt stopped on a
+production mapping compile error (corrected); second currently has a test generic
+assertion error, with no accepted new tests yet. No new build, phone install,
+SDK6 publication or Starter port. Phone ADB reachable06:12, no UI driving.
+
+Platform source/runtime unchanged: livee558a686/schema116.4/controlON,
+API f6022812/image5ce02e63 and worker14d8eb8b/image3a86bd67.
+117–138 remain undeployed. All54 communications PRD groups remain open.
+
 ## Phone reset; Mobile credential recovery continues — 9 November 2026, 01:36 UTC
 
 User flashed phone to stock ROM. Read-only ADB10.77.77.3:5555 is authorized/connected;

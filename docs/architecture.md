@@ -1,5 +1,10 @@
 # Architecture
 
+[Organization readiness publication storage](collaboration/space-readiness-publications.md)
+commits the original key journal with a shared revision and separate Matrix/PUSH
+checkpoints. Exact worker scope, leases and receiver commit order bound the hint
+inventory; current-target fanout and Mobile ownership remain separate work.
+
 [Organization readiness protocol](collaboration/space-readiness-control.md) carries
 a bounded opaque hint on the existing Matrix connection. Explicit group/company
 framing preserves encrypted traffic and original physical identities; publication

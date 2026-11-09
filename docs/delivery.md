@@ -1,5 +1,18 @@
 # Delivery and validation
 
+## Organization readiness publication storage — 9 November 2026
+
+V139 atomically captures existing verified-key journals into independent Matrix/PUSH
+checkpoints with commit-ordered revisions. Normal-role SQL tests cover rollback,
+cancellation, concurrency, capacity, retries, stale leases, scope and dump/restore.
+A failing regression proves that receiver timestamps alone cannot establish commit
+order; the final projection also fences the receiver revision. Final validation is
+23 JVM cases,zero failures/errors/skips,and40 Python migration/recovery cases with
+8,708 stable source inputs. Original activation and native SDK upload both capture
+exactly two channel rows. [Contract](collaboration/space-readiness-publications.md)
+and [evidence](measurements/collaboration-space-readiness-publications-2026-11-09.json).
+No shared DI or live change; typed repository/fanout/Mobile integration remains next.
+
 ## Organization readiness protocol — 9 November 2026
 
 The fixed group to-device control now preserves exact original/fresh Matrix identity,

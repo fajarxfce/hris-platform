@@ -771,6 +771,14 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 ),
         )
         val replacement = KeyPayload(key.user, key.device)
+        val readiness =
+            database()
+                .queryForList(
+                    "select event_id,channel from collaboration_space_readiness_deliveries where publisher_device_id=? order by channel",
+                    device,
+                )
+        assertEquals(listOf("MATRIX", "PUSH"), readiness.map { it["channel"] })
+        assertEquals(1, readiness.map { it["event_id"] }.toSet().size)
         val count = provider.keyUploads.get()
         val denied = uploadKeys(n, token, json.writeValueAsString(replacement.body()))
         assertEquals(409, denied.statusCode(), denied.body())

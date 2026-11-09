@@ -44,8 +44,8 @@ Synapse tests pass. The archive verifies every fresh XML and all8,706 stable inp
 format and architecture pass. No shared DI constructor changed, and the previous
 full worker gate is not counted again.
 
-Next implement the transactional publication counter/checkpoints and bounded current
-target fanout, then the Mobile foreground consumer, durable receipt and background
-owner. Those are not implemented by this protocol increment. No Mobile/SDK/schema,
-live runtime or phone build changes; group routing remains OFF and all54 PRD
-acceptance groups remain open.
+[Publication storage](space-readiness-publications.md) now commits a revision and
+separate Matrix/PUSH checkpoints with the existing key journal. Typed repository,
+bounded current-target fanout and Mobile foreground/background ownership remain
+next. The protocol alone does not provide those product owners. Group routing stays
+OFF; all54 PRD acceptance groups remain open.

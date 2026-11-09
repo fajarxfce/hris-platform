@@ -966,6 +966,19 @@ class CollaborationSpaceWorkerPublicationTest {
         )
         assertEquals(1, queried.get())
         assertEquals(1, provider.calls.get())
+        val readiness =
+            owner.queryForList(
+                "select event_id,channel,publication_cutoff from collaboration_space_readiness_deliveries where publisher_device_id=? order by channel",
+                id,
+            )
+        assertEquals(listOf("MATRIX", "PUSH"), readiness.map { it["channel"] })
+        assertEquals(1, readiness.map { it["event_id"] }.toSet().size)
+        assertTrue(
+            readiness.all {
+                (it["publication_cutoff"] as java.sql.Timestamp).toInstant() ==
+                    completion.completedAt
+            }
+        )
         assertEquals(
             oldCompanyKeys,
             f.originalSnapshot().getValue("collaboration_device_key_publications"),

@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-11-09T19:18:31.005308+00:00",
+  "baseCommit": "41c52145c0a04242d68f7bf420394e969f1e64eb",
+  "scope": "V139 atomic organization key-publication capture, independent Matrix/PUSH delivery storage and restricted current-target metadata; no worker fanout or Mobile activation",
+  "final": {
+    "startedAt": "2026-11-09T19:12:24.976892+00:00",
+    "elapsedSeconds": 335.11,
+    "counts": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "sourceFiles": 8708,
+    "sourcesUnchanged": true
+  },
+  "pythonCases": {
+    "migrationVersions": 5,
+    "recovery": 35
+  },
+  "reportClasses": {
+    "dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest": 2,
+    "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest": 11,
+    "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest": 10
+  },
+  "testcases": [
+    {
+      "class": "dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest",
+      "name": "groupUploadWithholdsReplyAfterNativeRevocationAndKeepsUncertainIdentity()"
+    },
+    {
+      "class": "dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest",
+      "name": "groupKeyUploadUsesOriginalIdentityAndStrictGroupKeyDispatch()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedCompetingWorkersPublishOneTransferAndNeverReplaceTheWinningCredential()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedLateAdmissionAfterCompletionRollsBackBothSidesAndCanRetry()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedWorkerUsesActualSynapseReadbackAndKeepsKeysAcrossProviderRestart()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedActivationWaitsForExplicitFreezeAndFiniteOldRequestsWithoutCallingProvider()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedActivationPublishesTheVerifiedOriginalKeysWithoutAnotherClientRequest()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedPublicationRollsBackOriginalRetirementAndNewStateAtEveryWriteBoundary()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedActivationMatchesActualSignedReadbackAndRetiresOnlyItsOriginalGateway()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedProviderErrorsAndKeysCannotPublishAfterNativeOrSourceChanges()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedActivationRejectsSubstitutedSuccessfulPublicationReadbackAtomically()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "freshActivationCannotPublishKeysBeforeItsSdkCreatesThem()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest",
+      "name": "retainedMissingSubstitutedAndInvalidSignedKeysLeaveOldStateRecoverable()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "revisionsFollowCommitOrderAndRollbackDoesNotLeaveAGap()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "aRoomBoundAfterPublicationIsNotAddedToTheCapturedFanout()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "unconfirmedOrSubstitutedSourceCannotCreateReadinessAndApiCannotReadWorkerQueue()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "receiverPublicationCommittedLaterCannotEnterAnEarlierRevisionThroughItsOlderTimestamp()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "keyPublicationAuditAndBothChannelsRollBackTogetherOnFailureOrCancellation()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "competingClaimersRespectChannelCapacityAndDumpRestoreRetainsExactProgress()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "channelsLeaseIndependentlyAndStopAfterEightAttemptsWithoutProgress()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "migrationPreservesOriginalPublicationAndCapturesOnlyNewJournalCommits()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "progressRequiresForwardCursorAndAnUnexpiredLeaseOfTheSamePublisher()"
+    },
+    {
+      "class": "dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest",
+      "name": "targetsRequireOriginalPeerRoomCurrentReceivingParentAndExactClaimedScope()"
+    }
+  ],
+  "sourceManifestSha256": "2719007c6ae2230806722d58e246b38d9320b724ad7b8aee8d2b866429c3eb7e",
+  "changedSources": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "6947ad5b3c52f1b7195f539e6547438b9beb440595e865d95679283928ff84ca",
+    "core/database/src/main/resources/db/migration/V139__collaboration_space_readiness_publications.sql": "1412bb0b220f238ae275a855bfaa6f36dc4d5ba87a930ddce9bf8460f5046e43",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceReadinessPublicationTest.kt": "e5b727b440623ae36b07157cef682c068017d1f80e23ea81e3e4d3cdcb3cb42d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceWorkerPublicationTest.kt": "aaaa4b5d58a7b8828f1820e9d00fe0d40c2c7527183fd7fd67be0bdf14b49a09",
+    "tool/recovery_set.py": "96daf55c687b692100e3dffe99243e1ea80a26b8df7a37bc74c96d4d2d2552b2",
+    "tool/test_recovery_set.py": "3452366f61d30b5ceb89ed0c199618b46a9863969f94702f4591868c5f9405bf"
+  },
+  "reports": {
+    "apps/server/build/test-results/test/TEST-dev.fajar.hris.NativeCollaborationMatrixIdentityHttpTest.xml": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "079004cadbfe70d64da3c2db49e97cd8c12f2310a85c7571ac33a0cb6cae94f4"
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceWorkerPublicationTest.xml": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "921ab3ef1a7685cc9f3194591c2084d1a755bdd9eb07f100013d52d5f4386c26"
+    },
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessPublicationTest.xml": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "56afb2e1b6ce80de9b6943f4fb73302b2867baabd73d747fcefe81c24201c574"
+    }
+  },
+  "history": {
+    "focused-1": {
+      "startedAt": "2026-11-09T19:00:06.962230+00:00",
+      "elapsedSeconds": 143.603,
+      "exitCode": 0,
+      "sourceFiles": 8708,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "focused-2": {
+      "startedAt": "2026-11-09T19:05:03.820101+00:00",
+      "elapsedSeconds": 335.97,
+      "exitCode": 0,
+      "sourceFiles": 8708,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "receiver-red": {
+      "startedAt": "2026-11-09T19:10:53.862638+00:00",
+      "elapsedSeconds": 46.865,
+      "exitCode": 1,
+      "sourceFiles": 8708,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "runtime": {
+    "liveSchema": "116.4",
+    "groupRouting": false,
+    "phoneBuild": 87,
+    "newApk": false,
+    "sdk": "26.10.23-hris.6",
+    "sharedDiChanged": false
+  },
+  "limits": {
+    "channels": [
+      "MATRIX",
+      "PUSH"
+    ],
+    "claimLimit": 4,
+    "activePerChannel": 8,
+    "leaseSeconds": 60,
+    "attemptsWithoutProgress": 8,
+    "maximumDeferralSeconds": 300,
+    "publicationLifetimeSeconds": 86400
+  },
+  "remaining": [
+    "Typed repository and bounded current-target fanout",
+    "Durable Mobile foreground/background readiness owner",
+    "Group product routing and all54 PRD acceptance groups"
+  ]
+}

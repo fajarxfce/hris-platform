@@ -42,7 +42,7 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("extract(epoch FROM token_expires_at)*1000000", expiring)
         self.assertIn(":expires:", expiring)
         with self.assertRaises(recovery.RecoveryError):
-            recovery.envelope_query(139)
+            recovery.envelope_query(140)
 
     def test_gateway_replay_projection_is_schema_gated_and_authenticates_its_metadata(self):
         for schema in (59, 103, 106, 107, 108):
@@ -137,9 +137,9 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("LIMIT 100001", sql)
 
     def test_schema_gate_accepts_reviewed_group_credentials_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, '116.1', '116.2', '116.3', '116.4'):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, '116.1', '116.2', '116.3', '116.4'):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 139, None, 'invalid', '116.5', '115.1', 116.1, '116.1.1', '1' * 65):
+        for schema in (58, 140, None, 'invalid', '116.5', '115.1', 116.1, '116.1.1', '1' * 65):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 
@@ -153,6 +153,13 @@ class RecoverySetTest(unittest.TestCase):
         self.assertNotIn("collaboration_space_push_hints", recovery.envelope_query(137))
         self.assertEqual(recovery.envelope_query(137), recovery.envelope_query(138))
         self.assertNotIn("collaboration_space_room_request_fences", recovery.envelope_query(138))
+
+    def test_group_readiness_channels_preserve_the_existing_encrypted_recovery_projection(self):
+        self.assertEqual((139,), recovery.validate_schema({'observedSchema': '139'}))
+        self.assertEqual(recovery.envelope_query(138), recovery.envelope_query(139))
+        for table in ('collaboration_space_readiness_revisions', 'collaboration_space_readiness_deliveries',
+                      'collaboration_space_readiness_targets'):
+            self.assertNotIn(table, recovery.envelope_query(139))
 
     def test_keypack_requires_exact_fields_current_key_and_unique_bounded_old_keys(self):
         self.assertEqual(keys(), recovery.validate_keys(keys()))

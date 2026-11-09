@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 18:48 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 19:18 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -67,13 +67,33 @@ and [measurement](measurements/collaboration-space-readiness-control-2026-11-09.
   No shared DI constructor changed;previous full worker cases are not recounted.
 - No active heavy job remains at this checkpoint. No new emulator or Mobile build.
 
-Next implement organization publication capture with commit-ordered revision and
-independent bounded Matrix/FCM progress,current target fanout,and the Mobile durable
-consumer/background owner. A signal must schedule existing originals after retaining
-its revision;it cannot create a message ACK or grant content authority. Company queues
-cannot be reused with a space UUID. Review final shared-lock ordering before adding
-capture to the original publication transaction. No queue migration or fanout code
-has been applied yet. Group routing stays OFF;phone87/live e558a686/schema116.4 stay.
+## Accepted publication storage; typed repository next
+
+V139 captures the existing original-worker/fresh-SDK key journal,shared commit revision
+and independent Matrix/PUSH rows atomically. No private key,payload,credential or new
+provider/client request. Current target metadata fences both timestamps and receiver
+commit revisions; no content authority. [Contract](collaboration/space-readiness-publications.md)
+and [measurement](measurements/collaboration-space-readiness-publications-2026-11-09.json).
+Private `.work/space-readiness-publication-2026-11-09`:
+- focused-1 /97107 REAPED PASS143.603s:6 normal-role SQL cases plus40 Python/quality.
+- focused-2 /2437 REAPED PASS335.970s:22 cases=9 SQL,11 activation,2 native API;
+  0 failures/errors/skips. Capacity,concurrent claims,stale cursor/lease,restore pass.
+- receiver-red /71687 REAPED EXPECTED FAILURE46.865s:1 case. Timestamp-only target
+  projection includes a receiver committed later; the exact assertion is retained.
+- final-1 /42132 REAPED PASS335.11s:23 cases=10 SQL,11 activation,2 API;
+  zero failures/errors/skips,40 Python migration/recovery cases,format/architecture,
+  8,708 stable source inputs. New receiver revision fence passes the original regression.
+- Strict accept.py checks final source/report hashes,exact cases and the prior failure.
+  No shared DI constructor changed; no full-worker re-count or new native emulator.
+- Eight next repository/contracts/policy/mapper/datasource/test files are prepared ONLY in
+  `prepared/`,not applied or accepted. Inspect them before continuing; no apply script
+  has run. Add actual repository readback/cancellation/rollback tests before adoption.
+
+Next implement typed repository and current per-target admission/fanout,then Mobile
+revision retention and foreground/background ownership. Do not use a space UUID as a
+company ID. Signals only schedule existing originals; they never create a message ACK.
+No active heavy job remains at this accepted checkpoint. Source schema139 is unshipped;
+group routing OFF,phone87/live e558a686/schema116.4 are unchanged. All54 groups stay open.
 
 RETIRED explicit-confirmation approach:9 Group and22 Mobile unaccepted Kotlin files
 are archived in each checkout's `.work/space-original-key-confirmation-2026-11-09/retired-*`.
@@ -193,7 +213,7 @@ for accepted source/hosted Apple transitions. No new APK or product activation.
 ## Accepted state
 
 - Group8d5724e2 exact published original reference is accepted:266 fresh cases,
-  native admission/actual LEGACY worker/API/OpenAPI/quality pass. Group V117–138 is
+  native admission/actual LEGACY worker/API/OpenAPI/quality pass. Group V117–139 is
   present only in this worktree and remains unshipped.
 - Root Platform feat/communications691f3fc5 (recovery verifier only after merge parent4d4df31f). Live API/worker remains
   e558a6868399058a2dcdee97acfd0e7fa7f1ef07, schema116.4, readiness control ON.

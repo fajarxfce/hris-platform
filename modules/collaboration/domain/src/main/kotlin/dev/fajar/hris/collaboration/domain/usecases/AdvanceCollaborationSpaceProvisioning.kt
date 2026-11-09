@@ -35,6 +35,7 @@ class AdvanceCollaborationSpaceProvisioning(
     private val provider: CollaborationMatrixPolicy,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val publications: CollaborationSpaceKeyRepository,
 ) {
     fun execute(lease: CollaborationSpaceProvisioningLease): Result<Unit> {
         if (!provider.enabled || !validCollaborationSpaceServer(provider.serverName))
@@ -160,7 +161,7 @@ class AdvanceCollaborationSpaceProvisioning(
                     }
                     .flatMap { provisioning.finish(lease) }
                     .flatMap { if (it) Result.Success(Unit) else lostLease() }
-                    .flatMap { completeRetained(current, lease, generation, verified) }
+                    .flatMap { completeRetained(actor, current, lease, generation, verified) }
                     .flatMap {
                         journal.record(
                             actor,
@@ -382,6 +383,7 @@ class AdvanceCollaborationSpaceProvisioning(
         else Result.Success(Unit)
 
     private fun completeRetained(
+        actor: Actor,
         current: Observation,
         lease: CollaborationSpaceProvisioningLease,
         generation: Long,
@@ -414,7 +416,74 @@ class AdvanceCollaborationSpaceProvisioning(
                     proof.observedAt,
                 )
             )
-            .map { Unit }
+            .flatMap { completed ->
+                if (
+                    completed.owner != retained.runtime.owner ||
+                        completed.target !=
+                            CollaborationLegacyRuntimeTarget(
+                                current.device.spaceId,
+                                current.device.id,
+                            ) ||
+                        completed.matrixUserId != current.device.matrixUserId ||
+                        completed.matrixDeviceId != current.device.matrixDeviceId ||
+                        completed.fingerprint != proof.fingerprint ||
+                        completed.nativeSessionVersion != lease.request.nativeSessionVersion ||
+                        completed.targetDeviceVersion != current.device.version + 1 ||
+                        completed.targetProviderGeneration != generation ||
+                        completed.provisioningRevision != lease.request.revision ||
+                        completed.keysObservedAt != proof.observedAt ||
+                        completed.completedAt < proof.observedAt
+                )
+                    return@flatMap changed()
+                val reservation =
+                    CollaborationSpaceKeyPublication(
+                        current.device.spaceId,
+                        current.device.accountId,
+                        current.device.id,
+                        current.device.originNativeSessionId,
+                        completed.matrixUserId,
+                        completed.matrixDeviceId,
+                        proof.fingerprint,
+                        0,
+                        completed.completedAt,
+                    )
+                // The provider identity was read and verified above. Completion, reservation and
+                // acknowledgement share this transaction; a failed publication also rolls back
+                // original-device retirement. No upload or new SDK request is required.
+                publications
+                    .find(reservation.spaceId, reservation.accountId, reservation.deviceId)
+                    .flatMap { existing ->
+                        if (existing != null) changed() else publications.reserve(reservation)
+                    }
+                    .flatMap { publications.publish(reservation, completed.completedAt) }
+                    .flatMap {
+                        publications.find(
+                            reservation.spaceId,
+                            reservation.accountId,
+                            reservation.deviceId,
+                        )
+                    }
+                    .flatMap { readback ->
+                        if (
+                            readback !=
+                                reservation.copy(version = 1, publishedAt = completed.completedAt)
+                        )
+                            changed()
+                        else
+                            journal.record(
+                                actor,
+                                ChangeRecord(
+                                    "collaboration_space_device",
+                                    current.device.id,
+                                    "collaboration.space_device_keys_published",
+                                    mapOf(
+                                        "spaceId" to current.device.spaceId.toString(),
+                                        "version" to "1",
+                                    ),
+                                ),
+                            )
+                    }
+            }
     }
 
     private fun checkInterrupted() {

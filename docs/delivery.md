@@ -1,5 +1,26 @@
 # Delivery and validation
 
+## Original key publication belongs to transfer — 9 November 2026
+
+The provisioning worker already verified the original signed Matrix identity but
+omitted the group publication required for receiving readiness. It now reserves,
+confirms and verifies that exact public identity in the completion transaction.
+Activation,original retirement,publication and audit roll back together. Fresh
+crypto devices still publish through their SDK; no Mobile endpoint,refresh flow,
+replacement key,SDK version or schema change is added.
+
+The corrected native fixture removes its extra keys/upload. The unchanged SDK6 APK
+sends two original messages,recovers after process death before Sent projection,
+and reads both offline in a later process. Exactly two encrypted provider events.
+Final source gate:616 fresh cases,0 failures,0 errors,1 existing opt-in skip;
+full worker and native API graphs,format and architecture pass. The separate native
+case passes139.231s. [Contract](collaboration/space-original-key-publication.md) and
+[audited evidence](measurements/collaboration-space-original-key-publication-2026-11-09.json)
+retain the original failing regression and exact scope. Live routing and phone87
+are unchanged. Continue readiness/background ownership/product integration; all54
+communications acceptance groups remain open.
+
+
 ## Current organization direct transport — 9 November 2026
 
 One admitted native GET returns the immutable published room, this parent's device and

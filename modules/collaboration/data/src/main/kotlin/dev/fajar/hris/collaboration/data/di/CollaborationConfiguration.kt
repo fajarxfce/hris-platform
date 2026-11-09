@@ -521,6 +521,7 @@ class CollaborationConfiguration {
         provider: CollaborationMatrixPolicy,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        publications: CollaborationSpaceKeyRepository,
     ) =
         AdvanceCollaborationSpaceProvisioning(
             registry,
@@ -542,6 +543,7 @@ class CollaborationConfiguration {
             provider,
             security,
             clock,
+            publications,
         )
 
     @Bean

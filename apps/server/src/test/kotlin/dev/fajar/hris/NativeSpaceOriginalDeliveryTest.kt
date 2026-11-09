@@ -174,7 +174,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                     "driver" to result,
                     "nativeRequests" to requests,
                     "groupKeyPublication" to
-                        "Explicit native gateway fixture reuses actual SDK signed public identity; automatic Mobile activation not proved",
+                        "Actual worker verifies original signed identity and commits confirmed publication with transfer before gateway bootstrap; no fixture key upload or extra Mobile request",
                 ),
             )
         } finally {

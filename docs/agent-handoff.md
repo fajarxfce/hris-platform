@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 18:19 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 18:41 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,7 +15,7 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Current worker publication correction (unaccepted)
+## Accepted worker original-key publication
 
 Root cause: AdvanceCollaborationSpaceProvisioning already reads/validates the actual
 signed original identity before immutable LEGACY completion, but omitted the V135
@@ -24,33 +24,35 @@ the same existing transaction, with timestamps from database completion. Fresh S
 devices still publish through their SDK; empty keys/upload stays counts-only. No
 extra Mobile endpoint, token refresh, SDK7, migration or readiness relaxation.
 
-Six Kotlin files currently change: worker use case, repository contract, shared
-constructor DI, worker publication tests and two native fixture files.
-[Contract](collaboration/space-original-key-publication.md) is not fully accepted yet.
-Private `.work/space-original-key-publication-2026-11-09`:
-- red-1 /30751 REAPED FAILED22.365s before tests: fixture passed DSLContext instead
-  of PostgresCollaborationSpaceKeyDataSource. Production remained unchanged.
+The atomic increment contains six Kotlin files:worker use case,repository contract,
+shared constructor DI,worker publication tests and two native fixture files.
+[Contract](collaboration/space-original-key-publication.md) and
+[measurement](measurements/collaboration-space-original-key-publication-2026-11-09.json)
+are accepted. Private `.work/space-original-key-publication-2026-11-09`:
+- red-1 /30751 REAPED FAILED22.365s:fixture passed DSLContext instead of its datasource.
 - red-2 /96766 REAPED EXPECTED FAILURE37.844s:one test,missing group publication.
-- focused-1 /97011 REAPED PASS164.148s:11 cases,zero failures/errors/skips,
-  original/fresh activation,36 write-boundary rollback variants,competing workers,
-  late admission,and actual Synapse continuity; API/worker compilation/quality pass.
-- TWO native fixtures are now applied after their original hashes were verified.
-  They remove explicit keys/upload and assert the worker publication before bootstrap.
+- focused-1 /97011 REAPED PASS164.148s:11 cases,zero failures/errors/skips,including
+  36 write-boundary rollback variants,competing workers and real Synapse continuity.
 - source-1 /29647 REAPED PASS31.698s:compile/format/architecture,8,698 stable inputs.
 - native-1 /71915 REAPED PASS139.231s:one actual Android SDK6 case,zero failures/errors/
-  skips. Worker activation suffices; original messages survive process loss,exactly
-  two encrypted provider events,and final offline read. Ten native requests retain
-  two bootstrap/two direct reads. Unchanged proof APK/Mobile source. Emulator stopped.
-- full-1 /62503 RUNNING:complete domain; seven relevant SQL/provider classes,delivery,
-  six native API/OpenAPI classes and FULL unfiltered apps:worker:test,plus quality.
-  Freeze Group source until reaped. This validates shared DI runtime contexts.
-- accept.py is prepared but has NOT run. Audit exact source/XML/native behavior after
-  full completion,then commit implementation/tests/docs. No source acceptance yet.
+  skips. Worker completion alone publishes before bootstrap;two originals survive
+  process loss,exactly two encrypted events,and final offline read. Ten native requests
+  retain two bootstrap/two direct reads. No fixture upload or extra Mobile key request.
+  Mobile source/APK are unchanged. The isolated emulator is stopped.
+- full-1 /62503 REAPED PASS1410.192s:616 fresh cases,zero failures/errors,
+  1 existing opt-in skip. Complete domain,seven SQL/provider classes,delivery,
+  six native API/OpenAPI classes,FULL unfiltered worker and quality pass.
+- Strict accept.py verifies archived fresh XML,all source manifests,unchanged APK,
+  original transaction/event identity,durable ACK before projection,and offline read.
+  Focused cases are not double-counted with the final suite. No new live/phone release.
 
-Next independent work is organization readiness controls,then background ownership
-and product routing. The company control cannot be reused with a space UUID. Any
-private successor preparation must stay outside the frozen source tree until62503
-finishes. No Mobile build,SDK7,live change or phone install follows from this gate.
+Next independent increment is organization readiness-control protocol and projection.
+Private `.work/space-readiness-control-2026-11-09/prepared` has14 Kotlin candidates;
+base.json pins six existing files,apply.py requires this accepted clean commit and no
+heavy job. No candidate has been applied,formatted,compiled or tested yet. Review its
+private design.md/check.py and preserve company/group scope separation. Add the bounded
+publication queue/current-target fanout and Mobile consumer/background owner afterward.
+Do not call the private protocol candidate product activation. Group routing remains OFF.
 
 RETIRED explicit-confirmation approach:9 Group and22 Mobile unaccepted Kotlin files
 are archived in each checkout's `.work/space-original-key-confirmation-2026-11-09/retired-*`.
@@ -112,7 +114,7 @@ Private `.work/space-original-delivery-native-2026-11-09`:
 
 Live e558a686/schema116.4/group routing OFF, phone87 and retained stopped sender87
 are unchanged. Native fixture acceptance is bounded above; no new product APK. Next:
-atomic worker original-key publication,group readiness-event consumption/background
+group readiness-event consumption/background
 ownership/product routing. No acceptance group is complete.
 
 ## Current source reconciliation

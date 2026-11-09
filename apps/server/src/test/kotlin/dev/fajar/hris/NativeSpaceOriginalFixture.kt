@@ -134,14 +134,24 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
                 ),
         )
         val bootstrap = UUID.randomUUID()
-        val gateway =
-            call(
-                native,
-                "$base/native-device/bootstrap",
-                mapOf("deviceId" to device, "expectedDeviceVersion" to 1),
-                bootstrap,
-            )
-        publishOriginalIdentity(owner, device, gateway["accessToken"].asString(), originalKeys)
+        // Worker completion alone must establish receiving readiness before any group SDK or
+        // gateway bootstrap exists. This is an assertion, never fixture publication SQL.
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_space_key_publications k join collaboration_legacy_runtime_completions c using(space_id,device_id,account_id,native_session_id,matrix_user_id,matrix_device_id) where k.device_id=? and k.fingerprint=? and k.version=1 and k.reserved_at=c.completed_at and k.published_at=c.completed_at",
+                    Int::class.java,
+                    device,
+                    fingerprint,
+                ),
+        )
+        call(
+            native,
+            "$base/native-device/bootstrap",
+            mapOf("deviceId" to device, "expectedDeviceVersion" to 1),
+            bootstrap,
+        )
         return GroupOriginal(space, device, bootstrap, registration, handover, createdAt)
     }
 
@@ -169,53 +179,6 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
                     clock.instant().plusSeconds(20),
                 )
             )
-        )
-    }
-
-    /**
-     * Explicit receiving-readiness precondition through the real admitted gateway. Mobile's
-     * automatic first-publication handoff is NOT proved by this delivery experiment.
-     */
-    private fun publishOriginalIdentity(
-        owner: SdkOwner,
-        groupDevice: UUID,
-        token: String,
-        public: CollaborationMatrixDeviceKeys,
-    ) {
-        val body =
-            mapOf(
-                "device_keys" to
-                    mapOf(
-                        "user_id" to public.userId,
-                        "device_id" to public.deviceId,
-                        "algorithms" to public.algorithms,
-                        "keys" to public.keys,
-                        "signatures" to public.signatures,
-                    )
-            )
-        val request =
-            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/keys/upload"))
-                .timeout(Duration.ofSeconds(20))
-                .header("Authorization", "Bearer $token")
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)))
-                .build()
-        val response =
-            owner.native.fixture.browser.send(request, HttpResponse.BodyHandlers.ofString())
-        assertTrue(response.body().length <= 16384)
-        val value = json.readTree(response.body())
-        assertEquals(200, response.statusCode()) {
-            "Original key publication failed: ${value.path("errcode").asString()}"
-        }
-        assertEquals(
-            1,
-            database()
-                .queryForObject(
-                    "select count(*) from collaboration_space_key_publications where device_id=? and account_id=? and version=1",
-                    Int::class.java,
-                    groupDevice,
-                    owner.native.fixture.account,
-                ),
         )
     }
 

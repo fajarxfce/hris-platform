@@ -922,6 +922,163 @@ class CollaborationSpaceWorkerPublicationTest {
     }
 
     @Test
+    fun retainedActivationPublishesTheVerifiedOriginalKeysWithoutAnotherClientRequest() {
+        val f = Fixture(verifiedMfa = true)
+        val original = f.activeLegacy(signed = true)
+        f.gateway(original)
+        val id = f.register(original)
+        f.freeze(id)
+        val lease = f.claim(id)
+        val oldCompanyKeys = f.originalSnapshot().getValue("collaboration_device_key_publications")
+        val publications =
+            StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(f.sql))
+        assertNull(success(f.transactions.run(f.actor) { publications.find(space, f.account, id) }))
+        val queried = AtomicInteger()
+        val keys =
+            f.keyProvider { _, _, _, _ ->
+                queried.incrementAndGet()
+                assertNull(
+                    success(f.transactions.run(f.actor) { publications.find(space, f.account, id) })
+                )
+                Result.Success(requireNotNull(f.retainedKeys).device)
+            }
+        val provider = f.provider(id)
+        success(f.advance(lease, provider, keys = keys))
+        val completion = requireNotNull(f.completion(original))
+        val publication =
+            requireNotNull(
+                success(f.transactions.run(f.actor) { publications.find(space, f.account, id) })
+            )
+        assertEquals(
+            CollaborationSpaceKeyPublication(
+                space,
+                f.account,
+                id,
+                f.session,
+                completion.matrixUserId,
+                completion.matrixDeviceId,
+                completion.fingerprint,
+                1,
+                completion.completedAt,
+                completion.completedAt,
+            ),
+            publication,
+        )
+        assertEquals(1, queried.get())
+        assertEquals(1, provider.calls.get())
+        assertEquals(
+            oldCompanyKeys,
+            f.originalSnapshot().getValue("collaboration_device_key_publications"),
+        )
+        assertEquals(
+            0,
+            requireNotNull(
+                owner.queryForObject(
+                    "select count(*) from collaboration_space_gateway_sessions where device_id=?",
+                    Int::class.java,
+                    id,
+                )
+            ),
+        )
+        assertEquals(
+            1,
+            requireNotNull(
+                owner.queryForObject(
+                    "select count(*) from audit_entries where actor_id=? and action='collaboration.space_device_keys_published'",
+                    Int::class.java,
+                    f.account,
+                )
+            ),
+        )
+        assertInstanceOf(Result.Failed::class.java, f.advance(lease, provider, keys = keys))
+        assertEquals(1, queried.get())
+        assertEquals(
+            publication,
+            success(f.transactions.run(f.actor) { publications.find(space, f.account, id) }),
+        )
+    }
+
+    @Test
+    fun freshActivationCannotPublishKeysBeforeItsSdkCreatesThem() {
+        val f = Fixture()
+        val id = f.register()
+        val untouched =
+            object : CollaborationSpaceKeyRepository {
+                override fun find(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    deviceId: UUID,
+                ): Result<CollaborationSpaceKeyPublication?> =
+                    error("No original publication for a fresh device")
+
+                override fun reserve(value: CollaborationSpaceKeyPublication): Result<Unit> =
+                    error("No original identity")
+
+                override fun publish(
+                    expected: CollaborationSpaceKeyPublication,
+                    at: Instant,
+                ): Result<Unit> = error("No original identity")
+            }
+        success(
+            f.advance(
+                f.claim(id),
+                f.provider(id),
+                keys = DisabledCollaborationMatrixKeyRepository(),
+                publications = untouched,
+            )
+        )
+        assertEquals(CollaborationDeviceState.ACTIVE, f.device(id).state)
+        assertEquals(
+            0,
+            owner.queryForObject(
+                "select count(*) from collaboration_space_key_publications where device_id=?",
+                Int::class.java,
+                id,
+            ),
+        )
+    }
+
+    @Test
+    fun retainedActivationRejectsSubstitutedSuccessfulPublicationReadbackAtomically() {
+        val f = Fixture()
+        val original = f.activeLegacy(signed = true)
+        f.gateway(original)
+        val id = f.register(original)
+        f.freeze(id)
+        val lease = f.claim(id)
+        val before = f.originalSnapshot()
+        val stored =
+            StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(f.sql))
+        val substituted =
+            object : CollaborationSpaceKeyRepository by stored {
+                override fun find(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    deviceId: UUID,
+                ): Result<CollaborationSpaceKeyPublication?> =
+                    stored.find(spaceId, accountId, deviceId).map { value ->
+                        if (value?.version == 1L) value.copy(fingerprint = "b".repeat(64))
+                        else value
+                    }
+            }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.advance(lease, f.provider(id), publications = substituted),
+        )
+        assertEquals(before, f.originalSnapshot())
+        assertNull(f.completion(original))
+        assertNull(success(f.transactions.run(f.actor) { stored.find(space, f.account, id) }))
+        success(f.advance(lease, f.provider(id)))
+        assertEquals(
+            1L,
+            requireNotNull(
+                    success(f.transactions.run(f.actor) { stored.find(space, f.account, id) })
+                )
+                .version,
+        )
+    }
+
+    @Test
     fun retainedActivationMatchesActualSignedReadbackAndRetiresOnlyItsOriginalGateway() {
         for (withGateway in listOf(false, true)) {
             val f = Fixture(verifiedMfa = true)
@@ -1272,8 +1429,18 @@ class CollaborationSpaceWorkerPublicationTest {
 
     @Test
     fun retainedPublicationRollsBackOriginalRetirementAndNewStateAtEveryWriteBoundary() {
-        for (stage in listOf("credential", "device", "queue", "completion", "journal")) for (mode in
-            listOf("failure", "cancel", "interrupt", "flag")) {
+        for (stage in
+            listOf(
+                "credential",
+                "device",
+                "queue",
+                "completion",
+                "key_reservation",
+                "key_publication",
+                "key_readback",
+                "key_journal",
+                "journal",
+            )) for (mode in listOf("failure", "cancel", "interrupt", "flag")) {
             val f = Fixture()
             val original = f.activeLegacy(signed = true)
             f.gateway(original)
@@ -1335,9 +1502,46 @@ class CollaborationSpaceWorkerPublicationTest {
                             }
                         }
                 }
+            val storedKeys =
+                StoredCollaborationSpaceKeyRepository(
+                    PostgresCollaborationSpaceKeyDataSource(f.sql)
+                )
+            val publications =
+                object : CollaborationSpaceKeyRepository by storedKeys {
+                    override fun reserve(value: CollaborationSpaceKeyPublication): Result<Unit> =
+                        storedKeys.reserve(value).flatMap {
+                            if (stage == "key_reservation") injected() else Result.Success(Unit)
+                        }
+
+                    override fun publish(
+                        expected: CollaborationSpaceKeyPublication,
+                        at: Instant,
+                    ): Result<Unit> =
+                        storedKeys.publish(expected, at).flatMap {
+                            if (stage == "key_publication") injected() else Result.Success(Unit)
+                        }
+
+                    override fun find(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        deviceId: UUID,
+                    ): Result<CollaborationSpaceKeyPublication?> =
+                        storedKeys.find(spaceId, accountId, deviceId).flatMap { value ->
+                            if (stage == "key_readback" && value?.version == 1L)
+                                injected().map { value }
+                            else Result.Success(value)
+                        }
+                }
             val journal = hookJournal { actor, record ->
                 f.journal.record(actor, record).flatMap {
-                    if (stage == "journal") injected() else Result.Success(Unit)
+                    if (
+                        (stage == "journal" &&
+                            record.action == "collaboration.space_device_activated") ||
+                            (stage == "key_journal" &&
+                                record.action == "collaboration.space_device_keys_published")
+                    )
+                        injected()
+                    else Result.Success(Unit)
                 }
             }
             fun run() =
@@ -1349,6 +1553,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     credentials,
                     journal,
                     completions = completion,
+                    publications = publications,
                 )
             try {
                 when (mode) {
@@ -1376,6 +1581,9 @@ class CollaborationSpaceWorkerPublicationTest {
             assertEquals(head, f.work(id))
             assertNull(f.state(id))
             assertNull(f.completion(original))
+            assertNull(
+                success(f.transactions.run(f.actor) { storedKeys.find(space, f.account, id) })
+            )
             f.activatedCount(0)
             success(f.advance(lease, f.provider(id)))
             f.activatedCount(1)
@@ -1444,6 +1652,22 @@ class CollaborationSpaceWorkerPublicationTest {
             assertEquals(0L, f.credential(id).state.generation)
             assertNotNull(f.completion(original))
             assertEquals(1L, f.device(id).version)
+            assertEquals(
+                1,
+                owner.queryForObject(
+                    "select count(*) from collaboration_space_key_publications where device_id=? and version=1",
+                    Int::class.java,
+                    id,
+                ),
+            )
+            assertEquals(
+                1,
+                owner.queryForObject(
+                    "select count(*) from audit_entries where actor_id=? and action='collaboration.space_device_keys_published'",
+                    Int::class.java,
+                    f.account,
+                ),
+            )
             f.activatedCount(1)
         } finally {
             pool.shutdownNow()
@@ -4644,30 +4868,34 @@ class CollaborationSpaceWorkerPublicationTest {
             val keys =
                 StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(sql))
             val value =
-                CollaborationSpaceKeyPublication(
-                    space,
-                    account,
-                    id,
-                    session,
-                    device.matrixUserId,
-                    device.matrixDeviceId,
-                    requireNotNull(device.legacyKeyFingerprint),
-                    0,
-                    Instant.now().truncatedTo(ChronoUnit.MICROS),
-                )
+                requireNotNull(success(transactions.run(actor) { keys.find(space, account, id) }))
+            assertEquals(space, value.spaceId)
+            assertEquals(account, value.accountId)
+            assertEquals(id, value.deviceId)
+            assertEquals(session, value.nativeSessionId)
+            assertEquals(device.matrixUserId, value.matrixUserId)
+            assertEquals(device.matrixDeviceId, value.matrixDeviceId)
+            assertEquals(device.legacyKeyFingerprint, value.fingerprint)
+            assertEquals(1L, value.version)
+            assertEquals(value.reservedAt, value.publishedAt)
+            val reservation = value.copy(version = 0, publishedAt = null)
             assertInstanceOf(
                 Result.Failed::class.java,
-                transactions.run(actor) { keys.reserve(value.copy(fingerprint = "b".repeat(64))) },
+                transactions.run(actor) {
+                    keys.reserve(reservation.copy(fingerprint = "b".repeat(64)))
+                },
             )
-            assertNull(success(transactions.run(actor) { keys.find(space, account, id) }))
-            success(transactions.run(actor) { keys.reserve(value) })
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) { keys.reserve(reservation) },
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                transactions.run(actor) {
+                    keys.publish(reservation, Instant.now().truncatedTo(ChronoUnit.MICROS))
+                },
+            )
             assertEquals(value, success(transactions.run(actor) { keys.find(space, account, id) }))
-            val at = Instant.now().truncatedTo(ChronoUnit.MICROS)
-            success(transactions.run(actor) { keys.publish(value, at) })
-            assertEquals(
-                value.copy(version = 1, publishedAt = at),
-                success(transactions.run(actor) { keys.find(space, account, id) }),
-            )
         }
 
         fun groupIdentity(
@@ -5036,6 +5264,8 @@ class CollaborationSpaceWorkerPublicationTest {
             clock: Clock = Clock.systemUTC(),
             keys: CollaborationMatrixKeyRepository = keyProvider(),
             completions: CollaborationLegacyRuntimeCompletionRepository = this.completions,
+            publications: CollaborationSpaceKeyRepository =
+                StoredCollaborationSpaceKeyRepository(PostgresCollaborationSpaceKeyDataSource(sql)),
         ): Result<Unit> =
             AdvanceCollaborationSpaceProvisioning(
                     registry,
@@ -5057,6 +5287,7 @@ class CollaborationSpaceWorkerPublicationTest {
                     CollaborationMatrixPolicy(true, server),
                     IdentitySecurityPolicy(),
                     clock,
+                    publications,
                 )
                 .execute(lease)
 

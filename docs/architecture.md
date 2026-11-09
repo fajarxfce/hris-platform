@@ -1,5 +1,10 @@
 # Architecture
 
+[Original-key activation](collaboration/space-original-key-publication.md) now commits
+verified original public-key readiness atomically with LEGACY worker completion.
+The actual original SDK needs no extra confirmation request or private-key change;
+organization readiness signals and product routing remain separate integration.
+
 [Current organization direct transport](collaboration/space-direct-transport.md) joins
 current native device, immutable room and explicit receiving readiness in one bounded
 read. SQL/native HTTP and shared API/full-worker graphs are validated; Mobile owning

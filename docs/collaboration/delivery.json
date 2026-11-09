@@ -109,7 +109,9 @@
         "https://github.com/fajarxfce/hris-platform/blob/de987b13eec8d9d0a7f7a082ba432e2222a89509/docs/measurements/collaboration-sdk-access-renewal-2026-11-05.json",
         "https://github.com/fajarxfce/hris-mobile/blob/e347b0cbccec91f0ede7a82d230c484803558463/docs/measurements/android-release-phone-2026-11-05-build32.json",
         "space-original-delivery-native.md",
-        "../measurements/collaboration-space-original-delivery-native-2026-11-09.json"
+        "../measurements/collaboration-space-original-delivery-native-2026-11-09.json",
+        "space-original-key-publication.md",
+        "../measurements/collaboration-space-original-key-publication-2026-11-09.json"
       ]
     },
     {
@@ -320,7 +322,9 @@
         "space-push-admission.md",
         "../measurements/collaboration-space-push-admission-2026-11-04.json",
         "space-push-delivery.md",
-        "../measurements/collaboration-space-push-delivery-2026-11-04.json"
+        "../measurements/collaboration-space-push-delivery-2026-11-04.json",
+        "space-original-key-publication.md",
+        "../measurements/collaboration-space-original-key-publication-2026-11-09.json"
       ]
     },
     {
@@ -872,7 +876,7 @@
   "next": [
     "Use ../agent-handoff.md for current source, running gates, live runtime and phone state. Earlier measurements retain their original scope and failures.",
     "Source reconciliation of group bf6e176a with root4d4df31f is accepted by full33511:1444 fresh cases, zero failures/errors, one existing opt-in skip,8686 unchanged inputs and full API/worker/quality/recovery proof. Current organization direct transport is also accepted with452 cases, zero failures/errors and one existing opt-in skip using exact source/XML comparison across its corrected fixture gates. Continue Mobile transport and original delivery ownership; no live rollout.",
-    "Mobile direct transport ab17eadd and owning original delivery69e639f8 are accepted/pushed:56 final focused and4,304 full cases, including54 exact browser cases, zero failures/errors/skips. Prior hosted42628449460 is accepted; new hosted42656803963 runs exact69e639f8. Continue the actual isolated original SDK/SQL/HTTP/restart experiment, group readiness/background ownership and product routing. Never replace keys or original transactions.",
+    "Mobile original delivery69e639f8/a14eea78 and hosted42656803963 are accepted (9137 hosted cases including2499 Apple simulator). Worker-only original-key publication now passes full API/worker/source and actual Android native gates without fixture upload or Mobile/SDK changes. Continue organization readiness controls,background ownership and product routing; preserve original keys,stores and transactions.",
     "Preserve eight originals in the latest stopped Mobile87 sender store and the Bima74 store, sidecars, keys and transaction IDs. SDK26.10.23-hris.6 is published and immutable. Never send Draft66 092041 or resend accepted originals.",
     "Complete organization UI, E2EE rich messages/media/stickers/voice, Drive/iCloud recovery, MatrixRTC native calls and LiveKit meetings. All54 acceptance groups remain open; physical iPhone interaction is waived, relevant Apple source/runtime and call/push acceptance remain separate.",
     "Push every accepted atomic implementation/test/doc commit. One heavy local compiler OR emulator; freeze its input checkouts, reap before edits or another heavy job. Mobile proves generic foundations before Starter. Group V117\u2013138 remains undeployed; live schema116.4/readiness control ON is unchanged."

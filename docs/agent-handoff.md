@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 21:56 UTC. Historical detail remains in
+Updated 9 November 2026, 22:08 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -125,13 +125,26 @@ zero failures/errors/skips. Required root/platform/quality checks pass;focused/f
 retain identical4,593 source inputs and unchanged Inspector bytes. All XML audited.
 No collector or actual group worker is bound;this is not product activation.
 
-Current sole heavy job is Mobile inventory full-1 /11069, under private
-`.work/space-room-binding-inventory-2026-11-09`. Focused51195 is REAPED PASS208.1s:
-25 cases,zero failures/errors/skips,4,595 stable source inputs and strict audit.
-Five unaccepted Kotlin inputs add a bounded local encrypted room-binding reader,
-account/generation/revision cursors,nine shared database regressions and same-instance
-DI. Keep source frozen until full11069 is reaped;expected4,328 fresh cases.
-No emulator,SDK,APK,phone or live change. Current Mobile handoff owns the next steps.
+Mobile [eba05a9c](https://github.com/fajarxfce/hris-mobile/blob/eba05a9c/docs/collaboration-space-room-inventory.md)
+is committed/pushed;38798 is reaped. Bounded encrypted room inventory now preserves
+account/generation/revision cursors,authenticates both immutable indexes,advances over
+empty projected pages and reports concurrent appends. Focused51195 passes25 cases;
+full11069 REAPED PASS575.815s:4,328 fresh cases=3,679 desktop+626 Android host
++23 browser,zero failures/errors/skips. Required root/platform/quality checks and exact source/library/XML audit
+pass with4,595 unchanged source inputs. No original binding rewrite or schema change.
+
+Fresh [CI42707758241](https://github.com/fajarxfce/hris-mobile/actions/runs/42707758241)
+is running on immutableeba05a9c253aa7fe7f0cf816b49c128b4f3003a6;dispatch9340 reaped.
+Expected6,743 portable+2,549 Apple=9,292 cases. Mobile inventory hosted.json/auditor
+pins it against accepted42697887863. No successor hosted acceptance yet.
+
+Current only heavy local job is Mobile sync focused-1 /9832, under private
+`.work/space-device-sync-2026-11-09`. Ten unaccepted Kotlin inputs add an exact installed
+group sync port on the existing runtime,owned native/directory/bootstrap admission,
+one remote device read and original-client initial sync. Sixteen domain cases and
+three new Android cases accompany existing native sync/adoption/readiness tests and
+app DI. Pinned formatter85341 is reaped;expected37 focused cases. Keep sources frozen
+until reaped. No collector,actual group worker,product activation,phone or live change.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must

@@ -1,6 +1,36 @@
 # Agent continuation — HRIS workspace
 
 
+## Phone83 installed and SDK6 public; Starter validation active — 9 November 2026, 07:28 UTC
+
+Mobile6633f2f8 records fresh install83 on10.77.77.3:5555, exact APK checksum verified,
+install-only/no phone UI. SDK6 release438835525 publishes all6 exact verified assets:
+https://github.com/fajarxfce/hris-mobile/releases/tag/matrix-sdk-26.10.23-hris.6
+Descriptor fetched publicly; existing assets/releases never replaced. Draft tag and
+stale draft asset-URL404 verification failures were recovered by exact release ID
+and fresh public URLs, without duplicate publication.
+
+Native83 all4 old messages remain Sent across upgrade/route/resume/cold; exactly one
+new Parent83 071123 accepted in2895.244ms while receiver stopped. Now FIVE originals,
+never resend/reset. Latest COMPLETE store: Mobile native-parent-renewal-native-
+2026-11-09/sender at83 with all4 userdata/encryption files + full AVD. Three Matrix
+refreshes200; native parent renews29.064s before its old access expiry; no bootstrap,
+403 or429. Original strict zero-metadata gate remains FAILED: room bin310 is independently
+attributed to one scheduled15-minute WorkManager sweep and one completed continuation
+(3.095s, two successful Sync traces with22HTTP reads each). Scoped progress acceptance
+preserves that failed record; startup metadata and latency p95 remain open.
+
+Starter generic worker8file and identity2file ports applied from Mobilea1f2cfe9/c0b645d0
+only after reviewed native83. Format passes; ACTIVE heavy job28792 is Starter
+.work/session-maintenance-port-2026-11-09/check-full-1. Freeze Starter/inspector inputs,
+reap, inspect, document and push if valid. No emulator or Mobile compiler running.
+Mobile next: reduce history's repeated3-call admission using existing combined transport
+snapshot. Keep history independent of recipient send readiness; preserve before/after
+scope/denial checks. No new product changes to that path yet.
+Platform livee558a686/schema116.4/controlON unchanged,117–138 undeployed.
+All54 communications PRD groups remain open; continue from Mobile handoff.
+
+
 ## Mobile83 verified; retained runtime acceptance running — 9 November 2026, 07:02 UTC
 
 Mobile f6670592 records verified APK83 and the active retained82→83 observation.

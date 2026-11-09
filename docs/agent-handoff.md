@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 21:19 UTC. Historical detail remains in
+Updated 9 November 2026, 21:45 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -109,15 +109,28 @@ pass,4,584 stable sources and exact XML/library audit. Protocol hosted evidence 
 for the earlier immutable source,not these successor bytes. No actual provider
 callback measurement,app collector,wake ACK,foreground sync activation or phone build.
 
-No active local heavy job. Next actual durable group wake processing and bounded
-local room-binding inventory/cursor,documented in Mobile private native directory.
+Mobile [01544c26](https://github.com/fajarxfce/hris-mobile/blob/01544c26/docs/collaboration-space-readiness-wake.md)
+is committed/pushed;18367 is reaped. Its independent organization wake key retains
+exact generations before scheduling, and the owning use case guards current local
+parent/runtime around encrypted receipt persistence and schedule handoff. Full70424
+is REAPED PASS593.165s:4,338 fresh cases=3,670 desktop+626 Android host+42 browser,
+zero failures/errors/skips. Required root/platform/quality checks pass;focused/full
+retain identical4,593 source inputs and unchanged Inspector bytes. All XML audited.
+No collector or actual group worker is bound;this is not product activation.
+
+Current sole heavy job is Mobile inventory focused-1 /51195, under private
+`.work/space-room-binding-inventory-2026-11-09`. Five unaccepted Kotlin inputs add a
+bounded local encrypted room-binding reader, account/generation/revision cursors,
+nine shared database regressions and same-instance DI. Its source remains frozen
+until the job is reaped. Expected25 focused cases, then required full checks.
+No emulator,SDK,APK,phone or live change. Current Mobile handoff owns the next steps.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must
 start that same client's sync under current admission. Exact logical source and
 physical Matrix sender stay distinct. Never call registry lookup from inside the
 native listener monitor;registry retirement already takes the reverse lock order.
-Next native stream ownership,then actual group wake processing/product routing.
+Next finish local inventory,then actual group recovery/sync ownership and product routing.
 No SDK7,APK88,phone or live rollout. All54 acceptance groups remain open. Group
 recovery max140 must not be copied to original/live max116.4.
 

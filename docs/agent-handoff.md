@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 17:26 UTC. Historical detail remains in
+Updated 9 November 2026, 18:26 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,28 +17,40 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Accepted original-delivery proof; original-key activation next
+## Original-key worker publication — full validation running
 
-Mobilea14eea78 and Groupe2c61dad are pushed,with their source/tests/contracts and
-identical audited measurement. Native31328/native-5 passes135.232s:two original
-transactions and encrypted events survive a killed process after durable ACK and before
-Sent projection. A further process reads both Sent records offline before transport.
-Ten native requests contain exactly two bootstrap replays and two direct-transport reads;
-no native registration/room request/failure. Both manifests and SDK6 APK match,all other
-128 tasks stay up to date,and the isolated emulator is stopped. Earlier driver race and
-missing group-key precondition failures are preserved. No heavy local job is active.
+Mobilea14eea78 and Groupe2c61dad accept the prior original-delivery native fixture,
+which used an explicit current-gateway upload of the unchanged signed public key.
+Review found the owning correction: AdvanceCollaborationSpaceProvisioning already
+verifies that actual original identity,so it must publish the group key record in
+the same transaction as LEGACY completion. No extra Mobile endpoint,token-refresh
+request,SDK7,private-key replacement or new schema is needed. The temporary explicit
+confirmation approach is retired and archived; do not restore its private candidates.
 
-The fixture confirms the original SDK's signed public identity through the real group
-gateway. It does NOT prove automatic Mobile original-key publication. That is the next
-implementation: explicit confirmation under current original-device/native authority,
-preserving existing keys and the current counts-only/upload/readiness contracts. Keep
-SDK/private-key bytes in their existing owners; no speculative reset or resend.
+Group67def551 records the replacement regression and current work. Red96766 fails
+on the missing record after a fixture-only compile correction. Focused97011 passes
+11 cases/164.148s:rollback at every write/readback/audit boundary,competing workers,
+late admission and actual Synapse continuity. Source29647 passes31.698s.
 
-Hosted42656803963 portable artifact is accepted with6,638 cases; Apple still runs.
-Do not redispatch. Mobile source20 and Group driver89 tests pass,plus compilation and
-quality. See the current Mobile/Group handoffs for exact evidence and hashes. All54
-communications acceptance groups remain open; no new product APK or live rollout.
-Phone87,stopped retained sender87,live e558a686/schema116.4 and group routing OFF remain.
+Native71915 passes139.231s with the old fixture upload removed. The worker confirms
+original publication before bootstrap; two original messages survive a process kill
+after durable ACK and before Sent projection,produce exactly two encrypted provider
+events,and remain readable offline in a later process. Ten native requests retain
+two bootstrap/two direct reads. Mobile source and accepted SDK6 APK are unchanged.
+The isolated2560MiB/two-core emulator is stopped; phone87 remains untouched.
+
+Group62503/full-1 is RUNNING with frozen inputs:complete domain,relevant SQL/provider,
+delivery,native API/OpenAPI and FULL worker tests/quality. Domain192 passes so far.
+Strict source/XML/native audit and implementation/test/doc commit remain required.
+Private group readiness-control successor candidates are not applied or validated.
+Follow [Group handoff](https://github.com/fajarxfce/hris-platform/blob/feat/communication-space/docs/agent-handoff.md)
+for that job; do not start another heavy compiler/emulator or repeat accepted gates.
+
+Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple
+simulator,zero failures/errors/skips,and unsigned Xcode host success. Mobilea945220c
+records audited artifacts. No redispatch is needed. Native Apple Matrix/APNs/calls
+remain separate. All54 PRD groups stay open; no product APK88 or live rollout.
+Phone87,retained sender87,live e558a686/schema116.4 and group routing OFF remain.
 
 ## Current work
 
@@ -103,14 +115,10 @@ regressions first reproduced inventory-order rejection and unbounded post-ACK st
 corrected source preserves original IDs, late ACK journals and absent-original uncertainty.
 Source does not activate group UI/worker/SDK delivery or deploy the backend.
 
-Hosted42656803963 is RUNNING on exact69e639f8, portable and Apple jobs. Do not redispatch.
-Mobile has four uncommitted proof-only Kotlin files for actual original staging, local
-DB/journal interruption and existing-only group SDK restoration. Source4649 is RUNNING
-with frozen Mobile inputs (root/proof unit/APK/lint/quality); one reported Detekt
-LongMethod still needs correction after the job is reaped. The actual Group server
-fixture/driver remain to be implemented. No actual native proof or APK88 exists.
-SDK6 AAR has four verified ABIs; use its x86_64 library for the dedicated emulator and
-validate packaged stripping. All old accepted native originals remain untouched.
+The former Mobile4649 compilation/native-proof work is complete; its failed first
+attempt and corrected source/native/hosted gates are retained in the current Mobile
+handoff. Do not restart it. Current work is the worker publication gate above.
+SDK6 remains immutable; all original stores/messages remain preserved.
 
 ## Accepted runtime and device state
 

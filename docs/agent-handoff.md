@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 19:18 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 19:24 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -67,7 +67,7 @@ and [measurement](measurements/collaboration-space-readiness-control-2026-11-09.
   No shared DI constructor changed;previous full worker cases are not recounted.
 - No active heavy job remains at this checkpoint. No new emulator or Mobile build.
 
-## Accepted publication storage; typed repository next
+## Accepted publication storage
 
 V139 captures the existing original-worker/fresh-SDK key journal,shared commit revision
 and independent Matrix/PUSH rows atomically. No private key,payload,credential or new
@@ -85,13 +85,38 @@ Private `.work/space-readiness-publication-2026-11-09`:
   8,708 stable source inputs. New receiver revision fence passes the original regression.
 - Strict accept.py checks final source/report hashes,exact cases and the prior failure.
   No shared DI constructor changed; no full-worker re-count or new native emulator.
-- Eight next repository/contracts/policy/mapper/datasource/test files are prepared ONLY in
-  `prepared/`,not applied or accepted. Inspect them before continuing; no apply script
-  has run. Add actual repository readback/cancellation/rollback tests before adoption.
+- Prepared successor files were subsequently applied after7d4d7f1f. Do not reapply
+  `space-readiness-publication-2026-11-09/prepared`; it is stale after the fixes below.
 
-Next implement typed repository and current per-target admission/fanout,then Mobile
-revision retention and foreground/background ownership. Do not use a space UUID as a
-company ID. Signals only schedule existing originals; they never create a message ACK.
+## Accepted typed queue repository; current-target fanout next
+
+Eight Kotlin files add domain lease/checkpoint/channel and pure representation policy,
+repository contract,raw SQL datasource,strict mappings/repository and actual normal-role
+repository tests. No shared DI,new schema,worker/provider loop or Mobile activation.
+[Contract](collaboration/space-readiness-queue.md) and
+[measurement](measurements/collaboration-space-readiness-queue-2026-11-09.json).
+Private `.work/space-readiness-queue-2026-11-09`:
+- base/applied.json record7d4d7f1f and the original eight candidate hashes. All were
+  ALREADY APPLIED; do not copy candidates over current source.
+- focused-1 /94366 REAPED FAILED30.409s:two cross-module smart-cast errors;zero tests.
+- focused-2 /32816 REAPED FAILED28.854s:scripted edit changed only the mapper before
+  its assertion failed;one repository smart cast remained. Zero tests;no acceptance.
+- focused-3 /50419 REAPED PASS80.941s:4 actual repository cases,zero failures/errors/
+  skips,8,716 stable inputs,format/architecture. Fourteen real post-write rollback/
+  cancellation/interruption variants and malformed actual claims/targets remain
+  subcases,not extra JUnit cases. No broad unrelated rerun or full-worker recount.
+- verify.py validates exact archived XML,all source hashes,case names and earlier
+  compile-only failures. accepted.json is copied to the tracked measurement.
+- Root5d75101a and Mobilefcfc8f26 already link the accepted storage7d4d7f1f;both pushes
+  are reaped. No Mobile source build or install;source remainsa14eea78/69e639f8.
+
+Next implement current per-target Matrix/PUSH admission and bounded fanout,then Mobile
+revision retention and foreground/background ownership. Claim transactions must end
+before target account guards. Do not use a space UUID as a company ID. Signals only
+schedule existing originals;they never create a message ACK. Reacquire current exact
+native/device/identity/publication/provider or push registration before and after
+external delivery;do not refresh credentials or create keys inside fanout.
+
 No active heavy job remains at this accepted checkpoint. Source schema139 is unshipped;
 group routing OFF,phone87/live e558a686/schema116.4 are unchanged. All54 groups stay open.
 

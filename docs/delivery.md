@@ -1,5 +1,15 @@
 # Delivery and validation
 
+## Organization readiness queue repository — 9 November 2026
+
+The typed repository now validates complete channel/scope/checkpoint identity and
+post-write readback. Four real repository tests pass,including fourteen transactional
+failure/cancellation variants and malformed claims/targets;zero failures/errors/skips,
+8,716 stable inputs,format and architecture pass. Two earlier compile-only failures
+are retained. [Contract](collaboration/space-readiness-queue.md) and
+[evidence](measurements/collaboration-space-readiness-queue-2026-11-09.json).
+No new DI/schema/worker or Mobile activation;current-target fanout remains next.
+
 ## Organization readiness publication storage — 9 November 2026
 
 V139 atomically captures existing verified-key journals into independent Matrix/PUSH

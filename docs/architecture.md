@@ -1,5 +1,9 @@
 # Architecture
 
+[Typed readiness queue](collaboration/space-readiness-queue.md) preserves explicit
+organization/channel identity and verifies full SQL progress readback. Use cases own
+transactions,per-target admission and retry; raw I/O remains in the datasource.
+
 [Organization readiness publication storage](collaboration/space-readiness-publications.md)
 commits the original key journal with a shared revision and separate Matrix/PUSH
 checkpoints. Exact worker scope, leases and receiver commit order bound the hint

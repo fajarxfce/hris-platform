@@ -52,7 +52,8 @@ regression first fails on the incorrect timestamp-only projection, then passes
 with the revision guard. Both prior positive gates and that expected failure are
 retained separately; cases are not added twice. Shared DI is unchanged.
 
-Typed repository readback, bounded current-target fanout, Mobile durable consumption/
-background ownership and product routing remain next. No live rollout, SDK change,
+[Typed repository readback](space-readiness-queue.md) is now accepted separately.
+Bounded current-target fanout, Mobile durable consumption/background ownership and
+product routing remain next. No live rollout, SDK change,
 new APK or Starter port. Live schema116.4 and phone87 stay unchanged; group routing
 is OFF and all54 communications acceptance groups remain open.

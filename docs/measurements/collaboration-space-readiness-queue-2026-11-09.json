@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-11-09T19:24:19.742993+00:00",
+  "baseCommit": "7d4d7f1f604b21ac6e14155d294026c44de531f0",
+  "scope": "Typed organization readiness queue repository, strict scope/cursor/readback and raw SQL; no fanout, DI, migration or Mobile activation",
+  "final": {
+    "startedAt": "2026-11-09T19:22:22.522341+00:00",
+    "elapsedSeconds": 80.941,
+    "counts": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "sourceFiles": 8716,
+    "sourcesUnchanged": true
+  },
+  "testcases": [
+    "falseOrInterruptedPostWriteReadbackRollsBackActualCursorAndRelease()",
+    "malformedClaimAndTargetRowsFailInsideTheAcquisitionBoundaryWithoutLeakingAClaim()",
+    "typedChannelsReadExactTargetsAndCompareTheWholeCheckpointBeforeProgress()",
+    "invalidCallerBoundsAndCoordinatesNeverAcquireTheDatasource()"
+  ],
+  "reports": {
+    "modules/collaboration/data/build/test-results/test/TEST-dev.fajar.hris.collaboration.data.CollaborationSpaceReadinessQueueRepositoryTest.xml": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "a1c46f6bc5d94d1eba24ef2890d5964f4edb8310eba0e955896742b6ff558149"
+    }
+  },
+  "sourceManifestSha256": "ff5c7e6cdaf22c6808ff8702c1e94b1f54afaf05d0e51c240eac02c238bfb4aa",
+  "changedSources": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationSpaceReadinessQueueDataSource.kt": "f5e094b398d11531b9f4a52489fc433d683c43785473413a0257a57b1f0f9fa0",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationSpaceReadinessQueueDataSource.kt": "063c65a6eaae73ec5d1221236b667d1a68a9628f944666cdbc18cccfa8a1f5ae",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/mappers/CollaborationSpaceReadinessMapping.kt": "5d2d8acc988a256c10889200f547d058cb910da86d2416e61a4cd851266e92b3",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationSpaceReadinessQueueRepository.kt": "9b6c22c4c587ab6a71708c65a387915f18d86ba57145f4be51e7df8285e708ce",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSpaceReadinessQueueRepositoryTest.kt": "7123b3853fda2b821745af98898da903b358cbfe377f421750bb5ac03b17d8c6",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationSpaceReadinessDelivery.kt": "aa9905917dda4da19c2a2751efa34285f56caaa6349d31c14ac2b6479ab427e1",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationSpaceReadinessQueuePolicy.kt": "f0449a66585125fe84b4b8103ddf2d3fbf7e02e432bba311174ae1898e8e2c4f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSpaceReadinessQueueRepository.kt": "34ba35dc8e145e83af93926102cc6b2ab6535b2d402a305314dd11cc8ee48926"
+  },
+  "history": {
+    "focused-1": {
+      "startedAt": "2026-11-09T19:20:00.753251+00:00",
+      "elapsedSeconds": 30.409,
+      "exitCode": 1,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "focused-2": {
+      "startedAt": "2026-11-09T19:21:32.351019+00:00",
+      "elapsedSeconds": 28.854,
+      "exitCode": 1,
+      "sourcesUnchanged": true,
+      "counts": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "notes": [
+    "Both early failures were cross-module smart casts before any tests; focused-2 followed an incomplete scripted edit and left one cast unfixed.",
+    "Four tests include fourteen real post-write rollback/cancellation/interruption variants and malformed actual claim/target rows. Subcases are not counted as separate JUnit tests.",
+    "Storage7d4d7f1f has independent accepted23 JVM and40 Python evidence; not repeated or recounted.",
+    "No shared DI or live/phone/SDK/Starter change."
+  ]
+}

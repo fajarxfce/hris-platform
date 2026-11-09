@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 17:20 UTC. Historical detail remains in
+Updated 9 November 2026, 17:26 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -12,36 +12,33 @@ open. Mobile proves reusable foundations before Starter. Follow AGENTS.md layer
 ownership and preserve original accounts, native/SDK identities, keys and transactions.
 
 One heavy local compiler OR emulator. Do not kill live API/worker JVMs. The emulator
-uses2560MiB/two cores. The retained sender is stopped; a fresh isolated proof AVD runs. Phone10.77.77.3:5555 is install-only; announce each
+uses2560MiB/two cores. Both the retained sender and isolated proof AVD are stopped. Phone10.77.77.3:5555 is install-only; announce each
 installation and never launch, automate, uninstall or clear its app. Crashlytics IAM
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Active original-delivery proof
+## Accepted original-delivery proof; original-key activation next
 
-Mobiledfcc97e6 and Group716eab57 handoffs record the current experiment. Mobile owning
-source69e639f8 and native transport ab17eadd/96d2d238 are accepted; no live activation.
-Hosted42656803963 portable artifact is audited:6,638 fresh desktop/Android/browser
-cases pass,including all24 owning-delivery cases on desktop/browser. Apple still runs.
-Do not redispatch. Mobile proof-only source passes20 tests and APK/lint/quality; Group
-fixture compilation/format/architecture pass;82 existing driver tests and7 new ownership
-regressions pass. Native-3 exposed a checkpoint-read race (fixed with a reproduced
-regression); native-4 correctly rejected unconfirmed group recipient keys. Group now
-establishes receiving publication through its actual gateway using the original SDK
-signed public identity. No key replacement or SQL publication injection. Automatic
-Mobile first-key-publication activation remains separate required product work.
+Mobilea14eea78 and Groupe2c61dad are pushed,with their source/tests/contracts and
+identical audited measurement. Native31328/native-5 passes135.232s:two original
+transactions and encrypted events survive a killed process after durable ACK and before
+Sent projection. A further process reads both Sent records offline before transport.
+Ten native requests contain exactly two bootstrap replays and two direct-transport reads;
+no native registration/room request/failure. Both manifests and SDK6 APK match,all other
+128 tasks stay up to date,and the isolated emulator is stopped. Earlier driver race and
+missing group-key precondition failures are preserved. No heavy local job is active.
 
-**Native31328 is running** in Group `.work/space-original-delivery-native-2026-11-09/native-5`.
-Both source manifests are frozen. It uses a new private emulator image (2560MiB/two
-cores), actual SDK6 and isolated native HTTP/PostgreSQL/Synapse. Two fictional paused
-original commands are delivered to an offline recipient; the owned process is killed
-after durable receipt and before projection, then exact original transactions/storage
-must survive restart and offline reads. Reap before changing source. Earlier two boot
-failures are recorded; they ran no server/message test. Do not reset or resend employee
-originals, boot the retained sender87, or install another phone APK for this test.
+The fixture confirms the original SDK's signed public identity through the real group
+gateway. It does NOT prove automatic Mobile original-key publication. That is the next
+implementation: explicit confirmation under current original-device/native authority,
+preserving existing keys and the current counts-only/upload/readiness contracts. Keep
+SDK/private-key bytes in their existing owners; no speculative reset or resend.
 
-Group test-only source and Mobile four proof files remain uncommitted pending actual
-native evidence. Phone87, live e558a686/schema116.4 and group routing OFF are unchanged.
+Hosted42656803963 portable artifact is accepted with6,638 cases; Apple still runs.
+Do not redispatch. Mobile source20 and Group driver89 tests pass,plus compilation and
+quality. See the current Mobile/Group handoffs for exact evidence and hashes. All54
+communications acceptance groups remain open; no new product APK or live rollout.
+Phone87,stopped retained sender87,live e558a686/schema116.4 and group routing OFF remain.
 
 ## Current work
 

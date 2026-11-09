@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 20:44 UTC. Historical detail remains in
+Updated 9 November 2026, 20:58 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -81,15 +81,29 @@ Both gates retain8,729 identical source inputs;exact XML and complete worker set
 checks pass. One new context case opens ten feature-flag configurations,uses actual
 normal-role queue claims and verifies pool termination. No actual cloud delivery.
 
-Mobileb061614a has eleven pending Kotlin inputs for exact group V1 readiness
-parsing,a separate encrypted receipt namespace,four pure/eight shared storage tests
-and an app graph assertion. Its `.work/space-readiness-protocol-2026-11-09`
-focused-1 /81916 RUNNING now owns the only heavy compiler. Mobile source is frozen;
-no other Gradle/Java formatter/emulator. Next required root/platform and fresh hosted
-Apple checks,then current-runtime provenance,durable wake ownership and product routing.
-Group worker integration is complete;do not restart56826 or old native/hosted gates.
+Mobile [da248173](https://github.com/fajarxfce/hris-mobile/blob/da248173/docs/collaboration-space-readiness-receipts.md)
+is committed/pushed;93828 is reaped. Eleven Kotlin inputs implement strict group V1
+parsing and isolated encrypted revision receipts with SQLite/IndexedDB/Apple Room
+contracts and real app DI. Focused81916 passes24 cases/244.810s. Full50781 is REAPED
+PASS588.489s:4,284 fresh cases=3,641 desktop+621 Android host+22 forced browser,
+zero failures/errors/skips. Required root check,Android release/lint,shared Wasm/iOS
+source and quality pass.4,582 source inputs and Inspector bytes stay unchanged.
+
+Fresh [hosted42697887863](https://github.com/fajarxfce/hris-mobile/actions/runs/42697887863)
+is IN PROGRESS on exactda2481732e51132fac7249fc31d732f037c2222c;no Apple runtime
+acceptance yet. Its private protocol directory contains hosted.json and digest/XML
+audit. Never substitute older42656803963 evidence for this source. No local heavy
+job is running at this checkpoint. Mobile's next native signal work is pinned in
+`.work/space-readiness-native-2026-11-09`; it may proceed independently of hosted CI.
+
+The actual old recovery worker is company-only and cannot acknowledge group work.
+Group adoption also restores a paused SDK,so the eventual foreground owner must
+start that same client's sync under current admission. Exact logical source and
+physical Matrix sender stay distinct. Never call registry lookup from inside the
+native listener monitor;registry retirement already takes the reverse lock order.
+Next native stream ownership,then actual group wake processing/product routing.
 No SDK7,APK88,phone or live rollout. All54 acceptance groups remain open. Group
-recovery max140 must not be copied to Root/live schema116.4.
+recovery max140 must not be copied to original/live max116.4.
 
 
 Hosted42656803963 is fully accepted on69e639f8:9,137 cases,including2,499 Apple

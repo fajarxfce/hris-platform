@@ -1,5 +1,21 @@
 # Agent continuation — HRIS workspace
 
+## Phone reset; Mobile credential recovery continues — 9 November 2026, 01:36 UTC
+
+User flashed phone to stock ROM. Read-only ADB10.77.77.3:5555 is authorized/connected;
+HRIS package is absent. Previous phone70/local-key/old-queue assumptions no longer
+apply. Upcoming validated build79 must be a fresh install, announced first and
+install-only (no phone UI). Do not assume erased private keys survived. Retained
+emulator78 remains the original pending-message regression fixture; never resend
+Recovery78 005634 or reset its keys.
+
+Mobile source cfd7412e keeps credential writer alive through native drain; cbacb8af
+persists rejected credentials across runtime lifetimes (81 focused tests pass).
+Uncommitted selected-owner automatic recovery is under focus28468; one new domain
+test currently has an incorrectly expired gateway fixture. Follow Mobile's newest
+handoff for correction, source/full gates and native proof. No complete acceptance
+or Starter port yet. No server change: live e558a686/schema116.4/control ON remains.
+
 ## Native78 exposes stale SDK refresh; server unchanged — 9 November 2026, 01:08 UTC
 
 Mobile a1f2cfe9 fixes duplicate recovery consumers manufacturing fresh wakes. Its full

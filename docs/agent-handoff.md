@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 20:58 UTC. Historical detail remains in
+Updated 9 November 2026, 21:19 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -90,11 +90,27 @@ zero failures/errors/skips. Required root check,Android release/lint,shared Wasm
 source and quality pass.4,582 source inputs and Inspector bytes stay unchanged.
 
 Fresh [hosted42697887863](https://github.com/fajarxfce/hris-mobile/actions/runs/42697887863)
-is IN PROGRESS on exactda2481732e51132fac7249fc31d732f037c2222c;no Apple runtime
-acceptance yet. Its private protocol directory contains hosted.json and digest/XML
-audit. Never substitute older42656803963 evidence for this source. No local heavy
-job is running at this checkpoint. Mobile's next native signal work is pinned in
-`.work/space-readiness-native-2026-11-09`; it may proceed independently of hosted CI.
+is pinned to exactda2481732e51132fac7249fc31d732f037c2222c. Portable is now accepted:
+6,662 cases (3,089 desktop+621 Android host+2,952 browser),zero failures/errors/skips;
+full previous report set plus24 new protocol/storage cases verified. Audit7525 is
+reaped. Job129434510765,artifact13710243749,3,296,341 bytes,GitHub digest and ZIP CRC
+verified. SHA25619ce5254277f1c2c03502ea6b22fb4043b5fe7443d78fe5b8c783b69cd3aa471;
+XML manifest3539a401dad1b6aa535c06a4a81799ac6ebe600fa55ffbf5e2f6f6c4e3955288.
+Apple remains IN PROGRESS;no native Apple/Room/Xcode acceptance yet. Private Mobile
+protocol directory contains hosted.json and archived portable audit. Do not rerun.
+
+Mobile [a877c088](https://github.com/fajarxfce/hris-mobile/blob/a877c088/docs/collaboration-space-readiness-listener.md)
+is also committed/pushed;68495 is reaped. This successor routes original native
+clients to group controls using immutable logical source and actual physical sender,
+with a separate bounded stream and one subscription handle lifetime. Focused30283
+passes84 cases/198.331s;full45533 is REAPED PASS630.629s:4,297 cases=3,645 desktop,
+626 Android host,26 browser,zero failures/errors/skips. Required root/platform/quality
+pass,4,584 stable sources and exact XML/library audit. Protocol hosted evidence is
+for the earlier immutable source,not these successor bytes. No actual provider
+callback measurement,app collector,wake ACK,foreground sync activation or phone build.
+
+No active local heavy job. Next actual durable group wake processing and bounded
+local room-binding inventory/cursor,documented in Mobile private native directory.
 
 The actual old recovery worker is company-only and cannot acknowledge group work.
 Group adoption also restores a paused SDK,so the eventual foreground owner must

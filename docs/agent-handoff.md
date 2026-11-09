@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 15:53 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 16:49 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -103,10 +103,13 @@ Preserve Inspector's unrelated gradlew.bat worktree delta. SDK26.10.23-hris.6 re
 
 ## Next work
 
-1. Commit/push the accepted twelve-file direct-transport increment; the audit is done.
-   Reconciliation fa90ddcc is already pushed. Never redo either accepted source gate.
-2. Validate/commit/push the13-file Mobile transport candidate, then continue owning
-   original SDK delivery. Root691f3fc5's verifier maximum stays116.4; Group stays138.
+1. Direct transport96d2d238 and reconciliationfa90ddcc are accepted/pushed. Never redo
+   their apply/merge or accepted source gates. Live runtime/schema remain unchanged.
+2. Mobile ab17eadd/69e639f8 are accepted/pushed for direct transport/original delivery;
+   full owning source passes4,304 cases with exact source/XML audit. Hosted42656803963
+   runs exact69e639f8. Four proof-only Mobile files are now uncommitted; source4649 is
+   running and has one Detekt finding to correct after reaping. Finish the isolated
+   Group real Synapse/SQL/HTTP fixture and driver; no actual SDK delivery proof yet.
 3. Continue owning original SDK delivery/history, recipient readiness, background
    lifetime and group product routing. Existing Prepare/Resolve/Replay Room commands
    are accepted; do not recreate them or replace uncertain originals.
@@ -140,10 +143,9 @@ All new cases and both readiness worker contexts are present. Format/architectur
 checks pass. All local jobs are reaped; no deployment or group routing enablement.
 
 Private attempts/corrections/audit are under `.work/space-direct-transport-2026-11-09`.
-Do not repeat the initial apply or any accepted reconciliation/hosted gate. Mobile still
-has thirteen uncompiled transport files; its original follow-up has seven private files/
-ten pure tests with formatter-only proof. Owning delivery/receipt projection/late callback
-journaling and pause/drain remain required; no SDK or UI activation has been added.
+Do not repeat the initial apply or any accepted reconciliation/hosted gate. Mobile contracts ab17eadd/69e639f8 are accepted/pushed with current receipt/CAS/
+late-callback ownership. Actual SDK/restart proof, group wake/background ownership and
+product routing remain required. See the current Mobile handoff; no deployment/activation.
 
 Original message repository.get already returns archived command facts; its actual
 completion storage contract proves reopen/login behavior. No null-to-archive fallback

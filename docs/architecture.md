@@ -1,5 +1,11 @@
 # Architecture
 
+[Organization Matrix readiness fanout](collaboration/space-readiness-control-fanout.md)
+owns current recipient admission, external delivery and guarded cursor acknowledgement.
+Provider I/O stays outside transactions; deferral leaves recipient scope before
+publisher-only settlement. Stable transaction identity and finite retries preserve
+independent Matrix/PUSH progress. Worker and Mobile integration remain next.
+
 [Current readiness admission](collaboration/space-readiness-admission.md) validates
 actual original/fresh target identity and hard native lifetime without requiring short
 interactive freshness. Pure policy supplies bounded wake admission; the use case must

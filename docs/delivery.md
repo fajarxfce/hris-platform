@@ -1,5 +1,18 @@
 # Delivery and validation
 
+## Organization Matrix readiness fanout — 9 November 2026
+
+Current recipient guards now surround capture and acknowledgement, with external
+Matrix I/O between transactions. Expired credentials defer without refresh; changed
+credentials cannot acknowledge stale authority. Final validation passes 221 cases
+(205 domain, 16 actual PostgreSQL queue/use-case cases), zero failures/errors/skips,
+format and architecture, and 8,725 stable source inputs. A competing provider writer
+is proven to wait until target acknowledgement commits. The earlier invalid expired
+token fixture remains recorded. [Contract](collaboration/space-readiness-control-fanout.md)
+and [evidence](measurements/collaboration-space-readiness-control-fanout-2026-11-09.json).
+No shared DI, scheduled worker, Mobile or live change. Push and owning integration
+remain next; all 54 communications acceptance groups remain open.
+
 ## Current organization readiness admission — 9 November 2026
 
 Pure target policy now preserves original/fresh Matrix identity,confirmed keys,current

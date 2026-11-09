@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 19:46 UTC. Historical checkpoints are retained in
+Updated 9 November 2026, 20:08 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,17 +15,52 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
+## Accepted Matrix fanout; independent push and owning worker next
+
+Five new Kotlin files implement the owning Matrix fanout, pure bounded retry and
+real PostgreSQL use-case tests. No shared DI, worker loop, provider login/refresh,
+new key, Mobile source, APK, emulator or live change. Matrix and PUSH checkpoints
+remain separate. Current target capture/acknowledgement uses account -> native ->
+device -> gateway -> exact queue guards; I/O runs between transactions. Publisher
+settlement follows after leaving target scope. Stable controls retain provider
+transaction identity after lost local acknowledgement. The original device/key
+policy and V140 constraints remain unchanged.
+
+Private `.work/space-readiness-control-fanout-2026-11-09` pins
+bebe31388068c7b647c97663c8b789e2a5e96e7c/schema140:
+- focused-1 /9502 REAPED FAILED208.284s:220 cases,one fixture failure,zero errors/skips.
+  The expired-token setup attempted expiry before updatedAt; final setup instead
+  advances the injected clock after valid rotation. Production source unchanged.
+- focused-2 /21572 REAPED PASS215.181s:221 cases =205 domain +16 real PostgreSQL
+  repository/use-case cases,zero failures/errors/skips,8,725 stable inputs,quality.
+  Ten new use-case cases include a provider writer observed waiting on a real device
+  lock until acknowledgement commits; external transport alone is fake.
+- accept.py PASS verifies every source/report hash,prior fixture failure and final
+  case counts; accepted.json is the tracked measurement. No source edit during gates.
+- [Contract](collaboration/space-readiness-control-fanout.md) and
+  [evidence](measurements/collaboration-space-readiness-control-fanout-2026-11-09.json).
+
+Next connect independent PUSH readiness to bounded delivery. The existing
+HandleCollaborationSpacePush already owns current native registration/token and FCM
+outcomes. Prefer transactional handoff to its durable opaque wake queue if it
+preserves the publication checkpoint and current-target fencing; do not duplicate
+an FCM retry/cleanup owner without a concrete requirement. This is a review of the
+initial private design's direct-FCM proposal. Then wire both scheduled owners and
+validate full API plus unfiltered worker tests. Mobile group readiness/push consumers
+remain absent. Do not replay accepted protocol/Synapse/native/hosted gates. No active
+heavy job or new APK; phone87 remains unchanged. All54 acceptance groups remain open.
+
 ## Resume current fanout integration
 
 Accepted source:storage7d4d7f1f and typed queuea182ebf5 are committed/pushed;all pushes
 are reaped. V140 target acknowledgement4a5dd90f is committed/pushed;all pushes are reaped. No active
-heavy job at this checkpoint. Pure/current target admission now passes below. Next bounded Matrix/PUSH fanout,
+heavy job at this checkpoint. Pure/current target admission and Matrix control fanout now pass below. Next independent PUSH fanout,
 then Mobile durable ownership. Do not restart the retired confirmation
 endpoint,SDK7,old source gates or hosted42656803963. No new APK or live rollout.
 
 Private `.work/space-readiness-fanout-2026-11-09/design.md` records the integration
 boundary. Its initial base isa182ebf5;re-pin successor implementation to the V140
-commit before applying any candidate. Pure admission source is now accepted below;no owning fanout source exists yet.
+commit before applying any candidate. Pure admission and owning Matrix fanout are now accepted below; push and shared worker integration remain next.
 No nested transaction owners or hidden actor switch. Claim ends before target account
 guards. Exact successful/suppressed cursor advance runs inside the target transaction;
 transport deferral leaves it before publisher-only release. Revalidate actual target

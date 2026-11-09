@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 16:49 UTC. Historical detail remains in
+Updated 9 November 2026, 17:08 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -12,10 +12,31 @@ open. Mobile proves reusable foundations before Starter. Follow AGENTS.md layer
 ownership and preserve original accounts, native/SDK identities, keys and transactions.
 
 One heavy local compiler OR emulator. Do not kill live API/worker JVMs. The emulator
-uses2560MiB/two cores and is stopped. Phone10.77.77.3:5555 is install-only; announce each
+uses2560MiB/two cores. The retained sender is stopped; a fresh isolated proof AVD runs. Phone10.77.77.3:5555 is install-only; announce each
 installation and never launch, automate, uninstall or clear its app. Crashlytics IAM
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
+
+## Active original-delivery proof
+
+Mobile82986dbf and Group1b2c3f9f handoffs record the current experiment. Mobile owning
+source69e639f8 and native transport ab17eadd/96d2d238 are accepted; no live activation.
+Hosted42656803963 portable artifact is audited:6,638 fresh desktop/Android/browser
+cases pass,including all24 owning-delivery cases on desktop/browser. Apple still runs.
+Do not redispatch. Mobile proof-only source passes20 tests and APK/lint/quality; Group
+fixture compilation/format/architecture and88 Python driver tests pass.
+
+**Native61494 is running** in Group `.work/space-original-delivery-native-2026-11-09/native-3`.
+Both source manifests are frozen. It uses a new private emulator image (2560MiB/two
+cores), actual SDK6 and isolated native HTTP/PostgreSQL/Synapse. Two fictional paused
+original commands are delivered to an offline recipient; the owned process is killed
+after durable receipt and before projection, then exact original transactions/storage
+must survive restart and offline reads. Reap before changing source. Earlier two boot
+failures are recorded; they ran no server/message test. Do not reset or resend employee
+originals, boot the retained sender87, or install another phone APK for this test.
+
+Group test-only source and Mobile four proof files remain uncommitted pending actual
+native evidence. Phone87, live e558a686/schema116.4 and group routing OFF are unchanged.
 
 ## Current work
 

@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:47 UTC. Historical detail remains in
+Updated 9 November 2026, 23:53 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -198,11 +198,21 @@ selecting zero targets. Only Group fixture changed:prepare recipient,create the 
 wait for listening,then complete the original recipient worker to publish its keys.
 Assertions verify room-before-publication and target ACK;safe traffic persists on failure.
 Group89294 is REAPED PASS34.055s,8,733 unchanged inputs,format/architecture. Mobile
-source/APK and all production code are unchanged. Native-2 /98504 is RUNNING on a
-fresh2560MiB/two-core emulator with old+new scenarios. All source/APK inputs frozen;
-no compiler/formatter. Reap98504 and retain any failed data before corrections.
-Final Mobile root check and strict cross-source/APK/XML audit remain. No native
-acceptance,product APK88,phone or live rollout. Prepared files are archival now.
+source/APK and all production code are unchanged by fixture-order correction.
+Native98504 is REAPED PASS196.262s:2 cases,zero failures/errors/skips. Original scenario
+retains2 provider events/10 native requests. Group scenario proves actual control ->
+wake -> registered task -> original ACK,process death before Sent,exact claim recovery
+without FCM,and offline reads. Captured-signal replay deduplicates. Exactly2 provider
+events from3 encrypted HTTP sends;the replay keeps its original transaction. Group
+traffic:22 native requests (1 registration,1 bootstrap,3 transport),16 Matrix requests
+(4 secret-storage,6 sync,3 encrypted sends),zero401/403/server errors. This is whole
+scenario traffic,not per-message latency or phone/p95 evidence.
+
+All source/APK hashes match;no compilation during emulator;emulator stopped. Final
+Mobile full-1 /73682 is RUNNING with source/APK frozen. Required root check and exact
+cross-source/library/APK/XML audits remain before native-proof commits. Do not repeat
+native98504 absent new changes/failure. No product APK88,phone or live rollout. Previous
+failed native data stays retained;prepared source copies are archival now.
 
 Idle checks still need complete SDK inventory plus app commands/receipts. Producer
 wakes,group FCM/product routing,new SPACE enqueue and native acceptance remain.

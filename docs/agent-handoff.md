@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 03:39 UTC. Historical detail remains in
+Updated 10 November 2026, 04:01 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,36 +17,41 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Current Mobile integration — 10 November, 03:39 UTC
+## Current Mobile integration — 10 November, 04:01 UTC
 
-Mobile7a6fe534 is committed/pushed: replica data and a fresh work marker now commit
-atomically in SQLite/IndexedDB. The accepted final gate60400 passes303.454s and
-validates 7,468 results (4,012 same-source full/repair plus 3,456 exact accepted
-predecessor results). All 89 desktop and 87 browser database tests pass. One stale
-Kotlin-generated delegate caused an earlier AppFlow failure; unchanged tests pass
-after non-incremental recompilation. No UI/test timeout workaround. [Contract](https://github.com/fajarxfce/hris-mobile/blob/7a6fe534/docs/replica-work-wakes.md).
-Generic control42749839268 pins7a6fe534fc2e86064be9f60509f7befcc6afbf31 and is pending
-behind receipt42745403043. Do not redispatch/cancel either proof. Expected generic
-7,276 portable + 2,709 Apple, 16 Swift checks and unsigned host. Starter remains
-clean HEADffd0ac5; its four baseline files match Mobile before the generic change.
-Port only generic API/implementations/tests after real Apple acceptance.
+Mobile[d89e6b5d](https://github.com/fajarxfce/hris-mobile/commit/d89e6b5dcb0c0463916628ecd10a9bae946e5a1a) is committed/pushed
+(79200 reaped): new immutable room bindings atomically retain fresh recovery work,
+then the owning use case schedules after exact readback. Lost responses, schedule
+failure/timeouts/cancellation preserve committed data/work. Existing local reads and
+identical retention create no wake or scheduler request. No backend source/schema/DI
+change. [Contract](https://github.com/fajarxfce/hris-mobile/blob/d89e6b5dcb0c0463916628ecd10a9bae946e5a1a/docs/collaboration-space-binding-producer-wake.md).
 
-ACTIVE Mobile producer focused62815; nine Kotlin files are UNCOMMITTED and frozen
-through reap. New binding writes retain a fresh wake in the same transaction; the
-owning use case schedules only after exact readback. Lost responses, scheduling
-failure/timeouts and cancellation preserve committed data/work. Existing owned reads
-and identical retention perform no wake/scheduler work. Red43490 proves missing wake
-on the old producer; 25 domain and 30 actual SQLite cases currently pass, browser/app
-and quality still running. Read Mobile's active handoff before starting any compiler.
-No Group or Original backend source/DI/schema change for these increments.
+Focused62815 passes87 fresh cases/372.923s. Full77826 passes682.233s with9,294 validated
+results=7,301 fresh+1,993 exact reused,zero failure/error/skip. All4,656 Mobile/library
+inputs and current/archive XML match. Native46744 passes193.275s,two actual SDK cases:
+original transactions,callback loss,process death,group control/claim,pusher and idle
+checks remain; fresh binding/retained-read wake assertions pass. Original10native/
+11Matrix;group25native/17Matrix,one pusher,zero errors or extra idle direct requests.
+Exact unchanged backend source-2 compile reused; no compiler during2560MiB/two-core
+emulator,now stopped. No heavy local job remains. Current proof APK150470250bytes
+SHAde897799fc7e0eb4c8751915aa4a02a7a1a7fd14b83447426dd8a0556322a686.
 
-Pusher42739907129/95195319 is fully accepted: 9,744 cases, 16 Swift checks and unsigned
-host. Receipt42745403043/76a143b6 portable is accepted7,100 (audit85032, artifact
-13732619273 SHA bb615bd38b9c6ce45d51aaf6f3e8b036671278e9f2279c07efd519026f603976);
-Apple is still running. Generic proof does not cover the new producer integration.
-Phone remains87; ADB6953 timed out15s around03:37. Release88 remains uninstalled;
-no phone UI/data or live change. All 54 PRD groups remain open. Continue new SPACE
-commands/incoming history, notifications, rich messaging, backup, calls and meetings.
+Generic Mobile7a6fe534 control42749839268 is still pending behind receipt42745403043.
+Do not supersede it with another pending run. Receipt portable7,100 is accepted;
+Apple is building the host. Generic expected7,276 portable+2,709 Apple; producer CI
+must follow when generic is running,expected7,292 portable+2,717 Apple. No producer
+CI dispatched yet. Pusher42739907129 is fully accepted9,744+16Swift/unsignedhost.
+Starter remains clean HEADffd0ac5; nine-file core patch passes a dry apply check,
+no source/build change. Port after actual generic Apple acceptance. Read Mobile's
+handoff/private .work/space-binding-producer-wake-2026-11-10 before starting a job.
+
+Next SPACE sends need explicit account/space intent and durable command namespace,
+atomic command+wake insertion and complete mixed old/new ledger reconciliation under
+one physical SDK writer. Never reinterpret companyId as spaceId,ignore unmatched
+originals or move durable commands into disposable replicas. Continue incoming/older
+history,notifications/replies,rich media,backup,calls and meetings. All54 groups open.
+Phone remains87; last ADB6953 timed out15s around03:37. Release88 is uninstalled;
+no phone UI/data or live change. Live e558a686/schema116.4,groupOFF remains.
 
 ## Accepted: original receipt recovery; continue producer wakes
 

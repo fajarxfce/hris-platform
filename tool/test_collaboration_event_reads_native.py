@@ -185,5 +185,60 @@ class PendingReferenceEvidenceTest(unittest.TestCase):
                 reopened_history(value, adopted, completed=True)
 
 
+class IncomingWorkerEvidenceTest(unittest.TestCase):
+    staged = EventReadEvidenceTest.staged
+    incoming = EventReadEvidenceTest.incoming
+    retained = EventReadEvidenceTest.retained
+    adopted = EventReadEvidenceTest.adopted
+    reopened = EventReadEvidenceTest.reopened
+
+    def worker_result(self):
+        return self.adopted() | {"incoming": {
+            "retained": self.retained() | {"pendingReferences": 0, "providerExhaustedWithPending": False},
+            "originalJournalUnchanged": True,
+            "worker": {"turns": 2, "firstTurnMessages": 1, "contentBeforeProviderEof": True,
+                       "registeredTask": True, "emptyRepeatUnchanged": True, "coveredHintUnchanged": True}}}
+
+    def test_worker_evidence_is_separate_from_manual_acquisition_and_copied(self):
+        value = self.worker_result()
+        accepted = adopted_events(value, self.staged(), worker=True)
+        self.assertEqual(value, accepted)
+        value["incoming"]["worker"]["turns"] = 4
+        self.assertEqual(2, accepted["incoming"]["worker"]["turns"])
+        for source, options in [(self.worker_result(), {}), (self.adopted(), {"worker": True}),
+                                (self.worker_result(), {"worker": True, "completed": True}),
+                                (self.worker_result(), {"worker": 1})]:
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                adopted_events(source, self.staged(), **options)
+
+    def test_worker_cannot_claim_deferred_content_unbounded_turns_or_false_idle(self):
+        for delta in [{"turns": 1}, {"turns": 5}, {"turns": True}, {"firstTurnMessages": 0},
+                      {"firstTurnMessages": True}, {"contentBeforeProviderEof": False},
+                      {"registeredTask": False}, {"emptyRepeatUnchanged": False},
+                      {"coveredHintUnchanged": False}, {"body": "private"}]:
+            source=self.worker_result();source["incoming"]["worker"].update(delta)
+            with self.subTest(delta=delta), self.assertRaises(ValueError):
+                adopted_events(source, self.staged(), worker=True)
+
+    def test_worker_rejects_pending_sources_and_changed_original_receipts(self):
+        for delta in [{"pendingReferences": 1}, {"providerExhaustedWithPending": True},
+                      {"originalEventId": "$latestEdit"}, {"physicalProviderPreserved": False}]:
+            source=self.worker_result();source["incoming"]["retained"].update(delta)
+            with self.subTest(delta=delta), self.assertRaises(ValueError):
+                adopted_events(source, self.staged(), worker=True)
+        source=self.worker_result();source["incoming"]["originalJournalUnchanged"]=False
+        with self.assertRaises(ValueError):
+            adopted_events(source, self.staged(), worker=True)
+
+    def test_worker_content_reopens_in_a_new_process_without_runtime(self):
+        source=adopted_events(self.worker_result(), self.staged(), worker=True)
+        final=self.reopened() | {"incoming": source["incoming"]["retained"]}
+        self.assertEqual(final,reopened_history(final,source))
+        for delta in [{"processId": source["processId"]}, {"runtimeNeverOpened": False},
+                      {"incoming": self.retained()}]:
+            with self.subTest(delta=delta), self.assertRaises(ValueError):
+                reopened_history(final | delta,source)
+
+
 if __name__ == "__main__":
     unittest.main()

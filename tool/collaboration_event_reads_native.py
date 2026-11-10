@@ -133,7 +133,24 @@ def reopened_history(value, adopted, *, completed=False):
     return {**value, "incoming": dict(value["incoming"])}
 
 
-def adopted_events(value, staged, *, completed=False):
+def worker_incoming(value, staged):
+    if (not isinstance(value, dict) or set(value) != {"retained", "worker", "originalJournalUnchanged"}
+            or value["originalJournalUnchanged"] is not True):
+        raise ValueError("Invalid registered worker evidence")
+    worker = value["worker"]
+    flags = {"contentBeforeProviderEof", "registeredTask", "emptyRepeatUnchanged", "coveredHintUnchanged"}
+    if (not isinstance(worker, dict) or set(worker) != flags | {"turns", "firstTurnMessages"}
+            or any(worker[n] is not True for n in flags)
+            or type(worker["turns"]) is not int or not 2 <= worker["turns"] <= 4
+            or type(worker["firstTurnMessages"]) is not int or worker["firstTurnMessages"] != 1):
+        raise ValueError("Worker did not retain content before EOF and stop when idle")
+    return {"worker": dict(worker), "retained": retained_history(value["retained"], staged, completed=True),
+            "originalJournalUnchanged": True}
+
+
+def adopted_events(value, staged, *, completed=False, worker=False):
+    if type(worker) is not bool or (worker and completed):
+        raise ValueError("Invalid incoming worker scenario")
     checkpoint(value)
     flags = {"logicalRuntimePreserved", "physicalOwnerPreserved", "oldCompanyReadRejected",
              "foreignRuntimeReadRejected", "redactedTargetSenderPreserved", "runtimeReleased"}
@@ -149,7 +166,7 @@ def adopted_events(value, staged, *, completed=False):
     if any(value[name] != event for name, event in expected.items()):
         raise ValueError("Adoption changed an event identity")
     return {**value, "spaceWindow": original_window(value["spaceWindow"]),
-            "incoming": incoming_history(value["incoming"], staged, completed=completed)}
+            "incoming": worker_incoming(value["incoming"], staged) if worker else incoming_history(value["incoming"], staged, completed=completed)}
 
 
 class EventReadExperiment(OriginalDeliveryExperiment):
@@ -187,7 +204,8 @@ class EventReadExperiment(OriginalDeliveryExperiment):
         completed = self.fixture.get("completePendingIncoming", False)
         if type(completed) is not bool:
             raise ValueError("Invalid pending-reference scenario")
-        adopted = adopted_events(self.wait_app("events"), staged, completed=completed)
+        worker = self.fixture.get("incomingWorker", False)
+        adopted = adopted_events(self.wait_app("events"), staged, completed=completed, worker=worker)
         self.finished()
         port = self.native.port
         if not port:

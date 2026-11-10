@@ -13,29 +13,34 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Order(Ordered.HIGHEST_PRECEDENCE + 2)
 class NativeEventReadFailureTrace : OncePerRequestFilter() {
     private val failures = mutableListOf<Map<String, Any>>()
+    private val startupFailures = mutableListOf<Map<String, Any>>()
     private var active = false
 
     @Synchronized
     fun arm() {
+        check(!active)
         active = true
     }
 
     @Synchronized fun snapshot(): List<Map<String, Any>> = failures.toList()
 
+    @Synchronized fun startupSnapshot(): List<Map<String, Any>> = startupFailures.toList()
+
     @Synchronized
     private fun record(request: HttpServletRequest, status: Int) {
-        if (!active) return
-        check(failures.size < 32)
+        val captured = if (active) failures else startupFailures
+        check(captured.size < 32)
         val path = request.requestURI
         val operation =
             when {
+                path.endsWith("/login") -> "login"
                 path.contains("/context/") -> "context"
                 path.contains("/event/") -> "event"
                 path.endsWith("/messages") -> "messages"
                 path.endsWith("/sync") -> "sync"
                 else -> "other"
             }
-        failures +=
+        captured +=
             mapOf(
                 "operation" to operation,
                 "status" to status,
@@ -49,7 +54,10 @@ class NativeEventReadFailureTrace : OncePerRequestFilter() {
         chain: FilterChain,
     ) {
         chain.doFilter(request, response)
-        if (request.requestURI.startsWith("/_matrix/") && response.status >= 500)
+        if (
+            request.requestURI.startsWith("/_matrix/") &&
+                (response.status == 429 || response.status >= 500)
+        )
             record(request, response.status)
     }
 }

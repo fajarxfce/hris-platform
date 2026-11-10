@@ -29,6 +29,8 @@ import tools.jackson.databind.JsonNode
         [
             "HRIS_COLLABORATION_ENABLED=true",
             "HRIS_MATRIX_ENABLED=true",
+            "HRIS_COLLABORATION_PUSH_ENABLED=true",
+            "HRIS_MATRIX_PUSH_GATEWAY_URL=https://push.example.test/_matrix/push/v1/notify",
             "HRIS_COLLABORATION_SPACE_ENABLED=true",
             "HRIS_COLLABORATION_SPACE_MIN_ANDROID_BUILD=1",
             "HRIS_MATRIX_SERVER_NAME=matrix.example.test",
@@ -69,6 +71,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
     fun actualReadinessWakesRegisteredGroupTaskAndRecoversClaimAfterProcessLoss() {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
+        retainNativePush(sender)
         val recipient = sdkOwner(sdkPeer(base))
         val conversation = UUID.randomUUID()
         val room = originalRoom(sender, recipient, conversation)
@@ -151,6 +154,8 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             )
             val listening = waitFor(directory, "listening", process)
             assertTrue(listening["nativeSyncActive"].asBoolean())
+            assertTrue(listening["managedPusherActivated"].asBoolean())
+            val pusherHash = assertManagedPusher(sender, group)
             assertTrue(listening["startupWakeCleared"].asBoolean())
             assertEquals(
                 emptyList<String>(),
@@ -211,6 +216,8 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             assertTrue(result["cleanup"].asBoolean())
             val requests = trace.snapshot()
             val sdkRequests = matrixTrace.snapshot()
+            assertEquals(1, sdkRequests.getOrDefault("managedPusher", 0))
+            assertEquals(pusherHash, assertManagedPusher(sender, group))
             assertTrue(sdkRequests.getOrDefault("requests", 0) in 1..80)
             assertEquals(0, sdkRequests.getOrDefault("rejected", 0))
             assertEquals(0, sdkRequests.getOrDefault("serverError", 0))
@@ -242,6 +249,8 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
                     "nativeRequests" to requests,
                     "matrixRequests" to sdkRequests,
                     "actualGroupControl" to true,
+                    "managedPusherActivatedOnce" to true,
+                    "managedPusherRetainedAfterProcessLoss" to true,
                     "consumerReplayDeduplicated" to true,
                     "claimedBeforeDelivery" to true,
                     "idleRecoveryCompleted" to true,
@@ -269,6 +278,34 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             // the driver and survives failed experiments. Never touch employee stores.
             Files.deleteIfExists(directory.resolve("fixture.json"))
         }
+    }
+
+    private fun assertManagedPusher(sender: SdkOwner, group: GroupOriginal): String {
+        val row =
+            database()
+                .queryForMap(
+                    "select account_id,native_session_id,matrix_user_id,matrix_device_id,key_hash,version,published_at from collaboration_space_push_bindings where space_id=? and device_id=?",
+                    group.spaceId,
+                    group.deviceId,
+                )
+        assertEquals(sender.native.fixture.account, row["account_id"])
+        assertEquals(sender.native.session, row["native_session_id"])
+        assertEquals(sender.session.getValue("userId"), row["matrix_user_id"])
+        assertEquals(sender.session.getValue("deviceId"), row["matrix_device_id"])
+        assertEquals(1L, row["version"])
+        assertNotNull(row["published_at"])
+        val hash = row.getValue("key_hash") as String
+        assertEquals(listOf(hash), provider.managedPusherHashes(sender.session.getValue("userId")))
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_push_bindings where device_id=?",
+                    Int::class.java,
+                    sender.device,
+                ),
+        )
+        return hash
     }
 
     private fun assertOriginalReceipts(

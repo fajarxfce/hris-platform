@@ -40,6 +40,8 @@ class NativeSpaceRecoveryTrace : OncePerRequestFilter() {
         record("requests")
         when {
             request.requestURI.endsWith("/sync") -> record("sync")
+            request.requestURI == "/_matrix/client/unstable/dev.fajar.hris/pusher" ->
+                record("managedPusher")
             request.requestURI.contains("/account_data/m.secret_storage.") ->
                 record("secretStorage")
             request.requestURI.contains("/send/m.room.encrypted/") -> record("encryptedSend")

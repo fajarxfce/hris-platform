@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 import zipfile
 
 from collaboration_native_device import PACKAGE
-from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint
+from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint, delivery_diagnostic
 
 
 class OriginalDeliveryOwnershipTest(unittest.TestCase):
@@ -57,6 +57,26 @@ class OriginalDeliveryOwnershipTest(unittest.TestCase):
         self.assertEqual(checkpoint, experiment.wait_app("staged"))
         self.assertEqual([("original-staged",), ("instrumentation",), ("original-staged",)],
                          [call.args for call in experiment.app_json.call_args_list])
+
+    def test_delivery_diagnostic_rejects_payload_fields_and_invalid_counts(self):
+        value = {"reason": "UNRESOLVED", "confirmed": 1, "unresolved": 1,
+                 "receiptCount": 1, "states": ["SENT", "STAGED"], "elapsedMillis": 15}
+        self.assertEqual(value, delivery_diagnostic(value))
+        self.assertIsNot(value["states"], delivery_diagnostic(value)["states"])
+        for changes in ({"text": "never expose"}, {"confirmed": True}, {"unresolved": 3},
+                        {"reason": "unsafe"}, {"reason": []}, {"states": [{}, "SENT"]}, {"states": ["SENT"]}, {"elapsedMillis": -1}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                delivery_diagnostic(value | changes)
+
+    def test_failed_recovery_retains_only_validated_outcome_and_still_fails(self):
+        experiment = self.experiment()
+        value = {"reason": "STOPPED", "confirmed": 1, "unresolved": 1,
+                 "receiptCount": 1, "states": ["SENT", "STAGED"], "elapsedMillis": 16}
+        experiment.app_json = Mock(side_effect=[None, {"failureCategory": "IllegalStateException"}, None, value])
+        with self.assertRaises(RuntimeError):
+            experiment.wait_app("recovered")
+        self.assertEqual(value, experiment.result["delivery"])
+        self.assertFalse(experiment.result["passed"])
 
     def test_boolean_and_out_of_range_pids_are_rejected(self):
         for pid in (True, False, 0, -1, 2147483648, "121"):

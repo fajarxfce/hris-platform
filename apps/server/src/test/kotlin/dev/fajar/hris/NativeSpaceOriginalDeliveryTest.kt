@@ -18,7 +18,10 @@ import org.springframework.test.context.TestPropertySource
 import tools.jackson.databind.JsonNode
 
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_ORIGINAL_APK", matches = ".+")
-@Import(NativeOriginalDeliveryTraceConfiguration::class)
+@Import(
+    NativeOriginalDeliveryTraceConfiguration::class,
+    NativeSpaceRecoveryTraceConfiguration::class,
+)
 @TestPropertySource(
     properties =
         [
@@ -33,6 +36,7 @@ import tools.jackson.databind.JsonNode
 )
 class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
     @Autowired private lateinit var trace: NativeOriginalDeliveryTrace
+    @Autowired private lateinit var matrixTrace: NativeSpaceRecoveryTrace
 
     companion object {
         private val provider by lazy { NativeSdkMatrixServer(loginBurst = 32) }
@@ -129,6 +133,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
             assertEquals(group.spaceId, peerGroup.spaceId)
             val canonical = adoptRoom(sender, recipient, group, room)
             trace.arm()
+            matrixTrace.arm()
             write(
                 directory,
                 "group",
@@ -178,6 +183,11 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                 ),
             )
         } finally {
+            write(
+                directory,
+                "traffic",
+                mapOf("native" to trace.snapshot(), "matrix" to matrixTrace.snapshot()),
+            )
             if (process.isAlive) {
                 process.destroy()
                 if (!process.waitFor(15, TimeUnit.SECONDS)) {

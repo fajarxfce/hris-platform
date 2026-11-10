@@ -126,6 +126,32 @@ class NativeSdkMatrixServer(messageBurst: Int = 10, loginBurst: Int? = null) : A
         return "http://127.0.0.1:${server.getMappedPort(8008)}"
     }
 
+    /** Only bounded capability hashes leave the fictional provider; never push keys or tokens. */
+    fun managedPusherHashes(userId: String): List<String> {
+        require(userId.startsWith("@hris_") && userId.length <= 255)
+        val probe =
+            server.execInContainer(
+                "timeout",
+                "5",
+                "python",
+                "-c",
+                """
+                import hashlib,json,sqlite3,sys
+                with sqlite3.connect('file:/data/fixture.db?mode=ro',uri=True,timeout=2) as db:
+                 rows=db.execute('select pushkey from pushers where user_name=? limit 9',(sys.argv[1],)).fetchall()
+                 assert len(rows)<=8
+                 print(json.dumps(sorted(hashlib.sha256(row[0].encode()).hexdigest() for row in rows)))
+                """
+                    .trimIndent(),
+                userId,
+            )
+        check(probe.exitCode == 0 && probe.stdout.length <= 1024)
+        val values =
+            json.readTree(probe.stdout).iterator().asSequence().map { it.asString() }.toList()
+        check(values.size <= 8 && values.all { it.matches(Regex("[a-f0-9]{64}")) })
+        return values
+    }
+
     /** Read-only fixture observation, never exposing encrypted frames or provider credentials. */
     fun encryptedQueue(userId: String, deviceId: String, sender: String): List<String> {
         require(userId.startsWith("@hris_") && sender.startsWith("@hris_"))

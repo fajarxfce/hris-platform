@@ -76,6 +76,24 @@ def originals(value, fixture):
     return result
 
 
+def delivery_diagnostic(value):
+    """Strict metadata-only outcome; never copy arbitrary native diagnostic fields."""
+    fields = {"reason", "confirmed", "unresolved", "receiptCount", "states", "elapsedMillis"}
+    if not isinstance(value, dict) or set(value) != fields:
+        raise ValueError("Invalid original delivery diagnostic fields")
+    if not isinstance(value["reason"], str) or value["reason"] not in {"NONE", "DRAINED", "TIMED_OUT", "STOPPED", "FAILED", "UNRESOLVED"}:
+        raise ValueError("Invalid original delivery reason")
+    for name in ("confirmed", "unresolved", "receiptCount"):
+        if type(value[name]) is not int or not 0 <= value[name] <= 2:
+            raise ValueError("Invalid original delivery count")
+    if type(value["elapsedMillis"]) is not int or not 0 <= value["elapsedMillis"] <= 120_000:
+        raise ValueError("Invalid original delivery duration")
+    states = value["states"]
+    if not isinstance(states, list) or len(states) != 2 or any(not isinstance(s, str) or s not in {"SENT", "STAGED", "OTHER"} for s in states):
+        raise ValueError("Invalid original delivery states")
+    return {**value, "states": states[:]}
+
+
 class OriginalDeliveryExperiment:
     """Own exactly one proof package, reverse and instrumentation child; retain failures."""
     def __init__(self, apk, sdk, directory):
@@ -130,6 +148,10 @@ class OriginalDeliveryExperiment:
                 if value is not None:
                     return checkpoint(value)
                 self.result["diagnostic"] = native_diagnostic({"instrumentation": state})
+                if name == "recovered":
+                    delivery = self.app_json("original-delivery-result")
+                    if delivery is not None:
+                        self.result["delivery"] = delivery_diagnostic(delivery)
                 raise RuntimeError("Original instrumentation ended before its checkpoint")
             time.sleep(0.1)
         raise TimeoutError("Original application phase timed out")
@@ -188,6 +210,9 @@ class OriginalDeliveryExperiment:
         private_json(self.directory / "ack.json", ack)
         self.start("recover")
         recovered = self.wait_app("recovered")
+        delivery = self.app_json("original-delivery-result")
+        if delivery is not None:
+            self.result["delivery"] = delivery_diagnostic(delivery)
         if recovered["processId"] == first_pid or recovered.get("originalsRetained") is not True or recovered.get("recipientStayedOffline") is not True:
             raise ValueError("Original process recovery was not demonstrated")
         records = recovered.get("confirmed")

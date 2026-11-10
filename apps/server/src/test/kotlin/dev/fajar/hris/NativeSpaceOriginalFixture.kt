@@ -32,6 +32,28 @@ abstract class NativeSpaceOriginalFixture : NativeGatewaySdkFixture() {
         val createdAt: String,
     )
 
+    /** Real encrypted native registration API; the token is a fictional non-deliverable fixture. */
+    protected fun retainNativePush(owner: SdkOwner) {
+        val n = owner.native
+        val body = mapOf("platform" to "ANDROID", "token" to "fixture-fcm-${UUID.randomUUID()}")
+        val response =
+            n.fixture.browser.send(
+                HttpRequest.newBuilder(
+                        URI("http://127.0.0.1:$port/api/v1/auth/native/push-registration")
+                    )
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Authorization", "Bearer ${n.access}")
+                    .header("Content-Type", "application/json")
+                    .header("Idempotency-Key", UUID.randomUUID().toString())
+                    .PUT(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)))
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        assertEquals(200, response.statusCode())
+        assertTrue(response.body().length <= 16384)
+        assertEquals(0, json.readTree(response.body())["version"].asInt())
+    }
+
     protected fun originalRoom(sender: SdkOwner, recipient: SdkOwner, conversation: UUID): String {
         val at = clock.instant()
         val credential =

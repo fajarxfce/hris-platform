@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 05:06 UTC. Historical detail remains in
+Updated 10 November 2026, 05:26 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,35 +17,39 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 05:06 UTC
+## Mobile checkpoint — 10 November, 05:26 UTC
 
-Mobilebf644659 is pushed; its handoff records current work. Generic7a6fe534 has fully
-accepted hosted proof42749839268:9,985 tests,16 Swift checks,unsigned iOS host.
-Both portable20231/Apple77499 audits are reaped,with exact source/artifact/case checks.
-After that acceptance the nine generic core files were applied unchanged to Starter.
-Starter check-full-1/session61949 is the only heavy local compiler,using pinned
-inspector742a2d1. Do not start another compiler/emulator until it is reaped.
-No Starter source acceptance or commit yet; no HRIS policy was copied.
+Mobile6954beff is pushed. Nineteen Kotlin files retain explicit SPACE message intent,
+encrypted active/terminal data,atomic command+wake,local queue/observation and owning
+DI. Focused6481 REAPED PASS382.076s:68 fresh cases (9 policy,15 queue,8 observation,
+17 SQLite,17 real browser,2 app DI),zero failures/errors/skips,Apple source and quality.
+Strict audit verifies4,677 frozen inputs/library and current/archive XML; source SHA
+0ff251cd3098f6097863d6a5745190c804ef1714badc6ab59c637e9789b398dc.
+Full-1/session16809 RUNNING is the only heavy local compiler; source is frozen.
+The source remains uncommitted until full acceptance. See Mobile's new public
+collaboration-space-messages.md for ownership,uncertain-readback,scheduling and
+mixed-ledger boundaries. New native/worker/UI routing is not enabled. Inventory must
+include commands with no local binding before discharging recovery work.
 
-Command foundationb1adfd82 remains accepted locally202/full9,320. Fixed-ref control
-42758828055 is now RUNNING atb1adfd82,dispatch73995 reaped. Producer42753380451 is
-also RUNNING atd89e6b5d; do not redispatch/cancel either. Command audit depends on the
-producer artifact first. Receipt42745403043 remains fully accepted9,798.
+Initial17154/96716 failed new production/test generic inference before tests ran;
+both are reaped with logs/source retained. Explicit types were corrected without
+weakening assertions. Review also retains denial across transient session failures
+and full timestamp ordering across database reopen; both regression cases now pass.
 
-Mobile encrypted SPACE message storage focused54152 is REAPED PASS43 fresh cases
-(9 domain,16 SQLite,16 Chromium,2 DI),239.194s,zero failure/error/skip,Apple source and
-quality. All4,672 inputs and current/archive reports passed strict acceptance before
-further edits. Initial90715 failed a new fixture reader-name collision; only test
-reader names changed,no production/assertion workaround. Failed evidence remains.
+Starter30c4d72 is committed/pushed (61101 reaped) after independent full61949 passed
+588.178s,332 fresh/85 suites,zero failures/errors/skips,all three Android builds,lint,
+production web,iOS source,strict SBOM and quality. Source1,057/library49 fixed; new
+11 SQLite/11 browser cases,lint0errors/45existing advisories,SBOM366,three APK/26web
+files hashed. Its nine core files exactly match accepted Mobile7a6fe534 (hosted9,985).
+The next command foundation database-only patch passes dry apply but is NOT applied.
 
-Nineteen Mobile Kotlin files are now uncommitted: that storage plus local queue and
-observation usecases,22 new domain cases and owning-module DI. The additions are not
-yet compiled; formatter57528 passed/reaped. Next focused/full Mobile gates follow
-Starter61949. No new native/worker/UI route is enabled; complete mixed old/new ledger
-matching before exposing new organization sends. Explicit account/space identity stays
-separate from old company commands. Phone87 unchanged,release88 uninstalled. Availability
-question already pending; do not repeat it. Livee558a686/schema116.4/readinessON/groupOFF,
-no backend source/schema/DI change. All54 PRD groups remain open; continue delivery.
+Producer42753380451 portable29517 is REAPED PASS7,292;command42758828055 portable93083
+is REAPED PASS7,318. Digests/CRC/source/predecessor cases verified. Both Apple jobs
+remain running; do not redispatch/cancel. Producer expected2,717Apple,command2,730,
+each16Swift+unsignedhost. Mobile handoff has exact artifacts and continuation scripts.
+Phone87 unchanged; ADB62446 reaped timeout15s around05:21. Availability question already
+pending; do not repeat. No backend source/schema/DI/live change; live remains
+ e558a686/schema116.4/readinessON/groupOFF. All54 PRD groups remain open; continue work.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

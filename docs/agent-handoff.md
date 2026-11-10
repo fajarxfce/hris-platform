@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 14:05 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:36 UTC. Follow AGENTS.md. Prior details are retained in
 [35c03f9d](https://github.com/fajarxfce/hris-platform/blob/35c03f9d/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -8,40 +8,32 @@ with pushes and validated phone updates. All54 acceptance groups remain open. No
 Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
-Current accepted Mobilef64e47136a309453ab9d6ea67993ed8e5200b611 binds exact acquired events
-to the installed physical runtime; its full47121 passes10203 local cases. Native proof
-5b15c2fe passes1case/125.992s, preserving encrypted original/edit/redaction/missing-key
-facts across adoption. It reproduced Company Storage and Space Unexpected failures at
-an edit head. Group9d072639's follow-up trace passes136.487s and identifies one context503
-with collaboration_provider_invalid_response. These are accepted reproductions, not a fixed
-production reader. No employee phone or live server was changed.
+Current repair accepted: this commit ports the exact Group82f2c817 protocol mapper and its
+10-case regression. Original full1/49822 REAPED PASS23/158.561s,8,293fixedsources,
+manifest1c51f7464333dcbb1de03e8e927875809384746c72d600cd43a228c286796ce7. API/worker
+bootJARs and format/architecture pass. Strict audit preserves all applicable previous case
+identities. Initial24 expectation included an unported Group-only namespace case; Original's
+unchanged transport test has2, so23actual. No test weakened. [Contract](collaboration/room-redaction-mapping.md).
 
-Current Group3UNCOMMITTED files fix valid redacted encrypted events and retain matched
-redaction metadata plus own transactions. Green2/91392 REAPED PASS42/137.027s,8,740stable
-inputs,all12suites and prior case identities preserved; format/architecture/server fixture
-compilation pass. Strengthened native fixture now requires both windows Success and zero5xx.
-Native revalidation waits for the Mobile fix. Group6d47a49f docs push26663 is REAPED.
+Mobile6334c0c4 pushed78047 REAPED accepts14Kotlin history-anchor/proof files: focused176 and
+full10224=8205fresh+2019exact reused. Group native-fixed3/5268 REAPED PASS3/214.303s; both
+Company/Space windows Success, original/edit hashes/identity preserved, zero5xx. Two finite
+missing-anchor reads added; existing original/mixed process-loss/offline controls preserve
+transactions with exactly2/3 provider events. SDK6/source/APK fingerprints match; emulator
+stopped. Group6f7c7380 push58321 REAPED publishes final native evidence.
 
-Mobile14Kotlin files are UNCOMMITTED/frozen in focused2/36860 RUNNING,176expected. It keeps
-raw anchor provenance separate from original ACKs, preserves the complete surrounding
-window, uses the API failure boundary, and rechecks current Company publication. First
-focused1/53935 failed only the new fixture's hardcoded anchor expectation; 45cases/1failure,
-92.595s,exact candidate archived. Independent fixture expectation is corrected; current45
-domain cases pass,remaining host/older-history/browser/quality checks continue. One3GiB
-Mobile compiler,no emulator. Next full10224expected and the actual SDK6 regression.
+Next stage exact accepted JARs as API/worker images, preserve rollback images and activate
+without migrations. Live e558a686/schema116.4/readinessON/groupOFF remains unchanged until
+separate recorded activation. Only application delta from live is the protocol mapper;
+previously accepted recovery verifier tools are not runtime code. No Group schema/DI change.
 
-Original's CollaborationDirectRoomEventMapping is byte-identical to the pre-fix Group
-mapper (SHA484969ff5197ba342b80b14529370f00b077aca60a00f24b41848fa8d4cedfac). After final
-native acceptance, port that protocol fix and its regression tests here, validate existing
-Company sync/history, and prepare the live-compatible server update without group schemas.
-Original has no code change yet. Keep live e558a686/schema116.4/readinessON/groupOFF intact.
-
-Hosted classifier42819170095 COMPLETE11295plus16Swift/unsignedhost; Apple63577 and prior
-portable1908 are reaped/audited. Runtime42824039795 portable49173 passes8201; Apple still
-running. No native Apple Matrix implementation claim. Current Mobilec08cf834 push55285 is
-REAPED; Mobile/Group handoffs own current exact commands and results. ADB64277 timed out15s
-at14:00; phone87 remains last known,88uninstalled. INSTALL-ONLY and the existing availability
-question remain. No generic Starter delta, SDK artifact change or new phone build.
+Mobile75d32436 push33996 REAPED publishes runtime42824039795 COMPLETE/audited11330 plus
+16Swift/unsignedhost; Apple45856 REAPED. New6334c0c4 hosted42835309631 is RUNNING, expected
+11359=8222portable+3137Apple plus16Swift/host; ref40325/dispatch42308 REAPED. This does not
+implement native Apple Matrix. Phone87 remains last known,88uninstalled,89unbuilt. Latest
+ADB87583 timeout15s(REAPED). Existing availability question stays pending; INSTALL-ONLY.
+No live/phone/SDK/Starter change. Continue bounded Space incoming retention/progress and the
+full communications PRD; all54 acceptance groups remain open.
 
 Predecessor hosted controls are COMPLETE and strictly audited: history42808577683=11145,
 edits42811675228=11196, raw source42815332867=11211; each also16Swift/unsignedhost.

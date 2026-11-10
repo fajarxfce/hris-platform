@@ -1,0 +1,30 @@
+{
+  "startedAt": "2026-11-10T14:31:37.341366+00:00",
+  "elapsedSeconds": 158.561,
+  "counts": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sourceFiles": 8293,
+  "sourcesUnchanged": true,
+  "sourceManifestSha256": "1c51f7464333dcbb1de03e8e927875809384746c72d600cd43a228c286796ce7",
+  "exactGroupMapperAndTests": true,
+  "groupCaseIdentitiesPreservedExceptUnportedSpaceNamespace": true,
+  "expectedCountCorrection": "Planned24 included the Group-only fresh HRISG namespace case. Original unchanged MatrixSyncTransportTest has two cases, not three; the applicable gate has23. No test was removed or changed.",
+  "artifacts": {
+    "api": {
+      "path": "apps/server/build/libs/apps-server.jar",
+      "bytes": 98863606,
+      "sha256": "454f8664ffd5d1b4dd25b1861ca2e21aecf7d88aba0cffc13d7bdcf2c5852fc4"
+    },
+    "worker": {
+      "path": "apps/worker/build/libs/apps-worker.jar",
+      "bytes": 78941059,
+      "sha256": "050a0aeb8769fff286531ac34b9570224b6543c3eaaaf376f97884219a10434c"
+    }
+  },
+  "liveChanged": false,
+  "phoneInstalled": false
+}

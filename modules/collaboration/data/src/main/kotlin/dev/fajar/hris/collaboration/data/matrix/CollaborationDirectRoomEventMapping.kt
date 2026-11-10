@@ -35,8 +35,17 @@ fun mapCollaborationDirectRoomEvent(
     if (type == "m.room.message") throw MatrixResponseException()
     if (type !in states && type != "m.room.encrypted" && type != "m.room.redaction") return null
     if (stripped && type !in states) throw MatrixResponseException()
+    val redactionEvent = if (type == "m.room.redaction") redaction(value, pair, roomId) else null
     val content = value.path("content")
     objectNode(content)
+    val unsigned = if (stripped) eventJson.createObjectNode() else optionalObject(value, "unsigned")
+    val because =
+        if (unsigned.has("redacted_because"))
+            redaction(unsigned.path("redacted_because"), pair, roomId).also {
+                val target = (it["content"] as Map<*, *>)["redacts"] ?: it["redacts"]
+                if (target != text(value, "event_id", 255)) throw MatrixResponseException()
+            }
+        else null
     if (type in states) {
         if (!value.path("state_key").isString) throw MatrixResponseException()
         if (type == "m.room.member") {
@@ -60,13 +69,16 @@ fun mapCollaborationDirectRoomEvent(
         throw MatrixResponseException()
     if (
         type == "m.room.encrypted" &&
-            (content.path("algorithm").asString() != "m.megolm.v1.aes-sha2" ||
-                !content.path("ciphertext").isString ||
-                content.path("ciphertext").asString().length !in 1..1_048_576)
+            (if (because != null) !content.isEmpty
+            else
+                content.path("algorithm").asString() != "m.megolm.v1.aes-sha2" ||
+                    !content.path("ciphertext").isString ||
+                    content.path("ciphertext").asString().length !in 1..1_048_576)
     )
         throw MatrixResponseException()
     val result =
         linkedMapOf<String, Any>("type" to type, "sender" to sender, "content" to map(content))
+    redactionEvent?.get("redacts")?.let { result["redacts"] = it }
     if (value.has("state_key")) result["state_key"] = value.path("state_key").asString()
     if (!stripped) {
         result["event_id"] =
@@ -77,15 +89,50 @@ fun mapCollaborationDirectRoomEvent(
         if (!time.isIntegralNumber || !time.canConvertToLong() || time.asLong() < 0)
             throw MatrixResponseException()
         result["origin_server_ts"] = time.asLong()
-        val unsigned = optionalObject(value, "unsigned")
         val txn = unsigned.path("transaction_id")
+        val retained = linkedMapOf<String, Any>()
         if (sender == ownUser && txn.isString && txn.asString().length in 1..128)
-            result["unsigned"] = mapOf("transaction_id" to txn.asString())
+            retained["transaction_id"] = txn.asString()
+        if (because != null) retained["redacted_because"] = because
+        if (retained.isNotEmpty()) result["unsigned"] = retained
     }
     return result
 }
 
 private val eventJson = JsonMapper.builder().build()
+
+/** A single protocol event; never recurse through nested unsigned metadata. */
+private fun redaction(value: JsonNode, pair: Set<String>, roomId: String): Map<String, Any> {
+    objectNode(value)
+    if (text(value, "type", 128) != "m.room.redaction") throw MatrixResponseException()
+    val sender = text(value, "sender", 255)
+    if (sender !in pair || (value.has("room_id") && value.path("room_id").asString() != roomId))
+        throw MatrixResponseException()
+    val id = text(value, "event_id", 255)
+    if (!id.startsWith('$')) throw MatrixResponseException()
+    val content = value.path("content")
+    objectNode(content)
+    val modern = if (content.has("redacts")) text(content, "redacts", 255) else null
+    val legacy = if (value.has("redacts")) text(value, "redacts", 255) else null
+    val target = modern ?: legacy ?: throw MatrixResponseException()
+    if (
+        !target.startsWith('$') ||
+            target == id ||
+            (modern != null && legacy != null && modern != legacy)
+    )
+        throw MatrixResponseException()
+    val time = value.path("origin_server_ts")
+    if (!time.isIntegralNumber || !time.canConvertToLong() || time.asLong() < 0)
+        throw MatrixResponseException()
+    return linkedMapOf<String, Any>(
+            "type" to "m.room.redaction",
+            "sender" to sender,
+            "event_id" to id,
+            "origin_server_ts" to time.asLong(),
+            "content" to map(content),
+        )
+        .also { if (legacy != null) it["redacts"] = legacy }
+}
 
 private fun map(node: JsonNode): Map<String, Any> =
     eventJson.convertValue(node, object : TypeReference<Map<String, Any>>() {})

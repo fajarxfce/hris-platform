@@ -200,6 +200,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             val recovered = waitFor(directory, "recovered", process)
             assertTrue(recovered["groupTaskCompleted"].asBoolean())
             assertTrue(recovered["progressAndWakeCompleted"].asBoolean())
+            assertTrue(recovered["idleRecoveryCompleted"].asBoolean())
             assertTrue(recovered["recoveredWithoutNewControl"].asBoolean())
             val actualEvents = provider.encryptedRoomEvents(room, sender.session.getValue("userId"))
             assertOriginalReceipts(ids, staged, recovered, actualEvents)
@@ -217,7 +218,9 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             Thread.sleep(1_000)
             assertEquals(sdkRequests, matrixTrace.snapshot())
             assertEquals(requests, trace.snapshot())
-            assertTrue(requests.getOrDefault("directTransport", 0) in 2..3)
+            // Interrupted original, then recovered original; an explicit fresh idle sweep
+            // must complete locally without another direct transport request.
+            assertEquals(2, requests.getOrDefault("directTransport", 0))
             assertEquals(1, requests["bootstrapReplay"])
             assertEquals(1, requests["registration"])
             assertTrue(requests.getOrDefault("requests", 0) in 8..64)
@@ -241,6 +244,8 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
                     "actualGroupControl" to true,
                     "consumerReplayDeduplicated" to true,
                     "claimedBeforeDelivery" to true,
+                    "idleRecoveryCompleted" to true,
+                    "idleSweepAdditionalDirectTransport" to 0,
                     "recoveredWithoutFcm" to true,
                     "groupKeyPublication" to
                         "Actual original worker publishes verified signed identity with transfer. One exact fixture registration/bootstrap replay seeds encrypted local setup; recovery reuses it. No fixture key upload or key-confirmation endpoint.",

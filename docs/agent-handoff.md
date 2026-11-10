@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 9 November 2026, 23:57 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 00:25 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -14,6 +14,37 @@ uses2560MiB/two cores; retained sender87 is stopped, the accepted isolated nativ
 installation and never launch, automate, uninstall or clear it. Crashlytics access
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
+
+## Accepted: skip idle original-room transport
+
+This increment adds a bounded read-only domain demand check before per-room delivery.
+SDK inventory,active commands,ACK journal and immutable completions must agree before
+the worker skips transport. ACK-before-Sent,missing proof,unsettled SDK originals and
+changed inventories remain work. Current local family/directory denial/runtime guards
+remain. No enqueue,resume,settlement,message projection or retirement occurs in this read.
+Global adopted sync is unchanged;producer wakes after final observations remain next.
+
+Focused89418 REAPED PASS170.44s:123 cases. Full48682 REAPED PASS483.891s:4,437 fresh
+plus20 exact reused proof cases,4,457 validated,zero failures/errors/skips. Required
+root/Android host+release/lint/shared Wasm+iOS/browser/proof/quality pass. Both4,633-input
+manifests and all current source/library/XML checks agree. Source gate34803 passes
+30.759s,8,733 stable backend inputs,format/architecture. Native77040 REAPED PASS
+203.279s:2 actual cases,zero failures/errors/skips. Group has2 provider
+events,24 native/16 Matrix requests,
+zero401/403/server errors;exactly2 required direct transport reads,and no additional
+direct transport for the explicit fresh idle sweep. Original scenario retains2 events/
+10 native requests. Manual scheduler,actual registered task;later offline Sent reads
+follow online recovery. No OS timing or phone/p95 claim.
+
+First focused99095 failed only the new8-page fixture assertion (worker limit4/turn).
+The corrected test verifies retained wake after turn one and completion after turn two;
+production was unchanged. Native gate passed first attempt for this increment. Failed
+prior native userdata remains retained. No compiler/emulator remains active.
+Private `.work/space-recovery-demand-2026-11-10` holds exact audits and runners.
+Proof APK150450270 bytes,SHA2d3e323b055123cbbfc3e17bbf1b375d59291be31994089fa19270434129115a.
+No product88,phone or live rollout. All54 PRD acceptance groups remain open.
+
+[Contract](collaboration/space-recovery-demand.md) and[measurement](measurements/collaboration-space-recovery-demand-2026-11-10.json).
 
 ## Accepted: actual organization recovery proof
 

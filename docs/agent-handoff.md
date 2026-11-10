@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 14:36 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:40 UTC. Follow AGENTS.md. Prior details are retained in
 [35c03f9d](https://github.com/fajarxfce/hris-platform/blob/35c03f9d/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -22,10 +22,19 @@ missing-anchor reads added; existing original/mixed process-loss/offline control
 transactions with exactly2/3 provider events. SDK6/source/APK fingerprints match; emulator
 stopped. Group6f7c7380 push58321 REAPED publishes final native evidence.
 
-Next stage exact accepted JARs as API/worker images, preserve rollback images and activate
-without migrations. Live e558a686/schema116.4/readinessON/groupOFF remains unchanged until
-separate recorded activation. Only application delta from live is the protocol mapper;
-previously accepted recovery verifier tools are not runtime code. No Group schema/DI change.
+Live API/worker90163c32500ff2fa005013eaf83b026d4bdcf5ff is accepted. Source push37657,
+stage91598 and final activation96306 are REAPED. Stage25.097s verifies both image JAR hashes;
+activation2 PASS25.060s: schema116.4,11confirmedpublications, environment/mounts/staticIPs/
+published ports and all other services unchanged. Localhost and WireGuard health pass.
+Worker readiness AND readiness control remain enabled; Group features remain disabled.
+[Rollout](measurements/collaboration-room-redaction-rollout-2026-11-10.json).
+
+First activation78190 REAPED failed29.600s on an overly strict dynamic-IP equality guard,
+then restored both olde558a686 images successfully. Docker's published ports followed the
+new IP automatically; no application failure. Final guard checks configured staticIPs and
+both real endpoints. Initial stage preflight also corrected its stale readiness-control-OFF
+assumption before image building. Both failures and scripts remain private and measured.
+No schema/key resets or employee messages. Old images/overlay are retained for rollback.
 
 Mobile75d32436 push33996 REAPED publishes runtime42824039795 COMPLETE/audited11330 plus
 16Swift/unsignedhost; Apple45856 REAPED. New6334c0c4 hosted42835309631 is RUNNING, expected

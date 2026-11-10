@@ -26,3 +26,16 @@ also in Git. Activation is separate and must retain schema116.4/readinessON/grou
 configuration and keys. The old API/worker images remain available for image-only rollback.
 
 [Measurement](../measurements/collaboration-room-redaction-mapping-2026-11-10.json).
+
+API and worker90163c32500ff2fa005013eaf83b026d4bdcf5ff are now active. Final activation
+passes in25.060s, preserving schema116.4, all11 confirmed key publications, environment,
+mounts, configured static addresses, published ports and other services. Localhost and
+WireGuard health both pass. Worker readiness and readiness control remain enabled.
+
+The first attempt automatically restored the old images after an overly strict check
+rejected a changed dynamic bridge address. Docker had correctly updated its published-port
+routing; no application failure was observed. The final attempt verifies the actual endpoints
+and configured static addresses. A prior staging guard also assumed the old readiness-control
+setting; its read-only preflight was corrected to preserve the current enabled setting.
+Old images remain tagged for image-only rollback. No migrations or employee messages ran.
+[Rollout measurement](../measurements/collaboration-room-redaction-rollout-2026-11-10.json).

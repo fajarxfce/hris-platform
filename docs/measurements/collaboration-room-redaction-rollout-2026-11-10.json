@@ -1,0 +1,70 @@
+{
+  "startedAt": "2026-11-10T14:39:21.108442+00:00",
+  "source": "90163c32500ff2fa005013eaf83b026d4bdcf5ff",
+  "success": true,
+  "migrationStarted": false,
+  "phoneTouched": false,
+  "newMessagesSent": 0,
+  "apps": {
+    "api": {
+      "container": "55074750c7fc50a18c7964066145721c9429740ff5d8ddbb2e77d959aa388bd7",
+      "image": "sha256:8b7416fa54cbede4058ed15758bcf8a7536273e1b9a155298ae61b0dedec6c6e"
+    },
+    "worker": {
+      "container": "49cce2e345ba28751a9a2ec6415c8342315fb58b0d1f7129a519d28566d9ff0e",
+      "image": "sha256:fc0f5024f8803c670eaf685952d85d4e196cd9feb06868a7471485778aea6775"
+    }
+  },
+  "apiHealthy": true,
+  "otherServicesUnchanged": true,
+  "environmentAndMountsUnchanged": true,
+  "staticAddressesAndPublishedPortsPreserved": true,
+  "wireguardEndpointHealthy": true,
+  "schemaUnchanged": true,
+  "confirmedPublicationsPreserved": 11,
+  "protectedConfigurationUnchanged": true,
+  "readinessAndControlEnabled": true,
+  "rollbackTags": {
+    "api": "hris-dev-api:before-room-redaction-20261110T143625",
+    "worker": "hris-dev-worker:before-room-redaction-20261110T143638"
+  },
+  "finalSchema": "116.4",
+  "elapsedSeconds": 25.06,
+  "priorAttempt": {
+    "startedAt": "2026-11-10T14:37:30.233432+00:00",
+    "source": "90163c32500ff2fa005013eaf83b026d4bdcf5ff",
+    "success": false,
+    "migrationStarted": false,
+    "phoneTouched": false,
+    "newMessagesSent": 0,
+    "failureCategory": "AssertionError",
+    "bothImagesRolledBack": true,
+    "finalSchema": "116.4",
+    "elapsedSeconds": 29.6,
+    "cause": "The guard required an unchanged dynamic Docker bridge address. Images rolled back successfully; published WireGuard/localhost ports remained healthy. Final checks preserve configured static addresses and verify both published endpoints."
+  },
+  "stagingPreflightCorrection": {
+    "at": "2026-11-10T14:36:24.089817+00:00",
+    "failedBeforeImageBuild": true,
+    "liveChanged": false,
+    "cause": "Copied November8 staging guard expected readiness control OFF. Read-only inventory confirms original e558a686 worker now has readiness control ON; API has no override. Preserve the current values and all rendered environment fields."
+  },
+  "artifacts": {
+    "api": {
+      "path": "apps/server/build/libs/apps-server.jar",
+      "bytes": 98863606,
+      "sha256": "454f8664ffd5d1b4dd25b1861ca2e21aecf7d88aba0cffc13d7bdcf2c5852fc4"
+    },
+    "worker": {
+      "path": "apps/worker/build/libs/apps-worker.jar",
+      "bytes": 78941059,
+      "sha256": "050a0aeb8769fff286531ac34b9570224b6543c3eaaaf376f97884219a10434c"
+    }
+  },
+  "gate": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

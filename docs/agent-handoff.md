@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 04:22 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 05:06 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,29 +15,35 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 04:51 UTC
+## Mobile checkpoint — 10 November, 05:06 UTC
 
-Mobile command foundationb1adfd820e5e560bf3d689a6bee09a88d1f67a9a is committed/pushed,
-with docsc2b47bd5. Full44596 is REAPED PASS939.564s:9,320 verified results including
-3,864 fresh+5,456 exact accepted reused,zero failure/error/skip. Focused202 actual
-SQLite/Chromium cases and all90 AppFlow cases pass; Android host/release/lint,
-Wasm/iOS source,browsers,proof APK/unit tests and quality pass. All4,660 inputs match
-SHAed60ebcb63b731cfbe898ae0f8e08f22edbc735352e0b7af3895ad3232cc74a1.
-No new native runtime/phone/live claim. Generic42749839268 portable7,276 is accepted
-(audit20231,artifact13735936500,SHA96d215a265827595459de3f048e529e0c49bea1a6323fd4d9ba9374c7376f053);
-Apple is building its host. Producer42753380451 is pending: do not supersede it.
-Once producer starts, dispatch command control on fixed branch
-validation/command-work-wakes-20261110 (b1adfd82,pushed22905), not moving work HEAD.
-No command hosted run dispatched yet. Receipt42745403043 remains fully accepted9,798.
+Mobilebf644659 is pushed; its handoff records current work. Generic7a6fe534 has fully
+accepted hosted proof42749839268:9,985 tests,16 Swift checks,unsigned iOS host.
+Both portable20231/Apple77499 audits are reaped,with exact source/artifact/case checks.
+After that acceptance the nine generic core files were applied unchanged to Starter.
+Starter check-full-1/session61949 is the only heavy local compiler,using pinned
+inspector742a2d1. Do not start another compiler/emulator until it is reaped.
+No Starter source acceptance or commit yet; no HRIS policy was copied.
 
-Current Mobile source is uncommitted encrypted SPACE message storage:13 files with
-explicit owned intent, immutable terminal proof, codec/repository,9 domain and16
-shared storage cases plus app DI assertions. Focused90715 runs on frozen source;
-one compiler/no emulator. No usecase/native/worker/UI activation yet. Next local
-queue/observation/usecase policy and full checks, then mixed-ledger delivery. Read
-Mobile handoff and .work/space-message-storage-2026-11-10 before starting jobs.
-Starter remains cleanffd0ac5; phone87 unchanged,release88 uninstalled. No backend
-source/schema/DI/live change. Earlier evidence below is historical, not active work.
+Command foundationb1adfd82 remains accepted locally202/full9,320. Fixed-ref control
+42758828055 is now RUNNING atb1adfd82,dispatch73995 reaped. Producer42753380451 is
+also RUNNING atd89e6b5d; do not redispatch/cancel either. Command audit depends on the
+producer artifact first. Receipt42745403043 remains fully accepted9,798.
+
+Mobile encrypted SPACE message storage focused54152 is REAPED PASS43 fresh cases
+(9 domain,16 SQLite,16 Chromium,2 DI),239.194s,zero failure/error/skip,Apple source and
+quality. All4,672 inputs and current/archive reports passed strict acceptance before
+further edits. Initial90715 failed a new fixture reader-name collision; only test
+reader names changed,no production/assertion workaround. Failed evidence remains.
+
+Nineteen Mobile Kotlin files are now uncommitted: that storage plus local queue and
+observation usecases,22 new domain cases and owning-module DI. The additions are not
+yet compiled; formatter57528 passed/reaped. Next focused/full Mobile gates follow
+Starter61949. No new native/worker/UI route is enabled; complete mixed old/new ledger
+matching before exposing new organization sends. Explicit account/space identity stays
+separate from old company commands. Phone87 unchanged,release88 uninstalled. Availability
+question already pending; do not repeat it. Livee558a686/schema116.4/readinessON/groupOFF,
+no backend source/schema/DI change. All54 PRD groups remain open; continue delivery.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

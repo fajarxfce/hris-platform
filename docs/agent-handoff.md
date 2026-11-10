@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 07:10 UTC. Historical detail remains in
+Updated 10 November 2026, 07:31 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,42 +17,42 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 07:10 UTC
+## Mobile checkpoint — 10 November, 07:31 UTC
 
-Mobilee99c71046079734113d6e95906137d22f0d125d4 is committed/pushed31291,reaped.
-Exact Space receipt projection and owning offline reconciliation preserve original
-intent/device/transaction/origin,immutable completion aliases,and exact CAS readback.
-Focused11486 REAPED PASS167.668s:76 fresh cases. Full16645 REAPED PASS640.612s:
-9,630 verified=7,611 fresh+2,019 exact accepted reused,zero failures/errors/skips.
-All90 AppFlow cases pass unchanged;4,701 source/library inputs stayed fixed. Auditors
-and publication passed. Initial43366 test-only generic compile failure is retained;
-only expected assertion types changed. No native or product routing was activated.
-Pinned validation/space-receipt-projection-20261110 and hosted42772661276 are RUNNING;
-ref34899/dispatch51514 reaped. Expected7,628portable+2,885Apple,16Swift,unsignedhost.
+Mobile [31a0ed9a](https://github.com/fajarxfce/hris-mobile/commit/31a0ed9ac4a9ab78ea5eec6edcc48643ec0b9934)
+is committed and pushed (32638 reaped). Distinct staging-only queue capability shares
+one raw installed writer acquisition while preserving the original-only lease API.
+Complete paused inventory, physical identity, cancellation and close/drain are covered.
+No owning staging usecase, product routing or actual FFI enqueue acceptance is claimed.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/31a0ed9a/docs/collaboration-space-message-queue-capability.md).
 
-Next Mobile source has nine UNCOMMITTED Kotlin inputs: distinct staging-only queue
-contract,Android wrapper,shared raw writer acquisition,explicit unsupported fallback,
-owning DI,13 host cases,two portable fallback cases andone acquisition regression.
-Focused-1/session60165 RUNNING as the ONLY heavy compiler; source FROZEN. Expected41
-fresh selected tests including unchanged original-only lease tests and app DI. No
-capability acceptance yet. No staging usecase,new product route or native delivery is
-implemented by this raw handle. Mobile .work/space-message-queue-capability-2026-11-10
-owns the runner. Follow Mobile's latest handoff for subsequent execution changes.
+Focused 60165 passes 41 fresh cases/408.119s. Full process 1200951 completed/audited:
+607.515s, 9,650 verified = 7,631 fresh + 2,019 exact accepted reused, no failures/errors/
+skips. All 90 AppFlow cases pass unchanged; 4,705 source inputs and library bytes fixed.
+Manifest 51fafe9eea915ed9ed581145341f1b9c4b981790f9a977b4d10e96eb33b06bac.
+Pinned control 42775719615 is running at that source (ref 34796/dispatch 87677 reaped),
+expected 7,648 portable + 2,887 Apple, 16 Swift and unsigned host. Actual Apple Matrix
+runtime binding remains unavailable; fallback/source tests do not prove native chat.
 
-Receipt42766554589 is COMPLETE:7,486portable+2,814Apple=10,300,16Swift,unsignedhost.
-Apple98580 is REAPED/audited,artifact13742850380 SHA0936bef0e3f545f2ecfb09c7a4e39e118bbe19a5ba5eca6cf1489b2ae4f743b8.
-Source/digest/CRC/predecessor identities verified. Mixed queue18e0d371 is locally accepted
-(focused70/full9,556);its pinned control42769825037 remains running. Message42763070460
-COMPLETE10,195,producer42753380451 COMPLETE10,009,command42758828055 COMPLETE10,048.
-Preserve current mixed/projection controls; do not redispatch completed proof.
+Next Mobile source has five uncommitted, FROZEN inputs: new SPACE-room queue provenance,
+typed matcher/reader, 13 regression cases and one fixture expectation. Focused 48502 is
+RUNNING as the only local heavy compiler; expected 96 fresh cases. No acceptance yet.
+Private Mobile .work/space-new-room-queue-2026-11-10 retains exact runners. Follow the
+[current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
+for subsequent changes. Next: owning staging, mixed delivery, full pending inventory,
+incoming routing/history, media, backups, calls and meetings. All 54 PRD groups stay open.
 
-Starter a7ff417c33cbbffb9b44a84e489a2fbce7be5bb2 remains accepted/pushed:15 exact generic
-command-wake files,358 fresh independent tests/all platform-source and distribution build
-gates. No Starter code WIP or compiler. New HRIS-specific policy is not a generic port.
-Phone87 unchanged,88 uninstalled;last ADB44597 timed out15s at06:45,reaped. Existing
-availability question stays pending. Live e558a686/schema116.4/readinessON/groupOFF
-unchanged. Continue staging+mixed native delivery,complete recovery inventory,incoming
-routing/media/backup/calls/meetings. All54 acceptance groups remain open.
+Projection e99c7104 local 9,630 is accepted; hosted 42772661276 is running. Mixed 18e0d371
+local 9,556 is accepted; 42769825037 portable 7,554 is audited, Apple host still running.
+Receipt 42766554589 is fully accepted 10,300 + 16 Swift/host; message 42763070460 is fully
+accepted 10,195 + 16 Swift/host. Preserve active controls; do not rerun accepted evidence.
+
+Starter source a7ff417c is accepted/pushed: 15 exact generic command-wake files, 358 fresh
+independent tests/all required build gates. No Starter source WIP/compiler. HRIS-specific
+policies stay in Mobile. Phone 87 unchanged, 88 uninstalled; ADB 14496 timed out after 15s
+at 07:28 and is reaped. Existing availability question stays pending. Announce installs,
+use install-only, never drive/clear phone UI. Live e558a686/schema116.4/readiness ON/group
+OFF is unchanged. Do not kill live JVMs or overlap a heavy compiler and emulator.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

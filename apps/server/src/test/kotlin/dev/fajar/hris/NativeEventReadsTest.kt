@@ -203,6 +203,9 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             assertTrue(result["passed"].asBoolean())
             assertTrue(result["cleanup"].asBoolean())
             val adopted = result["adopted"]
+            assertEquals("Success", staged["companyWindow"]["kind"].asString())
+            assertEquals("Success", adopted["spaceWindow"]["kind"].asString())
+            assertTrue(failureTrace.snapshot().isEmpty())
             assertEquals(events["latestEdit"].asString(), adopted["headEventId"].asString())
             assertEquals(staged["originalHash"].asString(), adopted["originalHash"].asString())
             assertEquals(staged["latestEditHash"].asString(), adopted["latestEditHash"].asString())

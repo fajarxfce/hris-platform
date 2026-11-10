@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 14:03 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:08 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -11,7 +11,7 @@ coordinate repositories/policy, repositories their own datasources, ViewModels s
 
 ## Current redaction and edit-head repair
 
-Group has3UNCOMMITTED files: CollaborationDirectRoomEventMapping, its new
+Group accepts3files in this commit: CollaborationDirectRoomEventMapping, its new
 MatrixRoomRedactionMappingTest, and stronger NativeEventReadsTest assertions. Root cause:
 valid redacted encrypted content is empty, but the mapper required ciphertext and discarded
 matched unsigned.redacted_because. The fix validates exact redaction target/actor/room/time,
@@ -28,8 +28,10 @@ windows Success and zero observed5xx; final native run has not executed yet.
 Mobile14Kotlin files in history-anchor-2026-11-10 preserve exact acquired anchors separately
 from original ACKs and correct SDK decoding failure classification. Focused1/53935 REAPED
 45cases/1test-fixture failure/92.595s: old fixture hardcoded the original anchor. Only its
-independent expectation was adjusted,all14exact failed-candidate files archived. Focused2/
-36860 RUNNING expected176,source frozen. One3GiB compiler,no emulator; no Group compilation
+independent expectation was adjusted,all14exact failed-candidate files archived. Focused2/36860 REAPED131cases/1test failure/185.786s: runCurrent did not wait for the real
+Default decoder before raw I/O. Only the new host test gained an explicit entered barrier;
+production source is unchanged and all14exact candidate files are archived. Focused3/71222
+RUNNING expected176,source frozen. One3GiB compiler,no emulator; no Group compilation
 may overlap. Next Mobile full10224expected,then isolated native regression with both final
 sources. Native runner must use this Group green2 source checkpoint and the new Mobile APK.
 

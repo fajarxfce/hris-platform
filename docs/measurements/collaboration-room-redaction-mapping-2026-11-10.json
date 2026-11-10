@@ -1,0 +1,36 @@
+{
+  "startedAt": "2026-11-10T13:59:08.196118+00:00",
+  "elapsedSeconds": 137.027,
+  "counts": {
+    "tests": 42,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sourceFiles": 8740,
+  "sourcesUnchanged": true,
+  "sourceManifestSha256": "d8eb6665b11f02b7eba65c22de06a39bb7fef2159773aa0d579599d8d5f91981",
+  "priorCaseIdentitiesPreserved": true,
+  "priorRegression": {
+    "elapsedSeconds": 45.413,
+    "tests": 9,
+    "failures": 5,
+    "errors": 0,
+    "skipped": 0
+  },
+  "firstRepair": {
+    "elapsedSeconds": 178.546,
+    "counts": {
+      "tests": 41,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "newProtocolCases": 10,
+  "existingCompanyAndSpaceCases": 32,
+  "nativeRevalidationPending": true,
+  "phoneInstalled": false,
+  "liveChanged": false,
+  "schemaChanged": false
+}

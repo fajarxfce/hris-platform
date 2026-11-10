@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 19:03 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 19:23 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -9,35 +9,31 @@ Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: u
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
 
-## Active mobile incoming source/request
+## Active mobile incoming completion/provider evidence
 
-Mobile storage795f11c2 committed/pushed,31792 REAPED. Focused84063 accepted118/290.724s;
-full82562 accepted10511=8492fresh+2019exact controls/644.393s,4810inputs,
-manifestc08386dad0b82bccc0d8b6e1f65d7d330bea8115ca018c72122aec21e14a7106.
-Encrypted document/checkpoint plus distinct incoming wake commit atomically;16real-store cases
-per SQLite/Chromium and root/platform/quality gates PASS. No product worker or phone behavior.
+Mobile source/request7e36df3f committed/pushed,36686 REAPED. Focused204/352.143s and
+full10565=8546fresh+2019exact controls/656.1s accepted.4814inputs,manifest
+4e8356861e4d1bb0238591bb3336c577fa646eeffbb279252dd0803d9d478979. Storage795f11c2 accepted
+focused118/full10511. Source coverage uses exact HMAC-indexed events, never pagination tokens;
+known idle/late/duplicate hints avoid redundant work and preserve newer queued generations.
 
-Current11Mobile source/request files are APPLIED/UNCOMMITTED and FROZEN under focused2/64580
-RUNNING. Expected204focused/10565full/4814inputs; full1 NOT STARTED. Private
-space-incoming-source-2026-11-10 owns exact candidate/base/prior reports/runners. Exact source
-lookup uses existing HMAC index and consistent checkpoint; incoming.head is a pagination token,
-not event ID. Owning Queue admits local account/directory/binding, excludes clean acquired hints,
-resumes Provider/Pending for known sources and preserves newer work against late old hints.
-Atomic wake/queue exact readback precedes scheduling; duplicate hints do not write/reschedule.
-21domain/6real-store new scenarios. Focused1/97107 failed only wrong-room test expectation;
-stronger existing room authentication is preserved. Added source/pending-index consistency check.
+Current13Mobile Kotlin files APPLIED/UNCOMMITTED/FROZEN under focused1/75627 RUNNING.
+Expected336focused/10649full/4821inputs; full1 NOT STARTED. Private completion folder owns
+exact base/candidate/prior reports/runners. New16completion/21phase/5acquisition cases; existing
+24acquisition cases preserved. Space acquisition gains typed runtime/traversal/origin/before/after
+with exact post-commit readback; Company summary unchanged. Pure receipt validation, admitted
+phase update and clean Pending-room completion preserve newer demand/rescan and incoming wake.
+DI and proof host typed-receipt assertions included. No product worker/hint/native change enabled.
 
-PRIVATE completion folder contains5UNAPPLIED Mobile files/16domain scenarios for clean captured
-room completion, DI and fixtures. No runner/source acceptance yet. Worker must serialize provider
-writes/completion. Next prove phase advancement with actual committed checkpoint, finite rescan
-claims and bounded incoming worker; use collapsed scheduling and the existing native parent.
+After focused/full acceptance, actual native4 must retain original/mixed2/3transactions and
+prior request budgets with immutableSDK6. Current changes add local I/O; measure before claiming
+native acceptance. No Group business/fixture code change yet. Then fair deferral, read owners,
+finite scan claims, bounded worker and parent-owned hints; reuse collapsed scheduler.
 
-Hosted6699/42865846045 COMPLETE11621+16Swift/unsignedhost, predates newer pending/storage/
-request increments. No new dispatch. Original native4/64426 remains accepted230.275s, emulator
-STOPPED; Mobile7174557d/Group0ce34b92 pushed. Original/mixed2/3controls remain exact. No Group
-business code change. ADB76668 timeout REAPED18:39; release89 NOT INSTALLED, phone87 last
-known. Install-only, no launch/reset/UI drive. Original live90163/schema116.4 unchanged; Group
-117–140 undeployed. SDK6/private originals/dirty worktrees preserved. All54PRD groups OPEN.
+ADB17704 timeout REAPED19:17; release89 NOT INSTALLED, phone87 last known. Install-only, no
+UI drive/reset. Hosted6699/42865846045 complete11621+16Swift/unsignedhost predates new work;
+no new dispatch. Original live90163/schema116.4 unchanged; Group117–140 undeployed. SDK6,
+private originals/stores and dirty SDK/Inspector preserved. All54PRD groups OPEN. No agents.
 
 ## Historical checkpoints
 

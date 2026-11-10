@@ -63,9 +63,10 @@ def staged_events(value):
 
 def retained_history(value, staged):
     flags = {"originalTextPreserved", "replacementTextPreserved", "originalSenderTombstone",
-             "noOriginalFactForEdit", "noSpaceSendWork"}
+             "noOriginalFactForEdit", "noSpaceSendWork", "physicalProviderPreserved", "providerExhaustedWithPending"}
     fields = flags | {"messages", "originalEventId", "replacementEventId", "redactedEventId",
-                      "originalHash", "replacementHash", "revisionHash"}
+                      "originalHash", "replacementHash", "revisionHash", "frontierHash", "pendingHash",
+                      "providerReferences", "pendingReferences"}
     if (not isinstance(value, dict) or set(value) != fields
             or any(value[n] is not True for n in flags)
             or type(value["messages"]) is not int or value["messages"] != 1):
@@ -76,13 +77,19 @@ def retained_history(value, staged):
                 "originalHash": staged["originalHash"], "replacementHash": staged["latestEditHash"]}
     if any(value[n] != v for n, v in expected.items()):
         raise ValueError("Incoming history changed original/replacement identity")
-    content_hash(value["revisionHash"])
+    for name in ["revisionHash", "frontierHash", "pendingHash"]:
+        content_hash(value[name])
+    if (type(value["providerReferences"]) is not int or not 5 <= value["providerReferences"] <= 50
+            or type(value["pendingReferences"]) is not int
+            or value["pendingReferences"] != value["providerReferences"] - 2):
+        raise ValueError("Provider coverage lost unresolved references")
     return dict(value)
 
 
 def incoming_history(value, staged):
-    if (not isinstance(value, dict) or set(value) != {"retained", "replayUnchanged", "originalJournalUnchanged"}
-            or value["replayUnchanged"] is not True or value["originalJournalUnchanged"] is not True):
+    if (not isinstance(value, dict) or set(value) != {"retained", "replayUnchanged", "originalJournalUnchanged", "providerPages"}
+            or value["replayUnchanged"] is not True or value["originalJournalUnchanged"] is not True
+            or type(value["providerPages"]) is not int or not 1 <= value["providerPages"] <= 4):
         raise ValueError("Incoming replay changed history or outgoing work")
     return {**value, "retained": retained_history(value["retained"], staged)}
 

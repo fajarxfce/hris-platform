@@ -14,12 +14,14 @@ class EventReadEvidenceTest(unittest.TestCase):
     def retained(self):
         return {"messages": 1, "originalEventId": "$original", "replacementEventId": "$latestEdit",
                 "redactedEventId": "$peer", "originalHash": "a" * 64, "replacementHash": "c" * 64,
-                "revisionHash": "d" * 64,
+                "revisionHash": "d" * 64, "frontierHash": "e" * 64, "pendingHash": "f" * 64,
+                "providerReferences": 8, "pendingReferences": 6,
+                "physicalProviderPreserved": True, "providerExhaustedWithPending": True,
                 **{n: True for n in ["originalTextPreserved", "replacementTextPreserved",
                                     "originalSenderTombstone", "noOriginalFactForEdit", "noSpaceSendWork"]}}
 
     def incoming(self):
-        return {"retained": self.retained(), "replayUnchanged": True, "originalJournalUnchanged": True}
+        return {"retained": self.retained(), "replayUnchanged": True, "originalJournalUnchanged": True, "providerPages": 2}
 
     def reopened(self):
         return {"processId": 125, "incoming": self.retained(), "sameRevision": True,
@@ -99,6 +101,34 @@ class EventReadEvidenceTest(unittest.TestCase):
                         {"redactedEventId": "$other"}, {"noSpaceSendWork": False}]:
             with self.subTest(changed=changed), self.assertRaises(ValueError):
                 reopened_history(self.reopened() | {"incoming": self.retained() | changed}, self.adopted())
+
+
+    def test_provider_progress_requires_exact_counts_and_independent_fingerprints(self):
+        for changed in [{"providerReferences": True}, {"providerReferences": 4}, {"providerReferences": 51},
+                        {"pendingReferences": True}, {"pendingReferences": 0}, {"pendingReferences": 7},
+                        {"frontierHash": "unsafe"}, {"pendingHash": "unsafe"}, {"cursor": "private"}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                retained_history(self.retained() | changed, self.staged())
+
+    def test_provider_exhaustion_cannot_claim_pending_resolution_or_relabel_original_device(self):
+        for changed in [{"physicalProviderPreserved": False}, {"physicalProviderPreserved": 1},
+                        {"providerExhaustedWithPending": False}, {"providerExhaustedWithPending": 1}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                retained_history(self.retained() | changed, self.staged())
+
+    def test_provider_pages_have_a_finite_integer_bound(self):
+        for count in [1,2,3,4]:
+            valid=self.incoming() | {"providerPages": count}
+            self.assertEqual(valid,incoming_history(valid,self.staged()))
+        for count in [0,5,-1,True,2.0,"2"]:
+            with self.subTest(count=count), self.assertRaises(ValueError):
+                incoming_history(self.incoming() | {"providerPages": count},self.staged())
+
+    def test_reopened_requires_identical_provider_frontier_and_pending_reference_identity(self):
+        for changed in [{"frontierHash": "a" * 64}, {"pendingHash": "a" * 64},
+                        {"providerReferences": 9, "pendingReferences": 7}, {"physicalProviderPreserved": False}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                reopened_history(self.reopened() | {"incoming": self.retained() | changed},self.adopted())
 
 
 if __name__ == "__main__":

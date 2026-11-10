@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 16:42 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 16:51 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -11,35 +11,43 @@ coordinate repositories/policy, repositories their own datasources, ViewModels s
 
 ## Current incoming frontier acceptance
 
-Mobile81d4a869 accepts15Kotlin storage files and is pushed2030(REAPED). Focused39028 PASS94/
-278.191s and full92521 PASS10353=8334fresh+2019exact reused/746.742s, all strictly audited.
-4787inputs,manifestba7fa2c4c67a7f13c6b12e341a03557281141f5e998433e8c91525dff2c757a6.
-It preserves Company byte frames/schemas1/2, adds Space schema3 with original provider identity,
-and keeps provider head/until separate from unresolved references and bounded pending passes.
-Provider wrapper6b445302 already accepted full10327/933.751s. No product incoming worker yet.
+[Contract](collaboration/space-frontier-native.md). Mobile product81d4a869 is accepted/pushed: provider6b445302 plus durable Space traversal.
+Product full92521 REAPED PASS10353 (8334fresh+2019exact accepted controls); focused39028
+PASS94. Company schemas1/2 and fixed authenticated frames are preserved; Space schema3 keeps
+original physical provider identity, separate provider positions and pending-reference progress.
+No automatic incoming product consumer is enabled.
 
-Current Group4fixture files and Mobile3proof files are APPLIED, UNCOMMITTED and FROZEN for
-actual native acceptance. Mobile proof-1/65046 is RUNNING; Group source compilation must WAIT
-until that job is reaped. Both space-frontier-native-2026-11-10 folders own exact candidate/,
-base-sources.json, files.json, runners and auditors. Group candidates pass35Pythoncases:
-13event(4new+9old)+22original/mixed controls. Group compilation expected8740inputs/zero JVM
-cases; native run expected3cases,2560MiB2core isolated emulator plus768MiBprecompiled harness,
-never another heavy compiler. No live service/phone/SDK change or new provider message.
+Current Mobile3 proof files and Group4 fixture files are ACCEPTED by actual SDK execution.
+Native26170 REAPED PASS3/212.283s; strict accept-native.py passes. Two provider pages,
+15references/13pending; identical encrypted progress and pending hashes reopen in another
+process without backend transport or a Space runtime. Matrix32=prior30+2pages, unchanged
+4encrypted/3sync/2secretStorage; native7/2direct transports. Both original/mixed recovery
+controls retain exactly2/3provider events, original transactions, offline recipient, process
+loss and offline Sent projection. No new original resend, SDK artifact, phone or live change.
+Mobileproof65046 PASS20/108.612s,4787inputs,manifest
+691332d8ec90383067691d29e9d3a63850ebb2725ca052cb5f41d88bad4b7a7e.
+Group1689 compile PASS81.671s/zero JVM cases,8740inputs,manifest
+6f472c7de2186ddac2cc5b7fb9b51a7bc096c463b7909d3e30120629cd7b0efb;
+35Python protocol cases pass. All sessions REAPED; owned emulator STOPPED. Current proof APK
+150634868B SHAde06e534ced74ac7e88a121340c75582cb85f9307edf4758f00610e5f51adaed.
+Both .work/space-frontier-native-2026-11-10 directories preserve exact candidates, reports,
+runners and strict accepted audits. No local heavy job remains.
 
-New request contract: providerPage trace equals app's1..4 bounded metadata pages; totalMatrix
-30+pages with unchanged4encrypted/3sync/2secretStorage. Native7/2direct transports. Exact
-physical identity, provider frontier and unresolved-reference hashes must survive another
-process after removing its backend reverse, with no Space runtime. Both existing original/mixed
-controls retain their provider events, transactions, offline recipient and local Sent reopen.
-Mobile proof base/20prior reports are captured. Apply no further source changes during gates.
-After proof acceptance compile this Group fixture, audit source, run/audit native, then commit
-and push both exact fixture increments. Update evidence and continue admitted provider-page
-usecase and independent incoming worker; all54 PRD groups remain OPEN.
+Next implement the owning admitted provider-page usecase, then independent incoming recovery:
+current parent/directory/binding/runtime around I/O; finite pages and event batches; durable
+rescan wake independent of outgoing work; unresolved references retried when keys arrive,
+including after provider exhaustion. SDK callbacks alone cannot cover process death. Preserve
+all prior original controls. All54 PRD acceptance groups remain OPEN; continue the long run.
+No generic Starter source delta or native Apple Matrix implementation is claimed.
 
-Incoming producte1ab hosted42849335674 portable is audited8316; Apple3184+16Swift/unsignedhost
-still RUNNING. Mobile handoff owns details. Release89 accepted/NOT INSTALLED; ADB62820 timed
-out15s(REAPED) near16:39. Phone87 last known; pending question retained. INSTALL-ONLY, no
-launch/reset/drive UI or replay of retained originals. LiveOriginal90163c32 schema116.4 unchanged.
+Hosted incoming producte1ab run42849335674 portable is audited8316; Apple3184+16Swift/unsigned
+host remains RUNNING. Mobile space-incoming-acquisition-2026-11-10/hosted-audit.py owns the
+remaining audit. No duplicate dispatch. Hosted source predates provider6b445/storage81d4;
+a later exact-product hosted validation remains necessary.
+
+Original live90163c32/API+worker schema116.4 unchanged. Release89 accepted/NOT INSTALLED;
+ADB62820 timed out15s(REAPED) near16:39. Phone87 last known; existing availability question
+stays pending. INSTALL-ONLY, announce installation, no launch/reset/drive UI or original resend.
 
 ## Current redaction and edit-head repair — accepted
 

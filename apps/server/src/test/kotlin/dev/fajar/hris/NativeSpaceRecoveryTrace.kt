@@ -40,6 +40,9 @@ class NativeSpaceRecoveryTrace : OncePerRequestFilter() {
         record("requests")
         when {
             request.requestURI.endsWith("/sync") -> record("sync")
+            request.requestURI.endsWith("/messages") &&
+                request.getParameter("dir") == "b" &&
+                request.getParameter("limit") == "20" -> record("providerPage")
             request.requestURI == "/_matrix/client/unstable/dev.fajar.hris/pusher" ->
                 record("managedPusher")
             request.requestURI.contains("/account_data/m.secret_storage.") ->

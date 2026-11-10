@@ -233,6 +233,18 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 staged["latestEditHash"].asString(),
                 incoming["retained"]["replacementHash"].asString(),
             )
+            val pages = incoming["providerPages"].asInt()
+            assertTrue(pages in 1..4)
+            assertEquals(pages, matrixTrace.snapshot()["providerPage"])
+            assertEquals(30 + pages, matrixTrace.snapshot()["requests"])
+            val retained = incoming["retained"]
+            assertTrue(retained["physicalProviderPreserved"].asBoolean())
+            assertTrue(retained["providerExhaustedWithPending"].asBoolean())
+            assertTrue(retained["providerReferences"].asInt() in 5..50)
+            assertEquals(
+                retained["providerReferences"].asInt() - 2,
+                retained["pendingReferences"].asInt(),
+            )
             assertEquals(2, trace.snapshot()["directTransport"])
             assertEquals("Success", staged["companyWindow"]["kind"].asString())
             assertEquals("Success", adopted["spaceWindow"]["kind"].asString())

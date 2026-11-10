@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 11:45 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 11:58 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -18,15 +18,27 @@ SHA9d0e7ddafdd92fbb784db8d9fb4478724cae21576d0d9eff15bc2e977f574996. No native r
 phone/live activation. Hosted42808577683 RUNNING exact0b84f0dc,expected11145+16Swift/host;
 source72460/ref82114/dispatch40835 reaped. Current Mobile handoff owns exact artifacts/gates.
 
-Current UNACCEPTED Space edit-storage7-file candidate is APPLIED in Mobile. Focused1/72288
-REAPED exit1/335.481s after94storage cases passed; DI test inferred-type compilation failed.
-Only that test changed to explicit assertSame<Any>; archived candidate/production bytes retained.
-Focused2/8330 REAPED PASS2fresh/115.724s plus iOS source/format/architecture/detekt. Strict
-repair audit verifies96total=94unchanged storage+2freshDI.4748inputs,manifest
-d7cf45325f9349e1fefbb8e0bbf7277ba865370b7501de33176ebb943759e45d. Full1/31487 RUNNING,
-expected10094; freeze source until reaped, then full audit/publish/commit/push. Prepared hosted
-11196 NOT dispatched. Private space-history-edits-2026-11-10 owns exact sources/gates; next
-finite original/edit acquisition review is design-only. No incoming stream or UI route yet.
+Latest accepted Mobile5da6cb95678f8e1493e245d42ac2a76f6f4d00ee is committed/pushed96465
+(REAPED).7Kotlin files add typed Space replacement storage without changing original identities,
+ordering, Company namespace or source. Focused1/72288 REAPED exit1/335.481s after94storage cases
+passed; DI test type inference failed. Only the assertion gained explicit<Any>; all7failed
+candidate files are archived. Focused2/8330 REAPED PASS2fresh/115.724s+iOSsource/format/arch/
+detekt; strict repair audit96verified=94unchanged storage+2freshDI. Full1/31487 REAPED PASS
+660.201s/10094=8075fresh+2019exact reused,zero failures/errors/skips. Strict full auditor/publisher
+pass.4748source/library inputs fixed,manifestd7cf45325f9349e1fefbb8e0bbf7277ba865370b7501de33176ebb943759e45d.
+Latest proofAPK150602468bytes SHA5ae67e42e3d0b6fc468d9a495e8395229178a85d428af5ce6fea9d87ef33b5c1.
+Hosted42811675228 RUNNING exact5da6cb95,expected11196+16Swift/host;source96465/ref10060/
+dispatch12225 REAPED. Storage42808577683 still running and is the exact hosted predecessor.
+No new native proof, phone install, live change or incoming/product route activated.
+
+Next raw-event acquisition review is design-only in Mobile space-original-acquisition-2026-11-10.
+Matrix provider head can be an edit while SDK timeline aggregates it onto an original; prove
+that boundary natively before reusing the current timeline-based original snapshot. Actual
+immutable SDK6 AAR/Javap confirms loadOrFetchRawEvent with json and explicit encryption status,
+preserving HRIS fields. That API availability is not native execution. Prefer owned raw event
+classification plus bounded replacement-target reads, retain originals/edits before progress,
+and keep local reads independent of acquisition. No next production source applied. Preserve
+dirty SDK tree; historical November6 consumer patch must not be reapplied blindly.
 
 Current Mobile native proof [2828b88b](https://github.com/fajarxfce/hris-mobile/commit/2828b88b4de8fd70c596375b8349e075ba173091)
 is committed/pushed78025 (REAPED). Four actual SDK6 cases pass269.304s in native1/45886,
@@ -76,9 +88,9 @@ Pending-inventory42792315555 COMPLETE10862+16Swift/host,Apple87521/reaped2996; c
 published65850051. Mixed-core10808,staging10676,new-room10574,capability10535,projection10513
 and earlier accepted controls remain in tracked measurements. Do not redispatch accepted runs.
 
-Mobile edit-storage full31487 is the only heavy job; emulator stopped. Never kill live API/worker JVMs. Phone10.77.77.3:5555 is INSTALL-ONLY:
-announce each install,never launch/drive/uninstall/clear UI/data. LastADB97574 timed out15s at
-11:17 and is reaped; existing availability question remains pending. Phone87 last known;
+All listed local gates are reaped; no heavy job or emulator running. Never kill live API/worker JVMs. Phone10.77.77.3:5555 is INSTALL-ONLY:
+announce each install,never launch/drive/uninstall/clear UI/data. LastADB80163 timed out15s near
+11:44 and is reaped; existing availability question remains pending. Phone87 last known;
 88uninstalled,latest89 not built. Preserve original keys/stores/messages and immutable SDK6;
 never resend retained originals or Draft66. Physical iPhone testing waiver does not waive
 Apple source/native runtime/push/call acceptance. Crashlytics IAM verified,do not ask again.

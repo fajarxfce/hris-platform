@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 14:33 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:48 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -25,14 +25,25 @@ original transactions and confirm exactly2/3 provider events with the recipient 
 process loss and subsequent offline restart remain covered. Emulator stopped; no compilation
 overlap or phone interaction. [Updated contract](collaboration/room-redaction-mapping.md).
 
-Original now has the exact mapper/test port and full1/49822 RUNNING,24expected Company
-history/sync/protocol cases plus quality and API/worker bootJARs. One2GiB compiler,no emulator.
-Next audit/commit/push that compatible port and prepare live activation without Group schemas.
-Live e558a686/schema116.4/readinessON/groupOFF unchanged. Phone87 last known,88uninstalled,
-89unbuilt,ADB64277 timeout at14:00; existing availability question and INSTALL-ONLY remain.
+Original90163c32/37a74bb9 are committed/pushed (37657/26149 REAPED). Company gate49822
+REAPED PASS23/158.561s, quality and both bootJARs. Initial24 prediction included Group-only
+namespace case; Original's unchanged transport test has2. Exact applicable cases preserved.
+Live API/worker90163c32 activation96306 REAPED PASS25.060s: schema116.4,11confirmedkeys,
+all environments/mounts/staticIPs/publishedports and other services preserved. Localhost and
+WireGuard healthy; readiness AND readiness-control ON,Group features OFF. First78190 attempt
+rolled back on overly strict dynamic-IP equality; final verifies configured staticIPs and actual
+published endpoints. No application failure/migration/message send. Old images remain tagged.
+
+Mobilef837897f push24066 REAPED is frozen for release89/44473 RUNNING from accepted6334c0c4
+sources. Private release-phone-2026-11-10-build89 owns build/lint/signature/SDK/byte audits and
+INSTALL-ONLY runner. One3GiB compiler,no emulator. Phone87 last known,88uninstalled,ADB87583
+timeout(REAPED); existing availability question remains. Do not drive phone or reset keys.
+Incoming retention planning is private under Mobile space-incoming-2026-11-10; source is not
+modified while release89 packages. It allows one target read, separate original/replacement
+facts, local targets before transport, explicit unresolved/redacted-original results, no EOF.
 
 Runtime hosted42824039795 COMPLETE/audited11330 plus16Swift/unsignedhost,Apple45856 REAPED.
-Current6334c0c4 hosted run still to dispatch. No native Apple Matrix implementation claim.
+Current6334c0c4 hosted42835309631 is RUNNING (expected11359+16Swift/host). No native Apple Matrix implementation claim.
 Next bounded Space incoming retention/progress and product integration; all54 PRD groups open.
 No generic Starter delta, SDK artifact change or new employee-phone message.
 

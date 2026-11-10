@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 12:29 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 13:06 UTC. Follow AGENTS.md. Prior details are retained in
 [35c03f9d](https://github.com/fajarxfce/hris-platform/blob/35c03f9d/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -8,51 +8,35 @@ with pushes and validated phone updates. All54 acceptance groups remain open. No
 Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
-Latest accepted Mobile99c7be198ecdab8dd9f6d8185de160dee184bdff adds internal raw-event I/O
-and15Android host cases; source push93173 REAPED. Focused2142 PASS26/191.306s; full92524
-PASS10109=3562fresh+6547exact accepted reused/597.577s,all reaped and strictly audited.
-4752source inputs fixed,manifest19fc3bd37896f5618a11df1a542e1fe78b75f8acff6a21d364d8a3d2bb22f036.
-Current proofAPK150602468B SHA5d0d280316aa07cb97644e28746bc6b8cec9a7274d39a28bb3d78c82d4e04cac.
-No SDK distribution/runtime binding/incoming activation/native execution/phone/live/Starter change.
-Hosted42815332867 RUNNING exact99c7be19,11211expected+16Swift/host; ref87991/dispatch78335
-REAPED. History42808577683 portable60998 REAPED8058/audited,Apple building host; edit42811675228
-still running. Current Mobile handoff owns exact artifacts and predecessor audit order.
+Latest accepted Mobile5c276a2fcc472260245ea56ba6db7b50c537bd59 is committed/pushed39983
+(REAPED). Typed event classification preserves original/edit/redaction/unresolved identity and
+actual SDK decryption. Focused49881 PASS105/302.286s; full34957 PASS10172=8153fresh+2019exact
+accepted reused/695.005s, all reaped/strictly audited.4755source inputs fixed,
+manifestf56484e626ceb0d012e9cca86f628150b7863dca87a3dc20ab6ed4ea7e69ff3c.
+Current proofAPK150605511B SHA24e8cef1c2319a00c2378495f9552f8a4c0f127cecdb86ff24edd64745ca685e.
+Hosted42819170095 RUNNING exact5c,11295expected+16Swift/unsignedhost. Ref67054/dispatch33180
+REAPED. No native equivalence, incoming activation, phone or live claim.
 
-Current UNACCEPTED Mobile work is3new Kotlin files for typed acquired-event classification and
-21common tests. Focused1/49881 RUNNING,105expected=(21new+7old original+7old edit)*Desktop/
-Androidhost/actualChromium,plusiOSsource/quality. No source edits during gate. Private Mobile
-raw-event-classification-2026-11-10 has runners/auditors/six prior mapper XML controls. Original/
-edit identities and SDK decryption stay distinct; a redaction actor only triggers a bounded
-target read, never establishes its original sender. Runtime parent ownership, actual native
-redaction equivalence and owning Space acquisition/persistence remain next. No new full gate yet.
+Current Mobile UNCOMMITTED14-file native integration owns finite raw reads under the existing
+parent/client and exact registry checks before/after I/O. Physical owner and logical Space wrapper
+stay distinct; no implicit SDK creation/sync/send. Adds15child-lifetime +4parent-integration host
+cases and4portable availability cases; existing DI/absent-runtime tests cover same instance/no I/O.
+Focused1/7075 RUNNING, source frozen,77expected; next full10203,4762source inputs. Not accepted.
+Private Mobile runtime-event-reads-2026-11-10 has exact list/runners/auditors. Mobile handoff
+fef96ccd is pushed36912(REAPED); it owns current work and gate outcomes.
 
-Accepted preceding Mobile history0b84f0dcc90969b36fb82b2cc7bb9416b6ed2c6d is committed/pushed
-72460(REAPED).14 Kotlin files add typed account/Space history storage and locally admitted
-observation with unchanged Company HMAC/AAD frames. Focused41593 REAPED PASS112/466.361s;
-full63357 REAPED PASS603.865s/10060=8041fresh+2019exact reused,zero failures/errors/skips.
-Strict auditors/publisher pass;4743source/library inputs fixed,manifest
-eb43c7e4cbf14e211a050ea90dd545cd0eff70a25b290e4b159fb5b470a3e26a. New proofAPK150602743bytes
-SHA9d0e7ddafdd92fbb784db8d9fb4478724cae21576d0d9eff15bc2e977f574996. No native repeat or
-phone/live activation. Hosted42808577683 RUNNING exact0b84f0dc,expected11145+16Swift/host;
-source72460/ref82114/dispatch40835 reaped. Current Mobile handoff owns exact artifacts/gates.
+Predecessor hosted controls are COMPLETE and strictly audited: history42808577683=11145,
+edits42811675228=11196, raw source42815332867=11211; each also16Swift/unsignedhost.
+Raw audits85411/96085 REAPED; complete measurement publishedfef96ccd. Previous complete
+history/edit measurements are retained in Git. Native Apple Matrix runtime remains missing.
+Do not rerun accepted gates or reapply the historical November6 SDK consumer patch.
 
-Accepted preceding Mobile5da6cb95678f8e1493e245d42ac2a76f6f4d00ee is committed/pushed96465
-(REAPED).7Kotlin files add typed Space replacement storage without changing original identities,
-ordering, Company namespace or source. Focused1/72288 REAPED exit1/335.481s after94storage cases
-passed; DI test type inference failed. Only the assertion gained explicit<Any>; all7failed
-candidate files are archived. Focused2/8330 REAPED PASS2fresh/115.724s+iOSsource/format/arch/
-detekt; strict repair audit96verified=94unchanged storage+2freshDI. Full1/31487 REAPED PASS
-660.201s/10094=8075fresh+2019exact reused,zero failures/errors/skips. Strict full auditor/publisher
-pass.4748source/library inputs fixed,manifestd7cf45325f9349e1fefbb8e0bbf7277ba865370b7501de33176ebb943759e45d.
-Historical edit-gate proofAPK150602468bytes SHA5ae67e42e3d0b6fc468d9a495e8395229178a85d428af5ce6fea9d87ef33b5c1.
-Hosted42811675228 RUNNING exact5da6cb95,expected11196+16Swift/host;source96465/ref10060/
-dispatch12225 REAPED. Storage42808577683 still running and is the exact hosted predecessor.
-No new native proof, phone install, live change or incoming/product route activated.
-
-Matrix provider head can be an edit while the SDK timeline aggregates it onto an original.
-Raw I/O is now locally accepted; classification is under test above. Native equivalence and
-owned repository acquisition remain next before activating incoming progress. Preserve the
-dirty SDK tree; historical November6 consumer patches must not be reapplied blindly.
+Next prove actual encrypted original/edit-at-head/redacted-target/missing-key behavior through
+public repository capabilities. The existing Company/Space ACK reader must also handle an edit
+head absent from its presentation timeline, using explicit acquired provenance; never weaken
+checks or relabel edit IDs as originals. Then own bounded incoming retention/progress. Preserve
+current immutable SDK6, dirty SDK source tree, Company namespace and offline local facts.
+No generic Starter delta and no live server/schema change.
 
 Current Mobile native proof [2828b88b](https://github.com/fajarxfce/hris-mobile/commit/2828b88b4de8fd70c596375b8349e075ba173091)
 is committed/pushed78025 (REAPED). Four actual SDK6 cases pass269.304s in native1/45886,
@@ -102,7 +86,7 @@ Pending-inventory42792315555 COMPLETE10862+16Swift/host,Apple87521/reaped2996; c
 published65850051. Mixed-core10808,staging10676,new-room10574,capability10535,projection10513
 and earlier accepted controls remain in tracked measurements. Do not redispatch accepted runs.
 
-Mobile classification focused49881 is RUNNING; older gates are reaped and emulator stopped. Never kill live API/worker JVMs. Phone10.77.77.3:5555 is INSTALL-ONLY:
+Mobile runtime event focused7075 is RUNNING; older gates are reaped and emulator stopped. Never kill live API/worker JVMs. Phone10.77.77.3:5555 is INSTALL-ONLY:
 announce each install,never launch/drive/uninstall/clear UI/data. LastADB82255 timed out15s near
 12:14 and is reaped; existing availability question remains pending. Phone87 last known;
 88uninstalled,latest89 not built. Preserve original keys/stores/messages and immutable SDK6;

@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 9 November 2026, 23:59 UTC. Historical detail remains in
+Updated 10 November 2026, 00:27 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -16,6 +16,44 @@ uses2560MiB/two cores. Both the retained sender and isolated proof AVD are stopp
 installation and never launch, automate, uninstall or clear its app. Crashlytics IAM
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
+
+## Current: local demand accepted; product release88 building
+
+Mobile[6a8b4f61](https://github.com/fajarxfce/hris-mobile/blob/6a8b4f61/docs/collaboration-space-recovery-demand.md)
+and Group[7ae66f89](https://github.com/fajarxfce/hris-platform/blob/7ae66f89/docs/collaboration/space-recovery-demand.md)
+are accepted/pushed;5984/82129 reaped. The new owning read checks complete local SDK
+inventory plus commands,ACK journal and immutable completions before skipping per-room
+transport. It never sends,settles,projects or retires. Pending/changed facts remain work;
+local ownership,denial and runtime guards remain. Global device sync is unchanged.
+
+Focused89418 passes123 cases/170.44s. Full48682 passes483.891s:4,437 fresh cases plus
+20 exact reused proof results,4,457 validated,zero failures/errors/skips. Required root,
+Android host/release/lint,shared Wasm+iOS source/browser/proof/quality pass.4,633 matching
+Mobile inputs and all source/library/XML hashes are verified. Source34803 passes30.759s,
+8,733 backend inputs,format/architecture. Only one backend test changed.
+Native77040 passes203.279s:2 actual cases. Original scenario2 events/10 native requests.
+Group2 events,24 native/16 Matrix requests,zero401/403/server errors. Exactly2 required
+direct transport reads;an explicitly requested fresh idle sweep adds no direct read.
+Original ACK/process loss/transaction/dedup/offline checks remain. Manual scheduler,
+later offline reads after reconnect;no OS timing/phone/p95 claims. Emulator stopped.
+First focused candidate failed one new8-page fixture assertion against4-page turns;
+corrected test verifies both turns,without changing production behavior.
+
+The only heavy job is Mobile release88 packaging51256 under
+`.work/release-phone-2026-11-10-build88`,source6a8b4f61,ARM64/nondebuggable devRelease,
+existing signer. Product inputs frozen. Reap it,verify manifest/signature/SDK/lint/source
+and acceptance before install-only. Announce before installation. Phone87 remains
+installed;latest bounded ADB connect95924 timed out. No phone UI or data was touched.
+No live group/schema change. No new compiler/emulator until packaging reaps.
+
+Hosted42721024887 still pins efa700bb:portable6,940 accepted;Apple test step passed,
+unsigned application host build still running/unaccepted. Do not redispatch or claim
+it covers demand/native successors. Next source work is group push receiver/background
+routing plus producer handoff and new SPACE enqueue/product integration. Read-only
+trace confirms Mobile only accepts collaboration.chat_available/companyId today,
+while server sends collaboration.space_chat_available/spaceId. Preserve explicit
+scope separation;quiet group packets request durable recovery and never grant display.
+All54 PRD groups remain open. Historical gates below are completed and do not own jobs.
 
 ## Original-key worker publication accepted
 

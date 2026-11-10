@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 06:46 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 07:10 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,39 +15,42 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 06:46 UTC
+## Mobile checkpoint — 10 November, 07:10 UTC
 
-Mobile18e0d371b68e3e36c3be5bfdb1b91eb3e439de99 is committed/pushed72891,reaped.
-Typed whole native queue matching keeps Company/Space ledgers separate and validates
-all originals before publishing a bounded local snapshot. Focused19427 passes70;
-full91322 REAPED PASS662.207s:9,556 verified=7,537 fresh+2,019 exact accepted reused,
-zero failures/errors/skips. Strict current/archive/source/library audits pass4,695
-fixed inputs. No native, worker or product routing activation.
-Control42769825037 pins18e0d371 on validation/mixed-original-queue-20261110;
-ref94349/dispatch1269 reaped. Expected7,554 portable+2,848 Apple,16Swift,unsigned host.
+Mobilee99c71046079734113d6e95906137d22f0d125d4 is committed/pushed31291,reaped.
+Exact Space receipt projection and owning offline reconciliation preserve original
+intent/device/transaction/origin,immutable completion aliases,and exact CAS readback.
+Focused11486 REAPED PASS167.668s:76 fresh cases. Full16645 REAPED PASS640.612s:
+9,630 verified=7,611 fresh+2,019 exact accepted reused,zero failures/errors/skips.
+All90 AppFlow cases pass unchanged;4,701 source/library inputs stayed fixed. Auditors
+and publication passed. Initial43366 test-only generic compile failure is retained;
+only expected assertion types changed. No native or product routing was activated.
+Pinned validation/space-receipt-projection-20261110 and hosted42772661276 are RUNNING;
+ref34899/dispatch51514 reaped. Expected7,628portable+2,885Apple,16Swift,unsignedhost.
 
-The next Mobile increment has eight UNCOMMITTED Kotlin inputs: exact Space completion
-and receipt projection policy, local CAS/readback reconciliation,37 domain cases and
-owning singleton DI. No sender, archive or journal retirement is activated. Focused-1
-session43366 is the ONLY heavy local job, source FROZEN. Desktop production compilation
-passes; three new test assertions need explicit Kotlin generic types. The continuing
-check must finish/reap before fixing those declarations; do not edit frozen inputs.
-Mobile .work/space-receipt-projection-2026-11-10 owns runner and failure logs.
+Next Mobile source has nine UNCOMMITTED Kotlin inputs: distinct staging-only queue
+contract,Android wrapper,shared raw writer acquisition,explicit unsupported fallback,
+owning DI,13 host cases,two portable fallback cases andone acquisition regression.
+Focused-1/session60165 RUNNING as the ONLY heavy compiler; source FROZEN. Expected41
+fresh selected tests including unchanged original-only lease tests and app DI. No
+capability acceptance yet. No staging usecase,new product route or native delivery is
+implemented by this raw handle. Mobile .work/space-message-queue-capability-2026-11-10
+owns the runner. Follow Mobile's latest handoff for subsequent execution changes.
 
-Messages42763070460 COMPLETE10,195 (2,779 Apple)+16Swift,unsignedhost; all artifacts
-and predecessor case identities audited. Receipt42766554589 portable7,486 audited,
-Apple still running(expected2,814). Preserve receipt and mixed controls; do not redispatch.
-Producer42753380451 COMPLETE10,009 and command42758828055 COMPLETE10,048 accepted.
+Receipt42766554589 is COMPLETE:7,486portable+2,814Apple=10,300,16Swift,unsignedhost.
+Apple98580 is REAPED/audited,artifact13742850380 SHA0936bef0e3f545f2ecfb09c7a4e39e118bbe19a5ba5eca6cf1489b2ae4f743b8.
+Source/digest/CRC/predecessor identities verified. Mixed queue18e0d371 is locally accepted
+(focused70/full9,556);its pinned control42769825037 remains running. Message42763070460
+COMPLETE10,195,producer42753380451 COMPLETE10,009,command42758828055 COMPLETE10,048.
+Preserve current mixed/projection controls; do not redispatch completed proof.
 
-Starter a7ff417c33cbbffb9b44a84e489a2fbce7be5bb2 committed/pushed:exact15 generic files
-match Mobileb1adfd82. Full32816 passes358 fresh/87suites,all Android/web/iOS-source/SBOM/
-quality,source1,061/library49 unchanged. No Starter WIP or compiler. Application-specific
-Space projection stays in Mobile. Continue mixed native delivery,explicit new-message
-capability,complete command inventory,incoming routing/media/backup/calls/meetings.
-
-Phone87 unchanged,release88 uninstalled. ADB44597 timed out15s around06:45,reaped;
-availability question is already pending. Live e558a686/schema116.4/readinessON/groupOFF
-unchanged. All54 PRD acceptance groups remain open. Continue after checkpoints.
+Starter a7ff417c33cbbffb9b44a84e489a2fbce7be5bb2 remains accepted/pushed:15 exact generic
+command-wake files,358 fresh independent tests/all platform-source and distribution build
+gates. No Starter code WIP or compiler. New HRIS-specific policy is not a generic port.
+Phone87 unchanged,88 uninstalled;last ADB44597 timed out15s at06:45,reaped. Existing
+availability question stays pending. Live e558a686/schema116.4/readinessON/groupOFF
+unchanged. Continue staging+mixed native delivery,complete recovery inventory,incoming
+routing/media/backup/calls/meetings. All54 acceptance groups remain open.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 02:50 UTC. Historical detail remains in
+Updated 10 November 2026, 03:39 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,19 +17,36 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Current Mobile integration — 10 November, 03:04 UTC
+## Current Mobile integration — 10 November, 03:39 UTC
 
-Mobile4ad82a5d records UNCOMMITTED atomic replica+wake source and frozen full38641.
-Read its active handoff before starting a compiler. The new raw SQLite/IDB mutation
-passes22actual focused cases; one same-current-generation regression fails when its
-guard is removed. No Starter port yet; its original four files equal the accepted
-Mobile base. Current full root/Android/Wasm/iOS/proof/quality gate remains running.
+Mobile7a6fe534 is committed/pushed: replica data and a fresh work marker now commit
+atomically in SQLite/IndexedDB. The accepted final gate60400 passes303.454s and
+validates 7,468 results (4,012 same-source full/repair plus 3,456 exact accepted
+predecessor results). All 89 desktop and 87 browser database tests pass. One stale
+Kotlin-generated delegate caused an earlier AppFlow failure; unchanged tests pass
+after non-incremental recompilation. No UI/test timeout workaround. [Contract](https://github.com/fajarxfce/hris-mobile/blob/7a6fe534/docs/replica-work-wakes.md).
+Generic control42749839268 pins7a6fe534fc2e86064be9f60509f7befcc6afbf31 and is pending
+behind receipt42745403043. Do not redispatch/cancel either proof. Expected generic
+7,276 portable + 2,709 Apple, 16 Swift checks and unsigned host. Starter remains
+clean HEADffd0ac5; its four baseline files match Mobile before the generic change.
+Port only generic API/implementations/tests after real Apple acceptance.
 
-Pusher42739907129/95195319 is fully accepted:9,744 cases=7,063 portable+2,681 Apple,
-16Swift and unsigned iOS host. Digests/CRC/previous identities verified; Apple30631
-reaped,artifact13731975537 SHA4c225ff65ce3a3e1591076a0749123c10ddac0afb916e1373f0ac60241a79c30.
-Recovery42745403043/76a143b6 is now running,not pending. Do not redispatch either run.
-No phone/live change; all54 PRD groups remain open. See Mobile's updated measurements.
+ACTIVE Mobile producer focused62815; nine Kotlin files are UNCOMMITTED and frozen
+through reap. New binding writes retain a fresh wake in the same transaction; the
+owning use case schedules only after exact readback. Lost responses, scheduling
+failure/timeouts and cancellation preserve committed data/work. Existing owned reads
+and identical retention perform no wake/scheduler work. Red43490 proves missing wake
+on the old producer; 25 domain and 30 actual SQLite cases currently pass, browser/app
+and quality still running. Read Mobile's active handoff before starting any compiler.
+No Group or Original backend source/DI/schema change for these increments.
+
+Pusher42739907129/95195319 is fully accepted: 9,744 cases, 16 Swift checks and unsigned
+host. Receipt42745403043/76a143b6 portable is accepted7,100 (audit85032, artifact
+13732619273 SHA bb615bd38b9c6ce45d51aaf6f3e8b036671278e9f2279c07efd519026f603976);
+Apple is still running. Generic proof does not cover the new producer integration.
+Phone remains87; ADB6953 timed out15s around03:37. Release88 remains uninstalled;
+no phone UI/data or live change. All 54 PRD groups remain open. Continue new SPACE
+commands/incoming history, notifications, rich messaging, backup, calls and meetings.
 
 ## Accepted: original receipt recovery; continue producer wakes
 
@@ -59,29 +76,9 @@ scenario now owns its interruption checkpoint; same Mobile APK passes without we
 assertions. All failed userdata remains preserved. No SDK artifact,backend product,
 DI,schema,live,phone or Starter change. All54 PRD acceptance groups remain open.
 
-Hosted[42745403043](https://github.com/fajarxfce/hris-mobile/actions/runs/42745403043)
-pins76a143b6c8fc81c6920658797f127dcf4a92e7b5,pending behind pusher42739907129;
-dispatch69781 reaped. Expected7,100 portable+2,698 Apple,16 Swift,unsigned iOS host.
-Do not redispatch. Mobile .work/space-original-receipt-recovery-2026-11-10 holds
-source/native/hosted audits and pins. Pusher95195319's portable7,063 is accepted,
-Apple is building unsigned host; audit remains pending. Predecessor CI excludes
-receipt recovery. Receiver9,690 and demand9,619 hosted cases are already accepted.
-
-Next: atomic replica mutation plus durable producer wake. A consumer reread cannot
-close a writer-after-final-read race. Same-current generations must be rejected even
-while pending. Mobile .work/replica-commit-wake-2026-11-10 contains read-only contract
-and133 raw override inventory; no source applied. Prove SQLite/browser/Apple in Mobile
-before porting generic core changes to Starter. Then bind new immutable room writes
-to durable wake and schedule after commit; retained identical reads remain no-op.
-Continue new SPACE commands,incoming/older history,notifications/replies,media,
-secure backup,calls and meetings. No whole acceptance group is closed yet.
-
-Phone remains87. ADB67480 timed out15s around02:44; accepted release88 from6a8b4f61
-is uninstalled and predates receiver/pusher/recovery. No UI/data/installation change.
-One availability question remains pending,do not repeat. Announce before using the
-accepted release88 install.py --install-only when reachable. Live remains
-e558a686/schema116.4/readinessON/groupOFF; GroupV140 is not deployed. Physical iPhone
-interaction waiver does not waive Apple runtime/build or actual push/call behavior.
+Current receipt/generic hosted runs, producer work and phone status are recorded
+above; do not repeat the old source/native gates. Live remains e558a686/schema116.4,
+readinessON/groupOFF; GroupV140 is not deployed. All 54 acceptance groups remain open.
 
 ## Accepted local demand — historical build notes below
 

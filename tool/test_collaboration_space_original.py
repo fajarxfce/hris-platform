@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 import zipfile
 
 from collaboration_native_device import PACKAGE
-from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint, delivery_diagnostic
+from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint, delivery_diagnostic, lost_receipt_checkpoint
 
 
 class OriginalDeliveryOwnershipTest(unittest.TestCase):
@@ -82,6 +82,30 @@ class OriginalDeliveryOwnershipTest(unittest.TestCase):
         for pid in (True, False, 0, -1, 2147483648, "121"):
             with self.subTest(pid=pid), self.assertRaises(ValueError):
                 checkpoint({"processId": pid})
+
+    def test_lost_callback_requires_missing_receipt_and_empty_sdk_before_death(self):
+        value = {"processId": 121, "receiptCount": 1, "queuedOriginalCount": 0,
+                 "interruptedAfterSdkRemoval": True, "journalDurable": True,
+                 "projectionNotWritten": True}
+        self.assertEqual(value, lost_receipt_checkpoint(value))
+        for changed in ({"receiptCount": 2}, {"receiptCount": True}, {"queuedOriginalCount": 1},
+                        {"queuedOriginalCount": False}, {"interruptedAfterSdkRemoval": False},
+                        {"journalDurable": False}, {"projectionNotWritten": False}):
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                lost_receipt_checkpoint(value | changed)
+
+    def test_original_interruption_releases_first_ack_then_requires_lost_second_callback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            experiment = self.experiment()
+            experiment.directory = Path(directory)
+            first = {"processId": 121, "receiptCount": 1}
+            ack = first | {"queuedOriginalCount": 0, "interruptedAfterSdkRemoval": True,
+                           "journalDurable": True, "projectionNotWritten": True}
+            experiment.wait_app = Mock(side_effect=[first, ack])
+            self.assertEqual(ack, experiment.await_interruption_checkpoint())
+            self.assertEqual(["first-ack", "ack"], [c.args[0] for c in experiment.wait_app.call_args_list])
+            self.assertTrue((Path(directory) / "first-ack.json").is_file())
+            self.assertTrue(experiment.result["lostCallbackAfterSdkRemoval"])
 
     def test_wrong_missing_duplicate_or_truncated_native_library_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

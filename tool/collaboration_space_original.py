@@ -94,6 +94,17 @@ def delivery_diagnostic(value):
     return {**value, "states": states[:]}
 
 
+def lost_receipt_checkpoint(value):
+    """One app receipt, both SDK originals removed, before the owned hard process death."""
+    checkpoint(value)
+    if (type(value.get("receiptCount")) is not int or value["receiptCount"] != 1
+            or type(value.get("queuedOriginalCount")) is not int or value["queuedOriginalCount"] != 0
+            or value.get("interruptedAfterSdkRemoval") is not True
+            or value.get("journalDurable") is not True or value.get("projectionNotWritten") is not True):
+        raise ValueError("Lost callback boundary was not demonstrated")
+    return value
+
+
 class OriginalDeliveryExperiment:
     """Own exactly one proof package, reverse and instrumentation child; retain failures."""
     def __init__(self, apk, sdk, directory):
@@ -185,6 +196,16 @@ class OriginalDeliveryExperiment:
             time.sleep(0.1)
         raise RuntimeError("Original Android process did not exit")
 
+    def await_interruption_checkpoint(self):
+        """Original-only proof: lose the second callback after its SDK transaction is gone."""
+        first = self.wait_app("first-ack")
+        if type(first.get("receiptCount")) is not int or first["receiptCount"] != 1:
+            raise ValueError("Expected only the first durable app receipt")
+        private_json(self.directory / "first-ack.json", first)
+        ack = lost_receipt_checkpoint(self.wait_app("ack"))
+        self.result["lostCallbackAfterSdkRemoval"] = True
+        return ack
+
     def execute(self):
         artifact = verified_artifact(self.native.apk)
         self.native.prepare()
@@ -203,7 +224,7 @@ class OriginalDeliveryExperiment:
         private_json(self.directory / "staged.json", staged)
         self.write_app("original-group", self.wait_host("group"))
         self.start("interrupt")
-        ack = self.wait_app("ack")
+        ack = self.await_interruption_checkpoint()
         if ack.get("journalDurable") is not True or ack.get("projectionNotWritten") is not True or ack.get("logicalId") not in mapping:
             raise ValueError("Interruption did not follow a durable original receipt")
         first_pid = self.kill_owned(ack)

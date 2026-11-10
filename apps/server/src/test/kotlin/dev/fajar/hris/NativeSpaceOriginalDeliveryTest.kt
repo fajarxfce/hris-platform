@@ -21,6 +21,7 @@ import tools.jackson.databind.JsonNode
 @Import(
     NativeOriginalDeliveryTraceConfiguration::class,
     NativeSpaceRecoveryTraceConfiguration::class,
+    NativeOriginalAckBarrierConfiguration::class,
 )
 @TestPropertySource(
     properties =
@@ -37,6 +38,7 @@ import tools.jackson.databind.JsonNode
 class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
     @Autowired private lateinit var trace: NativeOriginalDeliveryTrace
     @Autowired private lateinit var matrixTrace: NativeSpaceRecoveryTrace
+    @Autowired private lateinit var barrier: NativeOriginalAckBarrier
 
     companion object {
         private val provider by lazy { NativeSdkMatrixServer(loginBurst = 32) }
@@ -134,6 +136,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
             val canonical = adoptRoom(sender, recipient, group, room)
             trace.arm()
             matrixTrace.arm()
+            barrier.arm()
             write(
                 directory,
                 "group",
@@ -147,9 +150,15 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                     "conversationId" to canonical,
                 ),
             )
+            val firstAck = waitFor(directory, "first-ack", process)
+            assertEquals(1, firstAck["receiptCount"].asInt())
+            barrier.releaseSecond()
             val interrupted = waitFor(directory, "ack", process)
             assertTrue(interrupted["journalDurable"].asBoolean())
             assertTrue(interrupted["projectionNotWritten"].asBoolean())
+            assertTrue(interrupted["interruptedAfterSdkRemoval"].asBoolean())
+            assertEquals(0, interrupted["queuedOriginalCount"].asInt())
+            assertEquals(1, interrupted["receiptCount"].asInt())
             val recovered = waitFor(directory, "recovered", process)
             val actualEvents = provider.encryptedRoomEvents(room, sender.session.getValue("userId"))
             assertOriginalReceipts(ids, staged, recovered, actualEvents)
@@ -175,6 +184,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                     "recipientOffline" to true,
                     "originalTransactionsRetained" to true,
                     "interruptedBeforeProjection" to true,
+                    "secondProviderAckLostBeforeAppJournal" to true,
                     "localReadBeforeTransport" to true,
                     "driver" to result,
                     "nativeRequests" to requests,
@@ -183,6 +193,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                 ),
             )
         } finally {
+            barrier.releaseSecond()
             write(
                 directory,
                 "traffic",

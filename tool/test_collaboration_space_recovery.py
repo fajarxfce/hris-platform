@@ -21,10 +21,11 @@ class SpaceRecoveryDriverTest(unittest.TestCase):
             control = {"processId": 42, "durableWake": True, "capturedReplayDeduplicated": True, "publicationRevision": 7}
             ack = {"processId": 42, "claimedBeforeDelivery": True}
             with patch.object(OriginalDeliveryExperiment, "wait_app", side_effect=[listening, control, ack]) as receive:
-                self.assertEqual(ack, experiment.wait_app("ack"))
+                self.assertEqual(ack, experiment.await_interruption_checkpoint())
             self.assertEqual(["listening", "control", "ack"], [c.args[0] for c in receive.call_args_list])
             self.assertTrue((Path(directory) / "listening.json").is_file())
             self.assertTrue((Path(directory) / "control.json").is_file())
+            self.assertFalse((Path(directory) / "first-ack.json").exists())
 
     def test_missing_startup_isolation_never_allows_ack_to_reach_kill_owner(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -43,6 +43,10 @@ class SpaceRecoveryExperiment(OriginalDeliveryExperiment):
         self.result.update(actualGroupTask=True, actualNativeReadiness=True,
                            capturedConsumerReplayDeduplicated=True, recoveredWithoutFcm=True)
 
+    def await_interruption_checkpoint(self):
+        """Worker proof owns its control/claim handshake, independently of callback-loss proof."""
+        return self.wait_app("ack")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

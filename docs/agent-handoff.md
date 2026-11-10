@@ -17,6 +17,20 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
+## Current Mobile integration — 10 November, 03:04 UTC
+
+Mobile4ad82a5d records UNCOMMITTED atomic replica+wake source and frozen full38641.
+Read its active handoff before starting a compiler. The new raw SQLite/IDB mutation
+passes22actual focused cases; one same-current-generation regression fails when its
+guard is removed. No Starter port yet; its original four files equal the accepted
+Mobile base. Current full root/Android/Wasm/iOS/proof/quality gate remains running.
+
+Pusher42739907129/95195319 is fully accepted:9,744 cases=7,063 portable+2,681 Apple,
+16Swift and unsigned iOS host. Digests/CRC/previous identities verified; Apple30631
+reaped,artifact13731975537 SHA4c225ff65ce3a3e1591076a0749123c10ddac0afb916e1373f0ac60241a79c30.
+Recovery42745403043/76a143b6 is now running,not pending. Do not redispatch either run.
+No phone/live change; all54 PRD groups remain open. See Mobile's updated measurements.
+
 ## Accepted: original receipt recovery; continue producer wakes
 
 Mobile[76a143b6](https://github.com/fajarxfce/hris-mobile/blob/76a143b6/docs/collaboration-original-lost-callback.md)

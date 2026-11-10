@@ -245,7 +245,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 retained["providerReferences"].asInt() - 2,
                 retained["pendingReferences"].asInt(),
             )
-            assertEquals(2, trace.snapshot()["directTransport"])
+            assertEquals(2 + pages, trace.snapshot()["directTransport"])
             assertEquals("Success", staged["companyWindow"]["kind"].asString())
             assertEquals("Success", adopted["spaceWindow"]["kind"].asString())
             assertTrue(failureTrace.snapshot().isEmpty())

@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 13:06 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 13:17 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -21,9 +21,23 @@ Current Mobile UNCOMMITTED14-file native integration owns finite raw reads under
 parent/client and exact registry checks before/after I/O. Physical owner and logical Space wrapper
 stay distinct; no implicit SDK creation/sync/send. Adds15child-lifetime +4parent-integration host
 cases and4portable availability cases; existing DI/absent-runtime tests cover same instance/no I/O.
-Focused1/7075 RUNNING, source frozen,77expected; next full10203,4762source inputs. Not accepted.
-Private Mobile runtime-event-reads-2026-11-10 has exact list/runners/auditors. Mobile handoff
-fef96ccd is pushed36912(REAPED); it owns current work and gate outcomes.
+Focused1/7075 REAPED PASS77/409.620s, strict audit; Mobile full1/47121 RUNNING, source frozen,
+10203expected/4762inputs. Mobile handoffd6625ee4 pushed87654(REAPED) owns current gates.
+
+Group has3new UNCOMMITTED test files: NativeEventReadsTest.kt,
+tool/collaboration_event_reads_native.py and tool/test_collaboration_event_reads_native.py.
+4new Python evidence +18unchanged original-driver cases pass; JVM/native not compiled/run.
+Private runtime-event-native-2026-11-10 has files/log/protocol. No production/schema/DI changes.
+Driver awaits new Mobile `event-reads-stage`/`event-reads-space` instrumentation phases, which
+must be implemented after accepting Mobile runtime source. Five distinct events: sender original,
+peer original, first edit, redaction of peer by sender, latest edit. Missing-key read precedes
+explicit SDK sync; provider verifies four encrypted events. Both SDKs close before original
+LEGACY adoption; Space re-reads exact original/latest edit/redacted target under unchanged
+physical ownership. Observe old Company/Space window result without presuming a failure.
+Do not claim native equivalence or edit-head bug reproduction until actual SDK6 execution.
+Next implement Mobile probe, compile both sources sequentially, then isolated2560MiB2core
+emulator with precompiled768MiB harness; no compiler/emulator overlap or employee-device UI.
+
 
 Predecessor hosted controls are COMPLETE and strictly audited: history42808577683=11145,
 edits42811675228=11196, raw source42815332867=11211; each also16Swift/unsignedhost.
@@ -86,7 +100,7 @@ Pending-inventory42792315555 COMPLETE10862+16Swift/host,Apple87521/reaped2996; c
 published65850051. Mixed-core10808,staging10676,new-room10574,capability10535,projection10513
 and earlier accepted controls remain in tracked measurements. Do not redispatch accepted runs.
 
-Mobile runtime event focused7075 is RUNNING; older gates are reaped and emulator stopped. Never kill live API/worker JVMs. Phone10.77.77.3:5555 is INSTALL-ONLY:
+Mobile runtime event full47121 is RUNNING; older gates are reaped and emulator stopped. Never kill live API/worker JVMs. Phone10.77.77.3:5555 is INSTALL-ONLY:
 announce each install,never launch/drive/uninstall/clear UI/data. LastADB82255 timed out15s near
 12:14 and is reaped; existing availability question remains pending. Phone87 last known;
 88uninstalled,latest89 not built. Preserve original keys/stores/messages and immutable SDK6;

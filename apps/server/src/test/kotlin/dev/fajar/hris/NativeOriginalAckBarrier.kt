@@ -18,10 +18,13 @@ class NativeOriginalAckBarrier : OncePerRequestFilter() {
     private val permit = CountDownLatch(1)
     private val transactions = linkedSetOf<String>()
     private var active = false
+    private var expectedOriginals = 2
 
     @Synchronized
-    fun arm() {
+    fun arm(originals: Int = 2) {
+        require(originals in 2..3)
         check(!active && transactions.isEmpty() && permit.count == 1L)
+        expectedOriginals = originals
         active = true
     }
 
@@ -47,10 +50,10 @@ class NativeOriginalAckBarrier : OncePerRequestFilter() {
                     if (!active) false
                     else {
                         if (fingerprint !in transactions) {
-                            check(transactions.size < 2)
+                            check(transactions.size < expectedOriginals)
                             transactions += fingerprint
                         }
-                        transactions.last() == fingerprint && transactions.size == 2
+                        transactions.indexOf(fingerprint) >= 1
                     }
                 }
             if (wait)

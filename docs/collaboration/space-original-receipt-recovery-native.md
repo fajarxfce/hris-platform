@@ -1,5 +1,8 @@
 # Original callback-loss recovery on Android
 
+Latest extension: [mixed Company/Space native acceptance](mixed-space-native.md) retains
+the original-only and group-worker controls and adds one independently owned Space original.
+
 Mobile [76a143b6](https://github.com/fajarxfce/hris-mobile/blob/76a143b6c8fc81c6920658797f127dcf4a92e7b5/docs/collaboration-original-lost-callback.md)
 repairs a disappeared original from exact local history or one original SDK window.
 The preserved earlier failure had two app commands, one receipt and zero SDK originals;

@@ -76,27 +76,63 @@ def originals(value, fixture):
     return result
 
 
-def delivery_diagnostic(value):
+def delivery_diagnostic(value, expected=2):
     """Strict metadata-only outcome; never copy arbitrary native diagnostic fields."""
+    if type(expected) is not int or expected not in (2, 3):
+        raise ValueError("Invalid opted-in original count")
     fields = {"reason", "confirmed", "unresolved", "receiptCount", "states", "elapsedMillis"}
     if not isinstance(value, dict) or set(value) != fields:
         raise ValueError("Invalid original delivery diagnostic fields")
     if not isinstance(value["reason"], str) or value["reason"] not in {"NONE", "DRAINED", "TIMED_OUT", "STOPPED", "FAILED", "UNRESOLVED"}:
         raise ValueError("Invalid original delivery reason")
     for name in ("confirmed", "unresolved", "receiptCount"):
-        if type(value[name]) is not int or not 0 <= value[name] <= 2:
+        if type(value[name]) is not int or not 0 <= value[name] <= expected:
             raise ValueError("Invalid original delivery count")
     if type(value["elapsedMillis"]) is not int or not 0 <= value["elapsedMillis"] <= 120_000:
         raise ValueError("Invalid original delivery duration")
     states = value["states"]
-    if not isinstance(states, list) or len(states) != 2 or any(not isinstance(s, str) or s not in {"SENT", "STAGED", "OTHER"} for s in states):
+    if not isinstance(states, list) or len(states) != expected or any(not isinstance(s, str) or s not in {"SENT", "STAGED", "OTHER"} for s in states):
         raise ValueError("Invalid original delivery states")
     return {**value, "states": states[:]}
 
 
-def lost_receipt_checkpoint(value):
+def space_original(value, fixture, group, staged):
+    """The third original is new Space work on the unchanged physical SDK, never relabeled."""
+    checkpoint(value)
+    fields = {"processId", "logicalId", "spaceId", "conversationId", "transactionId", "originHash",
+              "sender", "textHash", "nativeSessionId", "deviceId", "bootstrapOperationId",
+              "companyPartitionEmpty", "completeOriginalCount"}
+    if set(value) != fields or value.get("companyPartitionEmpty") is not True or type(value.get("completeOriginalCount")) is not int or value["completeOriginalCount"] != 3:
+        raise ValueError("Invalid mixed original checkpoint")
+    logical = fixture.get("spaceLogicalId")
+    if not isinstance(logical, str) or logical in (fixture["logicalId"], fixture["secondLogicalId"]) or value["logicalId"] != logical:
+        raise ValueError("Expected a distinct new Space original")
+    for key in ("logicalId", "spaceId", "conversationId", "nativeSessionId", "deviceId", "bootstrapOperationId"):
+        if not isinstance(value[key], str) or str(uuid.UUID(value[key])) != value[key]:
+            raise ValueError("Invalid Space original coordinate")
+    if value["spaceId"] != group["spaceId"] or value["conversationId"] != group["conversationId"]:
+        raise ValueError("Space original changed its logical owner")
+    for key in ("nativeSessionId", "deviceId", "bootstrapOperationId"):
+        if any(value[key] != old[key] for old in staged["originals"]):
+            raise ValueError("Space original replaced the physical SDK")
+    for key in ("textHash", "originHash"):
+        if not isinstance(value[key], str) or not re.fullmatch(r"[a-f0-9]{64}", value[key]):
+            raise ValueError("Invalid Space original content fingerprint")
+    expected = hashlib.sha256((fixture["body"] + "-2").encode()).hexdigest()
+    if value["textHash"] != expected or value["sender"] != fixture["sender"]["userId"]:
+        raise ValueError("Space original content or sender changed")
+    if not isinstance(value["transactionId"], str) or not re.fullmatch(r"[!-~]{1,255}", value["transactionId"]) or any(value["transactionId"] == old["transactionId"] for old in staged["originals"]):
+        raise ValueError("Space original reused a physical transaction")
+    return value.copy()
+
+
+def lost_receipt_checkpoint(value, expected=2):
     """One app receipt, both SDK originals removed, before the owned hard process death."""
     checkpoint(value)
+    if type(expected) is not int or expected not in (2, 3):
+        raise ValueError("Invalid opted-in original count")
+    if expected == 3 and (type(value.get("spaceReceiptCount")) is not int or value["spaceReceiptCount"] != 0):
+        raise ValueError("Space callback was already retained before interruption")
     if (type(value.get("receiptCount")) is not int or value["receiptCount"] != 1
             or type(value.get("queuedOriginalCount")) is not int or value["queuedOriginalCount"] != 0
             or value.get("interruptedAfterSdkRemoval") is not True
@@ -117,6 +153,12 @@ class OriginalDeliveryExperiment:
         if not self.fixture.get("body", "").startswith("fictional-hris-worker-") or len(self.fixture["body"]) > 150:
             raise ValueError("Only new fictional messages may be used")
         self.native = NativeDevice(apk, native_proof_serial(), sdk, self.directory)
+        self.expected = 2
+        if "spaceLogicalId" in self.fixture:
+            value = self.fixture["spaceLogicalId"]
+            if not isinstance(value, str) or str(uuid.UUID(value)) != value or value in (self.fixture["logicalId"], self.fixture["secondLogicalId"]):
+                raise ValueError("Invalid opted-in Space original")
+            self.expected = 3
         self.process = None
         self.result = {"passed": False, "cleanup": False}
 
@@ -162,7 +204,7 @@ class OriginalDeliveryExperiment:
                 if name == "recovered":
                     delivery = self.app_json("original-delivery-result")
                     if delivery is not None:
-                        self.result["delivery"] = delivery_diagnostic(delivery)
+                        self.result["delivery"] = delivery_diagnostic(delivery, getattr(self, "expected", 2))
                 raise RuntimeError("Original instrumentation ended before its checkpoint")
             time.sleep(0.1)
         raise TimeoutError("Original application phase timed out")
@@ -202,7 +244,7 @@ class OriginalDeliveryExperiment:
         if type(first.get("receiptCount")) is not int or first["receiptCount"] != 1:
             raise ValueError("Expected only the first durable app receipt")
         private_json(self.directory / "first-ack.json", first)
-        ack = lost_receipt_checkpoint(self.wait_app("ack"))
+        ack = lost_receipt_checkpoint(self.wait_app("ack"), getattr(self, "expected", 2))
         self.result["lostCallbackAfterSdkRemoval"] = True
         return ack
 
@@ -222,8 +264,13 @@ class OriginalDeliveryExperiment:
         mapping = originals(staged, self.fixture)
         self.finished()
         private_json(self.directory / "staged.json", staged)
-        self.write_app("original-group", self.wait_host("group"))
+        group = self.wait_host("group")
+        self.write_app("original-group", group)
         self.start("interrupt")
+        if self.expected == 3:
+            new = space_original(self.wait_app("space-staged"), self.fixture, group, staged)
+            private_json(self.directory / "space-staged.json", new)
+            mapping[new["logicalId"]] = new["transactionId"]
         ack = self.await_interruption_checkpoint()
         if ack.get("journalDurable") is not True or ack.get("projectionNotWritten") is not True or ack.get("logicalId") not in mapping:
             raise ValueError("Interruption did not follow a durable original receipt")
@@ -233,11 +280,11 @@ class OriginalDeliveryExperiment:
         recovered = self.wait_app("recovered")
         delivery = self.app_json("original-delivery-result")
         if delivery is not None:
-            self.result["delivery"] = delivery_diagnostic(delivery)
+            self.result["delivery"] = delivery_diagnostic(delivery, getattr(self, "expected", 2))
         if recovered["processId"] == first_pid or recovered.get("originalsRetained") is not True or recovered.get("recipientStayedOffline") is not True:
             raise ValueError("Original process recovery was not demonstrated")
         records = recovered.get("confirmed")
-        if not isinstance(records, list) or len(records) != 2 or {r["logicalId"]: r["transactionId"] for r in records} != mapping:
+        if not isinstance(records, list) or len(records) != self.expected or {r["logicalId"]: r["transactionId"] for r in records} != mapping:
             raise ValueError("Recovery replaced or omitted an original")
         self.finished()
         private_json(self.directory / "recovered.json", recovered)
@@ -245,10 +292,10 @@ class OriginalDeliveryExperiment:
         self.start("offline")
         offline = self.wait_app("offline")
         self.finished()
-        if offline["processId"] in (first_pid, recovered["processId"]) or offline.get("localBeforeTransport") is not True or offline.get("confirmedCount") != 2:
+        if offline["processId"] in (first_pid, recovered["processId"]) or offline.get("localBeforeTransport") is not True or offline.get("confirmedCount") != self.expected:
             raise ValueError("Local original projection was not recovered offline")
         self.result.update(passed=True, actualProcessDeaths=1, offlineRestart=True,
-                           originalCount=2, offline=offline)
+                           originalCount=self.expected, spaceOriginal=self.expected == 3, offline=offline)
 
     def cleanup(self):
         stopped = stop_process(self.process)

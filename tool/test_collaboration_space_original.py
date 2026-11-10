@@ -1,5 +1,7 @@
 """Preserve original data on failure; reject changed processes and unverified SDK artifacts."""
 from pathlib import Path
+import hashlib
+import uuid
 import subprocess
 import tempfile
 import unittest
@@ -7,7 +9,7 @@ from unittest.mock import Mock, patch
 import zipfile
 
 from collaboration_native_device import PACKAGE
-from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint, delivery_diagnostic, lost_receipt_checkpoint
+from collaboration_space_original import OriginalDeliveryExperiment, verified_artifact, checkpoint, delivery_diagnostic, lost_receipt_checkpoint, space_original
 
 
 class OriginalDeliveryOwnershipTest(unittest.TestCase):
@@ -120,6 +122,80 @@ class OriginalDeliveryOwnershipTest(unittest.TestCase):
                             archive.writestr(name, b"unverified")
                     with self.assertRaises(ValueError):
                         verified_artifact(path)
+
+
+class MixedOriginalCheckpointTest(unittest.TestCase):
+    def example(self):
+        uid = lambda n: str(uuid.UUID(int=n))
+        fixture = {"logicalId": uid(11), "secondLogicalId": uid(12), "spaceLogicalId": uid(13),
+                   "body": "fictional-hris-worker-mixed", "sender": {"userId": "@fictional:matrix.example.test"}}
+        group = {"spaceId": uid(14), "conversationId": uid(15)}
+        physical = {"nativeSessionId": uid(7), "deviceId": uid(8), "bootstrapOperationId": uid(9)}
+        staged = {"originals": [{**physical, "logicalId": uid(11+i), "transactionId": "company-"+str(i)} for i in range(2)]}
+        value = {"processId": 121, "logicalId": uid(13), **group, **physical, "transactionId": "space-original",
+                 "originHash": "a"*64, "sender": fixture["sender"]["userId"],
+                 "textHash": hashlib.sha256((fixture["body"]+"-2").encode()).hexdigest(),
+                 "companyPartitionEmpty": True, "completeOriginalCount": 3}
+        return value, fixture, group, staged
+
+    def test_new_space_original_preserves_physical_scope_and_distinct_logical_owner(self):
+        value, fixture, group, staged = self.example()
+        retained = space_original(value, fixture, group, staged)
+        self.assertEqual(value, retained)
+        self.assertIsNot(value, retained)
+
+    def test_old_logical_id_and_wrong_space_or_conversation_are_rejected(self):
+        value, fixture, group, staged = self.example()
+        for changes in ({"logicalId": fixture["logicalId"]}, {"spaceId": str(uuid.UUID(int=91))},
+                        {"conversationId": str(uuid.UUID(int=92))}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                space_original(value | changes, fixture, group, staged)
+
+    def test_replaced_physical_device_session_or_bootstrap_is_rejected(self):
+        value, fixture, group, staged = self.example()
+        for field in ("nativeSessionId", "deviceId", "bootstrapOperationId"):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                space_original(value | {field: str(uuid.UUID(int=93))}, fixture, group, staged)
+
+    def test_reused_transaction_and_changed_sender_or_content_are_rejected(self):
+        value, fixture, group, staged = self.example()
+        for changes in ({"transactionId": "company-0"}, {"sender": "@other:matrix.example.test"},
+                        {"textHash": "b"*64}, {"originHash": "invalid"}, {"transactionId": "bad transaction"}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                space_original(value | changes, fixture, group, staged)
+
+    def test_extra_payload_fields_missing_fields_and_false_queue_proof_are_rejected(self):
+        value, fixture, group, staged = self.example()
+        for changes in ({"text": "unexpected"}, {"companyPartitionEmpty": False},
+                        {"completeOriginalCount": True}, {"completeOriginalCount": 2}, {"spaceId": []}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                space_original(value | changes, fixture, group, staged)
+        missing = value.copy(); missing.pop("originHash")
+        with self.assertRaises(ValueError):
+            space_original(missing, fixture, group, staged)
+
+    def test_third_diagnostic_requires_explicit_opt_in_and_keeps_strict_bounds(self):
+        value = {"reason": "DRAINED", "confirmed": 3, "unresolved": 0, "receiptCount": 3,
+                 "states": ["SENT"]*3, "elapsedMillis": 18}
+        with self.assertRaises(ValueError):
+            delivery_diagnostic(value)
+        self.assertEqual(value, delivery_diagnostic(value, 3))
+        for expected in (True, 1, 4, "3"):
+            with self.subTest(expected=expected), self.assertRaises(ValueError):
+                delivery_diagnostic(value, expected)
+        with self.assertRaises(ValueError):
+            delivery_diagnostic(value | {"confirmed": 4}, 3)
+
+    def test_mixed_interruption_requires_no_durable_space_receipt(self):
+        value = {"processId": 121, "receiptCount": 1, "queuedOriginalCount": 0,
+                 "interruptedAfterSdkRemoval": True, "journalDurable": True,
+                 "projectionNotWritten": True}
+        with self.assertRaises(ValueError):
+            lost_receipt_checkpoint(value, 3)
+        self.assertEqual(value | {"spaceReceiptCount": 0}, lost_receipt_checkpoint(value | {"spaceReceiptCount": 0}, 3))
+        for count in (False, True, 1, -1, "0"):
+            with self.subTest(count=count), self.assertRaises(ValueError):
+                lost_receipt_checkpoint(value | {"spaceReceiptCount": count}, 3)
 
 
 if __name__ == "__main__":

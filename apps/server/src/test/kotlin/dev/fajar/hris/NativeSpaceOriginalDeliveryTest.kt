@@ -12,11 +12,13 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
 import tools.jackson.databind.JsonNode
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_ORIGINAL_APK", matches = ".+")
 @Import(
     NativeOriginalDeliveryTraceConfiguration::class,
@@ -65,7 +67,15 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
 
     @Test
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
-    fun originalQueueSurvivesLostProjectionAndOfflineRecipientWithoutReplacement() {
+    fun originalQueueSurvivesLostProjectionAndOfflineRecipientWithoutReplacement() =
+        experiment(false)
+
+    @Test
+    @Timeout(value = 12, unit = TimeUnit.MINUTES)
+    fun newSpaceOriginalSharesTheQueueWithoutChangingCompanyOwnershipAfterProcessDeath() =
+        experiment(true)
+
+    private fun experiment(withSpace: Boolean) {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
         val recipient = sdkOwner(sdkPeer(base))
@@ -81,7 +91,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                 parent.resolve(UUID.randomUUID().toString()),
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")),
             )
-        val ids = List(2) { UUID.randomUUID().toString() }
+        val ids = List(if (withSpace) 3 else 2) { UUID.randomUUID().toString() }
         write(
             directory,
             "fixture",
@@ -94,7 +104,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                 "body" to "fictional-hris-worker-original-${UUID.randomUUID()}",
                 "sender" to sender.session + ("hrisAccessToken" to sender.native.access),
                 "recipient" to recipient.session + ("hrisAccessToken" to recipient.native.access),
-            ),
+            ) + if (withSpace) mapOf("spaceLogicalId" to ids[2]) else emptyMap(),
         )
         val log =
             Files.createFile(
@@ -136,7 +146,7 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
             val canonical = adoptRoom(sender, recipient, group, room)
             trace.arm()
             matrixTrace.arm()
-            barrier.arm()
+            barrier.arm(if (withSpace) 3 else 2)
             write(
                 directory,
                 "group",
@@ -152,6 +162,15 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
             )
             val firstAck = waitFor(directory, "first-ack", process)
             assertEquals(1, firstAck["receiptCount"].asInt())
+            val spaceStaged = if (withSpace) waitFor(directory, "space-staged", process) else null
+            if (spaceStaged != null) {
+                assertEquals(ids[2], spaceStaged["logicalId"].asString())
+                assertEquals(group.spaceId.toString(), spaceStaged["spaceId"].asString())
+                assertEquals(canonical.toString(), spaceStaged["conversationId"].asString())
+                assertTrue(spaceStaged["companyPartitionEmpty"].asBoolean())
+                assertEquals(3, spaceStaged["completeOriginalCount"].asInt())
+                assertEquals(0, firstAck["spaceReceiptCount"].asInt())
+            }
             barrier.releaseSecond()
             val interrupted = waitFor(directory, "ack", process)
             assertTrue(interrupted["journalDurable"].asBoolean())
@@ -159,16 +178,17 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
             assertTrue(interrupted["interruptedAfterSdkRemoval"].asBoolean())
             assertEquals(0, interrupted["queuedOriginalCount"].asInt())
             assertEquals(1, interrupted["receiptCount"].asInt())
+            if (withSpace) assertEquals(0, interrupted["spaceReceiptCount"].asInt())
             val recovered = waitFor(directory, "recovered", process)
             val actualEvents = provider.encryptedRoomEvents(room, sender.session.getValue("userId"))
-            assertOriginalReceipts(ids, staged, recovered, actualEvents)
+            assertOriginalReceipts(ids, staged, recovered, actualEvents, spaceStaged)
             val result = waitFor(directory, "result", process)
             assertTrue(process.waitFor(20, TimeUnit.SECONDS))
             assertEquals(0, process.exitValue())
             assertTrue(result["passed"].asBoolean())
             assertTrue(result["cleanup"].asBoolean())
             val requests = trace.snapshot()
-            assertEquals(2, requests["directTransport"])
+            assertEquals(if (withSpace) 3 else 2, requests["directTransport"])
             assertEquals(2, requests["bootstrapReplay"])
             assertTrue(requests.getOrDefault("requests", 0) in 4..24)
             for (kind in listOf("registration", "roomRequest", "failed")) assertEquals(
@@ -185,6 +205,8 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
                     "originalTransactionsRetained" to true,
                     "interruptedBeforeProjection" to true,
                     "secondProviderAckLostBeforeAppJournal" to true,
+                    "newSpaceOriginal" to withSpace,
+                    "spaceAckLostBeforeAppJournal" to withSpace,
                     "localReadBeforeTransport" to true,
                     "driver" to result,
                     "nativeRequests" to requests,
@@ -217,25 +239,35 @@ class NativeSpaceOriginalDeliveryTest : NativeSpaceOriginalFixture() {
         staged: JsonNode,
         recovered: JsonNode,
         actual: List<String>,
+        spaceStaged: JsonNode? = null,
     ) {
         assertTrue(recovered["originalsRetained"].asBoolean())
         assertTrue(recovered["recipientStayedOffline"].asBoolean())
         val original =
-            staged["originals"].associate {
-                it["logicalId"].asString() to it["transactionId"].asString()
-            }
+            staged["originals"]
+                .associate { it["logicalId"].asString() to it["transactionId"].asString() }
+                .toMutableMap()
+        if (spaceStaged != null) {
+            for (coordinate in
+                listOf("nativeSessionId", "deviceId", "bootstrapOperationId")) assertTrue(
+                staged["originals"].all {
+                    it[coordinate].asString() == spaceStaged[coordinate].asString()
+                }
+            )
+            original[spaceStaged["logicalId"].asString()] = spaceStaged["transactionId"].asString()
+        }
         val confirmed =
             recovered["confirmed"].associate {
                 it["logicalId"].asString() to it["transactionId"].asString()
             }
         assertEquals(ids.toSet(), original.keys)
-        assertEquals(2, original.values.toSet().size)
+        assertEquals(ids.size, original.values.toSet().size)
         assertEquals(original, confirmed)
         val receipts =
             recovered["confirmed"].flatMap { record ->
                 record["events"].iterator().asSequence().map { it.asString() }.toList()
             }
-        assertEquals(2, actual.size)
+        assertEquals(ids.size, actual.size)
         assertEquals(actual.toSet(), receipts.toSet())
         assertTrue(recovered["confirmed"].all { it["events"].size() == 1 })
     }

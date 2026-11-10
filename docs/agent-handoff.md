@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 13:06 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:05 UTC. Follow AGENTS.md. Prior details are retained in
 [35c03f9d](https://github.com/fajarxfce/hris-platform/blob/35c03f9d/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -8,22 +8,40 @@ with pushes and validated phone updates. All54 acceptance groups remain open. No
 Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
-Latest accepted Mobile5c276a2fcc472260245ea56ba6db7b50c537bd59 is committed/pushed39983
-(REAPED). Typed event classification preserves original/edit/redaction/unresolved identity and
-actual SDK decryption. Focused49881 PASS105/302.286s; full34957 PASS10172=8153fresh+2019exact
-accepted reused/695.005s, all reaped/strictly audited.4755source inputs fixed,
-manifestf56484e626ceb0d012e9cca86f628150b7863dca87a3dc20ab6ed4ea7e69ff3c.
-Current proofAPK150605511B SHA24e8cef1c2319a00c2378495f9552f8a4c0f127cecdb86ff24edd64745ca685e.
-Hosted42819170095 RUNNING exact5c,11295expected+16Swift/unsignedhost. Ref67054/dispatch33180
-REAPED. No native equivalence, incoming activation, phone or live claim.
+Current accepted Mobilef64e47136a309453ab9d6ea67993ed8e5200b611 binds exact acquired events
+to the installed physical runtime; its full47121 passes10203 local cases. Native proof
+5b15c2fe passes1case/125.992s, preserving encrypted original/edit/redaction/missing-key
+facts across adoption. It reproduced Company Storage and Space Unexpected failures at
+an edit head. Group9d072639's follow-up trace passes136.487s and identifies one context503
+with collaboration_provider_invalid_response. These are accepted reproductions, not a fixed
+production reader. No employee phone or live server was changed.
 
-Current Mobile UNCOMMITTED14-file native integration owns finite raw reads under the existing
-parent/client and exact registry checks before/after I/O. Physical owner and logical Space wrapper
-stay distinct; no implicit SDK creation/sync/send. Adds15child-lifetime +4parent-integration host
-cases and4portable availability cases; existing DI/absent-runtime tests cover same instance/no I/O.
-Focused1/7075 RUNNING, source frozen,77expected; next full10203,4762source inputs. Not accepted.
-Private Mobile runtime-event-reads-2026-11-10 has exact list/runners/auditors. Mobile handoff
-fef96ccd is pushed36912(REAPED); it owns current work and gate outcomes.
+Current Group3UNCOMMITTED files fix valid redacted encrypted events and retain matched
+redaction metadata plus own transactions. Green2/91392 REAPED PASS42/137.027s,8,740stable
+inputs,all12suites and prior case identities preserved; format/architecture/server fixture
+compilation pass. Strengthened native fixture now requires both windows Success and zero5xx.
+Native revalidation waits for the Mobile fix. Group6d47a49f docs push26663 is REAPED.
+
+Mobile14Kotlin files are UNCOMMITTED/frozen in focused2/36860 RUNNING,176expected. It keeps
+raw anchor provenance separate from original ACKs, preserves the complete surrounding
+window, uses the API failure boundary, and rechecks current Company publication. First
+focused1/53935 failed only the new fixture's hardcoded anchor expectation; 45cases/1failure,
+92.595s,exact candidate archived. Independent fixture expectation is corrected; current45
+domain cases pass,remaining host/older-history/browser/quality checks continue. One3GiB
+Mobile compiler,no emulator. Next full10224expected and the actual SDK6 regression.
+
+Original's CollaborationDirectRoomEventMapping is byte-identical to the pre-fix Group
+mapper (SHA484969ff5197ba342b80b14529370f00b077aca60a00f24b41848fa8d4cedfac). After final
+native acceptance, port that protocol fix and its regression tests here, validate existing
+Company sync/history, and prepare the live-compatible server update without group schemas.
+Original has no code change yet. Keep live e558a686/schema116.4/readinessON/groupOFF intact.
+
+Hosted classifier42819170095 COMPLETE11295plus16Swift/unsignedhost; Apple63577 and prior
+portable1908 are reaped/audited. Runtime42824039795 portable49173 passes8201; Apple still
+running. No native Apple Matrix implementation claim. Current Mobilec08cf834 push55285 is
+REAPED; Mobile/Group handoffs own current exact commands and results. ADB64277 timed out15s
+at14:00; phone87 remains last known,88uninstalled. INSTALL-ONLY and the existing availability
+question remain. No generic Starter delta, SDK artifact change or new phone build.
 
 Predecessor hosted controls are COMPLETE and strictly audited: history42808577683=11145,
 edits42811675228=11196, raw source42815332867=11211; each also16Swift/unsignedhost.
@@ -31,12 +49,8 @@ Raw audits85411/96085 REAPED; complete measurement publishedfef96ccd. Previous c
 history/edit measurements are retained in Git. Native Apple Matrix runtime remains missing.
 Do not rerun accepted gates or reapply the historical November6 SDK consumer patch.
 
-Next prove actual encrypted original/edit-at-head/redacted-target/missing-key behavior through
-public repository capabilities. The existing Company/Space ACK reader must also handle an edit
-head absent from its presentation timeline, using explicit acquired provenance; never weaken
-checks or relabel edit IDs as originals. Then own bounded incoming retention/progress. Preserve
-current immutable SDK6, dirty SDK source tree, Company namespace and offline local facts.
-No generic Starter delta and no live server/schema change.
+After the current history fix, continue bounded incoming retention/progress and product
+integration. Preserve immutable SDK6, dirty SDK source, original namespaces and offline facts.
 
 Current Mobile native proof [2828b88b](https://github.com/fajarxfce/hris-mobile/commit/2828b88b4de8fd70c596375b8349e075ba173091)
 is committed/pushed78025 (REAPED). Four actual SDK6 cases pass269.304s in native1/45886,

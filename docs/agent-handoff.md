@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 02:04 UTC. Historical detail remains in
+Updated 10 November 2026, 02:34 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -16,6 +16,35 @@ uses2560MiB/two cores. Both the retained sender and isolated proof AVD are stopp
 installation and never launch, automate, uninstall or clear its app. Crashlytics IAM
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
+
+## Active: lost original callback recovery
+
+Mobile[8bc72651](https://github.com/fajarxfce/hris-mobile/blob/8bc72651/docs/collaboration-original-lost-callback.md)
+records the root investigation:the preserved failed store has2 app commands,1 receipt
+and0 queued/dependent SDK originals. Original image hashes agree;no app launch,send,
+phone change or SDK artifact change occurred during inspection. SDK dequeue precedes
+async callback storage;group delivery lacked original-history receipt recovery.
+
+Group checkpoint3a4ecda1 is pushed (52182 reaped). Current Mobile source is UNCOMMITTED. Only disappeared pending originals acquire
+exact local evidence or one bounded original SDK window; ordinary queued sends do
+not acquire history. Two regression assertions fail without repair (46986,87.46s).
+Focused89708 REAPED PASS318.638s,70 fresh cases,zero failures/errors/skips;4,651 stable
+inputs and current/archive hashes verified. Android/app/proof compilation,format,
+architecture and detekt pass. ACTIVE Mobile full50072;source is frozen. Expected6,338
+validated cases. After reaping/audit,run Group source-1 then actual native-1 using Group
+.work/space-original-receipt-recovery-2026-11-10 runners/config. Native successor is
+NOT run yet. Group source currently changes only test fixtures/drivers,including the
+new NativeOriginalAckBarrier filter;14 Python cases pass0.006s. It deliberately
+holds the second send until the first app receipt,then verifies both SDK rows removed
+with only1 app receipt before hard process death. Do not relax these assertions.
+
+Pusher42739907129/95195319 portable is accepted7,063 cases;audit3789 reaped,
+artifact13728979615 SHA78d8a9c5ffc6f64d6566d409831f50726ee8b2290942c5419bfc62e3ad75f335.
+Apple remains running;this CI excludes current recovery source. Original failed
+native-1 data remains preserved in the older pusher workspace. All forensic emulators
+are stopped. Phone87 unchanged;ADB5209 timed out around02:19;accepted88 uninstalled,
+no new availability question. All54 PRD groups remain open. Next atomic producer-wake
+analysis is read-only in Mobile .work/replica-commit-wake-2026-11-10.
 
 ## Current: original managed pusher and recovery investigation
 

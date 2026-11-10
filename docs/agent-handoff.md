@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 07:51 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 08:23 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,42 +15,45 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 07:51 UTC
+## Mobile checkpoint — 10 November, 08:23 UTC
 
-Mobile [0aaaf786](https://github.com/fajarxfce/hris-mobile/commit/0aaaf786ef0fcf4c6ce591fe2a118263d548020f)
-is committed/pushed (57239 reaped). New SPACE-room provenance, typed matching and local
-reading keep logical commands separate from the retained physical SDK identity. New rooms
-query only the Space command namespace; LEGACY rooms retain two-ledger matching. No new
-native enqueue, sender or product routing is activated. [Contract](https://github.com/fajarxfce/hris-mobile/blob/0aaaf786/docs/collaboration-space-new-room-queue.md).
+Mobile [507224a3](https://github.com/fajarxfce/hris-mobile/commit/507224a3c3e4cb4c87cc3a7ba8b4f8be9535bd54)
+is committed/pushed (46472 reaped). Owning Space staging persists the original Staging
+attempt before paused enqueue and requires exact CAS readback. It recovers the same physical
+transaction after response loss; other unresolved same-device staging blocks enqueue.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/507224a3/docs/collaboration-space-message-staging.md).
 
-Focused 48502 passes 96 fresh cases/328.257s. Full 7378 passes 647.309s: 9,676 verified =
-7,657 fresh + 2,019 exact accepted reused; no failures/errors/skips. Both are reaped and
-strictly audited. All 90 AppFlow cases pass; 4,707 source inputs/library bytes fixed.
-Manifest 57adc26664e998567fe2f1906ce236cc7fffae6de5bd45548715e33f79c689e4.
-Control 42777934754 pins that source; ref 61884/dispatch 58063 reaped. Expected 7,674
-portable + 2,900 Apple, 16 Swift checks and unsigned host. Preserve this control.
+Focused-2/67472 PASS70/330.446s and full-1/14508 PASS664.833s are reaped and audited:
+9,744 verified = 7,725 fresh + 2,019 exact accepted reused, zero failure/error/skip. All
+required local platform/build/quality gates pass. 4,712 source/library inputs fixed;
+manifest 81e08d95924901a1c1fed27bb96486d1ef2fc8692035cf74094ebc8af0566a8f.
+Initial LongMethod failure and its invocation-phase repair remain recorded. Pinned control
+42781554618 is running (ref14911/dispatch44288 reaped), expected7,742 portable+2,934 Apple,
+16 Swift and unsigned host. Domain raw enqueue remains synthetic; native proof is next.
 
-Next Mobile work has seven APPLIED, UNCOMMITTED/FROZEN Kotlin inputs: owning Space staging,
-exact original recovery, 9 policy + 25 owning cases, fixture, singleton DI and app binding.
-Focused 63537 is RUNNING as the only heavy compiler; expected 70 fresh cases. No acceptance
-yet. Mobile .work/space-message-staging-2026-11-10 is canonical; its earlier draft copies
-are stale. [Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
-owns further state. Then mixed native delivery/recovery, full pending inventory, incoming
-history/routing, media, backups, calls and meetings. All 54 PRD acceptance groups stay open.
+Eleven APPLIED, UNCOMMITTED/FROZEN Mobile inputs extend the EXISTING delivery window to
+separate Company/Space ledgers, whole-inventory/proof planning before CAS, cross-ledger
+transaction/event ownership, scoped late callbacks and one bounded missing-receipt history
+window. New rooms perform no company command I/O. Focused-1/85670 is the ONLY local heavy
+compiler, expected226 fresh (13 policy+26 new owning+73 existing domain cases/platform,
+2 DI). No acceptance yet. Mobile .work/mixed-original-delivery-2026-11-10 retains drafts,
+runners and integration notes; tracked Mobile sources are canonical after application.
+[Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
+owns further state. Actual native staging/delivery, complete pending inventory, incoming
+history/routing, media, backups, calls and meetings remain. All54 PRD groups are open.
 
-Capability 31a0ed9a local 9,650 is accepted; 42775719615 is running. Projection e99c7104
-local 9,630 is accepted; 42772661276 portable 7,628 audited, Apple host running. Mixed
-42769825037 is fully accepted 10,402 +16 Swift/host; public evidence is in 0aaaf786.
-Receipt 42766554589 accepted 10,300 and message 42763070460 accepted 10,195, both +16
-Swift/host. Native Apple Matrix binding remains unavailable; these are source/storage/
-contract checks, not native Apple chat. Do not redispatch completed evidence.
+New-room0aaaf786 local9,676 is accepted;42777934754 portable7,674 is audited (61280 reaped),
+Apple pending. Capability31a0ed9a local9,650;42775719615 portable7,648 audited, Apple host
+pending. Projection42772661276 COMPLETE10,513+16Swift/host is published507224a3. Mixed
+42769825037 COMPLETE10,402+16Swift/host is published0aaaf786. Preserve controls; do not rerun
+accepted gates. Actual Apple Matrix runtime binding remains unavailable; hosted domain/
+storage tests and unsigned host do not implement native Apple chat.
 
-Starter source a7ff417c remains accepted/pushed: 15 exact generic command-wake files,
-358 fresh tests/all build gates; no Starter source WIP/compiler. HRIS policy stays Mobile.
-Phone 87 unchanged, 88 uninstalled; ADB 14496 timed out 15s at 07:28 and is reaped. Existing
-availability question remains pending. Announce install-only updates; never drive/clear
-phone UI. Live e558a686/schema116.4/readiness ON/group OFF unchanged. No emulator is running;
-preserve live JVMs. Mobile proves reusable foundations before Starter.
+Starter a7ff417c remains accepted/pushed:15 exact generic command-wake files,358 fresh/all
+required gates; no source WIP/compiler. HRIS policies stay Mobile. Phone87 unchanged,88
+uninstalled; ADB7150 timed out15s at08:22 and is reaped. Existing availability question is
+pending. Announce install-only updates; never drive/clear phone UI. No emulator. Live
+e558a686/schema116.4/readiness ON/group OFF unchanged; preserve live JVMs.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

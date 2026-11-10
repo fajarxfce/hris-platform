@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 00:25 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 01:09 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -14,6 +14,46 @@ uses2560MiB/two cores; retained sender87 is stopped, the accepted isolated nativ
 installation and never launch, automate, uninstall or clear it. Crashlytics access
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
+
+## Current Mobile integration and release status
+
+Mobile [cd4fb78b](https://github.com/fajarxfce/hris-mobile/blob/cd4fb78b/docs/collaboration-space-push-receiver.md)
+is accepted and pushed (51430 reaped). Strict schema1 group pushes match local account,
+native family, immutable group root and the registered logical device receipt before
+persisting a group recovery wake and scheduling its fixed task. No SDK/API/display in
+the receiver or fallback to company/Inbox. Android and Swift route through shared
+policy; lazy native push composition has its own app DI module.
+
+Focused 30082 passes 45 cases/100.7s. Full 5687 passes 6,301 fresh cases/954.348s:
+5,632 desktop +629 Android host +20 browser +20 proof-host unit cases. Required root,
+release/lint, shared Wasm/iOS source, format/architecture/detekt pass. All 4,641 inputs
+and current/archived reports agree; no cached test execution is counted as fresh.
+The earlier 45-case run passed tests but failed LongMethod (106-line worker DI);
+composition was separated without suppressing checks. No backend product source changed.
+
+Hosted 42721024887/efa700bb is fully accepted:9,568 tests plus unsigned iOS host.
+Successor 42728686367/6a8b4f61 portable is accepted:6,975 cases, artifact13724609514,
+SHA8aaa646239cc22cf09ff6bfd606ec1c8df27a19c8e3cda338b9a529316cbafd9; audit94614 reaped.
+Apple is building its host (expected2,644). Run42733595170 oncd4fb78b is pending behind
+it; dispatch30581 reaped. Preserve that pending run. Expected7,026portable +2,664Apple,
+plus16Swift envelope checks and unsigned iOS host. No new source may claim those
+pending hosted results. All54 PRD acceptance groups remain open.
+
+Release88 was packaged from6a8b4f61 and accepted before the group push receiver.
+Build51256 passes573.355s; ARM64 devRelease, nondebuggable, existing signer,
+123,596,175bytes/SHA142082381ed2eff87d50dbbeb01538229ac7c1491ccf70d46ef0ce73519b5c51.
+Manifest/16KiB/backup/Firebase/API/lint/SDK6 audits pass; no native product88 startup
+claim. Phone remains87: bounded ADB connects52260/4060 timed out; availability question
+pending. No install88 attempted, no phone UI/data touched. Use accepted private
+Mobile release88 install.py --install-only after announcing when reachable.
+
+No heavy job currently runs; all local compilers/emulators are reaped. Next Mobile work:
+managed group pusher through the exact installed original runtime and current device
+admission; two private domain candidates are prepared but NOT applied/accepted in
+.work/space-pusher-2026-11-10. Then producer wakes, new SPACE enqueue, incoming group
+history/notification/reply and product routing, rich media, calls and meetings.
+Live API/worker remains e558a686/schema116.4 with group disabled. Group V140 is not
+rolled out. Original schema verifier stays116.4. Do not restart historical jobs below.
 
 ## Accepted: skip idle original-room transport
 
@@ -42,7 +82,8 @@ production was unchanged. Native gate passed first attempt for this increment. F
 prior native userdata remains retained. No compiler/emulator remains active.
 Private `.work/space-recovery-demand-2026-11-10` holds exact audits and runners.
 Proof APK150450270 bytes,SHA2d3e323b055123cbbfc3e17bbf1b375d59291be31994089fa19270434129115a.
-No product88,phone or live rollout. All54 PRD acceptance groups remain open.
+This native proof did not package a product release or change the phone/live rollout;
+current release status is above. All54 PRD acceptance groups remain open.
 
 [Contract](collaboration/space-recovery-demand.md) and[measurement](measurements/collaboration-space-recovery-demand-2026-11-10.json).
 

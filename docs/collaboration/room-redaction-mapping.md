@@ -22,9 +22,17 @@ cases before the fix. The first repair passed41 cases; review then added the own
 transaction case. Format, architecture and server test-source compilation pass. The final
 source manifest contains8,740 stable inputs.
 
-The native fixture now requires both original-history windows to succeed with correct
-original/edit hashes and zero observed5xx. That stronger experiment awaits the Mobile
-edit-anchor fix and a newly compiled proof APK; this increment does not claim its execution.
-No schema, dependency injection, live deployment or employee-phone change is included.
+The stronger actual SDK6 experiment passes all three cases in 214.303s with Mobile6334c0c4.
+Both original-history windows now succeed with independently checked original/edit hashes,
+exact acquired anchors, and zero observed5xx. Missing-key, redaction identity and adoption
+checks remain. Original-only and mixed Company/Space process-loss recovery preserve the
+original transactions, confirm exactly two/three provider events with the recipient offline,
+and read all confirmations after another offline restart. SDK/source/APK/case audits pass.
 
-[Measurement](../measurements/collaboration-room-redaction-mapping-2026-11-10.json).
+The event experiment records28 Matrix requests versus26 before the fix, adding two bounded
+reads for edit heads absent from the presentation timeline. Native requests remain2; encrypted
+sends4/sync3/optional secret-storage2 remain unchanged. This does not measure employee-phone
+latency. The2,560MiB emulator is stopped. No live/phone change or Group schema rollout occurs.
+
+[Protocol measurement](../measurements/collaboration-room-redaction-mapping-2026-11-10.json)
+and [native measurement](../measurements/collaboration-history-anchor-native-2026-11-10.json).

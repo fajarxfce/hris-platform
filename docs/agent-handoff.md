@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 14:08 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:33 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -9,36 +9,32 @@ Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: u
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
 
-## Current redaction and edit-head repair
+## Current redaction and edit-head repair — accepted
 
-Group accepts3files in this commit: CollaborationDirectRoomEventMapping, its new
-MatrixRoomRedactionMappingTest, and stronger NativeEventReadsTest assertions. Root cause:
-valid redacted encrypted content is empty, but the mapper required ciphertext and discarded
-matched unsigned.redacted_because. The fix validates exact redaction target/actor/room/time,
-preserves original identity and own transactions, and never recursively copies unsigned data.
+Group82f2c817 pushed17355 REAPED accepts the protocol mapper,10 regressions and stronger
+native assertions. Green2/91392 REAPED PASS42/137.027s,8,740fixedinputs,
+manifestd8eb6665b11f02b7eba65c22de06a39bb7fef2159773aa0d579599d8d5f91981.
+Mobile6334c0c4 pushed78047 REAPED accepts14Kotlin files, focused176/203.280s and full10224
+(8205fresh+2019exact reused)/686.844s. Prior failed fixtures and exact candidates retained.
 
-Red1/60288 REAPED9cases/5failures/45.413s proves the regression. Green1/18068 REAPED
-PASS41/178.546s. Review preserved standalone own-redaction transactions; green2/91392
-REAPED PASS42/137.027s,all12suites/earlier case identities preserved,8,740stableinputs,
-manifestd8eb6665b11f02b7eba65c22de06a39bb7fef2159773aa0d579599d8d5f91981. Includes server
-fixture compilation,format/architecture. Private room-redaction-mapping-2026-11-10 stores
-red/green results,source/archive and strict audits. Native fixture now requires both history
-windows Success and zero observed5xx; final native run has not executed yet.
+Native-fixed3/5268 REAPED PASS3/214.303s. Strict accept-fixed.py verifies identical prior
+case IDs, fixed source/APK/SDK, both Company/Space windows Success with exact original/edit
+hashes, missing-key/redaction/adoption checks, zero5xx. Matrix28/native2; two bounded
+missing-anchor reads added relative to26/native2 baseline. Original/mixed controls retain
+original transactions and confirm exactly2/3 provider events with the recipient offline;
+process loss and subsequent offline restart remain covered. Emulator stopped; no compilation
+overlap or phone interaction. [Updated contract](collaboration/room-redaction-mapping.md).
 
-Mobile14Kotlin files in history-anchor-2026-11-10 preserve exact acquired anchors separately
-from original ACKs and correct SDK decoding failure classification. Focused1/53935 REAPED
-45cases/1test-fixture failure/92.595s: old fixture hardcoded the original anchor. Only its
-independent expectation was adjusted,all14exact failed-candidate files archived. Focused2/36860 REAPED131cases/1test failure/185.786s: runCurrent did not wait for the real
-Default decoder before raw I/O. Only the new host test gained an explicit entered barrier;
-production source is unchanged and all14exact candidate files are archived. Focused3/71222
-RUNNING expected176,source frozen. One3GiB compiler,no emulator; no Group compilation
-may overlap. Next Mobile full10224expected,then isolated native regression with both final
-sources. Native runner must use this Group green2 source checkpoint and the new Mobile APK.
+Original now has the exact mapper/test port and full1/49822 RUNNING,24expected Company
+history/sync/protocol cases plus quality and API/worker bootJARs. One2GiB compiler,no emulator.
+Next audit/commit/push that compatible port and prepare live activation without Group schemas.
+Live e558a686/schema116.4/readinessON/groupOFF unchanged. Phone87 last known,88uninstalled,
+89unbuilt,ADB64277 timeout at14:00; existing availability question and INSTALL-ONLY remain.
 
-Mobilec08cf834 pushed55285(REAPED) publishes classifier hosted42819170095 COMPLETE11295
-plus16Swift/unsignedhost; runtime42824039795 portable49173 REAPED/audited8201,Apple running.
-Phone87 remains last known,88uninstalled; ADB64277 timed out15s at14:00(REAPED). Existing
-availability question stays pending; INSTALL-ONLY boundaries remain. No live/SDK/Starter change.
+Runtime hosted42824039795 COMPLETE/audited11330 plus16Swift/unsignedhost,Apple45856 REAPED.
+Current6334c0c4 hosted run still to dispatch. No native Apple Matrix implementation claim.
+Next bounded Space incoming retention/progress and product integration; all54 PRD groups open.
+No generic Starter delta, SDK artifact change or new employee-phone message.
 
 ## Follow-up trace accepted
 

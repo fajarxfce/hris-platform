@@ -17,6 +17,30 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
+## Mobile checkpoint — 10 November, 04:51 UTC
+
+Mobile command foundationb1adfd820e5e560bf3d689a6bee09a88d1f67a9a is committed/pushed,
+with docsc2b47bd5. Full44596 is REAPED PASS939.564s:9,320 verified results including
+3,864 fresh+5,456 exact accepted reused,zero failure/error/skip. Focused202 actual
+SQLite/Chromium cases and all90 AppFlow cases pass; Android host/release/lint,
+Wasm/iOS source,browsers,proof APK/unit tests and quality pass. All4,660 inputs match
+SHAed60ebcb63b731cfbe898ae0f8e08f22edbc735352e0b7af3895ad3232cc74a1.
+No new native runtime/phone/live claim. Generic42749839268 portable7,276 is accepted
+(audit20231,artifact13735936500,SHA96d215a265827595459de3f048e529e0c49bea1a6323fd4d9ba9374c7376f053);
+Apple is building its host. Producer42753380451 is pending: do not supersede it.
+Once producer starts, dispatch command control on fixed branch
+validation/command-work-wakes-20261110 (b1adfd82,pushed22905), not moving work HEAD.
+No command hosted run dispatched yet. Receipt42745403043 remains fully accepted9,798.
+
+Current Mobile source is uncommitted encrypted SPACE message storage:13 files with
+explicit owned intent, immutable terminal proof, codec/repository,9 domain and16
+shared storage cases plus app DI assertions. Focused90715 runs on frozen source;
+one compiler/no emulator. No usecase/native/worker/UI activation yet. Next local
+queue/observation/usecase policy and full checks, then mixed-ledger delivery. Read
+Mobile handoff and .work/space-message-storage-2026-11-10 before starting jobs.
+Starter remains cleanffd0ac5; phone87 unchanged,release88 uninstalled. No backend
+source/schema/DI/live change. Earlier evidence below is historical, not active work.
+
 ## Current Mobile integration — 10 November, 04:22 UTC
 
 Mobile[d89e6b5d](https://github.com/fajarxfce/hris-mobile/commit/d89e6b5dcb0c0463916628ecd10a9bae946e5a1a) is committed/pushed

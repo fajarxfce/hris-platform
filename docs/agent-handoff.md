@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 04:01 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 04:22 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,7 +15,7 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Current Mobile integration — 10 November, 04:01 UTC
+## Current Mobile integration — 10 November, 04:22 UTC
 
 Mobile[d89e6b5d](https://github.com/fajarxfce/hris-mobile/commit/d89e6b5dcb0c0463916628ecd10a9bae946e5a1a) is committed/pushed
 (79200 reaped): new immutable room bindings atomically retain fresh recovery work,
@@ -31,14 +31,29 @@ original transactions,callback loss,process death,group control/claim,pusher and
 checks remain; fresh binding/retained-read wake assertions pass. Original10native/
 11Matrix;group25native/17Matrix,one pusher,zero errors or extra idle direct requests.
 Exact unchanged backend source-2 compile reused; no compiler during2560MiB/two-core
-emulator,now stopped. No heavy local job remains. Current proof APK150470250bytes
+emulator,now stopped. The current Mobile full gate below is the only local heavy job. Proof APK150470250bytes
 SHAde897799fc7e0eb4c8751915aa4a02a7a1a7fd14b83447426dd8a0556322a686.
 
-Generic Mobile7a6fe534 control42749839268 is still pending behind receipt42745403043.
-Do not supersede it with another pending run. Receipt portable7,100 is accepted;
-Apple is building the host. Generic expected7,276 portable+2,709 Apple; producer CI
-must follow when generic is running,expected7,292 portable+2,717 Apple. No producer
-CI dispatched yet. Pusher42739907129 is fully accepted9,744+16Swift/unsignedhost.
+Generic Mobile7a6fe534 control42749839268 is running. Producer control42753380451
+pinsd89e6b5dcb0c0463916628ecd10a9bae946e5a1a and is pending behind it; do not supersede
+that pending run. Expected generic7,276 portable+2,709 Apple; producer7,292+2,717.
+Receipt42745403043 is fully accepted9,798 cases (7,100 portable+2,698 Apple),16 Swift
+checks and unsigned host; public evidence is in Mobile7b032633. Pusher42739907129 is
+fully accepted9,744+16Swift/unsignedhost. Do not rerun accepted jobs.
+
+Current uncommitted Mobile command+wake foundation follows pushedd89e6b5d/7b032633;
+checkpoint a86ae506 is pushed. Raw CommandStore.insertBatchAndWake adds atomic new
+commands/work; active/archive replay never creates another wake. The shared request
+is renamed WorkWakeRequest without a compatibility alias or schema change. Thirteen
+new shared cases per platform pass in focused99243:202 fresh database cases (102
+SQLite+100 Chromium),zero failures/errors/skips,126.140s,Apple source/quality pass.
+All4,660 source/library inputs match; manifest SHA
+ed60ebcb63b731cfbe898ae0f8e08f22edbc735352e0b7af3895ad3232cc74a1.
+Full44596 is running on that frozen source,one compiler/no emulator. Initial private
+runner20937 failed configuration with zero tests; configuration-only correction is
+retained. No new SPACE command producer,phone build or backend change yet. See
+Mobile .work/command-commit-wake-2026-11-10 and current handoff before starting jobs.
+
 Starter remains clean HEADffd0ac5; nine-file core patch passes a dry apply check,
 no source/build change. Port after actual generic Apple acceptance. Read Mobile's
 handoff/private .work/space-binding-producer-wake-2026-11-10 before starting a job.

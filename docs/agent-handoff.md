@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 10:33 UTC. Historical detail remains in
+Updated 10 November 2026, 10:49 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,49 +17,66 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Current worker checkpoint — 10 November, 10:33 UTC
+## Current pending-worker source — 10 November, 10:45 UTC
 
-Last accepted Mobile product is [1d18e232](https://github.com/fajarxfce/hris-mobile/commit/1d18e2326cbb286630f92cb29d934b6b80d79d59), committed/pushed.
-Mixed/new-room demand focused1/77984 and full1/2861 are REAPED PASS:162 focused,
-9932 verified full (7913 fresh +2019 exact accepted reused), zero failure/error/skip.
-All4726 source/library inputs stayed fixed; manifest
-12b6aedbe631cb22bfe623b5b708057291ba0169922932af56e6930e418a4047.
-Control42796816133 remains active on that exact source, expected7930 portable +3028
-Apple. Pending-inventory42792315555 has audited7866 portable; Apple shared checks passed,
-unsigned host is still building. Mixed-core42785697360 is complete10808 +16Swift/host.
-Do not rerun accepted local gates or redispatch these controls.
+Mobile8c76f92c5c92cdf88d6827f3678e005c581fa8ab is committed/pushed17014 (REAPED):22 Kotlin inputs give the
+registered worker an authenticated schema2 message phase in the existing schema1-compatible
+partition, exact Instant/ID ordering and one durable claim. Old binding claims resume first;
+new pending commands use owning preparation/staging/delivery. Failed attempts advance before
+backoff; unready recipients return Unavailable instead of permanent Conflict. Concurrent
+cancellation ends only its attempt, and only the dedicated Finish owner checks the complete
+pending partition before wake completion. No usecase calls another usecase.
+[Contract](https://github.com/fajarxfce/hris-mobile/blob/8c76f92c/docs/collaboration-space-pending-recovery.md),
+[measurement](https://github.com/fajarxfce/hris-mobile/blob/8c76f92c/docs/measurements/collaboration-space-pending-recovery-2026-11-10.json).
 
-Current pending-worker candidate has22 APPLIED Kotlin inputs, not yet accepted. It adds
-an authenticated schema2 message phase in the existing schema1-compatible partition,
-exact Instant/ID ordering and one durable claim; resumes old binding claims, stages pending
-Space commands through owning usecases, advances failed attempts before backoff, and checks
-the complete pending partition before finishing the captured wake. Generic UpdateProgress
-rejects unchecked Finish. No usecase calls another usecase. Stage now classifies an unready
-recipient as Unavailable instead of permanent Conflict; a cancellation returned by Stage
-ends the attempt without delivery. Source1d18e232 remains the accepted baseline.
+Focused1/40918 REAPED FAILED156.483s:67 domain cases passed, then a cross-module test smart
+cast failed compilation. Its20 source bytes and review are retained. Corrected focused2
+finished435.576s:251 fresh cases,zero failures/errors/skips; its runner2452365 exited and
+strict audit passed (wrapper session ID lost across compaction). Full1/19057 is REAPED PASS
+581.55s:10010 verified =7991 fresh +2019 exact accepted reused,zero failures/errors/skips.
+Root/Android host/release compile/lint/Wasm/iOS/actualChromium/proofAPK/unit/quality pass.
+All4732 source/library inputs fixed,manifest
+fad9f11cebc53e7e60444da4341dc9b18fca16d688872ecf2aceef1d0f21d920.
+Strict focused/full auditors and publisher pass. ProofAPK150599939bytes,
+SHA50cb5b5b249663df1168f58f60fce02fccbecc8da97edca8006a9a307db14766,compiled only.
+No native or phone behavior claim. Core source freeze ended after acceptance; the separate
+proof2/34855 compile is now the only heavy job (3GiB, no emulator).
 
-Focused1/40918 is REAPED FAILED156.483s:67 domain Desktop cases passed, then a public
-nullable-property smart cast failed test compilation. Those20 candidate source bytes are
-retained privately. After reaping, the smart cast and owning recipient classification were
-fixed and cancellation/unready regressions added. Focused2 is currently running, expected251
-fresh cases (94 domain per Desktop/Chromium,18 storage per platform,25 worker +2DI), one3GiB
-compiler, no emulator. Its wrapper session ID was lost during compaction; runner PID2452365
-and .work/space-pending-recovery-2026-11-10/focused-2/result.json identify this run. Freeze
-all4732 source inputs until the runner finishes. Strict full audit expects10010 if focused
-passes; full has not started. Private README/runners supplement this tracked checkpoint.
+Current native WIP is APPLIED:3 Mobile proof Kotlin inputs and4 Group test/driver inputs.
+Core10010 remains unchanged. Private proof1 stopped before compilation because its copied
+runner compared the obsolete baseline; no tests/compiler started. Corrected proof2/34855
+is RUNNING and Mobile sources are FROZEN. Group test source is not compiled yet. All28 Python
+cases pass, retaining18 original-delivery +4 prior recovery +6 new ordering/evidence cases.
+An initial merged test run missed two imports (10 subtest errors); corrected before compile.
+Do not overwrite prior cases with the older24-case subset draft. Group/native runners and
+exact gates are under .work/space-pending-native-2026-11-10 in Mobile/Group.
 
-NEXT: complete focused/required full gates, then add actual native pending-worker coverage
-beside the accepted original-only/mixed/group controls. Queue a new Space command without
-an initial local binding; let the registered worker prepare/stage/deliver, interrupt after
-an original receipt boundary and recover exact transactions after process loss. The prior
-mixed native proof used direct delivery, so it does not establish this new worker path.
-[Tracked plan](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/collaboration-space-pending-recovery-plan.md).
-No native proof/backend implementation for the new case yet. No phone/live changes:
-phone87 last known,88 uninstalled; ADB76351 timeout15s at10:10 is reaped, question pending.
-Phone remains install-only; announce installations, never drive/clear UI. Livee558a686 /
-schema116.4 /readinessON /groupOFF unchanged. Starter generic sourcea7ff417c remains accepted358
-fresh; do not port HRIS business policy. Actual Apple Matrix runtime is still unavailable.
-All54 PRD groups remain open; continue incoming/history/edit routing,media,backup,calls/meetings.
+NEXT: finish/audit Mobile proof2, compile Group tests, then invoke four actual native cases.
+New case queues an unbound Space command; real worker claims/stages/delivers it beside two
+unchanged Company originals, interrupts receipt projection and recovers after process loss.
+Driver forwards listening/control before waiting for staging; retained app-count evidence
+is distinct from direct SDK inventory. Preserve original-only/mixed/group controls. Actual
+native four cases NOT RUN. Never inspect SDK while staging lease is held. No phone build.
+
+Host controls:42796816133 on1d18e232 has audited7930 portable (90228 REAPED),artifact13756830729,
+SHA97d61d4309bc4a6716c38b949a2e9c5d20945b1c02a45f54d74cfe6576cf0e37,
+report manifesta0396dc8939ec3b1d7e69f0892264a744c4013a84a398a51ca7f2bbc1e86d5f0;
+Apple3028 pending host completion. [Partial hosted evidence](https://github.com/fajarxfce/hris-mobile/blob/8c76f92c/docs/measurements/collaboration-mixed-recovery-demand-hosted-2026-11-10.json).
+Pending-inventory42792315555 COMPLETE10862=7866portable+2996Apple,16Swift/unsignedhost.
+Apple87521 is REAPED PASS2996/306suites,artifact13756512123,
+SHA0aaa2c1e87f6aaa1e891e8f6ff5199f9bdee5ab1ec8d95431adcaec1077dd31e,
+manifest8d3b847f0d6992894ff983bbf0bbddedf7b7d5f50f27f8b550469cd6052ebba4.
+Source/digest/CRC/predecessor identities verified. Complete measurement accompanies this checkpoint.
+New worker control42801929551 is RUNNING on8c76f92c,validation/space-pending-recovery-20261110;
+ref61718/dispatch14028 REAPED. Expected8008 portable +3062Apple=11070 +16Swift/host.
+Private hosted config and predecessor-case auditor are complete; do not redispatch.
+
+Phone87 last known;88 uninstalled;ADB34894 timeout15s at10:39 REAPED,availability question
+pending. Phone remains install-only; announce installations,never drive/clear UI. Live
+ e558a686/schema116.4/readinessON/groupOFF unchanged. Starter generic sourcea7ff417c remains
+accepted358 fresh; keep HRIS policy here. Actual Apple Matrix runtime remains unavailable.
+All54 PRD groups remain open. Continue native acceptance, incoming/history/edit/product
+routing, media, backup, calling and meetings. No new phone build yet.
 
 
 ## Current Mobile integration — 10 November, 04:22 UTC

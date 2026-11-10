@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
@@ -38,6 +39,7 @@ import tools.jackson.databind.JsonNode
             "HRIS_MATRIX_JWT_AUDIENCE=matrix:fixture",
         ]
 )
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
     @Autowired private lateinit var trace: NativeOriginalDeliveryTrace
     @Autowired private lateinit var matrixTrace: NativeSpaceRecoveryTrace
@@ -69,6 +71,16 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
     @Test
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
     fun actualReadinessWakesRegisteredGroupTaskAndRecoversClaimAfterProcessLoss() {
+        runRecovery(pendingSpace = false)
+    }
+
+    @Test
+    @Timeout(value = 12, unit = TimeUnit.MINUTES)
+    fun unboundSpaceCommandIsStagedByRegisteredWorkerAndRetainsClaimAfterProcessLoss() {
+        runRecovery(pendingSpace = true)
+    }
+
+    private fun runRecovery(pendingSpace: Boolean) {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
         retainNativePush(sender)
@@ -85,7 +97,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
                 parent.resolve(UUID.randomUUID().toString()),
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")),
             )
-        val ids = List(2) { UUID.randomUUID().toString() }
+        val ids = List(if (pendingSpace) 3 else 2) { UUID.randomUUID().toString() }
         write(
             directory,
             "fixture",
@@ -98,7 +110,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
                 "body" to "fictional-hris-worker-original-${UUID.randomUUID()}",
                 "sender" to sender.session + ("hrisAccessToken" to sender.native.access),
                 "recipient" to recipient.session + ("hrisAccessToken" to recipient.native.access),
-            ),
+            ) + if (pendingSpace) mapOf("spaceLogicalId" to ids[2]) else emptyMap(),
         )
         val log =
             Files.createFile(
@@ -157,6 +169,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             assertTrue(listening["managedPusherActivated"].asBoolean())
             val pusherHash = assertManagedPusher(sender, group)
             assertTrue(listening["startupWakeCleared"].asBoolean())
+            assertEquals(pendingSpace, listening["queuedSpaceWithoutBinding"].asBoolean())
             assertEquals(
                 emptyList<String>(),
                 provider.encryptedRoomEvents(room, sender.session.getValue("userId")),
@@ -200,6 +213,16 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             assertTrue(control["capturedReplayDeduplicated"].asBoolean())
             val interrupted = waitFor(directory, "ack", process)
             assertTrue(interrupted["claimedBeforeDelivery"].asBoolean())
+            assertEquals(pendingSpace, interrupted["pendingMessageClaim"].asBoolean())
+            val spaceStaged =
+                if (pendingSpace) waitFor(directory, "space-staged", process) else null
+            if (spaceStaged != null) {
+                assertTrue(spaceStaged["workerStaged"].asBoolean())
+                assertTrue(spaceStaged["unboundQueued"].asBoolean())
+                assertTrue(spaceStaged["companyPartitionEmpty"].asBoolean())
+                assertEquals(3, spaceStaged["retainedOriginalCount"].asInt())
+                assertFalse(spaceStaged.has("completeOriginalCount"))
+            }
             assertTrue(interrupted["journalDurable"].asBoolean())
             assertTrue(interrupted["projectionNotWritten"].asBoolean())
             val recovered = waitFor(directory, "recovered", process)
@@ -208,7 +231,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             assertTrue(recovered["idleRecoveryCompleted"].asBoolean())
             assertTrue(recovered["recoveredWithoutNewControl"].asBoolean())
             val actualEvents = provider.encryptedRoomEvents(room, sender.session.getValue("userId"))
-            assertOriginalReceipts(ids, staged, recovered, actualEvents)
+            assertOriginalReceipts(ids, staged, recovered, actualEvents, spaceStaged)
             val result = waitFor(directory, "result", process)
             assertTrue(process.waitFor(20, TimeUnit.SECONDS))
             assertEquals(0, process.exitValue())
@@ -227,7 +250,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             assertEquals(requests, trace.snapshot())
             // Interrupted original, then recovered original; an explicit fresh idle sweep
             // must complete locally without another direct transport request.
-            assertEquals(2, requests.getOrDefault("directTransport", 0))
+            assertEquals(if (pendingSpace) 3 else 2, requests.getOrDefault("directTransport", 0))
             assertEquals(1, requests["bootstrapReplay"])
             assertEquals(1, requests["registration"])
             assertTrue(requests.getOrDefault("requests", 0) in 8..64)
@@ -249,6 +272,9 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
                     "nativeRequests" to requests,
                     "matrixRequests" to sdkRequests,
                     "actualGroupControl" to true,
+                    "pendingSpaceWorker" to pendingSpace,
+                    "queuedWithoutBinding" to pendingSpace,
+                    "originalMessageClaimRecovered" to pendingSpace,
                     "managedPusherActivatedOnce" to true,
                     "managedPusherRetainedAfterProcessLoss" to true,
                     "consumerReplayDeduplicated" to true,
@@ -313,6 +339,7 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
         staged: JsonNode,
         recovered: JsonNode,
         actual: List<String>,
+        spaceStaged: JsonNode?,
     ) {
         assertTrue(recovered["originalsRetained"].asBoolean())
         assertTrue(recovered["recipientStayedOffline"].asBoolean())
@@ -320,18 +347,23 @@ class NativeSpaceRecoveryWorkerTest : NativeSpaceOriginalFixture() {
             staged["originals"].associate {
                 it["logicalId"].asString() to it["transactionId"].asString()
             }
+        val allOriginal =
+            if (spaceStaged == null) original
+            else
+                original +
+                    (spaceStaged["logicalId"].asString() to spaceStaged["transactionId"].asString())
         val confirmed =
             recovered["confirmed"].associate {
                 it["logicalId"].asString() to it["transactionId"].asString()
             }
-        assertEquals(ids.toSet(), original.keys)
-        assertEquals(2, original.values.toSet().size)
-        assertEquals(original, confirmed)
+        assertEquals(ids.toSet(), allOriginal.keys)
+        assertEquals(ids.size, allOriginal.values.toSet().size)
+        assertEquals(allOriginal, confirmed)
         val receipts =
             recovered["confirmed"].flatMap { record ->
                 record["events"].iterator().asSequence().map { it.asString() }.toList()
             }
-        assertEquals(2, actual.size)
+        assertEquals(ids.size, actual.size)
         assertEquals(actual.toSet(), receipts.toSet())
         assertTrue(recovered["confirmed"].all { it["events"].size() == 1 })
     }

@@ -104,6 +104,11 @@ def space_original(value, fixture, group, staged):
               "companyPartitionEmpty", "completeOriginalCount"}
     if set(value) != fields or value.get("companyPartitionEmpty") is not True or type(value.get("completeOriginalCount")) is not int or value["completeOriginalCount"] != 3:
         raise ValueError("Invalid mixed original checkpoint")
+    return space_original_coordinates(value, fixture, group, staged)
+
+
+def space_original_coordinates(value, fixture, group, staged):
+    """Shared original coordinates; each caller separately validates its evidence schema."""
     logical = fixture.get("spaceLogicalId")
     if not isinstance(logical, str) or logical in (fixture["logicalId"], fixture["secondLogicalId"]) or value["logicalId"] != logical:
         raise ValueError("Expected a distinct new Space original")
@@ -238,6 +243,9 @@ class OriginalDeliveryExperiment:
             time.sleep(0.1)
         raise RuntimeError("Original Android process did not exit")
 
+    def validate_space_staging(self, value, group, staged):
+        return space_original(value, self.fixture, group, staged)
+
     def await_interruption_checkpoint(self):
         """Original-only proof: lose the second callback after its SDK transaction is gone."""
         first = self.wait_app("first-ack")
@@ -268,7 +276,7 @@ class OriginalDeliveryExperiment:
         self.write_app("original-group", group)
         self.start("interrupt")
         if self.expected == 3:
-            new = space_original(self.wait_app("space-staged"), self.fixture, group, staged)
+            new = self.validate_space_staging(self.wait_app("space-staged"), group, staged)
             private_json(self.directory / "space-staged.json", new)
             mapping[new["logicalId"]] = new["transactionId"]
         ack = self.await_interruption_checkpoint()

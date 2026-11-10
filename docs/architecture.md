@@ -1,5 +1,8 @@
 # Architecture
 
+[Actual pending-worker recovery](collaboration/space-pending-native.md) verifies unbound Space discovery, original staging,
+process-loss recovery and offline projection through the registered task.
+
 [Local recovery demand](collaboration/space-recovery-demand.md) combines complete original SDK inventory with
 commands and ACK/completion evidence before skipping per-room transport. The owning
 read performs no send or projection; actual native idle recovery is separately verified.

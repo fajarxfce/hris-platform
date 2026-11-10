@@ -1,5 +1,8 @@
 # Architecture
 
+[Mobile foreground incoming startup](collaboration/space-incoming-foreground.md) is validated
+against the automatic collector and existing native recovery controls; realtime hints remain separate.
+
 [Actual pending-worker recovery](collaboration/space-pending-native.md) verifies unbound Space discovery, original staging,
 process-loss recovery and offline projection through the registered task.
 

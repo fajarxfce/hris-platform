@@ -262,6 +262,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                     listOf(
                         "contentBeforeProviderEof",
                         "registeredTask",
+                        "automaticStartup",
                         "emptyRepeatUnchanged",
                         "coveredHintUnchanged",
                     )) {

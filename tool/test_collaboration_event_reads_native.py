@@ -197,7 +197,8 @@ class IncomingWorkerEvidenceTest(unittest.TestCase):
             "retained": self.retained() | {"pendingReferences": 0, "providerExhaustedWithPending": False},
             "originalJournalUnchanged": True,
             "worker": {"turns": 2, "firstTurnMessages": 1, "contentBeforeProviderEof": True,
-                       "registeredTask": True, "emptyRepeatUnchanged": True, "coveredHintUnchanged": True}}}
+                       "registeredTask": True, "emptyRepeatUnchanged": True, "coveredHintUnchanged": True,
+                       "automaticStartup": True}}}
 
     def test_worker_evidence_is_separate_from_manual_acquisition_and_copied(self):
         value = self.worker_result()
@@ -215,7 +216,7 @@ class IncomingWorkerEvidenceTest(unittest.TestCase):
         for delta in [{"turns": 1}, {"turns": 5}, {"turns": True}, {"firstTurnMessages": 0},
                       {"firstTurnMessages": True}, {"contentBeforeProviderEof": False},
                       {"registeredTask": False}, {"emptyRepeatUnchanged": False},
-                      {"coveredHintUnchanged": False}, {"body": "private"}]:
+                      {"coveredHintUnchanged": False}, {"automaticStartup": False}, {"body": "private"}]:
             source=self.worker_result();source["incoming"]["worker"].update(delta)
             with self.subTest(delta=delta), self.assertRaises(ValueError):
                 adopted_events(source, self.staged(), worker=True)

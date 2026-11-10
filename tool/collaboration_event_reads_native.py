@@ -138,7 +138,8 @@ def worker_incoming(value, staged):
             or value["originalJournalUnchanged"] is not True):
         raise ValueError("Invalid registered worker evidence")
     worker = value["worker"]
-    flags = {"contentBeforeProviderEof", "registeredTask", "emptyRepeatUnchanged", "coveredHintUnchanged"}
+    flags = {"contentBeforeProviderEof", "registeredTask", "emptyRepeatUnchanged", "coveredHintUnchanged",
+             "automaticStartup"}
     if (not isinstance(worker, dict) or set(worker) != flags | {"turns", "firstTurnMessages"}
             or any(worker[n] is not True for n in flags)
             or type(worker["turns"]) is not int or not 2 <= worker["turns"] <= 4

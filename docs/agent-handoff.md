@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 13:17 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 13:38 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -8,35 +8,37 @@ with pushes and validated phone updates. All54 acceptance groups remain open. No
 Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
-Latest accepted Mobile5c276a2fcc472260245ea56ba6db7b50c537bd59 is committed/pushed39983
-(REAPED). Typed event classification preserves original/edit/redaction/unresolved identity and
-actual SDK decryption. Focused49881 PASS105/302.286s; full34957 PASS10172=8153fresh+2019exact
-accepted reused/695.005s, all reaped/strictly audited.4755source inputs fixed,
-manifestf56484e626ceb0d012e9cca86f628150b7863dca87a3dc20ab6ed4ea7e69ff3c.
-Current proofAPK150605511B SHA24e8cef1c2319a00c2378495f9552f8a4c0f127cecdb86ff24edd64745ca685e.
-Hosted42819170095 RUNNING exact5c,11295expected+16Swift/unsignedhost. Ref67054/dispatch33180
-REAPED. No native equivalence, incoming activation, phone or live claim.
 
-Current Mobile UNCOMMITTED14-file native integration owns finite raw reads under the existing
-parent/client and exact registry checks before/after I/O. Physical owner and logical Space wrapper
-stay distinct; no implicit SDK creation/sync/send. Adds15child-lifetime +4parent-integration host
-cases and4portable availability cases; existing DI/absent-runtime tests cover same instance/no I/O.
-Focused1/7075 REAPED PASS77/409.620s, strict audit; Mobile full1/47121 RUNNING, source frozen,
-10203expected/4762inputs. Mobile handoffd6625ee4 pushed87654(REAPED) owns current gates.
+## Native event proof accepted; old history failures remain
 
-Group has3new UNCOMMITTED test files: NativeEventReadsTest.kt,
-tool/collaboration_event_reads_native.py and tool/test_collaboration_event_reads_native.py.
-4new Python evidence +18unchanged original-driver cases pass; JVM/native not compiled/run.
-Private runtime-event-native-2026-11-10 has files/log/protocol. No production/schema/DI changes.
-Driver awaits new Mobile `event-reads-stage`/`event-reads-space` instrumentation phases, which
-must be implemented after accepting Mobile runtime source. Five distinct events: sender original,
-peer original, first edit, redaction of peer by sender, latest edit. Missing-key read precedes
-explicit SDK sync; provider verifies four encrypted events. Both SDKs close before original
-LEGACY adoption; Space re-reads exact original/latest edit/redacted target under unchanged
-physical ownership. Observe old Company/Space window result without presuming a failure.
-Do not claim native equivalence or edit-head bug reproduction until actual SDK6 execution.
-Next implement Mobile probe, compile both sources sequentially, then isolated2560MiB2core
-emulator with precompiled768MiB harness; no compiler/emulator overlap or employee-device UI.
+[Actual SDK6 result](collaboration/runtime-event-native.md) and its checked-in measurement supersede the running
+checkpoint below. Native1/44424 REAPED PASS1/125.992s, four encrypted provider events,
+missing-key then explicit sync, exact original/edit/hash/redaction identity across original
+physical runtime adoption. Emulator stopped, no compiler overlap, phone untouched.
+Mobile proof1/1607 PASS20/109.339s,4764inputs/ad29ef0af969e6333270b2e7d0d5b13a056ff2dfb4daa9785d2b2ceb9731952c.
+Group source1/73206 PASS84.146s/zero JVM tests (compile only),8738inputs/
+18ef0db2a4c5b58bd42b5c9c132937e75da6e6223c0a1d5b31e0ad37e7ce2526,4new+18old Python cases.
+Both gates and native audit passed; all sessions reaped. Current proofAPK150606837B
+SHA60f7fafe65480e989cf26855aec46bd9525ede27625619b8a2f594a56bda0f95, unchanged immutable SDK6.
+Productf64e4713 is committed/pushed; full47121 PASS10203/625.307s, focused7075 PASS77.
+No local job/emulator remains. Hosted classifier42819170095 Apple and runtime42824039795
+continue remotely. Classifier portable1908 is reaped/audited8170; do not rerun it.
+
+Next fix the OLD history reader using acquired anchor evidence: Company returns Storage and
+Space Unexpected when the latest event is a replacement. Do not remove identity checks or
+reinterpret edits as original ACKs. Keep the bounded surrounding window for multiple lost
+callbacks. One Matrix5xx is recorded but route/cause remains unproven; trace it before claiming
+a cause. Native PASS accepts the new capability and reproduces failures, not a fixed reader.
+The provider-only same-device redaction is fixture setup; production has no redaction route.
+All54 PRD groups stay open. No phone/live/SDK/Starter change or native Apple implementation.
+
+
+Current accepted production Mobilef64e47136a309453ab9d6ea67993ed8e5200b611 binds physical and
+logical Space event reads to the existing runtime. Source push76754 REAPED. Full47121 and
+focused7075 passed and are strictly audited; the native proof above exercises that exact
+production source. Mobile and Group proof changes are ready for their atomic commits.
+Private runtime-event-native-2026-11-10 in both repos preserves runners/source manifests.
+No Group production/schema/DI change.
 
 
 Predecessor hosted controls are COMPLETE and strictly audited: history42808577683=11145,

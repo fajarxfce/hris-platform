@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 18:14 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 18:44 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -8,6 +8,36 @@ with pushes and validated phone updates. All54 acceptance groups remain open. No
 Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
+
+## Active mobile incoming-demand storage
+
+Mobile7197a803 policy committed/pushed, focused124/full10479 accepted. Current11storage files
+remain UNCOMMITTED/FROZEN under full1/82562 RUNNING; expected10511. Focused2/84063 is
+REAPED/ACCEPTED118/290.724s,4810inputs,
+manifestc08386dad0b82bccc0d8b6e1f65d7d330bea8115ca018c72122aec21e14a7106.
+One encrypted document+small checkpoint atomically retain demand and independent incoming
+wake.16realstore cases eachSQLite/Chromium plus43controls each and iOSdata/quality checks PASS.
+Failed focused1 revealed checkpoint32768 limit and stale-login test caller; both corrected.
+Generic storage limits unchanged. Reap/audit full, then commit/push storage before applying more.
+
+Provider incoming.head is a pagination token, not an event ID. Mobile PRIVATE
+space-incoming-source-2026-11-10 has6UNAPPLIED files for consistent exact source+checkpoint
+lookup via existing HMAC index, six real-store cases, no schema change. Known source/provider
+EOF/no pending sources can exclude idle hints; never compare tokens to message IDs. Continue
+with owning Queue/Completion usecases and bounded worker. No new consumer/native/phone behavior.
+
+Hosted42865846045 exact66990838 COMPLETE/ACCEPTED11621=8399portable+3222Apple,16Swift/unsigned
+host PASS; artifacts/digests/CRC/old cases audited. Predates pending-reference/policy/storage;
+no duplicate run. Mobile6148626a latest earlier docs push,87708 REAPED. Previous actualnative4/
+64426 remains accepted230.275s, emulatorSTOPPED; Mobile7174557d/Group0ce34b92 pushed. Matrix32
+in both event scenarios; completed13source case adds zeroMatrix requests. No new Group code.
+
+ADB76668 timeout REAPED18:39; release89 NOT INSTALLED, phone87 last known. Install-only when
+reachable, never launch/reset/drive UI. Original live90163/schema116.4 unchanged; Group117–140
+undeployed. SDK6/private original transactions/stores preserved; no generic Starter delta.
+All54PRD groups remain OPEN. No agents. Mobile handoff owns exact active inputs and gates.
+
+## Historical checkpoints
 
 ## Active independent incoming-demand policy
 

@@ -203,6 +203,37 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             assertTrue(result["passed"].asBoolean())
             assertTrue(result["cleanup"].asBoolean())
             val adopted = result["adopted"]
+            assertTrue(result["offlineTransportRemoved"].asBoolean())
+            val incoming = adopted["incoming"]
+            val reopened = result["reopened"]
+            assertTrue(incoming["replayUnchanged"].asBoolean())
+            assertTrue(incoming["originalJournalUnchanged"].asBoolean())
+            assertTrue(reopened["sameRevision"].asBoolean())
+            assertTrue(reopened["runtimeNeverOpened"].asBoolean())
+            assertTrue(reopened["databaseReleased"].asBoolean())
+            assertNotEquals(adopted["processId"].asInt(), reopened["processId"].asInt())
+            assertEquals(incoming["retained"], reopened["incoming"])
+            assertEquals(
+                events["original"].asString(),
+                incoming["retained"]["originalEventId"].asString(),
+            )
+            assertEquals(
+                events["latestEdit"].asString(),
+                incoming["retained"]["replacementEventId"].asString(),
+            )
+            assertEquals(
+                events["peer"].asString(),
+                incoming["retained"]["redactedEventId"].asString(),
+            )
+            assertEquals(
+                staged["originalHash"].asString(),
+                incoming["retained"]["originalHash"].asString(),
+            )
+            assertEquals(
+                staged["latestEditHash"].asString(),
+                incoming["retained"]["replacementHash"].asString(),
+            )
+            assertEquals(2, trace.snapshot()["directTransport"])
             assertEquals("Success", staged["companyWindow"]["kind"].asString())
             assertEquals("Success", adopted["spaceWindow"]["kind"].asString())
             assertTrue(failureTrace.snapshot().isEmpty())
@@ -224,6 +255,8 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                     "encryptedEvents" to 4,
                     "physical" to staged,
                     "adopted" to adopted,
+                    "reopened" to reopened,
+                    "offlineTransportRemoved" to true,
                     "native" to trace.snapshot(),
                     "matrix" to matrixTrace.snapshot(),
                     "failures" to failureTrace.snapshot(),

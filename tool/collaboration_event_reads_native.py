@@ -61,12 +61,49 @@ def staged_events(value):
             "companyWindow": original_window(value["companyWindow"]), **{name: True for name in flags}}
 
 
+def retained_history(value, staged):
+    flags = {"originalTextPreserved", "replacementTextPreserved", "originalSenderTombstone",
+             "noOriginalFactForEdit", "noSpaceSendWork"}
+    fields = flags | {"messages", "originalEventId", "replacementEventId", "redactedEventId",
+                      "originalHash", "replacementHash", "revisionHash"}
+    if (not isinstance(value, dict) or set(value) != fields
+            or any(value[n] is not True for n in flags)
+            or type(value["messages"]) is not int or value["messages"] != 1):
+        raise ValueError("Incomplete encrypted incoming history evidence")
+    expected = {"originalEventId": staged["events"]["original"],
+                "replacementEventId": staged["events"]["latestEdit"],
+                "redactedEventId": staged["events"]["peer"],
+                "originalHash": staged["originalHash"], "replacementHash": staged["latestEditHash"]}
+    if any(value[n] != v for n, v in expected.items()):
+        raise ValueError("Incoming history changed original/replacement identity")
+    content_hash(value["revisionHash"])
+    return dict(value)
+
+
+def incoming_history(value, staged):
+    if (not isinstance(value, dict) or set(value) != {"retained", "replayUnchanged", "originalJournalUnchanged"}
+            or value["replayUnchanged"] is not True or value["originalJournalUnchanged"] is not True):
+        raise ValueError("Incoming replay changed history or outgoing work")
+    return {**value, "retained": retained_history(value["retained"], staged)}
+
+
+def reopened_history(value, adopted):
+    checkpoint(value)
+    flags = {"sameRevision", "runtimeNeverOpened", "databaseReleased"}
+    if (set(value) != flags | {"processId", "incoming"}
+            or any(value[n] is not True for n in flags)
+            or value["processId"] == adopted["processId"]
+            or value["incoming"] != adopted["incoming"]["retained"]):
+        raise ValueError("Incoming history was not reopened unchanged without a runtime")
+    return {**value, "incoming": dict(value["incoming"])}
+
+
 def adopted_events(value, staged):
     checkpoint(value)
     flags = {"logicalRuntimePreserved", "physicalOwnerPreserved", "oldCompanyReadRejected",
              "foreignRuntimeReadRejected", "redactedTargetSenderPreserved", "runtimeReleased"}
     fields = flags | {"processId", "headEventId", "originalHash", "latestEditHash", "redactedEventId",
-                      "redactionEventId", "spaceWindow"}
+                      "redactionEventId", "spaceWindow", "incoming"}
     if set(value) != fields or any(value[name] is not True for name in flags):
         raise ValueError("Original runtime ownership was not preserved")
     for name in ["originalHash", "latestEditHash"]:
@@ -76,12 +113,13 @@ def adopted_events(value, staged):
                 "redactionEventId": staged["events"]["redaction"]}
     if any(value[name] != event for name, event in expected.items()):
         raise ValueError("Adoption changed an event identity")
-    return {**value, "spaceWindow": original_window(value["spaceWindow"])}
+    return {**value, "spaceWindow": original_window(value["spaceWindow"]),
+            "incoming": incoming_history(value["incoming"], staged)}
 
 
 class EventReadExperiment(OriginalDeliveryExperiment):
     def start(self, phase):
-        if phase not in {"stage", "space"}:
+        if phase not in {"stage", "space", "local"}:
             raise ValueError("Unknown event-read phase")
         self.native.command("shell", "run-as", PACKAGE, "rm", "-f", "files/protocol-proof/instrumentation.json")
         self.process = subprocess.Popen([self.native.adb, "-s", self.native.serial, "shell", "am", "instrument",
@@ -113,7 +151,18 @@ class EventReadExperiment(OriginalDeliveryExperiment):
         self.start("space")
         adopted = adopted_events(self.wait_app("events"), staged)
         self.finished()
-        self.result.update(passed=True, physical=staged, adopted=adopted)
+        port = self.native.port
+        if not port:
+            raise RuntimeError("Incoming offline phase has no owned transport mapping")
+        self.native.command("reverse", "--remove", f"tcp:{port}")
+        self.native.port = None
+        if any(f"tcp:{port}" in line.split()[1:2] for line in self.native.command("reverse", "--list").splitlines()):
+            raise RuntimeError("Incoming offline phase still has transport")
+        self.start("local")
+        reopened = reopened_history(self.wait_app("local"), adopted)
+        self.finished()
+        self.result.update(passed=True, physical=staged, adopted=adopted,
+                           reopened=reopened, offlineTransportRemoved=True)
 
 
 if __name__ == "__main__":

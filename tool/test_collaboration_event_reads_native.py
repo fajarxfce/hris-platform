@@ -1,7 +1,7 @@
 """Reject incomplete native evidence; preserve event and physical ownership comparisons."""
 import unittest
 
-from collaboration_event_reads_native import staged_events, adopted_events, event_coordinates, original_window
+from collaboration_event_reads_native import staged_events, adopted_events, event_coordinates, original_window, retained_history, incoming_history, reopened_history
 
 
 class EventReadEvidenceTest(unittest.TestCase):
@@ -11,9 +11,24 @@ class EventReadEvidenceTest(unittest.TestCase):
                 "companyWindow": {"kind": "Unavailable", "code": "fixture.pending", "originals": 0, "anchorIncluded": False},
                 "missingKeyObserved": True, "decryptedAfterSync": True, "redactedTargetSenderPreserved": True, "bothSdkClosed": True}
 
+    def retained(self):
+        return {"messages": 1, "originalEventId": "$original", "replacementEventId": "$latestEdit",
+                "redactedEventId": "$peer", "originalHash": "a" * 64, "replacementHash": "c" * 64,
+                "revisionHash": "d" * 64,
+                **{n: True for n in ["originalTextPreserved", "replacementTextPreserved",
+                                    "originalSenderTombstone", "noOriginalFactForEdit", "noSpaceSendWork"]}}
+
+    def incoming(self):
+        return {"retained": self.retained(), "replayUnchanged": True, "originalJournalUnchanged": True}
+
+    def reopened(self):
+        return {"processId": 125, "incoming": self.retained(), "sameRevision": True,
+                "runtimeNeverOpened": True, "databaseReleased": True}
+
     def adopted(self):
         return {"processId": 124, "headEventId": "$latestEdit", "originalHash": "a" * 64, "latestEditHash": "c" * 64,
                 "redactedEventId": "$peer", "redactionEventId": "$redaction", "spaceWindow": self.staged()["companyWindow"],
+                "incoming": self.incoming(),
                 **{n: True for n in ["logicalRuntimePreserved", "physicalOwnerPreserved", "oldCompanyReadRejected",
                                     "foreignRuntimeReadRejected", "redactedTargetSenderPreserved", "runtimeReleased"]}}
 
@@ -51,6 +66,39 @@ class EventReadEvidenceTest(unittest.TestCase):
                         {"kind": "provider body"}, {"kind": []}, {"code": "unsafe text"}, {"body": "private"}]:
             with self.subTest(changed=changed), self.assertRaises(ValueError):
                 original_window(value | changed)
+
+
+    def test_incoming_evidence_is_copied_and_remains_independent_of_original_receipts(self):
+        source = self.incoming()
+        result = incoming_history(source, self.staged())
+        source["retained"]["originalHash"] = "f" * 64
+        self.assertEqual(self.incoming(), result)
+        self.assertEqual(self.reopened(), reopened_history(self.reopened(), self.adopted()))
+
+    def test_incoming_rejects_wrong_identity_hash_count_and_body_exposure(self):
+        for changed in [{"originalEventId": "$latestEdit"}, {"replacementEventId": "$original"},
+                        {"redactedEventId": "$redaction"}, {"originalHash": "c" * 64},
+                        {"replacementHash": "a" * 64}, {"messages": True}, {"messages": 2},
+                        {"revisionHash": "unsafe"}, {"body": "private"}, {"noOriginalFactForEdit": False}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                retained_history(self.retained() | changed, self.staged())
+
+    def test_incoming_rejects_changed_replay_or_outgoing_journal(self):
+        for changed in [{"replayUnchanged": False}, {"originalJournalUnchanged": 1}, {"token": "private"}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                incoming_history(self.incoming() | changed, self.staged())
+
+    def test_reopened_requires_a_new_process_and_released_database_without_a_runtime(self):
+        for changed in [{"processId": 124}, {"processId": True}, {"sameRevision": False},
+                        {"runtimeNeverOpened": False}, {"databaseReleased": 1}, {"body": "private"}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                reopened_history(self.reopened() | changed, self.adopted())
+
+    def test_reopened_rejects_changed_storage_revision_or_any_retained_fact(self):
+        for changed in [{"revisionHash": "e" * 64}, {"originalHash": "e" * 64},
+                        {"redactedEventId": "$other"}, {"noSpaceSendWork": False}]:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                reopened_history(self.reopened() | {"incoming": self.retained() | changed}, self.adopted())
 
 
 if __name__ == "__main__":

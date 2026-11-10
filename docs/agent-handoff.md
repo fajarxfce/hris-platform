@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 15:49 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 15:56 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -46,24 +46,27 @@ and required app/quality gates pass. One15s1..16-event batch uses one current ro
 local original facts before targets and separate original/edit commits. No sync/join/send,
 ViewModel I/O, durable incoming frontier or consumer/product integration is enabled yet.
 
-Current actual batch fixture:3Group files are APPLIED/UNCOMMITTED (NativeEventReadsTest,
-collaboration_event_reads_native.py and its test); production mapper82f2c817 is unchanged.
-Mobile has5APPLIED/UNCOMMITTED proof Kotlin files; proof1/36935 REAPED PASS20/111.123s,
-strict audit and actual dex/SDK checks. APK150632212B
-SHA4975867aab691df8c5c753fcfd20036e3d8da37ef069e563ee6f136ff63a51eb, immutableSDK6.
-Source1/43821 RUNNING here (testClasses/format/architecture, no native test yet).27Pythoncases
-PASS (9incoming+18oldoriginalcontrols). No emulator. Keep both source trees/library/APK frozen.
-Both repos' .work/space-incoming-native-2026-11-10 own exact candidates/base hashes, files.json,
-runners, config and strict auditors. After source gate reap/audit, run native.py native-1 here:
-isolated2560MiB2core emulator and precompiled768MiB test harness, never compiler overlap.
-Three existing native cases remain required. Added incoming proof invokes actual app DI twice,
-checks one original+separate latest edit+original-sender tombstone and unchanged revision/journal,
-then reopens a different process after removing its owned backend reverse. No new provider send;
-exact2direct transports for2batches. accept-native.py checks prior cases, SDK, reports, bounded
-requests, reopened evidence and both original/mixed recovery controls. Actual acceptance PENDING.
-After native acceptance commit/push both test-source increments and final evidence; then continue
-incoming provider frontier/pending-reference progress and its independent worker. Mobile current
-handoff owns later steps; no live/phone/SDK distribution is part of this fixture.
+Actual incoming batch fixture is ACCEPTED with this3-file test-source commit. Mobile's5proof
+files are accepted against producte1ab46e4. Native1/79710 REAPED PASS3/208.285s, boot40.900s;
+strict accept-native.py passes. Replay preserves encrypted history revision and original/send
+identity; another process reopens the same facts after backend reverse removal with no Space
+runtime. Native7 includes exactly2direct transports/2batches; Matrix30 includes unchanged4sends,
+3sync,2secret-storage; no failures. Both previous original/mixed controls retain exact2/3events,
+transactions, offline recipient, process-loss and local restart, with prior native counts.
+[Contract and measurement](collaboration/incoming-batch-native.md). Emulator stopped; no local
+heavy job remains, no compilation overlap and all source/library/APK fingerprints unchanged.
+
+Source43821 REAPED PASS80.918s/zero JVM tests (compilation only) plus27Pythoncases,
+8,740inputs,manifest7c4f1fc40aeebfee4b2ed3f959cfc7965614cba4dab5a9a23a640cda62c20d67.
+Mobile proof36935 REAPED PASS20/111.123s,4,775inputs,
+manifest3133cabf811fefa9650a1f17737fc8b957d363cab4569f4bb59b1801b6da9d3e.
+APK150632212B SHA4975867aab691df8c5c753fcfd20036e3d8da37ef069e563ee6f136ff63a51eb,SDK6.
+Both .work/space-incoming-native-2026-11-10 folders own exact reproducible runners/auditors,
+source manifests and private fixture evidence. No backend production mapper/live change here.
+Producte1ab46e4 hosted42849335674 is RUNNING, expected11500=8316portable+3184Apple plus16Swift/
+unsignedhost; ref87721/dispatch69895 REAPED. Mobile acquisition/hosted-audit.py owns acceptance.
+Continue independent incoming provider frontier/pending-reference progress and consumer work;
+all54 PRD groups remain open. No new phone build/install is implied by the test-only changes.
 
 Hosted history6334c0c4 run42835309631 COMPLETE/audited11359=8222portable+3137Apple plus16Swift/
 unsignediOS host. Apple60813 REAPED; Mobile80ce00fd publishes evidence. Runtime42824039795 is

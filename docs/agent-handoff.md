@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 09:41 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 09:58 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,7 +15,7 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 09:40 UTC
+## Mobile checkpoint — 10 November, 09:58 UTC
 
 Mobile [b03f591d](https://github.com/fajarxfce/hris-mobile/commit/b03f591d57012a062dff7a2044190e8ccdc5711d)
 is committed/pushed83579/reaped. Complete local Space pending inventory reads existing
@@ -28,7 +28,7 @@ no metadata/SDK/HTTP/write/schedule/acknowledgement or worker routing change.
 Focused1/51383 REAPED PASS116/340.79s. Full1/59690 REAPED PASS674.306s,9868verified=7849fresh+
 2019exact reused,zero failures/errors/skips. All required root/platform/quality checks pass;
 4724source/library bytes fixed,manifest0f5676b37b54248b7b02843c8298ee0eb6362c063619b41ccd2a2344f48ff7e2.
-Strict auditors/publisher pass. No local heavy process. Pinned control42792315555 is RUNNING
+Strict auditors/publisher pass. Only the newer mixed-demand full gate below is compiling. Pinned control42792315555 is RUNNING
 onb03f591d,ref83367/dispatch78364 reaped; expected7866portable+2996Apple=10862+16Swift/host.
 Do not redispatch or rerun accepted local gates. No new server source/schema.
 
@@ -40,16 +40,23 @@ Failed native1 test-only two-ID SQL guard and its bounded2..3 repair are retaine
 or SDK workaround. Do not repeat this native evidence without relevant source changes.
 
 Staging42781554618 COMPLETE10676+16Swift/unsigned host; portable7101/Apple90429 audits reaped.
-Mixed core42785697360 portable37305 REAPED PASS7830;Apple host still building. Complete/partial
-hosted evidence publishedb03f591d. New-room10574,capability10535,projection10513,matching10402
+Mixed core42785697360 COMPLETE10808=7830portable+2978Apple,16Swift/unsignedhost.
+Portable37305/Apple90383 audits REAPED; Appleartifact13752028936/SHA2040fed130a5ac4d725f33f87e8798f53888d6e0ba2fb82d0ffbfe729b219798.
+Complete mixed hosted evidence is published in the accompanying Mobile docs checkpoint. New-room10574,capability10535,projection10513,matching10402
 hosted controls remain accepted. Actual Apple Matrix runtime is still unavailable; shared
 code tests and unsigned hosts do not implement native Apple chat.
 
-NEXT: existing read-only demand must support both Company/Space ledgers and SPACE rooms;
-false needs exact idle proof for both complete ledgers. Then fair durable pending command
-claims/binding preparation/staging in the application worker, preserving schema1 authenticated
-progress and exact wake generations. Usecases never call each other. An unapplied/untested
-policy draft and design notes are private in Mobile .work/mixed-recovery-demand-2026-11-10.
+Current Mobile nine-input mixed/new-room demand WIP is FROZEN for full1/2861,one3GiB
+compiler/no emulator. Focused1/77984 REAPED PASS162/337.721s (new30 mixed demand+2selection,
+original16 demand retained, inventory18 and2DI),Desktop/actualChromium/iOS source/quality.
+Strict audit4726source manifest12b6aedbe631cb22bfe623b5b708057291ba0169922932af56e6930e418a4047.
+No accepted source claim until full gate passes. Both ledgers require exact idle proof,
+immutable pre-suspend capture and rechecks; SPACE rooms need no Company reads. No SDK/write
+or pending-worker activation. Private Mobile .work/mixed-recovery-demand-2026-11-10 retains
+runner/auditors and separate UNAPPLIED worker-draft. Preserve source freeze.
+NEXT: fair durable pending command claims/binding preparation/staging in application worker,
+preserving authenticated schema1 pending claims and exact wake generations. Proposed phase
+uses exact Instant+ID ordering (no millisecond truncation). Usecases never call each other.
 Incoming/history/edits/product routing,media,backups,calls/meetings and all54 PRD groups remain.
 [Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
 owns exact continuation. Startera7ff417c remains accepted358fresh; HRIS policy is not ported.

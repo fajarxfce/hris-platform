@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 13:45 UTC. Follow AGENTS.md. Prior details are retained in
+Updated 10 November 2026, 14:03 UTC. Follow AGENTS.md. Prior details are retained in
 [25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
 
 The user authorized the full communications PRD, sustained implementation, atomic commits
@@ -8,6 +8,35 @@ with pushes and validated phone updates. All54 acceptance groups remain open. No
 Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
 coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
 
+
+## Current redaction and edit-head repair
+
+Group has3UNCOMMITTED files: CollaborationDirectRoomEventMapping, its new
+MatrixRoomRedactionMappingTest, and stronger NativeEventReadsTest assertions. Root cause:
+valid redacted encrypted content is empty, but the mapper required ciphertext and discarded
+matched unsigned.redacted_because. The fix validates exact redaction target/actor/room/time,
+preserves original identity and own transactions, and never recursively copies unsigned data.
+
+Red1/60288 REAPED9cases/5failures/45.413s proves the regression. Green1/18068 REAPED
+PASS41/178.546s. Review preserved standalone own-redaction transactions; green2/91392
+REAPED PASS42/137.027s,all12suites/earlier case identities preserved,8,740stableinputs,
+manifestd8eb6665b11f02b7eba65c22de06a39bb7fef2159773aa0d579599d8d5f91981. Includes server
+fixture compilation,format/architecture. Private room-redaction-mapping-2026-11-10 stores
+red/green results,source/archive and strict audits. Native fixture now requires both history
+windows Success and zero observed5xx; final native run has not executed yet.
+
+Mobile14Kotlin files in history-anchor-2026-11-10 preserve exact acquired anchors separately
+from original ACKs and correct SDK decoding failure classification. Focused1/53935 REAPED
+45cases/1test-fixture failure/92.595s: old fixture hardcoded the original anchor. Only its
+independent expectation was adjusted,all14exact failed-candidate files archived. Focused2/
+36860 RUNNING expected176,source frozen. One3GiB compiler,no emulator; no Group compilation
+may overlap. Next Mobile full10224expected,then isolated native regression with both final
+sources. Native runner must use this Group green2 source checkpoint and the new Mobile APK.
+
+Mobilec08cf834 pushed55285(REAPED) publishes classifier hosted42819170095 COMPLETE11295
+plus16Swift/unsignedhost; runtime42824039795 portable49173 REAPED/audited8201,Apple running.
+Phone87 remains last known,88uninstalled; ADB64277 timed out15s at14:00(REAPED). Existing
+availability question stays pending; INSTALL-ONLY boundaries remain. No live/SDK/Starter change.
 
 ## Follow-up trace accepted
 

@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 09:58 UTC. Historical detail remains in
+Updated 10 November 2026, 10:33 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,54 +17,51 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 09:58 UTC
+## Current worker checkpoint — 10 November, 10:33 UTC
 
-Mobile [b03f591d](https://github.com/fajarxfce/hris-mobile/commit/b03f591d57012a062dff7a2044190e8ccdc5711d)
-is committed/pushed83579/reaped. Complete local Space pending inventory reads existing
-observe(access,null), including conversations without bindings. All128 bounded records are
-validated before Sent/Cancelled filtering; mutable Staging baselines are detached and original
-createdAt/ID ordering retained. Native-parent/session/directory checks bracket the local read;
-no metadata/SDK/HTTP/write/schedule/acknowledgement or worker routing change.
-[Contract](https://github.com/fajarxfce/hris-mobile/blob/b03f591d/docs/collaboration-space-pending-inventory.md).
+Last accepted Mobile product is [1d18e232](https://github.com/fajarxfce/hris-mobile/commit/1d18e2326cbb286630f92cb29d934b6b80d79d59), committed/pushed.
+Mixed/new-room demand focused1/77984 and full1/2861 are REAPED PASS:162 focused,
+9932 verified full (7913 fresh +2019 exact accepted reused), zero failure/error/skip.
+All4726 source/library inputs stayed fixed; manifest
+12b6aedbe631cb22bfe623b5b708057291ba0169922932af56e6930e418a4047.
+Control42796816133 remains active on that exact source, expected7930 portable +3028
+Apple. Pending-inventory42792315555 has audited7866 portable; Apple shared checks passed,
+unsigned host is still building. Mixed-core42785697360 is complete10808 +16Swift/host.
+Do not rerun accepted local gates or redispatch these controls.
 
-Focused1/51383 REAPED PASS116/340.79s. Full1/59690 REAPED PASS674.306s,9868verified=7849fresh+
-2019exact reused,zero failures/errors/skips. All required root/platform/quality checks pass;
-4724source/library bytes fixed,manifest0f5676b37b54248b7b02843c8298ee0eb6362c063619b41ccd2a2344f48ff7e2.
-Strict auditors/publisher pass. Only the newer mixed-demand full gate below is compiling. Pinned control42792315555 is RUNNING
-onb03f591d,ref83367/dispatch78364 reaped; expected7866portable+2996Apple=10862+16Swift/host.
-Do not redispatch or rerun accepted local gates. No new server source/schema.
+Current pending-worker candidate has22 APPLIED Kotlin inputs, not yet accepted. It adds
+an authenticated schema2 message phase in the existing schema1-compatible partition,
+exact Instant/ID ordering and one durable claim; resumes old binding claims, stages pending
+Space commands through owning usecases, advances failed attempts before backoff, and checks
+the complete pending partition before finishing the captured wake. Generic UpdateProgress
+rejects unchecked Finish. No usecase calls another usecase. Stage now classifies an unready
+recipient as Unavailable instead of permanent Conflict; a cancellation returned by Stage
+ends the attempt without delivery. Source1d18e232 remains the accepted baseline.
 
-Prior mixed native Mobile009c681f/Group3d0a2cb5 remains accepted:233.312s/3actual cases,
-new Space +two Company originals survive SDK dequeue with missing app receipts, process
-loss and offline restart;exact3provider events/transactions/device/keys/namespaces retained.
-Original-only and group-worker controls pass;group25native/17Matrix/1pusher/0extra idle transport.
-Failed native1 test-only two-ID SQL guard and its bounded2..3 repair are retained. No product
-or SDK workaround. Do not repeat this native evidence without relevant source changes.
+Focused1/40918 is REAPED FAILED156.483s:67 domain Desktop cases passed, then a public
+nullable-property smart cast failed test compilation. Those20 candidate source bytes are
+retained privately. After reaping, the smart cast and owning recipient classification were
+fixed and cancellation/unready regressions added. Focused2 is currently running, expected251
+fresh cases (94 domain per Desktop/Chromium,18 storage per platform,25 worker +2DI), one3GiB
+compiler, no emulator. Its wrapper session ID was lost during compaction; runner PID2452365
+and .work/space-pending-recovery-2026-11-10/focused-2/result.json identify this run. Freeze
+all4732 source inputs until the runner finishes. Strict full audit expects10010 if focused
+passes; full has not started. Private README/runners supplement this tracked checkpoint.
 
-Staging42781554618 COMPLETE10676+16Swift/unsigned host; portable7101/Apple90429 audits reaped.
-Mixed core42785697360 COMPLETE10808=7830portable+2978Apple,16Swift/unsignedhost.
-Portable37305/Apple90383 audits REAPED; Appleartifact13752028936/SHA2040fed130a5ac4d725f33f87e8798f53888d6e0ba2fb82d0ffbfe729b219798.
-Complete mixed hosted evidence is published in the accompanying Mobile docs checkpoint. New-room10574,capability10535,projection10513,matching10402
-hosted controls remain accepted. Actual Apple Matrix runtime is still unavailable; shared
-code tests and unsigned hosts do not implement native Apple chat.
+NEXT: complete focused/required full gates, then add actual native pending-worker coverage
+beside the accepted original-only/mixed/group controls. Queue a new Space command without
+an initial local binding; let the registered worker prepare/stage/deliver, interrupt after
+an original receipt boundary and recover exact transactions after process loss. The prior
+mixed native proof used direct delivery, so it does not establish this new worker path.
+[Tracked plan](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/collaboration-space-pending-recovery-plan.md).
+No native proof/backend implementation for the new case yet. No phone/live changes:
+phone87 last known,88 uninstalled; ADB76351 timeout15s at10:10 is reaped, question pending.
+Phone remains install-only; announce installations, never drive/clear UI. Livee558a686 /
+schema116.4 /readinessON /groupOFF unchanged. Starter generic sourcea7ff417c remains accepted358
+fresh; do not port HRIS business policy. Actual Apple Matrix runtime is still unavailable.
+All54 PRD groups remain open; continue incoming/history/edit routing,media,backup,calls/meetings.
 
-Current Mobile nine-input mixed/new-room demand WIP is FROZEN for full1/2861,one3GiB
-compiler/no emulator. Focused1/77984 REAPED PASS162/337.721s (new30 mixed demand+2selection,
-original16 demand retained, inventory18 and2DI),Desktop/actualChromium/iOS source/quality.
-Strict audit4726source manifest12b6aedbe631cb22bfe623b5b708057291ba0169922932af56e6930e418a4047.
-No accepted source claim until full gate passes. Both ledgers require exact idle proof,
-immutable pre-suspend capture and rechecks; SPACE rooms need no Company reads. No SDK/write
-or pending-worker activation. Private Mobile .work/mixed-recovery-demand-2026-11-10 retains
-runner/auditors and separate UNAPPLIED worker-draft. Preserve source freeze.
-NEXT: fair durable pending command claims/binding preparation/staging in application worker,
-preserving authenticated schema1 pending claims and exact wake generations. Proposed phase
-uses exact Instant+ID ordering (no millisecond truncation). Usecases never call each other.
-Incoming/history/edits/product routing,media,backups,calls/meetings and all54 PRD groups remain.
-[Current Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/chat-send-timing-20261107/docs/agent-handoff.md)
-owns exact continuation. Startera7ff417c remains accepted358fresh; HRIS policy is not ported.
-Phone87 unchanged,88uninstalled;ADB7776 timeout15s09:37/reaped, question pending. Install-only,
-announce updates,never drive/clear phone UI. Live e558a686/schema116.4/readinessON/groupOFF
-unchanged; preserve original keys/stores,immutable SDK6 and live JVMs.
+
 ## Current Mobile integration — 10 November, 04:22 UTC
 
 Mobile[d89e6b5d](https://github.com/fajarxfce/hris-mobile/commit/d89e6b5dcb0c0463916628ecd10a9bae946e5a1a) is committed/pushed

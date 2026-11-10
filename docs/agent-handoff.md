@@ -1,13 +1,40 @@
-# Agent continuation — organization chat
+# Agent continuation — HRIS communications
 
-Updated 10 November 2026, 19:23 UTC. Follow AGENTS.md. Prior details are retained in
-[25ab7b29](https://github.com/fajarxfce/hris-platform/blob/25ab7b29/docs/agent-handoff.md).
+Updated 10 November 2026, 19:50 UTC. Follow AGENTS.md. This opening section owns current work.
 
-The user authorized the full communications PRD, sustained implementation, atomic commits
-with pushes and validated phone updates. All54 acceptance groups remain open. No subagents.
-Mobile proves reusable foundations before Starter. Follow AGENTS.md ownership: usecases
-coordinate repositories/policy, repositories their own datasources, ViewModels screen state.
+## Current incoming completion acceptance
 
+Mobile13 Kotlin files accepted and committed as07e22182; push39105 pending reaping. Focused336/
+337.89s, full10649=8630fresh+2019exact controls/
+659.139s, native4/228.267s. Strict audits pass. 4821 inputs; manifest
+d0ede4e7ca20c4bb7737f92c847e28d80ee85b6f1014b164e21c4633d9b19bce. Original/mixed and offline native controls preserved; emulator stopped.
+Group record: docs/collaboration/space-incoming-completion-native.md; Mobile contract: docs/collaboration-space-incoming-completion.md. Private completion and completion-native
+folders own runners, immutable manifests, failed focused1 evidence and compact publication.
+
+First focused1/75627 failed17/103: initial revision comparison boxed Int zero versus Long.
+Explicit 0L fixes the policy; previous first-page cases remain. New Space acquisition receipt
+has exact current checkpoint readback. AdvanceProvider/CompleteRoom retain the independent wake,
+reject changed captures and preserve newer requests. No product consumer or SDK hint enabled.
+
+Next integrate a bounded incoming worker with fair deferral and durable inventory progress.
+Mobile private worker draft has23UNAPPLIED/UNTESTED Kotlin files and44new domain cases,
+including atomic scan+queue, schema1/2 compatibility and per-room30..300second retry eligibility.
+No app worker/hint wiring yet; retry/other owner/storage/app/native tests remain.
+Prefer committing scan cursor and queued room together in the existing encrypted demand document;
+this removes the cross-store claim/queue gap. Preserve active scan generation when a newer rescan
+arrives. Four rooms per captured FIFO turn; defer every unfinished room. One worker owns provider
+writes/completion; no inline missing-key loop. Parent-owned bounded hints and existing collapsed
+OS scheduling remain required. Queue/wake completion requires verified empty demand and scan.
+
+Hosted6699/42865846045 complete11621+16Swift/unsignedhost predates this batch. Prepared completion
+hosted auditor expects11993=8647portable+3346Apple,+16Swift/host; dispatch once against the pushed
+accepted commit. Release89 remains uninstalled, phone87 last known. Install-only when reachable;
+no launch/reset/UI driving. Live90163/schema116.4 unchanged; Group117–140 undeployed. SDK6,
+private original transactions and dirty SDK/Inspector trees preserved. No generic Starter delta.
+All54 communications PRD groups remain OPEN.
+
+
+## Historical checkpoints
 
 ## Active mobile incoming completion/provider evidence
 

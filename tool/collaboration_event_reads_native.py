@@ -61,14 +61,15 @@ def staged_events(value):
             "companyWindow": original_window(value["companyWindow"]), **{name: True for name in flags}}
 
 
-def retained_history(value, staged):
+def retained_history(value, staged, *, completed=False):
     flags = {"originalTextPreserved", "replacementTextPreserved", "originalSenderTombstone",
-             "noOriginalFactForEdit", "noSpaceSendWork", "physicalProviderPreserved", "providerExhaustedWithPending"}
+             "noOriginalFactForEdit", "noSpaceSendWork", "physicalProviderPreserved"}
     fields = flags | {"messages", "originalEventId", "replacementEventId", "redactedEventId",
                       "originalHash", "replacementHash", "revisionHash", "frontierHash", "pendingHash",
-                      "providerReferences", "pendingReferences"}
+                      "providerReferences", "pendingReferences", "providerExhaustedWithPending"}
     if (not isinstance(value, dict) or set(value) != fields
             or any(value[n] is not True for n in flags)
+            or type(completed) is not bool or value["providerExhaustedWithPending"] is not (not completed)
             or type(value["messages"]) is not int or value["messages"] != 1):
         raise ValueError("Incomplete encrypted incoming history evidence")
     expected = {"originalEventId": staged["events"]["original"],
@@ -81,31 +82,58 @@ def retained_history(value, staged):
         content_hash(value[name])
     if (type(value["providerReferences"]) is not int or not 5 <= value["providerReferences"] <= 50
             or type(value["pendingReferences"]) is not int
-            or value["pendingReferences"] != value["providerReferences"] - 2):
+            or value["pendingReferences"] != (0 if completed else value["providerReferences"] - 2)):
+
         raise ValueError("Provider coverage lost unresolved references")
     return dict(value)
 
 
-def incoming_history(value, staged):
-    if (not isinstance(value, dict) or set(value) != {"retained", "replayUnchanged", "originalJournalUnchanged", "providerPages"}
+def completed_incoming(value, staged, previous):
+    fields = {"resolved", "unresolved", "more", "retryRequired", "emptyRepeatUnchanged", "retained"}
+    if (not isinstance(value, dict) or set(value) != fields
+            or type(value["resolved"]) is not int or not 1 <= value["resolved"] <= 16
+            or value["resolved"] != previous["pendingReferences"]
+            or type(value["unresolved"]) is not int or value["unresolved"] != 0
+            or value["more"] is not False or value["retryRequired"] is not False
+            or value["emptyRepeatUnchanged"] is not True):
+        raise ValueError("Incomplete pending-reference completion")
+    retained = retained_history(value["retained"], staged, completed=True)
+    changed = {"pendingReferences", "providerExhaustedWithPending", "revisionHash", "frontierHash", "pendingHash"}
+    if any(retained[n] != v for n, v in previous.items() if n not in changed):
+        raise ValueError("Pending completion changed retained content or provider identity")
+    if retained["pendingHash"] == previous["pendingHash"]:
+        raise ValueError("Pending completion did not change the unresolved inventory")
+    return {**value, "retained": retained}
+
+
+def incoming_history(value, staged, *, completed=False):
+    fields = {"retained", "replayUnchanged", "originalJournalUnchanged", "providerPages"}
+    if completed:
+        fields.add("completed")
+    if (not isinstance(value, dict) or set(value) != fields
             or value["replayUnchanged"] is not True or value["originalJournalUnchanged"] is not True
             or type(value["providerPages"]) is not int or not 1 <= value["providerPages"] <= 4):
         raise ValueError("Incoming replay changed history or outgoing work")
-    return {**value, "retained": retained_history(value["retained"], staged)}
+    retained = retained_history(value["retained"], staged)
+    result = {**value, "retained": retained}
+    if completed:
+        result["completed"] = completed_incoming(value["completed"], staged, retained)
+    return result
 
 
-def reopened_history(value, adopted):
+def reopened_history(value, adopted, *, completed=False):
     checkpoint(value)
+    expected = adopted["incoming"]["completed"] if completed else adopted["incoming"]
     flags = {"sameRevision", "runtimeNeverOpened", "databaseReleased"}
     if (set(value) != flags | {"processId", "incoming"}
             or any(value[n] is not True for n in flags)
             or value["processId"] == adopted["processId"]
-            or value["incoming"] != adopted["incoming"]["retained"]):
+            or value["incoming"] != expected["retained"]):
         raise ValueError("Incoming history was not reopened unchanged without a runtime")
     return {**value, "incoming": dict(value["incoming"])}
 
 
-def adopted_events(value, staged):
+def adopted_events(value, staged, *, completed=False):
     checkpoint(value)
     flags = {"logicalRuntimePreserved", "physicalOwnerPreserved", "oldCompanyReadRejected",
              "foreignRuntimeReadRejected", "redactedTargetSenderPreserved", "runtimeReleased"}
@@ -121,7 +149,7 @@ def adopted_events(value, staged):
     if any(value[name] != event for name, event in expected.items()):
         raise ValueError("Adoption changed an event identity")
     return {**value, "spaceWindow": original_window(value["spaceWindow"]),
-            "incoming": incoming_history(value["incoming"], staged)}
+            "incoming": incoming_history(value["incoming"], staged, completed=completed)}
 
 
 class EventReadExperiment(OriginalDeliveryExperiment):
@@ -156,7 +184,10 @@ class EventReadExperiment(OriginalDeliveryExperiment):
         private_json(self.directory / "staged.json", staged)
         self.write_app("original-group", self.wait_host("group"))
         self.start("space")
-        adopted = adopted_events(self.wait_app("events"), staged)
+        completed = self.fixture.get("completePendingIncoming", False)
+        if type(completed) is not bool:
+            raise ValueError("Invalid pending-reference scenario")
+        adopted = adopted_events(self.wait_app("events"), staged, completed=completed)
         self.finished()
         port = self.native.port
         if not port:
@@ -166,7 +197,7 @@ class EventReadExperiment(OriginalDeliveryExperiment):
         if any(f"tcp:{port}" in line.split()[1:2] for line in self.native.command("reverse", "--list").splitlines()):
             raise RuntimeError("Incoming offline phase still has transport")
         self.start("local")
-        reopened = reopened_history(self.wait_app("local"), adopted)
+        reopened = reopened_history(self.wait_app("local"), adopted, completed=completed)
         self.finished()
         self.result.update(passed=True, physical=staged, adopted=adopted,
                            reopened=reopened, offlineTransportRemoved=True)

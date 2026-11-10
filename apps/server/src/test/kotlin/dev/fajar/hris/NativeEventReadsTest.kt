@@ -26,7 +26,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
 import tools.jackson.databind.JsonNode
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_EVENT_READ_APK", matches = ".+")
 @Import(
     NativeOriginalDeliveryTraceConfiguration::class,
@@ -77,7 +77,15 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
 
     @Test
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
-    fun exactEncryptedEventsSurviveOriginalRuntimeAdoptionWithoutPresentationRelabeling() {
+    fun exactEncryptedEventsSurviveOriginalRuntimeAdoptionWithoutPresentationRelabeling() =
+        exerciseIncomingHistory(completePending = false)
+
+    @Test
+    @Timeout(value = 12, unit = TimeUnit.MINUTES)
+    fun completedIncomingReferencesRemainExhaustedAcrossOfflineReopen() =
+        exerciseIncomingHistory(completePending = true)
+
+    private fun exerciseIncomingHistory(completePending: Boolean) {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
         val recipient = sdkOwner(sdkPeer(base))
@@ -100,6 +108,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             "fixture",
             mapOf(
                 "baseUrl" to "http://127.0.0.1:$port",
+                "completePendingIncoming" to completePending,
                 "roomId" to room,
                 "conversationId" to conversation,
                 "logicalId" to UUID.randomUUID(),
@@ -212,7 +221,8 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             assertTrue(reopened["runtimeNeverOpened"].asBoolean())
             assertTrue(reopened["databaseReleased"].asBoolean())
             assertNotEquals(adopted["processId"].asInt(), reopened["processId"].asInt())
-            assertEquals(incoming["retained"], reopened["incoming"])
+            val finalIncoming = if (completePending) incoming["completed"] else incoming
+            assertEquals(finalIncoming["retained"], reopened["incoming"])
             assertEquals(
                 events["original"].asString(),
                 incoming["retained"]["originalEventId"].asString(),
@@ -236,7 +246,12 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             val pages = incoming["providerPages"].asInt()
             assertTrue(pages in 1..4)
             assertEquals(pages, matrixTrace.snapshot()["providerPage"])
-            assertEquals(30 + pages, matrixTrace.snapshot()["requests"])
+            val pendingReads =
+                if (completePending) incoming["retained"]["pendingReferences"].asInt() else 0
+            val matrixRequests = requireNotNull(matrixTrace.snapshot()["requests"])
+            if (completePending)
+                assertTrue(matrixRequests in (30 + pages)..(30 + pages + pendingReads))
+            else assertEquals(30 + pages, matrixRequests)
             val retained = incoming["retained"]
             assertTrue(retained["physicalProviderPreserved"].asBoolean())
             assertTrue(retained["providerExhaustedWithPending"].asBoolean())
@@ -245,7 +260,20 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 retained["providerReferences"].asInt() - 2,
                 retained["pendingReferences"].asInt(),
             )
-            assertEquals(2 + pages, trace.snapshot()["directTransport"])
+            assertEquals(
+                2 + pages + if (completePending) 1 else 0,
+                trace.snapshot()["directTransport"],
+            )
+            if (completePending) {
+                val completed = incoming["completed"]
+                assertEquals(retained["pendingReferences"].asInt(), completed["resolved"].asInt())
+                assertEquals(0, completed["unresolved"].asInt())
+                assertFalse(completed["more"].asBoolean())
+                assertFalse(completed["retryRequired"].asBoolean())
+                assertTrue(completed["emptyRepeatUnchanged"].asBoolean())
+                assertEquals(0, completed["retained"]["pendingReferences"].asInt())
+                assertFalse(completed["retained"]["providerExhaustedWithPending"].asBoolean())
+            }
             assertEquals("Success", staged["companyWindow"]["kind"].asString())
             assertEquals("Success", adopted["spaceWindow"]["kind"].asString())
             assertTrue(failureTrace.snapshot().isEmpty())

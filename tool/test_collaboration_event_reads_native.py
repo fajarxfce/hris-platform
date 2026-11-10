@@ -131,5 +131,59 @@ class EventReadEvidenceTest(unittest.TestCase):
                 reopened_history(self.reopened() | {"incoming": self.retained() | changed},self.adopted())
 
 
+class PendingReferenceEvidenceTest(unittest.TestCase):
+    staged = EventReadEvidenceTest.staged
+    retained = EventReadEvidenceTest.retained
+    incoming = EventReadEvidenceTest.incoming
+    adopted = EventReadEvidenceTest.adopted
+    reopened = EventReadEvidenceTest.reopened
+    def completed(self):
+        return {"resolved": 6, "unresolved": 0, "more": False, "retryRequired": False,
+                "emptyRepeatUnchanged": True,
+                "retained": self.retained() | {"pendingReferences": 0,
+                    "providerExhaustedWithPending": False, "pendingHash": "1" * 64,
+                    "frontierHash": "2" * 64}}
+
+    def final_adopted(self):
+        return self.adopted() | {"incoming": self.incoming() | {"completed": self.completed()}}
+
+    def test_pending_completion_is_explicit_and_copies_its_final_inventory(self):
+        value = self.final_adopted()
+        accepted = adopted_events(value, self.staged(), completed=True)
+        self.assertEqual(value, accepted)
+        value["incoming"]["completed"]["retained"]["pendingHash"] = "9" * 64
+        self.assertEqual(self.final_adopted(), accepted)
+        with self.assertRaises(ValueError):
+            adopted_events(self.final_adopted(), self.staged())
+        with self.assertRaises(ValueError):
+            adopted_events(self.adopted(), self.staged(), completed=True)
+
+    def test_partial_wrong_or_unbounded_completion_cannot_report_exhaustion(self):
+        for delta in [{"resolved": 5}, {"resolved": True}, {"resolved": 17}, {"unresolved": True},
+                      {"unresolved": 1}, {"more": True}, {"more": 0}, {"retryRequired": True},
+                      {"emptyRepeatUnchanged": False}, {"body": "private"}]:
+            value = self.adopted() | {"incoming": self.incoming() | {"completed": self.completed() | delta}}
+            with self.subTest(delta=delta), self.assertRaises(ValueError):
+                adopted_events(value, self.staged(), completed=True)
+
+    def test_completion_preserves_content_and_provider_but_changes_pending_inventory(self):
+        for delta in [{"providerReferences": 9}, {"pendingReferences": 1}, {"pendingHash": "f" * 64},
+                      {"originalHash": "b" * 64}, {"providerExhaustedWithPending": True},
+                      {"providerExhaustedWithPending": 0}, {"noSpaceSendWork": False}]:
+            completed = self.completed() | {"retained": self.completed()["retained"] | delta}
+            value = self.adopted() | {"incoming": self.incoming() | {"completed": completed}}
+            with self.subTest(delta=delta), self.assertRaises(ValueError):
+                adopted_events(value, self.staged(), completed=True)
+
+    def test_completed_inventory_reopens_in_a_new_offline_process(self):
+        adopted = adopted_events(self.final_adopted(), self.staged(), completed=True)
+        final = self.reopened() | {"incoming": self.completed()["retained"]}
+        self.assertEqual(final, reopened_history(final, adopted, completed=True))
+        for value in [self.reopened(), final | {"processId": 124}, final | {"runtimeNeverOpened": False},
+                      final | {"incoming": final["incoming"] | {"frontierHash": "e" * 64}}]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                reopened_history(value, adopted, completed=True)
+
+
 if __name__ == "__main__":
     unittest.main()

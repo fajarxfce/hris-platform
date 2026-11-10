@@ -47,3 +47,15 @@ verified by checksum. No employee phone, live server/schema, product incoming ro
 Starter policy or Apple Matrix runtime changes are included.
 
 [Measurement](../measurements/collaboration-runtime-event-native-2026-11-10.json).
+
+## Follow-up failure trace
+
+A second fresh native run passes in136.487s with the same four encrypted events and all
+identity/adoption assertions. Two test-only source files add a passive bounded recorder
+using the existing error-code response advice. The previously unresolved failure is one
+context503, code `collaboration_provider_invalid_response`. No request body, credential,
+event ID or raw path is retained. The old Company Storage and Space Unexpected outcomes
+remain reproduced. This identifies the route/code; the production fix is still next.
+Test compilation passes80.335s with8,739 unchanged inputs and zero executed JVM cases;
+the subsequent native run executes one passing case. Emulator stopped and phone untouched.
+[Trace measurement](../measurements/collaboration-runtime-event-trace-2026-11-10.json).

@@ -1,0 +1,61 @@
+{
+  "startedAt": "2026-11-10T13:42:39.736632+00:00",
+  "elapsedSeconds": 136.487,
+  "bootSeconds": 40.751,
+  "counts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sourcesUnchanged": true,
+  "apkUnchanged": true,
+  "noCompilationDuringEmulator": true,
+  "emulatorStopped": true,
+  "phoneTouched": false,
+  "memoryMiB": 2560,
+  "cores": 2,
+  "serverCompilation": {
+    "startedAt": "2026-11-10T13:41:00.954517+00:00",
+    "elapsedSeconds": 80.335,
+    "sourceFiles": 8739,
+    "sourcesUnchanged": true,
+    "counts": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "changedSources": [
+      "apps/server/src/test/kotlin/dev/fajar/hris/NativeEventReadFailureTrace.kt",
+      "apps/server/src/test/kotlin/dev/fajar/hris/NativeEventReadsTest.kt"
+    ],
+    "compiledOnly": true,
+    "sourceManifestSha256": "820d15da372a6238fec4fd41a8e7f541e161357d495c6befa2aa176aa6f8d885"
+  },
+  "artifact": {
+    "apkSha256": "60f7fafe65480e989cf26855aec46bd9525ede27625619b8a2f594a56bda0f95",
+    "sdkVersion": "26.10.23-hris.6",
+    "abi": "x86_64",
+    "librarySha256": "ecffbab72fd5dd29d656bc4757ea423bb4bccf0444140af0480684bc32761278"
+  },
+  "native": {
+    "requests": 2,
+    "bootstrapReplay": 1
+  },
+  "matrix": {
+    "requests": 26,
+    "encryptedSend": 4,
+    "sync": 3,
+    "secretStorage": 2,
+    "serverError": 1
+  },
+  "failures": [
+    {
+      "operation": "context",
+      "status": 503,
+      "code": "collaboration_provider_invalid_response"
+    }
+  ],
+  "oldHistoryReaderFixed": false
+}

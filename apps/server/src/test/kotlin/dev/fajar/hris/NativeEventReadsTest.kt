@@ -31,6 +31,8 @@ import tools.jackson.databind.JsonNode
 @Import(
     NativeOriginalDeliveryTraceConfiguration::class,
     NativeSpaceRecoveryTraceConfiguration::class,
+    NativeEventReadFailureTraceConfiguration::class,
+    NativeSdkErrorTrace::class,
 )
 @TestPropertySource(
     properties =
@@ -48,6 +50,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
     @Autowired private lateinit var matrix: CollaborationMatrixRepository
     @Autowired private lateinit var trace: NativeOriginalDeliveryTrace
     @Autowired private lateinit var matrixTrace: NativeSpaceRecoveryTrace
+    @Autowired private lateinit var failureTrace: NativeEventReadFailureTrace
 
     companion object {
         private val provider by lazy { NativeSdkMatrixServer(loginBurst = 32) }
@@ -133,6 +136,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             assertPublished(recipient, ready["recipient"])
             trace.arm()
             matrixTrace.arm()
+            failureTrace.arm()
             write(directory, "stage-allowed", mapOf("ready" to true))
             val redaction = waitFor(directory, "redaction-request", process)
             val target = redaction["targetEventId"].asString()
@@ -219,13 +223,18 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                     "adopted" to adopted,
                     "native" to trace.snapshot(),
                     "matrix" to matrixTrace.snapshot(),
+                    "failures" to failureTrace.snapshot(),
                 ),
             )
         } finally {
             write(
                 directory,
                 "request-trace",
-                mapOf("native" to trace.snapshot(), "matrix" to matrixTrace.snapshot()),
+                mapOf(
+                    "native" to trace.snapshot(),
+                    "matrix" to matrixTrace.snapshot(),
+                    "failures" to failureTrace.snapshot(),
+                ),
             )
             if (process.isAlive) {
                 process.destroy()

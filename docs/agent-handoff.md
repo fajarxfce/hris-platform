@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 05:55 UTC. Historical detail remains in
+Updated 10 November 2026, 06:24 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,42 +17,46 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 05:55 UTC
+## Mobile checkpoint — 10 November, 06:23 UTC
 
-Mobile source b9db0bd98fa935ebe04d2db90d59871456b39305 is committed and pushed.
-Its local SPACE message queue/observation/storage passed focused68 and full9,418
-(7,399 fresh+2,019 exact accepted reused),zero failures/errors/skips. Both jobs are
-reaped and strict source/library/report audits passed. All90 AppFlow cases passed
-unchanged. Control42763070460 runs at that immutable source on
-validation/space-local-messages-20261110; expected7,416 portable+2,779 Apple,
-16Swift/unsignedhost. No new native/worker/UI routing or phone installation.
+Mobile receipt sourcedb4fc4f04115322e230386b4ed74166ed1b4b5ce is committed/pushed.
+Focused46078 passes62 cases; full39948 passes9,488 verified results (7,469 fresh+
+2,019 exact accepted reused),zero failures/errors/skips. Both are reaped and audited.
+The13 changed source files retain explicit SPACE receipt intent/device/transaction/
+origin,independent authenticated format,shared key-loss guards,atomic append+wake,
+exact replay no-op and explicit retirement. No native/worker/UI route is activated.
+Control42766554589 runs at that immutable source,expecting7,486 portable+2,814 Apple,
+16Swift/unsignedhost. Source push70061,ref94887,dispatch43822 are all reaped.
 
-The new SPACE receipt journal is uncommitted Mobile source. Focused37385 completed
-60 domain/SQLite/Chromium cases successfully,then failed an explicit type missing
-from the new app DI assertion. Only the assertion's Any type was added; production
-and test semantics are unchanged. Focused-2/session46078 is now the only local heavy
-compiler. Freeze Mobile source until reaped; expect62 fresh cases and quality/iOS
-source checks. Next full validation and atomic commit/push precede mixed-ledger
-matching and explicitly admitted new-message staging. Do not add enqueue to the
-original-only native lease or overlook commands with no room binding in recovery.
+Next Mobile increment is UNCOMMITTED:typed Company/Space whole-queue matching plus
+a bounded local reader,owning DI and34 domain cases. It preserves distinct logical
+owners and exact original physical mappings. Missing/ambiguous matches,changed
+origin/device,invalid completion,late account/denial and changed final inventory fail;
+no source infers ACK from absence or gains enqueue. Focused19427 is REAPED PASS339.490s:
+70 fresh cases (34 Desktop,34 real Chromium,2 app DI),zero failures/errors/skips,
+Apple source and quality. Strict source/library/current/archive audit passes4,695
+inputs; source manifestc33622c793135609fda86a24f21d6ba66dd81dd58d58867f4eff3437a1003deb.
+Full-1/session91322 is now RUNNING as the only heavy compiler. Freeze Mobile source;
+no full/native/phone acceptance yet. Mobile32ed8281 has the implementation checkpoint. Do not reapply drafts or start another compiler.
 
-Producer control42753380451 now fully passes10,009 tests (7,292 portable+2,717 Apple),
-16Swift checks and unsignedhost. Audits29517/71981 are reaped; exact source,digests,
-CRC and predecessor identities verified. Mobilecedc908e publishes full evidence.
-Command42758828055 portable7,318 is audited; Apple still running. It must complete
-before the prepared15-file Starter command database patch is applied. Do not cancel
-or redispatch either remaining command/message workflow.
+Starter sourcea7ff417c33cbbffb9b44a84e489a2fbce7be5bb2 is committed/pushed (54242
+reaped):the15 generic command database changes exactly match Mobileb1adfd82. Independent
+full32816 REAPED PASS518.812s,358 fresh cases/87 suites,zero failures/errors/skips,
+all configured Android/web/iOS-source/SBOM/quality gates. Inputs1,061/library49 stayed
+fixed. New13 SQLite/13 browser command cases,retained11+11 replica cases,lint0errors/
+45existing advisories,SBOM366,three APKs and26 web outputs verified. No Starter job remains.
 
-Starter source30c4d72 remains accepted/pushed after independent332 fresh cases and
-all configured Android/web/iOS-source/SBOM/quality gates. Its nine generic replica
-files match accepted Mobile7a6fe534 (hosted9,985). Command patch is unapplied;
-private apply.py now verifies both Mobile audits and exact pre/post Git bytes before
-mutation. No Starter compiler is running.
+Producer42753380451 fully passes10,009 tests (2,717Apple),16Swift,unsignedhost;
+command42758828055 fully passes10,048 (2,730Apple),16Swift,unsignedhost. Their audits
+are reaped and exact source/digests/CRC/predecessor identities verified. Message source
+b9db0bd9 control42763070460 portable70099 passes7,416;Apple is building its unsigned
+host. Artifact13739308669,SHA c7abc4fbbae40e67d713ae7379466228adbb781d737f9443b36f1a494c21f56a.
+Do not cancel/redispatch the running message/receipt controls. Mobile handoff owns auditors.
 
-Phone87 unchanged; release88 uninstalled. ADB62446 reaped timeout15s around05:21;
-availability question already pending. No backend source/schema/DI/live change.
-Live stays e558a686/schema116.4/readinessON/groupOFF. All54 PRD groups remain open.
-Continue work after this checkpoint; Mobile docs/agent-handoff.md owns active jobs.
+Phone87 unchanged,release88 uninstalled. Latest ADB8250 timed out15s around05:56 and
+is reaped;availability question already pending. No backend source/schema/DI/live
+change. Live stays e558a686/schema116.4/readinessON/groupOFF. All54 PRD groups remain
+open. Continue after this checkpoint; no completion or product activation is claimed.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

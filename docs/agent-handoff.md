@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 10 November 2026, 06:24 UTC. Historical detail remains in
+Updated 10 November 2026, 06:46 UTC. Historical detail remains in
 [4d4df31f](https://github.com/fajarxfce/hris-platform/blob/4d4df31f/docs/agent-handoff.md).
 Use this checkpoint and the linked current Mobile/Group files, not old active-job notes.
 
@@ -17,46 +17,39 @@ installation and never launch, automate, uninstall or clear its app. Crashlytics
 is verified; do not request it again. Physical iPhone testing is waived, relevant
 Apple runtime, push and calling acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 06:23 UTC
+## Mobile checkpoint — 10 November, 06:46 UTC
 
-Mobile receipt sourcedb4fc4f04115322e230386b4ed74166ed1b4b5ce is committed/pushed.
-Focused46078 passes62 cases; full39948 passes9,488 verified results (7,469 fresh+
-2,019 exact accepted reused),zero failures/errors/skips. Both are reaped and audited.
-The13 changed source files retain explicit SPACE receipt intent/device/transaction/
-origin,independent authenticated format,shared key-loss guards,atomic append+wake,
-exact replay no-op and explicit retirement. No native/worker/UI route is activated.
-Control42766554589 runs at that immutable source,expecting7,486 portable+2,814 Apple,
-16Swift/unsignedhost. Source push70061,ref94887,dispatch43822 are all reaped.
+Mobile18e0d371b68e3e36c3be5bfdb1b91eb3e439de99 is committed/pushed72891,reaped.
+Typed whole native queue matching keeps Company/Space ledgers separate and validates
+all originals before publishing a bounded local snapshot. Focused19427 passes70;
+full91322 REAPED PASS662.207s:9,556 verified=7,537 fresh+2,019 exact accepted reused,
+zero failures/errors/skips. Strict current/archive/source/library audits pass4,695
+fixed inputs. No native, worker or product routing activation.
+Control42769825037 pins18e0d371 on validation/mixed-original-queue-20261110;
+ref94349/dispatch1269 reaped. Expected7,554 portable+2,848 Apple,16Swift,unsigned host.
 
-Next Mobile increment is UNCOMMITTED:typed Company/Space whole-queue matching plus
-a bounded local reader,owning DI and34 domain cases. It preserves distinct logical
-owners and exact original physical mappings. Missing/ambiguous matches,changed
-origin/device,invalid completion,late account/denial and changed final inventory fail;
-no source infers ACK from absence or gains enqueue. Focused19427 is REAPED PASS339.490s:
-70 fresh cases (34 Desktop,34 real Chromium,2 app DI),zero failures/errors/skips,
-Apple source and quality. Strict source/library/current/archive audit passes4,695
-inputs; source manifestc33622c793135609fda86a24f21d6ba66dd81dd58d58867f4eff3437a1003deb.
-Full-1/session91322 is now RUNNING as the only heavy compiler. Freeze Mobile source;
-no full/native/phone acceptance yet. Mobile32ed8281 has the implementation checkpoint. Do not reapply drafts or start another compiler.
+The next Mobile increment has eight UNCOMMITTED Kotlin inputs: exact Space completion
+and receipt projection policy, local CAS/readback reconciliation,37 domain cases and
+owning singleton DI. No sender, archive or journal retirement is activated. Focused-1
+session43366 is the ONLY heavy local job, source FROZEN. Desktop production compilation
+passes; three new test assertions need explicit Kotlin generic types. The continuing
+check must finish/reap before fixing those declarations; do not edit frozen inputs.
+Mobile .work/space-receipt-projection-2026-11-10 owns runner and failure logs.
 
-Starter sourcea7ff417c33cbbffb9b44a84e489a2fbce7be5bb2 is committed/pushed (54242
-reaped):the15 generic command database changes exactly match Mobileb1adfd82. Independent
-full32816 REAPED PASS518.812s,358 fresh cases/87 suites,zero failures/errors/skips,
-all configured Android/web/iOS-source/SBOM/quality gates. Inputs1,061/library49 stayed
-fixed. New13 SQLite/13 browser command cases,retained11+11 replica cases,lint0errors/
-45existing advisories,SBOM366,three APKs and26 web outputs verified. No Starter job remains.
+Messages42763070460 COMPLETE10,195 (2,779 Apple)+16Swift,unsignedhost; all artifacts
+and predecessor case identities audited. Receipt42766554589 portable7,486 audited,
+Apple still running(expected2,814). Preserve receipt and mixed controls; do not redispatch.
+Producer42753380451 COMPLETE10,009 and command42758828055 COMPLETE10,048 accepted.
 
-Producer42753380451 fully passes10,009 tests (2,717Apple),16Swift,unsignedhost;
-command42758828055 fully passes10,048 (2,730Apple),16Swift,unsignedhost. Their audits
-are reaped and exact source/digests/CRC/predecessor identities verified. Message source
-b9db0bd9 control42763070460 portable70099 passes7,416;Apple is building its unsigned
-host. Artifact13739308669,SHA c7abc4fbbae40e67d713ae7379466228adbb781d737f9443b36f1a494c21f56a.
-Do not cancel/redispatch the running message/receipt controls. Mobile handoff owns auditors.
+Starter a7ff417c33cbbffb9b44a84e489a2fbce7be5bb2 committed/pushed:exact15 generic files
+match Mobileb1adfd82. Full32816 passes358 fresh/87suites,all Android/web/iOS-source/SBOM/
+quality,source1,061/library49 unchanged. No Starter WIP or compiler. Application-specific
+Space projection stays in Mobile. Continue mixed native delivery,explicit new-message
+capability,complete command inventory,incoming routing/media/backup/calls/meetings.
 
-Phone87 unchanged,release88 uninstalled. Latest ADB8250 timed out15s around05:56 and
-is reaped;availability question already pending. No backend source/schema/DI/live
-change. Live stays e558a686/schema116.4/readinessON/groupOFF. All54 PRD groups remain
-open. Continue after this checkpoint; no completion or product activation is claimed.
+Phone87 unchanged,release88 uninstalled. ADB44597 timed out15s around06:45,reaped;
+availability question is already pending. Live e558a686/schema116.4/readinessON/groupOFF
+unchanged. All54 PRD acceptance groups remain open. Continue after checkpoints.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

@@ -1,6 +1,6 @@
 # Agent continuation — organization chat
 
-Updated 10 November 2026, 05:26 UTC. Historical checkpoints are retained in
+Updated 10 November 2026, 05:55 UTC. Historical checkpoints are retained in
 [bf6e176a](https://github.com/fajarxfce/hris-platform/blob/bf6e176a/docs/agent-handoff.md).
 Use this file for current work; do not restart old gates from historical records.
 
@@ -15,39 +15,42 @@ installation and never launch, automate, uninstall or clear it. Crashlytics acce
 is verified; no repeated IAM request. Physical iPhone testing is waived, relevant
 Apple runtime/build and push/call acceptance remains separate.
 
-## Mobile checkpoint — 10 November, 05:26 UTC
+## Mobile checkpoint — 10 November, 05:55 UTC
 
-Mobile6954beff is pushed. Nineteen Kotlin files retain explicit SPACE message intent,
-encrypted active/terminal data,atomic command+wake,local queue/observation and owning
-DI. Focused6481 REAPED PASS382.076s:68 fresh cases (9 policy,15 queue,8 observation,
-17 SQLite,17 real browser,2 app DI),zero failures/errors/skips,Apple source and quality.
-Strict audit verifies4,677 frozen inputs/library and current/archive XML; source SHA
-0ff251cd3098f6097863d6a5745190c804ef1714badc6ab59c637e9789b398dc.
-Full-1/session16809 RUNNING is the only heavy local compiler; source is frozen.
-The source remains uncommitted until full acceptance. See Mobile's new public
-collaboration-space-messages.md for ownership,uncertain-readback,scheduling and
-mixed-ledger boundaries. New native/worker/UI routing is not enabled. Inventory must
-include commands with no local binding before discharging recovery work.
+Mobile source b9db0bd98fa935ebe04d2db90d59871456b39305 is committed and pushed.
+Its local SPACE message queue/observation/storage passed focused68 and full9,418
+(7,399 fresh+2,019 exact accepted reused),zero failures/errors/skips. Both jobs are
+reaped and strict source/library/report audits passed. All90 AppFlow cases passed
+unchanged. Control42763070460 runs at that immutable source on
+validation/space-local-messages-20261110; expected7,416 portable+2,779 Apple,
+16Swift/unsignedhost. No new native/worker/UI routing or phone installation.
 
-Initial17154/96716 failed new production/test generic inference before tests ran;
-both are reaped with logs/source retained. Explicit types were corrected without
-weakening assertions. Review also retains denial across transient session failures
-and full timestamp ordering across database reopen; both regression cases now pass.
+The new SPACE receipt journal is uncommitted Mobile source. Focused37385 completed
+60 domain/SQLite/Chromium cases successfully,then failed an explicit type missing
+from the new app DI assertion. Only the assertion's Any type was added; production
+and test semantics are unchanged. Focused-2/session46078 is now the only local heavy
+compiler. Freeze Mobile source until reaped; expect62 fresh cases and quality/iOS
+source checks. Next full validation and atomic commit/push precede mixed-ledger
+matching and explicitly admitted new-message staging. Do not add enqueue to the
+original-only native lease or overlook commands with no room binding in recovery.
 
-Starter30c4d72 is committed/pushed (61101 reaped) after independent full61949 passed
-588.178s,332 fresh/85 suites,zero failures/errors/skips,all three Android builds,lint,
-production web,iOS source,strict SBOM and quality. Source1,057/library49 fixed; new
-11 SQLite/11 browser cases,lint0errors/45existing advisories,SBOM366,three APK/26web
-files hashed. Its nine core files exactly match accepted Mobile7a6fe534 (hosted9,985).
-The next command foundation database-only patch passes dry apply but is NOT applied.
+Producer control42753380451 now fully passes10,009 tests (7,292 portable+2,717 Apple),
+16Swift checks and unsignedhost. Audits29517/71981 are reaped; exact source,digests,
+CRC and predecessor identities verified. Mobilecedc908e publishes full evidence.
+Command42758828055 portable7,318 is audited; Apple still running. It must complete
+before the prepared15-file Starter command database patch is applied. Do not cancel
+or redispatch either remaining command/message workflow.
 
-Producer42753380451 portable29517 is REAPED PASS7,292;command42758828055 portable93083
-is REAPED PASS7,318. Digests/CRC/source/predecessor cases verified. Both Apple jobs
-remain running; do not redispatch/cancel. Producer expected2,717Apple,command2,730,
-each16Swift+unsignedhost. Mobile handoff has exact artifacts and continuation scripts.
-Phone87 unchanged; ADB62446 reaped timeout15s around05:21. Availability question already
-pending; do not repeat. No backend source/schema/DI/live change; live remains
- e558a686/schema116.4/readinessON/groupOFF. All54 PRD groups remain open; continue work.
+Starter source30c4d72 remains accepted/pushed after independent332 fresh cases and
+all configured Android/web/iOS-source/SBOM/quality gates. Its nine generic replica
+files match accepted Mobile7a6fe534 (hosted9,985). Command patch is unapplied;
+private apply.py now verifies both Mobile audits and exact pre/post Git bytes before
+mutation. No Starter compiler is running.
+
+Phone87 unchanged; release88 uninstalled. ADB62446 reaped timeout15s around05:21;
+availability question already pending. No backend source/schema/DI/live change.
+Live stays e558a686/schema116.4/readinessON/groupOFF. All54 PRD groups remain open.
+Continue work after this checkpoint; Mobile docs/agent-handoff.md owns active jobs.
 
 ## Current Mobile integration — 10 November, 04:22 UTC
 

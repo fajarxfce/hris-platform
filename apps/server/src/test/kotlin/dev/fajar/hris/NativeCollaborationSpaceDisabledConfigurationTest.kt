@@ -47,6 +47,8 @@ class NativeCollaborationSpaceDisabledConfigurationTest : NativeCollaborationApi
                 "$base/direct-conversations/${UUID.randomUUID()}/room/receipts/read" to
                     """{"operationId":"${UUID.randomUUID()}","nativeSessionId":"${UUID.randomUUID()}","nativeSessionVersion":0,"deviceId":"${UUID.randomUUID()}","expectedDeviceVersion":0,"platform":"ANDROID","clientBuild":28}""",
                 "$base/legacy-conversations" to null,
+                "$base/legacy-rooms/read" to
+                    """{"companyId":"${UUID.randomUUID()}","matrixRoomId":"!original:matrix.example.test"}""",
                 "$base/legacy-conversations/${UUID.randomUUID()}/${UUID.randomUUID()}" to null,
                 "$base/native-device" to null,
                 "$base/identity" to "{}",

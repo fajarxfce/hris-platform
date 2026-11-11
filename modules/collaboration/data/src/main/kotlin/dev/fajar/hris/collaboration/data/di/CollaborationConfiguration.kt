@@ -98,6 +98,7 @@ class CollaborationConfiguration {
         policy: CollaborationSpacePolicy,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        provider: CollaborationMatrixPolicy,
     ) =
         ReadNativeCollaborationSpaceDirect(
             conversations,
@@ -108,6 +109,7 @@ class CollaborationConfiguration {
             policy,
             security,
             clock,
+            provider,
         )
 
     @Bean

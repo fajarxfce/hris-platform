@@ -8,6 +8,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import java.time.Clock
+import java.time.Instant
 import java.util.UUID
 
 /** Current native reads of owned conversation intent and original-room metadata, never content. */
@@ -20,6 +21,7 @@ class ReadNativeCollaborationSpaceDirect(
     private val policy: CollaborationSpacePolicy,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val provider: CollaborationMatrixPolicy,
 ) {
     fun list(
         actor: Actor,
@@ -88,6 +90,55 @@ class ReadNativeCollaborationSpaceDirect(
         }
     }
 
+    /** Original Company coordinates remain explicit; this read never creates a Space binding. */
+    fun legacyRoom(
+        actor: Actor,
+        sessionId: UUID,
+        sessionVersion: Long,
+        spaceId: UUID,
+        client: ClientVersion?,
+        companyId: UUID,
+        roomId: String,
+    ): Result<CollaborationSpaceLegacyConversation> {
+        if (companyId == UUID(0, 0) || !validCollaborationSpaceRoomId(roomId)) return invalidQuery()
+        if (!provider.enabled || !validCollaborationSpaceServer(provider.serverName))
+            return Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_unavailable"))
+        val started = clock.instant()
+        return read(actor, sessionId, sessionVersion, spaceId, client, started) {
+            val found =
+                conversations.legacyBoundRoom(
+                    spaceId,
+                    actor.accountId,
+                    companyId,
+                    provider.serverName,
+                    roomId,
+                )
+            found.flatMap { value ->
+                if (value == null) return@flatMap missing()
+                val room = value.room
+                if (
+                    value.spaceId != spaceId ||
+                        value.conversation.companyId != companyId ||
+                        actor.accountId !in
+                            listOf(
+                                value.conversation.firstAccountId,
+                                value.conversation.secondAccountId,
+                            ) ||
+                        room == null ||
+                        room.serverName != provider.serverName ||
+                        room.roomId != roomId
+                )
+                    return@flatMap Result.Failed(
+                        Failure(FailureKind.CONFLICT, "collaboration_original_room_changed")
+                    )
+                Result.Success(value)
+            }
+        }
+    }
+
+    private fun expiredRoomRead() =
+        Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_room_read_expired"))
+
     private fun invalidQuery() =
         Result.Failed(Failure(FailureKind.VALIDATION, "invalid_collaboration_conversation_query"))
 
@@ -100,6 +151,7 @@ class ReadNativeCollaborationSpaceDirect(
         sessionVersion: Long,
         spaceId: UUID,
         client: ClientVersion?,
+        requestedAt: Instant? = null,
         acquire: () -> Result<T>,
     ): Result<T> {
         if (actor.companyId != null)
@@ -118,6 +170,7 @@ class ReadNativeCollaborationSpaceDirect(
                 if (acquired is Result.Failed) return acquired
                 val current = spaces.current()
                 if (current is Result.Failed) return current
+                val at = clock.instant()
                 return admitCollaborationSpaceSession(
                         actor,
                         (acquired as Result.Success).value,
@@ -128,14 +181,19 @@ class ReadNativeCollaborationSpaceDirect(
                         client,
                         policy,
                         security,
-                        clock.instant(),
+                        at,
                     )
                     .flatMap {
-                        if (it.spaceId == spaceId) Result.Success(Unit)
-                        else
+                        if (it.spaceId != spaceId)
                             Result.Failed(
                                 Failure(FailureKind.FORBIDDEN, "collaboration_access_denied")
                             )
+                        else if (
+                            requestedAt != null &&
+                                (at < requestedAt || at >= requestedAt.plusSeconds(30))
+                        )
+                            expiredRoomRead()
+                        else Result.Success(Unit)
                     }
             }
             val admitted = admission()

@@ -32,3 +32,6 @@ to-device frames and prove their identity lookup/decryption with the actual SDK.
 Current group recipient query/claim is not historical peer-key authority, and owned
 history must not grant new sends or OTK claims to obsolete devices. Group sync,
 retained-history fallback, metadata/push and full Mobile adoption remain required.
+
+The [native exact original-room read](space-original-physical-read.md) now exposes this lookup
+under current native admission. Its Mobile consumer and original typed routing remain pending.

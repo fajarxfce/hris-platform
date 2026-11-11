@@ -2197,6 +2197,121 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
         )
     }
 
+    @Test
+    fun originalPhysicalRoomReadUsesNativeOwnershipWithoutPublishingOrContactingProvider() {
+        val a = groupNative()
+        val b = groupNative()
+        val outsider = groupNative()
+        val base = groupBase(a)
+        val original = UUID.randomUUID()
+        val matrixRoomId = "!original-$original:matrix.example.test"
+        val pair = listOf(a.fixture.account, b.fixture.account).sortedBy(UUID::toString)
+        database()
+            .update(
+                "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?::timestamptz)",
+                b.fixture.company,
+                original,
+                pair[0],
+                pair[1],
+                a.fixture.account,
+                clock.instant().minusSeconds(1).toString(),
+            )
+        seedGroupLegacyRoom(b, original, matrixRoomId)
+        val path = "$base/legacy-rooms/read"
+        val input =
+            mapOf("companyId" to b.fixture.company.toString(), "matrixRoomId" to matrixRoomId)
+        val tables =
+            listOf(
+                "collaboration_space_direct_conversations",
+                "collaboration_space_room_bindings",
+                "collaboration_space_devices",
+                "background_jobs",
+            )
+        val before =
+            tables.associateWith {
+                database().queryForObject("select count(*) from $it", Int::class.java)!!
+            }
+        for (reader in listOf(a, b)) {
+            val response = groupCall(reader, path, input, operation = null)
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            val body = json.readTree(response.body())
+            assertEquals(setOf("spaceId", "conversation", "room"), body.propertyNames().toSet())
+            assertEquals(original.toString(), body["conversation"]["id"].asString())
+            assertEquals(b.fixture.company.toString(), body["conversation"]["companyId"].asString())
+            assertEquals(a.fixture.account.toString(), body["conversation"]["createdBy"].asString())
+            assertEquals(b.fixture.account.toString(), body["room"]["createdBy"].asString())
+            assertEquals(matrixRoomId, body["room"]["roomId"].asString())
+            assertEquals(
+                setOf("serverName", "roomId", "boundAt", "createdBy"),
+                body["room"].propertyNames().toSet(),
+            )
+        }
+        failure(
+            groupCall(outsider, path, input, operation = null),
+            404,
+            "collaboration_conversation_not_found",
+        )
+        failure(
+            groupCall(a, path, input + ("companyId" to a.fixture.company.toString())),
+            404,
+            "collaboration_conversation_not_found",
+        )
+        failure(
+            groupCall(a, path, input + ("matrixRoomId" to "!unknown:matrix.example.test")),
+            404,
+            "collaboration_conversation_not_found",
+        )
+        for (bad in
+            listOf(
+                emptyMap<String, String>(),
+                input - "companyId",
+                input - "matrixRoomId",
+                input + ("serverName" to "other.test"),
+                input + ("companyId" to "bad"),
+            )) {
+            val response = groupCall(a, path, bad, operation = null)
+            assertEquals(400, response.statusCode(), response.body())
+        }
+        failure(
+            groupCall(a, path, input + ("companyId" to UUID(0, 0).toString())),
+            422,
+            "invalid_collaboration_conversation_query",
+        )
+        failure(
+            groupCall(a, path, input + ("matrixRoomId" to "invalid")),
+            422,
+            "invalid_collaboration_conversation_query",
+        )
+        failure(groupCall(a, path, input, build = "27"), 403, "client_update_required")
+        assertTrue(groupCall(a, path, input, token = null).statusCode() in setOf(401, 403))
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        failure(groupCall(b, path, input), 403, "collaboration_access_denied")
+        // Original owned metadata does not grant current peer/provider authority.
+        assertEquals(200, groupCall(a, path, input).statusCode())
+        database()
+            .update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                a.session,
+            )
+        assertEquals(401, groupCall(a, path, input).statusCode())
+        assertEquals(
+            401,
+            groupCall(a, path, input + ("matrixRoomId" to "!unknown:matrix.example.test"))
+                .statusCode(),
+        )
+        assertEquals(
+            before,
+            tables.associateWith {
+                database().queryForObject("select count(*) from $it", Int::class.java)!!
+            },
+        )
+    }
+
     private fun exchangeRoomNative(n: Native): Pair<Native, String> {
         val response =
             command(
@@ -2691,7 +2806,11 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             }
     }
 
-    private fun seedGroupLegacyRoom(n: Native, conversation: UUID) {
+    private fun seedGroupLegacyRoom(
+        n: Native,
+        conversation: UUID,
+        matrixRoomId: String = "!original:matrix.example.test",
+    ) {
         val device = seedGroupLegacy(n)
         val job = UUID.randomUUID()
         val db = database()
@@ -2725,11 +2844,12 @@ class NativeCollaborationSpaceConfigurationTest : NativeCollaborationApiFixture(
             job,
         )
         db.update(
-            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test','!original:matrix.example.test',?::timestamptz)",
+            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test',?,?::timestamptz)",
             n.fixture.company,
             conversation,
             n.fixture.account,
             job,
+            matrixRoomId,
             at,
         )
     }

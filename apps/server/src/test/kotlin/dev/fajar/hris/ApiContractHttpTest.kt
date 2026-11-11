@@ -44,6 +44,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations/{conversationId}/room/requests/receipts/read" to "post",
                 "$base/direct-conversations/{conversationId}/room/requests/fence" to "post",
                 "$base/rooms/read" to "post",
+                "$base/legacy-rooms/read" to "post",
                 "$base/legacy-conversations" to "get",
                 "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
@@ -73,7 +74,8 @@ class ApiContractHttpTest : PeopleApiFixture() {
             if (
                 path.endsWith("/legacy-runtime/publication") ||
                     path.endsWith("/receipts/read") ||
-                    path.endsWith("/rooms/read")
+                    path.endsWith("/rooms/read") ||
+                    path.endsWith("/legacy-rooms/read")
             ) {
                 assertFalse(operation.path("x-hris-idempotency-key").asBoolean())
                 assertTrue(
@@ -248,6 +250,17 @@ class ApiContractHttpTest : PeopleApiFixture() {
             schemas["CollaborationSpaceRoomView"]["properties"].propertyNames().toSet(),
         )
         val physicalRoomQuery = schemas["ReadCollaborationSpaceProviderRoomRequest"]
+        val legacyRoomQuery = schemas["ReadCollaborationSpaceLegacyRoomRequest"]
+        assertEquals(
+            setOf("companyId", "matrixRoomId"),
+            legacyRoomQuery["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("companyId", "matrixRoomId"),
+            legacyRoomQuery["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals("uuid", legacyRoomQuery["properties"]["companyId"]["format"].asString())
+        assertEquals(255L, legacyRoomQuery["properties"]["matrixRoomId"]["maxLength"].asLong())
         assertEquals(setOf("matrixRoomId"), physicalRoomQuery["properties"].propertyNames().toSet())
         assertEquals(
             setOf("matrixRoomId"),

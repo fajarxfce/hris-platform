@@ -203,11 +203,354 @@ class NativeCollaborationSpaceDirectTest {
         assertEquals(before, f.counts())
     }
 
+    @Test
+    fun originalPhysicalReadUsesExplicitCompanyAndConfiguredServerWithoutCreatingIntent() {
+        val f = Fixture()
+        val before = f.counts()
+        val value =
+            f.original.copy(
+                room = f.original.room!!.copy(roomId = "!original:untrusted-locator.test")
+            )
+        var calls = 0
+        val repo =
+            object : CollaborationSpaceConversationRepository by f.repo {
+                override fun legacyBoundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    companyId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceLegacyConversation?> {
+                    calls++
+                    assertEquals(
+                        listOf(f.s.space, f.s.account, f.s.company),
+                        listOf(spaceId, accountId, companyId),
+                    )
+                    assertEquals("matrix.example.test", serverName)
+                    assertEquals(value.room!!.roomId, roomId)
+                    return Result.Success(value)
+                }
+            }
+        assertEquals(
+            value,
+            success(
+                f.read(repo)
+                    .legacyRoom(
+                        f.s.actor,
+                        f.s.parent,
+                        0,
+                        f.s.space,
+                        f.f.client,
+                        f.s.company,
+                        value.room!!.roomId,
+                    )
+            ),
+        )
+        assertEquals(1, calls)
+        assertEquals(before, f.counts())
+    }
+
+    @Test
+    fun originalPhysicalReadRejectsMismatchedMetadataWithoutInventingASpaceBinding() {
+        val f = Fixture()
+        var value = f.original
+        val repo =
+            object : CollaborationSpaceConversationRepository by f.repo {
+                override fun legacyBoundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    companyId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceLegacyConversation?> = Result.Success(value)
+            }
+        val original = f.original
+        for (changed in
+            listOf(
+                original.copy(spaceId = UUID.randomUUID()),
+                original.copy(conversation = original.conversation.copy(companyId = f.other)),
+                original.copy(
+                    conversation =
+                        original.conversation.copy(
+                            firstAccountId = UUID.randomUUID(),
+                            secondAccountId = UUID.randomUUID(),
+                        )
+                ),
+                original.copy(room = null),
+                original.copy(room = original.room!!.copy(serverName = "other.test")),
+                original.copy(room = original.room!!.copy(roomId = "!other:matrix.example.test")),
+            )) {
+            value = changed
+            failure(
+                f.read(repo)
+                    .legacyRoom(
+                        f.s.actor,
+                        f.s.parent,
+                        0,
+                        f.s.space,
+                        f.f.client,
+                        f.s.company,
+                        "!original:matrix.example.test",
+                    ),
+                "collaboration_original_room_changed",
+            )
+        }
+        assertTrue(f.counts().values.all { it == 0 })
+    }
+
+    @Test
+    fun currentNativeDenialWinsOverMissingFailedAndSuccessfulPhysicalLookup() {
+        val f = Fixture()
+        val start = f.f.clock.at
+        for (mode in 0..2) {
+            f.f.clock.at = start
+            val repo =
+                object : CollaborationSpaceConversationRepository by f.repo {
+                    override fun legacyBoundRoom(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        companyId: UUID,
+                        serverName: String,
+                        roomId: String,
+                    ): Result<CollaborationSpaceLegacyConversation?> {
+                        f.f.clock.at = start.plusSeconds(901)
+                        return when (mode) {
+                            0 -> Result.Success(null)
+                            1 -> Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_storage"))
+                            else -> Result.Success(f.original)
+                        }
+                    }
+                }
+            failure(
+                f.read(repo)
+                    .legacyRoom(
+                        f.s.actor,
+                        f.s.parent,
+                        0,
+                        f.s.space,
+                        f.f.client,
+                        f.s.company,
+                        "!original:matrix.example.test",
+                    ),
+                "native_session_invalid",
+            )
+        }
+    }
+
+    @Test
+    fun physicalLookupHasThirtySecondBudgetAndRejectsBackwardClockWithoutRetry() {
+        val f = Fixture()
+        val start = f.f.clock.at.plusSeconds(10)
+        var offset = 0L
+        var calls = 0
+        val repo =
+            object : CollaborationSpaceConversationRepository by f.repo {
+                override fun legacyBoundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    companyId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceLegacyConversation?> {
+                    calls++
+                    f.f.clock.at = start.plusSeconds(offset)
+                    return Result.Success(f.original)
+                }
+            }
+        for (seconds in listOf(-1L, 30L, 31L, 29L)) {
+            f.f.clock.at = start
+            offset = seconds
+            val result =
+                f.read(repo)
+                    .legacyRoom(
+                        f.s.actor,
+                        f.s.parent,
+                        0,
+                        f.s.space,
+                        f.f.client,
+                        f.s.company,
+                        "!original:matrix.example.test",
+                    )
+            if (seconds == 29L) assertEquals(f.original, success(result))
+            else failure(result, "collaboration_room_read_expired")
+        }
+        assertEquals(4, calls)
+    }
+
+    @Test
+    fun deniedActorCannotUseMissingOriginalAsAnAdmissionShortcut() {
+        val f = Fixture()
+        f.s.owner.update(
+            "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+            f.s.account,
+        )
+        var called = false
+        val repo =
+            object : CollaborationSpaceConversationRepository by f.repo {
+                override fun legacyBoundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    companyId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceLegacyConversation?> {
+                    called = true
+                    return Result.Success(null)
+                }
+            }
+        failure(
+            f.read(repo)
+                .legacyRoom(
+                    f.s.actor,
+                    f.s.parent,
+                    0,
+                    f.s.space,
+                    f.f.client,
+                    f.s.company,
+                    "!unknown:matrix.example.test",
+                ),
+            "collaboration_access_denied",
+        )
+        assertFalse(called)
+    }
+
+    @Test
+    fun originalPhysicalLookupPropagatesCancellationAndInterruption() {
+        val f = Fixture()
+        for (interrupted in listOf(false, true)) {
+            var calls = 0
+            val repo =
+                object : CollaborationSpaceConversationRepository by f.repo {
+                    override fun legacyBoundRoom(
+                        spaceId: UUID,
+                        accountId: UUID,
+                        companyId: UUID,
+                        serverName: String,
+                        roomId: String,
+                    ): Result<CollaborationSpaceLegacyConversation?> {
+                        calls++
+                        if (interrupted) throw InterruptedException("fixture")
+                        else throw CancellationException("fixture")
+                    }
+                }
+            val call = {
+                f.read(repo)
+                    .legacyRoom(
+                        f.s.actor,
+                        f.s.parent,
+                        0,
+                        f.s.space,
+                        f.f.client,
+                        f.s.company,
+                        "!original:matrix.example.test",
+                    )
+            }
+            if (interrupted) assertThrows(InterruptedException::class.java) { call() }
+            else assertThrows(CancellationException::class.java) { call() }
+            assertEquals(1, calls)
+        }
+        assertTrue(f.counts().values.all { it == 0 })
+    }
+
+    @Test
+    fun malformedPhysicalQueriesAndDisabledProviderDoNotReadOrCreateRooms() {
+        val f = Fixture()
+        for ((company, room) in
+            listOf(
+                UUID(0, 0) to "!original:test",
+                f.s.company to "bad",
+                f.s.company to "!${"x".repeat(255)}",
+            )) failure(
+            f.read().legacyRoom(f.s.actor, f.s.parent, 0, f.s.space, f.f.client, company, room),
+            "invalid_collaboration_conversation_query",
+        )
+        for (provider in
+            listOf(
+                CollaborationMatrixPolicy(false, "matrix.example.test"),
+                CollaborationMatrixPolicy(true, "bad/server"),
+            )) failure(
+            f.read(provider = provider)
+                .legacyRoom(
+                    f.s.actor,
+                    f.s.parent,
+                    0,
+                    f.s.space,
+                    f.f.client,
+                    f.s.company,
+                    "!original:matrix.example.test",
+                ),
+            "collaboration_unavailable",
+        )
+        assertTrue(f.counts().values.all { it == 0 })
+    }
+
+    @Test
+    fun wrongParentAndCompanyActorCannotAcquireOriginalPhysicalMetadata() {
+        val f = Fixture()
+        failure(
+            f.read()
+                .legacyRoom(
+                    f.s.actor.copy(companyId = f.s.company),
+                    f.s.parent,
+                    0,
+                    f.s.space,
+                    f.f.client,
+                    f.s.company,
+                    "!original:matrix.example.test",
+                ),
+            "platform_scope_required",
+        )
+        failure(
+            f.read()
+                .legacyRoom(
+                    f.s.actor,
+                    UUID.randomUUID(),
+                    0,
+                    f.s.space,
+                    f.f.client,
+                    f.s.company,
+                    "!original:matrix.example.test",
+                ),
+            "native_session_invalid",
+        )
+        failure(
+            f.read()
+                .legacyRoom(
+                    f.s.actor,
+                    f.s.parent,
+                    1,
+                    f.s.space,
+                    f.f.client,
+                    f.s.company,
+                    "!original:matrix.example.test",
+                ),
+            "native_session_invalid",
+        )
+    }
+
     private inner class Fixture {
         val f = SpaceGatewayBootstrapFixture(postgres)
         val s = f.storage
         val peer = UUID.randomUUID()
         val other = UUID.randomUUID()
+        val original =
+            CollaborationSpaceLegacyConversation(
+                s.space,
+                CollaborationDirectConversation(
+                    UUID.randomUUID(),
+                    s.company,
+                    listOf(s.account, peer).sortedBy(UUID::toString)[0],
+                    listOf(s.account, peer).sortedBy(UUID::toString)[1],
+                    s.account,
+                    s.at,
+                ),
+                CollaborationLegacyRoomMetadata(
+                    "matrix.example.test",
+                    "!original:matrix.example.test",
+                    s.at,
+                    s.account,
+                ),
+            )
 
         init {
             Flyway.configure().dataSource(s.source).target("130").load().migrate()
@@ -264,7 +607,11 @@ class NativeCollaborationSpaceDirectTest {
                 )
                 .execute(actor, s.parent, version, s.space, client, operation, peer)
 
-        fun read(repo: CollaborationSpaceConversationRepository = this.repo) =
+        fun read(
+            repo: CollaborationSpaceConversationRepository = this.repo,
+            provider: CollaborationMatrixPolicy =
+                CollaborationMatrixPolicy(true, "matrix.example.test"),
+        ) =
             ReadNativeCollaborationSpaceDirect(
                 repo,
                 f.spaces,
@@ -274,6 +621,7 @@ class NativeCollaborationSpaceDirectTest {
                 CollaborationSpacePolicy(true, 5, 5),
                 IdentitySecurityPolicy(),
                 f.clock,
+                provider,
             )
 
         fun revokePeer() {

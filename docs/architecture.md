@@ -1,5 +1,8 @@
 # Architecture
 
+[Company pending page sizes](collaboration/company-pending-limit.md) preserve finite16-row Original seeks through
+concurrent resolution and reopen. Content acknowledgement and incoming activation remain separate.
+
 [Native physical-room resolution](collaboration/space-physical-room.md) shares the guarded logical
 room reader, preserves exact published ownership and returns no provider authority.
 

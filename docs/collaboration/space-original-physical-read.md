@@ -29,5 +29,5 @@ run exposed a shared fixture room ID; the corrected isolated ID passed all 75 HT
 All previously selected case IDs remain. No schema or live deployment changed.
 
 [Exact evidence](../measurements/collaboration-space-original-physical-read-2026-11-11.json).
-The Mobile metadata consumer, typed original routing, inventory, key recovery and raw batch
+The Mobile original metadata consumer, typed original routing, inventory, key recovery and raw batch
 activation remain required before native end-to-end acceptance.

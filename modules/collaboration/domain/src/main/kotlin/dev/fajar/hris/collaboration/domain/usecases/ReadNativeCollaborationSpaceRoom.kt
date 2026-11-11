@@ -27,7 +27,7 @@ class ReadNativeCollaborationSpaceRoom(
         parentId: UUID,
         parentVersion: Long,
         spaceId: UUID,
-        conversationId: UUID,
+        query: CollaborationSpaceRoomQuery,
         client: ClientVersion?,
     ): Result<CollaborationSpaceRoomView> {
         if (actor.companyId != null)
@@ -36,23 +36,49 @@ class ReadNativeCollaborationSpaceRoom(
         if (available is Result.Failed) return available
         if (!provider.enabled || !validCollaborationSpaceServer(provider.serverName))
             return Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_unavailable"))
-        if (listOf(parentId, spaceId, conversationId).any { it == UUID(0, 0) } || parentVersion < 0)
+        val validQuery =
+            when (query) {
+                is CollaborationSpaceRoomQuery.Conversation -> query.id != UUID(0, 0)
+                is CollaborationSpaceRoomQuery.ProviderRoom ->
+                    validCollaborationSpaceRoomId(query.id)
+            }
+        if (listOf(parentId, spaceId).any { it == UUID(0, 0) } || parentVersion < 0 || !validQuery)
             return Result.Failed(
                 Failure(FailureKind.VALIDATION, "invalid_collaboration_conversation_query")
             )
         val started = clock.instant()
         return transactions.run(actor) {
-            val roomGuard = rooms.lock(spaceId, conversationId)
-            if (roomGuard is Result.Failed) return@run roomGuard
-            val found = conversations.find(spaceId, actor.accountId, conversationId)
-            if (found is Result.Failed) return@run found
-            val conversation =
-                (found as Result.Success).value
-                    ?: return@run Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "collaboration_conversation_not_found")
-                    )
-            for (account in
-                listOf(conversation.firstAccountId, conversation.secondAccountId).sorted()) {
+            // An immutable lookup chooses the room guard; it grants no authority. No account or
+            // native lock may precede that room guard. Recheck the exact binding under the guard.
+            val selection: Result<Pair<UUID, CollaborationSpaceBoundRoom?>> =
+                when (query) {
+                    is CollaborationSpaceRoomQuery.Conversation -> Result.Success(query.id to null)
+                    is CollaborationSpaceRoomQuery.ProviderRoom ->
+                        rooms
+                            .boundRoom(spaceId, actor.accountId, provider.serverName, query.id)
+                            .flatMap {
+                                snapshotCollaborationSpaceBoundRoom(
+                                    spaceId,
+                                    actor.accountId,
+                                    provider.serverName,
+                                    query.id,
+                                    it,
+                                    clock.instant(),
+                                )
+                            }
+                            .map { it.intent.conversationId to it }
+                }
+            val found =
+                selection.flatMap { (id, _) ->
+                    rooms.lock(spaceId, id).flatMap {
+                        conversations.find(spaceId, actor.accountId, id)
+                    }
+                }
+            val conversation = (found as? Result.Success)?.value
+            val accounts =
+                conversation?.let { listOf(it.firstAccountId, it.secondAccountId) }
+                    ?: listOf(actor.accountId)
+            for (account in accounts.sorted()) {
                 val guarded = identities.lockAccount(account, shared = true)
                 if (guarded is Result.Failed) return@run guarded
             }
@@ -86,6 +112,7 @@ class ReadNativeCollaborationSpaceRoom(
             fun admission(): Result<Unit> {
                 val before = nativeAdmission()
                 if (before is Result.Failed) return before
+                if (conversation == null) return Result.Success(Unit)
                 fun peers(): Result<Unit> {
                     for (account in
                         listOf(conversation.firstAccountId, conversation.secondAccountId)) {
@@ -107,12 +134,26 @@ class ReadNativeCollaborationSpaceRoom(
             val admitted = admission()
             if (admitted is Result.Failed) return@run admitted
             fun acquire(): Result<CollaborationSpaceRoomView> {
+                // Failed/absent lookups cannot bypass current native denial.
+                if (selection is Result.Failed) return selection
+                if (found is Result.Failed) return found
+                if (conversation == null)
+                    return Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "collaboration_conversation_not_found")
+                    )
+                val (conversationId, selectedBinding) = (selection as Result.Success).value
                 val readIntent = rooms.intent(spaceId, actor.accountId, conversationId)
                 if (readIntent is Result.Failed) return readIntent
                 val readStatus = rooms.status(spaceId, actor.accountId, conversationId)
                 if (readStatus is Result.Failed) return readStatus
                 val readBinding = rooms.binding(spaceId, actor.accountId, conversationId)
                 if (readBinding is Result.Failed) return readBinding
+                if (
+                    selectedBinding != null &&
+                        ((readIntent as Result.Success).value != selectedBinding.intent ||
+                            (readBinding as Result.Success).value != selectedBinding.binding)
+                )
+                    return changed()
                 return collaborationSpaceRoomView(
                     spaceId,
                     conversationId,

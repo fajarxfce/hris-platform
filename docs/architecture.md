@@ -1,5 +1,8 @@
 # Architecture
 
+[Native physical-room resolution](collaboration/space-physical-room.md) shares the guarded logical
+room reader, preserves exact published ownership and returns no provider authority.
+
 [Mobile foreground incoming startup](collaboration/space-incoming-foreground.md) is validated
 against the automatic collector and existing native recovery controls; realtime hints remain separate.
 

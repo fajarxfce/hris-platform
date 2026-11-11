@@ -598,7 +598,14 @@ class CollaborationSpaceRoomWorkerTest {
                     IdentitySecurityPolicy(),
                     f.clock,
                 )
-                .execute(actor, parent, 0, s.space, conversation, f.client)
+                .execute(
+                    actor,
+                    parent,
+                    0,
+                    s.space,
+                    CollaborationSpaceRoomQuery.Conversation(conversation),
+                    f.client,
+                )
 
         fun revokePeer() {
             s.owner.update(

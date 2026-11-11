@@ -4490,7 +4490,14 @@ class CollaborationSpaceWorkerPublicationTest {
                     IdentitySecurityPolicy(),
                     Clock.systemUTC(),
                 )
-                .execute(actor, session, 0, space, conversation, client)
+                .execute(
+                    actor,
+                    session,
+                    0,
+                    space,
+                    CollaborationSpaceRoomQuery.Conversation(conversation),
+                    client,
+                )
 
         fun readDirectTransport(conversation: UUID) =
             ReadNativeCollaborationSpaceDirectTransport(

@@ -11,6 +11,7 @@ import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceR
 import dev.fajar.hris.collaboration.delivery.responses.NativeCollaborationSpaceRoomRequestResolutionResponse
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomObservedAttempt
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomOperation
+import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomQuery
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomRequestFormat
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomRequestIntent
 import dev.fajar.hris.collaboration.domain.entities.CollaborationSpaceRoomView
@@ -189,7 +190,7 @@ class NativeCollaborationSpaceRoomController(
                 identity.sessionId,
                 identity.sessionVersion,
                 spaceId,
-                conversationId,
+                CollaborationSpaceRoomQuery.Conversation(conversationId),
                 client.version,
             )
             .response()

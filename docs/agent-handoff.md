@@ -1,6 +1,6 @@
 # Agent continuation — HRIS communications
 
-Updated 11 November 2026, 00:01 UTC. This opening section owns current work; older checkpoints below are historical.
+Updated 11 November 2026, 00:35 UTC. This opening section owns current work; older checkpoints below are historical.
 
 ## Foreground incoming startup accepted
 
@@ -96,9 +96,19 @@ compiled/native APIs; all five build-driver tests pass. No Android artifact/vers
 publication exists yet. Host generation is NOT Apple compilation or Android acceptance.
 Binding contract/evidence: collaboration-sdk-incoming-hints-bindings.md (Mobile),
 collaboration/sdk-incoming-hints-bindings.md (Group), and shared measurement filename
-collaboration-sdk-incoming-hints-bindings-2026-11-11.json. Next dispatch the candidate all-ABI
-workflow once on this immutable revision, accept its exact native pair, then integrate the owned
-application consumer, pending-key and physical-room routing. SDK7 is retired; never reuse it.
+collaboration-sdk-incoming-hints-bindings-2026-11-11.json. Candidate all-ABI run 42928136481 is RUNNING at immutable b94f6fa79fc1e22b1ded081af03237603fca6f65,
+ref validation/sdk-incoming-hints-20261111. Dispatch15115 and all pushes are reaped. Do not
+redispatch. Private Mobile sdk-incoming-hints-ci-2026-11-11 owns hosted.json, pinned download.py
+and prepared (not executed) packaging scripts. All four ABI jobs are now ACCEPTED after download73482 REAPED: exact GitHub digests/CRC,
+source and Kotlin pairs, symbols and ELF alignments verified. Manifest
+5f93684eac1c1e26f95f250d87ec34b91bdd22ad34a2a8af5659f8a210623b3f. Android evidence:
+collaboration-sdk-incoming-hints-android-2026-11-11.json (both repos). Raw ARM64 differs from
+raw SDK6 by only22,592 bytes; APK-stripped and AAR-raw binaries are distinct comparisons.
+A fresh wrapper at /home/fajar/hris/.worktrees/matrix-kotlin-incoming-hints-2026-11-11 is now
+staged at pinned c1664f7 with all four verified libraries and nine generated Kotlin files.
+prepare-package.py EXECUTED; do not repeat. SDK8 native candidates exist, but no AAR/runtime
+dependency/publication exists. Run package.py only after the local Group compiler is reaped.
+SDK7 is retired; never reuse it. Then integrate the owned incoming application consumer.
 The current incoming scanner sees local bindings only; it cannot cover unknown server rooms
 when a batch is lost. Cold/gap recovery must include admitted provider/server inventory coverage.
 Never infer the cursor of queued content from a later local position read.
@@ -106,7 +116,33 @@ Server push locators are physical matrixRoomId/matrixEventId. Logical UUID listi
 feed. The existing admitted rooms.boundRoom lookup can locate an unknown physical room; preserve
 the room-first, sorted-account, native-session guard order of ReadNativeCollaborationSpaceRoom.
 
-Phone ADB32274 timed out/reaped; validated release 89 is still uninstalled. Existing availability
+Group physical-room resolution is ACCEPTED: eleven source/test files, eight new admission/storage
+cases and one new native HTTP case. Total478 passed =222 fresh final HTTP/worker +256 exact
+unchanged controls (205 domain/51data); one unchanged opt-in real elapsed-hour report-retention
+case was skipped. All30 prior native room cases remain. Final-1/session71990 REAPED /561.679s,
+8,743 inputs, manifest9a8d6b737051eaa6633840ce5bfc53909d2b10883c4b6cd7f463e3da71682abe;
+report manifestcd38146ec8e493c0bdfe4f8c904ea1202a4e1e0832e7f9555fb5151a5b40a90a.
+Full-1/session43391 is preserved as FAILED /872.418s: two HTTP assertion errors and old UUID
+worker fixture calls. Only three test files changed afterward; all product source and 256
+passing domain/data controls stayed exact. No rerun of the unchanged 14-minute control suite.
+The native POST /spaces/{spaceId}/rooms/read shares ReadNativeCollaborationSpaceRoom and its typed
+logical/physical query. Immutable selection precedes room/account/native guard order; exact
+binding readback and current denial fence either acquisition result. It returns published SPACE
+or retained LEGACY metadata, not an invented unpublished original. No schema, shared use-case DI,
+SDK/provider I/O or deployment change. Contract: collaboration-space-physical-room.md (Mobile),
+collaboration/space-physical-room.md (Group); shared measurement filename
+collaboration-space-physical-room-2026-11-11.json. Private Group space-physical-room-2026-11-11
+owns both source snapshots, failures and reports. publish.py EXECUTED; never repeat it.
+
+SDK8 packaging session77349 is RUNNING in private Mobile sdk-incoming-hints-ci-2026-11-11.
+Group compiler is reaped; only this packaging compiler is active. Do not mutate staged wrapper,
+SDK source, build manifest or packaging tools during it. No consumer/version/publication change.
+Next inspect the actual compiled JVM APIs/AAR pair, then validate the application consumer and
+native runtime before publication. Private consumer-notes.md records unresolved atomic cursor/
+physical-demand ownership, key-only pending retries, inventory gaps and original Company routing;
+it is investigation, not implemented consumer behavior. All54 PRD groups remain OPEN.
+
+Phone ADB93824 timed out/reaped; validated release 89 is still uninstalled. Existing availability
 question remains pending. Notify before install-only; do not launch, reset or drive phone UI.
 No live deployment or generic Starter delta. SDK6, live 90163c/schema 116.4 and original sender
 keys/messages remain protected. All 54 communications PRD groups remain OPEN. Continue work.

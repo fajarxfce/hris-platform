@@ -2546,6 +2546,73 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
     }
 
     @Test
+    fun groupPhysicalRoomLookupAdmitsOwnedMetadataWithoutProviderRequests() {
+        val a = groupEmployee()
+        val b = groupEmployee()
+        val outsider = groupEmployee()
+        val (device, gateway) = enrollGroup(a)
+        enrollGroup(b)
+        val room = publishedGroupRoom(a, device, b)
+        val row =
+            database()
+                .queryForMap(
+                    "select space_id,conversation_id from collaboration_space_room_bindings where matrix_room_id=?",
+                    room,
+                )
+        val path = "/api/v1/collaboration/spaces/${row["space_id"]}/rooms/read"
+        val input = mapOf("matrixRoomId" to room)
+        val before = provider.roomCalls.get()
+        for (reader in listOf(a, b)) {
+            val response = groupNativeCall(reader, path, input)
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            val body = json.readTree(response.body())
+            assertEquals(
+                setOf("spaceId", "conversationId", "provisioning", "room"),
+                body.propertyNames().toSet(),
+            )
+            assertEquals(row["conversation_id"].toString(), body["conversationId"].asString())
+            assertEquals(room, body["room"]["roomId"].asString())
+            assertEquals("matrix.example.test", body["room"]["serverName"].asString())
+            assertFalse(response.body().contains(gateway))
+        }
+        for ((bad, expectedStatus) in
+            listOf(
+                emptyMap<String, Any>() to 400,
+                mapOf("matrixRoomId" to "invalid") to 422,
+                mapOf("matrixRoomId" to room, "serverName" to "attacker.test") to 400,
+            )) {
+            val response = groupNativeCall(a, path, bad)
+            assertEquals(expectedStatus, response.statusCode(), response.body())
+        }
+        assertEquals(
+            404,
+            groupNativeCall(a, path, mapOf("matrixRoomId" to "!unknown:matrix.example.test"))
+                .statusCode(),
+        )
+        assertEquals(404, groupNativeCall(outsider, path, input).statusCode())
+        assertTrue(groupNativeCall(a, path, input, token = gateway).statusCode() in setOf(401, 403))
+        database()
+            .update(
+                "delete from membership_permissions where account_id=? and permission='collaboration.chat'",
+                b.fixture.account,
+            )
+        assertEquals(403, groupNativeCall(a, path, input).statusCode())
+        database()
+            .update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                a.session,
+            )
+        assertEquals(401, groupNativeCall(a, path, input).statusCode())
+        assertEquals(
+            401,
+            groupNativeCall(a, path, mapOf("matrixRoomId" to "!unknown:matrix.example.test"))
+                .statusCode(),
+        )
+        assertEquals(before, provider.roomCalls.get())
+    }
+
+    @Test
     fun groupDirectTransportReturnsOnlyCurrentNativePairDeviceAndPublishedRoom() {
         val a = groupEmployee()
         val b = groupEmployee()

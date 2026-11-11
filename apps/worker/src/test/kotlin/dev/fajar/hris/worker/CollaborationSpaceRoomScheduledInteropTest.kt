@@ -147,9 +147,27 @@ class CollaborationSpaceRoomScheduledInteropTest {
             TimeUnit.MILLISECONDS.sleep(25)
         }
         val firstView =
-            success(read.execute(first.actor, first.parent, 0, space, conversation, client))
+            success(
+                read.execute(
+                    first.actor,
+                    first.parent,
+                    0,
+                    space,
+                    CollaborationSpaceRoomQuery.Conversation(conversation),
+                    client,
+                )
+            )
         val secondView =
-            success(read.execute(second.actor, second.parent, 0, space, conversation, client))
+            success(
+                read.execute(
+                    second.actor,
+                    second.parent,
+                    0,
+                    space,
+                    CollaborationSpaceRoomQuery.Conversation(conversation),
+                    client,
+                )
+            )
         assertEquals(firstView, secondView)
         val published = requireNotNull(firstView.room)
         assertEquals(CollaborationSpaceRoomOrigin.SPACE, published.origin)
@@ -186,7 +204,17 @@ class CollaborationSpaceRoomScheduledInteropTest {
         )
         assertEquals(
             published,
-            success(read.execute(second.actor, second.parent, 0, space, conversation, client)).room,
+            success(
+                    read.execute(
+                        second.actor,
+                        second.parent,
+                        0,
+                        space,
+                        CollaborationSpaceRoomQuery.Conversation(conversation),
+                        client,
+                    )
+                )
+                .room,
         )
         val releasedBy = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
         while (

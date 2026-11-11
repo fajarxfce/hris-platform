@@ -660,6 +660,170 @@ class NativeCollaborationSpaceRoomTest {
     }
 
     @Test
+    fun physicalRoomLookupKeepsSpaceLegacyAndPeerCoordinatesWithoutWrites() {
+        val f = PublishedRoomFixture()
+        val before = f.owner.counts()
+        assertEquals(success(f.read()), success(f.physical()))
+        assertEquals(success(f.readPeer()), success(f.physical(peer = true)))
+        f.adoptOriginal()
+        assertEquals(success(f.read()), success(f.physical()))
+        assertEquals(
+            f.intent.original,
+            requireNotNull(success(f.physical(peer = true)).room).original,
+        )
+        assertEquals(before, f.owner.counts())
+    }
+
+    @Test
+    fun physicalRoomLookupRejectsMalformedAndForeignMetadata() {
+        val f = PublishedRoomFixture()
+        var lookups = 0
+        f.onLookup = { lookups++ }
+        for (id in listOf("", "not a room", "!" + "x".repeat(1024))) {
+            assertEquals(
+                "invalid_collaboration_conversation_query",
+                (f.physical(id) as Result.Failed).failure.code,
+            )
+        }
+        assertEquals(0, lookups)
+        val intent = f.intent
+        val binding = f.binding
+        for (candidate in
+            listOf(
+                CollaborationSpaceBoundRoom(intent.copy(spaceId = UUID.randomUUID()), binding),
+                CollaborationSpaceBoundRoom(
+                    intent.copy(serverName = "other.example.test"),
+                    binding,
+                ),
+                CollaborationSpaceBoundRoom(
+                    intent,
+                    binding.copy(roomId = "!other:matrix.example.test"),
+                ),
+                CollaborationSpaceBoundRoom(
+                    intent,
+                    binding.copy(conversationId = UUID.randomUUID()),
+                ),
+            )) {
+            f.lookup = Result.Success(candidate)
+            assertEquals(
+                "collaboration_room_scope_invalid",
+                (f.physical() as Result.Failed).failure.code,
+            )
+        }
+    }
+
+    @Test
+    fun physicalRoomLookupDoesNotInferTheProviderFromTheRoomId() {
+        val f = PublishedRoomFixture()
+        f.binding = f.binding.copy(roomId = "!opaque:another.example.test")
+        val result = success(f.physical())
+        val room = requireNotNull(result.room)
+        assertEquals("matrix.example.test", room.serverName)
+        assertEquals(f.binding.roomId, room.roomId)
+    }
+
+    @Test
+    fun physicalRoomLookupRechecksTheSelectedBindingUnderItsGuard() {
+        val f = PublishedRoomFixture()
+        f.onLookup = { f.binding = f.binding.copy(roomId = "!changed:matrix.example.test") }
+        assertEquals(
+            "collaboration_room_provisioning_changed",
+            (f.physical() as Result.Failed).failure.code,
+        )
+    }
+
+    @Test
+    fun currentNativeDenialDominatesAbsentFailedAndPresentPhysicalLookups() {
+        val f = PublishedRoomFixture()
+        for (lookup in
+            listOf(
+                Result.Success(null),
+                Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_lookup_failure")),
+                Result.Success(CollaborationSpaceBoundRoom(f.intent, f.binding)),
+            )) {
+            f.lookup = lookup
+            f.owner.s.owner.update(
+                "update native_sessions set version=1 where id=?",
+                f.owner.s.parent,
+            )
+            val result = f.physical() as Result.Failed
+            assertEquals((f.read() as Result.Failed).failure.code, result.failure.code)
+            assertNotEquals("fixture_lookup_failure", result.failure.code)
+            assertNotEquals("collaboration_room_not_found", result.failure.code)
+            f.owner.s.owner.update(
+                "update native_sessions set version=0 where id=?",
+                f.owner.s.parent,
+            )
+        }
+    }
+
+    @Test
+    fun physicalRoomLookupKeepsFailureCancellationAndFinalDenialDistinct() {
+        val f = PublishedRoomFixture()
+        val before = f.owner.counts()
+        f.lookup = Result.Success(null)
+        assertEquals("collaboration_room_not_found", (f.physical() as Result.Failed).failure.code)
+        f.lookup = Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_lookup_failure"))
+        assertEquals("fixture_lookup_failure", (f.physical() as Result.Failed).failure.code)
+        f.lookup = null
+        f.onLookup = { throw CancellationException("fictional lookup cancellation") }
+        assertThrows(CancellationException::class.java) { f.physical() }
+        f.onLookup = {}
+        f.onBinding = { f.owner.revokePeer() }
+        assertEquals("collaboration_peer_unavailable", (f.physical() as Result.Failed).failure.code)
+        assertEquals(before, f.owner.counts())
+    }
+
+    @Test
+    fun physicalRoomLookupHasOneDeadlineIncludingSelectionAndPostReadChecks() {
+        val f = PublishedRoomFixture()
+        val start = f.owner.f.clock.instant()
+        for (phase in listOf("lookup", "binding")) {
+            f.owner.f.clock.at = start
+            f.onLookup =
+                if (phase == "lookup") ({ f.owner.f.clock.at = start.plusSeconds(30) }) else ({})
+            f.onBinding =
+                if (phase == "binding") ({ f.owner.f.clock.at = start.plusSeconds(30) }) else ({})
+            assertEquals(
+                "collaboration_room_provisioning_changed",
+                (f.physical() as Result.Failed).failure.code,
+            )
+        }
+    }
+
+    @Test
+    fun physicalRoomLookupWaitsForTheOriginalRoomGuardBeforeAccountAdmission() {
+        val f = PublishedRoomFixture()
+        val locked = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val selected = CountDownLatch(1)
+        f.onLookup = { selected.countDown() }
+        val pool = Executors.newFixedThreadPool(2)
+        try {
+            val writer =
+                pool.submit<Result<Unit>> {
+                    f.owner.s.tx {
+                        success(f.owner.rooms.lock(f.owner.s.space, f.owner.conversation))
+                        locked.countDown()
+                        assertTrue(release.await(10, TimeUnit.SECONDS))
+                        Result.Success(Unit)
+                    }
+                }
+            assertTrue(locked.await(10, TimeUnit.SECONDS))
+            val reader = pool.submit<Result<CollaborationSpaceRoomView>> { f.physical() }
+            assertTrue(selected.await(10, TimeUnit.SECONDS))
+            assertThrows(TimeoutException::class.java) { reader.get(100, TimeUnit.MILLISECONDS) }
+            release.countDown()
+            success(writer.get(10, TimeUnit.SECONDS))
+            assertEquals(success(f.read()), success(reader.get(10, TimeUnit.SECONDS)))
+        } finally {
+            release.countDown()
+            pool.shutdownNow()
+            assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+        }
+    }
+
+    @Test
     fun publishedRoomNamesItsExactOriginalCoordinatesOnlyForLegacy() {
         val f = PublishedRoomFixture()
         val before = f.owner.counts()
@@ -1129,8 +1293,26 @@ class NativeCollaborationSpaceRoomTest {
                 intent.matrixCreatorAccountId,
             )
         var onBinding: () -> Unit = {}
+        var onLookup: () -> Unit = {}
+        var lookup: Result<CollaborationSpaceBoundRoom?>? = null
         private val rooms =
             object : CollaborationSpaceRoomRepository by owner.rooms {
+                override fun boundRoom(
+                    spaceId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationSpaceBoundRoom?> {
+                    assertEquals(owner.s.space, spaceId)
+                    assertTrue(accountId in owner.pair)
+                    assertEquals("matrix.example.test", serverName)
+                    assertEquals(binding.roomId, roomId)
+                    val result =
+                        lookup ?: Result.Success(CollaborationSpaceBoundRoom(intent, binding))
+                    onLookup()
+                    return result
+                }
+
                 override fun intent(spaceId: UUID, accountId: UUID, conversationId: UUID) =
                     Result.Success(intent)
 
@@ -1167,6 +1349,14 @@ class NativeCollaborationSpaceRoomTest {
         }
 
         fun read() = owner.read(rooms = rooms)
+
+        fun physical(roomId: String = binding.roomId, peer: Boolean = false) =
+            owner.read(
+                actor = if (peer) owner.peerActor else owner.s.actor,
+                parent = if (peer) owner.peerParent else owner.s.parent,
+                rooms = rooms,
+                query = CollaborationSpaceRoomQuery.ProviderRoom(roomId),
+            )
 
         fun readPeer() =
             owner.read(actor = owner.peerActor, parent = owner.peerParent, rooms = rooms)
@@ -1301,6 +1491,8 @@ class NativeCollaborationSpaceRoomTest {
             parent: UUID = s.parent,
             rooms: CollaborationSpaceRoomRepository = this.rooms,
             parentVersion: Long = 0,
+            query: CollaborationSpaceRoomQuery =
+                CollaborationSpaceRoomQuery.Conversation(conversation),
         ) =
             ReadNativeCollaborationSpaceRoom(
                     rooms,
@@ -1314,7 +1506,7 @@ class NativeCollaborationSpaceRoomTest {
                     IdentitySecurityPolicy(),
                     f.clock,
                 )
-                .execute(actor, parent, parentVersion, s.space, conversation, f.client)
+                .execute(actor, parent, parentVersion, s.space, query, f.client)
 
         fun original(operation: UUID) =
             CollaborationSpaceRoomOperation(

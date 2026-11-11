@@ -43,6 +43,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "$base/direct-conversations/{conversationId}/room/requests" to "post",
                 "$base/direct-conversations/{conversationId}/room/requests/receipts/read" to "post",
                 "$base/direct-conversations/{conversationId}/room/requests/fence" to "post",
+                "$base/rooms/read" to "post",
                 "$base/legacy-conversations" to "get",
                 "$base/legacy-conversations/{legacyCompanyId}/{conversationId}" to "get",
                 "$base/identity" to "post",
@@ -69,7 +70,11 @@ class ApiContractHttpTest : PeopleApiFixture() {
                     .map { it.propertyNames().toSet() }
                     .toSet(),
             )
-            if (path.endsWith("/legacy-runtime/publication") || path.endsWith("/receipts/read")) {
+            if (
+                path.endsWith("/legacy-runtime/publication") ||
+                    path.endsWith("/receipts/read") ||
+                    path.endsWith("/rooms/read")
+            ) {
                 assertFalse(operation.path("x-hris-idempotency-key").asBoolean())
                 assertTrue(
                     operation["parameters"].iterator().asSequence().none {
@@ -241,6 +246,12 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertEquals(
             setOf("spaceId", "conversationId", "provisioning", "room"),
             schemas["CollaborationSpaceRoomView"]["properties"].propertyNames().toSet(),
+        )
+        val physicalRoomQuery = schemas["ReadCollaborationSpaceProviderRoomRequest"]
+        assertEquals(setOf("matrixRoomId"), physicalRoomQuery["properties"].propertyNames().toSet())
+        assertEquals(
+            setOf("matrixRoomId"),
+            physicalRoomQuery["required"].iterator().asSequence().map { it.asString() }.toSet(),
         )
         assertEquals(
             setOf("roomId", "serverName", "origin", "publishedAt", "original"),

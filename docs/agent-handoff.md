@@ -1,31 +1,46 @@
 # Agent continuation — HRIS communications
 
-Updated 11 November 2026, 02:38 UTC. This opening section owns current work; older checkpoints below are historical.
+Updated 11 November 2026, 03:14 UTC. This opening section owns current work; older checkpoints below are historical.
 
-## Active Mobile incoming retention — validation continues
+## Mobile incoming source retention accepted — continue integration
 
-Primary Mobile has an UNCOMMITTED frozen21-file source/test candidate for atomic per-source
-cursor and physical-room work. Source4,872 /5a21d58b02cd6e0f21bb0066254902cccd0c061c23638229290fdc3d0ba886dd.
-Focused3/session72088 REAPED PASS:275 =246 domain +29 SQLite cases /130.979s. Browser1/session99932
-is RUNNING; full checks have not run. Mobile private space-incoming-sync-retention-2026-11-11
-contains all scripts, expected RED failures and frozen sources. Primary Mobile handoff owns
-continuation. Group product/fixtures are unchanged; no new live deployment or phone build.
-No producer or physical/inventory/key consumer is enabled. All54 PRD groups remain OPEN.
+Mobile implementation5f678ed3feab2d24e3b97e5fc9b58159f15f785e is accepted and pushed. It contains21
+source/test files plus contract/evidence. Original source identity is full64-hex SHA-256, NOT UUID.
+Bounded authenticated parts keep source cursor, physical/logical work and optional wake in one
+existing replica transaction. Existing scheduling owners preserve all three captured collections.
+No Group product/fixture changes, deployment or new phone APK are included.
+
+Frozen Mobile4,872-input manifest:ec278139e3a0e0685dd761ce0fae093305da1844c1a001562586c3d944f03351.
+Focused5/session2293 +browser3/session62918 REAPED:552 cases /200.826s +165.157s. Full2/session74580
+REAPED PASS /676.869s:11,061 =9,023 fresh +2,038 exact accepted unchanged controls; zero failures,
+errors/skips. Audit64679 REAPED ACCEPTED, all prior case IDs preserved. First audit13350 corrected
+an omitted build-logic module in its source map without changing/rerunning application tests.
+Format/architecture74 modules/detekt, Android host/release compile/lint, browser/Wasm and iOS metadata
+pass. New Apple storage execution and application producer/worker integration remain separate.
+
+Mobile private space-incoming-sync-retention-2026-11-11 owns scripts, frozen/baseline sources,
+all superseded/failed evidence and next-producer-design.md. publish.py HAS EXECUTED. Shared measurement:
+collaboration-space-incoming-retention-2026-11-11.json. Group contract:collaboration/space-incoming-retention.md.
+Primary Mobile handoff owns next work: admitted serial batch production, owned observation through
+existing SdkSyncLifecycle, exact source/runtime fences, physical room resolution, provider inventory
+and key recovery. No producer/physical/inventory/key consumer is enabled. All54 groups stay OPEN.
 
 ## Current raw sync batches — accepted, continue with the durable owner
 
-Hosted control run42943310515 remains IN PROGRESS on immutable6baa8acc82bcd95a22ab3bc342458292f789de99,
-ref validation/raw-sync-batches-20261111. Portable is ACCEPTED:9,001 =4,253 desktop +732 Android host
-+4,016 Chromium, prior case IDs preserved. Job130270030971/artifact13822693072,3,643,965bytes,
-SHA c2fa2fa1400f9ec8ccd39ab1041e2afeb5ddc50fd422cf3d0692d286f813854c;
+Hosted control run42943310515 is COMPLETE and ACCEPTED on immutable6baa8acc82bcd95a22ab3bc342458292f789de99,
+ref validation/raw-sync-batches-20261111. 12,500 cases =9,001 portable +3,499 Apple;16 Swift push checks
+and unsigned Apple host pass. Prior case IDs, exact source, remote archive SHA-256 and ZIP CRCs verified.
+Portable job130270030971/artifact13822693072,3,643,965bytes,
+SHA c2fa2fa1400f9ec8ccd39ab1041e2afeb5ddc50fd422cf3d0692d286f813854c,
 report manifest6de40a2358339604b7f6b1dc7d455091c773b5689ba1601bb60dda3e884f65ac.
-Audit59880 REAPED PASS; first audit72594 passed artifact/test checks but could not download
-ANSI-bearing logs until gh's output flag was set for the private file. Apple is still running;
-expected3,499 cases,16 Swift push checks and unsigned host are NOT accepted yet. Do not redispatch.
-Private Mobile raw-sync-batches-2026-11-11/hosted-42943310515 owns archives, source pin and logs;
-public measurement:collaboration-raw-sync-batches-hosted-2026-11-11.json. This is control workflow
-coverage, not Apple native SDK8 acceptance or the stale SDK4 native workflow. Continue durable
-source retention while CI runs. All 54 PRD groups remain OPEN.
+Apple job130270030622/artifact13823799318,622,789bytes,
+SHA bc1e0b67b2eaba5ca46034e0aca4e1e0906f0a5e8768805d7c35c2e411190832,
+report manifesteaf723aa9910e867763b93b4942d413dde02e41dd3862fda1f567a44330f6fd4.
+Audits59880 and31349 REAPED PASS. The first portable audit72594 only failed downloading ANSI-bearing
+logs; gh's explicit output flag wrote them privately. No hosted test rerun was needed. Do not redispatch.
+Private Mobile raw-sync-batches-2026-11-11/hosted-42943310515 owns pinned source, archives and logs;
+public measurement:collaboration-raw-sync-batches-hosted-2026-11-11.json. This is raw-batch control
+coverage. Apple native SDK8 and the new source-retention candidate are separate acceptance.
 
 Mobile implementation 6baa8acc82bcd95a22ab3bc342458292f789de99 is committed and pushed. This Group checkpoint records the unchanged native fixtures and shared evidence.
 
@@ -79,7 +94,7 @@ Known separate CI follow-up: the legacy collaboration-hris.yml/check_space_queue
 still pins SDK4 and must not be claimed or dispatched as current SDK8 native acceptance.
 Current Group native controls select immutable SDK8 explicitly. Preserve old artifact hashes
 when updating the old workflow/fixture together. The accepted hosted foreground control run
-42923369580 remains SDK6 coverage; hosted raw-sync run42943310515 is pending, as recorded above.
+42923369580 remains SDK6 coverage; hosted raw-sync run42943310515 is accepted, as recorded above.
 
 Phone attempt 44309 REAPED timeout 124 at 01:50. The existing availability question stays pending;
 Release 89 (SDK6) remains the latest validated phone APK, install-only. No new phone install,

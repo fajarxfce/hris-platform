@@ -42,6 +42,34 @@ class EventReadEvidenceTest(unittest.TestCase):
         self.assertEqual("$firstEdit", accepted["events"]["firstEdit"])
         self.assertEqual(self.adopted(), adopted_events(self.adopted(), accepted))
 
+    def test_native_hint_evidence_is_explicit_and_detached_from_input(self):
+        hints = {"syncResponses": 3, "observedEventKinds": 4,
+                 **{name: True for name in ["exactPositions", "boundedHints", "initialReconciliation",
+                                           "registrationPositionUnchanged", "storedKeyObserved", "listenerFinished"]}}
+        value = self.staged() | {"sdkIncomingHints": hints}
+        accepted = staged_events(value, hints=True)
+        self.assertEqual(value, accepted)
+        hints["listenerFinished"] = False
+        self.assertIs(True, accepted["sdkIncomingHints"]["listenerFinished"])
+        for source, options in [(accepted, {}), (self.staged(), {"hints": True}),
+                                (accepted, {"hints": 1})]:
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                staged_events(source, **options)
+
+    def test_native_hints_reject_incomplete_callbacks_unbounded_counts_and_payloads(self):
+        hints = {"syncResponses": 3, "observedEventKinds": 4,
+                 **{name: True for name in ["exactPositions", "boundedHints", "initialReconciliation",
+                                           "registrationPositionUnchanged", "storedKeyObserved", "listenerFinished"]}}
+        variants = [{name: False} for name in hints if type(hints[name]) is bool]
+        variants += [{"syncResponses": True}, {"syncResponses": 17}, {"observedEventKinds": 3},
+                     {"cursor": "private"}, {"key": "private"}, {"body": "private"}]
+        for changed in variants:
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                staged_events(self.staged() | {"sdkIncomingHints": hints | changed}, hints=True)
+        for value in [None, {}, [], hints | {"listenerFinished": 1}]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                staged_events(self.staged() | {"sdkIncomingHints": value}, hints=True)
+
     def test_rejects_missing_keys_provisioning_claims_payloads_and_boolean_process_ids(self):
         for changed in [{"missingKeyObserved": False}, {"decryptedAfterSync": 1}, {"bothSdkClosed": False},
                         {"processId": True}, {"body": "private"}, {"latestEditHash": "unsafe"}]:

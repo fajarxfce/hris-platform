@@ -47,18 +47,36 @@ def original_window(value):
     return dict(value)
 
 
-def staged_events(value):
+def sdk_incoming_hints(value):
+    flags = {"exactPositions", "boundedHints", "initialReconciliation",
+             "registrationPositionUnchanged", "storedKeyObserved", "listenerFinished"}
+    counts = {"syncResponses": 3, "observedEventKinds": 4}
+    if (not isinstance(value, dict) or set(value) != flags | set(counts)
+            or any(value[name] is not True for name in flags)
+            or any(type(value[name]) is not int or value[name] != count for name, count in counts.items())):
+        raise ValueError("Incomplete native sync/key hint evidence")
+    return dict(value)
+
+
+def staged_events(value, *, hints=False):
     checkpoint(value)
     fields = {"processId", "events", "originalHash", "firstEditHash", "latestEditHash", "companyWindow",
               "missingKeyObserved", "decryptedAfterSync", "redactedTargetSenderPreserved", "bothSdkClosed"}
+    if type(hints) is not bool:
+        raise ValueError("Invalid native hint scenario")
+    if hints:
+        fields.add("sdkIncomingHints")
     if set(value) != fields:
         raise ValueError("Unexpected event-read checkpoint fields")
     flags = {"missingKeyObserved", "decryptedAfterSync", "redactedTargetSenderPreserved", "bothSdkClosed"}
     if any(value[name] is not True for name in flags):
         raise ValueError("Native acquisition sequence was not established")
-    return {"processId": value["processId"], "events": event_coordinates(value["events"]),
+    result = {"processId": value["processId"], "events": event_coordinates(value["events"]),
             **{name: content_hash(value[name]) for name in ["originalHash", "firstEditHash", "latestEditHash"]},
             "companyWindow": original_window(value["companyWindow"]), **{name: True for name in flags}}
+    if hints:
+        result["sdkIncomingHints"] = sdk_incoming_hints(value["sdkIncomingHints"])
+    return result
 
 
 def retained_history(value, staged, *, completed=False):
@@ -180,6 +198,9 @@ class EventReadExperiment(OriginalDeliveryExperiment):
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def execute(self):
+        hints = self.fixture.get("sdkIncomingHints", False)
+        if type(hints) is not bool:
+            raise ValueError("Invalid native hint scenario")
         artifact = verified_artifact(self.native.apk)
         self.native.prepare()
         installed = self.native.bind({"matrix": {"baseUrl": self.fixture["baseUrl"]}})
@@ -197,7 +218,7 @@ class EventReadExperiment(OriginalDeliveryExperiment):
             raise ValueError("Invalid fixture redaction target")
         private_json(self.directory / "redaction-request.json", redaction)
         self.write_app("original-redaction-completed", self.wait_host("redaction-completed"))
-        staged = staged_events(self.wait_app("staged"))
+        staged = staged_events(self.wait_app("staged"), hints=hints)
         self.finished()
         private_json(self.directory / "staged.json", staged)
         self.write_app("original-group", self.wait_host("group"))

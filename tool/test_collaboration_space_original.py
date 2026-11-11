@@ -120,8 +120,15 @@ class OriginalDeliveryOwnershipTest(unittest.TestCase):
                         archive.writestr("AndroidManifest.xml", b"fictional")
                         for name in names:
                             archive.writestr(name, b"unverified")
-                    with self.assertRaises(ValueError):
-                        verified_artifact(path)
+                    for version in ["26.10.23-hris.6", "26.10.23-hris.8"]:
+                        with patch.dict("os.environ", {"HRIS_COLLAB_NATIVE_SDK": version}), self.assertRaises(ValueError):
+                            verified_artifact(path)
+
+    def test_an_unknown_or_retired_sdk_cannot_supply_its_own_native_pin(self):
+        for version in ["", "26.10.23-hris.7", "unverified"]:
+            with self.subTest(version=version), patch.dict("os.environ", {"HRIS_COLLAB_NATIVE_SDK": version}):
+                with self.assertRaisesRegex(ValueError, "Unknown native SDK artifact"):
+                    verified_artifact("does-not-exist.apk")
 
 
 class MixedOriginalCheckpointTest(unittest.TestCase):

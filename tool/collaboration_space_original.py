@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shlex
@@ -20,23 +21,31 @@ from collaboration_hris_native import (private_json, read_json, app_write_script
 
 SDK6_X86_64 = "ecffbab72fd5dd29d656bc4757ea423bb4bccf0444140af0480684bc32761278"
 SDK6_X86_64_BYTES = 111204848
+PINNED_NATIVE_SDKS = {
+    "26.10.23-hris.6": (SDK6_X86_64_BYTES, SDK6_X86_64),
+    "26.10.23-hris.8": (111331328, "6e4e177e2e9ec01df4a4b238bbefaeba6b228fed0d139224f2b0424484e2cd95"),
+}
 
 
 def verified_artifact(path):
-    """Exact SDK6 release bytes, deterministically stripped by NDK28.2.13676358."""
+    """Pinned native bytes, independently stripped by NDK28.2.13676358; SDK6 is default."""
+    version = os.environ.get("HRIS_COLLAB_NATIVE_SDK", "26.10.23-hris.6")
+    if version not in PINNED_NATIVE_SDKS:
+        raise ValueError("Unknown native SDK artifact")
+    library_bytes, library_hash = PINNED_NATIVE_SDKS[version]
     path = Path(path).resolve(strict=True)
     if not 1 <= path.stat().st_size <= 256 * 1024 * 1024:
         raise ValueError("Invalid original-delivery APK size")
     with zipfile.ZipFile(path) as archive:
         names = [entry for entry in archive.infolist() if entry.filename.endswith("/libmatrix_sdk_ffi.so")]
-        if len(names) != 1 or names[0].filename != "lib/x86_64/libmatrix_sdk_ffi.so" or names[0].file_size != SDK6_X86_64_BYTES:
-            raise ValueError("Expected the immutable SDK6 x86_64 library")
+        if len(names) != 1 or names[0].filename != "lib/x86_64/libmatrix_sdk_ffi.so" or names[0].file_size != library_bytes:
+            raise ValueError("Expected the pinned x86_64 library")
         with archive.open(names[0]) as library:
-            if hashlib.file_digest(library, "sha256").hexdigest() != SDK6_X86_64:
-                raise ValueError("Original delivery requires the exact SDK6 release")
+            if hashlib.file_digest(library, "sha256").hexdigest() != library_hash:
+                raise ValueError("Original delivery requires the exact pinned SDK")
     with path.open("rb") as apk:
         return {"apkSha256": hashlib.file_digest(apk, "sha256").hexdigest(),
-                "sdkVersion": "26.10.23-hris.6", "abi": "x86_64", "librarySha256": SDK6_X86_64}
+                "sdkVersion": version, "abi": "x86_64", "librarySha256": library_hash}
 
 
 def checkpoint(value):

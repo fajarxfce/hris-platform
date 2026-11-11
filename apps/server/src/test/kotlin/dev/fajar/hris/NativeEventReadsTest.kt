@@ -95,7 +95,17 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
     fun registeredIncomingWorkerRetainsContentBeforeEofAndStopsAcrossOfflineReopen() =
         exerciseIncomingHistory(completePending = false, incomingWorker = true)
 
-    private fun exerciseIncomingHistory(completePending: Boolean, incomingWorker: Boolean = false) {
+    @Test
+    @Timeout(value = 12, unit = TimeUnit.MINUTES)
+    @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_SDK_INCOMING_HINTS", matches = "true")
+    fun nativeIncomingHintsPreserveExactSyncPositionsAndObserveStoredKeys() =
+        exerciseIncomingHistory(completePending = false, sdkIncomingHints = true)
+
+    private fun exerciseIncomingHistory(
+        completePending: Boolean,
+        incomingWorker: Boolean = false,
+        sdkIncomingHints: Boolean = false,
+    ) {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
         val recipient = sdkOwner(sdkPeer(base))
@@ -120,6 +130,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 "baseUrl" to "http://127.0.0.1:$port",
                 "completePendingIncoming" to completePending,
                 "incomingWorker" to incomingWorker,
+                "sdkIncomingHints" to sdkIncomingHints,
                 "roomId" to room,
                 "conversationId" to conversation,
                 "logicalId" to UUID.randomUUID(),
@@ -171,6 +182,20 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 mapOf("eventId" to redactionId, "targetEventId" to target),
             )
             val staged = waitFor(directory, "staged", process)
+            if (sdkIncomingHints) {
+                val hints = staged["sdkIncomingHints"]
+                assertEquals(3, hints["syncResponses"].asInt())
+                assertEquals(4, hints["observedEventKinds"].asInt())
+                for (flag in
+                    listOf(
+                        "exactPositions",
+                        "boundedHints",
+                        "initialReconciliation",
+                        "registrationPositionUnchanged",
+                        "storedKeyObserved",
+                        "listenerFinished",
+                    )) assertTrue(hints[flag].asBoolean(), flag)
+            } else assertFalse(staged.has("sdkIncomingHints"))
             for (flag in
                 listOf(
                     "bothSdkClosed",

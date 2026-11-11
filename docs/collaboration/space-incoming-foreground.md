@@ -45,3 +45,10 @@ routing remain separate work. No SDK artifact, live deployment or phone performa
 All 54 communications acceptance groups remain open.
 
 [Measurements](../measurements/collaboration-space-incoming-foreground-2026-11-10.json).
+
+The immutable foreground CI run [42923369580](https://github.com/fajarxfce/hris-mobile/actions/runs/42923369580)
+is now fully audited: 12,472 tests (8,979 portable and 3,493 Apple), 16 Swift push-envelope
+checks and an unsigned Apple application host. Archive digests/CRC and previous case identities
+are verified. Only the failed Apple job was retried after an infrastructure failure, with no source
+changes or portable rerun. [Hosted evidence](../measurements/collaboration-space-incoming-foreground-hosted-2026-11-10.json).
+This validates foreground integration with SDK6, not the new SDK8 native hint consumer.

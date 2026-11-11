@@ -1,17 +1,31 @@
 # Agent continuation — HRIS communications
 
-Updated 11 November 2026, 02:04 UTC. This opening section owns current work; older checkpoints below are historical.
+Updated 11 November 2026, 02:38 UTC. This opening section owns current work; older checkpoints below are historical.
+
+## Active Mobile incoming retention — validation continues
+
+Primary Mobile has an UNCOMMITTED frozen21-file source/test candidate for atomic per-source
+cursor and physical-room work. Source4,872 /5a21d58b02cd6e0f21bb0066254902cccd0c061c23638229290fdc3d0ba886dd.
+Focused3/session72088 REAPED PASS:275 =246 domain +29 SQLite cases /130.979s. Browser1/session99932
+is RUNNING; full checks have not run. Mobile private space-incoming-sync-retention-2026-11-11
+contains all scripts, expected RED failures and frozen sources. Primary Mobile handoff owns
+continuation. Group product/fixtures are unchanged; no new live deployment or phone build.
+No producer or physical/inventory/key consumer is enabled. All54 PRD groups remain OPEN.
 
 ## Current raw sync batches — accepted, continue with the durable owner
 
-Hosted control run42943310515 is IN PROGRESS on immutable6baa8acc82bcd95a22ab3bc342458292f789de99,
-ref validation/raw-sync-batches-20261111. This runs portable and Apple controls, not the old
-SDK4 native workflow. Expected portable9,001 and Apple3,499 cases,16 Swift push checks and
-an unsigned Apple host; none is accepted yet. Private Mobile raw-sync-batches-2026-11-11/
-hosted-42943310515 owns run state; public measurement is
-collaboration-raw-sync-batches-hosted-2026-11-11.json. Do not redispatch; audit exact source,
-remote archive digests, test IDs and build results when it finishes. Local source/native
-acceptance below remains valid. Continue the durable cursor/work owner while CI runs.
+Hosted control run42943310515 remains IN PROGRESS on immutable6baa8acc82bcd95a22ab3bc342458292f789de99,
+ref validation/raw-sync-batches-20261111. Portable is ACCEPTED:9,001 =4,253 desktop +732 Android host
++4,016 Chromium, prior case IDs preserved. Job130270030971/artifact13822693072,3,643,965bytes,
+SHA c2fa2fa1400f9ec8ccd39ab1041e2afeb5ddc50fd422cf3d0692d286f813854c;
+report manifest6de40a2358339604b7f6b1dc7d455091c773b5689ba1601bb60dda3e884f65ac.
+Audit59880 REAPED PASS; first audit72594 passed artifact/test checks but could not download
+ANSI-bearing logs until gh's output flag was set for the private file. Apple is still running;
+expected3,499 cases,16 Swift push checks and unsigned host are NOT accepted yet. Do not redispatch.
+Private Mobile raw-sync-batches-2026-11-11/hosted-42943310515 owns archives, source pin and logs;
+public measurement:collaboration-raw-sync-batches-hosted-2026-11-11.json. This is control workflow
+coverage, not Apple native SDK8 acceptance or the stale SDK4 native workflow. Continue durable
+source retention while CI runs. All 54 PRD groups remain OPEN.
 
 Mobile implementation 6baa8acc82bcd95a22ab3bc342458292f789de99 is committed and pushed. This Group checkpoint records the unchanged native fixtures and shared evidence.
 

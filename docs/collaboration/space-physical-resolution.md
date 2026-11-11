@@ -1,5 +1,8 @@
 # Mobile local physical room resolution
 
+Follow-up: [the single incoming worker](space-physical-worker.md) now consumes known physical bindings with
+source-aware selection and bounded deferral. Raw collection remains inactive.
+
 [Mobile implementation aed49dcb](https://github.com/fajarxfce/hris-mobile/commit/aed49dcbc1bd430533f77cab09302f5c8ee68221) transfers
 one exact physical incoming hint through its owned local binding. Registration supplies the
 configured provider name. No provider/transport request, room creation or new wake is involved.

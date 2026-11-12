@@ -101,10 +101,21 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
     fun nativeIncomingHintsPreserveExactSyncPositionsAndObserveStoredKeys() =
         exerciseIncomingHistory(completePending = false, sdkIncomingHints = true)
 
+    @Test
+    @Timeout(value = 12, unit = TimeUnit.MINUTES)
+    @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_SDK_INCOMING_HINTS", matches = "true")
+    fun nativeIncomingReceiptSurvivesLostReplyForegroundAndOfflineReopen() =
+        exerciseIncomingHistory(
+            completePending = false,
+            sdkIncomingHints = true,
+            incomingSources = true,
+        )
+
     private fun exerciseIncomingHistory(
         completePending: Boolean,
         incomingWorker: Boolean = false,
         sdkIncomingHints: Boolean = false,
+        incomingSources: Boolean = false,
     ) {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
@@ -131,6 +142,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 "completePendingIncoming" to completePending,
                 "incomingWorker" to incomingWorker,
                 "sdkIncomingHints" to sdkIncomingHints,
+                "incomingSources" to incomingSources,
                 "roomId" to room,
                 "conversationId" to conversation,
                 "logicalId" to UUID.randomUUID(),
@@ -251,6 +263,27 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             assertTrue(result["offlineTransportRemoved"].asBoolean())
             val incoming = adopted["incoming"]
             val reopened = result["reopened"]
+            if (incomingSources) {
+                val proof = adopted["incomingSources"]
+                for (flag in
+                    listOf(
+                        "nativeInitialReconciliation",
+                        "durableReceiptBeforeAck",
+                        "lostWriteReplyConfirmed",
+                        "rawReceiptDrained",
+                        "sameRuntimeInstance",
+                        "processCollectorJoined",
+                        "receiptSurvivesStop",
+                    )) assertTrue(proof[flag].asBoolean(), flag)
+                assertEquals(2, proof["foregroundResumes"].asInt())
+                assertEquals(1, proof["receiptWrites"].asInt())
+                assertEquals(1, proof["nativeAcknowledgements"].asInt())
+                assertTrue(proof["receiptDigest"].asString().matches(Regex("[a-f0-9]{64}")))
+                assertEquals(proof["receiptDigest"], reopened["incomingReceiptDigest"])
+            } else {
+                assertFalse(adopted.has("incomingSources"))
+                assertFalse(reopened.has("incomingReceiptDigest"))
+            }
             if (!incomingWorker) assertTrue(incoming["replayUnchanged"].asBoolean())
             assertTrue(incoming["originalJournalUnchanged"].asBoolean())
             assertTrue(reopened["sameRevision"].asBoolean())

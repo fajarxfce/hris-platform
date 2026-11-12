@@ -139,11 +139,19 @@ def incoming_history(value, staged, *, completed=False):
     return result
 
 
-def reopened_history(value, adopted, *, completed=False):
+def reopened_history(value, adopted, *, completed=False, sources=False):
     checkpoint(value)
     expected = adopted["incoming"]["completed"] if completed else adopted["incoming"]
     flags = {"sameRevision", "runtimeNeverOpened", "databaseReleased"}
-    if (set(value) != flags | {"processId", "incoming"}
+    if type(sources) is not bool:
+        raise ValueError("Invalid incoming source scenario")
+    fields = flags | {"processId", "incoming"}
+    if sources:
+        fields.add("incomingReceiptDigest")
+        receipt = incoming_source_receipt(adopted.get("incomingSources"))
+        if content_hash(value.get("incomingReceiptDigest")) != receipt["receiptDigest"]:
+            raise ValueError("Offline incoming receipt changed")
+    if (set(value) != fields
             or any(value[n] is not True for n in flags)
             or value["processId"] == adopted["processId"]
             or value["incoming"] != expected["retained"]):
@@ -167,14 +175,29 @@ def worker_incoming(value, staged):
             "originalJournalUnchanged": True}
 
 
-def adopted_events(value, staged, *, completed=False, worker=False):
-    if type(worker) is not bool or (worker and completed):
+def incoming_source_receipt(value):
+    flags = {"nativeInitialReconciliation", "durableReceiptBeforeAck", "lostWriteReplyConfirmed",
+             "rawReceiptDrained", "sameRuntimeInstance", "processCollectorJoined", "receiptSurvivesStop"}
+    counts = {"foregroundResumes": 2, "receiptWrites": 1, "nativeAcknowledgements": 1}
+    if (not isinstance(value, dict) or set(value) != flags | set(counts) | {"receiptDigest"}
+            or any(value[name] is not True for name in flags)
+            or any(type(value[name]) is not int or value[name] != count for name, count in counts.items())):
+        raise ValueError("Invalid native incoming receipt evidence")
+    content_hash(value["receiptDigest"])
+    return dict(value)
+
+
+def adopted_events(value, staged, *, completed=False, worker=False, sources=False):
+    if type(worker) is not bool or type(sources) is not bool or (worker and completed) or (sources and (worker or completed)):
         raise ValueError("Invalid incoming worker scenario")
     checkpoint(value)
     flags = {"logicalRuntimePreserved", "physicalOwnerPreserved", "oldCompanyReadRejected",
              "foreignRuntimeReadRejected", "redactedTargetSenderPreserved", "runtimeReleased"}
     fields = flags | {"processId", "headEventId", "originalHash", "latestEditHash", "redactedEventId",
                       "redactionEventId", "spaceWindow", "incoming"}
+    if sources:
+        fields.add("incomingSources")
+        incoming_source_receipt(value.get("incomingSources"))
     if set(value) != fields or any(value[name] is not True for name in flags):
         raise ValueError("Original runtime ownership was not preserved")
     for name in ["originalHash", "latestEditHash"]:
@@ -184,6 +207,9 @@ def adopted_events(value, staged, *, completed=False, worker=False):
                 "redactionEventId": staged["events"]["redaction"]}
     if any(value[name] != event for name, event in expected.items()):
         raise ValueError("Adoption changed an event identity")
+    value = dict(value)
+    if sources:
+        value["incomingSources"] = incoming_source_receipt(value["incomingSources"])
     return {**value, "spaceWindow": original_window(value["spaceWindow"]),
             "incoming": worker_incoming(value["incoming"], staged) if worker else incoming_history(value["incoming"], staged, completed=completed)}
 
@@ -227,7 +253,8 @@ class EventReadExperiment(OriginalDeliveryExperiment):
         if type(completed) is not bool:
             raise ValueError("Invalid pending-reference scenario")
         worker = self.fixture.get("incomingWorker", False)
-        adopted = adopted_events(self.wait_app("events"), staged, completed=completed, worker=worker)
+        sources = self.fixture.get("incomingSources", False)
+        adopted = adopted_events(self.wait_app("events"), staged, completed=completed, worker=worker, sources=sources)
         self.finished()
         port = self.native.port
         if not port:
@@ -237,7 +264,7 @@ class EventReadExperiment(OriginalDeliveryExperiment):
         if any(f"tcp:{port}" in line.split()[1:2] for line in self.native.command("reverse", "--list").splitlines()):
             raise RuntimeError("Incoming offline phase still has transport")
         self.start("local")
-        reopened = reopened_history(self.wait_app("local"), adopted, completed=completed)
+        reopened = reopened_history(self.wait_app("local"), adopted, completed=completed, sources=sources)
         self.finished()
         self.result.update(passed=True, physical=staged, adopted=adopted,
                            reopened=reopened, offlineTransportRemoved=True)

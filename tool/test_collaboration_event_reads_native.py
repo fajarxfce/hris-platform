@@ -34,6 +34,51 @@ class EventReadEvidenceTest(unittest.TestCase):
                 **{n: True for n in ["logicalRuntimePreserved", "physicalOwnerPreserved", "oldCompanyReadRejected",
                                     "foreignRuntimeReadRejected", "redactedTargetSenderPreserved", "runtimeReleased"]}}
 
+    def incoming_sources(self):
+        return {"foregroundResumes": 2, "receiptWrites": 1, "nativeAcknowledgements": 1, "receiptDigest": "9" * 64,
+                **{name: True for name in ["nativeInitialReconciliation", "durableReceiptBeforeAck", "lostWriteReplyConfirmed",
+                                          "rawReceiptDrained", "sameRuntimeInstance", "processCollectorJoined", "receiptSurvivesStop"]}}
+
+    def test_native_receipt_evidence_is_copied_and_required_only_for_selected_case(self):
+        source = self.adopted() | {"incomingSources": self.incoming_sources()}
+        result = adopted_events(source, self.staged(), sources=True)
+        source["incomingSources"]["receiptWrites"] = 2
+        self.assertEqual(1, result["incomingSources"]["receiptWrites"])
+        for value, options in [(result, {}), (self.adopted(), {"sources": True}),
+                               (result, {"sources": 1}), (result, {"sources": True, "worker": True}),
+                               (result, {"sources": True, "completed": True})]:
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                adopted_events(value, self.staged(), **options)
+
+    def test_native_receipt_rejects_extra_writes_acks_flags_and_payload(self):
+        original = self.incoming_sources()
+        changes = [{name: False} for name, value in original.items() if type(value) is bool]
+        changes += [{"foregroundResumes": 3}, {"receiptWrites": 2}, {"nativeAcknowledgements": 0},
+                    {"nativeAcknowledgements": True}, {"receiptDigest": "unsafe"}, {"key": "private"}]
+        for change in changes:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                adopted_events(self.adopted() | {"incomingSources": original | change}, self.staged(), sources=True)
+        for value in [None, {}, [], original | {"rawReceiptDrained": 1}]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                adopted_events(self.adopted() | {"incomingSources": value}, self.staged(), sources=True)
+
+    def test_offline_receipt_matches_the_native_receipt_without_opening_runtime(self):
+        adopted = self.adopted() | {"incomingSources": self.incoming_sources()}
+        reopened = self.reopened() | {"incomingReceiptDigest": adopted["incomingSources"]["receiptDigest"]}
+        self.assertEqual(reopened, reopened_history(reopened, adopted, sources=True))
+        for change in [{"incomingReceiptDigest": "8" * 64}, {"incomingReceiptDigest": None},
+                       {"runtimeNeverOpened": False}, {"processId": adopted["processId"]}]:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                reopened_history(reopened | change, adopted, sources=True)
+
+    def test_offline_receipt_cannot_be_missing_or_claimed_for_unselected_scenario(self):
+        adopted = self.adopted() | {"incomingSources": self.incoming_sources()}
+        for value, options in [(self.reopened(), {"sources": True}),
+                               (self.reopened() | {"incomingReceiptDigest": "9" * 64}, {}),
+                               (self.reopened(), {"sources": 1})]:
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                reopened_history(value, adopted, **options)
+
     def test_preserves_distinct_original_edits_and_redaction_without_aliasing_input(self):
         source = self.staged()
         accepted = staged_events(source)

@@ -1,6 +1,6 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 15:08 UTC. Continue implementation beyond checkpoints and push every commit.
+Updated 12 November 2026, 15:23 UTC. Continue implementation beyond checkpoints and push every commit.
 All54 PRD acceptance groups remain OPEN. No subagents. One compiler OR emulator. Phone install-only:
 announce and select serial; never launch/drive UI, reset data or uninstall. No question is pending.
 
@@ -102,13 +102,27 @@ errors occurred before compilation (missing pre-format manifest and wrong cwd) a
 
 ## Immediate continuation
 
-Mobile65459d8cc5c7e307032d4f937853b18f37e1c3e5 is committed/pushed (87252 REAPED).
-This commit records Group test/trace/docs. Then prepare release90
-from the pushed Mobile HEAD with accepted full/native inputs and SDK8. Existing release89 is already
-installed; do not reinstall it. Build/verify signed ARM64 release and owned emulator startup before
-announcing any new phone installation; install-only to10.77.77.3:5555, no UI drive/reset/uninstall.
-Keep live Group OFF and schema116.4. A new product release is not yet built or accepted. No compiler
-or emulator is active. Continue remaining communications work beyond this checkpoint.
+Mobile65459d8cc5c7e307032d4f937853b18f37e1c3e5 and Groupe8e4a880 are committed/pushed;
+87252/50315 REAPED. Mobile HEAD must stay65459d8c during release90 packaging.
+
+Release90 workspace: /home/fajar/hris/hris-mobile/.work/release-phone-2026-11-12-build90.
+Fresh build.py/verify.py/startup.py/accept-release.py/install.py and ABI init scripts are prepared.
+Accepted source/native/library manifests are copied there. x86_64 release build63455 started around
+15:12UTC and is not yet reaped. Inspect build-x86_64/result.json/logs and reap it before another heavy
+job. It uses version90, SDK8, the same development signer, private WireGuard API and exact pushed
+Mobile65459d8c. Mobile source/Inspector inputs must remain unchanged; do not edit or commit Mobile
+while the builder checks its HEAD. No emulator or phone installation is active.
+
+Next commands in Mobile, sequentially after each successful result:
+verify.py x86_64; startup.py (fresh2560MiB/two-core emulator, actual nondebuggable product cold-start
+and separate process reopen, no employee account/chat); inspect its screenshots and stop/reap;
+build.py arm64-v8a; verify.py arm64-v8a (requires identical executable DEX to tested x86 release);
+accept-release.py; announce before install.py --install-only to explicit10.77.77.3:5555.
+ARM64 packaging is guarded by startup-accepted.json. Installation keeps identity/data and verifies
+actual installed hash. Known89 local APK can verify the old signer when its device hash matches,
+avoiding a redundant WireGuard download. Never drive/reset/uninstall the phone or replay old messages.
+No release90 artifact, startup, ARM64 or install is accepted yet. Release89 is already installed;
+do not reinstall89. The new package preserves live Group OFF/schema116.4. Continue PRD work after it.
 
 ## Current hosted control
 

@@ -1,6 +1,6 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 20:09 UTC. Continue beyond checkpoints; push every commit.
+Updated 12 November 2026, 20:15 UTC. Continue beyond checkpoints; push every commit.
 All54 PRD acceptance groups remain OPEN. No subagents. One local compiler OR emulator.
 Phone installs require a prior announcement, explicit serial and `--install-only`; never
 launch/drive/reset/uninstall the user's phone UI. The physical iPhone interaction requirement
@@ -39,9 +39,11 @@ resource limits and Swift/link deadlines remain fixed. Python guard tests10 pass
 New candidate43296438399/job131455907436 is IN PROGRESS; no package accepted or published.
 Mobile .work/sdk8-apple-build-budget-2026-11-12/audit-hosted.py is prepared for that exact run.
 Integrate its tooling/evidence after release92, retaining this main handoff.
-Release92 scripts prepared, not built; full14688/native10 are accepted. Commit/push the
-Company fix, snapshot that clean head into release92/state.json, then build x86, inspect
-fresh release startup, build/verify ARM64 and install-only when the phone is available.
+Release92 x86 build17259 ACTIVE from20:10UTC, exact pushed Mobile151438b4ba85f599fb2eefc080a6ac15423ac6e1.
+Workspace Mobile.work/release-phone-2026-11-12-build92; full14688/native10 evidence copied.
+Do not edit Mobile tracked files or change its HEAD until both ABI builds/startup are accepted.
+Reap build, run verify.py x86_64, startup.py (fresh emulator), inspect screenshot and record
+startup-visual.json; then build/verify ARM64, accept-release.py and install-only if reachable.
 Release91 remains accepted/uninstalled; latest20:00 ADB12-second timeout (95589 REAPED).
 
 Canonical local Space thread history is ACCEPTED and pushed as Mobileed4e61f5 / Group6c34ecbd in Mobile
@@ -95,7 +97,7 @@ body prefix rejected before app preparation), and suite-1 launch-failure.json (T
 no process started). No deadlines or assertions weakened. Sources/data from failed native runs
 remain. `accept-native.py suite-2` and Mobile `accept-full.py full-1` have passed. Do not repeat.
 Contract and compact evidence: native-account-replacement documentation and measurement.
-No compiler/emulator is active at this checkpoint. No new phone APK for proof-only changes.
+The preceding account-replacement checkpoint is historical; release92 compiler state is above.
 
 ## Continue these exact hosted gates
 
@@ -113,22 +115,31 @@ loge91af91423786ab3bfabc2351a7092696633806add4044c676bc337ee28b3f50.
 Portableauditor13912 accepted12,604; Chrome156→157 changed only launcher suffix on5,601 old
 cases. Failed auditor/audit-correction retained. Both compact measurements updated. Do not rerun.
 
-Store43279731370 on836ac52575daf1747aac1cf94a6768a80998023f has STARTED.
-Portable131439574875 and Apple131439575160 are running; latest19:42UTC.
-Dispatch89306 REAPED; expect12,604portable and5,156Apple (prior13 inventory +8 store methods).
-Run `.work/apple-sdk-store-2026-11-12/hosted-audit.py portable|apple hosted-43279731370` only
-after each job succeeds. Auditor is prepared/syntax checked, not executed. A later same-branch run
-can now queue; finish the Company fix before choosing its exact head. Do not dispatch multiple pending runs.
+Store43279731370 on836ac52575daf1747aac1cf94a6768a80998023f: PORTABLE ACCEPTED12,604;
+auditor42655 REAPED. Job131439574875 success. Artifact13979103864/4047761B/
+46d6243020390461076118757d53c002d4ea33966db6a10908b48964b5493bd7;
+report865d8fb4dfd65dc9b2dab91ed7ac356b2d3d38c9e01c434e9192ef725a47f18e;
+log6ea31e8b1fecaeb4d96afaa35fb03af4791999c871fb0ae111a6c2a1c197411c.
+Prepared config wrongly copied the prior Chrome156→157 replacement; all current browser
+reports are156 and preserve original case IDs directly. Failed config/auditor22498 and
+correction retained; no normalization, test rerun or source change. Apple131439575160
+still in progress; run Mobile.work/apple-sdk-store-2026-11-12/hosted-audit.py apple
+hosted-43279731370 after success; expected5,156Apple including13inventory and8store methods.
+
+New control43297910558 on151438b4ba85f599fb2eefc080a6ac15423ac6e1 is PENDING behind store.
+It covers canonical history + Company cancellation, expected12,666portable +5,187Apple =17,853.
+Mobile.work/company-thread-publication-2026-11-12/hosted-control/state.json and hosted-audit.py
+are prepared. Dispatch48900 REAPED. DO NOT dispatch another pending same-branch control run.
 Inventory and store local main ARM64/metadata, all21 native-test method compilation and full
 `:check` pass. Linux executed0 Apple cases. Both adapters require a pre-provisioned private,
 backup-excluded root; store creation and existing-only access remain separate. No product binding.
 
-Native SDK8 Apple candidate43267867675 on9b7c4d3fac0127e2f440e8dc5fb420dc66c22cfc is
-IN_PROGRESS on macos-15-intel, job131356202237 (build began17:18UTC). It must verify all4 Swift
-cases, original raw-key test unchanged,5 architectures across3 XCFramework slices and actual
-iOS device+simulator linking. Run `.work/sdk8-apple-planning-2026-11-12/audit-hosted.py` after
-success; prepared/syntax checked, not executed. Two earlier ARM attempts43261761056 failed
-before any step due to runner acquisition/capacity; exact annotations preserved. Do not rerun ARM.
+Native SDK8 Apple43267867675 FAILED on the150-minute framework build deadline; top
+section records exact failed artifact and measured target times. New isolated budget-only
+candidate43296438399 on3c9c41a9f45f0533e4591a632d1df862668a06d0/job131455907436 is running.
+Use Mobile.work/sdk8-apple-build-budget-2026-11-12/audit-hosted.py only after success.
+All4 Swift identities,5 architectures/3 slices and device/simulator links remain required.
+Two older ARM attempts43261761056 failed before any step due to runner capacity; preserve.
 No SDK publication or Apple app runtime binding yet. The app still selects unavailable Apple
 Matrix runtime; actual bridge/composition follows accepted native SDK8. Preserve failed evidence
 and fix demonstrated causes only. Independent Android/Group product work may continue.
@@ -143,8 +154,8 @@ ARM124,317,071B /45e26962b2acc839498558affd2fbce059f602f29d1b62e25f2b55276740cf7
 Fresh x86 emulator cold2891ms/reopen1557ms, each stable10s, actual onboarding screenshot inspected.
 Release91 supersedes uninstalled90;89 installed09:10UTC earlier. Never reinstall89.
 
-Latest connect87876 REAPED timeout12s at19:22UTC (also75528 at19:03 and50256 at18:59); no install attempted.
-Route is10.77.77.3 viawg0. At19:16UTC the peer handshake was31,445s old. Do not repeatedly
+Latest connect95589 REAPED timeout12s at20:00UTC; no install attempted.
+Route is10.77.77.3 viawg0. At20:12UTC the peer handshake was34,837s old. Do not repeatedly
 ask for availability. Once explicit ADB serial10.77.77.3:5555 connects, announce EACH install,
 then `setsid --wait python3 .work/release-phone-2026-11-12-build91/install.py --install-only`.
 Inspect any existing install-result first, preserve signer/identity and verify exact APK bytes.

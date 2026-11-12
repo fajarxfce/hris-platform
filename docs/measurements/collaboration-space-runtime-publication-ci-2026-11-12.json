@@ -1,0 +1,43 @@
+{
+  "sourceCommit": "cef427683f8167436faa7d8bec3f523ae7a16453",
+  "runId": 43182776077,
+  "validatedTests": 17519,
+  "portable": {
+    "sourceCommit": "cef427683f8167436faa7d8bec3f523ae7a16453",
+    "runId": 43182776077,
+    "url": "https://github.com/fajarxfce/hris-mobile/actions/runs/43182776077",
+    "jobId": 131075551755,
+    "artifactId": 13929080879,
+    "bytes": 4024310,
+    "sha256": "c4b59b593fe157dde36abbc6e07e10f613ca7f9adb3ec56cffc86794ef2a6d16",
+    "githubDigestAndZipCrcVerified": true,
+    "priorCaseIdsPreserved": true,
+    "counts": {
+      "desktopTest": 5935,
+      "testAndroidHostTest": 947,
+      "wasmJsBrowserTest": 5562
+    },
+    "reportManifestSha256": "0cadc4739bd5b53bbd2514eea2c20ef0c9306dab84ef483dc7e8bae97aa34e6f",
+    "jobLogSha256": "5b118a308668b0d932074912a4227d9e4b5b49b9a0f2b696954374bb7c0204d7"
+  },
+  "apple": {
+    "sourceCommit": "cef427683f8167436faa7d8bec3f523ae7a16453",
+    "runId": 43182776077,
+    "url": "https://github.com/fajarxfce/hris-mobile/actions/runs/43182776077",
+    "jobId": 131075548574,
+    "artifactId": 13933157085,
+    "bytes": 803728,
+    "sha256": "d1518594c2d29536de8a3487161d900cfb712af942a8ff0e25b1c3dfce4da871",
+    "githubDigestAndZipCrcVerified": true,
+    "priorCaseIdsPreserved": true,
+    "counts": {
+      "iosSimulatorArm64Test": 5075
+    },
+    "reportManifestSha256": "5260ba90ecb294404ef8a2bfb697dfdae50f7bd417d1861465c417c9a4f46700",
+    "jobLogSha256": "eae62ec13251144f1d64a92d40e7de53861d1568e76f677e2ab01dc6820bdb37"
+  },
+  "notes": [
+    "Initial Apple plugin resolution failed before compilation; one failed-job retry passed.",
+    "This validates common Kotlin on the Apple simulator, not the native Matrix SDK8 adapter."
+  ]
+}

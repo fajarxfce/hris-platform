@@ -15,3 +15,9 @@ records the preserved failure and exact hashes. No new native execution, phone b
 Group deployment is claimed. The [canonical thread](unresolved-canonical-thread.md) now uses
 this observer under the existing admission owner. Continue participant/composer context and
 organization UI.
+
+Hosted control43312753298 on exact Mobile1f47eedd passes12,716 portable cases:
+6,083 desktop,955 Android host and5,678 browser. Artifact, report and job-log digests
+are audited with all prior identities retained, zero replacements and no browser-name
+normalization. The compact measurement records this evidence. Apple job131515464968
+is still running; its expected5,212 native shared cases are not yet accepted.

@@ -173,6 +173,18 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 .redirectErrorStream(true)
                 .redirectOutput(log.toFile())
                 .start()
+        val requestPhases = linkedMapOf<String, Map<String, Map<String, Int>>>()
+        fun recordRequestPhase(phase: String) {
+            if (incomingWorker) {
+                requestPhases[phase] =
+                    mapOf(
+                        "native" to trace.snapshot(),
+                        "nativeKinds" to trace.requestKinds(),
+                        "matrix" to matrixTrace.snapshot(),
+                        "matrixKinds" to matrixTrace.requestKinds(),
+                    )
+            }
+        }
         try {
             val ready = waitFor(directory, "ready", process)
             assertPublished(sender, ready["sender"])
@@ -180,6 +192,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             trace.arm()
             matrixTrace.arm()
             failureTrace.arm()
+            recordRequestPhase("armed")
             write(directory, "stage-allowed", mapOf("ready" to true))
             val redaction = waitFor(directory, "redaction-request", process)
             val target = redaction["targetEventId"].asString()
@@ -194,6 +207,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 mapOf("eventId" to redactionId, "targetEventId" to target),
             )
             val staged = waitFor(directory, "staged", process)
+            recordRequestPhase("physicalSeedComplete")
             if (sdkIncomingHints) {
                 val hints = staged["sdkIncomingHints"]
                 assertEquals(3, hints["syncResponses"].asInt())
@@ -256,6 +270,7 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             )
             val result = waitFor(directory, "result", process)
             assertTrue(process.waitFor(20, TimeUnit.SECONDS))
+            recordRequestPhase("offlineReopenComplete")
             assertEquals(0, process.exitValue())
             assertTrue(result["passed"].asBoolean())
             assertTrue(result["cleanup"].asBoolean())
@@ -314,7 +329,9 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
             )
             if (incomingWorker) {
                 val proof = incoming["worker"]
-                assertEquals(2, proof["turns"].asInt())
+                // Actual process discovery includes canonical routing and the final local scan.
+                // The Mobile fixture independently enforces the original four-turn hard bound.
+                assertEquals(4, proof["turns"].asInt())
                 assertEquals(1, proof["firstTurnMessages"].asInt())
                 for (flag in
                     listOf(
@@ -334,24 +351,38 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 assertTrue(retained["physicalProviderPreserved"].asBoolean())
                 assertTrue(retained["providerReferences"].asInt() in 5..50)
                 assertEquals(2, matrixTrace.snapshot()["providerPage"])
+                val seed = requireNotNull(requestPhases["physicalSeedComplete"])
+                assertTrue(requireNotNull(seed["native"]).isEmpty())
+                assertEquals(21, requireNotNull(seed["matrix"])["requests"])
+                // Two source syncs, four history reads, two secret-store reads and one SDK read
+                // follow physical staging. No additional encrypted send or transport acquisition.
                 assertEquals(
                     mapOf(
-                        "requests" to 31,
+                        "requests" to 30,
                         "encryptedSend" to 4,
-                        "sync" to 3,
+                        "sync" to 5,
                         "secretStorage" to 2,
                         "providerPage" to 2,
                     ),
                     matrixTrace.snapshot(),
                 )
                 assertEquals(
-                    mapOf(
-                        "requests" to 14,
-                        "registration" to 1,
-                        "bootstrapReplay" to 1,
-                        "directTransport" to 3,
-                    ),
+                    mapOf("requests" to 18, "registration" to 1, "bootstrapReplay" to 1),
                     trace.snapshot(),
+                )
+                assertEquals(
+                    mapOf(
+                        "otherGet" to 4,
+                        "identityRead" to 1,
+                        "registration" to 1,
+                        "bootstrap" to 1,
+                        "deviceRead" to 11,
+                    ),
+                    trace.requestKinds(),
+                )
+                assertEquals(
+                    matrixTrace.snapshot()["requests"],
+                    matrixTrace.requestKinds().values.sum(),
                 )
             } else {
                 val pages = incoming["providerPages"].asInt()
@@ -418,6 +449,10 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                 ),
             )
         } finally {
+            if (incomingWorker) {
+                recordRequestPhase("finished")
+                write(directory, "request-phases", requestPhases)
+            }
             write(
                 directory,
                 "request-trace",

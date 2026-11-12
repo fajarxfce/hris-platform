@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class NativeOriginalDeliveryTrace : OncePerRequestFilter() {
     private val counts = mutableMapOf<String, Int>()
+    private val kinds = mutableMapOf<String, Int>()
     private var armed = false
 
     @Synchronized
@@ -24,6 +25,13 @@ class NativeOriginalDeliveryTrace : OncePerRequestFilter() {
     }
 
     @Synchronized fun snapshot(): Map<String, Int> = counts.toMap()
+
+    @Synchronized fun requestKinds(): Map<String, Int> = kinds.toMap()
+
+    @Synchronized
+    private fun recordKind(key: String) {
+        if (armed) kinds[key] = minOf(10_000, kinds.getOrDefault(key, 0) + 1)
+    }
 
     @Synchronized
     private fun record(key: String) {
@@ -41,6 +49,23 @@ class NativeOriginalDeliveryTrace : OncePerRequestFilter() {
                 path.startsWith("/api/v1/collaboration/spaces/")
         ) {
             record("requests")
+            recordKind(
+                when {
+                    request.method == "GET" && path.endsWith("/native-device") -> "deviceRead"
+                    request.method == "GET" && path.endsWith("/identity") -> "identityRead"
+                    request.method == "GET" && path.endsWith("/transport") -> "transportRead"
+                    request.method == "POST" && path.endsWith("/legacy-rooms/read") ->
+                        "legacyRoomRead"
+                    request.method == "POST" && path.endsWith("/rooms/read") -> "providerRoomRead"
+                    request.method == "POST" && path.endsWith("/native-device/bootstrap") ->
+                        "bootstrap"
+                    request.method == "POST" && path.endsWith("/native-device") -> "registration"
+                    request.method == "GET" -> "otherGet"
+                    request.method == "POST" -> "otherPost"
+                    request.method == "PUT" -> "otherPut"
+                    else -> "other"
+                }
+            )
             when {
                 request.method == "GET" && path.endsWith("/transport") -> record("directTransport")
                 request.method == "POST" && path.endsWith("/native-device/bootstrap") ->

@@ -1,6 +1,6 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 13:24 UTC. Continue the PRD and push every commit. All 54 acceptance groups OPEN.
+Updated 12 November 2026, 13:51 UTC. Continue the PRD and push every commit. All 54 acceptance groups OPEN.
 No subagents. One compiler OR emulator. Phone install-only: announce and select serial; never
 launch/drive UI, reset data or uninstall. Continue beyond checkpoints.
 
@@ -59,12 +59,54 @@ Format1/96904 REAPED35.586s. Focused1/26911 REAPED FAILED117.278s before tests: 
 Focused2/54233 REAPED PASSED70/0 in332.067s (34 domain desktop +34 browser +2 shared DI).
 Strict audit inline exit0; all prior case IDs preserved. Report manifest
 06099ea61e29a97c35e4957e811b67780aa7b41789293bd6371fd26f36a74d02.
-Proof1/session45999 ACTIVE; no source edits/emulator during build. After completion run
-accept-proof.py proof-1, set Group native config from planned-native-config.json, then native
-worker7 with unchanged assertions. Full baseline gate expected14,581 local. All audits are
-prepared; accept-full.py uses focused2/proof1, never the failed run.
-Native worker6 remains the behavioral regression; constructor/compiler failures are not red proof.
-Group exact turns2/Matrix31/native14 assertions remain unreached and need actual final trace review.
+Proof1/45999 REAPED PASSED21/0 in158.391s; strict audit inline exit0.
+APK152,433,182B/b780610908ed1edd8f33c8242b76a9f72f98c9364439ebccc93ffb54524b9200,
+immutable proof1/accepted-proof.apk; source/library unchanged, SDK8 library unchanged.
+Native worker7/13438 REAPED FAILED1 in129.265s (boot31.503): frontend protocol PASSED,
+including bounded4 turns, first-page content, Original journal, no-op repeat/covered hint,
+cleanup and offline new-process reopening with unchanged revision/no runtime/database released.
+The failure is the old Group turns2 expectation (actual4), not a frontend failure.
+Trace native18/reg1/bootstrap1, Matrix30/send4/sync5/secret2/provider2; zero active HTTP failures.
+Fixture08f895c0-163d-44a8-89b7-7d12f7125dc4 preserved. The diagnostic runner then tried to inspect
+an already-cleaned proof package; its JSONDecodeError is secondary, not an app storage error.
+Runner now skips failed-state inspection when the frontend completed successfully.
+
+Group has three uncommitted test-only files with fixed request categories/finite phase snapshots;
+existing counter maps and assertions are unchanged. Prior source1 evidence preserved. Format2/
+33897 REAPED22.797s; source2/77053 REAPED79.234s, audit exit0. Source8,745 manifest
+d629d53ee8f0852069233a3741e8ee9ff9a3d7c2f31cd5ea00027a9ecee976b2; test class
+fcde1a38c34ca5334af51970d4c29d3dfe6512fdb2bda5df044dfe05e7db7199.
+Native worker8/9702 REAPED FAILED the unchanged Group turns2 assertion in119.244s,
+boot30.450s; frontend again PASSED all flags. Fixturea7a83cf4-3602-4b20-a663-55c76b4d97f6.
+Phase trace: physical staging21 Matrix/no native; subsequent9 Matrix (2 sync,4 history,
+2 account-data,1 SDK GET). Native18 comprises11 device GET,1 identity GET,4 other GET,
+1 registration and1 bootstrap; no transport acquisition or active HTTP failure. Final phase
+matches offline-complete phase. Exact fixture/trace is retained; do not erase failed images.
+
+Group old constants were updated after that audit; no Mobile bound or assertion was removed.
+Format3/71701 REAPED21.001s, source3/81343 REAPED77.772s, strict audit exit0. Group source
+manifest56d3997415f214dbfe86d5462d198c0132a3451f5ea34da198e4c2b0be98a3de; test class
+df7cd71be098b03b9fd7c35d27eb402692d4d2ee9f5816968f60df35778ce747.
+Full native suite1/42409 REAPED PASSED7/0 in296.282s, boot29.399s; strict accept-suite.py
+inline exit0. Six prior case IDs preserved plus the registered worker. Source/APK unchanged,
+no compiler overlap, fresh isolated2560MiB/two-core emulator stopped, phone untouched.
+[Native measurement](measurements/collaboration-original-covered-hints-native-2026-11-12.json).
+
+Mobile full1/session69373 ACTIVE; expected14,581 local. No source edits or emulator during
+this compiler gate. After completion run accept-full.py full-1. Source/focused/proof/native
+accepted artifacts are under .work/space-original-covered-hint-2026-11-12. Prepare compact full
+measurement, commit/push Mobile and Group, then dispatch the prepared exact-source CI once
+(tree clean, local acceptance and pushed commit required). Expected17,673=12,559 portable
+(6,006 desktop/952 Android/5,601 browser)+5,114 Apple; zero case renames. Do not wait idle on CI.
+
+Next work: preserve the seven cases and add a separately scoped native real-key-during-held-write
+proof, followed by a finite quiet-period request observation. Current receipt proof covers initial
+reconciliation, one lost write reply and two foreground resumes; it does not prove a newly received
+key during the held transaction. SDK8 Room.discardRoomKey can create a new fictional peer session;
+extra real events legitimately change the timeline, so do not weaken existing four-event/head/
+first-page assertions to accommodate it. Own all resources and keep phone/Bima stores untouched.
+Detailed pending contract is .work/space-original-covered-hint-2026-11-12/next-native-key-contract.md.
+Native worker6 remains the preserved behavioral failure; compile failures are not red proof.
 
 ## CI, prior commit and phone
 
@@ -73,7 +115,7 @@ Documentation4257dfac /18cdb196 pushes51703/31022 REAPED. Hosted control43220169
 has portable accepted12,516 and Apple pending. Portable audit14182 REAPED, artifact13946618859/4,041,558B; ZIP0b5ddb30ca10349d0510b23b41bdbad3dd11b5ca15a4eb9667d9a4a972f7c99a. See compact collaboration-space-incoming-discovery-ci-2026-11-12.json; source/case/archive/log hashes verified. State/auditor live in
 `.work/space-incoming-discovery-coalescing-2026-11-12/hosted-43220169006`. Expected17,611=12,516
 portable (5,987/947/5,582) +5,095 Apple. Audit against fully accepted progressive43200304791.
-Metadata6d9f745a / Groupa867612a pushed;26418/15641 REAPED. Hosted metadata43224352728 is active on exact6d9f745a; dispatch81388 REAPED, single attempt. Expected17,634=12,533 portable(5,993/952/5,588)+5,101 Apple. State/auditor live under metadata workspace hosted-43224352728 and use coalescing43220169006 as predecessor. Coalescing12762 REAPED last status: portable application-bindings/compilation and Apple setup-adapter steps still running.
+Metadata6d9f745a / Groupa867612a pushed;26418/15641 REAPED. Hosted metadata43224352728 has portable accepted12,533 and Apple active on exact6d9f745a; audit83236 REAPED, artifact13949271713/4,034,807B, ZIPa10230d40b80c33bc14c55ca820e3ed6bad1a2927798e9f43792369d50b783c0. Dispatch81388 REAPED, single attempt. Expected17,634=12,533 portable(5,993/952/5,588)+5,101 Apple. State/auditor live under metadata workspace hosted-43224352728 and use coalescing43220169006 as predecessor. Coalescing Apple is building the iOS application host at13:40UTC; do not redispatch or repeat accepted portable audits.
 
 Release89 is INSTALLED on10.77.77.3:5555, verified09:10UTC (65584 REAPED). Do not reinstall.
 SDK6, install-only upgrade, identity preserved and no UI interaction. Current SDK8 x86 proof APKs

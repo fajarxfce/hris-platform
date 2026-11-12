@@ -1,12 +1,33 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 20:27 UTC. Continue beyond checkpoints; push every commit.
+Updated 12 November 2026, 20:43 UTC. Continue beyond checkpoints; push every commit.
 All54 PRD acceptance groups remain OPEN. No subagents. One local compiler OR emulator.
 Phone installs require a prior announcement, explicit serial and `--install-only`; never
 launch/drive/reset/uninstall the user's phone UI. The physical iPhone interaction requirement
 is waived; native Apple/call/push behavior is not accepted merely by compilation.
 
 ## Current next implementation
+
+ACTIVE: canonical thread commands in Mobile.work/canonical-thread-commands-2026-11-12.
+15 source paths change,5167 inputs: existing canonical observer evolves to
+ObserveCollaborationSpaceThread, returning typed history plus separate Space/Original
+command lists. No API/SDK/mutation or Company reads for Space-only rooms. Old history
+assertions inspect the same nested component; no prior test IDs removed.
+Format1/39167 REAPED PASS36.269s. Focused1/42217 REAPED234.510s,51 cases/2 failures:
+42 domain cases pass; both new data failures assumed reopen retained the old local
+session. Existing Scenario.reopen also renews login. Preserve failed-storage-fixture-1.
+Tests now require the new access explicitly, retain all content comparisons, reject
+old-session lookup and read originals through renewed Company access. Production was
+not changed for those fixture failures. App DI2 did not run after the data failures.
+
+Review found a separate concern: combine waits for all first values before propagating
+a known failure. New deterministic case aKnownCommandFailureDoesNotWaitForAnotherCommandStore
+holds the original source and expects the canonical failure immediately. It has not run.
+Format2/88470 ACTIVE from20:42; reap, run capture.py, then run.py red-fast-1 (expect one
+real failure with current production). Preserve the red candidate, fix the read-state
+composition only after evidence, keep all assertions, rerun focused expected54 and
+full expected14724 with prior14688 IDs. No full/current native claim for these edits yet.
+No source edits or second compiler/emulator until the active formatter is reaped.
 
 Company thread publication is ACCEPTED: Mobile151438b4ba85f599fb2eefc080a6ac15423ac6e1,
 Group6158096d evidence (later Group1480acdf records hosted progress). Both pushed.
@@ -19,11 +40,11 @@ Preserve red1 (16cases/one real failure,3values instead of2), failed-publication
 and exact111 historical excluded XML/657 cases. Source/native acceptance is finished; do not rerun.
 
 Release92 is fully ACCEPTED and UNINSTALLED; see Phone delivery below. No local heavy process
-remains after ARM build39435 and verifier38284 REAPED. App sources may now change.
+remains after ARM build39435 and verifier38284 REAPED. The release gates are finished; the new source formatter above is active.
 
 NEXT: implement canonical bound-room pending-command projection in the existing observer.
 Mobile.work/canonical-thread-commands-2026-11-12 has plan.json and a verified14688-case
-baseline (1455 reports), current source manifest and historical native10. No source edits yet.
+baseline (1455 reports), current source manifest and historical native10. Source implementation and validation are active as recorded above.
 Evolve ObserveCollaborationSpaceThreadHistory into ObserveCollaborationSpaceThread, keeping
 CollaborationSpaceThreadHistory as the typed history component of a new thread snapshot.
 Add separate Space/Original Company command lists; never coerce ownership or collapse equal

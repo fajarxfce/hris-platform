@@ -1,5 +1,7 @@
 # Architecture
 
+[Registered-source discovery](collaboration/space-incoming-discovery.md) shares existing incoming work and atomically strengthens unresolved Joined inventory without changing worker bounds.
+
 [Original key-history coordinates](collaboration/space-original-key-history.md) preserve Company and historical device under current source admission.
 Durable keys passes and native content acquisition remain separate.
 

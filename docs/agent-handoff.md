@@ -1,6 +1,6 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 20:15 UTC. Continue beyond checkpoints; push every commit.
+Updated 12 November 2026, 20:27 UTC. Continue beyond checkpoints; push every commit.
 All54 PRD acceptance groups remain OPEN. No subagents. One local compiler OR emulator.
 Phone installs require a prior announcement, explicit serial and `--install-only`; never
 launch/drive/reset/uninstall the user's phone UI. The physical iPhone interaction requirement
@@ -8,68 +8,36 @@ is waived; native Apple/call/push behavior is not accepted merely by compilation
 
 ## Current next implementation
 
-ACTIVE: .work/company-thread-publication-2026-11-12, base Mobileed4e61f5 / Group6c34ecbd.
-Two source paths now change: Company ObserveCollaborationThread and its existing test class.
-Red1/52219 REAPED:16 cases, one failure; slow collector received3 values rather than2 after denial.
-The default/outer buffer chain retained a snapshot outside cancelled readers. Move the rendezvous
-inside admission flatMapLatest, remove the outer channel. Preserve exact regression assertions and
-failed-publication-boundary-1. Formatter2/72483 PASS34.441s; green1/59720 REAPED PASS16/92.365s.
-Full1/95318 REAPED PASS668.332s; independent audit accepts14,688 cases:12,650 fresh
-and2,038 unchanged, all14,686 prior IDs retained. Frozen5161inputs/
-52aa82e138e376350b6f43a2e09fa33c757359c41f59b23bd619ac05f0609663.
-Report manifest2d942e3fa5cd90e46d74baaf60442c5c146f76e37e26e1102943a955e985a14a.
-Immutable full-1/accepted-proof.apk152443552B/
-293446ec43495b4abb323cde31d1cc110b00a707fe38ecd346115ab8c92a928b.
-Native suite-1/20256 REAPED PASS10/476.311s; strict accept-native.py passes.
-Exact current-source immutable APK, boot28.424s,2560MiB/two cores, no compilation
-during emulator; emulator stopped and phone untouched. Group source2 provenance retained.
-All current Company source/native gates are finished. Do not rerun them.
-Keep the exact111 historical reports/657 cases excluded with retained digests.
-Apple inventory acceptance is pushed as Mobilee056b86a / Group890b61b3; its measurement
-is compacted to digests/counts/required13 in Mobile7f7fa717 / Groupa4ecdae3 (pushed).
-Full423-report details remain in the Apple artifact.
+Company thread publication is ACCEPTED: Mobile151438b4ba85f599fb2eefc080a6ac15423ac6e1,
+Group6158096d evidence (later Group1480acdf records hosted progress). Both pushed.
+Workspace .work/company-thread-publication-2026-11-12: full95318 REAPED PASS668.332s,
+14,688 cases =12,650 fresh +2,038 unchanged; all prior IDs retained. Native20256 REAPED
+PASS10/476.311s on exact APK293446ec43495b4abb323cde31d1cc110b00a707fe38ecd346115ab8c92a928b.
+Inputs5161/52aa82e138e376350b6f43a2e09fa33c757359c41f59b23bd619ac05f0609663.
+Report2d942e3fa5cd90e46d74baaf60442c5c146f76e37e26e1102943a955e985a14a.
+Preserve red1 (16cases/one real failure,3values instead of2), failed-publication-boundary-1,
+and exact111 historical excluded XML/657 cases. Source/native acceptance is finished; do not rerun.
 
-Apple SDK8 Intel43267867675 FAILED after the9000-second aggregate build deadline during
-native target4; first3 targets completed in42m46s/37m37s/41m46s. No Swift cases executed.
-Failed artifact13979116356/digest6d1a3b994c2a123359b0da700463a3743cc03c313126c907232098576eb4c0d8
-is preserved. Isolated worktree .worktrees/hris-mobile-apple-budget-2026-11-12 has pushed
-fix/apple-sdk-build-budget-20261112 at3c9c41a9f45f0533e4591a632d1df862668a06d0.
-Only framework/job build budgets change to300/360minutes; all architectures, tests, source,
-resource limits and Swift/link deadlines remain fixed. Python guard tests10 pass.
-New candidate43296438399/job131455907436 is IN PROGRESS; no package accepted or published.
-Mobile .work/sdk8-apple-build-budget-2026-11-12/audit-hosted.py is prepared for that exact run.
-Integrate its tooling/evidence after release92, retaining this main handoff.
-Release92 x86 build17259 ACTIVE from20:10UTC, exact pushed Mobile151438b4ba85f599fb2eefc080a6ac15423ac6e1.
-Workspace Mobile.work/release-phone-2026-11-12-build92; full14688/native10 evidence copied.
-Do not edit Mobile tracked files or change its HEAD until both ABI builds/startup are accepted.
-Reap build, run verify.py x86_64, startup.py (fresh emulator), inspect screenshot and record
-startup-visual.json; then build/verify ARM64, accept-release.py and install-only if reachable.
-Release91 remains accepted/uninstalled; latest20:00 ADB12-second timeout (95589 REAPED).
+Release92 is fully ACCEPTED and UNINSTALLED; see Phone delivery below. No local heavy process
+remains after ARM build39435 and verifier38284 REAPED. App sources may now change.
 
-Canonical local Space thread history is ACCEPTED and pushed as Mobileed4e61f5 / Group6c34ecbd in Mobile
-.work/space-thread-history-routing-2026-11-12. Read docs/collaboration-space-thread-history.md.
-13 changed inputs add typed physical location and one owned observation use case, data DI and
-actual encrypted storage integration. Original Company coordinates remain under Group admission;
-HR Company selection/denial does not replace organization authority. Product UI remains separate.
+NEXT: implement canonical bound-room pending-command projection in the existing observer.
+Mobile.work/canonical-thread-commands-2026-11-12 has plan.json and a verified14688-case
+baseline (1455 reports), current source manifest and historical native10. No source edits yet.
+Evolve ObserveCollaborationSpaceThreadHistory into ObserveCollaborationSpaceThread, keeping
+CollaborationSpaceThreadHistory as the typed history component of a new thread snapshot.
+Add separate Space/Original Company command lists; never coerce ownership or collapse equal
+UUIDs across namespaces. Group admission still owns both; Space-only rooms perform no Company
+message I/O. Reuse the current reader lifetime, validation policies and repositories, not a
+second copied observer or usecase-to-usecase orchestration. Freeze staging baselines before
+suspended admission checks, retain pending and sent-but-unarchived facts, retire all readers
+on cancellation. Preserve all existing history test identities/assertions; add meaningful
+command ownership, concurrency, immutable snapshot and actual encrypted reopen cases.
+Unbound conversations/composer metadata remain a subsequent contract before product UI.
+Do not stop at this checkpoint. Push every commit and continue the product long run.
 
-Focused3/74590 REAPED PASS36/273.041s. Full1/7777 REAPED PASS822.013s; strict audit accepts14,686:
-12,648 fresh and2,038 unchanged cases, all14,626 prior identities preserved,60 new across JVM/browser.
-Inputs5161/cd6f263a89da0b2a974501b099286b8884a66c7d19b2de2b9680cdc74165f35f.
-Report manifest61c2a871b3500217b05c5b2fbc35c1d5d168a5e5c84734f441cf283dd14161eb.
-Immutable full-1/accepted-proof.apk152443503B/
-0bbdd271e6bdb09064d27e720d11a51479a4a124b0072765b3e33adb843435f6; SDK8 native unchanged.
-No new native suite or phone claim. Canonical-history gates are finished; the current-source native suite above has passed. Do not rerun accepted canonical gates.
-
-Preserve failed-test-compile-1, failed-publication-boundary-1 and full-1/failed-auditor-1.py.
-The exact slow-consumer test demonstrated an extra outer buffer holding a page outside cancellation;
-removing only that extra handoff fixes it. Assertions retained. Audit excluded111 old browser XML
-files/657 historical cases outside both accepted baseline and current execution; no accepted IDs
-removed, no test rerun for the audit correction. Digests and audit-correction.json are preserved.
-
-Mobile Company fix is committed as151438b4ba85f599fb2eefc080a6ac15423ac6e1.
-NEXT: record/push this evidence and prepare the next
-validated phone build. Then continue canonical pending-message projection and product routing.
-Keep current parallel context/history/queue startup. Do not stop at this checkpoint; push every commit.
+Canonical history baseline is Mobileed4e61f5 / Group6c34ecbd, full14686 accepted; no rerun.
+Inventory compact evidence cleanup is Mobile7f7fa717 / Groupa4ecdae3, already pushed.
 
 ## Current completed increment
 
@@ -146,20 +114,24 @@ and fix demonstrated causes only. Independent Android/Group product work may con
 
 ## Phone delivery
 
-Release91 is fully accepted and UNINSTALLED, from b816431824e4255fcc101641bc6257894ff6649e.
-The exact source record is in `.work/release-phone-2026-11-12-build91/release-acceptance.json`
-and measurements/collaboration-release91-2026-11-12.json. Workspace accepted14,626+9native inputs,
-release lint0, same signer/appID, SDK26.10.23-hris.8, nondebuggable,16KiB ZIP/ELF, equal DEX in both ABIs.
-ARM124,317,071B /45e26962b2acc839498558affd2fbce059f602f29d1b62e25f2b55276740cf7d.
-Fresh x86 emulator cold2891ms/reopen1557ms, each stable10s, actual onboarding screenshot inspected.
-Release91 supersedes uninstalled90;89 installed09:10UTC earlier. Never reinstall89.
+Release92 is fully accepted from151438b4ba85f599fb2eefc080a6ac15423ac6e1 and UNINSTALLED.
+Mobile.work/release-phone-2026-11-12-build92/release-acceptance.json and measurement record
+14688+10native, source5161/52aa82e1..., SDK26.10.23-hris.8, nondebuggable, same signer,
+lint0, compiled backup exclusions,16KiB ZIP/native alignment and equal executable DEX:
+722a63ed79391df34e89a36b072bc9ca712c2fe1902cbf36f5b8f31bb3a1a927.
+ARM124333455B/d8001bd137fdd08d3d3b112519eef226ee38ba78c35c6b29cba51b019fc3700c.
+x86138079688B/0742652c7382f37155bd7880aa1c2cd162ffaf88af7d9c089e750dcef6c42810.
+X86 build17259 REAPED657.652s, verify61263 REAPED; startup53204 REAPED78.255s,
+fresh2560MiB/two cores, cold2908ms/reopen2145ms, stable10s/process. Both screenshots
+were inspected and show complete onboarding. ARM39435 REAPED42.972s, verify38284 REAPED.
+All gates are finished; do not rebuild. No authenticated release/phone latency claim.
 
-Latest connect95589 REAPED timeout12s at20:00UTC; no install attempted.
-Route is10.77.77.3 viawg0. At20:12UTC the peer handshake was34,837s old. Do not repeatedly
-ask for availability. Once explicit ADB serial10.77.77.3:5555 connects, announce EACH install,
-then `setsid --wait python3 .work/release-phone-2026-11-12-build91/install.py --install-only`.
-Inspect any existing install-result first, preserve signer/identity and verify exact APK bytes.
-Never drive the phone UI; continue other work while unavailable. Firebase IAM is already verified.
+Latest ADB97763 REAPED timeout12s at20:26UTC; no installation attempted. At20:12UTC the
+WireGuard handshake was34837s old; route is correct viawg0. Do not repeat availability questions.
+When10.77.77.3:5555 connects, announce EACH actual installation, then run Mobile
+.work/release-phone-2026-11-12-build92/install.py --install-only. Inspect any existing
+install-result first; never uninstall/reset/downgrade/launch/drive the phone UI. Preserve app data.
+92 supersedes uninstalled91/90. Last confirmed physical install89 at09:10UTC; never reinstall89.
 
 ## Protected repositories, stores and live runtime
 

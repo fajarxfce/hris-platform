@@ -1,6 +1,6 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 13:51 UTC. Continue the PRD and push every commit. All 54 acceptance groups OPEN.
+Updated 12 November 2026, 14:02 UTC. Continue the PRD and push every commit. All 54 acceptance groups OPEN.
 No subagents. One compiler OR emulator. Phone install-only: announce and select serial; never
 launch/drive UI, reset data or uninstall. Continue beyond checkpoints.
 
@@ -42,7 +42,7 @@ Company coverage requires provider=null; Published Space uses non-null provider 
 
 The eight-file coverage change is now APPLIED and uncommitted in Mobile. Workspace
 `.work/space-original-covered-hint-2026-11-12`, baseline accepted metadata6d9f745a/14,555 cases.
-Current5,136-input manifest0c3be4a8ce87881e81680f3935a6564f6b59c1aa42a100753d3479262c415018.
+Current5,136-input manifest6dc8053f533b4c818afe39d2a17ddeb3db75481aa3fb27ef7f1004a19124879a.
 It adds named pure Original coverage policies; the owning queue use case receives an explicit
 parent, resolves registered legacy Company/device provenance, reads one source/pending page,
 confirms unchanged progress, and fences registration/admission. Unknown/unclean history stays
@@ -92,12 +92,32 @@ inline exit0. Six prior case IDs preserved plus the registered worker. Source/AP
 no compiler overlap, fresh isolated2560MiB/two-core emulator stopped, phone untouched.
 [Native measurement](measurements/collaboration-original-covered-hints-native-2026-11-12.json).
 
-Mobile full1/session69373 ACTIVE; expected14,581 local. No source edits or emulator during
-this compiler gate. After completion run accept-full.py full-1. Source/focused/proof/native
-accepted artifacts are under .work/space-original-covered-hint-2026-11-12. Prepare compact full
-measurement, commit/push Mobile and Group, then dispatch the prepared exact-source CI once
-(tree clean, local acceptance and pushed commit required). Expected17,673=12,559 portable
-(6,006 desktop/952 Android/5,601 browser)+5,114 Apple; zero case renames. Do not wait idle on CI.
+Mobile full1/69373 REAPED FAILED351.352s:7,061 fresh cases/35 failures. All35 belong to
+legacy-routing domain tests (ResolveCollaborationSpaceIncomingAliasTest21,
+ResolveCollaborationSpaceIncomingBindingTest4, ResolveCollaborationSpaceOriginalPhysicalBindingTest10).
+They share SpaceIncomingRequestFixture through SpaceIncomingPhysicalResolutionFixture. Changing its
+default to SPACE silently changed the legacy fixtures. No production failure was inferred from this.
+Exact failed eight-file candidate and source map are retained under failed-full-candidate-1.
+
+Correction changes ONLY two commonTest files: restore the prior LEGACY default; explicitly select
+SPACE in all21 Published queue tests. Thirteen Original tests already select LEGACY. All other
+fixture consumers retain their original semantics, and no assertion/case ID changed. Production,
+DI, native fixture and accepted APK bytes remain unchanged. Current manifest6dc8053f533b4c818afe39d2a17ddeb3db75481aa3fb27ef7f1004a19124879a.
+Format2/49947 REAPED PASSED35.673s. Focused3/session44681 ACTIVE:210 cases (104 domain desktop,
+104 browser,2 shared DI) includes all three affected routing classes. Do not edit source or run
+an emulator during this gate. Run accept-focused.py focused-3 after success.
+
+Then run run.py full-2 and accept-full.py full-2. Full2 explicitly reruns Shared desktop, Data
+desktop and proof-unit tests in addition to existing required tasks; the auditor reuses no reports
+from failed full1. Expected14,581 local. The seven native cases need no duplicate run for these two
+commonTest-only changes; native-test-only-source-delta.json verifies the precise difference, and
+full2 must confirm the same APK hash. Historical native manifest remains0c3be4a8 rather than claiming
+it executed on the later whole-tree manifest. Source/runtime inputs are unchanged.
+
+Group source/test/native proof commit e6a3bc36 is pushed;19367 REAPED. Mobile source is uncommitted
+pending successful full2. Prepare compact full measurement, commit/push, then dispatch the prepared
+exact-source CI once (tree clean/local acceptance/pushed commit required). Expected17,673=12,559
+portable(6,006 desktop/952 Android/5,601 browser)+5,114 Apple; zero case renames. Continue beyond CI.
 
 Next work: preserve the seven cases and add a separately scoped native real-key-during-held-write
 proof, followed by a finite quiet-period request observation. Current receipt proof covers initial
@@ -112,10 +132,10 @@ Native worker6 remains the preserved behavioral failure; compile failures are no
 
 Coalescing source f11eea10 / Group b620663c is committed/pushed and accepted14,538 locally.
 Documentation4257dfac /18cdb196 pushes51703/31022 REAPED. Hosted control43220169006 on exactf11eea10
-has portable accepted12,516 and Apple pending. Portable audit14182 REAPED, artifact13946618859/4,041,558B; ZIP0b5ddb30ca10349d0510b23b41bdbad3dd11b5ca15a4eb9667d9a4a972f7c99a. See compact collaboration-space-incoming-discovery-ci-2026-11-12.json; source/case/archive/log hashes verified. State/auditor live in
+is fully accepted17,611 (12,516 portable+5,095 Apple). Portable audit14182 REAPED, artifact13946618859/4,041,558B; ZIP0b5ddb30ca10349d0510b23b41bdbad3dd11b5ca15a4eb9667d9a4a972f7c99a. See compact collaboration-space-incoming-discovery-ci-2026-11-12.json; source/case/archive/log hashes verified. State/auditor live in
 `.work/space-incoming-discovery-coalescing-2026-11-12/hosted-43220169006`. Expected17,611=12,516
 portable (5,987/947/5,582) +5,095 Apple. Audit against fully accepted progressive43200304791.
-Metadata6d9f745a / Groupa867612a pushed;26418/15641 REAPED. Hosted metadata43224352728 has portable accepted12,533 and Apple active on exact6d9f745a; audit83236 REAPED, artifact13949271713/4,034,807B, ZIPa10230d40b80c33bc14c55ca820e3ed6bad1a2927798e9f43792369d50b783c0. Dispatch81388 REAPED, single attempt. Expected17,634=12,533 portable(5,993/952/5,588)+5,101 Apple. State/auditor live under metadata workspace hosted-43224352728 and use coalescing43220169006 as predecessor. Coalescing Apple is building the iOS application host at13:40UTC; do not redispatch or repeat accepted portable audits.
+Metadata6d9f745a / Groupa867612a pushed;26418/15641 REAPED. Hosted metadata43224352728 has portable accepted12,533 and Apple active on exact6d9f745a; audit83236 REAPED, artifact13949271713/4,034,807B, ZIPa10230d40b80c33bc14c55ca820e3ed6bad1a2927798e9f43792369d50b783c0. Dispatch81388 REAPED, single attempt. Expected17,634=12,533 portable(5,993/952/5,588)+5,101 Apple. State/auditor live under metadata workspace hosted-43224352728 and use coalescing43220169006 as predecessor. Coalescing Apple audit87382 REAPED; artifact13949887539/805,739B, ZIPa9674c6897ccc2131c4c5a4623e9b2d1980b37186fb31b3eb56bf90016d56877, all2 reviewed Apple renames and prior case IDs verified. Do not poll or redispatch43220169006. Metadata Apple is building the iOS host. Apple job timeout90 minutes, host step30; portable job60. Apple host success does not prove native SDK8 execution.
 
 Release89 is INSTALLED on10.77.77.3:5555, verified09:10UTC (65584 REAPED). Do not reinstall.
 SDK6, install-only upgrade, identity preserved and no UI interaction. Current SDK8 x86 proof APKs

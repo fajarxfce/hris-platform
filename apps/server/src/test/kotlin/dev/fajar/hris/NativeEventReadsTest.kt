@@ -321,12 +321,14 @@ class NativeEventReadsTest : NativeSpaceOriginalFixture() {
                         "contentBeforeProviderEof",
                         "registeredTask",
                         "automaticStartup",
+                        "actualSourceRetained",
                         "emptyRepeatUnchanged",
                         "coveredHintUnchanged",
                     )) {
                     assertTrue(proof[flag].asBoolean(), flag)
                 }
                 val retained = incoming["retained"]
+                assertTrue(retained["companyStorage"].asBoolean())
                 assertEquals(0, retained["pendingReferences"].asInt())
                 assertFalse(retained["providerExhaustedWithPending"].asBoolean())
                 assertTrue(retained["physicalProviderPreserved"].asBoolean())

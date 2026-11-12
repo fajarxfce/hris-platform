@@ -79,15 +79,17 @@ def staged_events(value, *, hints=False):
     return result
 
 
-def retained_history(value, staged, *, completed=False):
+def retained_history(value, staged, *, completed=False, company=False):
     flags = {"originalTextPreserved", "replacementTextPreserved", "originalSenderTombstone",
              "noOriginalFactForEdit", "noSpaceSendWork", "physicalProviderPreserved"}
+    if company is True:
+        flags = flags | {"companyStorage"}
     fields = flags | {"messages", "originalEventId", "replacementEventId", "redactedEventId",
                       "originalHash", "replacementHash", "revisionHash", "frontierHash", "pendingHash",
                       "providerReferences", "pendingReferences", "providerExhaustedWithPending"}
     if (not isinstance(value, dict) or set(value) != fields
             or any(value[n] is not True for n in flags)
-            or type(completed) is not bool or value["providerExhaustedWithPending"] is not (not completed)
+            or type(company) is not bool or type(completed) is not bool or value["providerExhaustedWithPending"] is not (not completed)
             or type(value["messages"]) is not int or value["messages"] != 1):
         raise ValueError("Incomplete encrypted incoming history evidence")
     expected = {"originalEventId": staged["events"]["original"],
@@ -165,13 +167,13 @@ def worker_incoming(value, staged):
         raise ValueError("Invalid registered worker evidence")
     worker = value["worker"]
     flags = {"contentBeforeProviderEof", "registeredTask", "emptyRepeatUnchanged", "coveredHintUnchanged",
-             "automaticStartup"}
+             "automaticStartup", "actualSourceRetained"}
     if (not isinstance(worker, dict) or set(worker) != flags | {"turns", "firstTurnMessages"}
             or any(worker[n] is not True for n in flags)
             or type(worker["turns"]) is not int or not 2 <= worker["turns"] <= 4
             or type(worker["firstTurnMessages"]) is not int or worker["firstTurnMessages"] != 1):
         raise ValueError("Worker did not retain content before EOF and stop when idle")
-    return {"worker": dict(worker), "retained": retained_history(value["retained"], staged, completed=True),
+    return {"worker": dict(worker), "retained": retained_history(value["retained"], staged, completed=True, company=True),
             "originalJournalUnchanged": True}
 
 

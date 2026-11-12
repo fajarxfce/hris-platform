@@ -218,7 +218,7 @@ def adopted_events(value, staged, *, completed=False, worker=False, sources=Fals
 
 class EventReadExperiment(OriginalDeliveryExperiment):
     def start(self, phase):
-        if phase not in {"stage", "space", "local"}:
+        if phase not in {"stage", "space", "local", "late-recovery", "late-recovered-local"}:
             raise ValueError("Unknown event-read phase")
         self.native.command("shell", "run-as", PACKAGE, "rm", "-f", "files/protocol-proof/instrumentation.json")
         self.process = subprocess.Popen([self.native.adb, "-s", self.native.serial, "shell", "am", "instrument",

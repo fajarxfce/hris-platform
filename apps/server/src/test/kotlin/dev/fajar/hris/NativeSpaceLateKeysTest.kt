@@ -83,7 +83,16 @@ class NativeSpaceLateKeysTest : NativeSpaceOriginalFixture() {
     @Test
     @Timeout(value = 12, unit = TimeUnit.MINUTES)
     @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_SDK_INCOMING_HINTS", matches = "true")
-    fun realKeyDuringLostReceiptReplySurvivesQuietObservationAndOfflineReopen() {
+    fun realKeyDuringLostReceiptReplySurvivesQuietObservationAndOfflineReopen() =
+        scenario(recover = false)
+
+    @Test
+    @Timeout(value = 12, unit = TimeUnit.MINUTES)
+    @EnabledIfEnvironmentVariable(named = "HRIS_COLLAB_SDK_INCOMING_HINTS", matches = "true")
+    fun retainedLateKeyRecoveryDrainsThroughRegisteredWorkerAfterProcessLoss() =
+        scenario(recover = true)
+
+    private fun scenario(recover: Boolean) {
         val base = native()
         val sender = sdkOwner(sdkPeer(base))
         val recipient = sdkOwner(sdkPeer(base))
@@ -105,6 +114,7 @@ class NativeSpaceLateKeysTest : NativeSpaceOriginalFixture() {
             mapOf(
                 "baseUrl" to "http://127.0.0.1:$port",
                 "incomingLateKeys" to true,
+                "recoverLateKeys" to recover,
                 "roomId" to room,
                 "conversationId" to conversation,
                 "logicalId" to UUID.randomUUID(),
@@ -125,7 +135,12 @@ class NativeSpaceLateKeysTest : NativeSpaceOriginalFixture() {
         val process =
             ProcessBuilder(
                     "python3",
-                    root.resolve("tool/collaboration_late_keys_native.py").toString(),
+                    root
+                        .resolve(
+                            if (recover) "tool/collaboration_late_key_recovery_native.py"
+                            else "tool/collaboration_late_keys_native.py"
+                        )
+                        .toString(),
                     "--apk",
                     requireNotNull(System.getenv("HRIS_COLLAB_EVENT_READ_APK")),
                     "--sdk",
@@ -289,10 +304,13 @@ class NativeSpaceLateKeysTest : NativeSpaceOriginalFixture() {
             assertTrue(adopted["runtimeReleased"].asBoolean())
             record("beforeOffline")
             write(directory, "offline-allowed", mapOf("ready" to true))
-            val result = waitFor(directory, "result", process)
-            assertTrue(process.waitFor(20, TimeUnit.SECONDS))
-            assertEquals(0, process.exitValue())
-            assertTrue(result["passed"].asBoolean() && result["cleanup"].asBoolean())
+            val result = waitFor(directory, if (recover) "offline-complete" else "result", process)
+            if (!recover) {
+                assertTrue(process.waitFor(20, TimeUnit.SECONDS))
+                assertEquals(0, process.exitValue())
+                assertTrue(result["cleanup"].asBoolean())
+            }
+            assertTrue(result["passed"].asBoolean())
             assertTrue(result["offlineTransportRemoved"].asBoolean())
             val local = result["reopened"]
             assertEquals(retained["retained"], local["retained"])
@@ -302,6 +320,46 @@ class NativeSpaceLateKeysTest : NativeSpaceOriginalFixture() {
             )
             record("offlineComplete")
             assertEquals(phases["beforeOffline"], phases["offlineComplete"])
+            var recovery: JsonNode? = null
+            if (recover) {
+                write(directory, "recovery-allowed", mapOf("ready" to true))
+                val resumed = waitFor(directory, "recovery-ready", process)
+                val content = resumed["recovered"]
+                assertNotEquals(local["processId"].asInt(), resumed["processId"].asInt())
+                assertEquals(2, content["messages"].asInt())
+                assertEquals(late, content["lateEventId"].asString())
+                assertEquals(retained["retained"]["receiptDigest"], content["receiptDigest"])
+                for (flag in
+                    listOf(
+                        "recoveryComplete",
+                        "registeredWorkerDrained",
+                        "companyStorage",
+                        "originalTextPreserved",
+                        "replacementTextPreserved",
+                        "originalSenderTombstone",
+                    )) {
+                    assertTrue(content[flag].asBoolean(), flag)
+                }
+                assertEquals(0, content["pendingReferences"].asInt())
+                assertTrue(resumed["resourcesReleased"].asBoolean())
+                record("recoveredBeforeOffline")
+                write(directory, "recovered-offline-allowed", mapOf("ready" to true))
+                val completed = waitFor(directory, "result", process)
+                assertTrue(process.waitFor(20, TimeUnit.SECONDS))
+                assertEquals(0, process.exitValue())
+                assertTrue(completed["passed"].asBoolean() && completed["cleanup"].asBoolean())
+                assertTrue(completed["recoveredOfflineTransportRemoved"].asBoolean())
+                val reopened = completed["recoveredLocal"]
+                assertNotEquals(resumed["processId"].asInt(), reopened["processId"].asInt())
+                assertTrue(
+                    reopened["runtimeNeverOpened"].asBoolean() &&
+                        reopened["resourcesReleased"].asBoolean()
+                )
+                assertEquals(content, reopened["recovered"])
+                record("recoveredOfflineComplete")
+                assertEquals(phases["recoveredBeforeOffline"], phases["recoveredOfflineComplete"])
+                recovery = completed["recoveredLocal"]
+            }
             assertTrue(failureTrace.snapshot().isEmpty())
             assertEquals(5, matrixTrace.snapshot()["encryptedSend"])
             assertTrue(requireNotNull(matrixTrace.snapshot()["requests"]) <= 64)
@@ -320,6 +378,7 @@ class NativeSpaceLateKeysTest : NativeSpaceOriginalFixture() {
                 mapOf(
                     "encryptedEvents" to 5,
                     "lateKeys" to retained,
+                    "recovered" to recovery,
                     "quietMillis" to quiet["observedMillis"].asLong(),
                     "quietNonSyncUnchanged" to true,
                     "quietSync" to quietSync,

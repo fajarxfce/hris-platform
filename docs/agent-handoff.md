@@ -1,6 +1,6 @@
 # Agent continuation — communications long run
 
-Updated 12 November 2026, 14:02 UTC. Continue the PRD and push every commit. All 54 acceptance groups OPEN.
+Updated 12 November 2026, 14:07 UTC. Continue the PRD and push every commit. All 54 acceptance groups OPEN.
 No subagents. One compiler OR emulator. Phone install-only: announce and select serial; never
 launch/drive UI, reset data or uninstall. Continue beyond checkpoints.
 
@@ -103,18 +103,23 @@ Correction changes ONLY two commonTest files: restore the prior LEGACY default; 
 SPACE in all21 Published queue tests. Thirteen Original tests already select LEGACY. All other
 fixture consumers retain their original semantics, and no assertion/case ID changed. Production,
 DI, native fixture and accepted APK bytes remain unchanged. Current manifest6dc8053f533b4c818afe39d2a17ddeb3db75481aa3fb27ef7f1004a19124879a.
-Format2/49947 REAPED PASSED35.673s. Focused3/session44681 ACTIVE:210 cases (104 domain desktop,
-104 browser,2 shared DI) includes all three affected routing classes. Do not edit source or run
-an emulator during this gate. Run accept-focused.py focused-3 after success.
+Format2/49947 REAPED PASSED35.673s. Focused3/44681 REAPED PASSED140/0 in186.468s:
+104 domain desktop +34 browser +2 shared DI. The private browser filter still selected only
+the two coverage classes; no browser failure was observed. Browser-routing1/40854 REAPED
+PASSED70/0 in28.953s for the three additional routing classes. Combined strict audit inline
+exit0 accepts210 unique cases,11 XML reports, no dropped/renamed IDs, same source/library.
+Report manifest1a60517c76e4e350d4bcdde191a99714df736be65f3332dbaa572a2d87fbff57.
 
-Then run run.py full-2 and accept-full.py full-2. Full2 explicitly reruns Shared desktop, Data
-desktop and proof-unit tests in addition to existing required tasks; the auditor reuses no reports
-from failed full1. Expected14,581 local. The seven native cases need no duplicate run for these two
-commonTest-only changes; native-test-only-source-delta.json verifies the precise difference, and
-full2 must confirm the same APK hash. Historical native manifest remains0c3be4a8 rather than claiming
-it executed on the later whole-tree manifest. Source/runtime inputs are unchanged.
+Full2/session34926 ACTIVE; no source edits or emulator during build. After completion run
+accept-full.py full-2. Full2 explicitly reruns Shared desktop, Data desktop and proof-unit
+tests in addition to existing required tasks; no failed-full1 reports are reused. Expected14,581
+local. The seven native cases need no duplicate run for the two commonTest-only corrections;
+native-test-only-source-delta.json verifies the precise difference, and full2 must confirm the
+same APK hash. Historical native manifest remains0c3be4a8 rather than claiming execution on
+the later whole-tree manifest. Production/native inputs are unchanged. Current full auditor
+requires that identical APK and marks native acceptance only after verifying the two test paths.
 
-Group source/test/native proof commit e6a3bc36 is pushed;19367 REAPED. Mobile source is uncommitted
+Group source/test/native proof commit e6a3bc36 is pushed;19367 REAPED. Documentation165c8d45 is pushed;20047 REAPED. Mobile source is uncommitted
 pending successful full2. Prepare compact full measurement, commit/push, then dispatch the prepared
 exact-source CI once (tree clean/local acceptance/pushed commit required). Expected17,673=12,559
 portable(6,006 desktop/952 Android/5,601 browser)+5,114 Apple; zero case renames. Continue beyond CI.

@@ -12,5 +12,6 @@ old-account non-null results are explicitly rejected by the corrected new assert
 
 [Evidence](../measurements/collaboration-space-room-binding-observation-mobile-2026-11-12.json)
 records the preserved failure and exact hashes. No new native execution, phone build or
-Group deployment is claimed. Continue unresolved-thread/composer integration in the existing
-admission owner before organization UI; the current thread still uses one-shot binding reads.
+Group deployment is claimed. The [canonical thread](unresolved-canonical-thread.md) now uses
+this observer under the existing admission owner. Continue participant/composer context and
+organization UI.

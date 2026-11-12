@@ -1,5 +1,7 @@
 # Architecture
 
+[Canonical organization thread history](collaboration/canonical-thread-history.md) reads exact Original or Space storage under Group admission through the Mobile domain owner.
+
 [Native account replacement](collaboration/native-account-replacement.md) verifies stale callback retirement and original encrypted receipt, identity and offline history continuity through actual application ownership.
 
 [Bounded account metadata discovery](collaboration/account-history-metadata-scan.md) skips internal projections within one finite read while preserving unreturned history and exact cursor scope.

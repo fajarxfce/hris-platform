@@ -3,6 +3,7 @@ package dev.fajar.hris
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import java.util.concurrent.TimeUnit
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.Ordered
@@ -15,6 +16,9 @@ class NativeSpaceRecoveryTrace : OncePerRequestFilter() {
     private val counts = mutableMapOf<String, Int>()
     private val kinds = mutableMapOf<String, Int>()
     private var active = false
+    private var syncObservedAt: Long? = null
+    private var syncOverflowed = false
+    private val syncTimings = mutableListOf<NativeSyncTiming>()
 
     @Synchronized
     fun arm() {
@@ -25,6 +29,51 @@ class NativeSpaceRecoveryTrace : OncePerRequestFilter() {
     @Synchronized fun snapshot(): Map<String, Int> = counts.toMap()
 
     @Synchronized fun requestKinds(): Map<String, Int> = kinds.toMap()
+
+    /**
+     * Optional finite idle observation; no cursor, identity, URL or request content is retained.
+     */
+    @Synchronized
+    fun startSyncObservation() {
+        check(syncObservedAt == null && syncTimings.isEmpty())
+        syncObservedAt = System.nanoTime()
+    }
+
+    @Synchronized
+    fun finishSyncObservation(): NativeSyncObservation {
+        check(syncObservedAt != null)
+        syncObservedAt = null
+        return NativeSyncObservation(syncTimings.toList(), syncOverflowed)
+    }
+
+    @Synchronized
+    private fun beginSync(request: HttpServletRequest): Pair<Int, Long>? {
+        val observedAt = syncObservedAt ?: return null
+        if (syncTimings.size == 8) {
+            syncOverflowed = true
+            return null
+        }
+        val started = System.nanoTime()
+        syncTimings.add(
+            NativeSyncTiming(
+                startedMillis = TimeUnit.NANOSECONDS.toMillis(started - observedAt),
+                timeoutMillis = request.getParameter("timeout")?.toIntOrNull(),
+                sincePresent = !request.getParameter("since").isNullOrEmpty(),
+                fullState = request.getParameter("full_state") == "true",
+            )
+        )
+        return syncTimings.lastIndex to started
+    }
+
+    @Synchronized
+    private fun completeSync(start: Pair<Int, Long>, status: Int) {
+        if (syncObservedAt == null) return
+        syncTimings[start.first] =
+            syncTimings[start.first].copy(
+                elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start.second),
+                status = status,
+            )
+    }
 
     @Synchronized
     private fun recordKind(name: String) {
@@ -81,13 +130,29 @@ class NativeSpaceRecoveryTrace : OncePerRequestFilter() {
                 record("secretStorage")
             request.requestURI.contains("/send/m.room.encrypted/") -> record("encryptedSend")
         }
-        chain.doFilter(request, response)
+        val sync = if (path.endsWith("/sync")) beginSync(request) else null
+        try {
+            chain.doFilter(request, response)
+        } finally {
+            if (sync != null) completeSync(sync, response.status)
+        }
         when {
             response.status == 401 || response.status == 403 -> record("rejected")
             response.status >= 500 -> record("serverError")
         }
     }
 }
+
+data class NativeSyncTiming(
+    val startedMillis: Long,
+    val timeoutMillis: Int?,
+    val sincePresent: Boolean,
+    val fullState: Boolean,
+    val elapsedMillis: Long? = null,
+    val status: Int? = null,
+)
+
+data class NativeSyncObservation(val requests: List<NativeSyncTiming>, val overflowed: Boolean)
 
 @TestConfiguration(proxyBeanMethods = false)
 class NativeSpaceRecoveryTraceConfiguration {

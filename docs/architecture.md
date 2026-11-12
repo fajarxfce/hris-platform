@@ -1,5 +1,7 @@
 # Architecture
 
+[Native account replacement](collaboration/native-account-replacement.md) verifies stale callback retirement and original encrypted receipt, identity and offline history continuity through actual application ownership.
+
 [Bounded account metadata discovery](collaboration/account-history-metadata-scan.md) skips internal projections within one finite read while preserving unreturned history and exact cursor scope.
 
 [Registered-source discovery](collaboration/space-incoming-discovery.md) shares existing incoming work and atomically strengthens unresolved Joined inventory without changing worker bounds.

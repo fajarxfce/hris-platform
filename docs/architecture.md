@@ -1,5 +1,7 @@
 # Architecture
 
+[Exact inbox edit outcomes](collaboration/mobile-space-inbox-edit-outcomes.md) separates provider facts, local supersession and transport acknowledgement.
+
 [Coherent original and edit evidence](collaboration/mobile-history-edit-snapshot.md) shares one canonical authenticated source revision.
 
 [Admitted offline editing](collaboration/mobile-space-edit-admission.md) retains one reviewed gesture and stable preview under owned local facts.

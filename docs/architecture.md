@@ -1,5 +1,7 @@
 # Architecture
 
+[Atomic command and checked projection insertion](collaboration/mobile-command-insert-projection.md) keeps command, source guard, projection and wake in one raw transaction.
+
 [Canonical organization thread history](collaboration/canonical-thread-history.md) reads exact Original or Space storage under Group admission through the Mobile domain owner.
 
 [Native account replacement](collaboration/native-account-replacement.md) verifies stale callback retirement and original encrypted receipt, identity and offline history continuity through actual application ownership.

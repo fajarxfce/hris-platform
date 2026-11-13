@@ -156,3 +156,10 @@ legacy seeding, history/list and Group product integration remain.
 The ten generic raw transaction files are locally accepted in Mobile (15 new platform methods,
 full 15,939). The independent Starter port is prepared but not applied. Group terminal producers
 and the repair worker still need to use the atomic retained demand before product activation.
+
+## Mandatory Group terminal repair publication
+
+Mobile now requires a fresh prepared repair request for Group archival/cancellation, retaining it
+atomically with the exact command. Fifteen new shared cases pass locally; full 15,969. The generic
+raw prerequisite is already accepted in Starter 0d2b4ee0; this HRIS encryption/policy integration
+stays in Mobile. Admitted terminal callers, the finite worker and product ownership remain.

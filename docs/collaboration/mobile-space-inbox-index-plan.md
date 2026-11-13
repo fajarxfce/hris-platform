@@ -150,3 +150,9 @@ full15,839. Admitted owner, legacy seeding, history/list and product integration
 Four admitted finite/exact read and checkpoint actions, plus the strengthened existing message
 observer, pass35 new shared methods and all prior identities, full15,909. The finite worker,
 legacy seeding, history/list and Group product integration remain.
+
+## Command archival and replica publication
+
+The ten generic raw transaction files are locally accepted in Mobile (15 new platform methods,
+full 15,939). The independent Starter port is prepared but not applied. Group terminal producers
+and the repair worker still need to use the atomic retained demand before product activation.

@@ -34,3 +34,11 @@ no live service or phone UI; the installed phone build remains 92.
 Evidence: `docs/measurements/collaboration-space-inbox-draft-publication-mobile-2026-11-13.json`.
 
 Mobile source: https://github.com/fajarxfce/hris-mobile/commit/70ddda6e7cc14af1b34782c5f37e17205145e186
+
+## Actual Apple and portable verification
+
+Control 43403331941 at 8a48212f21c0e1c18802997fe46aabd4c567fba7 passes 19,059 cases: 13,468 portable and
+5,591 actual Apple cases. All 81 new transaction/index/draft/send methods ran on Apple;
+the iOS host and 16 push-envelope fields pass. Earlier pending statuses above are superseded
+for this source. Later reference storage, command progress and product activation are separate.
+Evidence: `docs/measurements/collaboration-space-inbox-hosted-mobile-2026-11-13.json`.

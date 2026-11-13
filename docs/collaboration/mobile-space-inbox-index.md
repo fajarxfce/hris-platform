@@ -41,3 +41,11 @@ removed. The user's phone retains release92.
 Evidence: `docs/measurements/collaboration-space-inbox-index-mobile-2026-11-13.json`.
 
 Mobile implementation: `de787d5733befd9767c9ecb76af662a89b82f7fe`.
+
+## Actual Apple and portable verification
+
+Control 43403331941 at 8a48212f21c0e1c18802997fe46aabd4c567fba7 passes 19,059 cases: 13,468 portable and
+5,591 actual Apple cases. All 81 new transaction/index/draft/send methods ran on Apple;
+the iOS host and 16 push-envelope fields pass. Earlier pending statuses above are superseded
+for this source. Later reference storage, command progress and product activation are separate.
+Evidence: `docs/measurements/collaboration-space-inbox-hosted-mobile-2026-11-13.json`.

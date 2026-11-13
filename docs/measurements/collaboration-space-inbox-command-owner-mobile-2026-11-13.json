@@ -114,10 +114,12 @@
   "currentOperationFailurePreserved": true,
   "nativeSend": false,
   "productGraphActivated": false,
-  "actualNewAppleExecution": false,
+  "actualNewAppleExecution": true,
   "installedPhoneBuild": 92,
   "phoneInstalled": false,
   "liveChanged": false,
   "mobileSourceCommit": "f858ad164a5f7c8760fd57d25e2db46917b63d66",
-  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/f858ad164a5f7c8760fd57d25e2db46917b63d66/docs/measurements/collaboration-space-inbox-command-owner-2026-11-13.json"
+  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/f858ad164a5f7c8760fd57d25e2db46917b63d66/docs/measurements/collaboration-space-inbox-command-owner-2026-11-13.json",
+  "acceptedHostedRun": 43467846733,
+  "hostedEvidence": "docs/measurements/collaboration-owner-source-guards-hosted-mobile-2026-11-13.json"
 }

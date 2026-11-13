@@ -1,5 +1,7 @@
 # Architecture
 
+[Admitted history inbox publication](collaboration/mobile-space-inbox-history-admission.md) coordinates canonical proof and source/index publication under local ownership.
+
 [Bounded history inbox projections](collaboration/mobile-space-inbox-history-projection.md) preserve original anchors, pending edits and explicit unresolved work.
 
 [Exact inbox edit outcomes](collaboration/mobile-space-inbox-edit-outcomes.md) separates provider facts, local supersession and transport acknowledgement.

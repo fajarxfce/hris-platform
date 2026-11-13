@@ -1,5 +1,7 @@
 # Architecture
 
+[Incremental local replica pages](collaboration/mobile-replica-change-pages.md) enumerate bounded published changes independently of source versions.
+
 [Admitted history inbox publication](collaboration/mobile-space-inbox-history-admission.md) coordinates canonical proof and source/index publication under local ownership.
 
 [Bounded history inbox projections](collaboration/mobile-space-inbox-history-projection.md) preserve original anchors, pending edits and explicit unresolved work.

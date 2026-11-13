@@ -69,12 +69,14 @@
   "bodyFreePendingEditPointer": true,
   "originalPlacementPreserved": true,
   "oldPayloadReadsPreserved": true,
-  "actualNewAppleExecution": false,
+  "actualNewAppleExecution": true,
   "atomicEditAuthoringActivated": false,
   "productGraphActivated": false,
   "phoneInstalled": false,
   "installedPhoneBuild": 92,
   "liveChanged": false,
   "mobileSourceCommit": "68504a579f6c6a2ea06711e9f884059d1a46b143",
-  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/68504a579f6c6a2ea06711e9f884059d1a46b143/docs/measurements/collaboration-space-inbox-edit-provenance-2026-11-13.json"
+  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/68504a579f6c6a2ea06711e9f884059d1a46b143/docs/measurements/collaboration-space-inbox-edit-provenance-2026-11-13.json",
+  "acceptedHostedRun": 43498640097,
+  "hostedEvidence": "docs/measurements/collaboration-inbox-command-hosted-mobile-2026-11-13.json"
 }

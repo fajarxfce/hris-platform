@@ -322,3 +322,9 @@ history/catalog backfill remain before activation. See `docs/collaboration/mobil
 Bounded canonical snapshot and exact source selection pass focused46/full16547. Both proven
 namespaces and possible unstamped originals remain unresolved without allocating duplicate
 anchors. Admitted preview publication and bounded backfill remain before activation. See `docs/collaboration/mobile-space-inbox-history-source.md`.
+
+## Pending edit provenance — 13 November 2026
+
+Body-free replacement pointers and immutable optimistic previews pass focused37/full16587.
+Actual command authoring/outcome release and canonical incoming/history backfill remain before
+activation. See `docs/collaboration/mobile-space-inbox-edit-provenance.md`.

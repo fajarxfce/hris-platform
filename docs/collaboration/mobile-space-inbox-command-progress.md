@@ -34,3 +34,10 @@ as part of this acceptance.
 Evidence: `docs/measurements/collaboration-space-inbox-command-progress-mobile-2026-11-13.json`.
 
 Mobile source: [0296a8e8](https://github.com/fajarxfce/hris-mobile/blob/0296a8e8131599e975fdc0b34dbfd4dacd4e5ad2/docs/measurements/collaboration-space-inbox-command-progress-2026-11-13.json).
+
+## Actual Apple and portable verification
+
+Control 43427620202 at 42fd5d12c5353779d4a61cc50b8c53ae8c6c0bc6 passes 19,362 cases, including 5,692 actual
+Apple executions and all 101 new repair/archival cases. The host and 16 push fields pass.
+Earlier pending Apple status is superseded for this exact source. Later terminal publication,
+worker and product integration remain separate. Evidence: `docs/measurements/collaboration-inbox-repair-hosted-mobile-2026-11-13.json`.

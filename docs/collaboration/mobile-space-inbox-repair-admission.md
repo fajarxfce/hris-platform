@@ -47,3 +47,10 @@ activated by these admitted actions.
 Evidence: `docs/measurements/collaboration-space-inbox-repair-admission-mobile-2026-11-13.json`.
 
 Mobile source: [cecee5e4](https://github.com/fajarxfce/hris-mobile/blob/cecee5e41865129407b4a66ca83a3dbfefbd6275/docs/measurements/collaboration-space-inbox-repair-admission-2026-11-13.json).
+
+## Actual Apple and portable verification
+
+Control 43427620202 at 42fd5d12c5353779d4a61cc50b8c53ae8c6c0bc6 passes 19,362 cases, including 5,692 actual
+Apple executions and all 101 new repair/archival cases. The host and 16 push fields pass.
+Earlier pending Apple status is superseded for this exact source. Later terminal publication,
+worker and product integration remain separate. Evidence: `docs/measurements/collaboration-inbox-repair-hosted-mobile-2026-11-13.json`.

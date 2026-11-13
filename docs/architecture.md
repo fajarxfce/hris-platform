@@ -1,5 +1,7 @@
 # Architecture
 
+[Atomic edit preview publication](collaboration/mobile-space-edit-inbox-publication.md) keeps command, checked original preview and recovery wake together.
+
 [Atomic command and checked projection insertion](collaboration/mobile-command-insert-projection.md) keeps command, source guard, projection and wake in one raw transaction.
 
 [Canonical organization thread history](collaboration/canonical-thread-history.md) reads exact Original or Space storage under Group admission through the Mobile domain owner.

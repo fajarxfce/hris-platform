@@ -71,7 +71,7 @@
   "newSharedMethods": 1,
   "retainedTimingMethods": 9,
   "existingSharedPatternCommit": "c50a8983",
-  "actualAppleFixVerified": false,
+  "actualAppleFixVerified": true,
   "expectedHostedTotal": 20006,
   "expectedHostedPortable": {
     "desktopTest": 6696,
@@ -84,5 +84,7 @@
   "installedPhoneBuild": 92,
   "liveChanged": false,
   "mobileSourceCommit": "fe2e1cbb742dfde262182863d11b6604fe3a9c32",
-  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/fe2e1cbb742dfde262182863d11b6604fe3a9c32/docs/measurements/collaboration-apple-delivery-failure-outcome-2026-11-13.json"
+  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/fe2e1cbb742dfde262182863d11b6604fe3a9c32/docs/measurements/collaboration-apple-delivery-failure-outcome-2026-11-13.json",
+  "acceptedHostedRun": 43455295124,
+  "hostedEvidence": "docs/measurements/collaboration-delivery-failure-hosted-mobile-2026-11-13.json"
 }

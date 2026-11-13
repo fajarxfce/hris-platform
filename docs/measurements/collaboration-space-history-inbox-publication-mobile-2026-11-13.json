@@ -93,11 +93,13 @@
     "portableAuditReaped": true
   },
   "publicationMethodsIncludedInPredecessorControl": false,
-  "actualNewAppleExecution": false,
+  "actualNewAppleExecution": true,
   "productGraphActivated": false,
   "phoneInstalled": false,
   "installedPhoneBuild": 92,
   "liveChanged": false,
   "mobileSourceCommit": "dfa65894ae5ab58c1dcc84ce1cf098904cef15fa",
-  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/dfa65894ae5ab58c1dcc84ce1cf098904cef15fa/docs/measurements/collaboration-space-history-inbox-publication-2026-11-13.json"
+  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/dfa65894ae5ab58c1dcc84ce1cf098904cef15fa/docs/measurements/collaboration-space-history-inbox-publication-2026-11-13.json",
+  "acceptedHostedRun": 43486239620,
+  "hostedEvidence": "docs/measurements/collaboration-canonical-history-hosted-mobile-2026-11-13.json"
 }

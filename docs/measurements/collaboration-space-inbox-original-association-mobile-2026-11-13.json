@@ -49,11 +49,13 @@
   "newSharedMethods": 18,
   "associationDoesNotSettleReceipts": true,
   "unmatchedDoesNotAuthorizeHistoryAnchor": true,
-  "actualNewAppleExecution": false,
+  "actualNewAppleExecution": true,
   "productGraphActivated": false,
   "phoneInstalled": false,
   "installedPhoneBuild": 92,
   "liveChanged": false,
   "mobileSourceCommit": "261bc330b5afabf4bfa83fa5a51f004d85018936",
-  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/261bc330b5afabf4bfa83fa5a51f004d85018936/docs/measurements/collaboration-space-inbox-original-association-2026-11-13.json"
+  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/261bc330b5afabf4bfa83fa5a51f004d85018936/docs/measurements/collaboration-space-inbox-original-association-2026-11-13.json",
+  "acceptedHostedRun": 43486239620,
+  "hostedEvidence": "docs/measurements/collaboration-canonical-history-hosted-mobile-2026-11-13.json"
 }

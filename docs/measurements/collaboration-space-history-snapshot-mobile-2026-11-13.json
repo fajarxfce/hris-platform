@@ -107,11 +107,13 @@
     "appleJobId": 132033900078
   },
   "snapshotMethodsIncludedInPredecessorControl": false,
-  "actualNewAppleExecution": false,
+  "actualNewAppleExecution": true,
   "productGraphActivated": false,
   "phoneInstalled": false,
   "installedPhoneBuild": 92,
   "liveChanged": false,
   "mobileSourceCommit": "854d8b32a2cbf23107dafc50cde73d57f258e5cb",
-  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/854d8b32a2cbf23107dafc50cde73d57f258e5cb/docs/measurements/collaboration-space-history-snapshot-2026-11-13.json"
+  "mobileEvidenceUrl": "https://github.com/fajarxfce/hris-mobile/blob/854d8b32a2cbf23107dafc50cde73d57f258e5cb/docs/measurements/collaboration-space-history-snapshot-2026-11-13.json",
+  "acceptedHostedRun": 43486239620,
+  "hostedEvidence": "docs/measurements/collaboration-canonical-history-hosted-mobile-2026-11-13.json"
 }

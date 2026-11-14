@@ -1,5 +1,7 @@
 # Architecture
 
+[Authenticated history change pages](collaboration/mobile-history-changes.md) retain exact source identity and bounded local references.
+
 [Incremental local replica pages](collaboration/mobile-replica-change-pages.md) enumerate bounded published changes independently of source versions.
 
 [Admitted history inbox publication](collaboration/mobile-space-inbox-history-admission.md) coordinates canonical proof and source/index publication under local ownership.

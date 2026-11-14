@@ -1,5 +1,7 @@
 # Recipient projection after exact-query acceptance
 
+The [recipient thread consumer](mobile-recipient-thread.md) is now validated, including joined source/destination/history/progress and one editor. Back/selection/actions, real root/page/navigation integration, independent drafts, global inbox continuity, finite setup ownership and product rollout remain required. No recipient product route is active.
+
 The [recipient bubble rows](mobile-recipient-rows.md) is now validated, including stable visual identity through real association and exact command/history evidence. ViewModel/editor/root integration, independent drafts, global inbox continuity, finite setup ownership and product rollout remain required. No recipient product route is active.
 
 The [recipient display continuity](mobile-recipient-presentation.md) is now validated, including exact command/history evidence and independent source retirement. Actual bubble identity, ViewModel/editor/root integration, independent drafts, global inbox continuity, finite setup ownership and product rollout remain required. No recipient product route is active.

@@ -1,5 +1,7 @@
 # Architecture
 
+[Recipient thread consumer](collaboration/mobile-recipient-thread.md) keeps one serial editor and a joined read request in presentation; domain retains admission, storage and delivery policy.
+
 [Stable recipient bubble rows](collaboration/mobile-recipient-rows.md) keeps recipient visual identity distinct from real canonical action coordinates while reusing the physical-history join.
 
 [Recipient display continuity](collaboration/mobile-recipient-presentation.md) validates one bounded source frame and keeps pure status selection outside ViewModel orchestration.

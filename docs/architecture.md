@@ -1,5 +1,7 @@
 # Architecture
 
+[Shared exact recipient message progress](collaboration/mobile-recipient-progress.md) reuses one bounded observation and preserves distinct original types without setup or delivery.
+
 [Recipient destination observation](collaboration/mobile-recipient-destination.md) retains one immutable association within its admitted collector and never initiates setup or delivery.
 
 [Recipient local projection](collaboration/mobile-recipient-projection.md) scopes decoded source facts to one collector; domain owns admission and raw storage remains policy-free.

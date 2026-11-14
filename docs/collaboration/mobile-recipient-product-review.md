@@ -1,5 +1,7 @@
 # Product integration after recipient owner acceptance
 
+The [shared exact message progress](mobile-recipient-progress.md) is now implemented and validated. Command/history composition, editor/index continuity, finite new-recipient setup and active product routes remain required. Canonical and recipient originals share bounded record observation; their public types and provenance remain distinct.
+
 The [admitted destination observer](mobile-recipient-destination.md) is now implemented and validated. Command/history composition, editor/index continuity, finite new-recipient setup and active product routes remain required. Earlier requests for a new association store or its missing observer are superseded.
 
 The [local draft/original projection](mobile-recipient-projection.md) is now implemented and validated. Canonical association observation/history composition, editor/index continuity, new-recipient setup ownership and product routes below remain required. Earlier raw-projection proposals are superseded by this implementation.
@@ -29,3 +31,6 @@ Do not implement that option without resolving canonical handoff identity: indep
 Existing ChatComposerEditingSession is access-generic but its draft/submission types and conversationId are canonical. Reusing it by passing peerAccountId as conversationId would violate the current identity boundary. Trace its serial captured-write/rapid-send behavior before defining a recipient editor owner or a narrowly justified typed refactor; do not move persistence policy into the ViewModel.
 
 Mobile source: https://github.com/fajarxfce/hris-mobile/commit/1592cf6a6d87bf6ca83617c2a407f67f91c2a4a0
+
+
+UI reuse review (not implemented): ui-ux-pro-max's verified stable-list-key and loading-feedback guidance plus compose-component-design's slot/modifier references support reusing ChatComposerInput, ChatMessageBubble and ChatDayDivider. The existing composer already has a caller action slot and Send without a loading flag. Preserve per-message pending feedback and long-press selection; add no network subtitle, selection checkbox or inert attachment controls. SpaceChatThreadPage/SpaceChatMessageIdentity are canonical adapters: a recipient route must retain its own stable peer/original identity through association, never alias a peer as conversationId. Extract a common layout only when two actual consumers justify its varying slots. Current docs/experience.md and the user's four-tab requirements supersede the historical five-tab/release26 prose in docs/chat-experience.md. Rendered tests/screenshots and editor/inbox continuity still remain.

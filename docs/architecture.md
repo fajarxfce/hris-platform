@@ -1,5 +1,7 @@
 # Architecture
 
+[Admitted local inbox pages](collaboration/mobile-inbox-product-page.md) reads bounded retained recency pages under current account admission.
+
 [Local inbox product ownership](collaboration/mobile-inbox-product-owner.md) ties admitted local repair to application start and joined account replacement.
 
 [Shared inbox repair lifetime](collaboration/mobile-inbox-repair-lifetime.md) services commands between bounded history turns under one collected owner.

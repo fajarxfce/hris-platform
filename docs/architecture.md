@@ -1,5 +1,7 @@
 # Architecture
 
+[Retained history owner inputs](collaboration/mobile-history-owner-inputs.md) keeps request and completion identities in one admitted observation.
+
 [Admitted history source operations](collaboration/mobile-history-inbox-source-admission.md) owns lifecycle, pending windows and exact source recovery.
 
 [Retained inbox repair bootstrap](collaboration/mobile-inbox-repair-bootstrap-demand.md) retains existing demand across unchanged owner restarts.

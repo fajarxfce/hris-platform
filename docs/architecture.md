@@ -1,5 +1,11 @@
 # Architecture
 
+
+[Mobile Group contact/root ownership](collaboration/mobile-contact-root.md)
+
+No server or rollout change. Mobile presentation retains admitted contacts independently of Company scope.
+
+
 [Measured local contact snapshots](collaboration/mobile-contact-snapshot.md) guide retained account/Group presentation without per-search acquisition.
 
 [Retained inbox paging](collaboration/mobile-inbox-paging.md) preserves local pages, visible identity and pending/draft previews.

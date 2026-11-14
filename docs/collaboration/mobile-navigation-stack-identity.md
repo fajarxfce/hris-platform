@@ -34,3 +34,6 @@ No new APK, phone interaction, live deployment or Apple runtime execution is cla
 GroupOFF and undeployed V117–140 remain. All54 communications PRD acceptance groups remain OPEN.
 
 Mobile source: https://github.com/fajarxfce/hris-mobile/commit/21435d2dccac25528c3d28b30f2605973cd4ff6e
+
+Generic port independently accepted: https://github.com/fajarxfce/compose-fluent-starter/commit/bd13df78622b42a237ff5d847ba4a7034dc3dcfe
+See [port evidence](../measurements/navigation-stack-starter-port-2026-11-14.json).

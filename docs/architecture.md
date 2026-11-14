@@ -1,6 +1,12 @@
 # Architecture
 
 
+[Mobile recipient destination proof](collaboration/mobile-recipient-destination-proof.md)
+
+No live rollout; canonical transfer and product integration remain.
+
+
+
 [Mobile recipient original storage](collaboration/mobile-recipient-outbox.md)
 
 No server or live rollout change. Canonical transfer and product routes remain pending.

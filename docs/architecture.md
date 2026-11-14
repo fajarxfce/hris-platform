@@ -1,6 +1,12 @@
 # Architecture
 
 
+[Mobile recipient original storage](collaboration/mobile-recipient-outbox.md)
+
+No server or live rollout change. Canonical transfer and product routes remain pending.
+
+
+
 [Mobile recipient drafts](collaboration/mobile-recipient-drafts.md)
 
 No server or rollout change. New-recipient working copies remain a local mobile capability.

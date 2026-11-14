@@ -1,6 +1,12 @@
 # Architecture
 
 
+[Mobile Group root composition](collaboration/mobile-root-composition.md)
+
+No server or rollout change. Local UI lifetime remains independent of Company selection.
+
+
+
 [Mobile Group contact/root ownership](collaboration/mobile-contact-root.md)
 
 No server or rollout change. Mobile presentation retains admitted contacts independently of Company scope.

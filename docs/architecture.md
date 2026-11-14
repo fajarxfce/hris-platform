@@ -1,5 +1,7 @@
 # Architecture
 
+[Recipient selection](collaboration/mobile-recipient-selection.md) matches selected UI rows to explicit local context while domain owns session, admission and storage policy.
+
 [Recipient departure](collaboration/mobile-recipient-departure.md) flushes route-owned local editing before exact confirmed navigation; domain retains storage and delivery policy.
 
 [Recipient thread consumer](collaboration/mobile-recipient-thread.md) keeps one serial editor and a joined read request in presentation; domain retains admission, storage and delivery policy.

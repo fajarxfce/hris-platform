@@ -48,3 +48,13 @@ incoming runtime activation and measured app navigation before live enablement o
 The generic Compose/Lifecycle alignment needs an independently verified Starter port after Mobile acceptance. The HRIS presentation stays in Mobile. All 54 communications PRD groups stay open.
 
 Evidence: `docs/measurements/collaboration-inbox-paging-mobile-2026-11-14.json`.
+
+## Verified generic Compose alignment — 14 November 2026
+
+[Starter 712ca99a](https://github.com/fajarxfce/compose-fluent-starter/commit/712ca99a42d4cb48aee25b3a2a51724ed2fa8530)
+ports eight generic version/test/verification/lock files from Mobile caa59e48. All 1,049 prior
+tests run freshly with preserved identities; Android variants, production Web, Apple compilation
+and lint pass. Five desktop captures were inspected. 732 artifacts were independently verified;
+HRIS Paging, Matrix adapters, account policy and product UI remain in Mobile.
+See [exact evidence](https://github.com/fajarxfce/compose-fluent-starter/blob/712ca99a42d4cb48aee25b3a2a51724ed2fa8530/docs/measurements/compose-platform-alignment-2026-11-14.json).
+No new Apple execution, phone installation or live rollout.

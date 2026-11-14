@@ -1,6 +1,12 @@
 # Architecture
 
 
+[Mobile retained contacts and search](collaboration/mobile-contact-surfaces.md)
+
+No server or rollout change. Browse/search retain one admitted local source.
+
+
+
 [Mobile Group root composition](collaboration/mobile-root-composition.md)
 
 No server or rollout change. Local UI lifetime remains independent of Company selection.

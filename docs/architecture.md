@@ -1,5 +1,10 @@
 # Architecture
 
+[Mobile finite recipient transfer](collaboration/mobile-recipient-transfer.md)
+
+No live rollout; recipient transfer ownership and product integration remain.
+
+
 
 [Mobile recipient destination proof](collaboration/mobile-recipient-destination-proof.md)
 

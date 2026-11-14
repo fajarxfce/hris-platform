@@ -1,6 +1,12 @@
 # Architecture
 
 
+[Mobile recipient drafts](collaboration/mobile-recipient-drafts.md)
+
+No server or rollout change. New-recipient working copies remain a local mobile capability.
+
+
+
 [Mobile independent navigation stacks](collaboration/mobile-navigation-stack-identity.md)
 
 No server or rollout change. Multiple navigation stacks retain independent owners.

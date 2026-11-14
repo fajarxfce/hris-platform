@@ -1,5 +1,7 @@
 # Architecture
 
+[Measured local contact snapshots](collaboration/mobile-contact-snapshot.md) guide retained account/Group presentation without per-search acquisition.
+
 [Retained inbox paging](collaboration/mobile-inbox-paging.md) preserves local pages, visible identity and pending/draft previews.
 
 [Anchored local inbox windows](collaboration/mobile-inbox-window.md) reads bounded local windows around the visible conversation under current admission.

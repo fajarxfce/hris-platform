@@ -1,9 +1,29 @@
 # Agent continuation — communications long run
 
-Mobile source: `fed7419f97aaaa6b7b3ef9304d79d055e2a7c925` (pushed).
+Mobile source: `d889a9afdc3b3ebaa264222a0aca2a0775ab5443` (pushed).
 
-Updated 14 November 2026, 20:06 UTC. Continue beyond checkpoints; push every commit.
-All54 PRD acceptance groups remain OPEN. No subagents. One local compiler OR emulator.
+Updated 14 November 2026, 20:31 UTC. Continue beyond checkpoints; push every commit.
+All 54 PRD acceptance groups remain OPEN. No subagents. One local compiler OR emulator.
+
+## Exact published replica queries accepted
+
+ReplicaQuery can select an exact document ID beside other bounded indexed pages under one
+published checkpoint. SQLite and IndexedDB use their existing primary-key reads and transaction;
+missing/tombstoned identities stay absent, staging stays hidden and account ownership stays exact.
+This enables a narrow recipient draft/source-marker frame without enumerating every peer draft.
+No migration, network call or feature policy was added.
+
+Validation: 18,177 cases (6756 fresh on this source across focused/full gates / 11421 exact unchanged), preserving all 18,169 prior IDs plus 8. Focused 179/session95425 and full/session55670 reaped 0. Source e69e55f42ad5f7f68afd4b3d882621a2235b51b871481ca92b27a439277d39c7; reports a372eda15290ca4febe332a16b4917d42d32e2c99114749580631876cecf8112.
+Read [storage contract](collaboration/mobile-replica-exact-queries.md).
+
+Next port these eight generic paths to Starter after this Mobile acceptance. Then implement
+the recipient projection in collaboration/mobile-recipient-projection-review.md: coherent draft/marker,
+bounded authenticated original cache, exact source-version invalidation, and admission/cancellation.
+Canonical association/history and independent draft continuity are required before activating a
+recipient product route or retiring provisional rows. The component from fed7419f remains accepted.
+
+Phone 93 is installed and predates these changes. Group OFF; V117–140 undeployed; all 54 PRD groups
+remain OPEN. Preserve the blocked SQLite preparation, failed Apple evidence and protected stores.
 
 ## Recipient editor and read ownership accepted
 

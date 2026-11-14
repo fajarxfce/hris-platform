@@ -1,5 +1,7 @@
 # Architecture
 
+[Admitted empty history-page confirmation](collaboration/mobile-history-empty-page-confirmation.md) checks exact source and destination facts before empty-page progress.
+
 [Binding history invalidation](collaboration/mobile-history-binding-invalidation.md) publishes new room availability and recovery wake atomically.
 
 [Checked history publication receipts](collaboration/mobile-history-inbox-receipts.md) expose the actual source and destination versions of conditional publication.

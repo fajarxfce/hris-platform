@@ -1,5 +1,7 @@
 # Recipient projection after exact-query acceptance
 
+The [recipient display continuity](mobile-recipient-presentation.md) is now validated, including exact command/history evidence and independent source retirement. Actual bubble identity, ViewModel/editor/root integration, independent drafts, global inbox continuity, finite setup ownership and product rollout remain required. No recipient product route is active.
+
 The [shared exact message progress](mobile-recipient-progress.md) is now implemented and validated. Command/history composition, editor/index continuity, finite new-recipient setup and active product routes remain required. Canonical and recipient originals share bounded record observation; their public types and provenance remain distinct.
 
 The [admitted destination observer](mobile-recipient-destination.md) is now implemented and validated. Command/history composition, editor/index continuity, finite new-recipient setup and active product routes remain required. Earlier requests for a new association store or its missing observer are superseded.

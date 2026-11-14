@@ -1,8 +1,6 @@
-# Recipient transfer owner — next implementation
+# Recipient transfer owner — design
 
-This is a plan, not an active worker or a completed product route. The accepted per-original
-transfer operation is the prerequisite. Keep Group rollout OFF until its separate product and
-live gates pass.
+This implementation plan is now fulfilled by the [accepted local owner](mobile-recipient-owner.md). The design constraints below remain the rationale. Product routes and live Group rollout still require their separate gates.
 
 ## Separate original changes from typing
 
@@ -75,4 +73,4 @@ Then continue pending-recipient list rows, Send gesture ownership, new-contact r
 company membership filters and explicit Group product/live rollout. This worker alone does not
 complete the54 communication PRD acceptance groups.
 
-Mobile source: https://github.com/fajarxfce/hris-mobile/commit/3b9da0a80b30c7ca67c58daaa5c3ba8de6aa7574
+Mobile source: https://github.com/fajarxfce/hris-mobile/commit/1592cf6a6d87bf6ca83617c2a407f67f91c2a4a0

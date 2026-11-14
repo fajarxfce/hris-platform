@@ -1,5 +1,7 @@
 # Architecture
 
+[Local recipient ownership](collaboration/mobile-recipient-owner.md) adds finite local transfer beside inbox repair. Raw snapshot codecs own mapping; repositories own storage transactions, domain use cases own admission and pure retry policy, and the app owns cancellation/subscriptions.
+
 [Mobile finite recipient transfer](collaboration/mobile-recipient-transfer.md)
 
 No live rollout; recipient transfer ownership and product integration remain.

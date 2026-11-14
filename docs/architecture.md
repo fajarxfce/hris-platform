@@ -1,6 +1,12 @@
 # Architecture
 
 
+[Mobile independent navigation stacks](collaboration/mobile-navigation-stack-identity.md)
+
+No server or rollout change. Multiple navigation stacks retain independent owners.
+
+
+
 [Mobile retained contacts and search](collaboration/mobile-contact-surfaces.md)
 
 No server or rollout change. Browse/search retain one admitted local source.

@@ -1,5 +1,7 @@
 # Architecture
 
+[Mobile recipient contact labels](collaboration/mobile-recipient-contact.md) keep local acquisition and admission in domain while navigation supplies the owned public name.
+
 [Muted text contrast](collaboration/mobile-muted-text-contrast.md) is a shared design-system token correction; application policy is unchanged.
 
 [Recipient navigation](collaboration/mobile-recipient-navigation.md) keeps distinct peer/canonical identities within one bounded Group owner; navigation composition owns lifecycle and platform effects.
